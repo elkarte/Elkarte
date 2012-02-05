@@ -2188,45 +2188,57 @@ function sort_array_length($a, $b)
  * Provides a list of possible SMF versions to use in emulation
  *
  * @return string
- * Search for a ban name.
- * 
- * @return string
  */
-function AutoSuggest_Search_BanNames()
+function AutoSuggest_Search_SMFVersions()
 {
-	global $user_info, $txt, $smcFunc, $context;
 
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
-	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-	// Find the member.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_ban_group, name
-		FROM {db_prefix}ban_groups
-		WHERE name LIKE {string:search}
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
-		array(
-			'search' => $_REQUEST['search'],
-		)
-	);
 	$xml_data = array(
 		'items' => array(
 			'identifier' => 'item',
 			'children' => array(),
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$row['name'] = strtr($row['name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
-		$xml_data['items']['children'][] = array(
-			'attributes' => array(
-				'id' => $row['name'],
-			),
-			'value' => $row['name'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
+	$versions = array(
+		'SMF 1.1',
+		'SMF 1.1.1',
+		'SMF 1.1.2',
+		'SMF 1.1.3',
+		'SMF 1.1.4',
+		'SMF 1.1.5',
+		'SMF 1.1.6',
+		'SMF 1.1.7',
+		'SMF 1.1.8',
+		'SMF 1.1.9',
+		'SMF 1.1.10',
+		'SMF 1.1.11',
+		'SMF 1.1.12',
+		'SMF 1.1.13',
+		'SMF 1.1.14',
+		'SMF 1.1.15',
+		'SMF 1.1.16',
+		'SMF 2.0 beta 1',
+		'SMF 2.0 beta 1.2',
+		'SMF 2.0 beta 2',
+		'SMF 2.0 beta 3',
+		'SMF 2.0 RC 1',
+		'SMF 2.0 RC 1.2',
+		'SMF 2.0 RC 2',
+		'SMF 2.0 RC 3',
+		'SMF 2.0',
+		'SMF 2.0.1',
+		'SMF 2.0.2',
+		'DIALOGO 1.0',
+	);
+
+	foreach ($versions as $id => $version)
+		if (strpos($version, strtoupper($_REQUEST['search'])) !== false)
+			$xml_data['items']['children'][] = array(
+				'attributes' => array(
+					'id' => $id,
+				),
+				'value' => $version,
+			);
 
 	return $xml_data;
 }
