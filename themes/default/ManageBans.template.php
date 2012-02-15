@@ -190,69 +190,8 @@ function template_ban_edit()
 	if (!$context['ban']['is_new'] && empty($context['ban_suggestions']))
 	{
 		echo '
-			<br />
-			<form action="', $scripturl, '?action=admin;area=ban;sa=edit" method="post" accept-charset="UTF-8" style="padding: 0px;margin: 0px;" onsubmit="return confirm(\'', $txt['ban_remove_selected_triggers_confirm'], '\');">
-				<table class="table_grid">
-					<thead>
-						<tr class="catbg">
-							<th scope="col" class="first_th" style="width:65%;text-align:left">', $txt['ban_banned_entity'], '</th>
-							<th scope="col" style="width:15%;text-align:center">', $txt['ban_hits'], '</th>
-							<th scope="col" style="width:15%;text-align:center">', $txt['ban_actions'], '</th>
-							<th scope="col" class="last_th" style="width:5%;text-align:center">
-								<input type="checkbox" onclick="invertAll(this, this.form, \'ban_items\');" class="input_check" />
-							</th>
-						</tr>
-					</thead>
-					<tbody>';
-
-		if (empty($context['ban_items']))
-			echo '
-						<tr class="windowbg2">
-							<td colspan="4">(', $txt['ban_no_triggers'], ')</td>
-						</tr>';
-		else
-		{
-			$alternate = true;
-			foreach ($context['ban_items'] as $ban_item)
-			{
-				echo '
-						<tr class="lefttext ', $alternate ? 'windowbg' : 'windowbg2', '">
-							<td>';
-				if ($ban_item['type'] == 'ip')
-					echo '		<strong>', $txt['ip'], ':</strong>&nbsp;', $ban_item['ip'];
-				elseif ($ban_item['type'] == 'hostname')
-					echo '		<strong>', $txt['hostname'], ':</strong>&nbsp;', $ban_item['hostname'];
-				elseif ($ban_item['type'] == 'email')
-					echo '		<strong>', $txt['email'], ':</strong>&nbsp;', $ban_item['email'];
-				elseif ($ban_item['type'] == 'user')
-					echo '		<strong>', $txt['username'], ':</strong>&nbsp;', $ban_item['user']['link'];
-				echo '
-							</td>
-							<td class="centertext">', $ban_item['hits'], '</td>
-							<td class="centertext">
-								<a href="', $scripturl, '?action=admin;area=ban;sa=edittrigger;bg=', $context['ban']['id'], ';bi=', $ban_item['id'], '">', $txt['ban_edit_trigger'], '</a>
-							</td>
-							<td class="centertext">
-								<input type="checkbox" name="ban_items[]" value="', $ban_item['id'], '" class="input_check" />
-							</td>
-						</tr>';
-				$alternate = !$alternate;
-			}
-		}
-
-		echo '
-					</tbody>
-				</table>
-
-				<div class="flow_auto">
-					<div class="floatright">
-						<div class="additional_row">
-							[<a href="', $scripturl, '?action=admin;area=ban;sa=edittrigger;bg=', $context['ban']['id'], '">', $txt['ban_add_trigger'], '</a>] <input type="submit" name="remove_selection" value="', $txt['ban_remove_selected_triggers'], '" class="button_submit" />
-						</div>
-					</div>
-				</div>
-			</form>';
-
+			<br />';
+		template_show_list('ban_items');
 	}
 
 	echo '
