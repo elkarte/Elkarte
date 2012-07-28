@@ -329,8 +329,6 @@ function updateSettingsFile($config_vars)
 		// Add in any newly defined vars that were passed
 		foreach ($config_vars as $var => $val)
 			$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
-
-		$settingsArray[$end] = '?' . '>';
 	}
 	else
 		$settingsArray[$end] = trim($settingsArray[$end]);
