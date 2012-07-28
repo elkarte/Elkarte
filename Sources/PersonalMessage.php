@@ -2783,5 +2783,3 @@ function LoadRules($reload = false)
 	}
 	$smcFunc['db_free_result']($request);
 }
-
-?>

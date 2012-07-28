@@ -1809,5 +1809,3 @@ function loadPaymentGateways()
 
 	return $gateways;
 }
-
-?>

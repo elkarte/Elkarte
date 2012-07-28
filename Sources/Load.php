@@ -2588,5 +2588,3 @@ function loadDatabase()
 	if (DIALOGO == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
-
-?>

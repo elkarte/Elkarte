@@ -160,5 +160,3 @@ function Sticky()
 	// Take them back to the now stickied topic.
 	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 }
-
-?>

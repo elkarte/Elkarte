@@ -1423,5 +1423,3 @@ function cleanLangString($string, $to_display = true)
 
 	return $new_string;
 }
-
-?>

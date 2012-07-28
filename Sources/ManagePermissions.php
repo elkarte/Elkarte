@@ -2439,5 +2439,3 @@ function ModifyPostModeration()
 	createToken('admin-mppm');
 
 }
-
-?>

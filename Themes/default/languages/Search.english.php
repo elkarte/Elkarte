@@ -193,5 +193,3 @@ $txt['sphinx_max_matches'] = 'Maximum # matches:';
 $txt['sphinx_max_matches_desc'] = 'Maximum amount of matches the search deamon will return.';
 $txt['sphinx_create_config'] = 'Create Sphinx config';
 $txt['sphinx_test_connection'] = 'Test connection to Sphinx daemon';
-
-?>

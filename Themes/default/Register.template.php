@@ -788,5 +788,3 @@ function template_contact_form_done()
 		</div>
 		<br class="clear" />';
 }
-
-?>

@@ -1206,5 +1206,3 @@ function QuickModeration()
 
 	redirectexit($redirect_url);
 }
-
-?>

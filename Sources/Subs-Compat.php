@@ -186,5 +186,3 @@ function loadOldClassFile($filename)
 		'$1function ',
 	), rtrim(file_get_contents($sourcedir . '/' . $filename))));
 }
-
-?>

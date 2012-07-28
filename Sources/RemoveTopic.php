@@ -1519,5 +1519,3 @@ function removeDeleteConcurrence()
 
 	fatal_lang_error('post_already_deleted', false, array($confirm_url));
 }
-
-?>

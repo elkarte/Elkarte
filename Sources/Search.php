@@ -2754,5 +2754,3 @@ function searchSort($a, $b)
 
 	return $searchAPI->searchSort($a, $b);
 }
-
-?>

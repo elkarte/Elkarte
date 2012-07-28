@@ -351,5 +351,3 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			);
 	}
 }
-
-?>

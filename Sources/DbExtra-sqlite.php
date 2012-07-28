@@ -367,5 +367,3 @@ function smf_db_get_backup()
 
 	obExit(false);
 }
-
-?>

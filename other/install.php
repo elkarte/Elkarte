@@ -1941,7 +1941,7 @@ function updateSettingsFile($vars)
 function updateDbLastError() 
 {
 	// Write out the db_last_error file with the error timestamp 
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
+	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
 	
 	return true;
 }
@@ -2555,5 +2555,3 @@ function template_delete_install()
 		<br />
 		', $txt['good_luck'];
 }
-
-?>

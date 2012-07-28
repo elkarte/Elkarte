@@ -455,5 +455,3 @@ function smf_db_get_version()
 
 	return $ver;
 }
-
-?>
