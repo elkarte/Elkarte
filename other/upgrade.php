@@ -2105,16 +2105,7 @@ function changeSettings($config_vars)
 				}
 			}
 		}
-		if (isset($settingsArray[$i]))
-		{
-			if (trim(substr($settingsArray[$i], 0, 2)) == '?' . '>')
-				$end = $i;
-		}
 	}
-
-	// Assume end-of-file if the end wasn't found.
-	if (empty($end) || $end < 10)
-		$end = count($settingsArray);
 
 	if (!empty($config_vars))
 	{
@@ -2125,8 +2116,6 @@ function changeSettings($config_vars)
 				$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
 		}
 	}
-	// This should be the last line and even last bytes of the file.
-	$settingsArray[$end] = '?' . '>';
 
 	// Blank out the file - done to fix a oddity with some servers.
 	$fp = fopen($boarddir . '/Settings.php', 'w');

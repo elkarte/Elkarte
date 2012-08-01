@@ -1887,9 +1887,6 @@ function updateSettingsFile($vars)
 			continue;
 		}
 
-		if (trim($settingsArray[$i]) == '?' . '>')
-			$settingsArray[$i] = '';
-
 		// Don't trim or bother with it if it's not a variable.
 		if (substr($settingsArray[$i], 0, 1) != '$')
 			continue;
@@ -1932,7 +1929,6 @@ function updateSettingsFile($vars)
 		if ($settingsArray[$i] != '' || @$settingsArray[$i - 1] != '')
 			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
 	}
-	fwrite($fp, $settingsArray[$i] . '?' . '>');
 	fclose($fp);
 
 	return true;
