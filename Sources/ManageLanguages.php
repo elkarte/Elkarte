@@ -23,7 +23,6 @@ if (!defined('DIALOGO'))
  * This is the main function for the languages area.
  * It dispatches the requests.
  * Loads the ManageLanguages template. (sub-actions will use it)
- * @todo lazy loading.
  *
  * @uses ManageSettings language file
  */
@@ -140,7 +139,7 @@ function AddLanguage()
 
 /**
  * Gets a list of available languages from the mother ship
- * Will return a subset if searching, otherwise all avaialble
+ * Will return a subset if searching, otherwise all available
  *
  * @return string
  */
@@ -686,7 +685,7 @@ function ModifyLanguages()
 
 /**
  * How many languages?
- * Callback for the list in ManageLanguageSettings().
+ * Callback for the list in ModifyLanguages().
  */
 function list_getNumLanguages()
 {
@@ -695,7 +694,7 @@ function list_getNumLanguages()
 
 /**
  * Fetch the actual language information.
- * Callback for $listOptions['get_items']['function'] in ManageLanguageSettings.
+ * Callback for $listOptions['get_items']['function'] in ModifyLanguages.
  * Determines which languages are available by looking for the "index.{language}.php" file.
  * Also figures out how many users are using a particular language.
  */
@@ -1216,7 +1215,6 @@ function ModifyLanguage()
 
 /**
  * This function cleans language entries to/from display.
- * @todo This function could be two functions?
  *
  * @param $string
  * @param $to_display
