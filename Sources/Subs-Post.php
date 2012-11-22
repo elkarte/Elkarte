@@ -80,7 +80,6 @@ function preparsecode(&$message, $previewing = false)
 	// If we have an open tag, close it.
 	if ($in_tag)
 		$message .= '[/code]';
-	
 	// Open any ones that need to be open, only if we've never had a tag.
 	if ($codeopen && !$had_tag)
 		$message = '[code]' . $message;
@@ -279,10 +278,8 @@ function un_preparsecode($message)
 		}
 	}
 
-	
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-	
 }
 
 /**
@@ -1486,7 +1483,7 @@ function SpellCheck()
 	// Construct a bit of Javascript code.
 	$context['spell_js'] = '
 		var txt = {"done": "' . $txt['spellcheck_done'] . '"};
-		var mispstr = window.opener.spellCheckGetText(spell_fieldname);
+		var mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ';
 		var misps = Array(';
 
 	// Get all the words (Javascript already separated them).

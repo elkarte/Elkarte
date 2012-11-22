@@ -736,8 +736,9 @@ function template_main()
 		if ($context['require_verification'])
 			echo '
 							<strong>', $txt['verification'], ':</strong>', template_control_verification($context['visual_verification_id'], 'quick_reply'), '<br />';
-
-		if ($options['display_quick_reply'] < 3)
+		
+		// Not using the full editor?
+		if (empty($options['use_editor_quick_reply']))
 		{
 			echo '
 							<div class="quickReplyContent">
@@ -788,7 +789,7 @@ function template_main()
 
 		if ($context['show_spellchecking'])
 			echo '
-								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\');" tabindex="', $context['tabindex']++, '" class="button_submit" />';
+								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
 		if ($context['drafts_save'] && !empty($options['drafts_show_saved_enabled']))
 			echo '
@@ -824,11 +825,15 @@ function template_main()
 					iFreq: ', (empty($modSettings['masterAutoSaveDraftsDelay']) ? 60000 : $modSettings['masterAutoSaveDraftsDelay'] * 1000), '
 				});
 			// ]]></script>';
-
-	if ($context['show_spellchecking'])
+			
+	// Spell check for quick modify and quick reply (w/o the editor)
+	if ($context['show_spellchecking'] && (empty($options['use_editor_quick_reply']) || empty($options['display_quick_reply'])))
 		echo '
-			<form action="', $scripturl, '?action=spellcheck" method="post" accept-charset="', $context['character_set'], '" name="spell_form" id="spell_form" target="spellWindow"><input type="hidden" name="spellstring" value="" /></form>
-				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>';
+				<form name="spell_form" id="spell_form" method="post" accept-charset="', $context['character_set'], '" target="spellWindow" action="', $scripturl, '?action=spellcheck">
+					<input type="hidden" name="spellstring" value="" />
+					<input type="hidden" name="fulleditor" value="" />
+				</form>
+				<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
 	echo '
 				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/topic.js"></script>
