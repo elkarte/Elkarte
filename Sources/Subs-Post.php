@@ -1,21 +1,24 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file contains those functions pertaining to posting, and other such
  * operations, including sending emails, ims, blocking spam, preparsing posts,
  * spell checking, and the post box.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -77,6 +80,7 @@ function preparsecode(&$message, $previewing = false)
 	// If we have an open tag, close it.
 	if ($in_tag)
 		$message .= '[/code]';
+	
 	// Open any ones that need to be open, only if we've never had a tag.
 	if ($codeopen && !$had_tag)
 		$message = '[code]' . $message;
@@ -275,8 +279,10 @@ function un_preparsecode($message)
 		}
 	}
 
+	
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
+	
 }
 
 /**
@@ -586,7 +592,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	if ($message_id !== null && empty($modSettings['mail_no_message_id']))
 		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
-	$headers .= 'X-Mailer: SMF' . $line_break;
+	$headers .= 'X-Mailer: DIALOGO' . $line_break;
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
@@ -596,7 +602,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$orig_message = $message;
 
 	// The mime boundary separates the different alternative versions.
-	$mime_boundary = 'SMF-' . md5($message . time());
+	$mime_boundary = 'DIALOGO-' . md5($message . time());
 
 	// Using mime, as it allows to send a plain unencoded alternative.
 	$headers .= 'Mime-Version: 1.0' . $line_break;
@@ -782,7 +788,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	}
 
 	// If they are using SSI there is a good chance obExit will never be called.  So lets be nice and flush it for them.
-	if (SMF === 'SSI')
+	if (DIALOGO === 'SSI')
 		return AddMailQueue(true);
 
 	return true;

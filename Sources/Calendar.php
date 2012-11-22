@@ -1,20 +1,22 @@
 <?php
 
 /**
- * This file has only one real task, showing the calendar.
- * Original module by Aaron O'Neil - aaron@mud-master.com
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file has only one real task, showing the calendar.
+ * Original module by Aaron O'Neil - aaron@mud-master.com
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -381,7 +383,7 @@ function iCalDownload()
 	$filecontents = '';
 	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
-	$filecontents .= 'PRODID:-//SimpleMachines//SMF ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('SMF ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'PRODID:-//Dialogo Forum//DIALOGO ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('DIALOGO ' => ''))) . '//EN' . "\n";
 	$filecontents .= 'VERSION:2.0' . "\n";
 	$filecontents .= 'BEGIN:VEVENT' . "\n";
 	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";

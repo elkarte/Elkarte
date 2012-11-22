@@ -1,20 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file is concerned pretty entirely, as you see from its name, with
  * logging in and out members, and the validation of that.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -254,7 +257,7 @@ function Login2()
 	$user_settings = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 
-	// Figure out the password using SMF's encryption - if what they typed is right.
+	// Figure out the password using DIALOGO's encryption - if what they typed is right.
 	if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40)
 	{
 		// Needs upgrading?
@@ -361,7 +364,7 @@ function Login2()
 			}
 		}
 
-		// SMF's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+		// DIALOGO's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0)
 		{
 			require_once($sourcedir . '/Subs-Compat.php');
@@ -371,7 +374,7 @@ function Login2()
 		// Allows mods to easily extend the $other_passwords array
 		call_integration_hook('integrate_other_passwords', array($other_passwords));
 
-		// Whichever encryption it was using, let's make it use SMF's now ;).
+		// Whichever encryption it was using, let's make it use DIALOGO's now ;).
 		if (in_array($user_settings['passwd'], $other_passwords))
 		{
 			$user_settings['passwd'] = $sha_passwd;

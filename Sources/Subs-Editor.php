@@ -1,20 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file contains those functions specific to the editing box and is
  * generally used for WYSIWYG type functionality.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -476,7 +479,7 @@ function html_to_bbc($text)
 		// Keep track of the number of nested list levels.
 		$listDepth = 0;
 
-		// Map what we can expect from the HTML to what is supported by SMF.
+		// Map what we can expect from the HTML to what is supported.
 		$listTypeMapping = array(
 			'1' => 'decimal',
 			'A' => 'upper-alpha',
@@ -2164,7 +2167,7 @@ function AutoSuggestHandler($checkRegistered = null)
 	// These are all registered types.
 	$searchTypes = array(
 		'member' => 'Member',
-		'versions' => 'SMFVersions',
+		'versions' => 'DIALOGOVersions',
 	);
 
 	call_integration_hook('integrate_autosuggest', array($searchTypes));
@@ -2235,11 +2238,11 @@ function AutoSuggest_Search_Member()
 }
 
 /**
- * Provides a list of possible SMF versions to use in emulation
+ * Provides a list of possible DIALOGO versions to use in emulation
  * 
  * @return string
  */
-function AutoSuggest_Search_SMFVersions()
+function AutoSuggest_Search_DIALOGOVersions()
 {
 
 	$xml_data = array(
@@ -2250,34 +2253,34 @@ function AutoSuggest_Search_SMFVersions()
 	);
 
 	$versions = array(
-		'SMF 1.1',
-		'SMF 1.1.1',
-		'SMF 1.1.2',
-		'SMF 1.1.3',
-		'SMF 1.1.4',
-		'SMF 1.1.5',
-		'SMF 1.1.6',
-		'SMF 1.1.7',
-		'SMF 1.1.8',
-		'SMF 1.1.9',
-		'SMF 1.1.10',
-		'SMF 1.1.11',
-		'SMF 1.1.12',
-		'SMF 1.1.13',
-		'SMF 1.1.14',
-		'SMF 1.1.15',
-		'SMF 1.1.16',
-		'SMF 2.0 beta 1',
-		'SMF 2.0 beta 1.2',
-		'SMF 2.0 beta 2',
-		'SMF 2.0 beta 3',
-		'SMF 2.0 RC 1',
-		'SMF 2.0 RC 1.2',
-		'SMF 2.0 RC 2',
-		'SMF 2.0 RC 3',
-		'SMF 2.0',
-		'SMF 2.0.1',
-		'SMF 2.0.2',
+		'DIALOGO 1.1',
+		'DIALOGO 1.1.1',
+		'DIALOGO 1.1.2',
+		'DIALOGO 1.1.3',
+		'DIALOGO 1.1.4',
+		'DIALOGO 1.1.5',
+		'DIALOGO 1.1.6',
+		'DIALOGO 1.1.7',
+		'DIALOGO 1.1.8',
+		'DIALOGO 1.1.9',
+		'DIALOGO 1.1.10',
+		'DIALOGO 1.1.11',
+		'DIALOGO 1.1.12',
+		'DIALOGO 1.1.13',
+		'DIALOGO 1.1.14',
+		'DIALOGO 1.1.15',
+		'DIALOGO 1.1.16',
+		'DIALOGO 2.0 beta 1',
+		'DIALOGO 2.0 beta 1.2',
+		'DIALOGO 2.0 beta 2',
+		'DIALOGO 2.0 beta 3',
+		'DIALOGO 2.0 RC 1',
+		'DIALOGO 2.0 RC 1.2',
+		'DIALOGO 2.0 RC 2',
+		'DIALOGO 2.0 RC 3',
+		'DIALOGO 2.0',
+		'DIALOGO 2.0.1',
+		'DIALOGO 2.0.2',
 	);
 
 	foreach ($versions as $id => $version)

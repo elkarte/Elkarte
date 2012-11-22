@@ -1,20 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file contains all the administration functions for subscriptions.
  * (and some more than that :P)
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -1766,7 +1769,7 @@ function loadSubscriptions()
  * Load all the payment gateways.
  * Checks the Sources directory for any files fitting the format of a payment gateway,
  * loads each file to check it's valid, includes each file and returns the
- * function name and whether it should work with this version of SMF.
+ * function name and whether it should work with this version of DIALOGO.
  *
  * @return array
  */
@@ -1786,7 +1789,7 @@ function loadPaymentGateways()
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// SMF Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, '// DIALOGO Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
 					require_once($sourcedir . '/' . $file);
 

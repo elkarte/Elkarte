@@ -1,27 +1,30 @@
 <?php
 
 /**
- * Handle all of the searching from here.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * Handle all of the searching from here.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
-// This defines two version types for checking the API's are compatible with this version of SMF.
+// This defines two version types for checking the API's are compatible with this version of DIALOGO.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'SMF 2.1 Alpha 1',
-	// This is the minimum version of SMF that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('SMF 2+1=Alpha=1', array('+' => '.', '=' => ' ')),
+	'forum_version' => 'DIALOGO 1.0 Alpha 1',
+	// This is the minimum version of DIALOGO that an API could have been written for to work. (strtr to stop accidentally updating version on release)
+	'search_version' => strtr('DIALOGO 1+0=Alpha=1', array('+' => '.', '=' => ' ')),
 );
 
 /**
@@ -2138,7 +2141,7 @@ function findSearchAPI()
 		fatal_lang_error('search_api_missing');
 	require_once($sourcedir . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.php');
 
-	// Create an instance of the search API and check it is valid for this version of SMF.
+	// Create an instance of the search API and check it is valid for this version of DIALOGO.
 	$search_class_name = $modSettings['search_index'] . '_search';
 	$searchAPI = new $search_class_name();
 

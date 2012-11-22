@@ -1,20 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file has the very important job of ensuring forum security.
  * This task includes banning and permissions, namely.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -120,7 +123,7 @@ function is_not_guest($message = '')
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
-	if (!WIRELESS && SMF != 'SSI' && empty($context['theme_loaded']))
+	if (!WIRELESS && DIALOGO != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Never redirect to an attachment
@@ -391,7 +394,7 @@ function is_not_banned($forceCheck = false)
 			'language' => $user_info['language'],
 		);
 
-		// SMF's Wipe 'n Clean(r) erases all traces.
+		// Wipe 'n Clean(r) erases all traces.
 		$_GET['action'] = '';
 		$_GET['board'] = '';
 		$_GET['topic'] = '';
@@ -1039,7 +1042,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	$permissions = (array) $permissions;
 
 	/*
-	 * Set $simple to true to use this function as it were in SMF 2.0.x.
+	 * Set $simple to true to use this function in compatability mode
 	 * Otherwise, the resultant array becomes split into the multiple
 	 * permissions that were passed. Other than that, it's just the normal
 	 * state of play that you're used to.

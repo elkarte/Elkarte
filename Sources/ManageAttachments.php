@@ -1,20 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file doing the job of attachments and avatars maintenance and management.
  * @todo refactor as controller-model
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -102,7 +105,7 @@ function ManageAttachmentSettings($return_config = false)
 	// If not set, show a default path for the base directory
 	if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
 		if (is_dir($modSettings['attachmentUploadDir'][1]))
-			$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];		
+			$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];
 		else
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 
@@ -244,7 +247,7 @@ function ManageAttachmentSettings($return_config = false)
 					));
 
 					$_POST['use_subdirectories_for_attachments'] = 1;
-					$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);	
+					$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 
 				}
 			}
@@ -738,7 +741,7 @@ function MaintainFiles()
 	if (!empty($modSettings['attachmentDirFileLimit']))
 		$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir_files, 0), 0);
 	$context['attachment_current_files'] = comma_format($current_dir_files, 0);
-	
+
 	$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 	$context['attach_dirs'] = $attach_dirs;
 	$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? unserialize($modSettings['attachment_basedirectories']) : array();
@@ -2070,7 +2073,7 @@ function ManageAttachmentPaths()
 			if (!is_array($modSettings['last_attachments_directory']))
 				$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
 			$num = substr(strrchr($modSettings['attachmentUploadDir'][$_POST['current_dir']], '_'), 1);
-			
+
 			if (is_numeric($num))
 			{
 				// Need to find the base folder.
@@ -2234,7 +2237,7 @@ function ManageAttachmentPaths()
 			if (!empty($_SESSION['errors']['dir']))
 				foreach($_SESSION['errors']['dir'] as $error)
 					$errors['dir'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
-			
+
 			if (!empty($_SESSION['errors']['base']))
 				foreach($_SESSION['errors']['base'] as $error)
 					$errors['base'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
@@ -2586,9 +2589,9 @@ function attachDirStatus($dir, $expected_files)
 function TransferAttachments()
 {
 	global $modSettings, $context, $smcFunc, $sourcedir, $txt, $boarddir;
-	
+
 	checkSession();
-	
+
 	$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 	if (!empty($modSettings['attachment_basedirectories']))
 		$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
@@ -2606,7 +2609,7 @@ function TransferAttachments()
 	$current_progress = 0;
 	$total_moved = 0;
 	$total_not_moved = 0;
-	
+
 	if (empty($_POST['from']) || (empty($_POST['auto']) && empty($_POST['to'])))
 		$results[] = $txt['attachment_transfer_no_dir'];
 

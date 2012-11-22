@@ -1,20 +1,21 @@
 <?php
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
+ * 
+ * This template file contains only the sub template fatal_error. It is
+ * shown when an error occurs, and should show at least a back button and
+ * $context['error_message'].
  */
 
-// @todo
-/*	This template file contains only the sub template fatal_error. It is
-	shown when an error occurs, and should show at least a back button and
-	$context['error_message'].
-*/
 
 // Show an error message.....
 function template_fatal_error()

@@ -1,35 +1,38 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Custom Search API class .. used when custom SMF index is used
+ * Custom Search API class .. used when custom DIALOGO index is used
  */
 class custom_search
 {
 	/**
-	 *This is the last version of SMF that this was tested on, to protect against API changes.
+	 *This is the last version of DIALOGO that this was tested on, to protect against API changes.
 	 * @var type
 	 */
-	public $version_compatible = 'SMF 2.1 Alpha 1';
+	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
 
 	/**
-	 *This won't work with versions of SMF less than this.
+	 *This won't work with versions of DIALOGO less than this.
 	 * @var type
 	 */
-	public $min_smf_version = 'SMF 2.1 Alpha 1';
+	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
 
 	/**
 	 * Is it supported?

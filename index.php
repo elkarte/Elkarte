@@ -1,7 +1,18 @@
 <?php
 
 /**
- * This, as you have probably guessed, is the crux on which SMF functions.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * This, as you have probably guessed, is the crux for all functions.
  * Everything should start here, so all the setup and security is done
  * properly.  The most interesting part of this file is the action array in
  * the smf_main() function.  It is formatted as so:
@@ -10,20 +21,12 @@
  * Then, you can access the FunctionToCall() function from Source-File.php
  * with the URL index.php?action=action-in-url.  Relatively simple, no?
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-$forum_version = 'SMF 2.1 Alpha 1';
+$forum_version = 'Dialogo 1.0 Alpha 1';
 
 // Get everything started up...
-define('SMF', 1);
+define('DIALOGO', 1);
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
 error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
@@ -62,7 +65,7 @@ if (version_compare(PHP_VERSION, '5.1', '<'))
 if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
 
-// Create a variable to store some SMF specific functions in.
+// Create a variable to store some specific functions in.
 $smcFunc = array();
 
 // Initiate the database connection and define some database functions to use.

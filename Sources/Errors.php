@@ -1,21 +1,24 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
  * care of logging, error messages, error handling, database errors, and
  * error log administration.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -66,7 +69,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
 
 	// Don't log the session hash in the url twice, it's a waste.
-	$query_string = htmlspecialchars((SMF == 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
+	$query_string = htmlspecialchars((DIALOGO == 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
 
 	// Just so we know what board error messages are from.
 	if (isset($_POST['board']) && !isset($_GET['board']))
@@ -274,7 +277,7 @@ function setup_fatal_error_context($error_message, $error_code)
 		return false;
 
 	// Maybe they came from dlattach or similar?
-	if (SMF != 'SSI' && empty($context['theme_loaded']))
+	if (DIALOGO != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Don't bother indexing errors mate...
@@ -300,7 +303,7 @@ function setup_fatal_error_context($error_message, $error_code)
 	}
 
 	// If this is SSI, what do they want us to do?
-	if (SMF == 'SSI')
+	if (DIALOGO == 'SSI')
 	{
 		if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 			$ssi_on_error_method();
@@ -316,7 +319,7 @@ function setup_fatal_error_context($error_message, $error_code)
 	obExit(null, true, false, true);
 
 	/* DO NOT IGNORE:
-		If you are creating a bridge to SMF or modifying this function, you MUST
+		If you are creating a bridge to DIALOGO or modifying this function, you MUST
 		make ABSOLUTELY SURE that this function quits and DOES NOT RETURN TO NORMAL
 		PROGRAM FLOW.  Otherwise, security error messages will not be shown, and
 		your forum will be in a very easily hackable state.
@@ -380,7 +383,7 @@ function display_db_error()
 
 		// Language files aren't loaded yet :(.
 		$db_error = @$smcFunc['db_error']($db_connection);
-		@mail($webmaster_email, $mbname . ': SMF Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that SMF could not connect to the database, contact your host if this continues.');
+		@mail($webmaster_email, $mbname . ': DIALOGO Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that DIALOGO could not connect to the database, contact your host if this continues.');
 	}
 
 	// What to do?  Language files haven't and can't be loaded yet...
@@ -392,7 +395,7 @@ function display_db_error()
 	</head>
 	<body>
 		<h3>Connection Problems</h3>
-		Sorry, SMF was unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
+		Sorry, DIALOGO was unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
 	</body>
 </html>';
 

@@ -1,18 +1,22 @@
 <?php
 
 /**
- * Handle all of the OpenID interfacing and communications.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * Handle all of the OpenID interfacing and communications.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -250,7 +254,7 @@ function smf_openID_return()
 	if ($_GET['openid_mode'] != 'id_res')
 		fatal_lang_error('openid_not_resolved');
 
-	// SMF has this annoying habit of removing the + from the base64 encoding.  So lets put them back.
+	// this has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 	foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
 		if (isset($_GET[$key]))
 			$_GET[$key] = str_replace(' ', '+', $_GET[$key]);

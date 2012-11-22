@@ -13,11 +13,11 @@ $txt['install_step_databasechange'] = 'Database Population';
 $txt['install_step_admin'] = 'Admin Account';
 $txt['install_step_delete'] = 'Finalize Install';
 
-$txt['smf_installer'] = 'SMF Installer';
+$txt['smf_installer'] = 'DIALOGO Installer';
 $txt['installer_language'] = 'Language';
 $txt['installer_language_set'] = 'Set';
 $txt['congratulations'] = 'Congratulations, the installation process is complete!';
-$txt['congratulations_help'] = 'If at any time you need support, or SMF fails to work properly, please remember that <a href="http://www.simplemachines.org/community/index.php" target="_blank">help is available</a> if you need it.';
+$txt['congratulations_help'] = 'If at any time you need support, or the forum fails to work properly, please remember that <a href="http://www.simplemachines.org/community/index.php" target="_blank">help is available</a> if you need it.';
 $txt['still_writable'] = 'Your installation directory is still writable.  It\'s a good idea to chmod it so that it is not writable for security reasons.';
 $txt['delete_installer'] = 'Click here to delete this install.php file now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
@@ -25,19 +25,19 @@ $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed 
 $txt['good_luck'] = 'Good luck!<br />Simple Machines';
 
 $txt['install_welcome'] = 'Welcome';
-$txt['install_welcome_desc'] = 'Welcome to SMF. This script will guide you through the process for installing %1$s. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
+$txt['install_welcome_desc'] = 'Welcome to DIALOGO. This script will guide you through the process for installing %1$s. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
 $txt['install_all_lovely'] = 'We\'ve completed some initial tests on your server and everything appears to be in order. Simply click the &quot;Continue&quot; button below to get started.';
 
 $txt['user_refresh_install'] = 'Forum Refreshed';
 $txt['user_refresh_install_desc'] = 'While installing, the installer found that (with the details you provided) one or more of the tables this installer might create already existed.<br />Any missing tables in your installation have been recreated with the default data, but no data was deleted from existing tables.';
 
-$txt['default_topic_subject'] = 'Welcome to SMF!';
+$txt['default_topic_subject'] = 'Welcome to DIALOGO!';
 $txt['default_topic_message'] = 'Welcome to Simple Machines Forum!<br /><br />We hope you enjoy using your forum.&nbsp; If you have any problems, please feel free to [url=http://www.simplemachines.org/community/index.php]ask us for assistance[/url].<br /><br />Thanks!<br />Simple Machines';
 $txt['default_board_name'] = 'General Discussion';
 $txt['default_board_description'] = 'Feel free to talk about anything and everything in this board.';
 $txt['default_category_name'] = 'General Category';
 $txt['default_time_format'] = '%B %d, %Y, %I:%M:%S %p';
-$txt['default_news'] = 'SMF - Just Installed!';
+$txt['default_news'] = 'DIALOGO - Just Installed!';
 $txt['default_karmaLabel'] = 'Karma:';
 $txt['default_karmaSmiteLabel'] = '[smite]';
 $txt['default_karmaApplaudLabel'] = '[applaud]';
@@ -46,7 +46,7 @@ $txt['default_smileyset_name'] = 'Alienine\'s Set';
 $txt['default_aaron_smileyset_name'] = 'Aaron\'s Set';
 $txt['default_akyhne_smileyset_name'] = 'Akyhne\'s Set';
 $txt['default_fugue_smileyset_name'] = 'Fugue\'s Set';
-$txt['default_theme_name'] = 'SMF Default Theme - Curve II';
+$txt['default_theme_name'] = 'DIALOGO Default Theme - Curve II';
 $txt['default_core_theme_name'] = 'Core Theme';
 $txt['default_classic_theme_name'] = 'Classic YaBB SE Theme';
 $txt['default_babylon_theme_name'] = 'Babylon Theme';
@@ -88,7 +88,7 @@ $txt['error_message_try_again'] = 'to try this step again.';
 $txt['error_message_bad_try_again'] = 'to try installing anyway, but note that this is <em>strongly</em> discouraged.';
 
 $txt['install_settings'] = 'Forum Settings';
-$txt['install_settings_info'] = 'This page requires you to define a few key settings for your forum. SMF has automatically detected key settings for you.';
+$txt['install_settings_info'] = 'This page requires you to define a few key settings for your forum. DIALOGO has automatically detected key settings for you.';
 $txt['install_settings_name'] = 'Forum name';
 $txt['install_settings_name_info'] = 'This is the name of your forum, ie. &quot;The Testing Forum&quot;.';
 $txt['install_settings_name_default'] = 'My Community';
@@ -113,7 +113,7 @@ $txt['install_settings_proceed'] = 'Proceed';
 $txt['db_settings'] = 'Database Server Settings';
 $txt['db_settings_info'] = 'These are the settings to use for your database server.  If you don\'t know the values, you should ask your host what they are.';
 $txt['db_settings_type'] = 'Database type';
-$txt['db_settings_type_info'] = 'Multiple supported database types were detected - which do you wish to use. Please note that running pre-SMF 2.0 RC3 along with newer SMF versions in the same PostgreSQL database is not supported. You need to upgrade your older installations in that case.';
+$txt['db_settings_type_info'] = 'Multiple supported database types were detected - which do you wish to use?';
 $txt['db_settings_server'] = 'Server name';
 $txt['db_settings_server_info'] = 'This is nearly always localhost - so if you don\'t know, try localhost.';
 $txt['db_settings_username'] = 'Username';
@@ -121,10 +121,10 @@ $txt['db_settings_username_info'] = 'Fill in the username you need to connect to
 $txt['db_settings_password'] = 'Password';
 $txt['db_settings_password_info'] = 'Here, put the password you need to connect to your database.<br />If you don\'t know this, you should try the password to your ftp account.';
 $txt['db_settings_database'] = 'Database name';
-$txt['db_settings_database_info'] = 'Fill in the name of the database you want to use for SMF to store its data in.';
+$txt['db_settings_database_info'] = 'Fill in the name of the database you want to use for DIALOGO to store its data in.';
 $txt['db_settings_database_info_note'] = 'If this database does not exist, this installer will try to create it.';
 $txt['db_settings_database_file'] = 'Database filename';
-$txt['db_settings_database_file_info'] = 'This is the name of the file in which to store the SMF data. We recommend you use the randomly generated name for this and set the path of this file to be outside of the public area of your webserver.';
+$txt['db_settings_database_file_info'] = 'This is the name of the file in which to store the DIALOGO data. We recommend you use the randomly generated name for this and set the path of this file to be outside of the public area of your webserver.';
 $txt['db_settings_prefix'] = 'Table prefix';
 $txt['db_settings_prefix_info'] = 'The prefix for every table in the database.  <strong>Do not install two forums with the same prefix!</strong><br />This value allows for multiple installations in one database.';
 $txt['db_sqlite_warning'] = 'Only recommended for small, low volume and/or intranet-type forums';
@@ -167,18 +167,18 @@ $txt['ftp_path_info'] = 'This is the <em>relative</em> path you use in your FTP 
 $txt['ftp_path_found_info'] = 'The path in the box above was automatically detected.';
 $txt['ftp_connect'] = 'Connect';
 $txt['ftp_setup_why'] = 'What is this step for?';
-$txt['ftp_setup_why_info'] = 'Some files need to be writable for SMF to work properly.  This step allows you to let the installer make them writable for you.  However, in some cases it won\'t work - in that case, please make the following files 777 (writable, 755 on some hosts):';
+$txt['ftp_setup_why_info'] = 'Some files need to be writable for DIALOGO to work properly.  This step allows you to let the installer make them writable for you.  However, in some cases it won\'t work - in that case, please make the following files 777 (writable, 755 on some hosts):';
 $txt['ftp_setup_again'] = 'to test if these files are writable again.';
 
-$txt['error_php_too_low'] = 'Warning!  You do not appear to have a version of PHP installed on your webserver that meets SMF\'s <strong>minimum installations requirements</strong>.<br />If you are not the host, you will need to ask your host to upgrade, or use a different host - otherwise, please upgrade PHP to a recent version.<br /><br />If you know for a fact that your PHP version is high enough you may continue, although this is strongly discouraged.';
+$txt['error_php_too_low'] = 'Warning!  You do not appear to have a version of PHP installed on your webserver that meets DIALOGO\'s <strong>minimum installations requirements</strong>.<br />If you are not the host, you will need to ask your host to upgrade, or use a different host - otherwise, please upgrade PHP to a recent version.<br /><br />If you know for a fact that your PHP version is high enough you may continue, although this is strongly discouraged.';
 $txt['error_missing_files'] = 'Unable to find crucial installation files in the directory of this script!<br /><br />Please make sure you uploaded the entire installation package, including the sql file, and then try again.';
 $txt['error_session_save_path'] = 'Please inform your host that the <strong>session.save_path specified in php.ini</strong> is not valid!  It needs to be changed to a directory that <strong>exists</strong>, and is <strong>writable</strong> by the user PHP is running under.<br />';
-$txt['error_windows_chmod'] = 'You\'re on a windows server, and some crucial files are not writable.  Please ask your host to give <strong>write permissions</strong> to the user PHP is running under for the files in your SMF installation.  The following files or directories need to be writable:';
+$txt['error_windows_chmod'] = 'You\'re on a windows server, and some crucial files are not writable.  Please ask your host to give <strong>write permissions</strong> to the user PHP is running under for the files in your DIALOGO installation.  The following files or directories need to be writable:';
 $txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
 $txt['error_db_file'] = 'Cannot find database source script! Please check file %1$s is within your forum source directory.';
 $txt['error_db_connect'] = 'Cannot connect to the database server with the supplied data.<br /><br />If you are not sure about what to type in, please contact your host.';
-$txt['error_db_too_low'] = 'The version of your database server is very old, and does not meet SMF\'s minimum requirements.<br /><br />Please ask your host to either upgrade it or supply a new one, and if they won\'t, please try a different host.';
-$txt['error_db_database'] = 'The installer was unable to access the &quot;<em>%1$s</em>&quot; database.  With some hosts, you have to create the database in your administration panel before SMF can use it.  Some also add prefixes - like your username - to your database names.';
+$txt['error_db_too_low'] = 'The version of your database server is very old, and does not meet DIALOGO\'s minimum requirements.<br /><br />Please ask your host to either upgrade it or supply a new one, and if they won\'t, please try a different host.';
+$txt['error_db_database'] = 'The installer was unable to access the &quot;<em>%1$s</em>&quot; database.  With some hosts, you have to create the database in your administration panel before DIALOGO can use it.  Some also add prefixes - like your username - to your database names.';
 $txt['error_db_queries'] = 'Some of the queries were not executed properly.  This could be caused by an unsupported (development or old) version of your database software.<br /><br />Technical information about the queries:';
 $txt['error_db_queries_line'] = 'Line #';
 $txt['error_db_missing'] = 'The installer was unable to detect any database support in PHP.  Please ask your host to ensure that PHP was compiled with the desired database, or that the proper extension is being loaded.';
@@ -189,15 +189,15 @@ $txt['error_user_settings_no_password'] = 'Your password must be at least four c
 $txt['error_user_settings_taken'] = 'Sorry, a member is already registered with that username and/or email address.<br /><br />A new account has not been created.';
 $txt['error_user_settings_query'] = 'A database error occurred while trying to create an administrator.  This error was:';
 $txt['error_subs_missing'] = 'Unable to find the Sources/Subs.php file.  Please make sure it was uploaded properly, and then try again.';
-$txt['error_db_alter_priv'] = 'The database account you specified does not have permission to ALTER, CREATE, and/or DROP tables in the database; this is necessary for SMF to function properly.';
-$txt['error_versions_do_not_match'] = 'The installer has detected another version of SMF already installed with the specified information.  If you are trying to upgrade, you should use the upgrader, not the installer.<br /><br />Otherwise, you may wish to use different information, or create a backup and then delete the data currently in the database.';
-$txt['error_mod_security'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before SMF gets a say in anything. SMF has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.simplemachines.org/redirect/mod_security">More information about disabling mod_security</a>';
-$txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before SMF gets a say in anything. SMF has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.simplemachines.org/redirect/mod_security">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your ftp client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
-$txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can still install SMF without any problems, but only with UTF-8 support unchecked. If you would like to switch over to UTF-8 in the future (e.g. after the database server of your forum has been upgraded to version >= %1$s), you can convert your forum to UTF-8 through the admin panel.';
+$txt['error_db_alter_priv'] = 'The database account you specified does not have permission to ALTER, CREATE, and/or DROP tables in the database; this is necessary for DIALOGO to function properly.';
+$txt['error_versions_do_not_match'] = 'The installer has detected another version of DIALOGO already installed with the specified information.  If you are trying to upgrade, you should use the upgrader, not the installer.<br /><br />Otherwise, you may wish to use different information, or create a backup and then delete the data currently in the database.';
+$txt['error_mod_security'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before DIALOGO gets a say in anything. DIALOGO has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.simplemachines.org/redirect/mod_security">More information about disabling mod_security</a>';
+$txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before DIALOGO gets a say in anything. DIALOGO has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.simplemachines.org/redirect/mod_security">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your ftp client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
+$txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can still install DIALOGO without any problems, but only with UTF-8 support unchecked. If you would like to switch over to UTF-8 in the future (e.g. after the database server of your forum has been upgraded to version >= %1$s), you can convert your forum to UTF-8 through the admin panel.';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
-$txt['error_already_installed'] = 'The installer has detected that you already have SMF installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.simplemachines.org">Simple Machines Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
+$txt['error_already_installed'] = 'The installer has detected that you already have DIALOGO installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.simplemachines.org">Simple Machines Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_warning_notice'] = 'Warning!';
-$txt['error_script_outdated'] = 'This install script is out of date! The current version of SMF is %1$s but this install script is for %2$s.<br /><br />
+$txt['error_script_outdated'] = 'This install script is out of date! The current version of DIALOGO is %1$s but this install script is for %2$s.<br /><br />
 	It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are installing the latest version.';
 $txt['error_db_filename'] = 'You must enter a name for the database file name for SQLite.';
 $txt['error_db_prefix_numeric'] = 'The selected database type does not support the use of numeric prefixes.';
@@ -207,7 +207,7 @@ $txt['error_username_left_empty'] = 'Username field was left empty.';
 $txt['error_db_filename_exists'] = 'The database that you are trying to create exists.  Please delete the current database file or enter another name.';
 $txt['error_db_prefix_reserved'] = 'The prefix that you entered is a reserved prefix.  Please enter another prefix.';
 
-$txt['upgrade_upgrade_utility'] = 'SMF Upgrade Utility';
+$txt['upgrade_upgrade_utility'] = 'DIALOGO Upgrade Utility';
 $txt['upgrade_warning'] = 'Warning!';
 $txt['upgrade_critical_error'] = 'Critical Error!';
 $txt['upgrade_continue'] = 'Continue';
@@ -226,11 +226,11 @@ $txt['upgrade_incomplete'] = 'Incomplete';
 $txt['upgrade_not_quite_done'] = 'Not quite done yet!';
 $txt['upgrade_paused_overload'] = 'This upgrade has been paused to avoid overloading your server.  Don\'t worry, nothing\'s wrong - simply click the <label for="contbutt">continue button</label> below to keep going.';
 
-$txt['upgrade_ready_proceed'] = 'Thank you for choosing to upgrade to SMF %1$s. All files appear to be in place, and we\'re ready to proceed.';
+$txt['upgrade_ready_proceed'] = 'Thank you for choosing to upgrade to DIALOGO %1$s. All files appear to be in place, and we\'re ready to proceed.';
 
 $txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a setting checker tool from the <a href="http://www.simplemachines.org">Simple Machines Website</a>';
 
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
-$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of SMF is <em id="smfVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are upgrading to the latest version.';
+$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of DIALOGO is <em id="smfVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are upgrading to the latest version.';
 
 ?>

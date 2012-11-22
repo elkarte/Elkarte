@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to the database.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file has all the main functions in it that relate to the database.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -76,7 +79,7 @@ function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	if (empty($db_options['dont_select_db']) && !@mysql_select_db($db_name, $connection) && empty($db_options['non_fatal']))
 		display_db_error();
 
-	// This makes it possible to have SMF automatically change the sql_mode and autocommit if needed.
+	// This makes it possible to have DIALOGO automatically change the sql_mode and autocommit if needed.
 	if (isset($mysql_set_mode) && $mysql_set_mode === true)
 		$smcFunc['db_query']('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 		array(),
@@ -210,7 +213,7 @@ function smf_db_replacement__callback($matches)
 		break;
 
 		case 'identifier':
-			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for SMF.
+			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for DIALOGO.
 			return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
 		break;
 
@@ -369,7 +372,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		$clean .= substr($db_string, $old_pos);
 		$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-		// We don't use UNION in SMF, at least so far.  But it's useful for injections.
+		// We don't use UNION in DIALOGO, at least so far.  But it's useful for injections.
 		if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 			$fail = true;
 		// Comments?  We don't use comments in our queries, we leave 'em outside!
@@ -573,7 +576,7 @@ function smf_db_error($db_string, $connection = null)
 			if (in_array($query_errno, array(2006, 2013)) && $db_connection == $connection)
 			{
 				// Are we in SSI mode?  If so try that username and password first
-				if (SMF == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+				if (DIALOGO == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 				{
 					if (empty($db_persist))
 						$db_connection = @mysql_connect($db_server, $ssi_db_user, $ssi_db_passwd);
@@ -637,7 +640,7 @@ function smf_db_error($db_string, $connection = null)
 		$context['error_message'] = $txt['try_again'];
 
 	// A database error is often the sign of a database in need of upgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
-	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'SMF ' . @$modSettings['smfVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
+	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['smfVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
 		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['smfVersion']);
 
 	if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)

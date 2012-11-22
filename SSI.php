@@ -1,21 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
-// Don't do anything if SMF is already loaded.
-if (defined('SMF'))
+// Don't do anything if DIALOGO is already loaded.
+if (defined('DIALOGO'))
 	return true;
 
-define('SMF', 'SSI');
+define('DIALOGO', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -45,7 +47,7 @@ if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/c
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
 	false:	Default, will just load the error sub template and die - not putting any theme layers around it.
-	true:	Will load the error sub template AND put the SMF layers around it (Not useful if on total custom pages).
+	true:	Will load the error sub template AND put the DIALOGO layers around it (Not useful if on total custom pages).
 	string:	Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
 */
 $ssi_on_error_method = false;
@@ -72,7 +74,7 @@ require_once($sourcedir . '/Class-BrowserDetect.php');
 if (version_compare(PHP_VERSION, '5.1', '<'))
 	require_once($sourcedir . '/Subs-Compat.php');
 
-// Create a variable to store some SMF specific functions in.
+// Create a variable to store some DIALOGO specific functions in.
 $smcFunc = array();
 
 // Initate the database connection and define some database functions to use.

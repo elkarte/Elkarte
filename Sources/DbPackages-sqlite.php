@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file contains database functionality specifically designed for packages (mods) to utilize.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file contains database functionality specifically designed for packages (mods) to utilize.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -42,7 +45,7 @@ function db_packages_init()
 		$db_package_log = array();
 	}
 
-	// We setup an array of SMF tables we can't do auto-remove on - in case a mod writer cocks it up!
+	// We setup an array of tables we can't do auto-remove on - in case a mod writer cocks it up!
 	$reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
 		'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
 		'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
@@ -69,13 +72,13 @@ function db_packages_init()
  *  	'name' = Column name
  *  	'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
  *  	'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
- *  		If not set SMF will pick a size.
+ *  		If not set it will pick a size.
  *  	- 'default' = Default value - do not set if no default required.
  *  	- 'null' => Can it be null (true or false) - if not set default will be false.
  *  	- 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
  *  		 it should begin counting.
  *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
- *  	- 'name' => Index name (If left empty SMF will generate).
+ *  	- 'name' => Index name (If left empty it will be generated).
  *  	- 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
  *  	- 'columns' => Array containing columns that form part of key - in the order the index is to be created.
  *  - parameters: (None yet)
@@ -100,8 +103,8 @@ function smf_db_create_table($table_name, $columns, $indexes = array(), $paramet
 	$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
 	$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-	// First - no way do we touch SMF tables.
-	// Commented out for now. We need to alter SMF tables in order to use this in the upgrade.
+	// First - no way do we touch our own tables.
+	// Commented out for now. We need to alter our tables in order to use this in the upgrade.
 /*
 	if (in_array(strtolower($table_name), $reservedTables))
 		return false;

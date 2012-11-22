@@ -1,22 +1,25 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file's central purpose of existence is that of making the package
  * manager work nicely.  It contains functions for handling tar.gz and zip
  * files, as well as a simple xml parser to handle the xml package stuff.
  * Not to mention a few functions to make file handling easier.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -1039,7 +1042,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	// We haven't found the package script yet...
 	$script = false;
-	$the_version = strtr($forum_version, array('SMF ' => ''));
+	$the_version = strtr($forum_version, array('DIALOGO ' => ''));
 
 	// Emulation support...
 	if (!empty($_SESSION['version_emulate']))
@@ -1061,7 +1064,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		// They specified certain versions this part is for.
 		if ($this_method->exists('@for'))
 		{
-			// Don't keep going if this won't work for this version of SMF.
+			// Don't keep going if this won't work for this version of DIALOGO.
 			if (!matchPackageVersion($the_version, $this_method->fetch('@for')))
 				continue;
 		}
@@ -3102,7 +3105,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/SMF' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/DIALOGO' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n\r\n");
 			else
@@ -3112,7 +3115,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/SMF' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/DIALOGO' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n");
 			else

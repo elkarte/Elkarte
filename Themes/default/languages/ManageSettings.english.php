@@ -107,7 +107,7 @@ $txt['karmaLabel'] = 'Karma label';
 $txt['karmaApplaudLabel'] = 'Karma applaud label';
 $txt['karmaSmiteLabel'] = 'Karma smite label';
 
-$txt['caching_information'] = 'SMF supports caching through the use of accelerators. The currently supported accelerators include:
+$txt['caching_information'] = 'DIALOGO supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
 	<li>APC</li>
 	<li>eAccelerator</li>
@@ -116,9 +116,9 @@ $txt['caching_information'] = 'SMF supports caching through the use of accelerat
 	<li>Zend Platform/Performance Suite (Not Zend Optimizer)</li>
 	<li>XCache</li>
 </ul>
-Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed SMF will do file based caching.';
-$txt['detected_no_caching'] = '<strong class="alert">SMF has not been able to detect a compatible accelerator on your server.  File based caching can be used instead.</strong>';
-$txt['detected_accelerators'] = '<strong class="success">SMF has detected the following accelerators: %1$s</strong>';
+Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed file based caching will be used.';
+$txt['detected_no_caching'] = '<strong class="alert">Unable to detect a compatible accelerator on your server.  File based caching can be used instead.</strong>';
+$txt['detected_accelerators'] = '<strong class="success">The following accelerators have been detected: %1$s</strong>';
 
 
 $txt['cache_enable'] = 'Caching Level';
@@ -128,7 +128,7 @@ $txt['cache_level2'] = 'Level 2 Caching';
 $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
 $txt['cache_memcached'] = 'Memcache settings';
 $txt['cache_accelerator'] = 'Caching Accelerator';
-$txt['default_cache'] = 'SMF file based caching';
+$txt['default_cache'] = 'File based caching';
 $txt['apc_cache'] = 'APC';
 $txt['eAccelerator_cache'] = 'eAccelerator';
 $txt['mmcache_cache'] = 'Turck MMCache';
@@ -204,7 +204,7 @@ $txt['setting_warning_show_user'] = 'Moderators and Warned Users';
 $txt['setting_warning_show_all'] = 'All Users';
 
 $txt['signature_settings'] = 'Signature Settings';
-$txt['signature_settings_desc'] = 'Use the settings on this page to decide how member signatures should be treated in SMF.';
+$txt['signature_settings_desc'] = 'Use the settings on this page to decide how member signatures should be treated.';
 $txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default. <a href="' . $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;%2$s=%1$s">Run the process now</a>';
 $txt['signature_settings_applied'] = 'The updated rules have been applied to the existing signatures.';
 $txt['signature_enable'] = 'Enable signatures';
@@ -296,7 +296,7 @@ $txt['standard_profile_title'] = 'Standard Profile Fields';
 $txt['standard_profile_field'] = 'Field';
 
 $txt['core_settings_welcome_msg'] = 'Welcome to Your New Forum';
-$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of SMF\'s core features you want to enable. We\'d recommend only enabling with those features you need!';
+$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of DIALOGO\'s core features you want to enable. We\'d recommend only enabling with those features you need!';
 $txt['core_settings_item_cd'] = 'Calendar';
 $txt['core_settings_item_cd_desc'] = 'Enabling this feature will open up a selection of options to enable your users to view the calendar, add and review events, see users birthdates on a calendar and much, much more.';
 $txt['core_settings_item_dr'] = 'Drafts';
@@ -361,8 +361,8 @@ $txt['languages_download'] = 'Download Language Pack';
 $txt['languages_download_note'] = 'This page lists all the files that are contained within the language pack and some useful information about each one. All files that have their associated check box marked will be copied.';
 $txt['languages_download_info'] = '<strong>Note:</strong>
 	<ul class="normallist">
-		<li>Files which have the status &quot;Not Writable&quot; means SMF will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
-		<li>The Version information for a file displays the last SMF version which it was updated for. If it is indicated in green then this is a newer version than you have at current. If amber this indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
+		<li>Files which have the status &quot;Not Writable&quot; means the system will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
+		<li>The Version information for a file displays the last forum version which it was updated for. If it is indicated in green then this is a newer version than you have at current. If amber this indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
 		<li>Where a file already exists on your forum the &quot;Already Exists&quot; column will have one of two values. &quot;Identical&quot; indicates that the file already exists in an identical form and need not be overwritten. &quot;Different&quot; means that the contents vary in some way and overwriting is probably the optimum solution.</li>
 	</ul>';
 

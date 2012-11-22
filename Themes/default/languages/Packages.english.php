@@ -1,4 +1,5 @@
 <?php
+
 // Version: 2.1; Packages
 
 $txt['package_proceed'] = 'Proceed';
@@ -87,7 +88,7 @@ $txt['package_install_action'] = 'Action';
 $txt['package_install_desc'] = 'Description';
 $txt['install_actions'] = 'Install Actions';
 $txt['perform_actions'] = 'This will perform the following actions:';
-$txt['corrupt_compatible'] = 'The package you are trying to download or install is either corrupt or not compatible with this version of SMF.';
+$txt['corrupt_compatible'] = 'The package you are trying to download or install is either corrupt or not compatible with this version of the software.';
 $txt['package_create'] = 'Create';
 $txt['package_move'] = 'Move';
 $txt['package_delete'] = 'Delete';
@@ -152,7 +153,7 @@ $txt['package_ftp_server'] = 'FTP Server';
 $txt['package_ftp_port'] = 'Port';
 $txt['package_ftp_username'] = 'Username';
 $txt['package_ftp_password'] = 'Password';
-$txt['package_ftp_path'] = 'Local path to SMF';
+$txt['package_ftp_path'] = 'Local path to DIALOGO';
 $txt['package_ftp_test'] = 'Test';
 $txt['package_ftp_test_connection'] = 'Test Connection';
 $txt['package_ftp_test_success'] = 'FTP connection established.';
@@ -200,7 +201,7 @@ $txt['package_emulate'] = 'Emulate Version';
 $txt['package_emulate_install'] = 'Install Emulating:';
 $txt['package_emulate_uninstall'] = 'Uninstall Emulating:';
 $txt['package_emulate_revert'] = 'Revert';
-$txt['package_emulate_desc'] = 'Sometimes packages are locked to early versions of SMF but remain compatible with a newer version. Here you can choose to &quot;emulate&quot; a different SMF version within the package manager.';
+$txt['package_emulate_desc'] = 'Sometimes packages are locked to early versions of the software but remain compatible with a newer version. Here you can choose to &quot;emulate&quot; a different version within the package manager.';
 
 // Operations.
 $txt['operation_find'] = 'Find';
@@ -227,14 +228,14 @@ $txt['package_file_perms_more_files'] = 'More Files';
 
 $txt['package_file_perms_change'] = 'Change File Permissions';
 $txt['package_file_perms_predefined'] = 'Use predefined permission profile';
-$txt['package_file_perms_predefined_note'] = 'Note that this only applies the predefined profile to key SMF directories and files.';
+$txt['package_file_perms_predefined_note'] = 'Note that this only applies the predefined profile to key directories and files.';
 $txt['package_file_perms_apply'] = 'Apply individual file permissions settings selected above.';
 $txt['package_file_perms_custom'] = 'If &quot;Custom&quot; has been selected use chmod value of';
 $txt['package_file_perms_pre_restricted'] = 'Restricted - minimum files writable';
 $txt['package_file_perms_pre_standard'] = 'Standard - key files writable';
 $txt['package_file_perms_pre_free'] = 'Free - all files writable';
 $txt['package_file_perms_ftp_details'] = 'On most servers it is only possible to change file permissions using an FTP account. Please enter your FTP details below';
-$txt['package_file_perms_ftp_retain'] = 'Note, SMF will only retain the password information temporarily to aid operation of the package manager.';
+$txt['package_file_perms_ftp_retain'] = 'Note, the system will only retain the password information temporarily to aid operation of the package manager.';
 $txt['package_file_perms_go'] = 'Make Changes';
 
 $txt['package_file_perms_applying'] = 'Applying Changes';
@@ -247,7 +248,7 @@ $txt['package_file_perms_files_done'] = '%1$d of %2$d files done in current dire
 $txt['chmod_value_invalid'] = 'You have tried to enter an invalid chmod value. Chmod must be between 0444 and 0777';
 
 $txt['package_restore_permissions'] = 'Restore file permissions';
-$txt['package_restore_permissions_desc'] = 'The following file permissions were changed by SMF to install the selected package(s). You can return these files back to their original status by clicking &quot;Restore&quot; below.';
+$txt['package_restore_permissions_desc'] = 'The following file permissions were changed in order to install the selected package(s). You can return these files back to their original status by clicking &quot;Restore&quot; below.';
 $txt['package_restore_permissions_restore'] = 'Restore';
 $txt['package_restore_permissions_filename'] = 'Filename';
 $txt['package_restore_permissions_orig_status'] = 'Original Status';
@@ -258,12 +259,12 @@ $txt['package_restore_permissions_post_change'] = '%2$s (%3$s - was %2$s)';
 $txt['package_restore_permissions_action_skipped'] = '<em>Skipped</em>';
 $txt['package_restore_permissions_action_success'] = '<span style="color: green;">Success</span>';
 $txt['package_restore_permissions_action_failure'] = '<span class="error">Failed</span>';
-$txt['package_restore_permissions_action_done'] = 'SMF has attempted to restore the selected files back to their original permissions, the results can be seen below. If a change failed, or for a more detailed view of file permissions, please see the <a href="%1$s">File Permissions</a> section.';
+$txt['package_restore_permissions_action_done'] = 'An attempt to restore the selected files back to their original permissions has been completed, the results can be seen below. If a change failed, or for a more detailed view of file permissions, please see the <a href="%1$s">File Permissions</a> section.';
 
 $txt['package_file_perms_warning'] = 'Please Note';
 $txt['package_file_perms_warning_desc'] = '
 	<li>Be careful when changing file permissions from this section - incorrect permissions can adversely affect the operation of your forum!</li>
-	<li>On some server configurations selecting the wrong permissions may stop SMF from operating.</li>
+	<li>On some server configurations selecting the wrong permissions may stop the forum from operating.</li>
 	<li>Certain directories such as <em>attachments</em> need to be writable to use that functionality.</li>
 	<li>This functionality is mainly applicable on non-Windows based servers - it will not work as expected on Windows in regards to permission flags.</li>
 	<li>Before proceeding make sure you have an FTP client installed in case you do make an error and need to FTP into the server to remedy it.</li>';

@@ -1,19 +1,22 @@
 <?php
 
 /**
- * Forum maintenance. Important stuff.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * Forum maintenance. Important stuff.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -306,7 +309,7 @@ function MaintainFindFixErrors()
 
 /**
  * Wipes the whole cache directory.
- * This only applies to SMF's own cache directory, though.
+ * This only applies to DIALOGO's own cache directory, though.
  */
 function MaintainCleanCache()
 {
@@ -386,7 +389,7 @@ function Destroy()
  * Convert both data and database tables to UTF-8 character set.
  * It requires the admin_forum permission.
  * This only works if UTF-8 is not the global character set.
- * It supports all character sets used by SMF's language files.
+ * It supports all character sets used by DIALOGO's language files.
  * It redirects to ?action=admin;area=maintain after finishing.
  * This action is linked from the maintenance screen (if it's applicable).
  * Accessed by ?action=admin;area=maintain;sa=database;activity=convertutf8.
@@ -401,7 +404,7 @@ function ConvertUtf8()
 	// Show me your badge!
 	isAllowedTo('admin_forum');
 
-	// The character sets used in SMF's language files with their db equivalent.
+	// The character sets used in DIALOGO's language files with their db equivalent.
 	$charsets = array(
 		// Chinese-traditional.
 		'big5' => 'big5',
@@ -441,7 +444,7 @@ function ConvertUtf8()
 
 	$smcFunc['db_free_result']($request);
 
-	// Character sets supported by both MySQL and SMF's language files.
+	// Character sets supported by both MySQL and DIALOGO's language files.
 	$charsets = array_intersect($charsets, $db_charsets);
 
 	// This is for the first screen telling backups is good.
@@ -1144,7 +1147,7 @@ function OptimizeTables()
 	// If there aren't any tables then I believe that would mean the world has exploded...
 	$context['num_tables'] = count($tables);
 	if ($context['num_tables'] == 0)
-		fatal_error('You appear to be running SMF in a flat file mode... fantastic!', false);
+		fatal_error('You appear to be running DIALOGO in a flat file mode... fantastic!', false);
 
 	// For each table....
 	$context['optimized_tables'] = array();

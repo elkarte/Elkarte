@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file contains the files necessary to display news as an XML feed.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file contains the files necessary to display news as an XML feed.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -297,7 +300,7 @@ function ShowXmlFeed()
 
 	<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 	<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-	<generator uri="http://www.simplemachines.org" version="', strtr($forum_version, array('SMF' => '')), '">SMF</generator>
+	<generator uri="http://www.dialogoforum.org" version="', strtr($forum_version, array('DIALOGO' => '')), '">DIALOGO</generator>
 	<author>
 		<name>', strip_tags($context['forum_name']), '</name>
 	</author>';

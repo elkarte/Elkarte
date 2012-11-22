@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file has the hefty job of loading information for the forum.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file has the hefty job of loading information for the forum.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -187,9 +190,9 @@ function reloadSettings()
 	}
 
 	// Integration is cool.
-	if (defined('SMF_INTEGRATION_SETTINGS'))
+	if (defined('DIALOGO_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = unserialize(SMF_INTEGRATION_SETTINGS);
+		$integration_settings = unserialize(DIALOGO_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function, false);
 	}
@@ -319,7 +322,7 @@ function loadUserSettings()
 		// 2. RSS feeds and XMLHTTP requests don't count either.
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (SMF != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (DIALOGO != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
@@ -1457,7 +1460,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 
 		// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
-		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && SMF != 'SSI')
+		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && DIALOGO != 'SSI')
 		{
 			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
 			if (empty($_GET))
@@ -2559,19 +2562,19 @@ function loadDatabase()
 	require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (SMF == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	if (DIALOGO == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => SMF == 'SSI'));
+		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => DIALOGO == 'SSI'));
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
-	if (SMF == 'SSI')
+	if (DIALOGO == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
 
@@ -2716,7 +2719,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		case 'zend':
 			// Zend Platform/ZPS/etc.
 			if (function_exists('zend_shm_cache_store'))
-				zend_shm_cache_store('SMF::' . $key, $value, $ttl);
+				zend_shm_cache_store('DIALOGO::' . $key, $value, $ttl);
 			elseif (function_exists('output_cache_put'))
 				output_cache_put($key, $value);
 			break;
@@ -2735,7 +2738,7 @@ function cache_put_data($key, $value, $ttl = 120)
 				@unlink($cachedir . '/data_' . $key . '.php');
 			else
 			{
-				$cache_data = '<' . '?' . 'php if (!defined(\'SMF\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}' . '?' . '>';
+				$cache_data = '<' . '?' . 'php if (!defined(\'DIALOGO\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}' . '?' . '>';
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
@@ -2812,7 +2815,7 @@ function cache_get_data($key, $ttl = 120)
 		case 'zend':
 			// Zend's pricey stuff.
 			if (function_exists('zend_shm_cache_fetch'))
-				$value = zend_shm_cache_fetch('SMF::' . $key, $ttl);
+				$value = zend_shm_cache_fetch('DIALOGO::' . $key, $ttl);
 			elseif (function_exists('output_cache_get'))
 				$value = output_cache_get($key, $ttl);
 			break;
@@ -2821,7 +2824,7 @@ function cache_get_data($key, $ttl = 120)
 				$value = xcache_get($key);
 			break;
 		default:
-			// Otherwise it's SMF data!
+			// Otherwise it's DIALOGO data!
 			if (file_exists($cachedir . '/data_' . $key . '.php') && filesize($cachedir . '/data_' . $key . '.php') > 10)
 			{
 				// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution

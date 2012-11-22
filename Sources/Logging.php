@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file concerns itself with logging, whether in the database or files.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file concerns itself with logging, whether in the database or files.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -67,7 +70,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	// Grab the last all-of-SMF-specific log_online deletion time.
+	// Grab the last all-of-DIALOGO-specific log_online deletion time.
 	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
@@ -137,7 +140,7 @@ function writeLog($force = false)
 		$_SESSION['timeOnlineUpdated'] = time();
 
 	// Set their login time, if not already done within the last minute.
-	if (SMF != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
+	if (DIALOGO != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
 	{
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
@@ -388,7 +391,7 @@ function trackStats($stats = array())
  * You should use {@link logActions()} instead.
  * @example logAction('remove', array('starter' => $id_member_started));
  *
- * @deprecated deprecated since version 2.1
+ * @deprecated
  *
  * @param string $action
  * @param array $extra = array()
@@ -405,7 +408,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
 
 /**
  * Log changes to the forum, such as moderation events or administrative changes.
- * This behaves just like logAction() in SMF 2.0, except that it is designed to log multiple actions at once.
+ * This behaves just like logAction() did, except that it is designed to log multiple actions at once.
  *
  * @param array $logs
  * @return the last logged ID

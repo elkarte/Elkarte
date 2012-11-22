@@ -1,39 +1,40 @@
 <?php
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
- */
+ * This template contains two humble sub templates - main. Its job is pretty
+ * simple: it collects the information we need to actually send the topic.
+ *
+ * The main sub template gets shown from:
+ * 	'?action=emailuser;sa=sendtopic;topic=##.##'
+ * And should submit to:
+ * 	'?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
+ * It should send the following fields:
+ * 	y_name: sender's name.
+ * 	y_email: sender's email.
+ * 	comment: any additional comment.
+ * 	r_name: receiver's name.
+ * 	r_email: receiver's email address.
+ * 	send: this just needs to be set, as by the submit button.
+ * 	sc: the session id, or $context['session_id'].
+ *
+ * The report sub template gets shown from:
+ * 	'?action=reporttm;topic=##.##;msg=##'
+ * It should submit to:
+ * 	'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
+ * It only needs to send the following fields:
+ * 	comment: an additional comment to give the moderator.
+ * 	sc: the session id, or $context['session_id'].
 
-//------------------------------------------------------------------------------
-/*	This template contains two humble sub templates - main. Its job is pretty
-	simple: it collects the information we need to actually send the topic.
-
-	The main sub template gets shown from:
-		'?action=emailuser;sa=sendtopic;topic=##.##'
-	And should submit to:
-		'?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
-	It should send the following fields:
-		y_name: sender's name.
-		y_email: sender's email.
-		comment: any additional comment.
-		r_name: receiver's name.
-		r_email: receiver's email address.
-		send: this just needs to be set, as by the submit button.
-		sc: the session id, or $context['session_id'].
-
-	The report sub template gets shown from:
-		'?action=reporttm;topic=##.##;msg=##'
-	It should submit to:
-		'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
-	It only needs to send the following fields:
-		comment: an additional comment to give the moderator.
-		sc: the session id, or $context['session_id'].
 */
 
 // This is where we get information about who they want to send the topic to, etc.

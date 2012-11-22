@@ -1,21 +1,24 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file has the primary job of showing and editing people's profiles.
  * It also allows the user to change some of their or another's preferences,
  * and such things.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -62,7 +65,7 @@ function ModifyProfile($post_errors = array())
 	$context['user']['is_owner'] = $memID == $user_info['id'];
 
 	/* Define all the sections within the profile area!
-		We start by defining the permission required - then SMF takes this and turns it into the relevant context ;)
+		We start by defining the permission required - then we take this and turn it into the relevant context ;)
 		Possible fields:
 			For Section:
 				string $title:		Section title.

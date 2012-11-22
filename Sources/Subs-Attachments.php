@@ -1,21 +1,23 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
  * This file handles the uploading and creation of attachments
  * as well as the auto management of the attachment directories.
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines
- *
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 function automanage_attachments_check_directory()
@@ -471,7 +473,7 @@ function attachmentChecks($attachID)
 	if (!empty($error))
 		fatal_lang_error('attach_check_nag', 'debug', array($error));
 
-	// These are the only valid image types for SMF.
+	// These are the only valid image types.
 	$validImageTypes = array(
 		1 => 'gif',
 		2 => 'jpeg',
@@ -640,7 +642,7 @@ function createAttachment(&$attachmentOptions)
 
 	require_once($sourcedir . '/Subs-Graphics.php');
 
-	// These are the only valid image types for SMF.
+	// These are the only valid image types.
 	$validImageTypes = array(
 		1 => 'gif',
 		2 => 'jpeg',

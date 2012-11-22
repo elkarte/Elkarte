@@ -1,20 +1,23 @@
 <?php
 
 /**
- * This is perhaps the most important and probably most accessed file in all
- * of SMF.  This file controls topic, message, and attachment display.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This is perhaps the most important and probably most accessed file in all
+ * of DIALOGO.  This file controls topic, message, and attachment display.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -1592,7 +1595,7 @@ function loadAttachmentContext($id_msg)
 						list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 						$thumb_size = filesize($filename . '_thumb');
 
-						// These are the only valid image types for SMF.
+						// These are the only valid image types.
 						$validImageTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 5 => 'psd', 6 => 'bmp', 7 => 'tiff', 8 => 'tiff', 9 => 'jpeg', 14 => 'iff');
 
 						// What about the extension?

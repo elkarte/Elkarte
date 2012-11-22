@@ -1,19 +1,22 @@
 <?php
 
 /**
- * ManagePermissions handles all possible permission stuff.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * ManagePermissions handles all possible permission stuff.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -1400,7 +1403,7 @@ function loadAllPermissions($loadType = 'classic')
 	global $context, $txt, $modSettings;
 
 	// List of all the groups dependant on the currently selected view - for the order so it looks pretty, yea?
-	// Note to Mod authors - you don't need to stick your permission group here if you don't mind SMF sticking it the last group of the page.
+	// Note to Mod authors - you don't need to stick your permission group here if you don't mind having it as the last group of the page.
 	$permissionGroups = array(
 		'membergroup' => array(
 			'simple' => array(

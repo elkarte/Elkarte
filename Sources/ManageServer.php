@@ -1,9 +1,19 @@
 <?php
 
 /**
- * Contains all the functionality required to be able to edit the core server
- * settings. This includes anything from which an error may result in the forum
- * destroying itself in a firey fury.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * Contains all the functionality required to be able to edit the core server settings.
+ * This includes anything from which an error may result in the forum destroying itself in a firey fury.
  *
  * Adding options to one of the setting screens isn't hard. Call prepareDBSettingsContext;
  * The basic format for a checkbox is:
@@ -46,17 +56,9 @@
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
  *  	array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -581,7 +583,6 @@ function prepareServerSettingsContext(&$config_vars)
 
 /**
  * Helper function, it sets up the context for database settings.
- * @todo see rev. 10406 from 2.1-requests
  *
  * @param array $config_vars
  */
@@ -844,7 +845,6 @@ function saveSettings(&$config_vars)
 
 /**
  * Helper function for saving database settings.
- * @todo see rev. 10406 from 2.1-requests
  *
  * @param array $config_vars
  */

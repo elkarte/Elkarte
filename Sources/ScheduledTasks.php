@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file is automatically called and handles all manner of scheduled things.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file is automatically called and handles all manner of scheduled things.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -1241,7 +1244,7 @@ function loadEssentialThemeData()
 }
 
 /**
- * This retieves data (e.g. last version of SMF) from sm.org
+ * This retieves data (e.g. last version of DIALOGO)
  */
 function scheduled_fetchSMfiles()
 {

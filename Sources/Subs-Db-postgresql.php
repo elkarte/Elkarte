@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to the database.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file has all the main functions in it that relate to the database.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -448,7 +451,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		$clean .= substr($db_string, $old_pos);
 		$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-		// We don't use UNION in SMF, at least so far.  But it's useful for injections.
+		// We don't use UNION in DIALOGO, at least so far.  But it's useful for injections.
 		if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 			$fail = true;
 		// Comments?  We don't use comments in our queries, we leave 'em outside!
@@ -586,7 +589,7 @@ function smf_db_error($db_string, $connection = null)
 		$context['error_message'] = $txt['try_again'];
 
 	// A database error is often the sign of a database in need of updgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
-	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'SMF ' . @$modSettings['smfVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
+	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['smfVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
 		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['smfVersion']);
 
 	if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)

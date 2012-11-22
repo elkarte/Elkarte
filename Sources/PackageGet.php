@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file handles the package servers and packages download from Package Manager.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file handles the package servers and packages download from Package Manager.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -300,7 +303,7 @@ function PackageGBrowse()
 			$default_title = $smcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
 	}
 
-	$the_version = strtr($forum_version, array('SMF ' => ''));
+	$the_version = strtr($forum_version, array('DIALOGO ' => ''));
 	if (!empty($_SESSION['version_emulate']))
 		$the_version = $_SESSION['version_emulate'];
 
@@ -384,7 +387,7 @@ function PackageGBrowse()
 				$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
 				$package['is_newer'] = $package['is_installed'] && ($installed_mods[$package['id']] > $package['version']);
 
-				// This package is either not installed, or installed but old.  Is it supported on this version of SMF?
+				// This package is either not installed, or installed but old.  Is it supported on this version of DIALOGO?
 				if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 				{
 					if ($thisPackage->exists('version/@for'))
@@ -417,7 +420,7 @@ function PackageGBrowse()
 
 					if (!empty($package['author']['email']))
 					{
-						// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an SMF IM Form or other web mail form.
+						// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an DIALOGO IM Form or other web mail form.
 						$package['author']['href'] = preg_match('~^[\w\.\-]+@[\w][\w\-\.]+[\w]$~', $package['author']['email']) != 0 ? 'mailto:' . $package['author']['email'] : $package['author']['email'];
 						$package['author']['link'] = '<a href="' . $package['author']['href'] . '">' . $package['author']['name'] . '</a>';
 					}

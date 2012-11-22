@@ -1,19 +1,22 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to, well, everything.
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
+ * This file has all the main functions in it that relate to, well, everything.
+ *
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
@@ -2482,7 +2485,7 @@ function highlight_php_code($code)
 	global $context;
 
 	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'SMF_TAB();', '&#91;' => '[')));
+	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'DIALOGO_TAB();', '&#91;' => '[')));
 
 	$oldlevel = error_reporting(0);
 
@@ -2491,7 +2494,7 @@ function highlight_php_code($code)
 	error_reporting($oldlevel);
 
 	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
-	$buffer = preg_replace('~SMF_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
+	$buffer = preg_replace('~DIALOGO_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
 
 	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
@@ -2720,7 +2723,7 @@ function url_image_size($url)
 		if ($fp != false)
 		{
 			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/SMF' . "\r\n" . 'Connection: close' . "\r\n\r\n");
+			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/DIALOGO' . "\r\n" . 'Connection: close' . "\r\n\r\n");
 
 			// Read in the HTTP/1.1 or whatever.
 			$test = substr(fgets($fp, 11), -1);
@@ -2904,7 +2907,7 @@ function setupThemeContext($forceload = false)
 	// This is done to allow theme authors to customize it as they want.
 	$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'pm');
 
-	// 2.1+: Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
+	// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 	if($context['show_pm_popup'])
 		addInlineJavascript('
 		$(document).ready(function(){
@@ -3659,7 +3662,7 @@ function clean_cache($type = '')
 			break;
 		case 'zend':
 			if (function_exists('zend_shm_cache_clear'))
-				zend_shm_cache_clear('SMF');
+				zend_shm_cache_clear('DIALOGO');
 			break;
 		case 'xcache':
 			if (function_exists('xcache_clear_cache'))
@@ -3681,7 +3684,7 @@ function clean_cache($type = '')
 			if (!is_dir($cachedir))
 				return;
 
-			// Remove the files in SMF's own disk cache, if any
+			// Remove the files in DIALOGO's own disk cache, if any
 			$dh = opendir($cachedir);
 			while ($file = readdir($dh))
 			{
