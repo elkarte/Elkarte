@@ -801,10 +801,6 @@ function loadEssentialData()
 	if (empty($smcFunc))
 		$smcFunc = array();
 
-	// Check we don't need some compatibility.
-	if (@version_compare(PHP_VERSION, '5.1', '<='))
-		require_once($sourcedir . '/Subs-Compat.php');
-
 	// Initialize everything...
 	initialize_inputs();
 

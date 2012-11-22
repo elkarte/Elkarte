@@ -57,10 +57,6 @@ require_once($sourcedir . '/Load.php');
 require_once($sourcedir . '/Security.php');
 require_once($sourcedir . '/Class-BrowserDetect.php');
 
-// Using an pre-PHP 5.1 version?
-if (version_compare(PHP_VERSION, '5.1', '<'))
-	require_once($sourcedir . '/Subs-Compat.php');
-
 // If $maintenance is set specifically to 2, then we're upgrading or something.
 if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
