@@ -1641,3 +1641,15 @@ function updateAuthMethod()
 		document.getElementById("auth_pass_div").style.display = "none";
 	}
 }
+
+function highlightSelected(box)
+{
+	if (prevClass != "")
+		prevDiv.className = prevClass;
+
+	prevDiv = document.getElementById(box);
+	prevClass = prevDiv.className;
+
+	prevDiv.className = "highlight2";
+}
+
