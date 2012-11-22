@@ -1099,6 +1099,103 @@ h3.grid_header {
 	border-right: 1px solid #ddd;
 }
 
+/* Admin menu icons as sprites
+------------------------------------------------- */
+.admin_administration {
+	background: url(../images/admin/admin_sprite.png) no-repeat -0px -0px;
+}
+.admin_attachment {
+	background: url(../images/admin/admin_sprite.png) no-repeat -16px -0px;
+}
+.admin_ban {
+	background: url(../images/admin/admin_sprite.png) no-repeat -32px -0px;
+}
+.admin_boards {
+	background: url(../images/admin/admin_sprite.png) no-repeat -48px -0px;
+}
+.admin_calendar {
+	background: url(../images/admin/admin_sprite.png) no-repeat -64px -0px;
+}
+.admin_corefeatures {
+	background: url(../images/admin/admin_sprite.png) no-repeat -80px -0px;
+}
+.admin_current_theme {
+	background: url(../images/admin/admin_sprite.png) no-repeat -96px -0px;
+}
+.admin_engines {
+	background: url(../images/admin/admin_sprite.png) no-repeat -112px -0px;
+}
+.admin_exit {
+	background: url(../images/admin/admin_sprite.png) no-repeat -128px -0px;
+}
+.admin_features {
+	background: url(../images/admin/admin_sprite.png) no-repeat -144px -0px;
+}
+.admin_languages {
+	background: url(../images/admin/admin_sprite.png) no-repeat -160px -0px;
+}
+.admin_logs {
+	background: url(../images/admin/admin_sprite.png) no-repeat -176px -0px;
+}
+.admin_mail {
+	background: url(../images/admin/admin_sprite.png) no-repeat -192px -0px;
+}
+.admin_maintain {
+	background: url(../images/admin/admin_sprite.png) no-repeat -208px -0px;
+}
+.admin_membergroups {
+	background: url(../images/admin/admin_sprite.png) no-repeat -224px -0px;
+}
+.admin_members {
+	background: url(../images/admin/admin_sprite.png) no-repeat -240px -0px;
+}
+.admin_modifications {
+	background: url(../images/admin/admin_sprite.png) no-repeat -256px -0px;
+}
+.admin_news {
+	background: url(../images/admin/admin_sprite.png) no-repeat -272px -0px;
+}
+.admin_packages {
+	background: url(../images/admin/admin_sprite.png) no-repeat -288px -0px;
+}
+.admin_paid {
+	background: url(../images/admin/admin_sprite.png) no-repeat -304px -0px;
+}
+.admin_permissions {
+	background: url(../images/admin/admin_sprite.png) no-repeat -320px -0px;
+}
+.admin_posts {
+	background: url(../images/admin/admin_sprite.png) no-repeat -336px -0px;
+}
+.admin_regcenter {
+	background: url(../images/admin/admin_sprite.png) no-repeat -352px -0px;
+}
+.admin_reports {
+	background: url(../images/admin/admin_sprite.png) no-repeat -368px -0px;
+}
+.admin_scheduled {
+	background: url(../images/admin/admin_sprite.png) no-repeat -384px -0px;
+}
+.admin_search {
+	background: url(../images/admin/admin_sprite.png) no-repeat -400px -0px;
+}
+.admin_security {
+	background: url(../images/admin/admin_sprite.png) no-repeat -416px -0px;
+}
+.admin_server {
+	background: url(../images/admin/admin_sprite.png) no-repeat -432px -0px;
+}
+.admin_smiley {
+	background: url(../images/admin/admin_sprite.png) no-repeat -448px -0px;
+}
+.admin_support {
+	background: url(../images/admin/admin_sprite.png) no-repeat -464px -0px;
+}
+.admin_themes {
+	background: url(../images/admin/admin_sprite.png) no-repeat -480px -0px;
+}
+
+
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
 /*@media screen and (max-width: 85em) {
 	.features p {

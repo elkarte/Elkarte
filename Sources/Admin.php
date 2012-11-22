@@ -51,18 +51,21 @@ function AdminMain()
 				'index' => array(
 					'label' => $txt['admin_center'],
 					'function' => 'AdminHome',
-					'icon' => 'administration.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_administration',
 				),
 				'credits' => array(
 					'label' => $txt['support_credits_title'],
 					'function' => 'AdminHome',
-					'icon' => 'support.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_support',
 				),
 				'news' => array(
 					'label' => $txt['news_title'],
 					'file' => 'ManageNews.php',
 					'function' => 'ManageNews',
-					'icon' => 'news.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_news',
 					'permission' => array('edit_news', 'send_mail', 'admin_forum'),
 					'subsections' => array(
 						'editnews' => array($txt['admin_edit_news'], 'edit_news'),
@@ -75,7 +78,8 @@ function AdminMain()
 					'file' => 'Packages.php',
 					'function' => 'Packages',
 					'permission' => array('admin_forum'),
-					'icon' => 'packages.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_packages',
 					'subsections' => array(
 						'browse' => array($txt['browse_packages']),
 						'packageget' => array($txt['download_packages'], 'url' => $scripturl . '?action=admin;area=packages;sa=packageget;get'),
@@ -93,7 +97,8 @@ function AdminMain()
 					'label' => $txt['admin_logoff'],
 					'function' => 'AdminEndSession',
 					'enabled' => empty($modSettings['securityDisable']),
-					'icon' => 'exit.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_exit',
 				),
 
 			),
@@ -106,13 +111,15 @@ function AdminMain()
 					'label' => $txt['core_settings_title'],
 					'file' => 'ManageSettings.php',
 					'function' => 'ModifyCoreFeatures',
-					'icon' => 'corefeatures.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_corefeatures',
 				),
 				'featuresettings' => array(
 					'label' => $txt['modSettings_title'],
 					'file' => 'ManageSettings.php',
 					'function' => 'ModifyFeatureSettings',
-					'icon' => 'features.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_features',
 					'subsections' => array(
 						'basic' => array($txt['mods_cat_features']),
 						'layout' => array($txt['mods_cat_layout']),
@@ -125,7 +132,8 @@ function AdminMain()
 					'label' => $txt['admin_security_moderation'],
 					'file' => 'ManageSettings.php',
 					'function' => 'ModifySecuritySettings',
-					'icon' => 'security.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_security',
 					'subsections' => array(
 						'general' => array($txt['mods_cat_security_general']),
 						'spam' => array($txt['antispam_title']),
@@ -136,7 +144,8 @@ function AdminMain()
 					'label' => $txt['language_configuration'],
 					'file' => 'ManageLanguages.php',
 					'function' => 'ManageLanguages',
-					'icon' => 'languages.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_languages',
 					'subsections' => array(
 						'edit' => array($txt['language_edit']),
 						'add' => array($txt['language_add']),
@@ -147,7 +156,8 @@ function AdminMain()
 					'label' => $txt['admin_server_settings'],
 					'file' => 'ManageServer.php',
 					'function' => 'ModifySettings',
-					'icon' => 'server.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_server',
 					'subsections' => array(
 						'general' => array($txt['general_settings']),
 						'database' => array($txt['database_paths_settings']),
@@ -162,14 +172,16 @@ function AdminMain()
 					'file' => 'Themes.php',
 					'function' => 'ThemesMain',
 					'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
-					'icon' => 'current_theme.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_current_theme',
 				),
 				'theme' => array(
 					'label' => $txt['theme_admin'],
 					'file' => 'Themes.php',
 					'function' => 'ThemesMain',
 					'custom_url' => $scripturl . '?action=admin;area=theme',
-					'icon' => 'themes.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_themes',
 					'subsections' => array(
 						'admin' => array($txt['themeadmin_admin_title']),
 						'list' => array($txt['themeadmin_list_title']),
@@ -181,7 +193,8 @@ function AdminMain()
 					'label' => $txt['admin_modifications'],
 					'file' => 'ManageSettings.php',
 					'function' => 'ModifyModSettings',
-					'icon' => 'modifications.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_modifications',
 					'subsections' => array(
 						'general' => array($txt['mods_cat_modifications_misc']),
 						'hooks' => array($txt['hooks_title_list']),
@@ -200,7 +213,8 @@ function AdminMain()
 					'label' => $txt['admin_boards'],
 					'file' => 'ManageBoards.php',
 					'function' => 'ManageBoards',
-					'icon' => 'boards.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_boards',
 					'permission' => array('manage_boards'),
 					'subsections' => array(
 						'main' => array($txt['boardsEdit']),
@@ -213,7 +227,8 @@ function AdminMain()
 					'file' => 'ManagePosts.php',
 					'function' => 'ManagePostSettings',
 					'permission' => array('admin_forum'),
-					'icon' => 'posts.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_posts',
 					'subsections' => array(
 						'posts' => array($txt['manageposts_settings']),
 						'bbc' => array($txt['manageposts_bbc_settings']),
@@ -225,7 +240,8 @@ function AdminMain()
 					'label' => $txt['manage_drafts'],
 					'file' => 'Drafts.php',
 					'function' => 'ModifyDraftSettings',
-					'icon' => 'logs.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_logs',
 					'permission' => array('admin_forum'),
 					'enabled' => in_array('dr', $context['admin_features']),
 				),
@@ -233,7 +249,8 @@ function AdminMain()
 					'label' => $txt['manage_calendar'],
 					'file' => 'ManageCalendar.php',
 					'function' => 'ManageCalendar',
-					'icon' => 'calendar.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_calendar',
 					'permission' => array('admin_forum'),
 					'enabled' => in_array('cd', $context['admin_features']),
 					'subsections' => array(
@@ -245,7 +262,8 @@ function AdminMain()
 					'label' => $txt['manage_search'],
 					'file' => 'ManageSearch.php',
 					'function' => 'ManageSearch',
-					'icon' => 'search.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_search',
 					'permission' => array('admin_forum'),
 					'subsections' => array(
 						'weights' => array($txt['search_weights']),
@@ -257,7 +275,8 @@ function AdminMain()
 					'label' => $txt['smileys_manage'],
 					'file' => 'ManageSmileys.php',
 					'function' => 'ManageSmileys',
-					'icon' => 'smiley.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_smiley',
 					'permission' => array('manage_smileys'),
 					'subsections' => array(
 						'editsets' => array($txt['smiley_sets']),
@@ -272,7 +291,8 @@ function AdminMain()
 					'label' => $txt['attachments_avatars'],
 					'file' => 'ManageAttachments.php',
 					'function' => 'ManageAttachments',
-					'icon' => 'attachment.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_attachment',
 					'permission' => array('manage_attachments'),
 					'subsections' => array(
 						'browse' => array($txt['attachment_manager_browse']),
@@ -292,7 +312,8 @@ function AdminMain()
 					'label' => $txt['admin_users'],
 					'file' => 'ManageMembers.php',
 					'function' => 'ViewMembers',
-					'icon' => 'members.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_members',
 					'permission' => array('moderate_forum'),
 					'subsections' => array(
 						'all' => array($txt['view_all_members']),
@@ -303,7 +324,8 @@ function AdminMain()
 					'label' => $txt['admin_groups'],
 					'file' => 'ManageMembergroups.php',
 					'function' => 'ModifyMembergroups',
-					'icon' => 'membergroups.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_membergroups',
 					'permission' => array('manage_membergroups'),
 					'subsections' => array(
 						'index' => array($txt['membergroups_edit_groups'], 'manage_membergroups'),
@@ -315,7 +337,8 @@ function AdminMain()
 					'label' => $txt['edit_permissions'],
 					'file' => 'ManagePermissions.php',
 					'function' => 'ModifyPermissions',
-					'icon' => 'permissions.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_permissions',
 					'permission' => array('manage_permissions'),
 					'subsections' => array(
 						'index' => array($txt['permissions_groups'], 'manage_permissions'),
@@ -329,7 +352,8 @@ function AdminMain()
 					'label' => $txt['registration_center'],
 					'file' => 'ManageRegistration.php',
 					'function' => 'RegCenter',
-					'icon' => 'regcenter.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_regcenter',
 					'permission' => array('admin_forum', 'moderate_forum'),
 					'subsections' => array(
 						'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
@@ -342,7 +366,8 @@ function AdminMain()
 					'label' => $txt['ban_title'],
 					'file' => 'ManageBans.php',
 					'function' => 'Ban',
-					'icon' => 'ban.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_ban',
 					'permission' => 'manage_bans',
 					'subsections' => array(
 						'list' => array($txt['ban_edit_list']),
@@ -355,7 +380,8 @@ function AdminMain()
 					'label' => $txt['paid_subscriptions'],
 					'enabled' => in_array('ps', $context['admin_features']),
 					'file' => 'ManagePaid.php',
-					'icon' => 'paid.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_paid',
 					'function' => 'ManagePaidSubscriptions',
 					'permission' => 'admin_forum',
 					'subsections' => array(
@@ -367,7 +393,8 @@ function AdminMain()
 					'label' => $txt['search_engines'],
 					'enabled' => in_array('sp', $context['admin_features']),
 					'file' => 'ManageSearchEngines.php',
-					'icon' => 'engines.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_engines',
 					'function' => 'SearchEngines',
 					'permission' => 'admin_forum',
 					'subsections' => array(
@@ -386,7 +413,8 @@ function AdminMain()
 				'maintain' => array(
 					'label' => $txt['maintain_title'],
 					'file' => 'ManageMaintenance.php',
-					'icon' => 'maintain.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_maintain',
 					'function' => 'ManageMaintenance',
 					'subsections' => array(
 						'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
@@ -398,7 +426,8 @@ function AdminMain()
 				'scheduledtasks' => array(
 					'label' => $txt['maintain_tasks'],
 					'file' => 'ManageScheduledTasks.php',
-					'icon' => 'scheduled.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_scheduled',
 					'function' => 'ManageScheduledTasks',
 					'subsections' => array(
 						'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
@@ -409,7 +438,8 @@ function AdminMain()
 					'label' => $txt['mailqueue_title'],
 					'file' => 'ManageMail.php',
 					'function' => 'ManageMail',
-					'icon' => 'mail.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_mail',
 					'subsections' => array(
 						'browse' => array($txt['mailqueue_browse'], 'admin_forum'),
 						'settings' => array($txt['mailqueue_settings'], 'admin_forum'),
@@ -420,12 +450,14 @@ function AdminMain()
 					'label' => $txt['generate_reports'],
 					'file' => 'Reports.php',
 					'function' => 'ReportsMain',
-					'icon' => 'reports.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_reports',
 				),
 				'logs' => array(
 					'label' => $txt['logs'],
 					'function' => 'AdminLogs',
-					'icon' => 'logs.png',
+					'icon' => 'transparent.png',
+					'class' => 'admin_logs',
 					'subsections' => array(
 						'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
 						'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
