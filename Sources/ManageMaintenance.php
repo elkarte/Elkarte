@@ -389,7 +389,7 @@ function Destroy()
  * Convert both data and database tables to UTF-8 character set.
  * It requires the admin_forum permission.
  * This only works if UTF-8 is not the global character set.
- * It supports all character sets used by DIALOGO's language files.
+ * It supports all character sets used in our language files.
  * It redirects to ?action=admin;area=maintain after finishing.
  * This action is linked from the maintenance screen (if it's applicable).
  * Accessed by ?action=admin;area=maintain;sa=database;activity=convertutf8.
@@ -404,7 +404,7 @@ function ConvertUtf8()
 	// Show me your badge!
 	isAllowedTo('admin_forum');
 
-	// The character sets used in DIALOGO's language files with their db equivalent.
+	// The character sets used in the language files with their db equivalent.
 	$charsets = array(
 		// Chinese-traditional.
 		'big5' => 'big5',

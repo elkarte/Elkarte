@@ -530,6 +530,7 @@ function ModifyBasicSettings($return_config = false)
 			// Option-ish things... miscellaneous sorta.
 			array('check', 'allow_disableAnnounce'),
 			array('check', 'disallow_sendBody'),
+			array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
 	);
 
 	// Get all the time zones.
@@ -2099,7 +2100,7 @@ function ModifyPruningSettings($return_config = false)
 			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
 			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
 			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
-			// Mod Developers: Do NOT use the pruningOptions master variable for this as DIALOGO Core may overwrite your setting in the future!
+			// Mod Developers: Do NOT use the pruningOptions master variable for this as the Core may overwrite your setting in the future!
 	);
 
 	call_integration_hook('integrate_prune_settings', array($config_vars));

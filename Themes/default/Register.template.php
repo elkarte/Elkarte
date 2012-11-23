@@ -38,6 +38,11 @@ function template_registration_agreement()
 		echo '
 				<input type="submit" name="accept_agreement" value="', $txt['agreement_agree'], '" class="button_submit" />';
 
+	if ($context['show_contact_button'])
+		echo '
+				<br /><br />
+				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="button_submit" />';
+
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['register_token_var'], '" value="', $context['register_token'], '" />
@@ -341,6 +346,11 @@ function template_registration_form()
 	else
 		echo '
 				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
+
+	if ($context['show_contact_button'])
+		echo '
+				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="button_submit" />';
+
 	echo '
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -712,6 +722,70 @@ function template_edit_reserved_words()
 				</div>
 			</div>
 		</form>';
+}
+
+function template_contact_form()
+{
+	global $context, $settings, $options, $scripturl, $txt;
+
+	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['admin_contact_form'], '</h3>
+		</div>
+		<form id="contact_form" class="windowbg2" action="', $scripturl, '?action=contact" method="post" accept-charset="', $context['character_set'], '">
+			<div class="content">';
+			if (!empty($context['errors']))
+				echo '
+				<div class="errorbox">', $txt['errors_contact_form'], ': <ul><li>', implode('</li><li>', $context['errors']), '</li></ul></div>';
+			echo '
+				<dl class="settings">
+					<dt>
+						<label for="emailaddres">', $txt['admin_register_email'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="emailaddres" id="emailaddres" value="', !empty($context['emailaddres']) ? $context['emailaddres'] : '', '" tabindex="', $context['tabindex']++, '" />
+					</dd>
+					<dt>
+						<label for="contactmessage">', $txt['contact_your_message'], '</label>
+					</dt>
+					<dd>
+						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', !empty($context['contactmessage']) ? $context['contactmessage'] : '', '</textarea>
+					</dd>';
+			if ($context['require_verification'])
+			{
+					echo '
+					<dt>
+							', $txt['verification'], ':
+					</dt>
+					<dd>
+							', template_control_verification($context['visual_verification_id'], 'all'), '
+					</dd>';
+			}
+			echo '
+				</dl>
+				<hr class="hrcolor" />
+				<div class="flow_auto" >
+					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
+					<input type="hidden" name="sa" value="reservednames" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['contact_token_var'], '" value="', $context['contact_token'], '" />
+				</div>
+			</div>
+		</form>';
+}
+
+function template_contact_form_done()
+{
+	global $txt;
+
+	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['admin_contact_form'], '</h3>
+		</div>
+		<div class="windowbg2">
+				', $txt['contact_thankyou'], '
+		</div>
+		<br class="clear" />';
 }
 
 ?>
