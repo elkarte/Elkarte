@@ -1653,3 +1653,17 @@ function highlightSelected(box)
 	prevDiv.className = "highlight2";
 }
 
+function doAutoSubmit()
+{
+	var formID = typeof(formName) != 'undefined' ? formName : "autoSubmit";
+	
+	if (countdown == 0)
+		document.forms[formID].submit();
+	else if (countdown == -1)
+		return;
+
+	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
+	countdown--;
+
+	setTimeout("doAutoSubmit();", 1000);
+}
