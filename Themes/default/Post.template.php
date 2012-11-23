@@ -900,23 +900,11 @@ function template_announcement_send()
 		</form>
 	</div>
 	<br />
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var countdown = 2;
-			doAutoSubmit();
-
-			function doAutoSubmit()
-			{
-				if (countdown == 0)
-					document.forms.autoSubmit.submit();
-				else if (countdown == -1)
-					return;
-
-				document.forms.autoSubmit.b.value = "', $txt['announce_continue'], ' (" + countdown + ")";
-				countdown--;
-
-				setTimeout("doAutoSubmit();", 1000);
-			}
-		// ]]></script>';
+	<script type="text/javascript"><!-- // --><![CDATA[
+		var countdown = 2;
+		var txt_message = "', $txt['announce_continue'], '";
+		doAutoSubmit();
+	// ]]></script>';
 }
 
 ?>

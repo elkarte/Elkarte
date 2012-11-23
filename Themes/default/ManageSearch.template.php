@@ -272,7 +272,7 @@ function template_create_index_progress()
 						</div>
 					</div>
 					<hr class="hrcolor" />
-					<input type="submit" name="b" value="', $txt['search_create_index_continue'], '" class="button_submit" />
+					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" class="button_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="step" value="', $context['step'], '" />
@@ -283,20 +283,8 @@ function template_create_index_progress()
 	</div>
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var countdown = 10;
+		var txt_message = "', $txt['search_create_index_continue'], '";
 		doAutoSubmit();
-
-		function doAutoSubmit()
-		{
-			if (countdown == 0)
-				document.forms.autoSubmit.submit();
-			else if (countdown == -1)
-				return;
-
-			document.forms.autoSubmit.b.value = "', $txt['search_create_index_continue'], ' (" + countdown + ")";
-			countdown--;
-
-			setTimeout("doAutoSubmit();", 1000);
-		}
 	// ]]></script>';
 
 }

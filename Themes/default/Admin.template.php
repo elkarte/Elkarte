@@ -697,20 +697,8 @@ function template_not_done()
 	</div>
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var countdown = ', $context['continue_countdown'], ';
+		var txt_message = "', $txt['not_done_continue'], '";
 		doAutoSubmit();
-
-		function doAutoSubmit()
-		{
-			if (countdown == 0)
-				document.forms.autoSubmit.submit();
-			else if (countdown == -1)
-				return;
-
-			document.forms.autoSubmit.cont.value = "', $txt['not_done_continue'], ' (" + countdown + ")";
-			countdown--;
-
-			setTimeout("doAutoSubmit();", 1000);
-		}
 	// ]]></script>';
 }
 
@@ -1523,7 +1511,7 @@ function template_repair_boards()
 				</p>
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="submit" name="recount" id="recount_now" value="', $txt['errors_recount_now'], '" />
+					<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
 				</form>';
 		}
 		else
@@ -1546,20 +1534,9 @@ function template_repair_boards()
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var countdown = 5;
+		var txt_message = "', $txt['errors_recount_now'], '";
+		var formName = "recount_form";
 		doAutoSubmit();
-
-		function doAutoSubmit()
-		{
-			if (countdown == 0)
-				document.forms.recount_form.submit();
-			else if (countdown == -1)
-				return;
-
-			document.forms.recount_form.recount_now.value = "', $txt['errors_recount_now'], ' (" + countdown + ")";
-			countdown--;
-
-			setTimeout("doAutoSubmit();", 1000);
-		}
 	// ]]></script>';
 	}
 }

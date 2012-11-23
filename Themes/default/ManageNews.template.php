@@ -321,7 +321,7 @@ function template_email_members_send()
 						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
 					</div>
 					<hr class="hrcolor" />
-					<input type="submit" name="b" value="', $txt['email_continue'], '" class="button_submit" />
+					<input type="submit" name="cont" value="', $txt['email_continue'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="subject" value="', $context['subject'], '" />
 					<input type="hidden" name="message" value="', $context['message'], '" />
@@ -345,20 +345,8 @@ function template_email_members_send()
 
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var countdown = 2;
+		var message = "', $txt['email_continue'], '";
 		doAutoSubmit();
-
-		function doAutoSubmit()
-		{
-			if (countdown == 0)
-				document.forms.autoSubmit.submit();
-			else if (countdown == -1)
-				return;
-
-			document.forms.autoSubmit.b.value = "', $txt['email_continue'], ' (" + countdown + ")";
-			countdown--;
-
-			setTimeout("doAutoSubmit();", 1000);
-		}
 	// ]]></script>';
 }
 

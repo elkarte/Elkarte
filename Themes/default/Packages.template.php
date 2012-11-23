@@ -1789,20 +1789,8 @@ function template_pause_action_permissions()
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var countdown = ', $countDown, ';
+		var txt_message = "', $txt['not_done_continue'], '";
 		doAutoSubmit();
-
-		function doAutoSubmit()
-		{
-			if (countdown == 0)
-				document.forms.perm_submit.submit();
-			else if (countdown == -1)
-				return;
-
-			document.getElementById(\'cont\').value = "', $txt['not_done_continue'], ' (" + countdown + ")";
-			countdown--;
-
-			setTimeout("doAutoSubmit();", 1000);
-		}
 	// ]]></script>';
 
 }
