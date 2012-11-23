@@ -28,7 +28,7 @@
 		html:		'<!DOCTYPE html>' +
 				'<html>' +
 					'<head>' +
-						'<!--[if IE]><style>* {min-height: auto !important}</style><![endif]-->' +
+						'<style>.ie * {min-height: auto !important}</style>' +
 						'<meta http-equiv="Content-Type" content="text/html;charset={charset}" />' +
 						'<link rel="stylesheet" type="text/css" href="{style}" />' +
 					'</head>' +
@@ -302,7 +302,7 @@
 			// Add IE version class to the HTML element so can apply
 			// conditional styling without CSS hacks
 			if($.sceditor.ie)
-				$doc.find("html").addClass('ie' + $.sceditor.ie);
+				$doc.find("html").addClass('ie').addClass('ie' + $.sceditor.ie);
 
 			// iframe overflow fix
 			if(/iPhone|iPod|iPad| wosbrowser\//i.test(navigator.userAgent) || $.sceditor.ie)
@@ -875,7 +875,7 @@
 		 */
 		base.closeDropDown = function (focus) {
 			if($dropdown) {
-				$dropdown.remove();
+				$dropdown.off().remove();
 				$dropdown = null;
 			}
 
@@ -1619,6 +1619,10 @@
 		do {
 			div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->';
 		} while (all[0]);
+		
+		// Detect IE 10 as it doesn't support conditional comments.
+		if((document.all && window.atob))
+			v = 10;
 
 		return v > 4 ? v : undef;
 	}());
