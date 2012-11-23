@@ -40,31 +40,19 @@ function template_main()
 		echo '
 			var pollOptionNum = 0, pollTabIndex;
 			var pollOptionId = ', $context['last_choice_id'], ';
-			function addPollOption()
-			{
-				if (pollOptionNum == 0)
-				{
-					for (var i = 0, n = document.forms.postmodify.elements.length; i < n; i++)
-						if (document.forms.postmodify.elements[i].id.substr(0, 8) == \'options-\')
-						{
-							pollOptionNum++;
-							pollTabIndex = document.forms.postmodify.elements[i].tabIndex;
-						}
-				}
-				pollOptionNum++
-				pollOptionId++
-
-				setOuterHTML(document.getElementById(\'pollMoreOptions\'), ', JavaScriptEscape('<li><label for="options-'), ' + pollOptionId + ', JavaScriptEscape('">' . $txt['option'] . ' '), ' + pollOptionNum + ', JavaScriptEscape('</label>: <input type="text" name="options['), ' + pollOptionId + ', JavaScriptEscape(']" id="options-'), ' + pollOptionId + ', JavaScriptEscape('" value="" size="80" maxlength="255" tabindex="'), ' + pollTabIndex + ', JavaScriptEscape('" class="input_text" /></li><li id="pollMoreOptions"></li>'), ');
-			}';
+			var txt_option = "', $txt['option'], '";';
 
 	// If we are making a calendar event we want to ensure we show the current days in a month etc... this is done here.
 	if ($context['make_event'])
 		echo '
 			var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];';
 
-	// End of the javascript, start the form and display the link tree.
+	// End of the javascript
 	echo '
-		// ]]></script>
+		// ]]></script>';
+	
+	// Start the form and display the link tree.
+	echo '
 		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
@@ -411,7 +399,7 @@ function template_main()
 
 		echo '
 						</dl>';
-
+		
 		if (!empty($context['files_in_session_warning']))
 			echo '
 						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
@@ -440,18 +428,9 @@ function template_main()
 								<script type="text/javascript"><!-- // --><![CDATA[
 									var allowed_attachments = ', $context['num_allowed_attachments'], ';
 									var current_attachment = 1;
-
-									function addAttachment()
-									{
-										allowed_attachments = allowed_attachments - 1;
-										current_attachment = current_attachment + 1;
-										if (allowed_attachments <= 0)
-											return alert("', $txt['more_attachments_error'], '");
-
-										setOuterHTML(document.getElementById("moreAttachments"), \'<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment\' + current_attachment + \'" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\\\'attachment\' + current_attachment + \'\\\');">', $txt['clean_attach'], '<\/a>)\' + \'<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')<\' + \'/a><\' + \'/dd>\');
-
-										return true;
-									}
+									var txt_more_attachments_error = "', $txt['more_attachments_error'], '";
+									var txt_more_attachments = "', $txt['more_attachments'], '";
+									var txt_clean_attach = "', $txt['clean_attach'], '";
 								// ]]></script>
 							</dd>
 							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
@@ -553,195 +532,26 @@ function template_main()
 			<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 		</form>';
 
+	// The variables used to preview a post without loading a new page.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[';
-
-	// The functions used to preview a posts without loading a new page.
-	echo '
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var post_box_name = "', $context['post_box_name'], '";
+			var form_name = "postmodify";
+			var preview_area = "post";
 			var current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ';
-			var make_poll = ', $context['make_poll'] ? 'true' : 'false', ';
 			var txt_preview_title = "', $txt['preview_title'], '";
 			var txt_preview_fetch = "', $txt['preview_fetch'], '";
+			var make_poll = ', $context['make_poll'] ? 'true' : 'false', ';
 			var new_replies = new Array();
 			var reply_counter = ', empty($counter) ? 0 : $counter, ';
-			function previewPost()
-			{';
-	if (isBrowser('is_firefox'))
-		echo '
-				// Firefox doesn\'t render <marquee> that have been put it using javascript
-				if (document.forms.postmodify.elements[', JavaScriptEscape($context['post_box_name']), '].value.indexOf(\'[move]\') != -1)
-				{
-					return submitThisOnce(document.forms.postmodify);
-				}';
-	echo '
-				if (window.XMLHttpRequest)
-				{
-					// Opera didn\'t support setRequestHeader() before 8.01.
-					if (\'opera\' in window)
-					{
-						var test = new XMLHttpRequest();
-						if (!(\'setRequestHeader\' in test))
-							return submitThisOnce(document.forms.postmodify);
-					}
-					// @todo Currently not sending poll options and option checkboxes.
-					var x = new Array();
-					var textFields = [\'subject\', ', JavaScriptEscape($context['post_box_name']), ', ', JavaScriptEscape($context['session_var']), ', \'icon\', \'guestname\', \'email\', \'evtitle\', \'question\', \'topic\'];
-					var numericFields = [
-						\'board\', \'topic\', \'last_msg\',
-						\'eventid\', \'calendar\', \'year\', \'month\', \'day\',
-						\'poll_max_votes\', \'poll_expire\', \'poll_change_vote\', \'poll_hide\'
-					];
-					var checkboxFields = [
-						\'ns\'
-					];
-
-					for (var i = 0, n = textFields.length; i < n; i++)
-						if (textFields[i] in document.forms.postmodify)
-						{
-							// Handle the WYSIWYG editor.
-							if (textFields[i] == ', JavaScriptEscape($context['post_box_name']), ' && $("#', $context['post_box_name'], '").data("sceditor") != undefined)
-								x[x.length] = textFields[i] + \'=\' + $("#', $context['post_box_name'], '").data("sceditor").getText().replace(/&#/g, \'&#38;#\').php_to8bit().php_urlencode();
-							else
-								x[x.length] = textFields[i] + \'=\' + document.forms.postmodify[textFields[i]].value.replace(/&#/g, \'&#38;#\').php_to8bit().php_urlencode();
-						}
-					for (var i = 0, n = numericFields.length; i < n; i++)
-						if (numericFields[i] in document.forms.postmodify && \'value\' in document.forms.postmodify[numericFields[i]])
-							x[x.length] = numericFields[i] + \'=\' + parseInt(document.forms.postmodify.elements[numericFields[i]].value);
-					for (var i = 0, n = checkboxFields.length; i < n; i++)
-						if (checkboxFields[i] in document.forms.postmodify && document.forms.postmodify.elements[checkboxFields[i]].checked)
-							x[x.length] = checkboxFields[i] + \'=\' + document.forms.postmodify.elements[checkboxFields[i]].value;
-
-					sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=post2\' + (current_board ? \';board=\' + current_board : \'\') + (make_poll ? \';poll\' : \'\') + \';preview;xml\', x.join(\'&\'), onDocSent);
-
-					document.getElementById(\'preview_section\').style.display = \'\';
-					setInnerHTML(document.getElementById(\'preview_subject\'), txt_preview_title);
-					setInnerHTML(document.getElementById(\'preview_body\'), txt_preview_fetch);
-
-					return false;
-				}
-				else
-					return submitThisOnce(document.forms.postmodify);
-			}
-			function onDocSent(XMLDoc)
-			{
-				if (!XMLDoc)
-				{
-					document.forms.postmodify.preview.onclick = new function ()
-					{
-						return true;
-					}
-					document.forms.postmodify.preview.click();
-				}
-
-				// Show the preview section.
-				var preview = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'preview\')[0];
-				setInnerHTML(document.getElementById(\'preview_subject\'), preview.getElementsByTagName(\'subject\')[0].firstChild.nodeValue);
-
-				var bodyText = \'\';
-				for (var i = 0, n = preview.getElementsByTagName(\'body\')[0].childNodes.length; i < n; i++)
-					bodyText += preview.getElementsByTagName(\'body\')[0].childNodes[i].nodeValue;
-
-				setInnerHTML(document.getElementById(\'preview_body\'), bodyText);
-				document.getElementById(\'preview_body\').className = \'post\';
-
-				// Show a list of errors (if any).
-				var errors = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'errors\')[0];
-				var errorList = new Array();
-				for (var i = 0, numErrors = errors.getElementsByTagName(\'error\').length; i < numErrors; i++)
-					errorList[errorList.length] = errors.getElementsByTagName(\'error\')[i].firstChild.nodeValue;
-				document.getElementById(\'errors\').style.display = numErrors == 0 ? \'none\' : \'\';
-				document.getElementById(\'errors\').className = errors.getAttribute(\'serious\') == 1 ? \'errorbox\' : \'noticebox\';
-				document.getElementById(\'error_serious\').style.display = numErrors == 0 ? \'none\' : \'\';
-				setInnerHTML(document.getElementById(\'error_list\'), numErrors == 0 ? \'\' : errorList.join(\'<br />\'));
-
-				// Show a warning if the topic has been locked.
-				document.getElementById(\'lock_warning\').style.display = errors.getAttribute(\'topic_locked\') == 1 ? \'\' : \'none\';
-
-				// Adjust the color of captions if the given data is erroneous.
-				var captions = errors.getElementsByTagName(\'caption\');
-				for (var i = 0, numCaptions = errors.getElementsByTagName(\'caption\').length; i < numCaptions; i++)
-					if (document.getElementById(\'caption_\' + captions[i].getAttribute(\'name\')))
-						document.getElementById(\'caption_\' + captions[i].getAttribute(\'name\')).className = captions[i].getAttribute(\'class\');
-
-				if (errors.getElementsByTagName(\'post_error\').length == 1)
-					document.forms.postmodify.', $context['post_box_name'], '.style.border = \'1px solid red\';
-				else if (document.forms.postmodify.', $context['post_box_name'], '.style.borderColor == \'red\' || document.forms.postmodify.', $context['post_box_name'], '.style.borderColor == \'red red red red\')
-				{
-					if (\'runtimeStyle\' in document.forms.postmodify.', $context['post_box_name'], ')
-						document.forms.postmodify.', $context['post_box_name'], '.style.borderColor = \'\';
-					else
-						document.forms.postmodify.', $context['post_box_name'], '.style.border = null;
-				}
-
-				// Set the new last message id.
-				if (\'last_msg\' in document.forms.postmodify)
-					document.forms.postmodify.last_msg.value = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'last_msg\')[0].firstChild.nodeValue;
-
-				// Remove the new image from old-new replies!
-				for (i = 0; i < new_replies.length; i++)
-					document.getElementById(\'image_new_\' + new_replies[i]).style.display = \'none\';
-				new_replies = new Array();
-
-				var ignored_replies = new Array(), ignoring;
-				var newPosts = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'new_posts\')[0] ? XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'new_posts\')[0].getElementsByTagName(\'post\') : {length: 0};
-				var numNewPosts = newPosts.length;
-				if (numNewPosts != 0)
-				{
-					var newPostsHTML = \'<span id="new_replies"><\' + \'/span>\';
-					for (var i = 0; i < numNewPosts; i++)
-					{
-						new_replies[new_replies.length] = newPosts[i].getAttribute("id");
-
-						ignoring = false;
-						if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue != 0)
-							ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
-
-						newPostsHTML += \'<div class="windowbg\' + (++reply_counter % 2 == 0 ? \'2\' : \'\') + \' core_posts"><div class="content" id="msg\' + newPosts[i].getAttribute("id") + \'"><div class="floatleft"><h5>', $txt['posted_by'], ': \' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + \'</h5><span class="smalltext">&#171;&nbsp;<strong>', $txt['on'], ':</strong> \' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + \'&nbsp;&#187;</span> <span class="new_posts" id="image_new_\' + newPosts[i].getAttribute("id") + \'">', $txt['new'], '</span></div>\';';
-
-	if ($context['can_quote'])
-		echo '
-						newPostsHTML += \'<ul class="reset smalltext quickbuttons" id="msg_\' + newPosts[i].getAttribute("id") + \'_quote"><li><a href="#postmodify" onclick="return insertQuoteFast(\\\'\' + newPosts[i].getAttribute("id") + \'\\\');" class="quote_button"><span>',$txt['bbc_quote'],'</span><\' + \'/a></li></ul>\';';
-
-	echo '
-						newPostsHTML += \'<br class="clear" />\';
-
-						if (ignoring)
-							newPostsHTML += \'<div id="msg_\' + newPosts[i].getAttribute("id") + \'_ignored_prompt" class="smalltext">', $txt['ignoring_user'], '<a href="#" id="msg_\' + newPosts[i].getAttribute("id") + \'_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a></div>\';
-
-						newPostsHTML += \'<div class="list_posts smalltext" id="msg_\' + newPosts[i].getAttribute("id") + \'_body">\' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + \'<\' + \'/div></div></div>\';
-					}
-					setOuterHTML(document.getElementById(\'new_replies\'), newPostsHTML);
-				}
-
-				var numIgnoredReplies = ignored_replies.length;
-				if (numIgnoredReplies != 0)
-				{
-					for (var i = 0; i < numIgnoredReplies; i++)
-					{
-						aIgnoreToggles[ignored_replies[i]] = new smc_Toggle({
-							bToggleEnabled: true,
-							bCurrentlyCollapsed: true,
-							aSwappableContainers: [
-								\'msg_\' + ignored_replies[i] + \'_body\',
-								\'msg_\' + ignored_replies[i] + \'_quote\',
-							],
-							aSwapLinks: [
-								{
-									sId: \'msg_\' + ignored_replies[i] + \'_ignored_link\',
-									msgExpanded: \'\',
-									msgCollapsed: ', JavaScriptEscape($txt['show_ignore_user_post']), '
-								}
-							]
-						});
-					}
-				}
-
-				location.hash = \'#\' + \'preview_section\';
-
-				if (typeof(smf_codeFix) != \'undefined\')
-					smf_codeFix();
-			}';
-
+			var can_quote = ', $context['can_quote'] ? 'true' : 'false', ';
+			var show_ignore_user_post = "', $txt['show_ignore_user_post'], '";
+			var txt_bbc_quote = "', $txt['bbc_quote'], '";
+			var txt_ignoring_user = "', $txt['ignoring_user'], '";
+			var txt_new = "', $txt['new'], '";
+			var txt_posted_by = "', $txt['posted_by'], '";
+			var txt_on = "', $txt['on'], '";';
+			
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
@@ -804,7 +614,7 @@ function template_main()
 
 	echo '
 		// ]]></script>';
-
+		
 	// If the user is replying to a topic show the previous posts.
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
@@ -858,6 +668,7 @@ function template_main()
 		echo '
 		</div>
 		<script type="text/javascript"><!-- // --><![CDATA[
+			var post_box_name = "', $context['post_box_name'], '";
 			var aIgnoreToggles = new Array();';
 
 		foreach ($ignored_posts as $post_id)
@@ -881,27 +692,6 @@ function template_main()
 		}
 
 		echo '
-			function insertQuoteFast(messageid)
-			{
-				if (window.XMLHttpRequest)
-					getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=0\', onDocReceived);
-				else
-					reqWin(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=0\', 240, 90);
-
-				return true;
-			}
-			function onDocReceived(XMLDoc)
-			{
-				var text = \'\';
-
-				for (var i = 0, n = XMLDoc.getElementsByTagName(\'quote\')[0].childNodes.length; i < n; i++)
-					text += XMLDoc.getElementsByTagName(\'quote\')[0].childNodes[i].nodeValue;
-				$("#', $context['post_box_name'], '").data("sceditor").InsertText(text);
-			}
-			function onReceiveOpener(text)
-			{
-				$("#', $context['post_box_name'], '").data("sceditor").InsertText(text);
-			}
 		// ]]></script>';
 	}
 }
