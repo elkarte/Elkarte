@@ -3707,18 +3707,24 @@ function clean_cache($type = '')
 				zend_shm_cache_clear('DIALOGO');
 			break;
 		case 'xcache':
-			if (function_exists('xcache_clear_cache'))
+			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
-				//
-				if ($type === '')
+				
+				// Get the counts so we clear each instance
+				$pcnt = xcache_count(XC_TYPE_PHP);
+				$vcnt = xcache_count(XC_TYPE_VAR);
+				// Time to clear the user vars and/or the opcache
+				if ($type === '' || $type === 'user')
 				{
-					xcache_clear_cache(XC_TYPE_VAR, 0);
-					xcache_clear_cache(XC_TYPE_PHP, 0);
+					for ($i = 0; $i < $vcnt; $i++)
+						xcache_clear_cache(XC_TYPE_VAR, $i);
 				}
-				if ($type === 'user')
-					xcache_clear_cache(XC_TYPE_VAR, 0);
-				if ($type === 'data')
-					xcache_clear_cache(XC_TYPE_PHP, 0);
+				
+				if ($type === '' || $type === 'data')
+				{
+					for ($i = 0; $i < $pcnt; $i++)
+						xcache_clear_cache(XC_TYPE_PHP, $i);
+				}
 			}
 			break;
 		default:
