@@ -39,6 +39,8 @@ function MessageMain()
 	require_once($sourcedir . '/Subs-Post.php');
 
 	loadLanguage('PersonalMessage+Drafts');
+	loadJavascriptFile('PersonalMessage.js', array('default_theme' => true), 'PersonalMessage.js');
+	loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
 
 	if (WIRELESS && WIRELESS_PROTOCOL == 'wap')
 		fatal_lang_error('wireless_error_notyet', false);

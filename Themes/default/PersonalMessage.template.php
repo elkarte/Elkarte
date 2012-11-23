@@ -60,78 +60,8 @@ function template_folder()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var allLabels = {};
 		var currentLabels = {};
-		function loadLabelChoices()
-		{
-			var listing = document.forms.pmFolder.elements;
-			var theSelect = document.forms.pmFolder.pm_action;
-			var add, remove, toAdd = {length: 0}, toRemove = {length: 0};
-
-			if (theSelect.childNodes.length == 0)
-				return;
-
-			// This is done this way for internationalization reasons.
-			if (!(\'-1\' in allLabels))
-			{
-				for (var o = 0; o < theSelect.options.length; o++)
-					if (theSelect.options[o].value.substr(0, 4) == "rem_")
-						allLabels[theSelect.options[o].value.substr(4)] = theSelect.options[o].text;
-			}
-
-			for (var i = 0; i < listing.length; i++)
-			{
-				if (listing[i].name != "pms[]" || !listing[i].checked)
-					continue;
-
-				var alreadyThere = [], x;
-				for (x in currentLabels[listing[i].value])
-				{
-					if (!(x in toRemove))
-					{
-						toRemove[x] = allLabels[x];
-						toRemove.length++;
-					}
-					alreadyThere[x] = allLabels[x];
-				}
-
-				for (x in allLabels)
-				{
-					if (!(x in alreadyThere))
-					{
-						toAdd[x] = allLabels[x];
-						toAdd.length++;
-					}
-				}
-			}
-
-			while (theSelect.options.length > 2)
-				theSelect.options[2] = null;
-
-			if (toAdd.length != 0)
-			{
-				theSelect.options[theSelect.options.length] = new Option("', $txt['pm_msg_label_apply'], '", "");
-				setInnerHTML(theSelect.options[theSelect.options.length - 1], "', $txt['pm_msg_label_apply'], '");
-				theSelect.options[theSelect.options.length - 1].disabled = true;
-
-				for (i in toAdd)
-				{
-					if (i != "length")
-						theSelect.options[theSelect.options.length] = new Option(toAdd[i], "add_" + i);
-				}
-			}
-
-			if (toRemove.length != 0)
-			{
-				theSelect.options[theSelect.options.length] = new Option("', $txt['pm_msg_label_remove'], '", "");
-				setInnerHTML(theSelect.options[theSelect.options.length - 1], "', $txt['pm_msg_label_remove'], '");
-				theSelect.options[theSelect.options.length - 1].disabled = true;
-
-				for (i in toRemove)
-				{
-					if (i != "length")
-						theSelect.options[theSelect.options.length] = new Option(toRemove[i], "rem_" + i);
-				}
-			}
-		}
+		var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
+		var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
 	// ]]></script>';
 
 	echo '
@@ -538,7 +468,7 @@ function template_folder()
 
 	<div class="pagesection">
 		<div class="floatleft">', $context['page_index'], '</div>
-		<div class="floatright"><input type="submit" name="del_selected" value="', $txt['quickmod_delete_selected'], '" style="font-weight: normal;" onclick="if (!confirm(\'', $txt['delete_selected_confirm'], '\')) return false;" class="button_submit" /></div>
+		<input type="submit" name="del_selected" value="', $txt['quickmod_delete_selected'], '" style="font-weight: normal;" onclick="if (!confirm(\'', $txt['delete_selected_confirm'], '\')) return false;" class="button_submit" />
 	</div>';
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
@@ -901,6 +831,7 @@ function template_search_results()
 				{
 					$quote_button = create_button('quote.png', 'reply_quote', 'reply_quote', 'class="centericon"');
 					$reply_button = create_button('im_reply.png', 'reply', 'reply', 'class="centericon"');
+					
 					// You can only reply if they are not a guest...
 					if (!$message['member']['is_guest'])
 						echo '
@@ -1203,8 +1134,6 @@ function template_send()
 	</div><br class="clear" />';
 
 	echo '
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/PersonalMessage.js?alp21"></script>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oPersonalMessageSend = new smf_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
@@ -1315,6 +1244,7 @@ function template_labels()
 			</tr>
 		</thead>
 		<tbody>';
+	
 	if (count($context['labels']) < 2)
 		echo '
 			<tr class="windowbg2">
@@ -1339,6 +1269,7 @@ function template_labels()
 			$alternate = !$alternate;
 		}
 	}
+	
 	echo '
 		</tbody>
 		</table>';
@@ -1528,140 +1459,51 @@ function template_add_rule()
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
-			var criteriaNum = 0;
-			var actionNum = 0;
-			var groups = new Array()
-			var labels = new Array()';
+		var criteriaNum = 0;
+		var actionNum = 0;
+		var groups = new Array()
+		var labels = new Array()
+		
+		var txt_pm_readable_and = "', $txt['pm_readable_and'], '";
+		var txt_pm_readable_or = "', $txt['pm_readable_or'], '";
+		var txt_pm_readable_member = "', $txt['pm_readable_member'], '";
+		var txt_pm_readable_group = "', $txt['pm_readable_group'], '";
+		var txt_pm_readable_subject  = "', $txt['pm_readable_subject'], '";
+		var txt_pm_readable_body = "', $txt['pm_readable_body'], '";
+		var txt_pm_readable_buddy = "', $txt['pm_readable_buddy'], '";
+		var txt_pm_readable_label = "', $txt['pm_readable_label'], '";
+		var txt_pm_readable_delete = "', $txt['pm_readable_delete'], '";
+		var txt_pm_readable_start = "', $txt['pm_readable_start'], '";
+		var txt_pm_readable_end = "', $txt['pm_readable_end'], '";
+		var txt_pm_readable_then = "', $txt['pm_readable_then'], '";
+		
+		var txt_pm_rule_not_defined = "', $txt['pm_rule_not_defined'], '";
+		var txt_pm_rule_bud = "', $txt['pm_rule_bud'], '";
+		var txt_pm_rule_sub = "', $txt['pm_rule_sub'], '";
+		var txt_pm_rule_msg = "', $txt['pm_rule_msg'], '";
+		var txt_pm_rule_criteria_pick = "', $txt['pm_rule_criteria_pick'], '";
+		var txt_pm_rule_mid = "', $txt['pm_rule_mid'], '";
+		var txt_pm_rule_gid = "', $txt['pm_rule_gid'], '";
+		var txt_pm_rule_sel_group = "', $txt['pm_rule_sel_group'], '";
+		
+		var txt_pm_rule_sel_action = "', $txt['pm_rule_sel_action'], '";
+		var txt_pm_rule_label = "', $txt['pm_rule_label'], '";
+		var txt_pm_rule_delete = "', $txt['pm_rule_delete'], '";
+		var txt_pm_rule_sel_label = "', $txt['pm_rule_sel_label'], '";
+		';
 
+	// All of the groups
 	foreach ($context['groups'] as $id => $title)
 		echo '
-			groups[', $id, '] = "', addslashes($title), '";';
-
+		groups[', $id, '] = "', addslashes($title), '";';
+	
+	// And any existing labels
 	foreach ($context['labels'] as $label)
 		if ($label['id'] != -1)
 			echo '
-			labels[', ($label['id'] + 1), '] = "', addslashes($label['name']), '";';
+		labels[', ($label['id'] + 1), '] = "', addslashes($label['name']), '";';
 
 	echo '
-			function addCriteriaOption()
-			{
-				if (criteriaNum == 0)
-				{
-					for (var i = 0; i < document.forms.addrule.elements.length; i++)
-						if (document.forms.addrule.elements[i].id.substr(0, 8) == "ruletype")
-							criteriaNum++;
-				}
-				criteriaNum++
-
-				setOuterHTML(document.getElementById("criteriaAddHere"), \'<br /><select name="ruletype[\' + criteriaNum + \']" id="ruletype\' + criteriaNum + \'" onchange="updateRuleDef(\' + criteriaNum + \'); rebuildRuleDesc();"><option value="">', addslashes($txt['pm_rule_criteria_pick']), ':<\' + \'/option><option value="mid">', addslashes($txt['pm_rule_mid']), '<\' + \'/option><option value="gid">', addslashes($txt['pm_rule_gid']), '<\' + \'/option><option value="sub">', addslashes($txt['pm_rule_sub']), '<\' + \'/option><option value="msg">', addslashes($txt['pm_rule_msg']), '<\' + \'/option><option value="bud">', addslashes($txt['pm_rule_bud']), '<\' + \'/option><\' + \'/select>&nbsp;<span id="defdiv\' + criteriaNum + \'" style="display: none;"><input type="text" name="ruledef[\' + criteriaNum + \']" id="ruledef\' + criteriaNum + \'" onkeyup="rebuildRuleDesc();" value="" class="input_text" /><\' + \'/span><span id="defseldiv\' + criteriaNum + \'" style="display: none;"><select name="ruledefgroup[\' + criteriaNum + \']" id="ruledefgroup\' + criteriaNum + \'" onchange="rebuildRuleDesc();"><option value="">', addslashes($txt['pm_rule_sel_group']), '<\' + \'/option>';
-
-	foreach ($context['groups'] as $id => $group)
-		echo '<option value="', $id, '">', strtr($group, array("'" => "\'")), '<\' + \'/option>';
-
-	echo '<\' + \'/select><\' + \'/span><span id="criteriaAddHere"><\' + \'/span>\');
-			}
-
-			function addActionOption()
-			{
-				if (actionNum == 0)
-				{
-					for (var i = 0; i < document.forms.addrule.elements.length; i++)
-						if (document.forms.addrule.elements[i].id.substr(0, 7) == "acttype")
-							actionNum++;
-				}
-				actionNum++
-
-				setOuterHTML(document.getElementById("actionAddHere"), \'<br /><select name="acttype[\' + actionNum + \']" id="acttype\' + actionNum + \'" onchange="updateActionDef(\' + actionNum + \'); rebuildRuleDesc();"><option value="">', addslashes($txt['pm_rule_sel_action']), ':<\' + \'/option><option value="lab">', addslashes($txt['pm_rule_label']), '<\' + \'/option><option value="del">', addslashes($txt['pm_rule_delete']), '<\' + \'/option><\' + \'/select>&nbsp;<span id="labdiv\' + actionNum + \'" style="display: none;"><select name="labdef[\' + actionNum + \']" id="labdef\' + actionNum + \'" onchange="rebuildRuleDesc();"><option value="">', addslashes($txt['pm_rule_sel_label']), '<\' + \'/option>';
-
-	foreach ($context['labels'] as $label)
-		if ($label['id'] != -1)
-			echo '<option value="', ($label['id'] + 1), '">', addslashes($label['name']), '<\' + \'/option>';
-
-	echo '<\' + \'/select><\' + \'/span><span id="actionAddHere"><\' + \'/span>\');
-			}
-
-			// Rebuild the rule description!
-			function rebuildRuleDesc()
-			{
-				// Start with nothing.
-				var text = "";
-				var joinText = "";
-				var actionText = "";
-				var hadBuddy = false;
-				var foundCriteria = false;
-				var foundAction = false;
-				var curNum, curVal, curDef;
-
-				for (var i = 0; i < document.forms.addrule.elements.length; i++)
-				{
-					if (document.forms.addrule.elements[i].id.substr(0, 8) == "ruletype")
-					{
-						if (foundCriteria)
-							joinText = document.getElementById("logic").value == \'and\' ? ', JavaScriptEscape(' ' . $txt['pm_readable_and'] . ' '), ' : ', JavaScriptEscape(' ' . $txt['pm_readable_or'] . ' '), ';
-						else
-							joinText = \'\';
-						foundCriteria = true;
-
-						curNum = document.forms.addrule.elements[i].id.match(/\d+/);
-						curVal = document.forms.addrule.elements[i].value;
-						if (curVal == "gid")
-							curDef = document.getElementById("ruledefgroup" + curNum).value.php_htmlspecialchars();
-						else if (curVal != "bud")
-							curDef = document.getElementById("ruledef" + curNum).value.php_htmlspecialchars();
-						else
-							curDef = "";
-
-						// What type of test is this?
-						if (curVal == "mid" && curDef)
-							text += joinText + ', JavaScriptEscape($txt['pm_readable_member']), '.replace("{MEMBER}", curDef);
-						else if (curVal == "gid" && curDef && groups[curDef])
-							text += joinText + ', JavaScriptEscape($txt['pm_readable_group']), '.replace("{GROUP}", groups[curDef]);
-						else if (curVal == "sub" && curDef)
-							text += joinText + ', JavaScriptEscape($txt['pm_readable_subject']), '.replace("{SUBJECT}", curDef);
-						else if (curVal == "msg" && curDef)
-							text += joinText + ', JavaScriptEscape($txt['pm_readable_body']), '.replace("{BODY}", curDef);
-						else if (curVal == "bud" && !hadBuddy)
-						{
-							text += joinText + ', JavaScriptEscape($txt['pm_readable_buddy']), ';
-							hadBuddy = true;
-						}
-					}
-					if (document.forms.addrule.elements[i].id.substr(0, 7) == "acttype")
-					{
-						if (foundAction)
-							joinText = ', JavaScriptEscape(' ' . $txt['pm_readable_and'] . ' '), ';
-						else
-							joinText = "";
-						foundAction = true;
-
-						curNum = document.forms.addrule.elements[i].id.match(/\d+/);
-						curVal = document.forms.addrule.elements[i].value;
-						if (curVal == "lab")
-							curDef = document.getElementById("labdef" + curNum).value.php_htmlspecialchars();
-						else
-							curDef = "";
-
-						// Now pick the actions.
-						if (curVal == "lab" && curDef && labels[curDef])
-							actionText += joinText + ', JavaScriptEscape($txt['pm_readable_label']), '.replace("{LABEL}", labels[curDef]);
-						else if (curVal == "del")
-							actionText += joinText + ', JavaScriptEscape($txt['pm_readable_delete']), ';
-					}
-				}
-
-				// If still nothing make it default!
-				if (text == "" || !foundCriteria)
-					text = "', $txt['pm_rule_not_defined'], '";
-				else
-				{
-					if (actionText != "")
-						text += ', JavaScriptEscape(' ' . $txt['pm_readable_then'] . ' '), ' + actionText;
-					text = ', JavaScriptEscape($txt['pm_readable_start']), ' + text + ', JavaScriptEscape($txt['pm_readable_end']), ';
-				}
-
-				// Set the actual HTML!
-				setInnerHTML(document.getElementById("ruletext"), text);
-			}
 	// ]]></script>';
 
 	echo '
