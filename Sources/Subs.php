@@ -523,10 +523,6 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	$context['current_page'] = $start / $num_per_page;
 
-	// Wireless will need the protocol on the URL somewhere.
-	if (WIRELESS)
-		$base_url .= ';' . WIRELESS_PROTOCOL;
-
 	$base_link = '<a class="navPages" href="' . ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d') . '">%2$s</a> ';
 
 	// Compact pages is off or on?
@@ -861,10 +857,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		return $message;
 	}
 
-	// Never show smileys for wireless clients.  More bytes, can't see it anyway :P.
-	if (WIRELESS)
-		$smileys = false;
-	elseif ($smileys !== null && ($smileys == '1' || $smileys == '0'))
+	if ($smileys !== null && ($smileys == '1' || $smileys == '0'))
 		$smileys = (bool) $smileys;
 
 	if (empty($modSettings['enableBBC']) && $message !== false)
@@ -2501,20 +2494,7 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
-	if (WIRELESS)
-	{
-		// Add the scripturl on if needed.
-		if ($add)
-			$setLocation = $scripturl . '?' . $setLocation;
-
-		$char = strpos($setLocation, '?') === false ? '?' : ';';
-
-		if (strpos($setLocation, '#') !== false)
-			$setLocation = strtr($setLocation, array('#' => $char . WIRELESS_PROTOCOL . '#'));
-		else
-			$setLocation .= $char . WIRELESS_PROTOCOL;
-	}
-	elseif ($add)
+	if ($add)
 		$setLocation = $scripturl . ($setLocation != '' ? '?' . $setLocation : '');
 
 	// Put the session ID in.
@@ -2536,7 +2516,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
 
 	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
-	if ($refresh && !WIRELESS)
+	if ($refresh)
 		header('Refresh: 0; URL=' . strtr($setLocation, array(' ' => '%20')));
 	else
 		header('Location: ' . str_replace(' ', '%20', $setLocation));
@@ -2616,10 +2596,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 	if ($do_footer)
 	{
-		if (WIRELESS && !isset($context['sub_template']))
-			fatal_lang_error('wireless_error_notyet', false);
-
-		// Just show the footer, then.
+		// Show the footer.
 		loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
 		// Anything special to put out?
@@ -2657,10 +2634,10 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Hand off the output to the portal, etc. we're integrated with.
-	call_integration_hook('integrate_exit', array($do_footer && !WIRELESS));
+	call_integration_hook('integrate_exit', array($do_footer));
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
-	if (!$from_index || WIRELESS)
+	if (!$from_index)
 		exit;
 }
 
@@ -3040,9 +3017,9 @@ function template_header()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
 		// Are we debugging the template/html content?
-		if (!isset($_REQUEST['xml']) && isset($_GET['debug']) && !isBrowser('ie') && !WIRELESS)
+		if (!isset($_REQUEST['xml']) && isset($_GET['debug']) && !isBrowser('ie'))
 			header('Content-Type: application/xhtml+xml');
-		elseif (!isset($_REQUEST['xml']) && !WIRELESS)
+		elseif (!isset($_REQUEST['xml']))
 			header('Content-Type: text/html; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
 	}
 

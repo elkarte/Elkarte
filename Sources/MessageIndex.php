@@ -43,10 +43,7 @@ function MessageIndex()
 		redirectexit($board_info['redirect']);
 	}
 
-	if (WIRELESS)
-		$context['sub_template'] = WIRELESS_PROTOCOL . '_messageindex';
-	else
-		loadTemplate('MessageIndex');
+	loadTemplate('MessageIndex');
 
 	$context['name'] = $board_info['name'];
 	$context['description'] = $board_info['description'];
@@ -54,8 +51,8 @@ function MessageIndex()
 	$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
 	// View all the topics, or just a few?
-	$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) && !WIRELESS ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
-	$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) && !WIRELESS ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+	$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
+	$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 	$maxindex = isset($_REQUEST['all']) && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
 
 	// Right, let's only index normal stuff!
@@ -365,7 +362,7 @@ function MessageIndex()
 	if (!$pre_query || !empty($topic_ids))
 	{
 		// For search engine effectiveness we'll link guests differently.
-		$context['pageindex_multiplier'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) && !WIRELESS ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+		$context['pageindex_multiplier'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 		$result = $smcFunc['db_query']('substring', '
 			SELECT

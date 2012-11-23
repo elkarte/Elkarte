@@ -94,7 +94,7 @@ function LockTopic()
 	sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
 
 	// Back to the topic!
-	redirectexit('topic=' . $topic . '.' . $_REQUEST['start'] . (WIRELESS ? ';moderate' : ''));
+	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 }
 
 /**
@@ -158,7 +158,7 @@ function Sticky()
 		sendNotifications($topic, 'sticky');
 
 	// Take them back to the now stickied topic.
-	redirectexit('topic=' . $topic . '.' . $_REQUEST['start'] . (WIRELESS ? ';moderate' : ''));
+	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 }
 
 ?>

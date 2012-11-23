@@ -413,16 +413,10 @@ function JSMembers()
 
 	checkSession('get');
 
-	if (WIRELESS)
-		$context['sub_template'] = WIRELESS_PROTOCOL . '_pm';
-	else
-	{
-		// Why is this in the Help template, you ask?  Well, erm... it helps you.  Does that work?
-		loadTemplate('Help');
-
-		$context['template_layers'] = array();
-		$context['sub_template'] = 'find_members';
-	}
+	// Why is this in the Help template, you ask?  Well, erm... it helps you.  Does that work?
+	loadTemplate('Help');
+	$context['template_layers'] = array();
+	$context['sub_template'] = 'find_members';
 
 	if (isset($_REQUEST['search']))
 		$context['last_search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);

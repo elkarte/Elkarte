@@ -42,7 +42,7 @@ function CalendarMain()
 		'post' => 'CalendarPost',
 	);
 
-	if (isset($_GET['sa']) && isset($subActions[$_GET['sa']]) && !WIRELESS)
+	if (isset($_GET['sa']) && isset($subActions[$_GET['sa']]))
 		return $subActions[$_GET['sa']]();
 
 	// This is gonna be needed...

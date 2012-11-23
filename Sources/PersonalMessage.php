@@ -42,11 +42,7 @@ function MessageMain()
 	loadJavascriptFile('PersonalMessage.js', array('default_theme' => true), 'PersonalMessage.js');
 	loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
 
-	if (WIRELESS && WIRELESS_PROTOCOL == 'wap')
-		fatal_lang_error('wireless_error_notyet', false);
-	elseif (WIRELESS)
-		$context['sub_template'] = WIRELESS_PROTOCOL . '_pm';
-	elseif (!isset($_REQUEST['xml']))
+	if (!isset($_REQUEST['xml']))
 		loadTemplate('PersonalMessage');
 
 	// Load up the members maximum message capacity.
@@ -190,7 +186,7 @@ function MessageMain()
 	);
 
 	// Preferences...
-	$context['display_mode'] = WIRELESS ? 0 : $user_settings['pm_prefs'] & 3;
+	$context['display_mode'] = $user_settings['pm_prefs'] & 3;
 
 	$subActions = array(
 		'addbuddy' => 'WirelessAddBuddy',
@@ -367,7 +363,7 @@ function messageIndexBar($area)
 	$context['menu_item_selected'] = $current_area;
 
 	// Set the template for this area and add the profile layer.
-	if (!WIRELESS && !isset($_REQUEST['xml']))
+	if (!isset($_REQUEST['xml']))
 		$context['template_layers'][] = 'pm';
 }
 
@@ -848,8 +844,7 @@ function MessageFolder()
 
 	$context['can_send_pm'] = allowedTo('pm_send');
 	$context['can_send_email'] = allowedTo('send_email_to_members');
-	if (!WIRELESS)
-		$context['sub_template'] = 'folder';
+	$context['sub_template'] = 'folder';
 	$context['page_title'] = $txt['pm_inbox'];
 
 	// Finally mark the relevant messages as read.
@@ -1558,12 +1553,10 @@ function MessagePost()
 	isAllowedTo('pm_send');
 
 	loadLanguage('PersonalMessage');
+	
 	// Just in case it was loaded from somewhere else.
-	if (!WIRELESS)
-	{
-		loadTemplate('PersonalMessage');
-		$context['sub_template'] = 'send';
-	}
+	loadTemplate('PersonalMessage');
+	$context['sub_template'] = 'send';
 
 	// Extract out the spam settings - cause it's neat.
 	list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -1869,7 +1862,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	if (!isset($_REQUEST['xml']))
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
 
-	if (!WIRELESS && !isset($_REQUEST['xml']))
+	if (!isset($_REQUEST['xml']))
 		$context['sub_template'] = 'send';
 	elseif (isset($_REQUEST['xml']))
 		$context['sub_template'] = 'pm';

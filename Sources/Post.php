@@ -1030,10 +1030,6 @@ function Post($post_errors = array())
 			'extra_after' => '<span><strong class="nav"> )</strong></span>'
 		);
 
-	// Give wireless a linktree url to the post screen, so that they can switch to full version.
-	if (WIRELESS)
-		$context['linktree'][count($context['linktree']) - 1]['url'] = $scripturl . '?action=post;' . (!empty($topic) ? 'topic=' . $topic : 'board=' . $board) . '.' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . (int) $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '');
-
 	$context['subject'] = addcslashes($form_subject, '"');
 	$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
 
@@ -1149,9 +1145,7 @@ function Post($post_errors = array())
 	checkSubmitOnce('register');
 
 	// Finally, load the template.
-	if (WIRELESS && WIRELESS_PROTOCOL != 'wap')
-		$context['sub_template'] = WIRELESS_PROTOCOL . '_post';
-	elseif (!isset($_REQUEST['xml']))
+	if (!isset($_REQUEST['xml']))
 		loadTemplate('Post');
 }
 

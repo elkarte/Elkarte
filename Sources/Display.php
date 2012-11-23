@@ -40,11 +40,8 @@ function Display()
 	if (empty($topic))
 		fatal_lang_error('no_board', false);
 
-	// Load the proper template and/or sub template.
-	if (WIRELESS)
-		$context['sub_template'] = WIRELESS_PROTOCOL . '_display';
-	else
-		loadTemplate('Display');
+	// Load the template
+	loadTemplate('Display');
 
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -55,7 +52,7 @@ function Display()
 	}
 
 	// How much are we sticking on each page?
-	$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) && !WIRELESS ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+	$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 	// Let's do some work on what to search index.
 	if (count($_GET) > 2)
@@ -1090,13 +1087,6 @@ function Display()
 	$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 	if (!empty($context['drafts_save']))
 		loadLanguage('Drafts');
-
-	// Wireless shows a "more" if you can do anything special.
-	if (WIRELESS && WIRELESS_PROTOCOL != 'wap')
-	{
-		$context['wireless_more'] = $context['can_sticky'] || $context['can_lock'] || allowedTo('modify_any');
-		$context['wireless_moderate'] = isset($_GET['moderate']) ? ';moderate' : '';
-	}
 
 	// Load up the "double post" sequencing magic.
 	if (!empty($options['display_quick_reply']))

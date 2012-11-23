@@ -1601,15 +1601,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'spellcheck',
 	);
 
-	// Wireless mode?  Load up the wireless stuff.
-	if (WIRELESS)
-	{
-		$context['template_layers'] = array(WIRELESS_PROTOCOL);
-		loadTemplate('Wireless');
-		loadLanguage('Wireless+index+Modifications');
-	}
 	// Output is fully XML, so no need for the index template.
-	elseif (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['xml']))
 	{
 		loadLanguage('index+Modifications');
 		loadTemplate('Xml');
@@ -2418,7 +2411,7 @@ function template_include($filename, $once = false)
 		else
 			ob_start();
 
-		if (isset($_GET['debug']) && !WIRELESS)
+		if (isset($_GET['debug']))
 			header('Content-Type: application/xhtml+xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
 
 		// Don't cache error pages!!
