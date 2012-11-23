@@ -180,6 +180,65 @@ function summary($memID)
 		$smcFunc['db_free_result']($request);
 	}
 
+	// Load up the most recent attachments for this user for use in profile views etc.
+	$limit = 8;
+	$attachments = list_getAttachments(0, $limit, 'm.poster_time DESC', boardsAllowedTo('view_attachments'), $context['member']['id']);
+
+	// load them in to $context for use in the template
+	$i = 0;
+	$context['thumbs'] = array();
+	$mime_images_url = $settings['default_images_url'] . '/mime_images/';
+	$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
+	
+	for ($i = 0, $count = count($attachments); $i < $count; $i++)
+	{
+		$context['thumbs'][$i] = array(
+			'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
+			'img' => '',
+		);
+
+		// Show a thumbnail image well?
+		if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
+		{
+			if (!empty($attachments[$i]['id_thumb']))
+				$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="' . $attachments[$i]['subject'] . '" alt="" />';
+			else
+			{
+				// no thumbnail available ... use html instead
+				if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
+				{
+					if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
+						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+					else
+						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+				}
+			}
+		}
+		// Not an image so lets set a mime thumbnail based off the filetype
+		else
+		{
+			if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
+				$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight']. '" />';
+			else
+				$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" />';
+		}
+	}
+
+	// Would you be mine? Could you be mine? Be my buddy :D
+	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'] && !empty($user_info['buddies']))
+	{
+		$context['buddies'] = array();
+		loadMemberData($user_info['buddies'], false, 'profile');
+
+		// Get the info for this buddy
+		foreach ($user_info['buddies'] as $buddy)
+		{
+			loadMemberContext($buddy);
+			$context['buddies'][$buddy] = $memberContext[$buddy];
+		}
+	}
+
+	// To finish this off, custom profile fields
 	loadCustomFields($memID);
 }
 
@@ -625,12 +684,12 @@ function showAttachments($memID)
 /**
  * Get a list of attachments for this user
  *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
- * @param type $boardsAllowed
- * @param type $memID
- * @return type
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param array $boardsAllowed
+ * @param ing $memID
+ * @return array
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
@@ -638,9 +697,11 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 
 	// Retrieve some attachments.
 	$request = $smcFunc['db_query']('', '
-		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, m.id_msg, m.id_topic,
-			m.id_board, m.poster_time, m.subject, b.name
-		FROM {db_prefix}attachments AS a
+		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
+			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
+			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
+		FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
+			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE a.attachment_type = {int:attachment_type}
@@ -668,7 +729,12 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 		$attachments[] = array(
 			'id' => $row['id_attach'],
 			'filename' => $row['filename'],
+			'fileext' => $row['fileext'],
+			'width' => $row['width'],
+			'height' => $row['height'],
 			'downloads' => $row['downloads'],
+			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
+			'id_thumb' => $row['id_thumb'],
 			'subject' => censorText($row['subject']),
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],
