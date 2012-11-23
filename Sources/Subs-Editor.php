@@ -1480,6 +1480,7 @@ function create_control_richedit($editorOptions)
 		loadJavascriptFile('editor.js', array('default_theme' => true), 'smf_editor');
 		loadJavascriptFile('jquery.sceditor.js', array('default_theme' => true));
 		loadJavascriptFile('jquery.sceditor.bbcode.js', array('default_theme' => true));
+		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
