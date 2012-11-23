@@ -665,16 +665,6 @@ function ModifyLanguages()
 		'javascript' => '
 					var prevClass = "";
 					var prevDiv = "";
-					function highlightSelected(box)
-					{
-						if (prevClass != "")
-							prevDiv.className = prevClass;
-
-						prevDiv = document.getElementById(box);
-						prevClass = prevDiv.className;
-
-						prevDiv.className = "highlight2";
-					}
 					highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language). '");
 		',
 	);
