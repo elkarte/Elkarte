@@ -2485,12 +2485,13 @@
 		 *
 		 * @param {string} html
 		 * @param {string} endHTML
+		 * @return False on fail
 		 * @function
 		 * @name insertHTML
 		 * @memberOf jQuery.sceditor.rangeHelper.prototype
 		 */
 		base.insertHTML = function(html, endHTML) {
-			var node, div;
+			var node, div, range = base.selectedRange();
 
 			if(endHTML)
 				html += base.selectedHtml() + endHTML;
@@ -2507,7 +2508,12 @@
 				base.insertNode(node);
 			}
 			else
-				base.selectedRange().pasteHTML(html);
+			{
+				if(!range)
+					return false;
+				
+				range.pasteHTML(html);
+			}
 		};
 
 		/**
@@ -2520,6 +2526,7 @@
 		 * @param {Node} node
 		 * @param {Node} endNode
 		 *
+		 * @return False on fail
 		 * @function
 		 * @name insertNode
 		 * @memberOf jQuery.sceditor.rangeHelper.prototype
@@ -2530,7 +2537,10 @@
 				var	toInsert	= doc.createDocumentFragment(),
 					range		= base.selectedRange(),
 					selection, selectAfter;
-
+				
+				if(!range)
+					return false;
+				
 				toInsert.appendChild(node);
 
 				if(endNode)
@@ -2563,10 +2573,12 @@
 		 * @memberOf jQuery.sceditor.rangeHelper.prototype
 		 */
 		base.cloneSelected = function() {
-			if(!isW3C)
-				return base.selectedRange().duplicate();
-
-			return base.selectedRange().cloneRange();
+			var range = base.selectedRange();
+			
+			if(!range)
+				return;
+				
+			return isW3C ? range.cloneRange() : range.duplicate();
 		};
 
 		/**
@@ -2583,10 +2595,10 @@
 		base.selectedRange = function() {
 			var sel;
 
-			if(win.getSelection)
-				sel = win.getSelection();
-			else
-				sel = doc.selection;
+			sel = isW3C ? win.getSelection() : doc.selection;
+			
+			if(!sel)
+				return;
 
 			if(sel.getRangeAt && sel.rangeCount <= 0)
 			{
@@ -2595,10 +2607,7 @@
 				sel.addRange(r);
 			}
 
-			if(!isW3C)
-				return sel.createRange();
-
-			return sel.getRangeAt(0);
+			return isW3C ? sel.getRangeAt(0) : sel.createRange();
 		};
 
 		/**
@@ -2620,11 +2629,8 @@
 				return new XMLSerializer().serializeToString(range.cloneContents());
 
 			// IE < 9
-			if(!isW3C)
-			{
-				if(range.text !== '' && range.htmlText)
-					return range.htmlText;
-			}
+			if(!isW3C && range.text !== '' && range.htmlText)
+				return range.htmlText;
 
 			return '';
 		};
@@ -2639,7 +2645,10 @@
 		 */
 		base.parentNode = function() {
 			var range = base.selectedRange();
-
+			
+			if(!range)
+				return;
+			
 			if(isW3C)
 				return range.commonAncestorContainer;
 			else
@@ -2682,6 +2691,9 @@
 		base.insertNodeAt = function(start, node) {
 			var range = base.cloneSelected();
 
+			if(!range)
+				return false;
+				
 			range.collapse(start);
 
 			if(range.insertNode)
@@ -2803,9 +2815,9 @@
 			var	marker,
 				range	= base.selectedRange(),
 				start	= base.getMarker(startMarker),
-				end	= base.getMarker(endMarker);
+				end		= base.getMarker(endMarker);
 
-			if(!start || !end)
+			if(!start || !end || !range)
 				return false;
 
 			if(!isW3C)
@@ -2843,6 +2855,9 @@
 		 */
 		_selectOuterText = function(left, right) {
 			var range = base.cloneSelected();
+			
+			if(!range)
+				return false;
 
 			range.collapse(false);
 			if(!isW3C)
@@ -2869,6 +2884,9 @@
 		_getOuterText = function(before, length) {
 			var	ret	= "",
 				range	= base.cloneSelected();
+				
+			if(!range)
+				return false;
 
 			range.collapse(false);
 			if(before)
