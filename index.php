@@ -267,7 +267,6 @@ function smf_main()
 		'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
 		'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
 		'calendar' => array('Calendar.php', 'CalendarMain'),
-		'clock' => array('Calendar.php', 'clock'),
 		'collapse' => array('BoardIndex.php', 'CollapseCategory'),
 		'contact' => array('Register.php', 'ContactForm'),
 		'coppa' => array('Register.php', 'CoppaForm'),

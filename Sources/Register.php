@@ -480,7 +480,7 @@ function Register2($verifiedOpenID = false)
 
 	$memberID = registerMember($regOptions, true);
 
-	// What there actually an error of some kind dear boy?
+	// Was there actually an error of some kind dear boy?
 	if (is_array($memberID))
 	{
 		$reg_errors = array_merge($reg_errors, $memberID);

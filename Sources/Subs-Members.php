@@ -851,7 +851,6 @@ function registerMember(&$regOptions, $return_errors = false)
 	return $memberID;
 }
 
-
 /**
  * Check if a name is in the reserved words list.
  * (name, current member id, name/username?.)

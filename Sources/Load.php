@@ -1156,7 +1156,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'link_text' => '<a class="msn new_win" href="http://members.msn.com/' . $profile['msn'] . '" title="' . $txt['msn_title'] . ' - ' . $profile['msn'] . '">' . $profile['msn'] . '</a>'
 			) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
 			'real_posts' => $profile['posts'],
-			'posts' => $profile['posts'] > 500000 ? $txt['geek'] : comma_format($profile['posts']),
+			'posts' => comma_format($profile['posts']),
 			'avatar' => array(
 				'name' => $profile['avatar'],
 				'image' => $profile['avatar'] == '' ? ($profile['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename']) . '" alt="" />' : '') : (stristr($profile['avatar'], 'http://') ? '<img class="avatar" src="' . $profile['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($profile['avatar']) . '" alt="" />'),
