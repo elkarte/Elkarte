@@ -1949,24 +1949,13 @@ function template_groupMembership()
 		// Javascript for the selector stuff.
 		echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
-		var prevClass = "";
-		var prevDiv = "";
-		function highlightSelected(box)
-		{
-			if (prevClass != "")
-			{
-				prevDiv.className = prevClass;
-			}
-			prevDiv = document.getElementById(box);
-			prevClass = prevDiv.className;
-
-			prevDiv.className = "highlight2";
-		}';
+			var prevClass = "";
+			var prevDiv = "";';
 		if (isset($context['groups']['member'][$context['primary_group']]))
 			echo '
-		highlightSelected("primdiv_' . $context['primary_group'] . '");';
+			highlightSelected("primdiv_' . $context['primary_group'] . '");';
 		echo '
-	// ]]></script>';
+		// ]]></script>';
 	}
 
 	if (!empty($context['token_check']))
