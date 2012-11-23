@@ -1680,7 +1680,7 @@
 
 		// iOS 5+ supports content editable
 		if(/iPhone|iPod|iPad/i.test(userAgent))
-			isUnsupported = !/OS 5(_\d)+ like Mac OS X/i.test(userAgent);
+			isUnsupported = !/OS [5-9](_\d)+ like Mac OS X/i.test(userAgent);
 
 		// FireFox dose support WYSIWYG on mobiles so override
 		// any previous value if using FF
