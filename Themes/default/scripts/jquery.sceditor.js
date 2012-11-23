@@ -170,6 +170,11 @@
 		 */
 		var preLoadCache = [];
 
+		/**
+		 * The editors rangeHelper instance
+		 * @type {$.sceditor.rangeHelper}
+		 * @private
+		 */
 		var rangeHelper;
 
 		var $blurElm;
@@ -3117,7 +3122,7 @@
 		findCommonAncestor: function(node1, node2) {
 			// not as fast as making two arrays of parents and comparing
 			// but is a lot smaller and as it's currently only used with
-			// fixing invalid nesting it doesn't need to be very fast
+			// fixing invalid nesting so it doesn't need to be very fast
 			return $(node1).parents().has($(node2)).first();
 		},
 
@@ -3402,10 +3407,13 @@
 
 		// Min resize to width, set to null for half textarea width or -1 for unlimited
 		resizeMinWidth: null,
+		
 		// Min resize to height, set to null for half textarea height or -1 for unlimited
 		resizeMinHeight: null,
+		
 		// Max resize to height, set to null for double textarea height or -1 for unlimited
 		resizeMaxHeight: null,
+		
 		// Max resize to width, set to null for double textarea width or -1 for unlimited
 		resizeMaxWidth: null,
 
@@ -3417,12 +3425,19 @@
 
 		toolbarContainer: null,
 
-		// Curently experimental
+		// If to enable paste filtering. This is curently experimental, please report any issues.
 		enablePasteFiltering: false,
 
+		// If the editor is read only.
 		readOnly: false,
+		
+		// If to set the editor to right-to-left mode
 		rtl: false,
+		
+		// If to auto focus the editor on page load
 		autofocus: false,
+		
+		// If to auto expand the editor to fix the content
 		autoExpand: false,
 		
 		// If to auto update original textbox on blur
