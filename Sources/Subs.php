@@ -727,22 +727,21 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 /**
  * Removes special entities from strings.  Compatibility...
- * Should be used instead of html_entity_decode for PHP version compatibility reasons.
+ * Faster than html_entity_decode
  *
- * - removes the base entities (&lt;, &quot;, etc.) from text.
- * - additionally converts &nbsp; and &#039;.
+ * - removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
+ * - additionally converts &nbsp with str_replace
  *
  * @param string $string
  * @return the string without entities
  */
 function un_htmlspecialchars($string)
 {
-	static $translation = array();
+	$string = htmlspecialchars_decode($string, ENT_QUOTES);
+	$string = str_replace('&nbsp;', ' ', $string);
 
-	if (empty($translation))
-		$translation = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
+	return $string;
 
-	return strtr($string, $translation);
 }
 
 /**
