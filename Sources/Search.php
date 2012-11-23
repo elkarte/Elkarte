@@ -19,7 +19,7 @@
 if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
-// This defines two version types for checking the API's are compatible with this version of DIALOGO.
+// This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
 	'forum_version' => 'DIALOGO 1.0 Alpha 1',
@@ -2141,7 +2141,7 @@ function findSearchAPI()
 		fatal_lang_error('search_api_missing');
 	require_once($sourcedir . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.php');
 
-	// Create an instance of the search API and check it is valid for this version of DIALOGO.
+	// Create an instance of the search API and check it is valid for this version of the software.
 	$search_class_name = $modSettings['search_index'] . '_search';
 	$searchAPI = new $search_class_name();
 

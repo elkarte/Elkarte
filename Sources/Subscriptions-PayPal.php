@@ -137,6 +137,9 @@ class paypal_display
  */
 class paypal_payment
 {
+	/**
+	 * Holds the IPN response data
+	 */
 	private $return_data;
 
 	/**

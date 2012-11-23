@@ -451,7 +451,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		$clean .= substr($db_string, $old_pos);
 		$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-		// We don't use UNION in DIALOGO, at least so far.  But it's useful for injections.
+		// We don't use UNION, at least so far.  But it's useful for injections.
 		if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 			$fail = true;
 		// Comments?  We don't use comments in our queries, we leave 'em outside!
@@ -484,7 +484,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 
 /**
  * affected_rows
- * @param resource $connection
+ * @param string $result
  */
 function smf_db_affected_rows($result = null)
 {
