@@ -3129,25 +3129,30 @@
 		 */
 		removeWhiteSpace: function(root) {
 			// 00A0 is non-breaking space which should not be striped
-			var regex = /[^\S|\u00A0]+/g;
+			var	nodeValue,
+				regex = /[^\S|\u00A0]+/g;
 
 			this.traverse(root, function(node) {
-				if(node.nodeType === 3 && $(node).parents('code, pre').length === 0 && node.nodeValue)
+				nodeValue = node.nodeValue;
+				// TODO: have proper white-space checking for pre formatted text instead of checking for code and pre tags.
+				if(node.nodeType === 3 && $(node).parents('code, pre').length === 0 && nodeValue)
 				{
 					// new lines in text nodes are always ignored in normal handling
-					node.nodeValue = node.nodeValue.replace(/[\r\n]/, "");
+					nodeValue = nodeValue.replace(/[\r\n]/, "");
 
 					//remove empty nodes
-					if(!node.nodeValue.length)
+					if(!nodeValue.length)
 					{
 						node.parentNode.removeChild(node);
 						return;
 					}
 
-					if(!/\S|\u00A0/.test(node.nodeValue))
+					// If entirely whitespace then just set to a single space
+					if(!/\S|\u00A0/.test(nodeValue))
 						node.nodeValue = " ";
-					else if(regex.test(node.nodeValue))
-						node.nodeValue = node.nodeValue.replace(regex, " ");
+					// replace multiple spaces inbetween non-white space with a single space
+					else if(regex.test(nodeValue))
+						node.nodeValue = nodeValue.replace(regex, " ");
 				}
 			});
 		},
