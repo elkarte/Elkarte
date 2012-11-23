@@ -444,6 +444,7 @@ function loadUserSettings()
 		'permissions' => array(),
 	);
 	$user_info['groups'] = array_unique($user_info['groups']);
+	
 	// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
 	if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		unset($user_info['ignoreboards'][$tmp]);
@@ -1196,7 +1197,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
-
+	
 	// First do a quick run through to make sure there is something to be shown.
 	$memberContext[$user]['has_messenger'] = false;
 	foreach (array('icq', 'msn', 'aim', 'yim') as $messenger)
@@ -1540,13 +1541,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Some basic information...
 	if (!isset($context['html_headers']))
 		$context['html_headers'] = '';
-	if(!isset($context['javascript_files']))
+	if (!isset($context['javascript_files']))
 		$context['javascript_files'] = array();
-	if(!isset($context['css_files']))
+	if (!isset($context['css_files']))
 		$context['css_files'] = array();
-	if(!isset($context['javascript_inline']))
+	if (!isset($context['javascript_inline']))
 		$context['javascript_inline'] = array('standard' => array(), 'defer' => array());
-	if(!isset($context['javascript_vars']))
+	if (!isset($context['javascript_vars']))
 		$context['javascript_vars'] = array();
 
 	$context['menu_separator'] = !empty($settings['use_image_buttons']) ? ' ' : ' | ';
@@ -2063,7 +2064,7 @@ function addInlineJavascript($javascript, $defer = false)
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
 	global $user_info, $language, $settings, $context, $modSettings;
-	global $cachedir, $db_show_debug, $sourcedir, $txt;
+	global $db_show_debug, $sourcedir, $txt;
 	static $already_loaded = array();
 
 	// Default to the user's language.

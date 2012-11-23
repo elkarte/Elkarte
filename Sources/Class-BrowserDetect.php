@@ -61,16 +61,16 @@ class browser_detector
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())
-			$this->setupOpera();
+			$this->_setupOpera();
 		// Them webkits need to be set up too
 		elseif ($this->isWebkit())
-			$this->setupWebkit();
+			$this->_setupWebkit();
 		// We may have work to do on Firefox...
 		elseif ($this->isFirefox())
-			$this->setupFirefox();
+			$this->_setupFirefox();
 		// Old friend, old frenemy
 		elseif ($this->isIe())
-			$this->setupIe();
+			$this->_setupIe();
 
 		// Just a few mobile checks
 		$this->isOperaMini();
@@ -90,10 +90,10 @@ class browser_detector
 			$this->_browsers['possibly_robot'] = false;
 
 		// Fill out the historical array as needed to support old mods that don't use isBrowser
-		$this->fillInformation();
+		$this->_fillInformation();
 
 		// Last step ...
-		$this->setupBrowserPriority();
+		$this->_setupBrowserPriority();
 
 		// Now see what you've done!
 		$context['browser'] = $this->_browsers;
@@ -208,7 +208,7 @@ class browser_detector
 	 *  - set the browser version for Safari and Chrome
 	 *  - set the mobile flag for mobile based useragents
 	 */
-	private function setupWebkit()
+	private function _setupWebkit()
 	{
 		$this->_browsers += array(
 			'is_chrome' => strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false,
@@ -248,7 +248,7 @@ class browser_detector
 	 *  - attempts to distinguish between IE and IE in compatabilty view
 	 *  - checks for old IE on macs as well, since we can
 	 */
-	private function setupIe()
+	private function _setupIe()
 	{
 		$this->_browsers['is_ie_compat_view'] = false;
 
@@ -299,7 +299,7 @@ class browser_detector
 	 * - Gets the version of the FF browser in use
 	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
 	 */
-	private function setupFirefox()
+	private function _setupFirefox()
 	{
 		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
 			$this->_browsers['is_firefox' . (int) $match[1]] = true;
@@ -310,7 +310,7 @@ class browser_detector
 	 *  - checks for the version of Opera in use
 	 *  - uses checks for 10 first and falls through to <9
 	 */
-	private function setupOpera()
+	private function _setupOpera()
 	{
 		// Opera 10+ uses the version tag at the end of the string
 		if (preg_match('~\sVersion/([0-9]+)\.[0-9]+(?:\s*|$)~', $_SERVER['HTTP_USER_AGENT'], $match))
@@ -329,7 +329,7 @@ class browser_detector
 	 *  - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
 	 *  - only sets browsers that may need some help via css for compatablity
 	 */
-	private function setupBrowserPriority()
+	private function _setupBrowserPriority()
 	{
 		global $context;
 
@@ -369,7 +369,7 @@ class browser_detector
 	 * Fill out the historical array
 	 *  - needed to support old mods that don't use isBrowser
 	 */
-	function fillInformation()
+	private function _fillInformation()
 	{
 		$this->_browsers += array(
 			'is_opera' => false,

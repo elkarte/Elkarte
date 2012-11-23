@@ -84,7 +84,6 @@ function ManageNews()
  * Requires the edit_news permission.
  * Can be accessed with ?action=admin;sa=editnews.
  *
- * @uses ManageNews template, edit_news sub template.
  */
 function EditNews()
 {
@@ -297,8 +296,7 @@ function list_getNews()
 }
 
 /**
- * This function allows a user to select the membergroups to send their
- * mailing to.
+ * This function allows a user to select the membergroups to send their mailing to.
  * Called by ?action=admin;area=news;sa=mailingmembers.
  * Requires the send_mail permission.
  * Form is submitted to ?action=admin;area=news;mailingcompose.
@@ -729,8 +727,10 @@ function SendMailing($clean_only = false)
 	{
 		$members = explode(',', $_POST['exclude_members']);
 		foreach ($members as $member)
+		{
 			if ($member >= $context['start'])
 				$context['recipients']['exclude_members'][] = (int) $member;
+		}
 	}
 
 	// What about members we *must* do?
@@ -738,9 +738,12 @@ function SendMailing($clean_only = false)
 	{
 		$members = explode(',', $_POST['members']);
 		foreach ($members as $member)
+		{
 			if ($member >= $context['start'])
 				$context['recipients']['members'][] = (int) $member;
+		}
 	}
+	
 	// Cleaning groups is simple - although deal with both checkbox and commas.
 	if (!empty($_POST['groups']))
 	{
@@ -908,9 +911,11 @@ function SendMailing($clean_only = false)
 					$queryBuild[] = 'mem.id_post_group = {int:group_' . $group . '}';
 				}
 			}
+			
 			if (!empty($queryBuild))
 			$sendQuery .= implode(' OR ', $queryBuild);
 		}
+		
 		if (!empty($context['recipients']['members']))
 		{
 			$sendQuery .= ($sendQuery == '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
@@ -926,6 +931,7 @@ function SendMailing($clean_only = false)
 		// Anything to exclude?
 		if (!empty($context['recipients']['exclude_groups']) && in_array(0, $context['recipients']['exclude_groups']))
 			$sendQuery .= ' AND mem.id_group != {int:regular_group}';
+		
 		if (!empty($context['recipients']['exclude_members']))
 		{
 			$sendQuery .= ' AND mem.id_member NOT IN ({array_int:exclude_members})';

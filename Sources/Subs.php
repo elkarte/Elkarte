@@ -3208,7 +3208,7 @@ function template_footer()
 
 /**
  * Output the Javascript files
- * 	- tabbing in this function is to make the HTML source look good proper
+ * 	- tabbing in this function is to make the HTML source look proper
  *  - if defered is set function will output all JS (source & inline) set to load at page end
  *  - if the admin option to combine files is set, will use Class-Combiner
  *
@@ -3709,6 +3709,8 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
+				//$_SERVER["PHP_AUTH_USER"] = 'userid';
+				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
 				
 				// Get the counts so we clear each instance
 				$pcnt = xcache_count(XC_TYPE_PHP);

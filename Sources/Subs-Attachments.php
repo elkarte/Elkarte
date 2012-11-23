@@ -32,16 +32,21 @@ function automanage_attachments_check_directory()
 	elseif (!isset($_FILES))
 		return;
 	elseif (isset($_FILES['attachment']))
+	{
 		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+		{
 			if (!empty($dummy))
 			{
 				$doit = true;
 				break;
 			}
+		}
+	}
 
 	if (!isset($doit))
 		return;
 
+	// get our date and random numbers for the directory choices
 	$year = date('Y');
 	$month = date('m');
 	$day = date('d');
@@ -52,9 +57,10 @@ function automanage_attachments_check_directory()
 
 	if (!empty($modSettings['attachment_basedirectories']) && !empty($modSettings['use_subdirectories_for_attachments']))
 	{
-			if (!is_array($modSettings['attachment_basedirectories']))
-				$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
-			$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
+		if (!is_array($modSettings['attachment_basedirectories']))
+			$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+
+		$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
 	}
 	else
 		$base_dir = 0;
@@ -115,6 +121,14 @@ function automanage_attachments_check_directory()
 	return $outputCreation;
 }
 
+/**
+ * Creates a directory as defined by the admin attach options
+ * Attempts to make the directory writable
+ * Places an .htaccess in new directories for security
+ *
+ * @param type $updir
+ * @return boolean
+ */
 function automanage_attachments_create_directory($updir)
 {
 	global $modSettings, $initial_error, $context, $boarddir;
@@ -128,7 +142,7 @@ function automanage_attachments_create_directory($updir)
 		// Maybe it's just the folder name
 		$tree = get_directory_tree_elements($boarddir . DIRECTORY_SEPARATOR . $updir);
 		$count = count($tree);
-	
+
 		$directory = attachments_init_dir($tree, $count);
 		if ($directory === false)
 			return false;
@@ -140,7 +154,7 @@ function automanage_attachments_create_directory($updir)
 	{
 		if (!@is_dir($directory))
 		{
-			if (!@mkdir($directory,0755))
+			if (!@mkdir($directory, 0755))
 			{
 				$context['dir_creation_error'] = 'attachments_no_create';
 				return false;
@@ -151,6 +165,7 @@ function automanage_attachments_create_directory($updir)
 		$count--;
 	}
 
+	// try to make it writable
 	if (!is_writable($directory))
 	{
 		chmod($directory, 0755);
@@ -179,7 +194,7 @@ function automanage_attachments_create_directory($updir)
 	// Only update if it's a new directory
 	if (!in_array($updir, $modSettings['attachmentUploadDir']))
 	{
-		$modSettings['currentAttachmentUploadDir'] = max(array_keys($modSettings['attachmentUploadDir'])) +1;
+		$modSettings['currentAttachmentUploadDir'] = max(array_keys($modSettings['attachmentUploadDir'])) + 1;
 		$modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']] = $updir;
 
 		updateSettings(array(
@@ -193,6 +208,13 @@ function automanage_attachments_create_directory($updir)
 	return true;
 }
 
+/**
+ * Determines the current base directory and attachment directory
+ * Increments the above directory to the next availble slot
+ * Uses automanage_attachments_create_directory to create the incremental directory
+ * 
+ * @return boolean
+ */
 function automanage_attachments_by_space()
 {
 	global $modSettings, $boarddir, $context;
@@ -201,7 +223,8 @@ function automanage_attachments_by_space()
 		return;
 
 	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : $boarddir);
-	//Just to be sure: I don't want directory separators at the end
+
+	// Just to be sure: I don't want directory separators at the end
 	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
 	$basedirectory = rtrim($basedirectory, $sep);
 
@@ -219,8 +242,10 @@ function automanage_attachments_by_space()
 		$modSettings['last_attachments_directory'][$base_dir] = 0;
 	// And increment it.
 	$modSettings['last_attachments_directory'][$base_dir]++;
-
+	
 	$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $modSettings['last_attachments_directory'][$base_dir];
+	
+	// make sure it exists and is writable
 	if (automanage_attachments_create_directory($updir))
 	{
 		$modSettings['currentAttachmentUploadDir'] = array_search($updir, $modSettings['attachmentUploadDir']);
@@ -236,6 +261,12 @@ function automanage_attachments_by_space()
 		return false;
 }
 
+/**
+ * Finds the current directory tree for the supplied base directory
+ *
+ * @param type $directory
+ * @return boolean on fail else array of directory names
+ */
 function get_directory_tree_elements ($directory)
 {
 	/*
@@ -249,33 +280,47 @@ function get_directory_tree_elements ($directory)
 		$tree = preg_split('#[\\\/]#', $directory);
 	else
 	{
-		if (substr($directory, 0, 1)!=DIRECTORY_SEPARATOR)
+		if (substr($directory, 0, 1) != DIRECTORY_SEPARATOR)
 			return false;
 
-		$tree = explode(DIRECTORY_SEPARATOR, trim($directory,DIRECTORY_SEPARATOR));
+		$tree = explode(DIRECTORY_SEPARATOR, trim($directory, DIRECTORY_SEPARATOR));
 	}
 	return $tree;
 }
 
+/**
+ * Helper function for automanage_attachments_create_directory
+ * Gets the directory w/o drive letter for windows
+ * 
+ * @param array $tree
+ * @param int $count
+ * @return boolean
+ */
 function attachments_init_dir (&$tree, &$count)
 {
 	$directory = '';
 	// If on Windows servers the first part of the path is the drive (e.g. "C:")
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 	{
-		 //Better be sure that the first part of the path is actually a drive letter...
-		 //...even if, I should check this in the admin page...isn't it?
-		 //...NHAAA Let's leave space for users' complains! :P
-		if (preg_match('/^[a-z]:$/i',$tree[0]))
+		// Better be sure that the first part of the path is actually a drive letter...
+		// ...even if, I should check this in the admin page...isn't it?
+		// ...NHAAA Let's leave space for users' complains! :P
+		if (preg_match('/^[a-z]:$/i', $tree[0]))
 			$directory = array_shift($tree);
 		else
 			return false;
 
 		$count--;
 	}
+	
 	return $directory;
 }
 
+/**
+ * Handles the actual saving of attachments to a directory
+ * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder
+ * Validates the save location actually exists
+ */
 function processAttachments()
 {
 	global $context, $modSettings, $smcFunc, $txt, $user_info;
@@ -331,18 +376,22 @@ function processAttachments()
 		$ignore_temp = true;
 		// If new files are being added. We can't ignore those
 		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+		{
 			if (!empty($dummy))
 			{
 				$ignore_temp = false;
 				break;
 			}
+		}
 
 		// Need to make space for the new files. So, bye bye.
 		if (!$ignore_temp)
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+			{
 				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
 					unlink($attachment['tmp_name']);
+			}
 
 			$context['we_are_history'] = $txt['error_temp_attachments_flushed'];
 			$_SESSION['temp_attachments'] = array();
@@ -371,8 +420,10 @@ function processAttachments()
 
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
+		{
 			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
 				unlink($_FILES['attachment']['tmp_name'][$n]);
+		}
 
 		$_FILES['attachment']['tmp_name'] = array();
 	}
@@ -453,7 +504,7 @@ function processAttachments()
  * Performs various checks on an uploaded file.
  * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
  *
- * @param $attachID
+ * @param int $attachID
  */
 function attachmentChecks($attachID)
 {
@@ -550,7 +601,7 @@ function attachmentChecks($attachID)
 			updateSettings(array('attachment_full_notified' => 1));
 		}
 
-		// // No room left.... What to do now???
+		// No room left.... What to do now???
 		if (!empty($modSettings['attachmentDirFileLimit']) && $context['dir_files'] + 2 > $modSettings['attachmentDirFileLimit']
 			|| (!empty($modSettings['attachmentDirSizeLimit']) && $context['dir_size'] > $modSettings['attachmentDirSizeLimit'] * 1024))
 		{

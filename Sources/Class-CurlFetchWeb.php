@@ -24,7 +24,7 @@ if (!defined('DIALOGO'))
  * Load class
  * Initiate as
  *  - $fetch_data = new cURL_fetch_web_data();
- *	- optionaly pass an array of cURL options and redirect count
+ *	- optionally pass an array of cURL options and redirect count
  *	- cURL_fetch_web_data(cURL options array, Max redirects);
  *  - $fetch_data = new cURL_fetch_web_data(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
@@ -42,15 +42,13 @@ if (!defined('DIALOGO'))
 class curl_fetch_web_data
 {
 	/**
-	 * Set the default itmes for this class
-	 *
-	 * @var type
+	 * Set the default items for this class
 	 */
 	private $default_options = array(
 		CURLOPT_RETURNTRANSFER	=> 1, // Get returned value as a string (don't output it)
 		CURLOPT_HEADER			=> 1, // We need the headers to do our own redirect
 		CURLOPT_FOLLOWLOCATION	=> 0, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
-		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:11.0) Gecko Firefox/15.0.1', // set a normal looking useragent
+		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking useragent
 		CURLOPT_CONNECTTIMEOUT	=> 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT			=> 10, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS		=> 5, // stop after this many redirects
@@ -61,12 +59,12 @@ class curl_fetch_web_data
 	);
 
 	/**
-	* Start the curl object
-	* - allow for user override values
-	*
-	* @param type $options cURL options as an array
-	* @param type $max_redirect use to overide the default of 3
-	*/
+	 * Start the curl object
+	 * - allow for user override values
+	 *
+	 * @param type $options cURL options as an array
+	 * @param type $max_redirect use to override the default of 3
+	 */
 	public function __construct($options = array(), $max_redirect = 3)
 	{
 		// Initialize class variables
@@ -75,40 +73,40 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Main calling function,
-	*  - will request the page data from a given $url
-	*  - optionally will post data to the page form if post data is supplied
-	*  - passed arrays will be converted to a post string joined with &'s
-	*  - calls set_options to set the curl opts array values based on the defaults and user input
-	*
-	* @param type $url the site we are going to fetch
-	* @param type $post_data any post data as form name => value
-	*/
+	 * Main calling function,
+	 *  - will request the page data from a given $url
+	 *  - optionally will post data to the page form if post data is supplied
+	 *  - passed arrays will be converted to a post string joined with &'s
+	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
+	 *
+	 * @param type $url the site we are going to fetch
+	 * @param type $post_data any post data as form name => value
+	 */
 	public function get_url_data($url, $post_data = array())
 	{
 		// POSTing some data perhaps?
 		if (!empty($post_data) && is_array($post_data))
-			$this->post_data = $this->build_post_data($post_data);
+			$this->post_data = $this->_buildPostData($post_data);
 		elseif (!empty($post_data))
 			$this->post_data = trim($post_data);
 
 		// set the options and get it
-		$this->set_options();
-		$this->curl_request(str_replace(' ', '%20', $url));
+		$this->_setOptions();
+		$this->_curlRequest(str_replace(' ', '%20', $url));
 
 		return $this;
 	}
 
 	/**
-	* Makes the actual cURL call
-	*  - stores responses (url, code, error, headers, body) in the response array
-	*  - detects 301, 302, 307 codes and will redirect to the given response header location
-	*
-	* @param type $url site to fetch
-	* @param type $redirect flag to indicate if this was a redirect request or not
-	* @return boolean
+	 * Makes the actual cURL call
+	 *  - stores responses (url, code, error, headers, body) in the response array
+	 *  - detects 301, 302, 307 codes and will redirect to the given response header location
+	 *
+	 * @param type $url site to fetch
+	 * @param type $redirect flag to indicate if this was a redirect request or not
+	 * @return boolean
 	*/
-	private function curl_request($url, $redirect = false)
+	private function _curlRequest($url, $redirect = false)
 	{
 		// we do have a url I hope
 		if ($url == '')
@@ -116,7 +114,7 @@ class curl_fetch_web_data
 		else
 			$this->options[CURLOPT_URL] = $url;
 
-		// if we have not already been redirected, set it up so we can if needed
+		// if we have not already been redirected, set it up so we can
 		if (!$redirect)
 		{
 			$this->current_redirect = 1;
@@ -148,29 +146,29 @@ class curl_fetch_web_data
 			'body' => $body,
 		);
 
-		// If this a redirect with a location header and we have not given up, then do it again
+		// If this a redirect with a location header and we have not given up, then we play it again Sam
 		if (preg_match('~30[127]~i', $http_code) === 1 && $this->headers['location'] != '' && $this->current_redirect <= $this->max_redirect)
 		{
 			$this->current_redirect++;
-			$header_location = $this->get_redirect_url($url, $this->headers['location']);
-			$this->redirect($header_location, $url);
+			$header_location = $this->_getRedirectURL($url, $this->headers['location']);
+			$this->_redirect($header_location, $url);
 		}
 	}
 
 	/**
-	* Used if being redirected to ensure we have a fully qualified address
-	*
-	* @param type $last_url where we went to
-	* @param type $new_url where we were redirected to
-	* @return new url location
-	*/
-	private function get_redirect_url($last_url = '', $new_url = '')
+	 * Used if being redirected to ensure we have a fully qualified address
+	 *
+	 * @param type $last_url where we went to
+	 * @param type $new_url where we were redirected to
+	 * @return new url location
+	 */
+	private function _getRedirectURL($last_url = '', $new_url = '')
 	{
 		// Get the elements for these urls
 		$last_url_parse = parse_url($last_url);
 		$new_url_parse  = parse_url($new_url);
 
-		// redirect headers are often incomplete or relative so we need to make sure they are fully qualified
+		// redirect headers are often incomplete / relative so we need to make sure they are fully qualified
 		$new_url_parse['scheme'] = isset($new_url_parse['scheme']) ? $new_url_parse['scheme'] : $last_url_parse['scheme'];
 		$new_url_parse['host'] = isset($new_url_parse['host']) ? $new_url_parse['host'] : $last_url_parse['host'];
 		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : $last_url_parse['path'];
@@ -181,18 +179,18 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Used to return the results to the calling program
-	*  - called as ->result() will return the full final array
-	*  - called as ->result('body') to just return the page source of the result
-	*
-	* @param type $area used to return an area such as body, header, error
-	* @return type
-	*/
+	 * Used to return the results to the calling program
+	 *  - called as ->result() will return the full final array
+	 *  - called as ->result('body') to just return the page source of the result
+	 *
+	 * @param type $area used to return an area such as body, header, error
+	 * @return type
+	 */
 	public function result($area = '')
 	{
 		$max_result = count($this->response) - 1;
 
-		// just return a specifed area or the entire result?
+		// just return a specified area or the entire result?
 		if ($area == '')
 			return $this->response[$max_result];
 		else
@@ -200,13 +198,13 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Will return all results from all loops (redirects)
-	*  - Can be called as ->result_raw(x) where x is a specific loop results.
-	*  - Call as ->result_raw() for everything.
-	*
-	* @param type $response_number
-	* @return type
-	*/
+	 * Will return all results from all loops (redirects)
+	 *  - Can be called as ->result_raw(x) where x is a specific loop results.
+	 *  - Call as ->result_raw() for everything.
+	 *
+	 * @param type $response_number
+	 * @return type
+	 */
 	public function result_raw($response_number = '')
 	{
 		if (!is_numeric($response_number))
@@ -219,14 +217,14 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Takes supplied POST data and url encodes it
-	*  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
-	*  - drops vars with @ since we don't support sending files (uploading)
-	*
-	* @param type $post_data
-	* @return type
+	 * Takes supplied POST data and url encodes it
+	 *  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
+	 *  - drops vars with @ since we don't support sending files (uploading)
+	 *
+	 * @param type $post_data
+	 * @return type
 	*/
-	private function build_post_data($post_data)
+	private function _buildPostData($post_data)
 	{
 		if (is_array($post_data))
 		{
@@ -244,15 +242,14 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Sets the final cURL options for the current call
-	*  - overwrites our default values with user supplied ones or appends new user ones to what we have
-	*  - sets the callback function now that $this is existing
-	*
-	*/
-	private function set_options()
+	 * Sets the final cURL options for the current call
+	 *  - overwrites our default values with user supplied ones or appends new user ones to what we have
+	 *  - sets the callback function now that $this exists
+	 */
+	private function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
-		$this->default_options[CURLOPT_HEADERFUNCTION] = array($this, 'header_callback');
+		$this->default_options[CURLOPT_HEADERFUNCTION] = array($this, '_headerCallback');
 
 		// Any user options to account for
 		if (is_array($this->user_options))
@@ -264,7 +261,7 @@ class curl_fetch_web_data
 		else
 			$this->options = $this->default_options;
 
-		// POST data options, here we don't allow any overide
+		// POST data options, here we don't allow any override
 		if (isset($this->post_data))
 		{
 			$this->options[CURLOPT_POST] = 1;
@@ -273,29 +270,29 @@ class curl_fetch_web_data
 	}
 
 	/**
-	* Called to initiate a redirect from a 301, 302 or 307 header
-	*  - resets the cURL options for the loop, sets the referrer flag
-	*
-	* @param type $target_url
-	* @param type $referer_url
-	*/
-	private function redirect($target_url, $referer_url)
+	 * Called to initiate a redirect from a 301, 302 or 307 header
+	 *  - resets the cURL options for the loop, sets the referrer flag
+	 *
+	 * @param type $target_url
+	 * @param type $referer_url
+	 */
+	private function _redirect($target_url, $referer_url)
 	{
 		// no no I last saw that over there ... really, 301, 302, 307
-		$this->set_options();
+		$this->_setOptions();
 		$this->options[CURLOPT_REFERER] = $referer_url;
-		$this->curl_request($target_url, true);
+		$this->_curlRequest($target_url, true);
 	}
 
 	/**
-	* Callback function to parse returned headers
-	*  - lowercases everything to make it consistent
-	*
-	* @param type $cr
-	* @param type $header
-	* @return type
-	*/
-	private function header_callback($cr, $header)
+	 * Callback function to parse returned headers
+	 *  - lowercases everything to make it consistent
+	 *
+	 * @param type $cr
+	 * @param type $header
+	 * @return type
+	 */
+	private function _headerCallback($cr, $header)
 	{
 		$_header = trim($header);
 		$temp = explode(': ', $_header, 2);
@@ -304,7 +301,7 @@ class curl_fetch_web_data
 		if (isset($temp[0]) && isset($temp[1]))
 			$this->headers[strtolower($temp[0])] = strtolower(trim($temp[1]));
 
-		// return the length of what was passed unless you want a Failed writing header error ;)
+		// return the length of what was *passed* unless you want a Failed writing header error ;)
 		return strlen($header);
 	}
 }

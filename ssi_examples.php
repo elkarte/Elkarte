@@ -35,7 +35,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'home1')
 template_ssi_above();
 ?>
 
-			<h2>DIALOGO SSI.php Functions</h2>
+			<h2>SSI.php Functions</h2>
 			<p><strong>Current Version:</strong> 1.0 Alpha 1</p>
 			<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
@@ -419,7 +419,7 @@ function template_ssi_above()
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>DIALOGO 1.0 Alpha 1 SSI.php Examples</title>
+		<title>SSI.php Examples</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style type="text/css">
@@ -523,7 +523,7 @@ function template_ssi_above()
 		<div id="wrapper">
 			<div id="header"><div class="frame">
 				<div id="top_section">
-					<h1 class="forumtitle">DIALOGO 1.0 Alpha 1 SSI.php Examples</h1>
+					<h1 class="forumtitle">SSI.php Examples</h1>
 					<img id="smflogo" src="Themes/default/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />
 				</div>
 				<div id="upper_section" class="middletext" style="overflow: hidden;">
@@ -663,7 +663,7 @@ $topics = ssi_recentTopics(8, null, null, \'array\');
 
 foreach ($topics as $topic)
 {
-	// Uncomment the following code to get a listing of array elements that DIALOGO provides for this function.
+	// Uncomment the following code to get a listing of array elements that the system provides for this function.
 	// echo \'<pre>\', print_r($topic), \'</pre>\';
 
 	echo \'
