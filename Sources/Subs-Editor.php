@@ -1471,7 +1471,7 @@ function create_control_richedit($editorOptions)
 		// Some general stuff.
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 60000 : $modSettings['drafts_autosave_frequency'] * 1000;
+			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
 		loadTemplate('GenericControls', 'jquery.sceditor');
@@ -1489,9 +1489,12 @@ function create_control_richedit($editorOptions)
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
 			loadJavascriptFile($scripturl . '?action=loadeditorlocale', array(), 'sceditor_language');
+		
+		// Drafts?
+		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			loadJavascriptFile('drafts.js', array('default_theme' => true));
 
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
-		
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
 		{
