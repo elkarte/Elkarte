@@ -35,6 +35,10 @@ function SaveDraft(&$post_errors)
 {
 	global $txt, $context, $user_info, $smcFunc, $modSettings, $board;
 
+	// ajax calling
+	if (!isset($context['drafts_save']))
+		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
+
 	// can you be, should you be ... here?
 	if (empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_post_enabled']) || !allowedTo('post_draft') || !isset($_POST['save_draft']) || !isset($_POST['id_draft']))
 		return false;
@@ -185,6 +189,10 @@ function SavePMDraft(&$post_errors, $recipientList)
 {
 	global $context, $user_info, $smcFunc, $modSettings;
 
+	// ajax calling
+	if (!isset($context['drafts_pm_save']))
+		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
+	
 	// PM survey says ... can you stay or must you go
 	if (empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']) || !allowedTo('pm_draft') || !isset($_POST['save_draft']))
 		return false;
@@ -311,13 +319,13 @@ function SavePMDraft(&$post_errors, $recipientList)
 /**
  * Reads a draft in from the user_drafts table
  * Only loads the draft of a given type 0 for post, 1 for pm draft
- * validates that the draft is the users draft
+ * Validates that the draft is the users draft
  * Optionally loads the draft in to context or superglobal for loading in to the form
  *
- * @param type $id_draft - draft to load
- * @param type $type - type of draft
- * @param type $check - validate the user
- * @param type $load - load it for use in a form
+ * @param int $id_draft - draft to load
+ * @param int $type - type of draft
+ * @param bool $check - validate the user
+ * @param bool $load - load it for use in a form
  * @return boolean
  */
 function ReadDraft($id_draft, $type = 0, $check = true, $load = false)
@@ -399,10 +407,10 @@ function ReadDraft($id_draft, $type = 0, $check = true, $load = false)
 /**
  * Deletes one or many drafts from the DB
  * Validates the drafts are from the user
- * is supplied an array of drafts will attempt to remove all of them
+ * If supplied an array of drafts will attempt to remove all of them
  *
- * @param type $id_draft
- * @param type $check
+ * @param int $id_draft
+ * @param bool $check
  * @return boolean
  */
 function DeleteDraft($id_draft, $check = true)
@@ -432,11 +440,11 @@ function DeleteDraft($id_draft, $check = true)
  * Loads in a group of drafts for the user of a given type (0/posts, 1/pm's)
  * loads a specific draft for forum use if selected.
  * Used in the posting screens to allow draft selection
- * WIll load a draft if selected is supplied via post
+ * Will load a draft if selected is supplied via post
  *
- * @param type $member_id
- * @param type $topic
- * @param type $draft_type
+ * @param int $member_id
+ * @param int $topic
+ * @param int $draft_type
  * @return boolean
  */
 function ShowDrafts($member_id, $topic = false, $draft_type = 0)
@@ -522,7 +530,7 @@ function XmlDraft($id_draft)
  */
 function showProfileDrafts($memID, $draft_type = 0)
 {
-	global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
+	global $txt, $scripturl, $modSettings, $context, $smcFunc;
 
 	// Some initial context.
 	$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
@@ -656,9 +664,9 @@ function showProfileDrafts($memID, $draft_type = 0)
 /**
  * Show all PM drafts of the current user
  * Uses the showpmdraft template
- * Allows for the deleting and loading/editing of drafts
+ * Allows for the deleting and loading/editing of PM drafts
  *
- * @param type $memID
+ * @param int $memID = -1
  */
 function showPMDrafts($memID = -1)
 {
@@ -770,7 +778,7 @@ function showPMDrafts($memID = -1)
 		// BBC-ilize the message.
 		$row['body'] = parse_bbc($row['body'], true, 'draft' . $row['id_draft']);
 
-		// Have they provide who this will go to?
+		// Have they provided who this will go to?
 		$recipients = array(
 			'to' => array(),
 			'bcc' => array(),
