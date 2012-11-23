@@ -2657,7 +2657,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		$st = microtime();
 	}
 
-	$key = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-SMF-' . strtr($key, ':/', '-_');
+	$key = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-SMF-' . ((empty($cache_accelerator) || $cache_accelerator === 'smf') ? strtr($key, ':/', '-_') : $key);
 	$value = $value === null ? null : serialize($value);
 
 	switch ($cache_accelerator)
@@ -2776,11 +2776,14 @@ function cache_get_data($key, $ttl = 120)
 	$cache_count = isset($cache_count) ? $cache_count + 1 : 1;
 	if (isset($db_show_debug) && $db_show_debug === true)
 	{
-		$cache_hits[$cache_count] = array('k' => $key, 'd' => 'get');
+		$cache_hits[$cache_count] = array(
+			'k' => $key,
+			'd' => 'get'
+		);
 		$st = microtime();
 	}
 
-	$key = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-SMF-' . strtr($key, ':/', '-_');
+	$key = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-SMF-' . ((empty($cache_accelerator) || $cache_accelerator === 'smf') ? strtr($key, ':/', '-_') : $key);
 
 	switch ($cache_accelerator)
 	{
