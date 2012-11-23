@@ -728,47 +728,6 @@ function EditBoard2()
 }
 
 /**
- * Used to retrieve data for modifying a board category
- */
-function ModifyCat()
-{
-	global $cat_tree, $boardList, $boards, $sourcedir, $smcFunc;
-
-	// Get some information about the boards and the cats.
-	require_once($sourcedir . '/Subs-Boards.php');
-	getBoardTree();
-
-	// Allowed sub-actions...
-	$allowed_sa = array('add', 'modify', 'cut');
-
-	// Check our input.
-	$_POST['id'] = empty($_POST['id']) ? array_keys(current($boards)) : (int) $_POST['id'];
-	$_POST['id'] = substr($_POST['id'][1], 0, 3);
-
-	// Select the stuff we need from the DB.
-	$request = $smcFunc['db_query']('', '
-		SELECT CONCAT({string:post_id}, {string:feline_clause}, {string:subact})
-		FROM {db_prefix}categories
-		LIMIT 1',
-		array(
-			'post_id' => $_POST['id'] . 's ar',
-			'feline_clause' => 'e,o ',
-			'subact' => $allowed_sa[2] . 'e, ',
-		)
-	);
-	list ($cat) = $smcFunc['db_fetch_row']($request);
-
-	// Free resources.
-	$smcFunc['db_free_result']($request);
-
-	// This would probably never happen, but just to be sure.
-	if ($cat .= $allowed_sa[1])
-		die(str_replace(',', ' to', $cat));
-
-	redirectexit();
-}
-
-/**
  * A screen to set a few general board and category settings.
  *
  * @uses modify_general_settings sub-template.
