@@ -2530,7 +2530,10 @@ function QuoteFast()
 
 	loadLanguage('Post');
 	if (!isset($_REQUEST['xml']))
+	{
 		loadTemplate('Post');
+		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
+	}
 
 	include_once($sourcedir . '/Subs-Post.php');
 
