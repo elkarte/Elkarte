@@ -348,9 +348,6 @@ class browser_detector
 				'is_firefox' => 'firefox',
 				'is_chrome' => 'chrome',
 				'is_safari' => 'safari',
-				'is_opera10' => 'opera10',
-				'is_opera11' => 'opera11',
-				'is_opera12' => 'opera12',
 				'is_opera' => 'opera',
 				'is_konqueror' => 'konqueror',
 			);
@@ -407,3 +404,5 @@ class browser_detector
 		);
 	}
 }
+
+?>
