@@ -238,7 +238,7 @@ function AdminMain()
 				),
 				'managedrafts' => array(
 					'label' => $txt['manage_drafts'],
-					'file' => 'Drafts.php',
+					'file' => 'ManageDrafts.php',
 					'function' => 'ModifyDraftSettings',
 					'icon' => 'transparent.png',
 					'class' => 'admin_logs',

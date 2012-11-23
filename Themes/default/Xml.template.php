@@ -416,4 +416,19 @@ function template_webslice_recent_posts()
 	</div>';
 }
 
+/**
+ * Returns an xml response to a draft autosave request
+ * provides the id of the draft saved and the time it was saved in the response
+ *
+ */
+function template_xml_draft()
+{
+	global $txt, $context;
+
+	echo '<', '?xml version="1.0" encoding="', $context['character_set'], '" ?', '>
+<drafts>
+	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', timeformat($context['draft_saved_on']), ']]></draft>
+</drafts>';
+}
+
 ?>

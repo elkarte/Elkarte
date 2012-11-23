@@ -1798,7 +1798,7 @@ function MessagePost()
 	{
 		require_once($sourcedir . '/Drafts.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-		ShowDrafts($user_info['id'], $pm_seed, 1);
+		showDrafts($user_info['id'], $pm_seed, 1);
 	}
 
 	// Needed for the WYSIWYG editor.
@@ -2044,8 +2044,8 @@ function MessagePost2()
 
 	isAllowedTo('pm_send');
 	require_once($sourcedir . '/Subs-Auth.php');
-	
-	// PM Drafts enabled and needed? 
+
+	// PM Drafts enabled and needed?
 	if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
 		require_once($sourcedir . '/Drafts.php');
 
@@ -2260,7 +2260,7 @@ function MessagePost2()
 	// Want to save this as a draft and think about it some more?
 	if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
 	{
-		SavePMDraft($post_errors, $recipientList);
+		savePMDraft($post_errors, $recipientList);
 		return messagePostError($post_errors, $namedRecipientList, $recipientList);
 	}
 
@@ -2315,10 +2315,10 @@ function MessagePost2()
 	if (!empty($context['send_log']) && empty($context['send_log']['failed']))
 	{
 		$context['current_label_redirect'] = $context['current_label_redirect'] . ';done=sent';
-		
+
 		// If we had a PM draft for this one, then its time to remove it since it was just sent
 		if ($context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
-			DeleteDraft($_POST['id_pm_draft']);
+			deleteDrafts($_POST['id_pm_draft']);
 	}
 
 	// Go back to the where they sent from, if possible...

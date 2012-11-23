@@ -1772,7 +1772,7 @@ function scheduled_remove_old_drafts()
 	if (count($drafts) > 0)
 	{
 		require_once($sourcedir . '/Drafts.php');
-		DeleteDraft($drafts, false);
+		deleteDrafts($drafts, false);
 	}
 
 	return true;

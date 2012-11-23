@@ -1045,7 +1045,7 @@ function Post($post_errors = array())
 	if (!empty($context['drafts_save']))
 	{
 		require_once($sourcedir . '/Drafts.php');
-		ShowDrafts($user_info['id'], $topic);
+		showDrafts($user_info['id'], $topic);
 	}
 
 	// Needed for the editor and message icons.
@@ -1337,7 +1337,7 @@ function Post2()
 		// If drafts are enabled, then pass this off
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			SaveDraft($post_errors);
+			saveDraft($post_errors);
 			return Post();
 		}
 
@@ -1382,7 +1382,7 @@ function Post2()
 		// Saving your new topic as a draft first?
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			SaveDraft($post_errors);
+			saveDraft($post_errors);
 			return Post();
 		}
 
@@ -1465,7 +1465,7 @@ function Post2()
 		// If drafts are enabled, then lets send this off to save
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			SaveDraft($post_errors);
+			saveDraft($post_errors);
 			return Post();
 		}
 
@@ -1836,7 +1836,7 @@ function Post2()
 	
 	// If we had a draft for this, its time to remove it since it was just posted
 	if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
-		DeleteDraft($_POST['id_draft']);
+		deleteDrafts($_POST['id_draft']);
 
 	// Editing or posting an event?
 	if (isset($_POST['calendar']) && (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1))
