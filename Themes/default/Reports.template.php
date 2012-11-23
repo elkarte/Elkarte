@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
