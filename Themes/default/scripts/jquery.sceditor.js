@@ -316,7 +316,14 @@
 				.focus(function() {
 					lastRange = null;
 				});
-
+				
+			// auto-update original textbox on blur if option set to true
+			if(base.options.autoUpdate)
+			{
+				$body.bind("blur", base.updateTextareaValue);
+				$doc.bind("blur", base.updateTextareaValue);
+			}
+			
 			if(base.options.rtl)
 			{
 				$body.attr('dir', 'rtl');
@@ -3394,6 +3401,9 @@
 		rtl: false,
 		autofocus: false,
 		autoExpand: false,
+		
+		// If to auto update original textbox on blur
+		autoUpdate: false,
 
 		// If to run the editor without WYSIWYG support
 		runWithoutWysiwygSupport: false,
