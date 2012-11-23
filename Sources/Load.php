@@ -1924,20 +1924,27 @@ function loadCSSFile($filename, $params = array(), $id = '')
 	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-
+	
 	// account for shorthand like admin.css?alp21 filenames
 	$has_seed = strpos($filename, '.css?');
+	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 4) : $filename;
 	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
 	// Is this a local file?
 	if (strpos($filename, 'http') === false || !empty($params['local']))
 	{
+		$params['local'] = true;
+		$params['dir'] = $settings[$theme . '_dir'] . '/css/';
+		
 		// Are we validating the the file exists?
 		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/css/' . $filename))
 		{
 			// Maybe the default theme has it?
 			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
+			{
 				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
+				$params['dir'] = $settings['default_theme_dir'] . '/css/';
+			}
 			else
 				$filename = false;
 		}
