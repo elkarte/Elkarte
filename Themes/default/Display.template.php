@@ -762,23 +762,7 @@ function template_main()
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
 							<script type="text/javascript"><!-- // --><![CDATA[
-								function insertQuoteFast(messageid)
-								{
-									if (window.XMLHttpRequest)
-										getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
-									else
-										reqWin(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
-									return false;
-								}
-								function onDocReceived(XMLDoc)
-								{
-									var text = \'\';
-									for (var i = 0, n = XMLDoc.getElementsByTagName(\'quote\')[0].childNodes.length; i < n; i++)
-										text += XMLDoc.getElementsByTagName(\'quote\')[0].childNodes[i].nodeValue;
-									oEditorHandle_', $context['post_box_name'], '.insertText(text, false, true);
-
-									ajax_indicator(false);
-								}
+								var post_box_name = "', $context['post_box_name'], '";
 							// ]]></script>';
 
 		}
