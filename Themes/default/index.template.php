@@ -88,15 +88,9 @@ function template_html_above()
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>';
 
-	// The ?alp21 part of this link is just here to make sure browsers don't cache it wrongly.
-	echo '
-	<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index.css?alp21" />';
-
-	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
-	if (!empty($context['theme_variant']))
-		echo '
-	<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />';
-
+	// load in any css from mods or themes so they can overwrite if wanted
+	template_css();
+	
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if(!empty($settings['forum_width']))
 		echo '
@@ -105,9 +99,6 @@ function template_html_above()
 	// Quick and dirty testing of RTL horrors. Remove before production build.
 	//echo '
 	//<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
-
-	// load in any css from mods or themes so they can overwrite if wanted
-	template_css();
 
 	// load in any javascript files from mods and themes
 	template_javascript();
@@ -300,7 +291,7 @@ function template_body_above()
 						</form>';
 	}
 
-		// If the user is logged in, display stuff like their name, new messages, etc.
+	// If the user is logged in, display stuff like their name, new messages, etc.
 	if ($context['user']['is_logged'])
 	{
 		if (!empty($context['user']['avatar']))

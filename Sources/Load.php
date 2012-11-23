@@ -1804,15 +1804,18 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	global $context, $settings, $txt, $scripturl, $boarddir, $db_show_debug;
 
+	if (!is_array($style_sheets))
+		$style_sheets = array($style_sheets);
+	
 	// Do any style sheets first, cause we're easy with those.
-	if (!empty($style_sheets))
-	{
-		if (!is_array($style_sheets))
-			$style_sheets = array($style_sheets);
+	$style_sheets += array('index');
+	
+	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
+	if (!empty($context['theme_variant']))
+		$style_sheets += array($context['theme_variant']);
 
-		foreach ($style_sheets as $sheet)
-			loadCSSFile($sheet . '.css', array(), $sheet);
-	}
+	foreach ($style_sheets as $sheet)
+		loadCSSFile($sheet . '.css', array(), $sheet);
 
 	// No template to load?
 	if ($template_name === false)
