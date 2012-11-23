@@ -1833,38 +1833,48 @@
 		// START_COMMAND: Colour
 		color: {
 			_dropDown: function(editor, caller, callback) {
-				var	genColor		= {r: 255, g: 255, b: 255},
-					content			= $("<div />"),
-					colorColumns		= editor.options.colors?editor.options.colors.split("|"):new Array(21),
+				var	i, x, color, colors,
+					genColor     = {r: 255, g: 255, b: 255},
+					content      = $("<div />"),
+					colorColumns = editor.options.colors?editor.options.colors.split("|"):new Array(21),
 					// IE is slow at string concation so use an array
-					html			= [],
-					htmlIndex		= 0;
+					html         = [];
 
-				for (var i=0; i < colorColumns.length; ++i) {
-					var colors = colorColumns[i]?colorColumns[i].split(","):new Array(21);
+				for (i=0; i < colorColumns.length; ++i)
+				{
+					colors = colorColumns[i]?colorColumns[i].split(","):new Array(21);
 
-					html[htmlIndex++] = '<div class="sceditor-color-column">';
-
-					for (var x=0; x < colors.length; ++x) {
+					html.push('<div class="sceditor-color-column">');
+					for (x=0; x < colors.length; ++x)
+					{
 						// use pre defined colour if can otherwise use the generated color
-						var color = colors[x]?colors[x]:"#" + genColor.r.toString(16) + genColor.g.toString(16) + genColor.b.toString(16);
+						color = colors[x] || "#" + genColor.r.toString(16) + genColor.g.toString(16) + genColor.b.toString(16);
 
-						html[htmlIndex++] = '<a href="#" class="sceditor-color-option" style="background-color: '+color+'" data-color="'+color+'"></a>';
+						html.push('<a href="#" class="sceditor-color-option" style="background-color: '+color+'" data-color="'+color+'"></a>');
 
 						// calculate the next generated color
 						if(x%5===0)
-							genColor = {r: genColor.r, g: genColor.g-51, b: 255};
+						{
+							genColor.g -= 51;
+							genColor.b = 255;
+						}
 						else
-							genColor = {r: genColor.r, g: genColor.g, b: genColor.b-51};
+							genColor.b -= 51;
 					}
-
-					html[htmlIndex++] = '</div>';
+					html.push('</div>');
 
 					// calculate the next generated color
 					if(i%5===0)
-						genColor = {r: genColor.r-51, g: 255, b: 255};
+					{
+						genColor.r -= 51;
+						genColor.g = 255;
+						genColor.b = 255;
+					}
 					else
-						genColor = {r: genColor.r, g: 255, b: 255};
+					{
+						genColor.g = 255;
+						genColor.b = 255;
+					}
 				}
 
 				content.append(html.join(''))
