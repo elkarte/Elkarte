@@ -2408,10 +2408,7 @@ function PackagePermissionsAction()
 	umask(0);
 
 	$timeout_limit = 5;
-
-	$context['method'] = $_POST['method'] == 'individual' ? 'individual' : 'predefined';
-	$context['sub_template'] = 'action_permissions';
-	$context['page_title'] = $txt['package_file_perms_applying'];
+	$context['method'] = $_POST['method'] === 'individual' ? 'individual' : 'predefined';
 	$context['back_look_data'] = isset($_POST['back_look']) ? $_POST['back_look'] : array();
 
 	// Skipping use of FTP?
@@ -2419,7 +2416,7 @@ function PackagePermissionsAction()
 		$context['skip_ftp'] = true;
 
 	// We'll start off in a good place, security. Make sure that if we're dealing with individual files that they seem in the right place.
-	if ($context['method'] == 'individual')
+	if ($context['method'] === 'individual')
 	{
 		// Only these path roots are legal.
 		$legal_roots = array_keys($context['file_tree']);
@@ -2436,7 +2433,7 @@ function PackagePermissionsAction()
 			foreach ($_POST['permStatus'] as $path => $status)
 			{
 				// Nothing to see here?
-				if ($status == 'no_change')
+				if ($status === 'no_change')
 					continue;
 				$legal = false;
 				foreach ($legal_roots as $root)
@@ -2450,7 +2447,7 @@ function PackagePermissionsAction()
 				if (!file_exists($path))
 					continue;
 
-				if ($status == 'custom')
+				if ($status === 'custom')
 					$validate_custom = true;
 
 				// Now add it.
@@ -2498,7 +2495,7 @@ function PackagePermissionsAction()
 
 			// See if we're out of time?
 			if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-				return false;
+				pausePackagePermissionsAction();
 		}
 	}
 	// If predefined this is a little different.
@@ -2567,7 +2564,7 @@ function PackagePermissionsAction()
 				global $context;
 
 				if (!empty($data['writable_on']))
-					if ($context['predefined_type'] == 'standard' || $data['writable_on'] == 'restrictive')
+					if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
 						$context['special_files'][$path] = 1;
 
 				if (!empty($data['contents']))
@@ -2579,7 +2576,7 @@ function PackagePermissionsAction()
 				build_special_files__recursive($path, $data);
 		}
 		// Free doesn't need special files.
-		elseif ($context['predefined_type'] == 'free')
+		elseif ($context['predefined_type'] === 'free')
 			$context['special_files'] = array();
 		else
 			$context['special_files'] = unserialize(base64_decode($_POST['specialFiles']));
@@ -2594,10 +2591,11 @@ function PackagePermissionsAction()
 			while ($entry = readdir($dh))
 			{
 				$file_count++;
+				
 				// Actually process this file?
 				if (!$dont_chmod && !is_dir($path . '/' . $entry) && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
 				{
-					$status = $context['predefined_type'] == 'free' || isset($context['special_files'][$path . '/' . $entry]) ? 'writable' : 'execute';
+					$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path . '/' . $entry]) ? 'writable' : 'execute';
 					package_chmod($path . '/' . $entry, $status);
 				}
 
@@ -2605,8 +2603,10 @@ function PackagePermissionsAction()
 				if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
 				{
 					$dont_chmod = true;
-					// Don't do this again.
+					
+					// Make note of how far we have come so we restart at the right point
 					$context['file_offset'] = $file_count;
+					break;
 				}
 			}
 			closedir($dh);
@@ -2615,11 +2615,11 @@ function PackagePermissionsAction()
 			if ($dont_chmod)
 			{
 				$context['total_files'] = $file_count;
-				return false;
+				pausePackagePermissionsAction();
 			}
 
 			// Do the actual directory.
-			$status = $context['predefined_type'] == 'free' || isset($context['special_files'][$path]) ? 'writable' : 'execute';
+			$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path]) ? 'writable' : 'execute';
 			package_chmod($path, $status);
 
 			// We've finished the directory so no file offset, and no record.
@@ -2628,12 +2628,51 @@ function PackagePermissionsAction()
 
 			// See if we're out of time?
 			if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-				return false;
+				pausePackagePermissionsAction();
 		}
 	}
 
 	// If we're here we are done!
 	redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(serialize($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+}
+
+/**
+ * Function called to briefly pause execution of directory/file chmod actions
+ * Called by PackagePermissionsAction().
+ *
+ */
+function pausePackagePermissionsAction()
+{
+	global $context, $txt;
+
+	// Try get more time...
+	@set_time_limit(600);
+	if (function_exists('apache_reset_timeout'))
+		@apache_reset_timeout();
+		
+	// Set up the items for the pause form
+	$context['sub_template'] = 'pause_action_permissions';
+	$context['page_title'] = $txt['package_file_perms_applying'];
+	
+	// And how are we progressing with our directories
+	$context['remaining_items'] = count($context['method'] == 'individual' ? $context['to_process'] : $context['directory_list']);
+	$context['progress_message'] = sprintf($context['method'] == 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
+	$context['progress_percent'] = round(($context['total_items'] - $context['remaining_items']) / $context['total_items'] * 100, 1);
+	
+	// Never more than 100%!
+	$context['progress_percent'] = min($context['progress_percent'], 100);
+
+	// And how are we progessing with files within a directory
+	if ($context['method'] != 'individual' && !empty($context['total_files']))
+	{
+		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
+		$context['file_progress_percent'] = round($context['file_offset'] / $context['total_files'] * 100, 1);
+		
+		// Never more than 100%!
+		$context['file_progress_percent'] = min($context['file_progress_percent'], 100);
+	}
+	
+	obExit();
 }
 
 /**

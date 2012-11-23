@@ -621,7 +621,7 @@ function template_browse()
 
 	echo '
 	</div>
-	
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oAdvancedPanelToggle = new smc_Toggle({
 			bToggleEnabled: true,
@@ -1530,7 +1530,7 @@ function template_file_permissions()
 	foreach ($context['file_tree'] as $name => $dir)
 	{
 		echo '
-			
+
 				<tr class="windowbg2">
 					<td width="30%"><strong>';
 
@@ -1618,7 +1618,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 {
 	global $settings, $txt, $scripturl, $context;
 	$js_ident = preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident);
-	
+
 	// Have we actually done something?
 	$drawn_div = false;
 
@@ -1702,63 +1702,56 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 	}
 }
 
-function template_action_permissions()
+function template_pause_action_permissions()
 {
-	global $txt, $scripturl, $context, $settings;
-
-	$countDown = 3;
-
+	global $txt, $scripturl, $context;
+	
+	// How many have we done?
+	$countDown = 5;
+	
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="perm_submit" method="post" accept-charset="', $context['character_set'], '">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_file_perms_applying'], '</h3>
-			</div>';
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['package_file_perms_applying'], '</h3>
+		</div>';
 
 	if (!empty($context['skip_ftp']))
 		echo '
-			<div class="errorbox">
-				', $txt['package_file_perms_skipping_ftp'], '
-			</div>';
+		<div class="errorbox">
+			', $txt['package_file_perms_skipping_ftp'], '
+		</div>';
 
-	// How many have we done?
-	$remaining_items = count($context['method'] == 'individual' ? $context['to_process'] : $context['directory_list']);
-	$progress_message = sprintf($context['method'] == 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $remaining_items, $context['total_items']);
-	$progress_percent = round(($context['total_items'] - $remaining_items) / $context['total_items'] * 100, 1);
-
+	// First progress bar for the number of directories we are working
 	echo '
-			<div class="windowbg">
-				<div class="content">
-					<div>
-						<strong>', $progress_message, '</strong><br /><br />
-						<div class="progress_bar">
-							<div class="full_bar">', $progress_percent, '%</div>
-							<div class="blue_percent" style="width: ', $progress_percent, '%;">&nbsp;</div>
-						</div>
-					</div>';
+		<div class="windowbg">
+			<div class="content">
+				<div>
+					<strong>', $context['progress_message'], '</strong>
+					<div class="progress_bar">
+						<div class="full_bar">', $context['progress_percent'], '%</div>
+						<div class="blue_percent" style="width: ', $context['progress_percent'], '%;">&nbsp;</div>
+					</div>
+				</div>';
 
-	// Second progress bar for a specific directory?
+	// Second progress bar for progress in a specific directory?
 	if ($context['method'] != 'individual' && !empty($context['total_files']))
 	{
-		$file_progress_message = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
-		$file_progress_percent = round($context['file_offset'] / $context['total_files'] * 100, 1);
-
 		echo '
-					<br />
-					<div>
-						<strong>', $file_progress_message, '</strong><br /><br />
-						<div class="progress_bar">
-							<div class="full_bar">', $file_progress_percent, '%</div>
-							<div class="green_percent" style="width: ', $file_progress_percent, '%;">&nbsp;</div>
-						</div>
-					</div>';
+				<br />
+				<div>
+					<strong>', $context['file_progress_message'], '</strong>
+					<div class="progress_bar">
+						<div class="full_bar">', $context['file_progress_percent'], '%</div>
+						<div class="green_percent" style="width: ', $context['file_progress_percent'], '%;">&nbsp;</div>
+					</div>
+				</div>';
 	}
-
-	echo '
-					<br />';
+	
+	echo '		
+				<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="', $context['character_set'], '">';
 
 	// Put out the right hidden data.
-	if ($context['method'] == 'individual')
+	if ($context['method'] === 'individual')
 		echo '
 					<input type="hidden" name="custom_value" value="', $context['custom_value'], '" />
 					<input type="hidden" name="totalItems" value="', $context['total_items'], '" />
@@ -1781,15 +1774,15 @@ function template_action_permissions()
 		echo '
 					<input type="hidden" name="back_look[]" value="', $path, '" />';
 
+	// Standard fields
 	echo '
 					<input type="hidden" name="method" value="', $context['method'], '" />
 					<input type="hidden" name="action_changes" value="1" />
-					<div class="righttext padding">
-						<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
-					</div>
-				</div>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
+				</form>
 			</div>
-		</form>
+		</div>
 	</div>';
 
 	// Just the countdown stuff
