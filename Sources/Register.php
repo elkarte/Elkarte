@@ -46,6 +46,9 @@ function Register($reg_errors = array())
 	elseif (empty($user_info['is_guest']))
 		redirectexit();
 
+	if (isset($_POST['show_contact']))
+		redirectexit('action=contact');
+
 	loadLanguage('Login');
 	loadTemplate('Register');
 
@@ -53,6 +56,7 @@ function Register($reg_errors = array())
 	$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 	$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
 	$context['show_coppa'] = !empty($modSettings['coppaAge']);
+	$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'registration';
 
 	// Under age restrictions?
 	if ($context['show_coppa'])
@@ -851,4 +855,100 @@ function RegisterCheckUsername()
 	$context['valid_username'] = empty($errors);
 }
 
+/**
+ * Shows the contact form for the user to fill out
+ * Needs to be enabled to be used
+ */
+function ContactForm()
+{
+	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
+
+	// Already inside, no need to use this, just send a PM
+	// Disabled, you cannot enter.
+	if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] == 'disabled')
+		redirectexit();
+
+	loadLanguage('Login');
+	loadTemplate('Register');
+	spamProtection('contact');
+
+	if (isset($_REQUEST['send']))
+	{
+		checkSession('post');
+		validateToken('contact');
+
+		// No errors, yet.
+		$context['errors'] = array();
+
+		// Could they get the right send topic verification code?
+		require_once($sourcedir . '/Subs-Editor.php');
+		$verificationOptions = array(
+			'id' => 'contactform',
+		);
+		$context['require_verification'] = create_control_verification($verificationOptions, true);
+		if (is_array($context['require_verification']))
+		{
+			loadLanguage('Errors');
+			foreach ($context['require_verification'] as $error)
+				$context['errors'][] = $txt['error_' . $error];
+		}
+
+		// Check the email for validity.
+		$email = !empty($_POST['emailaddres']) ? trim($_POST['emailaddres']) : '';
+		if (empty($email))
+			$context['errors'][] = $txt['error_no_email'];
+		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
+			$context['errors'][] = $txt['error_bad_email'];
+
+		$message = !empty($_POST['contactmessage']) ? trim($smcFunc['htmlspecialchars']($_POST['contactmessage'])) : '';
+		if (empty($message))
+			$context['errors'][] = $txt['error_no_message'];
+		if (empty($context['errors']))
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_member
+				FROM {db_prefix}members
+				WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
+				ORDER BY real_name',
+				array(
+					'admin_group' => 1,
+				)
+			);
+			$admins = array();
+			while ($row = $smcFunc['db_fetch_assoc']($request))
+				$admins[] = $row['id_member'];
+			$smcFunc['db_free_result']($request);
+
+			if (!empty($admins))
+			{
+				require_once($sourcedir . '/Subs-Post.php');
+				sendpm(array('to' => $admins, 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
+
+			}
+			// Send the PM
+			redirectexit('action=contact;sa=done');
+		}
+		else
+		{
+			$context['emailaddres'] = $email;
+			$context['contactmessage'] = $message;
+		}
+	}
+
+	if (isset($_GET['sa']) && $_GET['sa'] == 'done')
+		$context['sub_template'] = 'contact_form_done';
+	else
+	{
+		$context['sub_template'] = 'contact_form';
+
+		require_once($sourcedir . '/Subs-Editor.php');
+		$verificationOptions = array(
+			'id' => 'contactform',
+		);
+		$context['require_verification'] = create_control_verification($verificationOptions);
+		$context['visual_verification_id'] = $verificationOptions['id'];
+	}
+
+	createToken('contact');
+}
 ?>
