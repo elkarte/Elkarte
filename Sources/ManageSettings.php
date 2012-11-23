@@ -506,8 +506,9 @@ function ModifyBasicSettings($return_config = false)
 			array('check', 'titlesEnable'),
 			array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
 		'',
-			// Jquery source
+			// Javascript and CSS options
 			array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
+			array('check', 'minify_css_js'),
 		'',
 			// SEO stuff
 			array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong>'),

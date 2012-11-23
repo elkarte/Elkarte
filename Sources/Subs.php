@@ -3211,17 +3211,56 @@ function template_footer()
  * Output the Javascript files
  * 	- tabbing in this function is to make the HTML source look good proper
  *  - if defered is set function will output all JS (source & inline) set to load at page end
+ *  - if the admin option to combine files is set, will use Class-Combiner
  *
  * @param bool $do_defered = false
  */
 function template_javascript($do_defered = false)
 {
-	global $context, $modSettings, $settings;
+	global $context, $modSettings, $settings, $sourcedir;
+	
+	$loadjquery = false;
 
-	// Use this hook to minify/optimize Javascript files and vars
+	// Use this hook to work with Javascript files and vars pre output
 	call_integration_hook('pre_javascript_output');
 
-	// Ouput the declared Javascript variables.
+	// Combine and minify javascript to save bandwidth and requests?
+	if (!empty($context['javascript_files']))
+	{
+		if (!empty($modSettings['minify_css_js']))
+		{
+			require_once($sourcedir . '/Class-Combine.php');
+			$combiner = new smf_Combiner;
+			$combine_name = $combiner->smf_js_combine($context['javascript_files'], $do_defered, $loadjquery);
+			
+			if (!empty($combine_name))
+				echo '
+	<script type="text/javascript" src="', $combine_name, '" id="jscombined' . ($do_defered ? 'top' : 'bottom') .'"></script>';
+		}
+		else
+		{
+			// While we have Javascript files to place in the template
+			foreach ($context['javascript_files'] as $id => $js_file)
+			{
+				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
+					echo '
+	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id,'"' , !empty($js_file['options']['async']) ? ' async="async"' : '' ,'></script>';
+				
+				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
+				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
+					$loadjquery = true;
+			}
+		}
+	}
+	
+	// load JQuery if needed
+	if (!empty($loadjquery))
+		echo '
+	<script type="text/javascript"><!-- // --><![CDATA[
+		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.1.min.js"><\/script>\');
+	// ]]></script>';
+	
+	// Output the declared Javascript variables.
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
 		echo '
@@ -3235,21 +3274,8 @@ function template_javascript($do_defered = false)
 	// ]]></script>';
 	}
 
-	// While we have Javascript files to place in the template
-	foreach ($context['javascript_files'] as $id => $js_file)
-	{
-		if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
-			echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id,'"' , !empty($js_file['options']['async']) ? ' async="async"' : '' ,'></script>';
 
-		// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
-		if ($id == 'jquery' && (!isset($modSettings['jquery_source']) || !in_array($modSettings['jquery_source'],array('local', 'cdn'))))
-		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.1.min.js"><\/script>\');
-	// ]]></script>';
 
-	}
 
 	// Inline JavaScript - Actually useful some times!
 	if (!empty($context['javascript_inline']))
@@ -3257,13 +3283,13 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
 		{
 			echo '
-<script type="text/javascript"><!-- // --><![CDATA[';
+	<script type="text/javascript"><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
 
 			echo'
-// ]]></script>';
+	// ]]></script>';
 		}
 
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
@@ -3282,17 +3308,34 @@ function template_javascript($do_defered = false)
 
 /**
  * Output the CSS files
+ *  - if the admin option to combine files is set, will use Class-Combiner
  */
 function template_css()
 {
-	global $context;
+	global $context, $sourcedir, $modSettings;
 
-	// Use this hook to minify/optimize CSS files
+	// Use this hook to work with CSS files pre output
 	call_integration_hook('pre_css_output');
 
-	foreach ($context['css_files'] as $id => $file)
-		echo '
+	// Combine and minify the CSS files to save bandwidth and requests?
+	if (!empty($context['css_files']))
+	{
+		if (!empty($modSettings['minify_css_js']))
+		{
+			require_once($sourcedir . '/Class-Combine.php');
+			$combiner = new smf_Combiner;
+			$combine_name = $combiner->smf_css_combine($context['css_files']);
+			if (!empty($combine_name))
+				echo '
+	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
+		}
+		else
+		{
+			foreach ($context['css_files'] as $id => $file)
+				echo '
 	<link rel="stylesheet" type="text/css" href="', $file['filename'], '" id="', $id,'" />';
+		}
+	}
 }
 
 /**

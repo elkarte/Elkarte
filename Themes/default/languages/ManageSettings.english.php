@@ -69,6 +69,7 @@ $txt['jquery_source'] = 'Source for the jQuery Library';
 $txt['jquery_local'] = 'Local';
 $txt['jquery_cdn'] = 'Google CDN';
 $txt['jquery_auto'] = 'Auto';
+$txt['minify_css_js'] = 'Minify Javascript and CSS files';
 $txt['queryless_urls'] = 'Search engine friendly URLs';
 $txt['queryless_urls_note'] = 'Apache/Lighttpd only';
 $txt['enableReportPM'] = 'Enable reporting of personal messages';
