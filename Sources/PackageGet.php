@@ -387,7 +387,7 @@ function PackageGBrowse()
 				$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
 				$package['is_newer'] = $package['is_installed'] && ($installed_mods[$package['id']] > $package['version']);
 
-				// This package is either not installed, or installed but old.  Is it supported on this version of DIALOGO?
+				// This package is either not installed, or installed but old.  Is it supported on this version?
 				if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 				{
 					if ($thisPackage->exists('version/@for'))
@@ -420,7 +420,7 @@ function PackageGBrowse()
 
 					if (!empty($package['author']['email']))
 					{
-						// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an DIALOGO IM Form or other web mail form.
+						// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an IM Form or other web mail form.
 						$package['author']['href'] = preg_match('~^[\w\.\-]+@[\w][\w\-\.]+[\w]$~', $package['author']['email']) != 0 ? 'mailto:' . $package['author']['email'] : $package['author']['email'];
 						$package['author']['link'] = '<a href="' . $package['author']['href'] . '">' . $package['author']['name'] . '</a>';
 					}

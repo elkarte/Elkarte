@@ -1495,6 +1495,7 @@ function create_control_richedit($editorOptions)
 			loadJavascriptFile('drafts.js', array('default_theme' => true));
 
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+		
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
 		{
@@ -2172,7 +2173,7 @@ function AutoSuggestHandler($checkRegistered = null)
 	// These are all registered types.
 	$searchTypes = array(
 		'member' => 'Member',
-		'versions' => 'DIALOGOVersions',
+		'versions' => 'SMFVersions',
 	);
 
 	call_integration_hook('integrate_autosuggest', array($searchTypes));
@@ -2243,11 +2244,11 @@ function AutoSuggest_Search_Member()
 }
 
 /**
- * Provides a list of possible DIALOGO versions to use in emulation
+ * Provides a list of possible SMF versions to use in emulation
  * 
  * @return string
  */
-function AutoSuggest_Search_DIALOGOVersions()
+function AutoSuggest_Search_SMFVersions()
 {
 
 	$xml_data = array(
@@ -2258,34 +2259,35 @@ function AutoSuggest_Search_DIALOGOVersions()
 	);
 
 	$versions = array(
-		'DIALOGO 1.1',
-		'DIALOGO 1.1.1',
-		'DIALOGO 1.1.2',
-		'DIALOGO 1.1.3',
-		'DIALOGO 1.1.4',
-		'DIALOGO 1.1.5',
-		'DIALOGO 1.1.6',
-		'DIALOGO 1.1.7',
-		'DIALOGO 1.1.8',
-		'DIALOGO 1.1.9',
-		'DIALOGO 1.1.10',
-		'DIALOGO 1.1.11',
-		'DIALOGO 1.1.12',
-		'DIALOGO 1.1.13',
-		'DIALOGO 1.1.14',
-		'DIALOGO 1.1.15',
-		'DIALOGO 1.1.16',
-		'DIALOGO 2.0 beta 1',
-		'DIALOGO 2.0 beta 1.2',
-		'DIALOGO 2.0 beta 2',
-		'DIALOGO 2.0 beta 3',
-		'DIALOGO 2.0 RC 1',
-		'DIALOGO 2.0 RC 1.2',
-		'DIALOGO 2.0 RC 2',
-		'DIALOGO 2.0 RC 3',
-		'DIALOGO 2.0',
-		'DIALOGO 2.0.1',
-		'DIALOGO 2.0.2',
+		'SMF 1.1',
+		'SMF 1.1.1',
+		'SMF 1.1.2',
+		'SMF 1.1.3',
+		'SMF 1.1.4',
+		'SMF 1.1.5',
+		'SMF 1.1.6',
+		'SMF 1.1.7',
+		'SMF 1.1.8',
+		'SMF 1.1.9',
+		'SMF 1.1.10',
+		'SMF 1.1.11',
+		'SMF 1.1.12',
+		'SMF 1.1.13',
+		'SMF 1.1.14',
+		'SMF 1.1.15',
+		'SMF 1.1.16',
+		'SMF 2.0 beta 1',
+		'SMF 2.0 beta 1.2',
+		'SMF 2.0 beta 2',
+		'SMF 2.0 beta 3',
+		'SMF 2.0 RC 1',
+		'SMF 2.0 RC 1.2',
+		'SMF 2.0 RC 2',
+		'SMF 2.0 RC 3',
+		'SMF 2.0',
+		'SMF 2.0.1',
+		'SMF 2.0.2',
+		'DIALOGO 1.0',
 	);
 
 	foreach ($versions as $id => $version)

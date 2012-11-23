@@ -308,8 +308,8 @@ function MaintainFindFixErrors()
 }
 
 /**
- * Wipes the whole cache directory.
- * This only applies to DIALOGO's own cache directory, though.
+ * Wipes the current cache entries as best it can.
+ * This only applies to our own cache entries, opcache and data
  */
 function MaintainCleanCache()
 {
@@ -444,7 +444,7 @@ function ConvertUtf8()
 
 	$smcFunc['db_free_result']($request);
 
-	// Character sets supported by both MySQL and DIALOGO's language files.
+	// Character sets supported by both MySQL and our language files.
 	$charsets = array_intersect($charsets, $db_charsets);
 
 	// This is for the first screen telling backups is good.

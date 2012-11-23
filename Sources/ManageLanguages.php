@@ -245,6 +245,7 @@ function DownloadLanguage()
 		// Otherwise, go go go!
 		elseif (!empty($install_files))
 		{
+			// @todo
 			$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
 			// Make sure the files aren't stuck in the cache.
 			package_flush_cache();
@@ -254,7 +255,7 @@ function DownloadLanguage()
 		}
 	}
 
-	// Open up the old china.
+	// @todo Open up the old china. 
 	if (!isset($archive_content))
 		$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 

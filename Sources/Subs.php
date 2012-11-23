@@ -3734,7 +3734,7 @@ function clean_cache($type = '')
 			if (!is_dir($cachedir))
 				return;
 
-			// Remove the files in DIALOGO's own disk cache, if any
+			// Remove the files in our own disk cache, if any
 			$dh = opendir($cachedir);
 			while ($file = readdir($dh))
 			{

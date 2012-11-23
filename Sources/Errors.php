@@ -319,7 +319,7 @@ function setup_fatal_error_context($error_message, $error_code)
 	obExit(null, true, false, true);
 
 	/* DO NOT IGNORE:
-		If you are creating a bridge to DIALOGO or modifying this function, you MUST
+		If you are creating a bridge or modifying this function, you MUST
 		make ABSOLUTELY SURE that this function quits and DOES NOT RETURN TO NORMAL
 		PROGRAM FLOW.  Otherwise, security error messages will not be shown, and
 		your forum will be in a very easily hackable state.
@@ -383,7 +383,7 @@ function display_db_error()
 
 		// Language files aren't loaded yet :(.
 		$db_error = @$smcFunc['db_error']($db_connection);
-		@mail($webmaster_email, $mbname . ': DIALOGO Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that DIALOGO could not connect to the database, contact your host if this continues.');
+		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 	}
 
 	// What to do?  Language files haven't and can't be loaded yet...
@@ -395,7 +395,7 @@ function display_db_error()
 	</head>
 	<body>
 		<h3>Connection Problems</h3>
-		Sorry, DIALOGO was unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
+		Sorry, we were unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
 	</body>
 </html>';
 
