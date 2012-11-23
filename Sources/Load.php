@@ -1959,7 +1959,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 
 /**
  * Add a Javascript file for output later
-
+ 
  * @param string $filename
  * @param array $params
  * Keys are the following:
@@ -1977,24 +1977,34 @@ function loadCSSFile($filename, $params = array(), $id = '')
 function loadJavascriptFile($filename, $params = array(), $id = '')
 {
 	global $settings, $context;
+	
+	if (empty($filename))
+		return;
 
 	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-
+	
 	// account for shorthand like admin.js?alp21 filenames
 	$has_seed = strpos($filename, '.js?');
+	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
 	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
 	// Is this a local file?
-	if (strpos($filename, 'http') === false || !empty($params['local']))
+	if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
 	{
+		$params['local'] = true;
+		$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
+		
 		// Are we validating it exists on disk?
 		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
 		{
 			// can't find it in this theme, how about the default?
 			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
+			{
 				$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['seed']);
+				$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+			}
 			else
 				$filename = false;
 		}
