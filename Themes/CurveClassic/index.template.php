@@ -56,7 +56,7 @@ function template_init()
 		'html' for an HTML 4.01 document type definition. */
 	$settings['doctype'] = 'xhtml';
 
-	// The version this template/theme is for. This should probably be the version of SMF it was created for.
+	// The version this template/theme is for. This should probably be the version it was created for.
 	$settings['theme_version'] = '2.0';
 
 	// Set a setting that tells the theme that it can render the tabs.

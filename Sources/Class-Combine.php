@@ -11,7 +11,7 @@
  * @version 2.1 Alpha 1
  */
 
-if (!defined('SMF'))
+if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**

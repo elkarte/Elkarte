@@ -358,17 +358,17 @@ function template_view_versions()
 				</thead>
 				<tbody>';
 
-	// The current version of the core SMF package.
+	// The current version of the core package.
 	echo '
 					<tr>
 						<td class="windowbg">
 							', $txt['admin_smfpackage'], '
 						</td>
 						<td class="windowbg">
-							<em id="yourSMF">', $context['forum_version'], '</em>
+							<em id="yourDIALOGO">', $context['forum_version'], '</em>
 						</td>
 						<td class="windowbg">
-							<em id="currentSMF">??</em>
+							<em id="currentDIALOGO">??</em>
 						</td>
 					</tr>';
 
