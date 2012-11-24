@@ -24,43 +24,43 @@ class custom_search
 {
 	/**
 	 *This is the last version of DIALOGO that this was tested on, to protect against API changes.
-	 * @var type
+	 * @var string
 	 */
 	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
 
 	/**
 	 *This won't work with versions of DIALOGO less than this.
-	 * @var type
+	 * @var string
 	 */
 	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
 
 	/**
 	 * Is it supported?
-	 * @var type
+	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * Index Settings
-	 * @var type
+	 * @var array
 	 */
 	protected $indexSettings = array();
 
 	/**
 	 * What words are banned?
-	 * @var type
+	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
-	 * @var type
+	 * @var int
 	 */
 	protected $min_word_length = null;
 
 	/**
 	 * What databases support the custom index?
-	 * @var type
+	 * @var array
 	 */
 	protected $supported_databases = array('mysql', 'postgresql', 'sqlite');
 
@@ -149,10 +149,10 @@ class custom_search
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param type $word
-	 * @param type $wordsSearch
-	 * @param type $wordsExclude
-	 * @param type $isExcluded
+	 * @param string $word
+	 * @param array $wordsSearch
+	 * @param array $wordsExclude
+	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -183,8 +183,8 @@ class custom_search
 	/**
 	 * Search for indexed words.
 	 *
-	 * @param type $words
-	 * @param type $search_data
+	 * @param array $words
+	 * @param array $search_data
 	 * @return type
 	 */
 	public function indexedWordQuery($words, $search_data)
@@ -275,9 +275,9 @@ class custom_search
 	/**
 	 *  After a post is made, we update the search index database
 	 *
-	 * @param type $msgOptions
-	 * @param type $topicOptions
-	 * @param type $posterOptions
+	 * @param array $msgOptions
+	 * @param array $topicOptions
+	 * @param array $posterOptions
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -301,9 +301,9 @@ class custom_search
 	/**
 	 * After a post is modified, we update the search index database.
 	 *
-	 * @param type $msgOptions
-	 * @param type $topicOptions
-	 * @param type $posterOptions
+	 * @param array $msgOptions
+	 * @param array $topicOptions
+	 * @param array $posterOptions
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{

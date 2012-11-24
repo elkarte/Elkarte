@@ -24,38 +24,38 @@ class fulltext_search
 {
 	/**
 	 * This is the last version of DIALOGO that this was tested on, to protect against API changes.
-	 * @var type
+	 * @var string
 	 */
 	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
 
 	/**
 	 * This won't work with versions of DIALOGO less than this.
-	 * @var type
+	 * @var string
 	 */
 	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
 
 	/**
 	 * Is it supported?
 	 *
-	 * @var type
+	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
-	 * @var type
+	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
-	 * @var type
+	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases support the fulltext index?
-	 * @var type
+	 * @var array
 	 */
 	protected $supported_databases = array('mysql');
 
