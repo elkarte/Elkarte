@@ -8,6 +8,16 @@ $txt['website_title'] = 'Website title';
 $txt['website_url'] = 'Website URL';
 $txt['signature'] = 'Signature';
 $txt['profile_posts'] = 'Posts';
+
+$txt['profile_info'] = 'Extra Details';
+$txt['profile_contact'] = 'Contact Information';
+$txt['profile_moderation'] = 'Moderation Information';
+$txt['profile_more'] = 'Signature';
+$txt['profile_attachments'] = 'Recent Attachments';
+$txt['profile_attachments_no'] = 'There are no Attachments from this member';
+$txt['profile_buddies_no'] = 'You have not set any buddies';
+$txt['profile_user_info'] = 'User Info';
+
 $txt['change_profile'] = 'Change profile';
 $txt['preview_signature'] = 'Preview signature';
 $txt['current_signature'] = 'Current signature';

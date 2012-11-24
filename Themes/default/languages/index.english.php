@@ -86,6 +86,7 @@ $txt['posts_made'] = 'Posts';
 $txt['topics_made'] = 'Topics';
 $txt['website'] = 'Website';
 $txt['register'] = 'Register';
+$txt['contact'] = 'Contact Us';
 $txt['warning_status'] = 'Warning Status';
 $txt['user_warn_watch'] = 'User is on moderator watch list';
 $txt['user_warn_moderate'] = 'User posts join approval queue';

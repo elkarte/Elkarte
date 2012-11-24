@@ -1101,97 +1101,97 @@ h3.grid_header {
 
 /* Admin menu icons as sprites
 ------------------------------------------------- */
-.admin_administration {
+.admin_img_administration {
 	background: url(../images/admin/admin_sprite.png) no-repeat -0px -0px;
 }
-.admin_attachment {
+.admin_img_attachment {
 	background: url(../images/admin/admin_sprite.png) no-repeat -16px -0px;
 }
-.admin_ban {
+.admin_img_ban {
 	background: url(../images/admin/admin_sprite.png) no-repeat -32px -0px;
 }
-.admin_boards {
+.admin_img_boards {
 	background: url(../images/admin/admin_sprite.png) no-repeat -48px -0px;
 }
-.admin_calendar {
+.admin_img_calendar {
 	background: url(../images/admin/admin_sprite.png) no-repeat -64px -0px;
 }
-.admin_corefeatures {
+.admin_img_corefeatures {
 	background: url(../images/admin/admin_sprite.png) no-repeat -80px -0px;
 }
-.admin_current_theme {
+.admin_img_current_theme {
 	background: url(../images/admin/admin_sprite.png) no-repeat -96px -0px;
 }
-.admin_engines {
+.admin_img_engines {
 	background: url(../images/admin/admin_sprite.png) no-repeat -112px -0px;
 }
-.admin_exit {
+.admin_img_exit {
 	background: url(../images/admin/admin_sprite.png) no-repeat -128px -0px;
 }
-.admin_features {
+.admin_img_features {
 	background: url(../images/admin/admin_sprite.png) no-repeat -144px -0px;
 }
-.admin_languages {
+.admin_img_languages {
 	background: url(../images/admin/admin_sprite.png) no-repeat -160px -0px;
 }
-.admin_logs {
+.admin_img_logs {
 	background: url(../images/admin/admin_sprite.png) no-repeat -176px -0px;
 }
-.admin_mail {
+.admin_img_mail {
 	background: url(../images/admin/admin_sprite.png) no-repeat -192px -0px;
 }
-.admin_maintain {
+.admin_img_maintain {
 	background: url(../images/admin/admin_sprite.png) no-repeat -208px -0px;
 }
-.admin_membergroups {
+.admin_img_membergroups {
 	background: url(../images/admin/admin_sprite.png) no-repeat -224px -0px;
 }
-.admin_members {
+.admin_img_members {
 	background: url(../images/admin/admin_sprite.png) no-repeat -240px -0px;
 }
-.admin_modifications {
+.admin_img_modifications {
 	background: url(../images/admin/admin_sprite.png) no-repeat -256px -0px;
 }
-.admin_news {
+.admin_img_news {
 	background: url(../images/admin/admin_sprite.png) no-repeat -272px -0px;
 }
-.admin_packages {
+.admin_img_packages {
 	background: url(../images/admin/admin_sprite.png) no-repeat -288px -0px;
 }
-.admin_paid {
+.admin_img_paid {
 	background: url(../images/admin/admin_sprite.png) no-repeat -304px -0px;
 }
-.admin_permissions {
+.admin_img_permissions {
 	background: url(../images/admin/admin_sprite.png) no-repeat -320px -0px;
 }
-.admin_posts {
+.admin_img_posts {
 	background: url(../images/admin/admin_sprite.png) no-repeat -336px -0px;
 }
-.admin_regcenter {
+.admin_img_regcenter {
 	background: url(../images/admin/admin_sprite.png) no-repeat -352px -0px;
 }
-.admin_reports {
+.admin_img_reports {
 	background: url(../images/admin/admin_sprite.png) no-repeat -368px -0px;
 }
-.admin_scheduled {
+.admin_img_scheduled {
 	background: url(../images/admin/admin_sprite.png) no-repeat -384px -0px;
 }
-.admin_search {
+.admin_img_search {
 	background: url(../images/admin/admin_sprite.png) no-repeat -400px -0px;
 }
-.admin_security {
+.admin_img_security {
 	background: url(../images/admin/admin_sprite.png) no-repeat -416px -0px;
 }
-.admin_server {
+.admin_img_server {
 	background: url(../images/admin/admin_sprite.png) no-repeat -432px -0px;
 }
-.admin_smiley {
+.admin_img_smiley {
 	background: url(../images/admin/admin_sprite.png) no-repeat -448px -0px;
 }
-.admin_support {
+.admin_img_support {
 	background: url(../images/admin/admin_sprite.png) no-repeat -464px -0px;
 }
-.admin_themes {
+.admin_img_themes {
 	background: url(../images/admin/admin_sprite.png) no-repeat -480px -0px;
 }
 
@@ -1278,20 +1278,21 @@ h3.grid_header {
 		overflow: auto;
 	}
 	#manage_boards .catbg {
-	margin-top: 10px;
-}
+		margin-top: 10px;
+	}
 	#manage_boards .windowbg {
 		line-height: 3.2em;
-}
+	}
 	#manage_boards ul {
 		max-height: 120em;
 		padding: 0 0 10px 0;
-}
+	}
 	#manage_boards dd, #manage_boards dt {
 		width: 100%;
-}
+	}
 	#manage_boards dt {
 		line-height: 1.6em;
+	}
 }
 /* These kids and their new-fangled thingummys. :P */
 /* When I were a lad, things were different! */

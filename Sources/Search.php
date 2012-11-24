@@ -343,6 +343,7 @@ function PlushSearch2()
 	// Load up the search API we are going to use.
 	$searchAPI = findSearchAPI();
 
+
 	// $search_params will carry all settings that differ from the default search parameters.
 	// That way, the URLs involved in a search page will be kept as short as possible.
 	$search_params = array();
@@ -1911,7 +1912,6 @@ function prepareSearchContext($reset = false)
 	// Do the censor thang...
 	censorText($message['body']);
 	censorText($message['subject']);
-
 	censorText($message['first_subject']);
 	censorText($message['last_subject']);
 
@@ -1972,7 +1972,7 @@ function prepareSearchContext($reset = false)
 	// Make sure we don't end up with a practically empty message body.
 	$message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $message['body']);
 
-	// Sadly, we need to check the icon ain't broke.
+	// Sadly, we need to check that the icon is not broken.
 	if (!empty($modSettings['messageIconChecks_enable']))
 	{
 		if (!isset($context['icon_sources'][$message['first_icon']]))

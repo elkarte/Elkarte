@@ -441,10 +441,11 @@ a img {
 }
 
 /* A more discreet highlight color, for selected membergroups etc. */
-/* Could be deprecated. */
+/* Could be deprecated. Is used by JS to show a selected item */
 .highlight2 {
 	background: #D1E1EF;
 	color: #222 !important;
+	font-size: 1.1em;
 }
 
 /* Generic, mostly color-related, classes.
