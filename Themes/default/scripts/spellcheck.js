@@ -315,5 +315,5 @@ function spellCheckSetText(text, editorID)
 {
 	$("#" + editorID).data("sceditor").InsertText(text, true);
 	if (!$("#" + editorID).data("sceditor").inSourceMode)
-		$("#" + editorID).data("sceditor").toggleTextMode();
+		$("#" + editorID).data("sceditor").toggleSourceMode();
 }
