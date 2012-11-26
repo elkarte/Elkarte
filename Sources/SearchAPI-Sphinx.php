@@ -18,13 +18,14 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Sphinx API, used when an Sphinx search damon is used
+ * Sphinx API, used when an Sphinx search daemon is used and access is via
+ * Sphinx native search API (SphinxAPI)
  */
 class sphinx_search
 {
 	/**
 	 * This is the last version of DIALOGO that this was tested on, to protect against API changes.
-	 * @var type
+	 * @var string
 	 */	
 	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
 	
@@ -61,11 +62,10 @@ class sphinx_search
 
 	/**
 	 * Nothing to do
-	 *
 	 */
 	public function __construct()
 	{
-		global $db_type;
+		global $db_type, $modSettings;
 
 		// Is this database supported?
 		if (!in_array($db_type, $this->supported_databases))
@@ -128,7 +128,7 @@ class sphinx_search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $modSettings, $excludedWords, $smcFunc;
+		global $modSettings, $excludedWords;
 
 		$x = strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
@@ -137,7 +137,6 @@ class sphinx_search
 	}
 
 	/**
-	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
 	 * @param mixed $word
@@ -182,7 +181,8 @@ class sphinx_search
 		// Only request the results if they haven't been cached yet.
 		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
-			// @todo Should this not be in here? Seems to depend on Sphinx version, some need it in order to work and some don't work with it
+			// @todo Should this not be in here? 
+			// Seems to depend on Sphinx version, some need it in order to work and some don't work with it
 			// The API communicating with the search daemon.
 			require_once($sourcedir . '/sphinxapi.php');
 
