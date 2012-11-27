@@ -269,6 +269,7 @@ function AdminMain()
 						'weights' => array($txt['search_weights']),
 						'method' => array($txt['search_method']),
 						'settings' => array($txt['settings']),
+						'managesphinx' => array($txt['search_sphinx']),
 					),
 				),
 				'smileys' => array(

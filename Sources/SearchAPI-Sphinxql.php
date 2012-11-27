@@ -18,7 +18,7 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * SphinxQL API, used when an Sphinx search daemon is used and you want to access it
+ * SearchAPI-Sphinxql.php, used when an Sphinx search daemon is used and you want to access it
  * via Sphinx's own implementation of MySQL network protocol
  */
 class sphinxql_search
@@ -75,7 +75,6 @@ class sphinxql_search
 		}
 		
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
-		$this->min_word_length = $this->_getMinWordLength();
 	}
 
 	/*
@@ -199,7 +198,8 @@ class sphinxql_search
 			if (!empty($extra_where))
 				$query .= ' AND ' . implode(' AND ', $extra_where);
 
-			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary sorting based on relevance value (if not the main sort method) and age
+			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary 
+			// sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time DESC';
 			
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches

@@ -49,6 +49,7 @@ function ManageSearch()
 		'removecustom' => 'EditSearchMethod',
 		'removefulltext' => 'EditSearchMethod',
 		'createmsgindex' => 'CreateMessageIndex',
+		'managesphinx' => 'EditSphinxSettings',
 	);
 
 	call_integration_hook('integrate_manage_search', array($subActions));
@@ -297,7 +298,7 @@ function EditSearchMethod()
 		validateToken('admin-msmpost');
 
 		updateSettings(array(
-			'search_index' => empty($_POST['search_index']) || (!in_array($_POST['search_index'], array('fulltext', 'custom', 'sphinx')) && !isset($context['search_apis'][$_POST['search_index']])) ? '' : $_POST['search_index'],
+			'search_index' => empty($_POST['search_index']) || (!in_array($_POST['search_index'], array('fulltext', 'custom')) && !isset($context['search_apis'][$_POST['search_index']])) ? '' : $_POST['search_index'],
 			'search_force_index' => isset($_POST['search_force_index']) ? '1' : '0',
 			'search_match_words' => isset($_POST['search_match_words']) ? '1' : '0',
 		));
@@ -397,6 +398,7 @@ function EditSearchMethod()
 				{
 					$context['table_info']['data_length'] = (int) $row['KB'];
 					$context['table_info']['index_length'] = (int) $row['KB'];
+					
 					// Doesn't support fulltext
 					$context['table_info']['fulltext_length'] = $txt['not_applicable'];
 				}
@@ -713,7 +715,7 @@ function loadSearchAPIs()
 		{
 			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.php$~', $file, $matches))
 			{
-				// Check this is definitely a valid API!
+				// Check that this is definitely a valid API!
 				$fp = fopen($sourcedir . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
@@ -798,6 +800,261 @@ function detectFulltextIndex()
 				$context['cannot_create_fulltext'] = true;
 		$smcFunc['db_free_result']($request);
 	}
+}
+
+/**
+ * Edit settings related to the sphinx or sphinxQL search function.
+ * Called by ?action=admin;area=managesearch;sa=sphinx.
+ */
+function EditSphinxSettings()
+{
+	global $txt, $context, $modSettings, $sourcedir;
+	
+	// saving the settings
+	if (isset($_POST['save']))
+	{
+		checkSession();
+		validateToken('admin-mssphinx');
+
+		updateSettings(array(
+			'sphinx_data_path' => rtrim($_POST['sphinx_data_path'], '/'),
+			'sphinx_log_path' => rtrim($_POST['sphinx_log_path'], '/'),
+			'sphinx_stopword_path' => $_POST['sphinx_stopword_path'],
+			'sphinx_indexer_mem' => (int) $_POST['sphinx_indexer_mem'],
+			'sphinx_searchd_server' => $_POST['sphinx_searchd_server'],
+			'sphinx_searchd_port' => (int) $_POST['sphinx_searchd_port'],
+			'sphinxql_searchd_port' => (int) $_POST['sphinxql_searchd_port'],
+			'sphinx_max_results' => (int) $_POST['sphinx_max_results'],
+		));
+	}
+	// checking if we can connect?
+	elseif (isset($_POST['checkconnect']))
+	{
+		checkSession();
+		validateToken('admin-mssphinx');
+		
+		// If they have not picked sphinx yet, let them know, but we can still check connections
+		if (empty($modSettings['search_index']) || ($modSettings['search_index'] !== 'sphinx' && $modSettings['search_index'] !== 'sphinxql'))
+		{
+			$context['settings_message'][] = $txt['sphinx_test_not_selected'];
+			$context['error_type'] = 'notice';
+		}
+		
+		// try to connect via Sphinx API?
+		if ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index']))
+		{
+			if (@file_exists($sourcedir . '/sphinxapi.php'))
+			{
+				include_once($sourcedir . '/sphinxapi.php');
+				$mySphinx = new SphinxClient();
+				$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
+				$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results']);
+				$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
+				$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
+				
+				$request = $mySphinx->Query('test', 'dialogo_index');
+				if ($request === false)
+				{
+					$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
+					$context['error_type'] = 'serious';
+				}
+				else
+					$context['settings_message'][] = $txt['sphinx_test_passed'];
+			}
+			else
+			{
+				$context['settings_message'][] = $txt['sphinx_test_api_missing'];
+				$context['error_type'] = 'serious';
+			}
+		}
+		
+		// try to connect via SphinxQL
+		if ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index']))
+		{
+			if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
+			{
+				$result = mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+				if ($result === false)
+				{
+					$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
+					$context['error_type'] = 'serious';
+				}
+				else
+					$context['settings_message'][] = $txt['sphinxql_test_passed'];
+			}
+			else
+			{
+				$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
+				$context['error_type'] = 'serious';
+			}
+		}
+	}
+	elseif (isset($_POST['createconfig']))
+	{
+		checkSession();
+		validateToken('admin-mssphinx');
+		
+		CreateSphinxConfig();
+	}
+	
+	// Setup for the template
+	$context['page_title'] = $txt['search_sphinx'];
+	$context['page_description'] = $txt['sphinx_description'];
+	$context['sub_template'] = 'manage_sphinx';
+	createToken('admin-mssphinx');
+}
+
+function CreateSphinxConfig()
+{
+	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_character_set, $modSettings;
+
+	$humungousTopicPosts = 200;
+
+	// set up to ouput a file to the users browser
+	ob_end_clean();
+	header('Pragma: ');
+	if (!$context['browser']['is_gecko'])
+		header('Content-Transfer-Encoding: binary');
+	header('Connection: close');
+	header('Content-Disposition: attachment; filename="sphinx.conf"');
+	header('Content-Type: application/octet-stream');
+
+	$weight_factors = array(
+		'age',
+		'length',
+		'first_message',
+		'sticky',
+	);
+	
+	$weight = array();
+	$weight_total = 0;
+	foreach ($weight_factors as $weight_factor)
+	{
+		$weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];
+		$weight_total += $weight[$weight_factor];
+	}
+
+	// weightless, then use defaults
+	if ($weight_total === 0)
+	{
+		$weight = array(
+			'age' => 25,
+			'length' => 25,
+			'first_message' => 25,
+			'sticky' => 25,
+		);
+		$weight_total = 100;
+	}
+	
+	// check paths are set, if not use some defaults
+	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
+	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
+
+	// output our minimal configuration file to get them started
+	echo '#
+# Sphinx configuration file (sphinx.conf), configured for Dialogo
+#
+# This is the minimum needed clean, simple, functional
+#
+# By default the location of this file would probably be:
+# /usr/local/etc/sphinx.conf
+#
+
+source dialogo_source
+{
+	type				= mysql
+	sql_host 			= ', $db_server, '
+	sql_user			= ', $db_user, '
+	sql_pass			= ', $db_passwd, '
+	sql_db				= ', $db_name, '
+	sql_port			= 3306', empty($db_character_set) ? '' : '
+	sql_query_pre		= SET NAMES ' . $db_character_set, '
+	sql_query_pre		=	\
+		REPLACE INTO ', $db_prefix, 'settings (variable, value) \
+		SELECT \'sphinx_indexed_msg_until\', MAX(id_msg) \
+		FROM ', $db_prefix, 'messages
+	sql_query_range		= \
+		SELECT 1, value \
+		FROM ', $db_prefix, 'settings \
+		WHERE variable = \'sphinx_indexed_msg_until\'
+	sql_range_step		= 1000
+	sql_query			= \
+		SELECT \
+			m.id_msg, m.id_topic, m.id_board, IF(m.id_member = 0, 4294967295, m.id_member) AS id_member, m.poster_time, m.body, m.subject, \
+			t.num_replies + 1 AS num_replies, CEILING(1000000 * ( \
+				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
+				IF(t.num_replies < 200, t.num_replies / 200, 1) * ' . $weight['length'] . ' + \
+				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
+				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
+			) / ' . $weight_total . ') AS relevance \
+		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
+		WHERE t.id_topic = m.id_topic \
+			AND s.variable = \'maxMsgID\' \
+			AND m.id_msg BETWEEN $start AND $end
+	sql_attr_uint		= id_topic
+	sql_attr_uint		= id_board
+	sql_attr_uint		= id_member
+	sql_attr_timestamp	= poster_time
+	sql_attr_timestamp	= relevance
+	sql_attr_timestamp	= num_replies
+	sql_query_info		= \
+		SELECT * \
+		FROM ', $db_prefix, 'messages \
+		WHERE id_msg = $id
+}
+
+source dialogo_delta_source : dialogo_source
+{
+	sql_query_pre	= ', isset($db_character_set) ? 'SET NAMES ' . $db_character_set : '', '
+	sql_query_range	= \
+		SELECT s1.value, s2.value \
+		FROM ', $db_prefix, 'settings AS s1, ', $db_prefix, 'settings AS s2 \
+		WHERE s1.variable = \'sphinx_indexed_msg_until\' \
+			AND s2.variable = \'maxMsgID\'
+}
+
+index dialogo_base_index
+{
+	html_strip 		= 1
+	source 			= dialogo_source
+	path 			= ', $modSettings['sphinx_data_path'], '/dialogo_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords 		= ' . $modSettings['sphinx_stopword_path'], '
+	min_word_len 	= 2
+	charset_type 	= ', isset($db_character_set) && $db_character_set === 'utf8' ? 'utf-8' : 'sbcs', '
+	charset_table 	= 0..9, A..Z->a..z, _, a..z
+}
+
+index dialogo_delta_index : dialogo_base_index
+{
+	source 			= dialogo_delta_source
+	path 			= ', $modSettings['sphinx_data_path'], '/dialogo_sphinx_delta.index
+}
+
+index dialogo_index
+{
+	type			= distributed
+	local			= dialogo_base_index
+	local			= dialogo_delta_index
+}
+
+indexer
+{
+	mem_limit 		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
+}
+
+searchd
+{
+	listen 			= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
+	listen 			= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
+	log 			= ', $modSettings['sphinx_log_path'], '/searchd.log
+	query_log 		= ', $modSettings['sphinx_log_path'], '/query.log
+	read_timeout 	= 5
+	max_children 	= 30
+	pid_file 		= ', $modSettings['sphinx_data_path'], '/searchd.pid
+	max_matches 	= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
+}
+';
+	obExit(false, false);
 }
 
 ?>

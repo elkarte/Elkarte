@@ -676,6 +676,7 @@ $txt['manage_holidays'] = 'Manage Holidays';
 $txt['calendar_settings'] = 'Calendar Settings';
 $txt['search_weights'] = 'Weights';
 $txt['search_method'] = 'Search Method';
+$txt['search_sphinx'] = 'Configure Sphinx';
 
 $txt['smiley_sets'] = 'Smiley Sets';
 $txt['smileys_add'] = 'Add Smiley';

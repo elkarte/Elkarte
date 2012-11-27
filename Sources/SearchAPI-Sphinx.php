@@ -18,7 +18,7 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Sphinx API, used when an Sphinx search daemon is used and access is via
+ * SearchAPI-Sphinx.php, used when an Sphinx search daemon is used and access is via
  * Sphinx native search API (SphinxAPI)
  */
 class sphinx_search
@@ -75,7 +75,6 @@ class sphinx_search
 		}
 		
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
-		$this->min_word_length = $this->_getMinWordLength();
 	}
 	
 	/*
@@ -183,6 +182,7 @@ class sphinx_search
 		{
 			// @todo Should this not be in here? 
 			// Seems to depend on Sphinx version, some need it in order to work and some don't work with it
+			//
 			// The API communicating with the search daemon.
 			require_once($sourcedir . '/sphinxapi.php');
 

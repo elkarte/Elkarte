@@ -60,20 +60,23 @@ $txt['search_method_index_already_exists'] = 'already created';
 $txt['search_method_fulltext_remove'] = 'remove fulltext index';
 $txt['search_method_index_partial'] = 'partially created';
 $txt['search_index_custom_resume'] = 'resume';
-// This string is used in a javascript confirmation popup; don't use entities.
+
+// These strings are used in a javascript confirmation popup; don't use entities.
 $txt['search_method_fulltext_warning'] = 'In order to be able to use fulltext search, you\\\'ll have to create a fulltext index first.';
+$txt['search_index_custom_warning'] = 'In order to be able to use a custom index search, you\\\'ll have to create a custom index first!';
 
 $txt['search_index'] = 'Search index';
 $txt['search_index_none'] = 'No index';
 $txt['search_index_custom'] = 'Custom index';
-$txt['search_index_sphinx'] = 'Sphinx';
-$txt['search_index_sphinx_desc'] = 'The admin panel only allows to switch between search indexes. To adjust further Sphinx settings, use the sphinx_config.php tool.';
 $txt['search_index_label'] = 'Index';
 $txt['search_index_size'] = 'Size';
 $txt['search_index_create_custom'] = 'create custom index';
 $txt['search_index_custom_remove'] = 'remove custom index';
-// This string is used in a javascript confirmation popup; don't use entities.
-$txt['search_index_custom_warning'] = 'In order to be able to use a custom index search, you\\\'ll have to create a custom index first!';
+
+$txt['search_index_sphinx'] = 'Sphinx';
+$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Configure Sphinx</a>]';
+$txt['search_index_sphinxql'] = 'SphinxQL';
+$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Configure Sphinx</a>]';
 
 $txt['search_force_index'] = 'Force the use of a search index';
 $txt['search_match_words'] = 'Match whole words only';
@@ -163,5 +166,32 @@ $txt['spider_logs_delete_confirm'] = 'Are you sure you wish to empty out all log
 $txt['spider_stats_select_month'] = 'Jump To Month';
 $txt['spider_stats_page_hits'] = 'Page Hits';
 $txt['spider_stats_no_entries'] = 'There are currently no spider statistics available.';
+
+// strings for setting up sphinx search
+$txt['sphinx_test_not_selected'] = 'You have not yet selected to use Sphinx or SphinxQL as your Search Method';
+$txt['sphinx_test_passed'] = 'All tests were successful, the system was able to connect to the sphinx search daemon using the Sphinx API.';
+$txt['sphinxql_test_passed'] = 'All tests were successful, the system was able to connect to the sphinx search daemon using SphinxQL commands.';
+$txt['sphinx_test_connect_failed'] = 'Unable to connect to the Sphinx daemon. Make sure it is running and configured properly. Sphinx search will not work until you fix the problem.';
+$txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
+$txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your Sources directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
+$txt['sphinx_description'] = 'From this page you can supply the access details to your Sphinx search daemon.  <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need save in the Sphinx configuration directory (typically /usr/local/etc) but this depends on your specific server configuration. Generally the options below can be left untouched, however they assume that Sphinx software was installed in /usr/local, using /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you will need a cron job to update the index, otherwise new or deleted content will not be reflected in  search results. The configuration file defines two indexes:<br /><br/><strong>dialogo_delta_index</strong>, an index that only stores the recent changes and can be called frequently. <strong>dialogo_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><tt>10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate dialogo_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate dialogo_delta_index</tt>';
+$txt['sphinx_index_data_path'] = 'Index data path:';
+$txt['sphinx_index_data_path_desc'] = 'This is the path that contains the search index files used by Sphinx.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Sphinx indexer and search daemon.';
+$txt['sphinx_log_file_path'] = 'Log file path:';
+$txt['sphinx_log_file_path_desc'] = 'Server path that will contain the log files created by Sphinx.<br />This directory must exist on your server and must be writable by the sphinx search daemon and indexer.';
+$txt['sphinx_stop_word_path'] = 'Stopword path:';
+$txt['sphinx_stop_word_path_desc'] = 'The server path to the stopword list (leave empty for no stopword list).';
+$txt['sphinx_memory_limit'] = 'Sphinx indexer memory limit:';
+$txt['sphinx_memory_limit_desc'] = 'The maximum amount of (RAM) memory the indexer is allowed to use.';
+$txt['sphinx_searchd_server'] = 'Search deamon server:';
+$txt['sphinx_searchd_server_desc'] = 'Address of the server running the search daemon. This must be a valid host name or IP address.<br />If not set, localhost will be used.';
+$txt['sphinx_searchd_port'] = 'Search deamon port:';
+$txt['sphinx_searchd_port_desc'] = 'Port on which the search deamon will listen.';
+$txt['sphinx_searchd_qlport'] = 'Sphinx QL deamon port:';
+$txt['sphinx_searchd_qlport_desc'] = 'Port on which the search deamon will listen for SphinxQL queries.';
+$txt['sphinx_max_matches'] = 'Maximum # matches:';
+$txt['sphinx_max_matches_desc'] = 'Maximum amount of matches the search deamon will return.';
+$txt['sphinx_create_config'] = 'Create Sphinx config';
+$txt['sphinx_test_connection'] = 'Test connection to Sphinx daemon';
 
 ?>
