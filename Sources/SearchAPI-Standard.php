@@ -18,7 +18,7 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Standard non full index, non custom index search
+ * SearchAPI-Standard.php, Standard non full index, non custom index search
  */
 class standard_search
 {

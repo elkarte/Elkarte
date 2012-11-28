@@ -18,7 +18,7 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Custom Search API class .. used when custom DIALOGO index is used
+ * SearchAPI-Custom.php, Custom Search API class .. used when custom DIALOGO index is used
  */
 class custom_search
 {

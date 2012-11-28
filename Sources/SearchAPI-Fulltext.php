@@ -18,7 +18,7 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Fulltext API, used when an SQL fulltext index is used
+ * SearchAPI-Fulltext.php, Fulltext API, used when an SQL fulltext index is used
  */
 class fulltext_search
 {
