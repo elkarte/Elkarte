@@ -208,6 +208,7 @@
 		 */
 		base.commands = $.extend({}, (options.commands || $.sceditor.commands));
 
+
 		/**
 		 * Initializer. Creates the editor iframe and textarea
 		 * @private
@@ -2178,7 +2179,6 @@
 				if(html)
 				{
 					author = (author ? '<cite>' + author + '</cite>' : '');
-
 					before = before + author + html + end + '<br />';
 					end    = null;
 				}
@@ -2389,7 +2389,6 @@
 			tooltip: "Insert current time"
 		},
 		// END_COMMAND
-
 
 		// START_COMMAND: Ltr
 		ltr: {
@@ -2866,6 +2865,7 @@
 			else
 			{
 				range = doc.createRange();
+
 				range.setStartBefore(start);
 				range.setEndAfter(end);
 
@@ -2888,6 +2888,7 @@
 				return false;
 
 			range.collapse(false);
+
 			if(!isW3C)
 			{
 				range.moveStart(characterStr, 0-left);
@@ -2916,6 +2917,7 @@
 				return '';
 
 			range.collapse(false);
+
 			if(before)
 			{
 				if(!isW3C)
@@ -3630,7 +3632,6 @@
 			var bIsSource = this.inSourceMode();
 
 			// @TODO make it put the quote close to the current selection
-
 			if (!bIsSource)
 				this.toggleSourceMode();
 
@@ -3741,7 +3742,6 @@
 							}
 
 							$dropdown = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
-
 							$dropdown.appendTo($('body'));
 							dropdownIgnoreLastClick = true;
 							adjheight = closeButton.height() + titlebar.height();

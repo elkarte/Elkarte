@@ -1458,7 +1458,7 @@ function SpellCheck()
 	global $txt, $context, $smcFunc;
 
 	// A list of "words" we know about but pspell doesn't.
-	$known_words = array('smf', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'smfisawesome', 'grandia', 'terranigma', 'rpgs');
+	$known_words = array('dialogo', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
 
 	loadLanguage('Post');
 	loadTemplate('Post');

@@ -2146,9 +2146,7 @@
 				if ($(element).children("cite:first").length === 1)
 				{
 					from = $(element).children("cite:first").text();
-
 					$(element).attr({'from': from.php_htmlspecialchars()});
-
 					from = '=' + from;
 					content = '';
 					$(element).children("cite:first").remove();
@@ -2178,7 +2176,6 @@
 			html: '<code class="php">{0}</code>'
 		},
 		// END_COMMAND
-
 
 		// START_COMMAND: Left
 		left: {
@@ -2242,7 +2239,6 @@
 				'" data-youtube-id="{0}" frameborder="0" allowfullscreen></iframe>'
 		},
 		// END_COMMAND
-
 
 		// START_COMMAND: Rtl
 		rtl: {

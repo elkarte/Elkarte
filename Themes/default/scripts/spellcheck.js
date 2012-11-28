@@ -310,6 +310,7 @@ function spellCheckGetText(editorID)
 {
 	return $("#" + editorID).data("sceditor").getText();
 }
+
 // set the sceditor text
 function spellCheckSetText(text, editorID)
 {

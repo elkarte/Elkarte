@@ -2140,7 +2140,7 @@ img.smiley {
 ---------------------------------------------------- */
 
 form#postmodify .roundframe {
-	padding: 0 12%;
+	padding: 12px 8%;
 }
 #post_header, .postbox {
 	padding: 6px;
