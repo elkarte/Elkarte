@@ -127,26 +127,16 @@ $txt['who_poll'] = 'Posting a new poll in <a href="' . $scripturl . '?board=%1$d
 
 // Credits text
 $txt['credits'] = 'Credits';
-$txt['credits_intro'] = 'Simple Machines wants to thank everyone who helped make SMF 2.0 what it is today; shaping and directing our project, all through the thick and the thin. It wouldn\'t have been possible without you. This includes our users and especially Charter Members - thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
+$txt['credits_intro'] = 'Dialogo wants to thank everyone who helped make it possilbe it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
 $txt['credits_team'] = 'The Team';
-$txt['credits_special'] = 'Special Thanks';
 $txt['credits_and'] = 'and';
-$txt['credits_anyone'] = 'And for anyone we may have missed, thank you!';
 $txt['credits_copyright'] = 'Copyrights';
 $txt['credits_forum'] = 'Forum';
 $txt['credits_modifications'] = 'Modifications';
 $txt['credits_software_graphics'] = 'Software/Graphics';
 $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Graphics';
-$txt['credits_groups_ps'] = 'Project Support';
 $txt['credits_groups_dev'] = 'Developers';
-$txt['credits_groups_support'] = 'Support Specialists';
-$txt['credits_groups_customize'] = 'Customizers';
-$txt['credits_groups_docs'] = 'Documentation Writers';
-$txt['credits_groups_marketing'] = 'Marketing';
-$txt['credits_groups_internationalizers'] = 'Localizers';
-$txt['credits_groups_servers'] = 'Servers Administrators';
-$txt['credits_groups_site'] = 'Site Administrators';
 $txt['credits_license'] = 'License';
 $txt['credits_copyright'] = 'Copyright';
 $txt['credits_version'] = 'Version';

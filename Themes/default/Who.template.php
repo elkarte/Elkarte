@@ -243,7 +243,7 @@ function template_credits()
 		</div>';
 	}
 
-	// ourselfs!
+	// Dialogo !
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
@@ -252,7 +252,7 @@ function template_credits()
 			<div class="content">
 				<dl>
 					<dt><strong>', $txt['credits_forum'], '</strong></dt>', '
-					<dd>', $context['copyrights']['smf'];
+					<dd>', $context['copyrights']['dialogo'];
 
 	echo '
 					</dd>
