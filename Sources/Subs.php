@@ -3218,7 +3218,7 @@ function template_javascript($do_defered = false)
 	if (!empty($loadjquery))
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
-		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.1.min.js"><\/script>\');
+		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.2.min.js"><\/script>\');
 	// ]]></script>';
 	
 	// Output the declared Javascript variables.
