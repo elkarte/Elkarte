@@ -633,7 +633,7 @@ function toggleCache ()
 	var memcache = document.getElementById('cache_memcached');
 	var cachedir = document.getElementById('cachedir');
 	memcache.disabled = cache_type.value != "memcached";
-	cachedir.disabled = cache_type.value != "smf";
+	cachedir.disabled = cache_type.value != "filebased";
 }
 
 /*

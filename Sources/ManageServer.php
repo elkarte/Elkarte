@@ -341,7 +341,7 @@ function ModifyCacheSettings($return_config = false)
 	if (function_exists('xcache_set'))
 		$detected['xcache'] = $txt['xcache_cache'];
 	if (function_exists('file_put_contents'))
-		$detected['smf'] = $txt['default_cache'];
+		$detected['filebased'] = $txt['default_cache'];
 		
 	// set our values to show what, if anything, we found
 	if (empty($detected))

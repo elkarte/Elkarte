@@ -138,7 +138,7 @@ $cache_enable = 0;
  */
 $cache_memcached = '';
 /**
- * This is only for the 'smf' file cache system. It is the path to the cache directory.
+ * This is only for the 'filebased' cache system. It is the path to the cache directory.
  * It is also recommended that you place this in /tmp/ if you are going to use this.
  * @var string
  */
