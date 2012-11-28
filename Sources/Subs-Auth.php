@@ -405,7 +405,6 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * Called by index.php?action=findmember.
  * - is used as a popup for searching members.
  * - uses sub template find_members of the Help template.
- * - also used to add members for PM's sent using wap2/imode protocol.
  */
 function JSMembers()
 {
