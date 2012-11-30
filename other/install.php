@@ -2336,7 +2336,7 @@ function template_database_settings()
 			</tr><tr id="db_name_contain">
 				<td valign="top" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
 				<td>
-					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'smf' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
+					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'dialogo' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_info'], '
 					<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span></div>
 				</td>

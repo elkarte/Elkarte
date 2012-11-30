@@ -597,7 +597,7 @@ function Credits($in_admin = false)
 	$context['credits_modifications'] = $mods;
 
 	$context['copyrights'] = array(
-		'dialogo' => sprintf($forum_copyright, $forum_version),
+		'dialogo' => sprintf($forum_copyright, ucfirst(strtolower($forum_version))),
 		/* Modification Authors:  You may add a copyright statement to this array for your mods.
 			Copyright statements should be in the form of a value only without a array key.  I.E.:
 				'Some Mod by Thantos &copy; 2010',

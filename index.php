@@ -23,7 +23,7 @@
  *
  */
 
-$forum_version = 'Dialogo 1.0 Alpha 1';
+$forum_version = 'DIALOGO 1.0 Alpha 1';
 
 // Get everything started up...
 define('DIALOGO', 1);
