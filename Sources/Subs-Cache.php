@@ -457,6 +457,11 @@ function clean_cache($type = '')
 function cache_get_key($key)
 {
 	global $boardurl, $sourcedir, $cache_accelerator;
+	static $key_prefix;
+	
+	// no need to do this every time, slows us down :P
+	if (empty($key_prefix))
+		$key_prefix = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-DIALOGO-';
 
-	return md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-DIALOGO-' . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
+	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }
