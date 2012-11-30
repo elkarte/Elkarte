@@ -3671,10 +3671,9 @@
 						}
 
 						if (base.inSourceMode())
-							base.textEditorInsertText(' ' + $(this).attr('alt') + ' ');
+							base.sourceEditorInsertText(' ' + $(this).attr('alt') + ' ');
 						else
-							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") +
-								'" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
+							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
 
 						e.preventDefault();
 					})
