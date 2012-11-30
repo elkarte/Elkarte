@@ -1374,15 +1374,13 @@ function PackageRemove()
 function PackageBrowse()
 {
 	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $settings;
-
-	$context['page_title'] .= ' - ' . $txt['browse_packages'];
-
-	$installed = $context['sub_action'] == 'installed' ? true : false;
-
-	$context['forum_version'] = $forum_version;
-	$context['modification_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
-
+	
 	require_once($sourcedir . '/Subs-List.php');
+	
+	$context['page_title'] .= ' - ' . $txt['browse_packages'];
+	$context['forum_version'] = $forum_version;
+	$installed = $context['sub_action'] == 'installed' ? true : false;
+	$context['modification_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
 
 	foreach ($context['modification_types'] as $type)
 	{
@@ -1539,10 +1537,10 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 	if (!@is_writable($boarddir . '/Packages'))
 		create_chmod_control(array($boarddir . '/Packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
-	$the_version = strtr($forum_version, array('DIALOGO ' => ''));
+	list($the_brand, $the_version) = explode(' ', $forum_version, 2);
 
 	// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-	if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array('DIALOGO ' => '')) == $the_version)
+	if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
 	{
 		unset($_SESSION['version_emulate']);
 	}
@@ -1551,11 +1549,11 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === $forum_version) && isset($_SESSION['version_emulate']))
 			unset($_SESSION['version_emulate']);
 		elseif ($_GET['version_emulate'] !== 0)
-			$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', 'DIALOGO ' => ''));
+			$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
 	}
 	if (!empty($_SESSION['version_emulate']))
 	{
-		$context['forum_version'] = 'DIALOGO ' . $_SESSION['version_emulate'];
+		$context['forum_version'] = $the_brand . ' ' . $_SESSION['version_emulate'];
 		$the_version = $_SESSION['version_emulate'];
 	}
 	if (isset($_SESSION['single_version_emulate']))
@@ -1565,6 +1563,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 	{
 		$instmods = loadInstalledPackages();
 		$installed_mods = array();
+		
 		// Look through the list of installed mods...
 		foreach ($instmods as $installed_mod)
 			$installed_mods[$installed_mod['package_id']] = array(
@@ -1663,7 +1662,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 				// This package is currently NOT installed.  Check if it can be.
 				if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
 				{
-					// Check if there's an install for *THIS* version of DIALOGO.
+					// Check if there's an install for *THIS* version
 					$installs = $packageInfo['xml']->set('install');
 					foreach ($installs as $install)
 					{
@@ -1675,7 +1674,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 						}
 					}
 
-					// no install found for this version, lets see if one exists for another
+					// no install found for our version, lets see if one exists for another
 					if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
 					{
 						$reset = true;
