@@ -650,7 +650,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 		SELECT YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
 		FROM {db_prefix}log_activity
 		WHERE ' . $condition_string . '
-		ORDER BY stats_day ASC',
+		ORDER BY stats_day DESC',
 		$condition_parameters
 	);
 	while ($row_days = $smcFunc['db_fetch_assoc']($days_result))
