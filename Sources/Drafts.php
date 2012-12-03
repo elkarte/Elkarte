@@ -695,5 +695,3 @@ function showPMDrafts($memID = -1)
 		'name' => $txt['drafts'],
 	);
 }
-
-?>

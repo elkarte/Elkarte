@@ -248,5 +248,3 @@ function template_print_below()
 	</body>
 </html>';
 }
-
-?>

@@ -108,5 +108,3 @@ function template_main()
 		</form>
 	</div>';
 }
-
-?>

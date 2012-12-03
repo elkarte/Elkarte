@@ -908,5 +908,3 @@ function template_announcement_send()
 		doAutoSubmit();
 	// ]]></script>';
 }
-
-?>

@@ -458,5 +458,3 @@ function template_merge_extra_options()
 		</form>
 	</div>';
 }
-
-?>

@@ -853,5 +853,3 @@ function createAttachment(&$attachmentOptions)
 	}
 	return true;
 }
-
-?>

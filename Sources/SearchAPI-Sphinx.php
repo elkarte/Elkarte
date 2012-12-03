@@ -303,4 +303,3 @@ class sphinx_search
 		return $sphinx_term;
 	}
 }
-?>

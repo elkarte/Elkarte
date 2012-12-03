@@ -262,5 +262,3 @@ class smf_Combiner
 		*/
 	}
 }
-
-?>
