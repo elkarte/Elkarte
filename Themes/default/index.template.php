@@ -252,7 +252,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
