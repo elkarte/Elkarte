@@ -1,14 +1,11 @@
 <?php
 
 /**
- * Simple Machines Forum (SMF)
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
  */
 
 if (!defined('DIALOGO'))
@@ -35,14 +32,14 @@ class smf_Combiner
 	 * @var string
 	 */
 	private $_archive_name = null;
-	
+
 	/**
 	 * Holds the file names of the files in the compilation
 	 *
 	 * @var string
 	 */
 	private $_archive_filenames = null;
-	
+
 	/**
 	 * Holds the comment line to add at the start of the compressed compilation
 	 *
@@ -219,7 +216,7 @@ class smf_Combiner
 		foreach ($this->_combine_files as $file)
 			$this->_archive_filenames .= $file['basename'] . ' ';
 		$this->_archive_filenames  = trim($this->_archive_filenames);
-		
+
 		$this->_archive_name = 'Amalgamation-' . sha1($this->_archive_filenames) . $type;
 	}
 
@@ -250,7 +247,7 @@ class smf_Combiner
 		// Add in the file header if available
 		if (!empty($this->_archive_header))
 			$this->_minified_cache = $this->_archive_header . $this->_minified_cache;
-	
+
 		// First the plain text version
 		file_put_contents($this->_archivedir . $this->_archive_name, $this->_minified_cache, LOCK_EX);
 
