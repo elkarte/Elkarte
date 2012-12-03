@@ -3138,7 +3138,7 @@ function profileSendActivation()
 {
 	global $sourcedir, $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Shouldn't happen but just in case.
 	if (empty($profile_vars['email_address']))
@@ -3442,7 +3442,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 		);
 
 		// Send an email to all group moderators etc.
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 
 		// Do we have any group moderators?
 		$request = $smcFunc['db_query']('', '

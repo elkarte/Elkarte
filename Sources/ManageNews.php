@@ -790,7 +790,10 @@ function SendMailing($clean_only = false)
 	if ($clean_only)
 		return;
 
-	require_once($sourcedir . '/Subs-Post.php');
+	// Some functions we will need
+	require_once($sourcedir . '/Subs-Mail.php');
+	if ($context['send_pm'])
+		require_once($sourcedir . '/Subs-PersonalMessage.php');
 
 	// We are relying too much on writing to superglobals...
 	$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';

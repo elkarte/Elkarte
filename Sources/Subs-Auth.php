@@ -533,7 +533,7 @@ function resetPassword($memID, $username = null)
 
 	// Language... and a required file.
 	loadLanguage('Login');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Get some important details.
 	$request = $smcFunc['db_query']('', '

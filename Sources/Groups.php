@@ -664,7 +664,7 @@ function GroupRequests()
 
 			if (!empty($email_details))
 			{
-				require_once($sourcedir . '/Subs-Post.php');
+				require_once($sourcedir . '/Subs-Mail.php');
 
 				// They are being approved?
 				if ($_POST['req_action'] == 'approve')

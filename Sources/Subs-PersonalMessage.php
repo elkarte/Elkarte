@@ -407,6 +407,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
+	
+	// Needed for our email functions
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	$onBehalf = $from !== null;
 
