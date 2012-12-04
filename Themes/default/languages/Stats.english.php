@@ -18,7 +18,6 @@ $txt['page_views'] = 'Page views';
 $txt['top_topics_replies'] = 'Top 10 Topics (by Replies)';
 $txt['top_topics_views'] = 'Top 10 Topics (by Views)';
 $txt['yearly_summary'] = 'Yearly Summary';
-$txt['smf_stats_14'] = 'Most Online';
 $txt['top_starters'] = 'Top Topic Starters';
 $txt['most_time_online'] = 'Most Time Online';
 $txt['best_karma'] = 'Best Karma';
