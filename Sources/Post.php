@@ -1233,7 +1233,7 @@ function Post2()
 
 		if (!empty($_REQUEST['msg']))
 		{
-			require_once($sourcedir . '/ManageAttachments.php');
+			require_once($sourcedir . '/Subs-Attachments.php');
 			$attachmentQuery = array(
 				'attachment_type' => 0,
 				'id_msg' => (int) $_REQUEST['msg'],

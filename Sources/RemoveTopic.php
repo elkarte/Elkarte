@@ -450,7 +450,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment, if it exists.
-	require_once($sourcedir . '/ManageAttachments.php');
+	require_once($sourcedir . '/Subs-Attachments.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -969,7 +969,7 @@ function removeMessage($message, $decreasePostCount = true)
 		}
 
 		// Delete attachment(s) if they exist.
-		require_once($sourcedir . '/ManageAttachments.php');
+		require_once($sourcedir . '/Subs-Attachments.php');
 		$attachmentQuery = array(
 			'attachment_type' => 0,
 			'id_msg' => $message,

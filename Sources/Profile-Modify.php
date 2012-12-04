@@ -2657,7 +2657,7 @@ function profileSaveAvatarData(&$value)
 	if (empty($memID) && !empty($context['password_auth_failed']))
 		return false;
 
-	require_once($sourcedir . '/ManageAttachments.php');
+	require_once($sourcedir . '/Subs-Attachments.php');
 
 	// We need to know where we're going to be putting it..
 	if (!empty($modSettings['custom_avatar_enabled']))
