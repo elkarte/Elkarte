@@ -329,8 +329,6 @@ function updateSettingsFile($config_vars)
 		// Add in any newly defined vars that were passed
 		foreach ($config_vars as $var => $val)
 			$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
-
-		$settingsArray[$end] = '?' . '>';
 	}
 	else
 		$settingsArray[$end] = trim($settingsArray[$end]);
@@ -401,7 +399,7 @@ function updateDbLastError($time)
 	global $boarddir;
 
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';' . "\n" . '?' . '>', LOCK_EX);
+	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
 	@touch($boarddir . '/' . 'Settings.php');
 }
 /**
@@ -525,5 +523,3 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
 }
-
-?>

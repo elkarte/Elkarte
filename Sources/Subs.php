@@ -4265,5 +4265,3 @@ function entity_fix__callback($matches)
 	else
 		return '&#' . $num . ';';
 }
-
-?>

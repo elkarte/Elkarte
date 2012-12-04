@@ -626,5 +626,3 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// Finally return the email to the caller so they can send it out.
 	return $ret;
 }
-
-?>

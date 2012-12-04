@@ -48,5 +48,3 @@ function template_notify_board()
 			</p>
 		</div>';
 }
-
-?>

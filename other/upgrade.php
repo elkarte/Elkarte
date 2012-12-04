@@ -2105,28 +2105,17 @@ function changeSettings($config_vars)
 				}
 			}
 		}
-		if (isset($settingsArray[$i]))
-		{
-			if (trim(substr($settingsArray[$i], 0, 2)) == '?' . '>')
-				$end = $i;
-		}
 	}
-
-	// Assume end-of-file if the end wasn't found.
-	if (empty($end) || $end < 10)
-		$end = count($settingsArray);
 
 	if (!empty($config_vars))
 	{
-		$settingsArray[$end++] = '';
+		$settingsArray[$i++] = '';
 		foreach ($config_vars as $var => $val)
 		{
 			if ($val != '#remove#')
-				$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
+				$settingsArray[$i++] = '$' . $var . ' = ' . $val . ';' . "\n";
 		}
 	}
-	// This should be the last line and even last bytes of the file.
-	$settingsArray[$end] = '?' . '>';
 
 	// Blank out the file - done to fix a oddity with some servers.
 	$fp = fopen($boarddir . '/Settings.php', 'w');
@@ -2144,7 +2133,7 @@ function changeSettings($config_vars)
 function updateLastError()
 {
 	// clear out the db_last_error file
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
+	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
 }
 
 function php_version_check()
@@ -4489,5 +4478,3 @@ function template_upgrade_complete()
 			Best of luck,<br />
 			Simple Machines';
 }
-
-?>

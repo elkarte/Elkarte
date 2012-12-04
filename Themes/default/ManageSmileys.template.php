@@ -535,5 +535,3 @@ function template_editicon()
 		</form>
 	</div>';
 }
-
-?>

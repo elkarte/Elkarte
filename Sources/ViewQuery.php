@@ -189,5 +189,3 @@ function ViewQuery()
 
 	obExit(false);
 }
-
-?>

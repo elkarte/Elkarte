@@ -395,5 +395,3 @@ function warning_preview()
 
 	$context['sub_template'] = 'pm';
 }
-
-?>

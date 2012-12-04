@@ -173,5 +173,3 @@ function template_manual()
 				</div>
 			</div>';
 }
-
-?>

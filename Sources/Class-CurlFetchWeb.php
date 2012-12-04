@@ -307,4 +307,3 @@ class curl_fetch_web_data
 	}
 }
 
-?>

@@ -2152,5 +2152,3 @@ function ModEndSession()
 
 	redirectexit('action=moderate');
 }
-
-?>

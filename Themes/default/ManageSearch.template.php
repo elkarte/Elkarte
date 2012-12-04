@@ -526,5 +526,3 @@ function template_manage_sphinx()
 		</form>
 	</div>';
 }
-
-?>

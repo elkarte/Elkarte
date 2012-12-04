@@ -297,5 +297,3 @@ function template_attachment_paths()
 
 	template_show_list('attach_paths');
 }
-
-?>

@@ -1799,5 +1799,3 @@ function template_pause_action_permissions()
 	// ]]></script>';
 
 }
-
-?>
