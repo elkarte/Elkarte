@@ -352,7 +352,7 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
 	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 		loadDraft((int) $_REQUEST['id_draft'], $draft_type, true, true);
 
-	// load all the drafts for this user that meet the criteria 
+	// load all the drafts for this user that meet the criteria
 	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$user_drafts = load_user_drafts($member_id, $topic, $draft_type, $drafts_keep_days);
 

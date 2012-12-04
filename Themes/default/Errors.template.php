@@ -11,7 +11,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- * 
+ *
  * This template file contains only the sub template fatal_error. It is
  * shown when an error occurs, and should show at least a back button and
  * $context['error_message'].

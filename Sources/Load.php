@@ -1953,7 +1953,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 
 /**
  * Add a Javascript file for output later
- 
+
  * @param string $filename
  * @param array $params
  * Keys are the following:

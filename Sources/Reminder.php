@@ -12,7 +12,7 @@
  *
  * @version 1.0 Alpha
  *
- * Handle sending out reminders, and checking the secret answer and question.  
+ * Handle sending out reminders, and checking the secret answer and question.
  * It uses just a few functions to do this, which are:
  *
  */

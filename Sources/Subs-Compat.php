@@ -12,7 +12,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file provides compatibility functions such as the sha1() function, 
+ * This file provides compatibility functions such as the sha1() function,
  * missing extensions, etc
  * It is only included for when the respective extension or function cannot be found.
  *

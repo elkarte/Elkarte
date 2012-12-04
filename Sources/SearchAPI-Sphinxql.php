@@ -198,7 +198,7 @@ class sphinxql_search
 			if (!empty($extra_where))
 				$query .= ' AND ' . implode(' AND ', $extra_where);
 
-			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary 
+			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary
 			// sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time DESC';
 

@@ -1502,11 +1502,9 @@ function DeleteInstall()
 	if (isset($modSettings['recycle_board']))
 	{
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
-		$forum_version = $current_version;  
-
+		$forum_version = $current_version;
 		// Now go get those files!
-		scheduled_fetchFiles(); 
-
+		scheduled_fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
@@ -1938,9 +1936,9 @@ function updateSettingsFile($vars)
 	return true;
 }
 
-function updateDbLastError() 
+function updateDbLastError()
 {
-	// Write out the db_last_error file with the error timestamp 
+	// Write out the db_last_error file with the error timestamp
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
 
 	return true;

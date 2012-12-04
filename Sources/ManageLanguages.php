@@ -253,7 +253,7 @@ function DownloadLanguage()
 		}
 	}
 
-	// @todo Open up the old china. 
+	// @todo Open up the old china.
 	if (!isset($archive_content))
 		$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 

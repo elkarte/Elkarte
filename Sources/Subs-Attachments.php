@@ -212,7 +212,7 @@ function automanage_attachments_create_directory($updir)
  * Determines the current base directory and attachment directory
  * Increments the above directory to the next availble slot
  * Uses automanage_attachments_create_directory to create the incremental directory
- * 
+ *
  * @return boolean
  */
 function automanage_attachments_by_space()
@@ -291,7 +291,7 @@ function get_directory_tree_elements ($directory)
 /**
  * Helper function for automanage_attachments_create_directory
  * Gets the directory w/o drive letter for windows
- * 
+ *
  * @param array $tree
  * @param int $count
  * @return boolean

@@ -180,7 +180,7 @@ class sphinx_search
 		// Only request the results if they haven't been cached yet.
 		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
-			// @todo Should this not be in here? 
+			// @todo Should this not be in here?
 			// Seems to depend on Sphinx version, some need it in order to work and some don't work with it
 			//
 			// The API communicating with the search daemon.

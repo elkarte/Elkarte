@@ -432,7 +432,7 @@ function template_manage_sphinx()
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="', $context['character_set'], '" name="create_index">
 			<div class="cat_bar">
-				<h3 class="catbg">', 
+				<h3 class="catbg">',
 					$context['page_title'], '
 				</h3>
 			</div>';
@@ -450,7 +450,7 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				<div class="infobox">', 
+				<div class="infobox">',
 					$context['page_description'], '
 				</div>
 			</div>

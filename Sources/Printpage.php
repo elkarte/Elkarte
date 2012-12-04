@@ -308,11 +308,11 @@ function PrintTopic()
 		// load them into $context so the template can use them
 		foreach ($temp as $row)
 		{
-			if (!empty($row['width']) && !empty($row['height'])) 
+			if (!empty($row['width']) && !empty($row['height']))
 			{
 				if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $row['height'] * ($modSettings['max_image_width'] / $row['width']) <= $modSettings['max_image_height']))
 				{
-					if ($row['width'] > $modSettings['max_image_width']) 
+					if ($row['width'] > $modSettings['max_image_width'])
 					{
 						$row['height'] = floor($row['height'] * ($modSettings['max_image_width'] / $row['width']));
 						$row['width'] = $modSettings['max_image_width'];
@@ -320,7 +320,7 @@ function PrintTopic()
 				}
 				elseif (!empty($modSettings['max_image_width']))
 				{
-					if ($row['height'] > $modSettings['max_image_height']) 
+					if ($row['height'] > $modSettings['max_image_height'])
 					{
 						$row['width'] = floor($row['width'] * $modSettings['max_image_height'] / $row['height']);
 						$row['height'] = $modSettings['max_image_height'];
