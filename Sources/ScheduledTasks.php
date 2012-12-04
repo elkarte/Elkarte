@@ -1755,7 +1755,7 @@ function scheduled_remove_old_drafts()
 	// init
 	$drafts= array();
 
-	// We need this for lanaguage items
+	// We need this for language items
 	loadEssentialThemeData();
 
 	// Find all of the old drafts
