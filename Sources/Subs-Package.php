@@ -1487,7 +1487,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 
 	// Normalize the $versions while we remove our previous Doh!
 	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
-	
+
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
 	list($the_brand,) = explode(' ', $forum_version, 2);
 	if ($the_brand = 'DIALOGO')
@@ -1524,7 +1524,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  */
 function matchPackageVersion($version, $versions)
 {
-	
+
 	// Make sure everything is lowercase and clean of spaces and unpleasant history.
 	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
 	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));

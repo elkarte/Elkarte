@@ -155,7 +155,7 @@ function Login2()
 		$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 
 	loadLanguage('Login');
-	
+
 	// Load the template stuff
 	loadTemplate('Login');
 	$context['sub_template'] = 'login';

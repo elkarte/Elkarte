@@ -743,7 +743,7 @@ function SendMailing($clean_only = false)
 				$context['recipients']['members'][] = (int) $member;
 		}
 	}
-	
+
 	// Cleaning groups is simple - although deal with both checkbox and commas.
 	if (!empty($_POST['groups']))
 	{
@@ -914,11 +914,11 @@ function SendMailing($clean_only = false)
 					$queryBuild[] = 'mem.id_post_group = {int:group_' . $group . '}';
 				}
 			}
-			
+
 			if (!empty($queryBuild))
 			$sendQuery .= implode(' OR ', $queryBuild);
 		}
-		
+
 		if (!empty($context['recipients']['members']))
 		{
 			$sendQuery .= ($sendQuery == '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
@@ -934,7 +934,7 @@ function SendMailing($clean_only = false)
 		// Anything to exclude?
 		if (!empty($context['recipients']['exclude_groups']) && in_array(0, $context['recipients']['exclude_groups']))
 			$sendQuery .= ' AND mem.id_group != {int:regular_group}';
-		
+
 		if (!empty($context['recipients']['exclude_members']))
 		{
 			$sendQuery .= ' AND mem.id_member NOT IN ({array_int:exclude_members})';

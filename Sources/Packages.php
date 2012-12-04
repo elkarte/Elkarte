@@ -1374,9 +1374,9 @@ function PackageRemove()
 function PackageBrowse()
 {
 	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $settings;
-	
+
 	require_once($sourcedir . '/Subs-List.php');
-	
+
 	$context['page_title'] .= ' - ' . $txt['browse_packages'];
 	$context['forum_version'] = $forum_version;
 	$installed = $context['sub_action'] == 'installed' ? true : false;
@@ -1563,7 +1563,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 	{
 		$instmods = loadInstalledPackages();
 		$installed_mods = array();
-		
+
 		// Look through the list of installed mods...
 		foreach ($instmods as $installed_mod)
 			$installed_mods[$installed_mod['package_id']] = array(
@@ -2590,7 +2590,7 @@ function PackagePermissionsAction()
 			while ($entry = readdir($dh))
 			{
 				$file_count++;
-				
+
 				// Actually process this file?
 				if (!$dont_chmod && !is_dir($path . '/' . $entry) && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
 				{
@@ -2602,7 +2602,7 @@ function PackagePermissionsAction()
 				if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
 				{
 					$dont_chmod = true;
-					
+
 					// Make note of how far we have come so we restart at the right point
 					$context['file_offset'] = $file_count;
 					break;
@@ -2648,16 +2648,16 @@ function pausePackagePermissionsAction()
 	@set_time_limit(600);
 	if (function_exists('apache_reset_timeout'))
 		@apache_reset_timeout();
-		
+
 	// Set up the items for the pause form
 	$context['sub_template'] = 'pause_action_permissions';
 	$context['page_title'] = $txt['package_file_perms_applying'];
-	
+
 	// And how are we progressing with our directories
 	$context['remaining_items'] = count($context['method'] == 'individual' ? $context['to_process'] : $context['directory_list']);
 	$context['progress_message'] = sprintf($context['method'] == 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
 	$context['progress_percent'] = round(($context['total_items'] - $context['remaining_items']) / $context['total_items'] * 100, 1);
-	
+
 	// Never more than 100%!
 	$context['progress_percent'] = min($context['progress_percent'], 100);
 
@@ -2666,11 +2666,11 @@ function pausePackagePermissionsAction()
 	{
 		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
 		$context['file_progress_percent'] = round($context['file_offset'] / $context['total_files'] * 100, 1);
-		
+
 		// Never more than 100%!
 		$context['file_progress_percent'] = min($context['file_progress_percent'], 100);
 	}
-	
+
 	obExit();
 }
 

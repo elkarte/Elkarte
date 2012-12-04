@@ -189,7 +189,7 @@ function summary($memID)
 	$context['thumbs'] = array();
 	$mime_images_url = $settings['default_images_url'] . '/mime_images/';
 	$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
-	
+
 	for ($i = 0, $count = count($attachments); $i < $count; $i++)
 	{
 		$context['thumbs'][$i] = array(

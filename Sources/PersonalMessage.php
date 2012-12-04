@@ -44,7 +44,7 @@ function MessageMain()
 
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('PersonalMessage');
-		
+
 	// Load up the members maximum message capacity.
 	loadMessageLimit();
 
@@ -110,7 +110,7 @@ function MessageMain()
 				'unread_messages' => 0,
 			);
 		}
-		
+
 		$context['labels'][-1] = array(
 			'id' => -1,
 			'name' => $txt['pm_msg_label_inbox'],
@@ -170,7 +170,7 @@ function MessageMain()
 	{
 		if (!isset($_REQUEST['xml']))
 			messageIndexBar($_REQUEST['sa']);
-			
+
 		// So it was set - let's go to that action.
 		if (is_array($subActions[$_REQUEST['sa']]))
 		{
@@ -282,7 +282,7 @@ function messageIndexBar($area)
 
 	$pm_areas['folders']['areas']['inbox']['unread_messages'] = &$context['labels'][-1]['unread_messages'];
 	$pm_areas['folders']['areas']['inbox']['messages'] = &$context['labels'][-1]['messages'];
-	
+
 	// If we have unread messages, make note of the number in the menus
 	if (!empty($context['labels'][-1]['unread_messages']))
 	{
@@ -384,7 +384,7 @@ function MessageFolder()
 		$sort_by = $_GET['sort'];
 		$descending = isset($_GET['desc']);
 	}
-	
+
 	// Set our sort by query
 	switch ($sort_by)
 	{
@@ -935,7 +935,7 @@ function MessagePost()
 	isAllowedTo('pm_send');
 
 	loadLanguage('PersonalMessage');
-	
+
 	// Just in case it was loaded from somewhere else.
 	loadTemplate('PersonalMessage');
 	$context['sub_template'] = 'send';
@@ -2638,7 +2638,8 @@ function ManageRules()
 }
 
 /**
- * This will apply rules to all unread messages. If all_messages is set will, clearly, do it to all!
+ * This will apply rules to all unread messages.
+ * If all_messages is set will, clearly, do it to all!
  *
  * @param bool $all_messages = false
  */

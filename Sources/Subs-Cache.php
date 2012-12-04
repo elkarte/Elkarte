@@ -408,7 +408,7 @@ function clean_cache($type = '')
 			{
 				//$_SERVER["PHP_AUTH_USER"] = 'userid';
 				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
-				
+
 				// Get the counts so we clear each instance
 				$pcnt = xcache_count(XC_TYPE_PHP);
 				$vcnt = xcache_count(XC_TYPE_VAR);
@@ -418,7 +418,7 @@ function clean_cache($type = '')
 					for ($i = 0; $i < $vcnt; $i++)
 						xcache_clear_cache(XC_TYPE_VAR, $i);
 				}
-				
+
 				if ($type === '' || $type === 'data')
 				{
 					for ($i = 0; $i < $pcnt; $i++)
@@ -458,7 +458,7 @@ function cache_get_key($key)
 {
 	global $boardurl, $sourcedir, $cache_accelerator;
 	static $key_prefix;
-	
+
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))
 		$key_prefix = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-DIALOGO-';

@@ -1710,10 +1710,10 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 function template_pause_action_permissions()
 {
 	global $txt, $scripturl, $context;
-	
+
 	// How many have we done?
 	$countDown = 5;
-	
+
 	echo '
 	<div id="admincenter">
 		<div class="cat_bar">
@@ -1751,8 +1751,8 @@ function template_pause_action_permissions()
 					</div>
 				</div>';
 	}
-	
-	echo '		
+
+	echo '
 				<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="', $context['character_set'], '">';
 
 	// Put out the right hidden data.

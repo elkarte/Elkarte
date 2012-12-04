@@ -143,7 +143,7 @@ function savePMDraft(&$post_errors, $recipientList)
 	// ajax calling
 	if (!isset($context['drafts_pm_save']))
 		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
-	
+
 	// PM survey says ... can you stay or must you go
 	if (empty($context['drafts_pm_save']) || !isset($_POST['save_draft']) || !isset($_POST['id_pm_draft']))
 		return false;
@@ -352,7 +352,7 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
 	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 		loadDraft((int) $_REQUEST['id_draft'], $draft_type, true, true);
 
-	// load all the drafts for this user that meet the criteria 
+	// load all the drafts for this user that meet the criteria
 	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$user_drafts = load_user_drafts($member_id, $topic, $draft_type, $drafts_keep_days);
 

@@ -359,7 +359,7 @@ function template_registration_form()
 			<input type="hidden" name="', $context['register_token_var'], '" value="', $context['register_token'], '" />
 			<input type="hidden" name="step" value="2" />
 		</form>
-		
+
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var regTextStrings = {
 				"username_valid": "', $txt['registration_username_available'], '",
@@ -599,7 +599,7 @@ function template_admin_register()
 					<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
 				</div>
 			</div>
-			
+
 		</form>
 	</div>
 	<br class="clear" />';

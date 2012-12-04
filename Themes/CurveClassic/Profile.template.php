@@ -54,7 +54,7 @@ function template_summary()
 	template_profile_block_buddies();
 	echo '
 		</div>';
-		
+
 	// left and right blocks, entered as left, right, left, right
 	$templates = array(
 		'summary',
@@ -65,10 +65,10 @@ function template_summary()
 		'moderation',
 	);
 	$left = true;
-	
+
 	echo '
 		<div id="profile_summary_container">';
-	
+
 	foreach ($templates as $template)
 	{
 		echo '
@@ -87,12 +87,12 @@ function template_summary()
 
 		$left = !$left;
 	}
-	
+
 	// clear up odd number of blocks
 	if (!$left)
 		echo '
 			<br class="clear" />';
-			
+
 	// end of the sidexside container
 	echo'
 		</div>';
@@ -403,7 +403,7 @@ function template_editIgnoreList()
 			<tr class="catbg">
 				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
-	
+
 	if ($context['can_send_email'])
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
@@ -2457,7 +2457,7 @@ function template_profile_signature_modify()
 	if (!empty($context['show_preview_button']))
 		echo '
 								<input type="submit" name="preview_signature" id="preview_button" value="', $txt['preview_signature'], '"  tabindex="', $context['tabindex']++, '" class="button_submit" />';
-	
+
 	if ($context['signature_warning'])
 		echo '
 								<span class="smalltext">', $context['signature_warning'], '</span>';
@@ -2835,7 +2835,7 @@ function template_profile_block_summary()
 						<dd>
 							<a href="', $scripturl, '?action=profile;area=showposts;u=', $context['id_member'], '">', $txt['showPosts'], '</a>
 							<br />';
-		
+
 		if (!empty($modSettings['drafts_enabled']))
 			echo '
 							<a href="', $scripturl, '?action=profile;area=showdrafts;u=', $context['id_member'], '">', $txt['drafts_show'], '</a>
@@ -3297,7 +3297,7 @@ function template_profile_block_moderation()
 function template_profile_block_buddies()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
-	
+
 	// init
 	$i = 0;
 	$per_line = 4;
@@ -3305,7 +3305,7 @@ function template_profile_block_buddies()
 	// set the height to about 2 lines of buddies w/avatars
 	if (isset($context['buddies']))
 		$div_height = 120 + (2 * max(empty($modSettings['avatar_max_height_external']) ? 0 : $modSettings['avatar_max_height_external'], empty($modSettings['avatar_max_height_upload']) ? 0 : $modSettings['avatar_max_height_upload'], 65));
-		
+
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
 		echo '
@@ -3386,7 +3386,7 @@ function template_profile_block_buddies()
 function template_profile_block_attachments()
 {
 	global $settings, $txt, $context, $scripturl;
-	
+
 	// init
 	$i = 0;
 	$per_line = 4;

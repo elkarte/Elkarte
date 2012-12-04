@@ -284,7 +284,7 @@ function scheduled_approval_notification()
 
 	// Get the mailing stuff.
 	require_once($sourcedir . '/Subs-Mail.php');
-	
+
 	// Need the below for loadLanguage to work!
 	loadEssentialThemeData();
 

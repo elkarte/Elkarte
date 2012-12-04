@@ -95,7 +95,7 @@ function template_maintenance()
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['attachment_pruning'], '</h3>
 		</div>
@@ -131,7 +131,7 @@ function template_maintenance()
 			</div>
 		</div>
 	</div>';
-	
+
 	echo '
 			<div id="transfer" class="cat_bar">
 				<h3 class="catbg">', $txt['attachment_transfer'], '</h3>

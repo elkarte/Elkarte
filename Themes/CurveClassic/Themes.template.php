@@ -96,7 +96,7 @@ function template_main()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
 				</div>
-				
+
 			</div>
 		</form>';
 
