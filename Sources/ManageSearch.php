@@ -398,7 +398,7 @@ function EditSearchMethod()
 				{
 					$context['table_info']['data_length'] = (int) $row['KB'];
 					$context['table_info']['index_length'] = (int) $row['KB'];
-					
+
 					// Doesn't support fulltext
 					$context['table_info']['fulltext_length'] = $txt['not_applicable'];
 				}
@@ -747,7 +747,6 @@ function loadSearchAPIs()
 
 	return $apis;
 }
-<<<<<<< HEAD
 
 /**
  * Checks if the message table already has a fulltext index created and returns the key name
@@ -810,7 +809,7 @@ function detectFulltextIndex()
 function EditSphinxSettings()
 {
 	global $txt, $context, $modSettings, $sourcedir;
-	
+
 	// saving the settings
 	if (isset($_POST['save']))
 	{
@@ -833,14 +832,14 @@ function EditSphinxSettings()
 	{
 		checkSession();
 		validateToken('admin-mssphinx');
-		
+
 		// If they have not picked sphinx yet, let them know, but we can still check connections
 		if (empty($modSettings['search_index']) || ($modSettings['search_index'] !== 'sphinx' && $modSettings['search_index'] !== 'sphinxql'))
 		{
 			$context['settings_message'][] = $txt['sphinx_test_not_selected'];
 			$context['error_type'] = 'notice';
 		}
-		
+
 		// try to connect via Sphinx API?
 		if ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index']))
 		{
@@ -852,7 +851,7 @@ function EditSphinxSettings()
 				$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results']);
 				$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 				$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
-				
+
 				$request = $mySphinx->Query('test', 'dialogo_index');
 				if ($request === false)
 				{
@@ -868,7 +867,7 @@ function EditSphinxSettings()
 				$context['error_type'] = 'serious';
 			}
 		}
-		
+
 		// try to connect via SphinxQL
 		if ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index']))
 		{
@@ -894,10 +893,10 @@ function EditSphinxSettings()
 	{
 		checkSession();
 		validateToken('admin-mssphinx');
-		
+
 		CreateSphinxConfig();
 	}
-	
+
 	// Setup for the template
 	$context['page_title'] = $txt['search_sphinx'];
 	$context['page_description'] = $txt['sphinx_description'];
@@ -926,7 +925,7 @@ function CreateSphinxConfig()
 		'first_message',
 		'sticky',
 	);
-	
+
 	$weight = array();
 	$weight_total = 0;
 	foreach ($weight_factors as $weight_factor)
@@ -946,7 +945,7 @@ function CreateSphinxConfig()
 		);
 		$weight_total = 100;
 	}
-	
+
 	// check paths are set, if not use some defaults
 	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
 	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
