@@ -154,7 +154,7 @@ function template_manual()
 
 	echo '
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_smf_user_help'], '</h3>
+				<h3 class="catbg">', $txt['manual_dialogo_user_help'], '</h3>
 			</div>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">

@@ -485,8 +485,7 @@ function SplitSelectionExecute()
 }
 
 /**
-	int splitTopic(int topicID, array messagesToBeSplit, string newSubject)
- * general function to split off a topic.
+ * General function to split off a topic.
  * creates a new topic and moves the messages with the IDs in
  * array messagesToBeSplit to the new topic.
  * the subject of the newly created topic is set to 'newSubject'.

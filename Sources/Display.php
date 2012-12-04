@@ -1518,7 +1518,7 @@ function Download()
  * the max_image_width and max_image_height settings.
  *
  * @param type $id_msg message number to load attachments for
- * @return array of attachemnts
+ * @return array of attachments
  */
 function loadAttachmentContext($id_msg)
 {

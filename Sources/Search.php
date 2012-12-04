@@ -1855,6 +1855,7 @@ function PlushSearch2()
 
 /**
  * Allows to search through personal messages.
+ * ?action=pm;sa=search
  * What it does:
  * - shows the screen to search pm's (?action=pm;sa=search)
  * - uses the search sub template of the PersonalMessage template.
@@ -1932,6 +1933,7 @@ function MessageSearch()
 
 /**
  * Actually do the search of personal messages and show the results
+ * ?action=pm;sa=search2
  * What it does:
  * - checks user input and searches the pm table for messages matching the query.
  * - uses the search_results sub template of the PersonalMessage template.
