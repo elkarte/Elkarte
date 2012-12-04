@@ -747,7 +747,6 @@ function loadSearchAPIs()
 
 	return $apis;
 }
-<<<<<<< HEAD
 
 /**
  * Checks if the message table already has a fulltext index created and returns the key name
