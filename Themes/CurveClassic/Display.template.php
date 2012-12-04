@@ -236,8 +236,8 @@ function template_main()
 			else
 				echo '
 									<img src="'. $message['member']['online']['image_href']. '" alt="" />';
-		}			
-		
+		}
+
 		// Show a link to the member's profile.
 		echo '
 								', $message['member']['link'], '
@@ -783,7 +783,7 @@ function template_main()
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});
 			// ]]></script>';
-			
+
 	// Spell check for quick modify and quick reply (w/o the editor)
 	if ($context['show_spellchecking'] && (empty($options['use_editor_quick_reply']) || empty($options['display_quick_reply'])))
 		echo '

@@ -34,7 +34,7 @@ function template_editsets()
 			</div>
 		</div>
 	</div>
-	
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		window.smfForum_scripturl = smf_scripturl;
 		window.smfForum_sessionid = smf_session_id;
@@ -240,7 +240,7 @@ function template_modifysmiley()
 			<input type="hidden" name="smiley" value="', $context['current_smiley']['id'], '" />
 		</form>
 	</div>
-	
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function updatePreview()
 		{
@@ -342,7 +342,7 @@ function template_addsmiley()
 					</dl>
 				</div>
 			</div>
-			
+
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['smiley_new'], '</h3>
 			</div>
@@ -434,7 +434,7 @@ function template_setorder()
 		<input type="hidden" name="reorder" value="1" />
 	</form>';
 	}
-	
+
 	echo '
 	</div>';
 }

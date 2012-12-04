@@ -17,7 +17,7 @@
  * @todo should not check permissions.
  *
  */
- 
+
 if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 

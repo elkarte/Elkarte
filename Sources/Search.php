@@ -2063,7 +2063,7 @@ function MessageSearch2()
 		// Came here from pagination?  Put them back into $_REQUEST for sanitization.
 		if (isset($search_params['labels']))
 			$_REQUEST['searchlabel'] = explode(',', $search_params['labels']);
-		
+
 		// Assuming we have some labels - make them all integers.
 		if (!empty($_REQUEST['searchlabel']) && is_array($_REQUEST['searchlabel']))
 		{
@@ -2094,17 +2094,17 @@ function MessageSearch2()
 			$searchq_parameters['label_implode'] = '(' . implode(' OR ', $labelStatements) . ')';
 		}
 	}
-	
+
 	// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
 	$blacklisted_words = array('quote', 'the', 'is', 'it', 'are', 'if');
-	
+
 	// What are we actually searching for?
 	$search_params['search'] = !empty($search_params['search']) ? $search_params['search'] : (isset($_REQUEST['search']) ? $_REQUEST['search'] : '');
 
 	// If we ain't got nothing - we should error!
 	if (!isset($search_params['search']) || $search_params['search'] == '')
 		$context['search_errors']['invalid_search_string'] = true;
-		
+
 	// Change non-word characters into spaces.
 	$stripped_query = preg_replace('~(?:[\x0B\0' . ($context['utf8'] ? '\x{A0}' : '\xA0') . '\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~' . ($context['utf8'] ? 'u' : ''), ' ', $search_params['search']);
 
@@ -2159,7 +2159,7 @@ function MessageSearch2()
 			$foundBlackListedWords = true;
 			unset($searchArray[$index]);
 		}
-		
+
 		$searchArray[$index] = $smcFunc['strtolower'](trim($value));
 		if ($searchArray[$index] == '')
 			unset($searchArray[$index]);
@@ -2189,7 +2189,7 @@ function MessageSearch2()
 		$context['search_params']['search'] = $smcFunc['htmlspecialchars']($context['search_params']['search']);
 	if (isset($context['search_params']['userspec']))
 		$context['search_params']['userspec'] = $smcFunc['htmlspecialchars']($context['search_params']['userspec']);
-	
+
 	// Now we have all the parameters, combine them together for pagination and the like...
 	$context['params'] = array();
 	foreach ($search_params as $k => $v)
@@ -2202,12 +2202,12 @@ function MessageSearch2()
 	{
 		if ($word == '')
 			continue;
-			
+
 		if ($search_params['subject_only'])
 			$andQueryParts[] = 'pm.subject' . (in_array($word, $excludedWords) ? ' NOT' : '') . ' LIKE {string:search_' . $index . '}';
 		else
 			$andQueryParts[] = '(pm.subject' . (in_array($word, $excludedWords) ? ' NOT' : '') . ' LIKE {string:search_' . $index . '} ' . (in_array($word, $excludedWords) ? 'AND pm.body NOT' : 'OR pm.body') . ' LIKE {string:search_' . $index . '})';
-		
+
 		$searchq_parameters['search_' . $index] = '%' . strtr($word, array('_' => '\\_', '%' => '\\%')) . '%';
 	}
 
@@ -2389,7 +2389,7 @@ function MessageSearch2()
 
 			// Parse out any BBC...
 			$row['body'] = parse_bbc($row['body'], true, 'pm' . $row['id_pm']);
-			
+
 			// Highlight the hits
 			foreach ($searchArray as $query)
 			{
@@ -2403,7 +2403,7 @@ function MessageSearch2()
 			}
 
 			$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] == 2 && isset($real_pm_ids[$head_pms[$row['id_pm']]]) ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg' . $row['id_pm'];
-			
+
 			$context['personal_messages'][] = array(
 				'id' => $row['id_pm'],
 				'member' => &$memberContext[$row['id_member_from']],

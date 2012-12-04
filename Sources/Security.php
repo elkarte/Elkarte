@@ -657,7 +657,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$referrer = $_SESSION['request_referer'];
 	else
 		$referrer = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
-	
+
 	if (!empty($referrer['host']))
 	{
 		if (strpos($_SERVER['HTTP_HOST'], ':') !== false)

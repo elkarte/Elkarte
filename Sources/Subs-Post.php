@@ -80,7 +80,7 @@ function preparsecode(&$message, $previewing = false)
 	// If we have an open tag, close it.
 	if ($in_tag)
 		$message .= '[/code]';
-	
+
 	// Open any ones that need to be open, only if we've never had a tag.
 	if ($codeopen && !$had_tag)
 		$message = '[code]' . $message;
@@ -279,10 +279,10 @@ function un_preparsecode($message)
 		}
 	}
 
-	
+
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-	
+
 }
 
 /**
@@ -623,11 +623,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Can't do it if there's no topics.
 	if (empty($topics))
 		return;
-	
+
 	// It must be an array - it must!
 	if (!is_array($topics))
 		$topics = array($topics);
-		
+
 	// Email functions will be helpful here
 	require_once($sourcedir . '/Subs-Mail.php');
 
@@ -1594,7 +1594,7 @@ function sendApprovalNotifications(&$topicData)
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
 		return;
-		
+
 	// Email ahoy
 	require_once($sourcedir . '/Subs-Mail.php');
 
@@ -1873,7 +1873,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
 		return;
-		
+
 	// Needed to notify admins, or anyone
 	require_once($sourcedir . '/Subs-Mail.php');
 
