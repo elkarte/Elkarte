@@ -4480,5 +4480,5 @@ function template_upgrade_complete()
 			If you had any problems with this upgrade, or have any problems using Dialogo, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
-			Simple Machines';
+			Dialogo';
 }
