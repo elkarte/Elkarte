@@ -1218,6 +1218,7 @@ function action_sendmessage()
 
 /**
  * This function allows the user to view their PM drafts
+ * Accessed by ?action=pm;sa=showpmdrafts
  */
 function action_messagedrafts()
 {

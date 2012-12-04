@@ -393,7 +393,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 
 	// Reverse the query if we're past 50% of the pages for better performance.
 	$start = $context['start'];
-	$reverse = $_REQUEST['start'] > $msgCount / 2;
+	$reverse = $start > $msgCount / 2;
 	if ($reverse)
 	{
 		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
@@ -482,31 +482,19 @@ function showPMDrafts($memID = -1)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
 
-	// init
-	$draft_type = 1;
+	// set up what we will need
+	$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 	// If just deleting a draft, do it and then redirect back.
 	if (!empty($_REQUEST['delete']))
 	{
 		checkSession('get');
 		$id_delete = (int) $_REQUEST['delete'];
-		$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}user_drafts
-			WHERE id_draft = {int:id_draft}
-				AND id_member = {int:id_member}
-				AND type = {int:draft_type}
-			LIMIT 1',
-			array(
-				'id_draft' => $id_delete,
-				'id_member' => $memID,
-				'draft_type' => $draft_type,
-			)
-		);
+		deleteDrafts($id_delete, $memID);
 
 		// now redirect back to the list
-		redirectexit('action=pm;sa=showpmdrafts;start=' . $start);
+		redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
 	}
 
 	// perhaps a draft was selected for editing? if so pass this off
@@ -516,6 +504,9 @@ function showPMDrafts($memID = -1)
 		$id_draft = (int) $_REQUEST['id_draft'];
 		redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
 	}
+
+	// init
+	$draft_type = 1;
 
 	// Default to 10.
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
@@ -545,7 +536,7 @@ function showPMDrafts($memID = -1)
 
 	// Reverse the query if we're past 50% of the total for better performance.
 	$start = $context['start'];
-	$reverse = $_REQUEST['start'] > $msgCount / 2;
+	$reverse = $start > $msgCount / 2;
 	if ($reverse)
 	{
 		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
