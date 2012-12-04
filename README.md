@@ -2,7 +2,7 @@ This is a **development** repository.
 
 This is a modified version of the SMF forum software that is released under a open source compatible BSD license.
 
-The origianl version of the software can be found at http://www.simplemachines.org/ 
+The original version of the software can be found at http://www.simplemachines.org/ 
 
 The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 

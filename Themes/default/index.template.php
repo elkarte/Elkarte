@@ -91,7 +91,7 @@ function template_html_above()
 
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
-	
+
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if(!empty($settings['forum_width']))
 		echo '

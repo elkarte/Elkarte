@@ -1539,7 +1539,7 @@ function Post2()
 		if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 			$post_errors[] = 'no_message';
 	}
-	
+
 	if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
 		$post_errors[] = 'no_event';
 
@@ -1825,7 +1825,7 @@ function Post2()
 		if (isset($topicOptions['id']))
 			$topic = $topicOptions['id'];
 	}
-	
+
 	// If we had a draft for this, its time to remove it since it was just posted
 	if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
 		deleteDrafts($_POST['id_draft']);

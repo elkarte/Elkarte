@@ -690,7 +690,7 @@ function template_convert_msgbody()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';
-	
+
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '

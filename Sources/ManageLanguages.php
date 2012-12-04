@@ -23,7 +23,6 @@ if (!defined('DIALOGO'))
  * This is the main function for the languages area.
  * It dispatches the requests.
  * Loads the ManageLanguages template. (sub-actions will use it)
- * @todo lazy loading.
  *
  * @uses ManageSettings language file
  */
@@ -45,8 +44,7 @@ function ManageLanguages()
 		'editlang' => 'ModifyLanguage',
 	);
 
-	$config_vars = array();
-	call_integration_hook('integrate_manage_languages', array($config_vars));
+	call_integration_hook('integrate_manage_languages', array($subActions));
 
 	// By default we're managing languages.
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
@@ -141,7 +139,7 @@ function AddLanguage()
 
 /**
  * Gets a list of available languages from the mother ship
- * Will return a subset if searching, otherwise all avaialble
+ * Will return a subset if searching, otherwise all available
  *
  * @return string
  */
@@ -255,7 +253,7 @@ function DownloadLanguage()
 		}
 	}
 
-	// @todo Open up the old china. 
+	// @todo Open up the old china.
 	if (!isset($archive_content))
 		$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 
@@ -687,7 +685,7 @@ function ModifyLanguages()
 
 /**
  * How many languages?
- * Callback for the list in ManageLanguageSettings().
+ * Callback for the list in ModifyLanguages().
  */
 function list_getNumLanguages()
 {
@@ -696,7 +694,7 @@ function list_getNumLanguages()
 
 /**
  * Fetch the actual language information.
- * Callback for $listOptions['get_items']['function'] in ManageLanguageSettings.
+ * Callback for $listOptions['get_items']['function'] in ModifyLanguages.
  * Determines which languages are available by looking for the "index.{language}.php" file.
  * Also figures out how many users are using a particular language.
  */
@@ -806,7 +804,7 @@ function ModifyLanguageSettings($return_config = false)
 	{
 		checkSession();
 
-		call_integration_hook('integrate_save_language_settings');
+		call_integration_hook('integrate_save_language_settings', array($config_vars));
 
 		saveSettings($config_vars);
 		redirectexit('action=admin;area=languages;sa=settings');
@@ -1217,7 +1215,6 @@ function ModifyLanguage()
 
 /**
  * This function cleans language entries to/from display.
- * @todo This function could be two functions?
  *
  * @param $string
  * @param $to_display

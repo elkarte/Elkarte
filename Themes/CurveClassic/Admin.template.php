@@ -215,7 +215,7 @@ function template_credits()
 		echo '
 					', $version['title'], ':
 				<em>', $version['version'], '</em>';
-		
+
 		// more details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
 			echo
@@ -1351,7 +1351,7 @@ function template_core_features()
 				<h3 class="catbg">
 					', $txt['core_settings_title'], '
 				</h3>
-			
+
 			</div>
 		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="', $context['character_set'], '">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
@@ -1543,7 +1543,7 @@ function template_php_info()
 
 		$alternate = true;
 		$localmaster = true;
-		
+
 		// and for each setting in this category
 		foreach ($php_area as $key => $setting)
 		{
@@ -1561,7 +1561,7 @@ function template_php_info()
 		</tr>';
 					$localmaster = false;
 				}
-					
+
 				echo '
 		<tr>
 			<td align="left" width="33%" class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
@@ -1583,7 +1583,7 @@ function template_php_info()
 			<td align="left" class="windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
 		</tr>';
 			}
-		
+
 			$alternate = !$alternate;
 		}
 		echo '

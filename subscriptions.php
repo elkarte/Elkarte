@@ -192,7 +192,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 		$real_details = @unserialize($subscription_info['pending_details']);
 		if (empty($real_details))
 			generateSubscriptionError(sprintf($txt['paid_count_not_find_outstanding_payment'], $member_id, $subscription_id));
-		
+
 		// Now we just try to find anything pending.
 		// We don't really care which it is as security happens later.
 		foreach ($real_details as $id => $detail)
@@ -202,7 +202,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 				$subscription_info['payments_pending']--;
 			break;
 		}
-		
+
 		$subscription_info['pending_details'] = empty($real_details) ? '' : serialize($real_details);
 
 		$smcFunc['db_query']('', '
@@ -221,7 +221,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 	if ($subscription_info['length'] == 'F')
 	{
 		$found_duration = 0;
-		
+
 		// This is a little harder, can we find the right duration?
 		foreach ($cost as $duration => $value)
 		{
@@ -241,7 +241,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 	else
 	{
 		$actual_cost = $cost['fixed'];
-		
+
 		// It must be at least the right amount.
 		if ($total_cost != 0 && $total_cost >= $actual_cost)
 		{
