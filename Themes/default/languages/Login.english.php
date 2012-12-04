@@ -156,5 +156,3 @@ $txt['contact_your_message'] = 'Your message';
 $txt['errors_contact_form'] = 'The following errors occured while processing your contact request';
 $txt['contact_subject'] = 'A guest has sent you a message';
 $txt['contact_thankyou'] = 'Thank you for your message, someone will contact you as soon as possible.';
-
-?>

@@ -783,5 +783,3 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 	return $log;
 }
-
-?>

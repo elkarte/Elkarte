@@ -1687,4 +1687,3 @@ function template_showPMDrafts()
 			<span>', $txt['pages'], ': ', $context['page_index'], '</span>
 		</div>';
 }
-?>

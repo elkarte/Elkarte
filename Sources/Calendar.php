@@ -432,5 +432,3 @@ function iCalDownload()
 	// Off we pop - lovely!
 	obExit(false);
 }
-
-?>

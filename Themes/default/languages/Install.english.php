@@ -229,5 +229,3 @@ $txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or i
 
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
 $txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of DIALOGO is <em id="ourVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.spudsdesign.com/dialogo/">Dialogo Community</a> website to ensure you are upgrading to the latest version.';
-
-?>

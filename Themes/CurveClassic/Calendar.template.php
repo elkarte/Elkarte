@@ -804,5 +804,3 @@ function template_thetime()
 </table>';
 
 }
-
-?>

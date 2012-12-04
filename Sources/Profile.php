@@ -805,5 +805,3 @@ function loadCustomFields($memID, $area = 'summary')
 
 	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
 }
-
-?>

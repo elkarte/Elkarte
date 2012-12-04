@@ -115,5 +115,3 @@ function createWaveFile($word)
 	// Noting more to add.
 	die();
 }
-
-?>

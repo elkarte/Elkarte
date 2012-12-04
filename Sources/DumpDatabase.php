@@ -230,5 +230,3 @@ function un_compressed($string = '')
 {
 	return $string;
 }
-
-?>

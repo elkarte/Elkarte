@@ -3201,5 +3201,3 @@ if (!function_exists('smf_crc32'))
 	global $sourcedir;
 	require_once $sourcedir . '/Subs-Compat.php';
 }
-
-?>

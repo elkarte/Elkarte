@@ -500,4 +500,3 @@ function template_sphinx_config_below()
 	</body>
 </html>';
 }
-?>

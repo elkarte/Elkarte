@@ -1056,5 +1056,3 @@ searchd
 ';
 	obExit(false, false);
 }
-
-?>

@@ -707,5 +707,3 @@ function template_convert_msgbody()
 		</div>
 	</div>';
 }
-
-?>

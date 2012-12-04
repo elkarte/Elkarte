@@ -696,5 +696,3 @@ function template_group_request_reason()
 		</form>
 	</div>';
 }
-
-?>

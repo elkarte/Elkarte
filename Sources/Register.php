@@ -951,4 +951,3 @@ function ContactForm()
 
 	createToken('contact');
 }
-?>

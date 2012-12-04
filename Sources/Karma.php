@@ -153,5 +153,3 @@ function ModifyKarma()
 		obExit(false);
 	}
 }
-
-?>

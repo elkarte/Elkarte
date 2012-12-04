@@ -3444,5 +3444,3 @@ function template_profile_block_attachments()
 		</div>
 	</div>';
 }
-
-?>

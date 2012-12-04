@@ -92,5 +92,3 @@ function template_edit_scheduled_tasks()
 		</form>
 	</div>';
 }
-
-?>
