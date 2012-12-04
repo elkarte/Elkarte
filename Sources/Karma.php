@@ -30,8 +30,6 @@ function ModifyKarma()
 {
 	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context;
 
- 	checkSession('get');
-
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))
 		fatal_lang_error('feature_disabled', true);
@@ -39,6 +37,8 @@ function ModifyKarma()
 	// If you're a guest or can't do this, blow you off...
 	is_not_guest();
 	isAllowedTo('karma_edit');
+
+	checkSession('get');
 
 	// we hold karma here.
 	require_once($sourcedir . '/Subs-Karma.php');
