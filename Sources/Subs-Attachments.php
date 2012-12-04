@@ -413,7 +413,7 @@ function processAttachments()
 			'board' => !empty($board) ? $board : 0,
 		);
 
-	// If we have an itital error, lets just display it.
+	// If we have an initial error, lets just display it.
 	if (!empty($initial_error))
 	{
 		$_SESSION['temp_attachments']['initial_error'] = $initial_error;

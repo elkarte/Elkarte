@@ -20,14 +20,10 @@
 if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
-/*	The contents of this file handle the deletion of topics, posts, and related
-	paraphernalia.  It has the following functions:
-
-*/
-
 /**
  * Completely remove an entire topic.
  * Redirects to the board when completed.
+ * Called for ?action=removetopic2
  */
 function RemoveTopic2()
 {
@@ -82,6 +78,7 @@ function RemoveTopic2()
 /**
  * Remove just a single post.
  * On completion redirect to the topic or to the board.
+ * Called for ?action=deletemsg
  */
 function DeleteMessage()
 {
@@ -1001,6 +998,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 /**
  * Move back a topic from the recycle board to its original board.
+ * Called for ?action=restoretopic
  */
 function RestoreTopic()
 {
