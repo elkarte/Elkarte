@@ -134,7 +134,7 @@ foreach ($incontext['steps'] as $num => $step)
 	{
 		// The current weight of this step in terms of overall progress.
 		$incontext['step_weight'] = $step[3];
-		
+
 		// Make sure we reset the skip button.
 		$incontext['skip'] = false;
 
@@ -925,7 +925,7 @@ function ForumSettings()
 			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
 		elseif (substr($_POST['boardurl'], -1) == '/')
 			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
-		
+
 		if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
 			$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 
@@ -1138,7 +1138,7 @@ function DatabasePopulation()
 		// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
 		if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
 			$globalCookies = true;
-		
+
 		// If there's a / in the middle of the path, or it starts with ~... we want local.
 		if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
 			$localCookies = true;
@@ -1262,21 +1262,21 @@ function AdminAccount()
 			$incontext['error'] = $txt['error_db_connect'];
 			return false;
 		}
-		
+
 		// Not matching passwords?
 		if ($_POST['password1'] != $_POST['password2'])
 		{
 			$incontext['error'] = $txt['error_user_settings_again_match'];
 			return false;
 		}
-		
+
 		// No password?
 		if (strlen($_POST['password1']) < 4)
 		{
 			$incontext['error'] = $txt['error_user_settings_no_password'];
 			return false;
 		}
-		
+
 		if (!file_exists($sourcedir . '/Subs.php'))
 		{
 			$incontext['error'] = $txt['error_subs_missing'];
@@ -1302,7 +1302,7 @@ function AdminAccount()
 				'db_error_skip' => true,
 			)
 		);
-		
+
 		if ($smcFunc['db_num_rows']($result) != 0)
 		{
 			list ($incontext['member_id'], $incontext['member_salt']) = $smcFunc['db_fetch_row']($result);
@@ -1497,13 +1497,13 @@ function DeleteInstall()
 
 	// Now is the perfect time to fetch the SM files.
 	require_once($sourcedir . '/ScheduledTasks.php');
-	
+
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
 	{
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
 		$forum_version = $current_version;  
-		
+
 		// Now go get those files!
 		scheduled_fetchFiles(); 
 
@@ -1942,7 +1942,7 @@ function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp 
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
-	
+
 	return true;
 }
 

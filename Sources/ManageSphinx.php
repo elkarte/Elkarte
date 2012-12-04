@@ -77,7 +77,7 @@ function step_0()
 	</form>
 	';
 
-	
+
 
 	template_sphinx_config_below();
 }
@@ -143,8 +143,8 @@ function step_1()
 			<input type="submit" value="Proceed" />
 		</div>
 	</form>
-	
-	
+
+
 	';
 
 
@@ -295,7 +295,7 @@ function step_3()
 		10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate smf_base_index<br />
 		0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate smf_delta_index</tt><br />
 
-		
+
 		';
 	template_sphinx_config_below();
 }

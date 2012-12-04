@@ -103,7 +103,7 @@ function template_select_search_method()
 		<div class="information">
 			<div class="smalltext" style="font-weight: normal;"><a href="', $scripturl, '?action=helpadmin;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a></div>
 		</div>
-			
+
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=method" method="post" accept-charset="', $context['character_set'], '">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['search_method'], '</h3>
@@ -447,14 +447,14 @@ function template_manage_sphinx()
 				</ul>
 			</div>';
 	}
-	
+
 	echo '
 			<div class="information">
 				<div class="infobox">', 
 					$context['page_description'], '
 				</div>
 			</div>
-			
+
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">

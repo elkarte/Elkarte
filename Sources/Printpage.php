@@ -281,7 +281,7 @@ function PrintTopic()
 		$messages = array();
 		foreach($context['posts'] as $temp)
 			$messages[] = $temp['id_msg'];
-		
+
 		// build the request
 		$request = $smcFunc['db_query']('', '
 			SELECT
@@ -326,7 +326,7 @@ function PrintTopic()
 						$row['height'] = $modSettings['max_image_height'];
 					}
 				}
-				
+
 				$row['filename'] = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 
 				// save for the template
@@ -334,7 +334,7 @@ function PrintTopic()
 			}
 		}
 	}
-	
+
 	// Set a canonical URL for this page.
 	$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.0';
 }

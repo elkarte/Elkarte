@@ -445,14 +445,14 @@ function template_manage_sphinx()
 				</ul>
 			</div>';
 	}
-	
+
 	echo '
 			<div class="information">
 				<div class="infobox">', 
 					$context['page_description'], '
 				</div>
 			</div>
-			
+
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">

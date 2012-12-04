@@ -26,28 +26,28 @@ class sphinxql_search
 	/**
 	 * This is the last version of DIALOGO that this was tested on, to protect against API changes.
 	 * @var string
-	 */	
+	 */
 	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
-	
+
 	/**
 	 * This won't work with versions of DIALOGO less than this.
 	 * @var string
 	 */
 	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
-	
+
 	/**
 	 * Is it supported?
 	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
-	
+
 	/**
 	 * What words are banned?
 	 * @var array
 	 */
 	protected $bannedWords = array();
-	
+
 	/**
 	 * What is the minimum word length?
 	 * @var int
@@ -73,7 +73,7 @@ class sphinxql_search
 			$this->is_supported = false;
 			return;
 		}
-		
+
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 	}
 
@@ -112,7 +112,7 @@ class sphinxql_search
 	public function isValid()
 	{
 		global $modSettings;
-		
+
 		return !(empty($modSettings['sphinxql_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
 	}
 
@@ -158,7 +158,7 @@ class sphinxql_search
 
 	/*
 	 * This has it's own custom search.
-	 */	
+	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
 		global $user_info, $context, $modSettings;
@@ -174,7 +174,7 @@ class sphinxql_search
 
 			// Construct the (binary mode) query.
 			$where_match = $this->_constructQuery($search_params['search']);
-			
+
 			// Nothing to search, return zero results
 			if (trim($where_match) == '')
 				return 0;
@@ -201,7 +201,7 @@ class sphinxql_search
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary 
 			// sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time DESC';
-			
+
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
 				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . $sphinx_sort;
@@ -237,7 +237,7 @@ class sphinxql_search
 			mysql_close($mySphinx);
 
 			$cached_results['total'] = count($cached_results['matches']);
-			
+
 			// Store the search results in the cache.
 			cache_put_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}

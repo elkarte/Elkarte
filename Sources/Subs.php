@@ -3176,7 +3176,7 @@ function template_footer()
 function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $sourcedir;
-	
+
 	$loadjquery = false;
 
 	// Use this hook to work with Javascript files and vars pre output
@@ -3190,7 +3190,7 @@ function template_javascript($do_defered = false)
 			require_once($sourcedir . '/Class-Combine.php');
 			$combiner = new smf_Combiner;
 			$combine_name = $combiner->smf_js_combine($context['javascript_files'], $do_defered, $loadjquery);
-			
+
 			if (!empty($combine_name))
 				echo '
 	<script type="text/javascript" src="', $combine_name, '" id="jscombined' . ($do_defered ? 'top' : 'bottom') .'"></script>';
@@ -3203,21 +3203,21 @@ function template_javascript($do_defered = false)
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
 	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id,'"' , !empty($js_file['options']['async']) ? ' async="async"' : '' ,'></script>';
-				
+
 				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
 				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
 					$loadjquery = true;
 			}
 		}
 	}
-	
+
 	// load JQuery if needed
 	if (!empty($loadjquery))
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.2.min.js"><\/script>\');
 	// ]]></script>';
-	
+
 	// Output the declared Javascript variables.
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{

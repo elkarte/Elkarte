@@ -242,9 +242,9 @@ function automanage_attachments_by_space()
 		$modSettings['last_attachments_directory'][$base_dir] = 0;
 	// And increment it.
 	$modSettings['last_attachments_directory'][$base_dir]++;
-	
+
 	$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $modSettings['last_attachments_directory'][$base_dir];
-	
+
 	// make sure it exists and is writable
 	if (automanage_attachments_create_directory($updir))
 	{
@@ -312,7 +312,7 @@ function attachments_init_dir (&$tree, &$count)
 
 		$count--;
 	}
-	
+
 	return $directory;
 }
 

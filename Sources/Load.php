@@ -442,7 +442,7 @@ function loadUserSettings()
 		'permissions' => array(),
 	);
 	$user_info['groups'] = array_unique($user_info['groups']);
-	
+
 	// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
 	if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		unset($user_info['ignoreboards'][$tmp]);
@@ -1195,7 +1195,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
-	
+
 	// First do a quick run through to make sure there is something to be shown.
 	$memberContext[$user]['has_messenger'] = false;
 	foreach (array('icq', 'msn', 'aim', 'yim') as $messenger)
@@ -1797,10 +1797,10 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
-	
+
 	// Do any style sheets first, cause we're easy with those.
 	$style_sheets += array('index');
-	
+
 	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 	if (!empty($context['theme_variant']))
 		$style_sheets += array($context['theme_variant']);
@@ -1918,7 +1918,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-	
+
 	// account for shorthand like admin.css?alp21 filenames
 	$has_seed = strpos($filename, '.css?');
 	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 4) : $filename;
@@ -1929,7 +1929,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 	{
 		$params['local'] = true;
 		$params['dir'] = $settings[$theme . '_dir'] . '/css/';
-		
+
 		// Are we validating the the file exists?
 		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/css/' . $filename))
 		{
@@ -1971,14 +1971,14 @@ function loadCSSFile($filename, $params = array(), $id = '')
 function loadJavascriptFile($filename, $params = array(), $id = '')
 {
 	global $settings, $context;
-	
+
 	if (empty($filename))
 		return;
 
 	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-	
+
 	// account for shorthand like admin.js?alp21 filenames
 	$has_seed = strpos($filename, '.js?');
 	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
@@ -1989,7 +1989,7 @@ function loadJavascriptFile($filename, $params = array(), $id = '')
 	{
 		$params['local'] = true;
 		$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
-		
+
 		// Are we validating it exists on disk?
 		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
 		{
