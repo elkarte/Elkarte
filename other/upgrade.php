@@ -1,14 +1,17 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
  */
 
 // Version information...
@@ -72,7 +75,7 @@ $upcontext['database_step'] = 3;
 @set_time_limit(600);
 if (!ini_get('safe_mode'))
 {
-	ini_set('mysql.connect_timeout', -1); 
+	ini_set('mysql.connect_timeout', -1);
 	ini_set('default_socket_timeout', 900);
 }
 // Clean the upgrade path if this is from the client.
@@ -134,7 +137,7 @@ if (isset($_GET['ssi']))
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Subs-Cache.php');	
+	require_once($sourcedir . '/Subs-Cache.php');
 	require_once($sourcedir . '/Security.php');
 	require_once($sourcedir . '/Subs-Package.php');
 
@@ -2141,7 +2144,7 @@ function changeSettings($config_vars)
 	fwrite($fp, rtrim($settingsArray[$i]));
 	fclose($fp);
 }
-function updateLastError() 
+function updateLastError()
 {
 	// clear out the db_last_error file
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
