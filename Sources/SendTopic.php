@@ -98,7 +98,7 @@ function SendTopic()
 	spamProtection('sendtopic');
 
 	// This is needed for sendmail().
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Trim the names..
 	$_POST['y_name'] = trim($_POST['y_name']);
@@ -222,7 +222,7 @@ function CustomEmail()
 	// Are we actually sending it?
 	if (isset($_POST['send']) && isset($_POST['email_body']))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 
 		checkSession();
 
@@ -367,7 +367,7 @@ function ReportToModerator2()
 	// Make sure they aren't spamming.
 	spamProtection('reporttm');
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// No errors, yet.
 	$post_errors = array();

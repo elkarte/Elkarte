@@ -12,8 +12,6 @@
  *
  * @version 1.0 Alpha
  *
- * This file handles the administration of languages tasks.
- *
  */
 
 ########## Maintenance ##########
@@ -53,7 +51,7 @@ $language = 'english';
  * URL to your forum's folder. (without the trailing /!)
  * @var string
  */
-$boardurl = 'http://127.0.0.1/smf';
+$boardurl = 'http://127.0.0.1/dialogo';
 /**
  * Email address to send emails from. (like noreply@yourdomain.com.)
  * @var string
@@ -63,7 +61,7 @@ $webmaster_email = 'noreply@myserver.com';
  * Name of the cookie to set for authentication.
  * @var string
  */
-$cookiename = 'SMFCookie11';
+$cookiename = 'DIALOGOCookie11';
 
 ########## Database Info ##########
 /**
@@ -81,7 +79,7 @@ $db_server = 'localhost';
  * The database name
  * @var string
  */
-$db_name = 'smf';
+$db_name = 'dialogo';
 /**
  * Database username
  * @var string
@@ -107,22 +105,22 @@ $ssi_db_passwd = '';
  * This helps to prevent conflicts
  * @var string
  */
-$db_prefix = 'smf_';
+$db_prefix = 'dialogo_';
 /**
  * Use a persistent database connection
  * @var int|bool
  */
 $db_persist = 0;
 /**
- * 
+ *
  * @var int|bool
  */
 $db_error_send = 0;
 
 ########## Cache Info ##########
 /**
- * Select a cache system. You want to leave this up to the cache area of the admin panel for 
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, smf, or xcache 
+ * Select a cache system. You want to leave this up to the cache area of the admin panel for
+ * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, smf, or xcache
  * (you can add more with a mod).
  * @var string
  */
@@ -160,13 +158,13 @@ $sourcedir = dirname(__FILE__) . '/Sources';
 ########## Error-Catching ##########
 # Note: You shouldn't touch these settings.
 if (file_exists(dirname(__FILE__) . '/db_last_error.php'))
-	include(dirname(__FILE__) . '/db_last_error.php'); 
+	include(dirname(__FILE__) . '/db_last_error.php');
 
 if (!isset($db_last_error))
 {
 	// File does not exist so lets try to create it
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
-	$db_last_error = 0; 
+	$db_last_error = 0;
 }
 
 if (file_exists(dirname(__FILE__) . '/install.php'))

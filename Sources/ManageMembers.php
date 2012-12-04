@@ -1033,7 +1033,7 @@ function AdminApprove()
 	// First, check our session.
 	checkSession();
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// We also need to the login languages here - for emails.
 	loadLanguage('Login');

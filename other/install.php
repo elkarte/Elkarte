@@ -1,18 +1,21 @@
 <?php
 
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
+ * @version 1.0 Alpha
  *
- * @version 2.1 Alpha 1
  */
 
-$GLOBALS['current_smf_version'] = '2.1 Alpha 1';
-$GLOBALS['db_script_version'] = '2-1';
+$GLOBALS['current_version'] = '1.0 Alpha 1';
+$GLOBALS['db_script_version'] = '1-0';
 
 $GLOBALS['required_php_version'] = '5.1.0';
 
@@ -101,8 +104,9 @@ load_lang_file();
 
 // This is what we are.
 $installurl = $_SERVER['PHP_SELF'];
-// This is where SMF is.
-$smfsite = 'http://www.simplemachines.org/smf';
+
+// This is where home is.
+$oursite = 'http://www.spudsdesign.com/dialogo/';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
@@ -117,7 +121,7 @@ $incontext['steps'] = array(
 );
 
 // Default title...
-$incontext['page_title'] = $txt['smf_installer'];
+$incontext['page_title'] = $txt['installer'];
 
 // What step are we on?
 $incontext['current_step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
@@ -130,6 +134,7 @@ foreach ($incontext['steps'] as $num => $step)
 	{
 		// The current weight of this step in terms of overall progress.
 		$incontext['step_weight'] = $step[3];
+
 		// Make sure we reset the skip button.
 		$incontext['skip'] = false;
 
@@ -218,9 +223,11 @@ function initialize_inputs()
 
 	// Add slashes, as long as they aren't already being added.
 	if (!function_exists('get_magic_quotes_gpc') || @get_magic_quotes_gpc() == 0)
+	{
 		foreach ($_POST as $k => $v)
 			if (strpos($k, 'password') === false)
 				$_POST[$k] = addslashes($v);
+	}
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
@@ -262,7 +269,7 @@ function initialize_inputs()
 	}
 
 	// Force an integer step, defaulting to 0.
-	$_GET['step'] = (int) @$_GET['step'];
+	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 }
 
 // Load the list of language files, and the current language file.
@@ -296,9 +303,10 @@ function load_lang_file()
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>SMF Installer: Error!</title>
+		<title>Installer: Error!</title>
 	</head>
-	<body style="font-family: sans-serif;"><div style="width: 600px;">
+	<body style="font-family: sans-serif;">
+	<div style="width: 600px;">
 		<h1 style="font-size: 14pt;">A critical error has occurred.</h1>
 
 		<p>This installer was unable to find the installer\'s language file or files.  They should be found under:</p>
@@ -309,7 +317,8 @@ function load_lang_file()
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
 
 		<p>If you continue to get this error message, feel free to <a href="http://support.simplemachines.org/">look to us for support</a>.</p>
-	</div></body>
+	</div>
+	</body>
 </html>';
 		die;
 	}
@@ -346,8 +355,8 @@ function load_database()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('SMF'))
-		define('SMF', 1);
+	if (!defined('DIALOGO'))
+		define('DIALOGO', 1);
 	if (empty($smcFunc))
 		$smcFunc = array();
 
@@ -423,7 +432,7 @@ function Welcome()
 		{
 			if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
 				$probably_installed++;
-			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/smf\';~', $line))
+			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/dialogo\';~', $line))
 				$probably_installed++;
 		}
 
@@ -468,7 +477,7 @@ function Welcome()
 	if (isset($error))
 		$incontext['error'] = $txt[$error];
 
-	// Mod_security blocks everything that smells funny. Let SMF handle security.
+	// Mod_security blocks everything that smells funny. Let us handle security.
 	if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
 		$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
 
@@ -492,7 +501,8 @@ function CheckFilesWritable()
 		'Themes',
 		'agreement.txt',
 		'Settings.php',
-		'Settings_bak.php'
+		'Settings_bak.php',
+		'db_last_error.php'
 	);
 	foreach ($incontext['detected_languages'] as $lang => $temp)
 		$extra_files[] = 'Themes/default/languages/' . $lang;
@@ -722,7 +732,7 @@ function DatabaseSettings()
 	}
 	else
 	{
-		$incontext['db']['prefix'] = 'smf_';
+		$incontext['db']['prefix'] = 'dialogo_';
 
 		// Should we use a non standard port?
 		if (!empty($db_port))
@@ -769,7 +779,7 @@ function DatabaseSettings()
 			'db_server' => $_POST['db_server'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'SMFCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
+			'cookiename' => 'DIALOGOCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 		);
 
 		// God I hope it saved!
@@ -793,7 +803,7 @@ function DatabaseSettings()
 		}
 
 		// Now include it for database functions!
-		define('SMF', 1);
+		define('DIALOGO', 1);
 		$modSettings['disableQueryCheck'] = true;
 		if (empty($smcFunc))
 			$smcFunc = array();
@@ -915,6 +925,7 @@ function ForumSettings()
 			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
 		elseif (substr($_POST['boardurl'], -1) == '/')
 			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+
 		if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
 			$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 
@@ -991,7 +1002,7 @@ function DatabasePopulation()
 		$smcFunc['db_free_result']($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] != $GLOBALS['current_smf_version'])
+		if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] != $GLOBALS['current_version'])
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -1015,7 +1026,7 @@ function DatabasePopulation()
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$smf_version}' => $GLOBALS['current_smf_version'],
+		'{$our_version}' => $GLOBALS['current_version'],
 		'{$current_time}' => time(),
 		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 	);
@@ -1127,6 +1138,7 @@ function DatabasePopulation()
 		// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
 		if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
 			$globalCookies = true;
+
 		// If there's a / in the middle of the path, or it starts with ~... we want local.
 		if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
 			$localCookies = true;
@@ -1144,41 +1156,6 @@ function DatabasePopulation()
 				$rows,
 				array('variable')
 			);
-		}
-	}
-
-	// Are we allowing stat collection?
-	if (isset($_POST['stats']) && strpos($_POST['boardurl'], 'http://localhost') !== 0)
-	{
-		// Attempt to register the site etc.
-		$fp = @fsockopen("www.simplemachines.org", 80, $errno, $errstr);
-		if ($fp)
-		{
-			$out = "GET /smf/stats/register_stats.php?site=" . base64_encode($_POST['boardurl']) . " HTTP/1.1\r\n";
-			$out .= "Host: www.simplemachines.org\r\n";
-			$out .= "Connection: Close\r\n\r\n";
-			fwrite($fp, $out);
-
-			$return_data = '';
-			while (!feof($fp))
-				$return_data .= fgets($fp, 128);
-
-			fclose($fp);
-
-			// Get the unique site ID.
-			preg_match('~SITE-ID:\s(\w{10})~', $return_data, $ID);
-
-			if (!empty($ID[1]))
-				$smcFunc['db_insert']('',
-					$db_prefix . 'settings',
-					array(
-						'variable' => 'string-255', 'value' => 'string-65534',
-					),
-					array(
-						'allow_sm_stats', $ID[1],
-					),
-					array('variable')
-				);
 		}
 	}
 
@@ -1285,18 +1262,21 @@ function AdminAccount()
 			$incontext['error'] = $txt['error_db_connect'];
 			return false;
 		}
+
 		// Not matching passwords?
 		if ($_POST['password1'] != $_POST['password2'])
 		{
 			$incontext['error'] = $txt['error_user_settings_again_match'];
 			return false;
 		}
+
 		// No password?
 		if (strlen($_POST['password1']) < 4)
 		{
 			$incontext['error'] = $txt['error_user_settings_no_password'];
 			return false;
 		}
+
 		if (!file_exists($sourcedir . '/Subs.php'))
 		{
 			$incontext['error'] = $txt['error_subs_missing'];
@@ -1322,6 +1302,7 @@ function AdminAccount()
 				'db_error_skip' => true,
 			)
 		);
+
 		if ($smcFunc['db_num_rows']($result) != 0)
 		{
 			list ($incontext['member_id'], $incontext['member_salt']) = $smcFunc['db_fetch_row']($result);
@@ -1401,7 +1382,7 @@ function DeleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_smf_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1416,6 +1397,7 @@ function DeleteInstall()
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Subs.php');
 	require_once($sourcedir . '/Load.php');
+	require_once($sourcedir . '/Subs-Cache.php');
 	require_once($sourcedir . '/Security.php');
 	require_once($sourcedir . '/Subs-Auth.php');
 
@@ -1515,12 +1497,14 @@ function DeleteInstall()
 
 	// Now is the perfect time to fetch the SM files.
 	require_once($sourcedir . '/ScheduledTasks.php');
+
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
 	{
-		$forum_version = $current_smf_version;  // The variable is usually defined in index.php so lets just use our variable to do it for us.
-		scheduled_fetchSMfiles(); // Now go get those files!
-
+		// The variable is usually defined in index.php so lets just use our variable to do it for us.
+		$forum_version = $current_version;
+		// Now go get those files!
+		scheduled_fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
@@ -1952,20 +1936,20 @@ function updateSettingsFile($vars)
 	return true;
 }
 
-function updateDbLastError() 
+function updateDbLastError()
 {
-	// Write out the db_last_error file with the error timestamp 
+	// Write out the db_last_error file with the error timestamp
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
-	
+
 	return true;
 }
 
-// Create an .htaccess file to prevent mod_security. SMF has filtering built-in.
+// Create an .htaccess file to prevent mod_security. Dialogo has filtering built-in.
 function fixModSecurity()
 {
 	$htaccess_addition = '
 <IfModule mod_security.c>
-	# Turn off mod_security filtering.  SMF is a big boy, it doesn\'t need its hands held.
+	# Turn off mod_security filtering.  We don\'t need our hands held.
 	SecFilterEngine Off
 
 	# The below probably isn\'t needed, but better safe than sorry.
@@ -2012,23 +1996,23 @@ function fixModSecurity()
 
 function template_install_above()
 {
-	global $incontext, $txt, $smfsite, $installurl;
+	global $incontext, $txt, $oursite, $installurl;
 
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', !empty($txt['lang_rtl']) ? ' dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=', isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'ISO-8859-1', '" />
 		<meta name="robots" content="noindex" />
-		<title>', $txt['smf_installer'], '</title>
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/index.css?alp21" />
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/install.css?alp21" />
+		<title>', $txt['installer'], '</title>
+		<link rel="stylesheet" type="text/css" href="Themes/default/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="Themes/default/css/install.css?alp10" />
 		<script type="text/javascript" src="Themes/default/scripts/script.js"></script>
 	</head>
 	<body>
 		<div id="header">
 			<div class="frame">
-				<h1 class="forumtitle">', $txt['smf_installer'], '</h1>
-				<img id="smflogo" src="Themes/default/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />
+				<h1 class="forumtitle">', $txt['installer'], '</h1>
+				<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
 			</div>
 		</div>
 		<div id="wrapper">
@@ -2117,7 +2101,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul class="reset">
-					<li class="copyright"><a href="http://www.simplemachines.org/" title="Simple Machines Forum" target="_blank" class="new_win">SMF &copy; 2011, Simple Machines</a></li>
+					<li class="copyright"><a href="http://www.spudsdesign.com/dialogo/" title="Dialogo Community" target="_blank" class="new_win">Dialogo &copy; 2012, Dialogo Community</a></li>
 				</ul>
 			</div>
 		</div>
@@ -2125,20 +2109,20 @@ function template_install_below()
 </html>';
 }
 
-// Welcome them to the wonderful world of SMF!
+// Welcome them to the wonderful world of Dialogo!
 function template_welcome_message()
 {
 	global $incontext, $installurl, $txt;
 
 	echo '
-	<script type="text/javascript" src="http://www.simplemachines.org/smf/current-version.js?version=' . $GLOBALS['current_smf_version'] . '"></script>
+	<script type="text/javascript" src="http://www.spudsdesign.com/dialogo/current-version.js?version=' . $GLOBALS['current_version'] . '"></script>
 	<form action="', $incontext['form_url'], '" method="post">
-		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_smf_version']), '</p>
+		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_version']), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="smfVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_smf_version'] . '</em>'), '
+				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_version'] . '</em>'), '
 			</div>
 		</div>';
 
@@ -2155,25 +2139,25 @@ function template_welcome_message()
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
 			// Latest version?
-			function smfCurrentVersion()
+			function ourCurrentVersion()
 			{
-				var smfVer, yourVer;
+				var ourVer, yourVer;
 
-				if (!(\'smfVersion\' in window))
+				if (!(\'ourVersion\' in window))
 					return;
 
-				window.smfVersion = window.smfVersion.replace(/SMF\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/DIALOGO\s?/g, \'\');
 
-				smfVer = document.getElementById("smfVersion");
+				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");
 
-				setInnerHTML(smfVer, window.smfVersion);
+				setInnerHTML(ourVer, window.ourVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion < window.smfVersion)
+				if (currentVersion < window.ourVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
-			addLoadEvent(smfCurrentVersion);
+			addLoadEvent(CurrentVersion);
 		// ]]></script>';
 }
 
@@ -2185,20 +2169,18 @@ function template_warning_divs()
 	// Errors are very serious..
 	if (!empty($incontext['error']))
 		echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background-color: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+		<div class="errorbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
-			<div style="padding-left: 6ex;">
+			<div>
 				', $incontext['error'], '
 			</div>
 		</div>';
 	// A warning message?
 	elseif (!empty($incontext['warning']))
 		echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background-color: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+		<div class="noticebox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div style="padding-left: 6ex;">
+			<div>
 				', $incontext['warning'], '
 			</div>
 		</div>';
@@ -2227,7 +2209,7 @@ function template_chmod_files()
 
 	if (!empty($incontext['ftp_errors']))
 		echo '
-		<div class="error_message">
+		<div class="errorbox">
 			<div style="color: red;">
 				', $txt['error_ftp_no_connect'], '<br />
 				<br />
@@ -2343,7 +2325,7 @@ function template_database_settings()
 			</tr><tr id="db_filename_contain" style="display: none;">
 				<td valign="top" class="textbox"><label for="db_filename_input">', $txt['db_settings_database_file'], ':</label></td>
 				<td>
-					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/smf_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
+					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/dialogo_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_file_info'], '</div>
 				</td>
 			</tr><tr>
@@ -2408,19 +2390,22 @@ function template_forum_settings()
 					<input type="text" name="mbname" id="mbname_input" value="', $txt['install_settings_name_default'], '" size="65" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_name_info'], '</div>
 				</td>
-			</tr><tr>
+			</tr>
+			<tr>
 				<td valign="top" class="textbox"><label for="boardurl_input">', $txt['install_settings_url'], ':</label></td>
 				<td>
 					<input type="text" name="boardurl" id="boardurl_input" value="', $incontext['detected_url'], '" size="65" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_url_info'], '</div>
 				</td>
-			</tr><tr>
+			</tr>
+			<tr>
 				<td valign="top" class="textbox">', $txt['install_settings_compress'], ':</td>
 				<td>
 					<input type="checkbox" name="compress" id="compress_check" checked="checked" class="input_check" /> <label for="compress_check">', $txt['install_settings_compress_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_compress_info'], '</div>
 				</td>
-			</tr><tr>
+			</tr>
+			<tr>
 				<td valign="top" class="textbox">', $txt['install_settings_dbsession'], ':</td>
 				<td>
 					<input type="checkbox" name="dbsession" id="dbsession_check" checked="checked" class="input_check" /> <label for="dbsession_check">', $txt['install_settings_dbsession_title'], '</label><br />
@@ -2432,13 +2417,6 @@ function template_forum_settings()
 				<td>
 					<input type="checkbox" name="utf8" id="utf8_check"', $incontext['utf8_default'] ? ' checked="checked"' : '', ' class="input_check"', $incontext['utf8_required'] ? ' disabled="disabled"' : '', ' /> <label for="utf8_check">', $txt['install_settings_utf8_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_utf8_info'], '</div>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="textbox">', $txt['install_settings_stats'], ':</td>
-				<td>
-					<input type="checkbox" name="stats" id="stats_check" class="input_check" /> <label for="stats_check">', $txt['install_settings_stats_title'], '</label><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_stats_info'], '</div>
 				</td>
 			</tr>
 		</table>';
@@ -2464,15 +2442,16 @@ function template_populate_database()
 	if (!empty($incontext['failures']))
 	{
 		echo '
-				<div style="color: red;">', $txt['error_db_queries'], '</div>
-				<ul>';
+				<div class="errorbox">', $txt['error_db_queries'], '
+					<ul>';
 
 		foreach ($incontext['failures'] as $line => $fail)
 			echo '
 						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail)), '</li>';
 
 		echo '
-				</ul>';
+					</ul>
+				</div>';
 	}
 
 	echo '

@@ -283,7 +283,8 @@ function scheduled_approval_notification()
 	$smcFunc['db_free_result']($request);
 
 	// Get the mailing stuff.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
+
 	// Need the below for loadLanguage to work!
 	loadEssentialThemeData();
 
@@ -533,7 +534,7 @@ function scheduled_daily_digest()
 	global $is_weekly, $txt, $mbname, $scripturl, $sourcedir, $smcFunc, $context, $modSettings;
 
 	// We'll want this...
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 	loadEssentialThemeData();
 
 	$is_weekly = !empty($is_weekly) ? 1 : 0;
@@ -1319,7 +1320,7 @@ function scheduled_birthdayemails()
 	loadEssentialThemeData();
 
 	// Going to need this to send the emails.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
 
@@ -1623,7 +1624,7 @@ function scheduled_paid_subscriptions()
 		// If this is the first one load the important bits.
 		if (empty($subs_reminded))
 		{
-			require_once($sourcedir . '/Subs-Post.php');
+			require_once($sourcedir . '/Subs-Mail.php');
 			// Need the below for loadLanguage to work!
 			loadEssentialThemeData();
 		}

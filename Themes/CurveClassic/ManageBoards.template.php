@@ -56,7 +56,7 @@ function template_main()
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=newboard;cat=', $category['id'], '" method="post" accept-charset="', $context['character_set'], '">
 			<div class="windowbg">
 				<div class="content">';
-				
+
 		if (count($category['boards']) !== 0)
 		{
 				echo '
@@ -94,7 +94,7 @@ function template_main()
 				}
 				$alternate = !$alternate;
 			}
-			
+
 			echo '
 						</ul>';
 		}

@@ -26,7 +26,7 @@ if (!defined('DIALOGO'))
 function loadMessageLimit()
 {
 	global $user_info, $context, $smcFunc;
-	
+
 	if ($user_info['is_admin'])
 		$context['message_limit'] = 0;
 	elseif (($context['message_limit'] = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
@@ -47,12 +47,12 @@ function loadMessageLimit()
 		// Save us doing it again!
 		cache_put_data('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
 	}
-}	
+}
 
 function loadPMLabels()
 {
 	global $user_info, $context, $smcFunc;
-	
+
 	// Looks like we need to reseek!
 	$result = $smcFunc['db_query']('', '
 		SELECT labels, is_read, COUNT(*) AS num
@@ -117,7 +117,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 			)
 		);
 	}
-	
+
 	list ($_GET['start']) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 }
@@ -408,6 +408,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
 
+	// Needed for our email functions
+	require_once($sourcedir . '/Subs-Mail.php');
+
 	$onBehalf = $from !== null;
 
 	// Initialize log array.
@@ -453,7 +456,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			}
 		}
 	}
-	
+
 	if (!empty($usernames))
 	{
 		$request = $smcFunc['db_query']('pm_find_username', '
@@ -512,7 +515,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$criteria = unserialize($row['criteria']);
-		
+
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
 		foreach ($criteria as $criterium)
@@ -608,7 +611,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$groups[] = $row['id_post_group'];
 
 		$message_limit = -1;
-		
+
 		// For each group see whether they've gone over their limit - assuming they're not an admin.
 		if (!in_array(1, $groups))
 		{
@@ -743,7 +746,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			$to_names[] = un_htmlspecialchars($row['real_name']);
 		$smcFunc['db_free_result']($request);
 	}
-	
+
 	$replacements = array(
 		'SUBJECT' => $subject,
 		'MESSAGE' => $message,
@@ -774,7 +777,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		if (isset($deletes[$id]))
 			unset($all_to[$k]);
 	}
-	
+
 	if (!empty($all_to))
 		updateMemberData($all_to, array('instant_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
 

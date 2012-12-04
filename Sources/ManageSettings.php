@@ -2612,7 +2612,7 @@ function get_integration_hooks_count()
 
 /**
  * Parses modSettings to create integration hook array
- * 
+ *
  * @staticvar type $integration_hooks
  * @return type
  */

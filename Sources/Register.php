@@ -615,7 +615,7 @@ function Activate()
 	// Resend the password, but only if the account wasn't activated yet.
 	if (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'resend' && ($row['is_activated'] == 0 || $row['is_activated'] == 2) && (!isset($_REQUEST['code']) || $_REQUEST['code'] == ''))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 
 		$replacements = array(
 			'REALNAME' => $row['real_name'],

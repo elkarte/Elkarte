@@ -12,8 +12,8 @@
  */
 
 // Version information...
-define('SMF_VERSION', '2.1 Alpha 1');
-define('SMF_LANG_VERSION', '2.1');
+define('CURRENT_VERSION', '1.0 Alpha 1');
+define('CURRENT_LANG_VERSION', '1.0');
 
 $GLOBALS['required_php_version'] = '5.1.0';
 $GLOBALS['required_mysql_version'] = '4.0.18';
@@ -46,10 +46,13 @@ $databases = array(
 $timeLimitThreshold = 3;
 $upgrade_path = dirname(__FILE__);
 $upgradeurl = $_SERVER['PHP_SELF'];
-// Where the SMF images etc are kept.
-$smfsite = 'http://www.simplemachines.org/smf';
+
+// Where the images etc are kept.
+$oursite = 'http://www.spudsdesign.com/dialogo';
+
 // Disable the need for admins to login?
 $disable_security = false;
+
 // How long, in seconds, must admin be inactive to allow someone else to run?
 $upcontext['inactive_timeout'] = 10;
 
@@ -69,7 +72,7 @@ $upcontext['database_step'] = 3;
 @set_time_limit(600);
 if (!ini_get('safe_mode'))
 {
-	ini_set('mysql.connect_timeout', -1); 
+	ini_set('mysql.connect_timeout', -1);
 	ini_set('default_socket_timeout', 900);
 }
 // Clean the upgrade path if this is from the client.
@@ -131,6 +134,7 @@ if (isset($_GET['ssi']))
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Load.php');
+	require_once($sourcedir . '/Subs-Cache.php');
 	require_once($sourcedir . '/Security.php');
 	require_once($sourcedir . '/Subs-Package.php');
 
@@ -188,7 +192,7 @@ if (!function_exists('clean_cache'))
 		if (!is_dir($cachedir))
 			return;
 
-		// Remove the files in SMF's own disk cache, if any
+		// Remove the files in our own disk cache, if any
 		$dh = opendir($cachedir);
 		while ($file = readdir($dh))
 		{
@@ -594,15 +598,15 @@ else
 }
 
 // Don't do security check if on Yabbse
-if (!isset($modSettings['smfVersion']))
+if (!isset($modSettings['ourVersion']))
 	$disable_security = true;
 
 // If this isn't the first stage see whether they are logging in and resuming.
 if ($upcontext['current_step'] != 0 || !empty($upcontext['user']['step']))
 	checkLogin();
 
-// This only exists if we're on SMF ;)
-if (isset($modSettings['smfVersion']))
+// Does this exist?
+if (isset($modSettings['ourVersion']))
 {
 	$request = $smcFunc['db_query']('', '
 		SELECT variable, value
@@ -633,9 +637,9 @@ if (!isset($settings['default_theme_url']))
 if (!isset($settings['default_theme_dir']))
 	$settings['default_theme_dir'] = $modSettings['theme_dir'];
 
-$upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
+$upcontext['is_large_forum'] = (empty($modSettings['ourVersion']) || $modSettings['ourVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['smfVersion']) ? 'Updating Your SMF Install!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Dialogo Install!' : 'Upgrading from YaBB SE!';
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -709,7 +713,7 @@ function upgradeExit($fallThrough = false)
 			if (function_exists('debug_print_backtrace'))
 				debug_print_backtrace();
 
-			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the SMF support forum to tell the Developers that they\'ve made a boo boo; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the Dialogo Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
 			flush();
 			die();
 		}
@@ -791,7 +795,7 @@ function loadEssentialData()
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
-	define('SMF', 1);
+	define('DIALOGO', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')
@@ -946,11 +950,11 @@ function WelcomeLogin()
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
 
 	// Need legacy scripts?
-	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 2.1)
+	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 2.0)
+	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.0)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 1.1)
+	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	if (!$check)
@@ -959,10 +963,10 @@ function WelcomeLogin()
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
-		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets SMF\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets DIALOGO\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
-		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of SMF.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of DIALOGO.<br /><br />Please ask your host to upgrade.');
 
 	// Do they have ALTER privileges?
 	if (!empty($databases[$db_type]['alter_support']) && $smcFunc['db_query']('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
@@ -971,7 +975,7 @@ function WelcomeLogin()
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || $match[1] != SMF_VERSION)
+	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 		return throw_error('The upgrader found some old or outdated files.<br /><br />Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
@@ -990,14 +994,14 @@ function WelcomeLogin()
 	if (!file_exists($cachedir_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['smfVersion']) && !isset($_GET['lang']))
-		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />SMF will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
+	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />DIALOGO will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
 		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
-		if (empty($match[1]) || $match[1] != SMF_LANG_VERSION)
+		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			return throw_error('The upgrader found some old or outdated language files, for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded the new versions of all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?skiplang">SKIP</a>] [<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	}
 
@@ -1105,7 +1109,7 @@ function checkLogin()
 				foreach ($groups as $k => $v)
 					$groups[$k] = (int) $v;
 
-				// Figure out the password using SMF's encryption - if what they typed is right.
+				// Figure out the password using our encryption - if what they typed is right.
 				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) == 40)
 				{
 					// Challenge passed.
@@ -1131,8 +1135,8 @@ function checkLogin()
 			$support_js = 0;
 
 		// Note down the version we are coming from.
-		if (!empty($modSettings['smfVersion']) && empty($upcontext['user']['version']))
-			$upcontext['user']['version'] = $modSettings['smfVersion'];
+		if (!empty($modSettings['ourVersion']) && empty($upcontext['user']['version']))
+			$upcontext['user']['version'] = $modSettings['ourVersion'];
 
 		// Didn't get anywhere?
 		if ((empty($sha_passwd) || $password != $sha_passwd) && empty($upcontext['username_incorrect']) && !$disable_security)
@@ -1190,7 +1194,7 @@ function checkLogin()
 				$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
-				if (empty($match[1]) || $match[1] != SMF_LANG_VERSION)
+				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				elseif (!file_exists($boarddir . '/Themes/default/languages/Install.' . basename($user_language, '.lng') . '.php'))
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
@@ -1232,45 +1236,15 @@ function UpgradeOptions()
 	if (empty($_POST['upcont']))
 		return false;
 
-	// Firstly, if they're enabling SM stat collection just do it.
-	if (!empty($_POST['stats']) && substr($boardurl, 0, 16) != 'http://localhost' && empty($modSettings['allow_sm_stats']))
-	{
-		// Attempt to register the site etc.
-		$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
-		if ($fp)
-		{
-			$out = 'GET /smf/stats/register_stats.php?site=' . base64_encode($boardurl) . ' HTTP/1.1' . "\r\n";
-			$out .= 'Host: www.simplemachines.org' . "\r\n";
-			$out .= 'Connection: Close' . "\r\n\r\n";
-			fwrite($fp, $out);
-
-			$return_data = '';
-			while (!feof($fp))
-				$return_data .= fgets($fp, 128);
-
-			fclose($fp);
-
-			// Get the unique site ID.
-			preg_match('~SITE-ID:\s(\w{10})~', $return_data, $ID);
-
-			if (!empty($ID[1]))
-				$smcFunc['db_insert']('replace',
-					$db_prefix . 'settings',
-					array('variable' => 'string', 'value' => 'string'),
-					array('allow_sm_stats', $ID[1]),
-					array('variable')
-				);
-		}
-	}
-	else
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}settings
-			WHERE variable = {string:allow_sm_stats}',
-			array(
-				'allow_sm_stats' => 'allow_sm_stats',
-				'db_error_skip' => true,
-			)
-		);
+	// No one opts in so why collect incomplete stats
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}settings
+		WHERE variable = {string:allow_sm_stats}',
+		array(
+			'allow_sm_stats' => false,
+			'db_error_skip' => true,
+		)
+	);
 
 	// Emptying the error log?
 	if (!empty($_POST['empty_error']))
@@ -1461,7 +1435,7 @@ function DatabaseChanges()
 		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
 		array('upgrade_2-0_' . $db_type . '.sql', '2.1', '2.1 dev0'),
-		array('upgrade_2-1_' . $db_type . '.sql', '3.0', SMF_VERSION),
+		array('upgrade_2-1_' . $db_type . '.sql', '3.0', CURRENT_VERSION),
 	);
 
 	// How many files are there in total?
@@ -1472,7 +1446,7 @@ function DatabaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < $file[1])
 				$upcontext['file_count']++;
 		}
 	}
@@ -1490,7 +1464,7 @@ function DatabaseChanges()
 			$upcontext['cur_file_num']++;
 			$upcontext['cur_file_name'] = $file[0];
 			// Do we actually need to do this still?
-			if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < $file[1])
 			{
 				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
 				if ($nextFile)
@@ -1499,11 +1473,11 @@ function DatabaseChanges()
 					$smcFunc['db_insert']('replace',
 						$db_prefix . 'settings',
 						array('variable' => 'string', 'value' => 'string'),
-						array('smfVersion', $file[2]),
+						array('ourVersion', $file[2]),
 						array('variable')
 					);
 
-					$modSettings['smfVersion'] = $file[2];
+					$modSettings['ourVersion'] = $file[2];
 				}
 
 				// If this is XML we only do this stuff once.
@@ -1866,7 +1840,7 @@ function DeleteUpgrade()
 {
 	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $smcFunc, $db_type;
 
-	// Now it's nice to have some of the basic SMF source files.
+	// Now it's nice to have some of the basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
 		redirectLocation('&ssi=1');
 
@@ -1908,12 +1882,12 @@ function DeleteUpgrade()
 
 	// Now is the perfect time to fetch the SM files.
 	if ($command_line)
-		cli_scheduled_fetchSMfiles();
+		cli_scheduled_fetchFiles();
 	else
 	{
 		require_once($sourcedir . '/ScheduledTasks.php');
-		$forum_version = SMF_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
-		scheduled_fetchSMfiles(); // Now go get those files!
+		$forum_version = CURRENT_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
+		scheduled_fetchFiles(); // Now go get those files!
 	}
 
 	// Log what we've done.
@@ -1958,7 +1932,7 @@ function DeleteUpgrade()
 }
 
 // Just like the built in one, but setup for CLI to not use themes.
-function cli_scheduled_fetchSMfiles()
+function cli_scheduled_fetchFiles()
 {
 	global $sourcedir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
 
@@ -2167,7 +2141,7 @@ function changeSettings($config_vars)
 	fwrite($fp, rtrim($settingsArray[$i]));
 	fclose($fp);
 }
-function updateLastError() 
+function updateLastError()
 {
 	// clear out the db_last_error file
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;' . "\n" . '?' . '>');
@@ -2528,7 +2502,7 @@ function upgrade_query($string, $unbuffered = false)
 	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line, $upcontext, $upgradeurl, $modSettings;
 	global $db_name, $db_unbuffered, $smcFunc;
 
-	// Get the query result - working around some SMF specific security - just this once!
+	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db_unbuffered = $unbuffered;
 	$result = $smcFunc['db_query']('', $string, 'security_override');
@@ -2995,7 +2969,7 @@ function cmdStep0()
 			$_GET['conv'] = 1;
 		elseif ($i != 0)
 		{
-			echo 'SMF Command-line Upgrader
+			echo 'DIALOGO Command-line Upgrader
 Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
     --language=LANG         Reset the forum\'s language to LANG.
@@ -3018,13 +2992,13 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
 		&& @file_exists($sourcedir . '/QueryString.php')
 		&& @file_exists($sourcedir . '/ManageBoards.php');
-	if (!$check && !isset($modSettings['smfVersion']))
+	if (!$check && !isset($modSettings['ourVersion']))
 		print_error('Error: Some files are missing or out-of-date.', true);
 
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || $match[1] != SMF_VERSION)
+	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 		print_error('Error: Some files have not yet been updated properly.');
 
 	// Make sure Settings.php is writable.
@@ -3052,7 +3026,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($boarddir . '/Themes'))
 		@chmod($boarddir . '/Themes', 0777);
 
-	if (!is_writable($boarddir . '/Themes') && !isset($modSettings['smfVersion']))
+	if (!is_writable($boarddir . '/Themes') && !isset($modSettings['ourVersion']))
 		print_error('Error: Unable to obtain write access to "Themes".');
 
 	// Make sure cache directory exists and is writable!
@@ -3066,14 +3040,14 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($cachedir_temp))
 		print_error('Error: Unable to obtain write access to "cache".', true);
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['smfVersion']) && !isset($_GET['lang']))
+	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
 		print_error('Error: Unable to find language files!', true);
 	else
 	{
 		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
-		if (empty($match[1]) || $match[1] != SMF_LANG_VERSION)
+		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			print_error('Error: Language files out of date.', true);
 		if (!file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
 			print_error('Error: Install language is missing for selected language.', true);
@@ -3321,7 +3295,7 @@ function template_chmod()
 	// @todo Temporary!
 	$txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
 	$txt['ftp_login'] = 'Your FTP connection information';
-	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup SMF.';
+	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup DIALOGO.';
 	$txt['ftp_server'] = 'Server';
 	$txt['ftp_server_info'] = 'The address (often localhost) and port for your FTP server.';
 	$txt['ftp_port'] = 'Port';
@@ -3332,7 +3306,7 @@ function template_chmod()
 	$txt['ftp_path'] = 'Install Path';
 	$txt['ftp_path_info'] = 'This is the <em>relative</em> path you use in your FTP client <a href="' . $_SERVER['PHP_SELF'] . '?ftphelp" onclick="window.open(this.href, \'\', \'width=450,height=250\');return false;" target="_blank">(more help)</a>.';
 	$txt['ftp_path_found_info'] = 'The path in the box above was automatically detected.';
-	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<tt>www</tt>&quot;, &quot;<tt>public_html</tt>&quot;, or &quot;<tt>httpdocs</tt>&quot; - but it should include the directory SMF is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
+	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<tt>www</tt>&quot;, &quot;<tt>public_html</tt>&quot;, or &quot;<tt>httpdocs</tt>&quot; - but it should include the directory DIALOGO is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
 	$txt['ftp_path_help_close'] = 'Close';
 	$txt['ftp_connect'] = 'Connect';
 
@@ -3425,7 +3399,7 @@ function template_chmod()
 
 function template_upgrade_above()
 {
-	global $modSettings, $txt, $smfsite, $settings, $upcontext, $upgradeurl;
+	global $modSettings, $txt, $oursite, $settings, $upcontext, $upgradeurl;
 
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', $upcontext['right_to_left'] ? ' dir="rtl"' : '', '>
@@ -3464,7 +3438,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="smflogo" src="Themes/default/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />
+			<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
@@ -3565,7 +3539,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.simplemachines.org/" title="Simple Machines Forum" target="_blank" class="new_win">SMF &copy;2011, Simple Machines</a></div>
+		<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/" title="Dialogo Community" target="_blank" class="new_win">DIALOGO &copy;2011, Dialogo</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -3635,16 +3609,16 @@ function template_welcome_message()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $txt;
 
 	echo '
-		<script type="text/javascript" src="http://www.simplemachines.org/smf/current-version.js?version=' . SMF_VERSION . '"></script>
+		<script type="text/javascript" src="http://www.spudsdesign.com/dialogo/current-version.js?version=' . CURRENT_VERSION . '"></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-			<h3>', sprintf($txt['upgrade_ready_proceed'], SMF_VERSION), '</h3>
+			<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 	<form action="', $upcontext['form_url'], '" method="post" name="upform" id="upform" ', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 		<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['upgrade_warning_out_of_date'], SMF_VERSION), '
+				', sprintf($txt['upgrade_warning_out_of_date'], CURRENT_VERSION), '
 			</div>
 		</div>';
 
@@ -3784,28 +3758,28 @@ function template_welcome_message()
 				document.getElementById(\'js_works\').value = 1;
 
 			// Latest version?
-			function smfCurrentVersion()
+			function ourCurrentVersion()
 			{
-				var smfVer, yourVer;
+				var ourVer, yourVer;
 
-				if (!(\'smfVersion\' in window))
+				if (!(\'ourVersion\' in window))
 					return;
 
-				window.smfVersion = window.smfVersion.replace(/SMF\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/DIALOGO\s?/g, \'\');
 
-				smfVer = document.getElementById(\'smfVersion\');
+				ourVer = document.getElementById(\'ourVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
 
-				setInnerHTML(smfVer, window.smfVersion);
+				setInnerHTML(ourVer, window.ourVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion < window.smfVersion)
+				if (currentVersion < window.ourVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
-			addLoadEvent(smfCurrentVersion);
+			addLoadEvent(ourCurrentVersion);
 
 			// This checks that the script file even exists!
-			if (typeof(smfSelectText) == \'undefined\')
+			if (typeof(ourSelectText) == \'undefined\')
 				document.getElementById(\'js_script_missing_error\').style.display = \'\';
 
 		// ]]></script>';
@@ -3837,7 +3811,7 @@ function template_upgrade_options()
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
 						<td width="100%">
-							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['smfVersion']) ? '' : ' (recommended!)', '
+							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['ourVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
 					<tr valign="top">
@@ -4311,7 +4285,7 @@ function template_clean_mods()
 	$upcontext['chmod_in_form'] = true;
 
 	echo '
-	<h3>SMF has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
+	<h3>DIALOGO has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">';
 
 	// In case it's required.
@@ -4361,7 +4335,7 @@ function template_cleanup_done()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>SMF has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
+	<h3>DIALOGO has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">
 		<table width="90%" align="center" cellspacing="1" cellpadding="2" style="background-color: black;">
 			<tr style="background-color: #eeeeee;">
@@ -4389,7 +4363,7 @@ function template_upgrade_templates()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>There have been numerous language and template changes since the previous version of SMF. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
+	<h3>There have been numerous language and template changes since the previous version of DIALOGO. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1', $upcontext['is_test'] ? '' : ';forreal=1', '" name="upform" id="upform" method="post">';
 
 	// Any files need to be writable?
@@ -4400,7 +4374,7 @@ function template_upgrade_templates()
 	if ($upcontext['temp_progress'] == 0 && !$upcontext['is_test'] && (!empty($upcontext['languages']) || !empty($upcontext['themes'])))
 	{
 		echo '
-		The following template files will be updated to ensure they are compatible with this version of SMF. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
+		The following template files will be updated to ensure they are compatible with this version of DIALOGO. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
 		<table width="90%" align="center" cellspacing="1" cellpadding="2" style="background-color: black;">
 			<tr style="background-color: #eeeeee;">
 				<td width="80%"><strong>Area</strong></td>
@@ -4492,7 +4466,7 @@ function template_upgrade_complete()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of SMF</a>.  Hope you like it!</h3>
+	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of DIALOGO</a>.  Hope you like it!</h3>
 	<form action="', $boardurl, '/index.php">';
 
 	if (!empty($upcontext['can_delete_script']))
@@ -4510,7 +4484,7 @@ function template_upgrade_complete()
 			<img src="', $boardurl, '/Themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
-			If you had any problems with this upgrade, or have any problems using SMF, please don\'t hesitate to <a href="http://www.simplemachines.org/community/index.php">look to us for assistance</a>.<br />
+			If you had any problems with this upgrade, or have any problems using Dialogo, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
 			Simple Machines';

@@ -13,7 +13,7 @@ $txt['install_step_databasechange'] = 'Database Population';
 $txt['install_step_admin'] = 'Admin Account';
 $txt['install_step_delete'] = 'Finalize Install';
 
-$txt['smf_installer'] = 'DIALOGO Installer';
+$txt['installer'] = 'DIALOGO Installer';
 $txt['installer_language'] = 'Language';
 $txt['installer_language_set'] = 'Set';
 $txt['congratulations'] = 'Congratulations, the installation process is complete!';
@@ -22,7 +22,7 @@ $txt['still_writable'] = 'Your installation directory is still writable.  It\'s 
 $txt['delete_installer'] = 'Click here to delete this install.php file now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
 $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed forum</a> and begin to use it.  You should first make sure you are logged in, after which you will be able to access the administration center.';
-$txt['good_luck'] = 'Good luck!<br />Simple Machines';
+$txt['good_luck'] = 'Thanks for installing Dialogo!';
 
 $txt['install_welcome'] = 'Welcome';
 $txt['install_welcome_desc'] = 'Welcome to DIALOGO. This script will guide you through the process for installing %1$s. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
@@ -105,9 +105,6 @@ $txt['install_settings_dbsession_info2'] = 'This feature is generally a good ide
 $txt['install_settings_utf8'] = 'UTF-8 Character Set';
 $txt['install_settings_utf8_title'] = 'Use UTF-8 as default character set';
 $txt['install_settings_utf8_info'] = 'This feature lets both the database and the forum use an international character set, UTF-8. This can be useful when working with multiple languages that use different character sets.';
-$txt['install_settings_stats'] = 'Allow Stat Collection';
-$txt['install_settings_stats_title'] = 'Allow Simple Machines to Collect Basic Stats Monthly';
-$txt['install_settings_stats_info'] = 'If enabled, this will allow Simple Machines to visit your site once a month to collect basic statistics. This will help us make decisions as to which configurations to optimize the software for. For more information please visit our <a href="http://www.simplemachines.org/about/stats.php" target="_blank">info page</a>.';
 $txt['install_settings_proceed'] = 'Proceed';
 
 $txt['db_settings'] = 'Database Server Settings';
@@ -195,7 +192,7 @@ $txt['error_mod_security'] = 'The installer has detected the mod_security module
 $txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before DIALOGO gets a say in anything. DIALOGO has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.simplemachines.org/redirect/mod_security">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your ftp client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
 $txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can still install DIALOGO without any problems, but only with UTF-8 support unchecked. If you would like to switch over to UTF-8 in the future (e.g. after the database server of your forum has been upgraded to version >= %1$s), you can convert your forum to UTF-8 through the admin panel.';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
-$txt['error_already_installed'] = 'The installer has detected that you already have DIALOGO installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.simplemachines.org">Simple Machines Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
+$txt['error_already_installed'] = 'The installer has detected that you already have DIALOGO installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.spudsdesign.com/dialogo/">Dialogo Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of DIALOGO is %1$s but this install script is for %2$s.<br /><br />
 	It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are installing the latest version.';
@@ -231,6 +228,6 @@ $txt['upgrade_ready_proceed'] = 'Thank you for choosing to upgrade to DIALOGO %1
 $txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a setting checker tool from the <a href="http://www.simplemachines.org">Simple Machines Website</a>';
 
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
-$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of DIALOGO is <em id="smfVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are upgrading to the latest version.';
+$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of DIALOGO is <em id="ourVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.spudsdesign.com/dialogo/">Dialogo Community</a> website to ensure you are upgrading to the latest version.';
 
 ?>

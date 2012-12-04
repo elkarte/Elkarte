@@ -737,7 +737,7 @@ function template_main()
 		if ($context['require_verification'])
 			echo '
 							<strong>', $txt['verification'], ':</strong>', template_control_verification($context['visual_verification_id'], 'quick_reply'), '<br />';
-		
+
 		// Using the full editor
 		if (empty($options['use_editor_quick_reply']))
 		{
@@ -813,7 +813,7 @@ function template_main()
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});
 			// ]]></script>';
-			
+
 	// Spell check for quick modify and quick reply (w/o the editor)
 	if ($context['show_spellchecking'] && (empty($options['use_editor_quick_reply']) || empty($options['display_quick_reply'])))
 		echo '

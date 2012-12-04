@@ -173,9 +173,9 @@ function template_body_above()
 	// the upshrink image, right-floated
 	echo '
 				<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />';
-	
+
 	echo empty($settings['site_slogan']) ? '
-				<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '
+				<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '
 				<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
 			</div>
 			<div id="upper_wrap">
@@ -188,7 +188,7 @@ function template_body_above()
 		if (!empty($context['user']['avatar']))
 			echo '
 						<p class="avatar"><a href="', $scripturl, '?action=profile">', $context['user']['avatar']['image'], '</a></p>';
-			
+
 			echo '
 						<ul class="reset">
 							<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>

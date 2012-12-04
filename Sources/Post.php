@@ -1539,7 +1539,7 @@ function Post2()
 		if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 			$post_errors[] = 'no_message';
 	}
-	
+
 	if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
 		$post_errors[] = 'no_event';
 
@@ -1825,7 +1825,7 @@ function Post2()
 		if (isset($topicOptions['id']))
 			$topic = $topicOptions['id'];
 	}
-	
+
 	// If we had a draft for this, its time to remove it since it was just posted
 	if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
 		deleteDrafts($_POST['id_draft']);
@@ -2210,7 +2210,7 @@ function AnnouncementSend()
 	$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($message, false, $id_msg), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 
 	// We need this in order to be able send emails.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Select the email addresses for this batch.
 	$request = $smcFunc['db_query']('', '
@@ -2303,7 +2303,7 @@ function notifyMembersBoard(&$topicData)
 	global $txt, $scripturl, $language, $user_info;
 	global $modSettings, $sourcedir, $board, $smcFunc, $context;
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))

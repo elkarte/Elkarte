@@ -91,7 +91,7 @@ function template_html_above()
 
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
-	
+
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if(!empty($settings['forum_width']))
 		echo '
@@ -252,7 +252,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
