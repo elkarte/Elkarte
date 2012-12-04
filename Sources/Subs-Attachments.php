@@ -938,7 +938,6 @@ function increaseDownloadCounter($id_attach)
 			'id_attach' => $id_attach,
 		)
 	);
-
 }
 
 /**

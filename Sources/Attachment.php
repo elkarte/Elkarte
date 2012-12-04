@@ -67,16 +67,9 @@ function Download()
 
 	// Update the download counter (unless it's a thumbnail).
 	if ($attachment_type != 3)
-		$smcFunc['db_query']('attach_download_increase', '
-			UPDATE LOW_PRIORITY {db_prefix}attachments
-			SET downloads = downloads + 1
-			WHERE id_attach = {int:id_attach}',
-			array(
-				'id_attach' => $id_attach,
-			)
-		);
+		increaseDownloadCounter($id_attach);
 
-	$filename = getAttachmentFilename($real_filename, $_REQUEST['attach'], $id_folder, false, $file_hash);
+	$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 
 	// This is done to clear any output that was made before now.
 	ob_end_clean();
@@ -115,7 +108,7 @@ function Download()
 	}
 
 	// Check whether the ETag was sent back, and cache based on that...
-	$eTag = '"' . substr($_REQUEST['attach'] . $real_filename . filemtime($filename), 0, 64) . '"';
+	$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 	if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 	{
 		ob_end_clean();
