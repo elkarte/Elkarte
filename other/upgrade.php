@@ -1039,7 +1039,7 @@ function WelcomeLogin()
 				<li>Source Directory: ' . $boarddir . '</li>
 				<li>Cache Directory: ' . $cachedir_temp . '</li>
 			</ul>
-			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="http://download.simplemachines.org/?tools">Repair Settings</a> tool from the Simple Machines website before continuing.';
+			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the Dialogo website before continuing.';
 
 	// Either we're logged in or we're going to present the login.
 	if (checkLogin())
@@ -4480,5 +4480,5 @@ function template_upgrade_complete()
 			If you had any problems with this upgrade, or have any problems using Dialogo, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
-			Simple Machines';
+			Dialogo';
 }
