@@ -51,7 +51,7 @@ function downloadAvatar($url, $memID, $max_width, $max_height)
 	if (empty($memID))
 		return false;
 
-	require_once($sourcedir . '/ManageAttachments.php');
+	require_once($sourcedir . '/Subs-Attachments.php');
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['currentAttachmentUploadDir'] : 1;

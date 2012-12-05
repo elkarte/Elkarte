@@ -236,7 +236,7 @@ function smf_main()
 		'coppa' => array('Register.php', 'CoppaForm'),
 		'credits' => array('Who.php', 'Credits'),
 		'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
-		'dlattach' => array('Display.php', 'Download'),
+		'dlattach' => array('Attachment.php', 'Download'),
 		'editpoll' => array('Poll.php', 'EditPoll'),
 		'editpoll2' => array('Poll.php', 'EditPoll2'),
 		'emailuser' => array('SendTopic.php', 'EmailUser'),
