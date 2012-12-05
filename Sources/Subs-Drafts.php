@@ -3,7 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
- * @license   BSD https://github.com/Spuds/Dialogo/blob/master/license.md
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
  */
