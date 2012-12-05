@@ -3,7 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
- * @license   BSD https://github.com/Spuds/Dialogo/blob/master/license.md
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
  */
@@ -67,21 +67,21 @@ class site_Combiner
 	 * @var string
 	 */
 	private $_archive_dir = null;
-	
+
 	/**
 	 * The url where we will save the combined and packed files
 	 *
 	 * @var string
 	 */
 	private $_archive_url = null;
-	
+
 	/**
 	 * Nothing much to do but start
 	 */
 	public function __construct()
 	{
 		global $cachedir, $boarddir, $boardurl, $settings;
-		
+
 		// init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $boardurl . '/cache';
@@ -226,14 +226,14 @@ class site_Combiner
 	private function _buildName($type)
 	{
 		global $settings;
-		
+
 		// create this groups archive name
 		foreach ($this->_combine_files as $file)
 			$this->_archive_filenames .= $file['basename'] . ' ';
 
 		// add in the actual theme url to make the sha1 unique to this hive
 		$this->_archive_filenames = $settings['actual_theme_url'] . trim($this->_archive_filenames);
-		
+
 		// save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 	}
@@ -253,11 +253,11 @@ class site_Combiner
 		foreach ($this->_combine_files as $file)
 		{
 			$tempfile = file_get_contents($file['file']);
-			
+
 			// css needs relative locations converted for the moved hive to work
 			if ($type === 'css')
 				$tempfile = str_replace('../images', $file['url'] . '/images', $tempfile);
-			
+
 			$this->_cache .= (($i !== 0) ? "\n" : '') . $tempfile;
 			$i++;
 		}
