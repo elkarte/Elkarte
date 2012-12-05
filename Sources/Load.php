@@ -1929,6 +1929,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 	{
 		$params['local'] = true;
 		$params['dir'] = $settings[$theme . '_dir'] . '/css/';
+		$params['url'] = $settings[$theme . '_url'];
 
 		// Are we validating the the file exists?
 		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/css/' . $filename))
@@ -1938,6 +1939,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 			{
 				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
 				$params['dir'] = $settings['default_theme_dir'] . '/css/';
+				$params['url'] = $settings['default_theme_url'];
 			}
 			else
 				$filename = false;

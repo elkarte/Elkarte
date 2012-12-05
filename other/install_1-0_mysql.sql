@@ -23,13 +23,13 @@ CREATE TABLE {$db_prefix}admin_info_files (
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, data, filetype)
 VALUES
-	(1, 'current-version.js', '/smf/', 'version=%3$s', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/smf/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/smf/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
-	(4, 'latest-packages.js', '/smf/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(5, 'latest-smileys.js', '/smf/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(6, 'latest-support.js', '/smf/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(7, 'latest-themes.js', '/smf/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
+	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
+	(4, 'latest-packages.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(5, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(6, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(7, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -1635,7 +1635,7 @@ VALUES
 	(3, 0, 60, 1, 'd', 0, 'daily_maintenance'),
 	(5, 0, 0, 1, 'd', 0, 'daily_digest'),
 	(6, 0, 0, 1, 'w', 0, 'weekly_digest'),
-	(7, 0, {$sched_task_offset}, 1, 'd', 0, 'fetchSMfiles'),
+	(7, 0, {$sched_task_offset}, 1, 'd', 0, 'fetchFiles'),
 	(8, 0, 0, 1, 'd', 1, 'birthdayemails'),
 	(9, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
 	(10, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
@@ -1912,24 +1912,33 @@ CREATE TABLE {$db_prefix}spiders (
 INSERT INTO {$db_prefix}spiders
 	(id_spider, spider_name, user_agent, ip_info)
 VALUES (1, 'Google', 'googlebot', ''),
-	(2, 'Yahoo!', 'slurp', ''),
+	(2, 'Yahoo!', 'Yahoo! Slurp', ''),
 	(3, 'MSN', 'msnbot', ''),
-	(4, 'Google (Mobile)', 'Googlebot-Mobile', ''),
-	(5, 'Google (Image)', 'Googlebot-Image', ''),
-	(6, 'Google (AdSense)', 'Mediapartners-Google', ''),
-	(7, 'Google (Adwords)', 'AdsBot-Google', ''),
-	(8, 'Yahoo! (Mobile)', 'YahooSeeker/M1A1-R2D2', ''),
-	(9, 'Yahoo! (Image)', 'Yahoo-MMCrawler', ''),
-	(10, 'MSN (Mobile)', 'MSNBOT_Mobile', ''),
-	(11, 'MSN (Media)', 'msnbot-media', ''),
-	(12, 'Cuil', 'twiceler', ''),
-	(13, 'Ask', 'Teoma', ''),
-	(14, 'Baidu', 'Baiduspider', ''),
-	(15, 'Gigablast', 'Gigabot', ''),
-	(16, 'InternetArchive', 'ia_archiver-web.archive.org', ''),
-	(17, 'Alexa', 'ia_archiver', ''),
-	(18, 'Omgili', 'omgilibot', ''),
-	(19, 'EntireWeb', 'Speedy Spider', '');
+	(4, 'Bing', 'bingbot', ''),
+	(5, 'Google (Mobile)', 'Googlebot-Mobile', ''),
+	(6, 'Google (Image)', 'Googlebot-Image', ''),
+	(7, 'Google (AdSense)', 'Mediapartners-Google', ''),
+	(8, 'Google (Adwords)', 'AdsBot-Google', ''),
+	(9, 'Yahoo! (Mobile)', 'YahooSeeker/M1A1-R2D2', ''),
+	(10, 'Yahoo! (Image)', 'Yahoo-MMCrawler', ''),
+	(11, 'Yahoo! (Blogs)', 'Yahoo-Blogs', ''),
+	(12, 'Yahoo! (Feeds)', 'YahooFeedSeeker', ''),
+	(13, 'MSN (Mobile)', 'MSNBOT_Mobile', ''),
+	(14, 'MSN (Media)', 'msnbot-media', ''),
+	(15, 'Cuil', 'twiceler', ''),
+	(16, 'Ask', 'Teoma', ''),
+	(17, 'Baidu', 'Baiduspider', ''),
+	(18, 'Gigablast', 'Gigabot', ''),
+	(19, 'InternetArchive', 'ia_archiver-web.archive.org', ''),
+	(20, 'Alexa', 'ia_archiver', ''),
+	(21, 'Omgili', 'omgilibot', ''),
+	(22, 'EntireWeb', 'Speedy Spider', ''),
+	(23, 'Yandex', 'YandexBot', ''),
+	(24, 'Yandex', 'YandexImages', ''),
+	(25, 'Yandex', 'YandexVideo', ''),
+	(26, 'Yandex', 'YandexBlogs', ''),
+	(27, 'Yandex', 'YandexMedia', ''),
+	(28, 'Yandex', 'YandexBot', '');
 
 #
 # Table structure for table `subscriptions`

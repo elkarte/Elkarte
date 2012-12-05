@@ -383,7 +383,7 @@ function iCalDownload()
 	$filecontents = '';
 	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
-	$filecontents .= 'PRODID:-//DialogoForum//DIALOGO ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('DIALOGO ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'PRODID:-//DialogoCommunity//DIALOGO ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('DIALOGO ' => ''))) . '//EN' . "\n";
 	$filecontents .= 'VERSION:2.0' . "\n";
 	$filecontents .= 'BEGIN:VEVENT' . "\n";
 	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";

@@ -68,7 +68,7 @@ function template_admin()
 				</div>
 				<div class="windowbg nopadding">
 					<div class="content">
-						<div id="smfAnnouncements">', $txt['lfyi'], '</div>
+						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
 					</div>
 				</div>
 			</div>';
@@ -88,7 +88,7 @@ function template_admin()
 							', $txt['support_versions_forum'], ':
 							<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
 							', $txt['support_versions_current'], ':
-							<em id="smfVersion" style="white-space: nowrap;">??</em><br />
+							<em id="ourVersion" style="white-space: nowrap;">??</em><br />
 							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
@@ -96,6 +96,7 @@ function template_admin()
 							<br />
 							<strong>', $txt['administrators'], ':</strong>
 							', implode(', ', $context['administrators']);
+	
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
@@ -152,10 +153,10 @@ function template_admin()
 						%message%
 					</dd>
 				'), ',
-				sAnnouncementContainerId: \'smfAnnouncements\',
+				sAnnouncementContainerId: \'ourAnnouncements\',
 
 				bLoadVersions: true,
-				sSmfVersionContainerId: \'smfVersion\',
+				sOurVersionContainerId: \'ourVersion\',
 				sYourVersionContainerId: \'yourVersion\',
 				sVersionOutdatedTemplate: ', JavaScriptEscape('
 					<span class="alert">%currentVersion%</span>
@@ -172,7 +173,6 @@ function template_admin()
 						</h3>
 					</div>
 					<div class="windowbg">
-						<span class="topslice"><span></span></span>
 						<div class="content">
 							<div id="update_message" class="smalltext">
 								%message%
@@ -205,7 +205,7 @@ function template_credits()
 		<div id="support_credits">
 			<div class="cat_bar">
 				<h3 class="catbg">
-					', $txt['support_title'], ' <img src="', $settings['images_url'], '/smflogo.png" id="credits_logo" alt="" />
+					', $txt['support_title'], ' <img src="', $settings['images_url'], '/logo.png" id="credits_logo" alt="" />
 				</h3>
 			</div>
 			<div class="windowbg">
@@ -214,7 +214,7 @@ function template_credits()
 						', $txt['support_versions_forum'], ':
 					<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 						', $txt['support_versions_current'], ':
-					<em id="smfVersion" style="white-space: nowrap;">??</em><br />';
+					<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -311,14 +311,14 @@ function template_credits()
 	// This makes all the support information available to the support script...
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var smfSupportVersions = {};
+			var ourSupportVersions = {};
 
-			smfSupportVersions.forum = "', $context['forum_version'], '";';
+			ourSupportVersions.forum = "', $context['forum_version'], '";';
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
 		echo '
-			smfSupportVersions.', $variable, ' = "', $version['version'], '";';
+			ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 
 	// Now we just have to include the script and wait ;).
 	echo '
@@ -330,23 +330,23 @@ function template_credits()
 	// This sets the latest support stuff.
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
-			function smfCurrentVersion()
+			function ourCurrentVersion()
 			{
-				var smfVer, yourVer;
-
-				if (!window.smfVersion)
+				var ourVer, yourVer;
+console.log("here");
+				if (!window.ourVersion)
 					return;
 
-				smfVer = document.getElementById("smfVersion");
+				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");
 
-				setInnerHTML(smfVer, window.smfVersion);
+				setInnerHTML(ourVer, window.ourVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion != window.smfVersion)
+				if (currentVersion != window.ourVersion)
 					setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
 			}
-			addLoadEvent(smfCurrentVersion)
+			addLoadEvent(ourCurrentVersion)
 		// ]]></script>';
 }
 
@@ -388,10 +388,10 @@ function template_view_versions()
 							', $txt['admin_smfpackage'], '
 						</td>
 						<td class="windowbg">
-							<em id="yourDIALOGO">', $context['forum_version'], '</em>
+							<em id="yourVersion">', $context['forum_version'], '</em>
 						</td>
 						<td class="windowbg">
-							<em id="currentDIALOGO">??</em>
+							<em id="ourVersion">??</em>
 						</td>
 					</tr>';
 
@@ -405,7 +405,7 @@ function template_view_versions()
 							<em id="yourSources">??</em>
 						</td>
 						<td class="windowbg">
-							<em id="currentSources">??</em>
+							<em id="ourSources">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -425,7 +425,7 @@ function template_view_versions()
 						<em id="yourSources', $filename, '">', $version, '</em>
 					</td>
 					<td class="windowbg2" width="25%">
-						<em id="currentSources', $filename, '">??</em>
+						<em id="ourSources', $filename, '">??</em>
 					</td>
 				</tr>';
 
@@ -444,7 +444,7 @@ function template_view_versions()
 							<em id="yourDefault">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentDefault">??</em>
+							<em id="ourDefault">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -463,7 +463,7 @@ function template_view_versions()
 							<em id="yourDefault', $filename, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="currentDefault', $filename, '">??</em>
+							<em id="ourDefault', $filename, '">??</em>
 						</td>
 					</tr>';
 
@@ -482,7 +482,7 @@ function template_view_versions()
 							<em id="yourLanguages">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentLanguages">??</em>
+							<em id="ourLanguages">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -503,7 +503,7 @@ function template_view_versions()
 							<em id="your', $filename, '.', $language, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="current', $filename, '.', $language, '">??</em>
+							<em id="our', $filename, '.', $language, '">??</em>
 						</td>
 					</tr>';
 	}
@@ -526,7 +526,7 @@ function template_view_versions()
 							<em id="yourTemplates">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentTemplates">??</em>
+							<em id="ourTemplates">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -545,7 +545,7 @@ function template_view_versions()
 							<em id="yourTemplates', $filename, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="currentTemplates', $filename, '">??</em>
+							<em id="ourTemplates', $filename, '">??</em>
 						</td>
 					</tr>';
 
@@ -577,7 +577,6 @@ function template_view_versions()
 				}
 			});
 		// ]]></script>';
-
 }
 
 // Form for stopping people using naughty words, etc.

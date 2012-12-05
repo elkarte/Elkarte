@@ -1247,7 +1247,7 @@ function loadEssentialThemeData()
 /**
  * This retieves data (e.g. last version of DIALOGO)
  */
-function scheduled_fetchSMfiles()
+function scheduled_fetchFiles()
 {
 	global $sourcedir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
 
@@ -1260,6 +1260,7 @@ function scheduled_fetchSMfiles()
 	);
 
 	$js_files = array();
+	$errors = 0;
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1269,7 +1270,6 @@ function scheduled_fetchSMfiles()
 			'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
 		);
 	}
-
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
@@ -1282,29 +1282,31 @@ function scheduled_fetchSMfiles()
 	foreach ($js_files as $ID_FILE => $file)
 	{
 		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.simplemachines.org' : '';
+		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.spudsdesign.com' : '';
 		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
 
 		// Get the file
 		$file_data = fetch_web_data($url);
 
-		// If we got an error - give up - the site might be down.
-		if ($file_data === false)
+		// If we are tossing errors - give up - the site might be down.
+		if ($file_data === false && $errors++ > 2)
 		{
 			log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
 			return false;
 		}
-
-		// Save the file to the database.
-		$smcFunc['db_query']('substring', '
-			UPDATE {db_prefix}admin_info_files
-			SET data = SUBSTRING({string:file_data}, 1, 65534)
-			WHERE id_file = {int:id_file}',
-			array(
-				'id_file' => $ID_FILE,
-				'file_data' => $file_data,
-			)
-		);
+		elseif ($file_data !== false)
+		{
+			// Save the update to the database
+			$smcFunc['db_query']('substring', '
+				UPDATE {db_prefix}admin_info_files
+				SET data = SUBSTRING({string:file_data}, 1, 65534)
+				WHERE id_file = {int:id_file}',
+				array(
+					'id_file' => $ID_FILE,
+					'file_data' => $file_data,
+				)
+			);
+		}
 	}
 	return true;
 }

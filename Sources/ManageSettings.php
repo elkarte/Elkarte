@@ -440,7 +440,8 @@ function ModifyCoreFeatures($return_config = false)
 		updateSettings($setting_changes);
 
 		// This is needed to let menus appear if cache > 2
-		clean_cache('data');
+		if ($modSettings['cache_enable'] > 2)
+			clean_cache('data');
 
 		// Any post save things?
 		foreach ($core_features as $id => $feature)

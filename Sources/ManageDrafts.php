@@ -11,7 +11,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- *
  */
 
 if (!defined('DIALOGO'))

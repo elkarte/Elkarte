@@ -55,11 +55,13 @@ function Display()
 
 	// Let's do some work on what to search index.
 	if (count($_GET) > 2)
+	{
 		foreach ($_GET as $k => $v)
 		{
 			if (!in_array($k, array('topic', 'board', 'start', session_name())))
 				$context['robot_no_index'] = true;
 		}
+	}
 
 	if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
 		$context['robot_no_index'] = true;

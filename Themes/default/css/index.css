@@ -1417,15 +1417,15 @@ h1.forumtitle a {
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
 }
 /* Float these items to the right */
-#siteslogan, img#smflogo {
+#siteslogan, img#logo {
 	margin: 0;
 	padding: 0;
 	float: right;
 	line-height: 50px;
 	font-size: 1.8em;
 }
-/* Tweak the SMF logo */
-img#smflogo {
+/* Tweak the logo */
+img#logo {
 	margin: 16px 0 0 0;
 }
 /*
@@ -2495,6 +2495,9 @@ ul.post_options li {
 	border-top: 1px solid #ccc;
 	margin: -1px 0 0 0;
 	padding: 10px;
+}
+#postAttachment2 {
+	overflow: hidden;
 }
 #postAttachment dd, #postAttachment2 dd {
 	margin: 4px 0 4px 12px;
