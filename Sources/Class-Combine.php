@@ -1,14 +1,11 @@
 <?php
 
 /**
- * Simple Machines Forum (SMF)
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD https://github.com/Spuds/Dialogo/blob/master/license.md
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
 if (!defined('DIALOGO'))
@@ -20,7 +17,7 @@ if (!defined('DIALOGO'))
  * Calls minification classes to reduce size of css and js file saving bandwidth
  * Can creates a .gz file, be would require .htaccess or the like to use
  */
-class smf_Combiner
+class site_Combiner
 {
 	/**
 	 * Holds all the files contents that we have joined in to one
@@ -66,11 +63,30 @@ class smf_Combiner
 
 	/**
 	 * The directory where we will save the combined and packed files
-	 * @todo .. yeah remove the hard-code
 	 *
 	 * @var string
 	 */
-	private $_archivedir = null;
+	private $_archive_dir = null;
+	
+	/**
+	 * The url where we will save the combined and packed files
+	 *
+	 * @var string
+	 */
+	private $_archive_url = null;
+	
+	/**
+	 * Nothing much to do but start
+	 */
+	public function __construct()
+	{
+		global $cachedir, $boarddir, $boardurl, $settings;
+		
+		// init
+		$this->_archive_dir = $cachedir;
+		$this->_archive_url = $boardurl . '/cache';
+		$this->_loadjquery = false;
+	}
 
 	/**
 	 * Combine javascript files in to a single file to save requests
@@ -79,16 +95,12 @@ class smf_Combiner
 	 * @param bool $do_defered
 	 * @param bool $loadjquery
 	 */
-	public function smf_js_combine($files, $do_defered, &$loadjquery)
+	public function site_js_combine($files, $do_defered, &$loadjquery)
 	{
-		global $modSettings, $settings, $sourcedir;
+		global $modSettings, $sourcedir;
 
-		// init
-		$this->_loadjquery = false;
-		$this->_archivedir = $settings['actual_theme_dir'] . '/scripts/';
-
-		// No files then we are done
-		if (empty($files))
+		// No files or missing directory then we are done
+		if (empty($files) || !file_exists($this->_archive_dir))
 			return false;
 
 		// get the filenames and last modified time for this batch
@@ -134,7 +146,7 @@ class smf_Combiner
 		}
 
 		// return the name for inclusion in the output
-		return $settings['actual_theme_url'] . '/scripts/' . $this->_archive_name;
+		return $this->_archive_url . '/' . $this->_archive_name;
 	}
 
 	/**
@@ -142,15 +154,12 @@ class smf_Combiner
 	 *
 	 * @param array $files
 	 */
-	public function smf_css_combine($files)
+	public function site_css_combine($files)
 	{
-		global $settings, $sourcedir;
+		global $settings, $sourcedir, $boardurl;
 
-		// init
-		$this->_archivedir = $settings['actual_theme_dir'] . '/css/';
-
-		// No files then we are done
-		if (empty($files))
+		// No files or missing dir then we are done
+		if (empty($files) || !file_exists($this->_archive_dir))
 			return false;
 
 		// get the filenames and last modified time for this batch
@@ -163,6 +172,7 @@ class smf_Combiner
 				$this->_combine_files[$file['options']['basename']]['file'] = $filename;
 				$this->_combine_files[$file['options']['basename']]['time'] = filemtime($filename);
 				$this->_combine_files[$file['options']['basename']]['basename'] = $file['options']['basename'];
+				$this->_combine_files[$file['options']['basename']]['url'] = $file['options']['url'];
 			}
 		}
 
@@ -177,7 +187,7 @@ class smf_Combiner
 		if ($this->_isStale())
 		{
 			$this->_archive_header = '/* ' . $this->_archive_filenames . " */\n";
-			$this->_combineFiles();
+			$this->_combineFiles('css');
 
 			// CSSmin it to save some space
 			require_once($sourcedir . '/lib/cssmin.php');
@@ -188,7 +198,7 @@ class smf_Combiner
 		}
 
 		// return the name
-		return $settings['actual_theme_url'] . '/css/' . $this->_archive_name;
+		return $this->_archive_url . '/' . $this->_archive_name;
 	}
 
 	/**
@@ -198,7 +208,7 @@ class smf_Combiner
 	private function _isStale()
 	{
 		// if any files in the archive are newer than the archive file itself, then the archive is stale
-		$filemtime = file_exists($this->_archivedir . '/' . $this->_archive_name) ? filemtime($this->_archivedir . '/' . $this->_archive_name) : 0;
+		$filemtime = file_exists($this->_archive_dir . '/' . $this->_archive_name) ? filemtime($this->_archive_dir . '/' . $this->_archive_name) : 0;
 
 		foreach ($this->_combine_files as $file)
 		{
@@ -215,29 +225,40 @@ class smf_Combiner
 	 */
 	private function _buildName($type)
 	{
+		global $settings;
+		
 		// create this groups archive name
 		foreach ($this->_combine_files as $file)
 			$this->_archive_filenames .= $file['basename'] . ' ';
-		$this->_archive_filenames  = trim($this->_archive_filenames);
 
-		$this->_archive_name = 'Amalgamation-' . sha1($this->_archive_filenames) . $type;
+		// add in the actual theme url to make the sha1 unique to this hive
+		$this->_archive_filenames = $settings['actual_theme_url'] . trim($this->_archive_filenames);
+		
+		// save the hive, or a nest, or a conglomeration. Like it was grown
+		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 	}
 
 	/**
 	 * Combines files into a single compliation
 	 */
-	private function _combineFiles()
+	private function _combineFiles($type = null)
 	{
 		$i = 0;
 
 		// remove any old cache file(s)
-		@unlink($this->_archivedir . '/' . $this->_archive_name);
-		@unlink($this->_archivedir . '/' . $this->_archive_name . '.gz');
+		@unlink($this->_archive_dir . '/' . $this->_archive_name);
+		@unlink($this->_archive_dir . '/' . $this->_archive_name . '.gz');
 
 		// now build the new compilation
 		foreach ($this->_combine_files as $file)
 		{
-			$this->_cache .= (($i !== 0) ? "\n" : '') . file_get_contents($file['file']);
+			$tempfile = file_get_contents($file['file']);
+			
+			// css needs relative locations converted for the moved hive to work
+			if ($type === 'css')
+				$tempfile = str_replace('../images', $file['url'] . '/images', $tempfile);
+			
+			$this->_cache .= (($i !== 0) ? "\n" : '') . $tempfile;
 			$i++;
 		}
 	}
@@ -252,11 +273,11 @@ class smf_Combiner
 			$this->_minified_cache = $this->_archive_header . $this->_minified_cache;
 
 		// First the plain text version
-		file_put_contents($this->_archivedir . $this->_archive_name, $this->_minified_cache, LOCK_EX);
+		file_put_contents($this->_archive_dir . '/' . $this->_archive_name, $this->_minified_cache, LOCK_EX);
 
 		// And now the compressed version, just uncomment the below
 		/*
-		$fp = gzopen($this->_archivedir . $this->_archive_name . '.gz', 'w9');
+		$fp = gzopen($this->_archive_dir . $this->_archive_name . '.gz', 'w9');
 		gzwrite ($fp, $this->_minified_cache);
 		gzclose($fp);
 		*/

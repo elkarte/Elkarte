@@ -3188,8 +3188,8 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Class-Combine.php');
-			$combiner = new smf_Combiner;
-			$combine_name = $combiner->smf_js_combine($context['javascript_files'], $do_defered, $loadjquery);
+			$combiner = new site_Combiner;
+			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered, $loadjquery);
 
 			if (!empty($combine_name))
 				echo '
@@ -3281,8 +3281,8 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Class-Combine.php');
-			$combiner = new smf_Combiner;
-			$combine_name = $combiner->smf_css_combine($context['css_files']);
+			$combiner = new site_Combiner;
+			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '
 	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
