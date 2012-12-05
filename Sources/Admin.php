@@ -654,7 +654,7 @@ function AdminHome()
 }
 
 /**
- * Get one of the admin information files from Dialogo.
+ * Get the content of an admin information file from the database.
  */
 function DisplayAdminFile()
 {
