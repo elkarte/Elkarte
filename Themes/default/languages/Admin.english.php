@@ -105,15 +105,15 @@ $txt['attachment_file_size'] = 'File Size';
 $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set';
 $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set';
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
-$txt['live'] = 'Live from Simple Machines...';
+$txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
 $txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 
-$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.';
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/Spuds/SMF21se/archive/master.zip" target="_blank" class="new_win">Github Dialogo Respository</a>.';
 $txt['version_check_more'] = '(more detailed)';
 
-$txt['lfyi'] = 'You are unable to connect to simplemachines.org\'s latest news file.';
+$txt['lfyi'] = 'You are unable to connect to dialogo\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
@@ -297,8 +297,8 @@ $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected m
 $txt['support_credits_title'] = 'Support and Credits';
 $txt['support_credits_info'] = 'Links to support for common issues, and version information to give if you have problems.';
 $txt['support_title'] = 'Support Information';
-$txt['support_versions_current'] = 'Current forum version';
-$txt['support_versions_forum'] = 'Forum version';
+$txt['support_versions_current'] = 'Current version';
+$txt['support_versions_forum'] = 'This version';
 $txt['support_versions_php'] = 'PHP version';
 $txt['support_versions_db'] = '%1$s version';
 $txt['support_versions_server'] = 'Server version';

@@ -2110,7 +2110,7 @@ function template_welcome_message()
 	global $incontext, $installurl, $txt;
 
 	echo '
-	<script type="text/javascript" src="http://www.spudsdesign.com/dialogo/current-version.js?version=' . $GLOBALS['current_version'] . '"></script>
+	<script type="text/javascript" src="http://www.spudsdesign.com/site/current-version.js?version=' . $GLOBALS['current_version'] . '"></script>
 	<form action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_version']), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">

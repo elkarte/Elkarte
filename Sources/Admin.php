@@ -653,7 +653,7 @@ function AdminHome()
 }
 
 /**
- * Get one of the admin information files from Simple Machines.
+ * Get one of the admin information files from Dialogo.
  */
 function DisplayAdminFile()
 {

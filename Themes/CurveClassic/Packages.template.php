@@ -552,7 +552,7 @@ function template_browse()
 		// Make a list of already installed mods so nothing is listed twice ;).
 		echo '
 			window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
-			window.smfVersion = "', $context['forum_version'], '";
+			window.ourVersion = "', $context['forum_version'], '";
 		// ]]></script>';
 
 		if (empty($modSettings['disable_smf_js']))
