@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Profile
+// Version: 1.0; Drafts
 
 global $scripturl, $context;
 

@@ -406,6 +406,7 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
+				// @todo interface !!!
 				//$_SERVER["PHP_AUTH_USER"] = 'userid';
 				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
 

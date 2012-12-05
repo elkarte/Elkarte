@@ -196,7 +196,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			return;
 
 		$postgroups = cache_get_data('updateStats:postgroups', 360);
-		if ($postgroups == null || $parameter1 == null)
+		if ($postgroups === null || $parameter1 === null)
 		{
 			// Fetch the postgroups!
 			$request = $smcFunc['db_query']('', '
@@ -600,7 +600,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 }
 
 /**
- * - Formats a number.
+ * Formats a number.
  * - uses the format of number_format to decide how to format the number.
  *   for example, it might display "1 234,50".
  * - caches the formatting data from the setting for optimization.

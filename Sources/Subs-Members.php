@@ -318,7 +318,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete personal messages.
-	require_once($sourcedir . '/PersonalMessage.php');
+	require_once($sourcedir . '/Subs-PersonalMessage.php');
 	deleteMessages(null, null, $users);
 
 	$smcFunc['db_query']('', '
@@ -798,6 +798,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		}
 
 		// Send admin their notification.
+		require_once($sourcedir . '/Subs-Post.php');
 		adminNotify('standard', $memberID, $regOptions['username']);
 	}
 	// Need to activate their account - or fall under COPPA.
@@ -842,6 +843,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 		// Admin gets informed here...
+		require_once($sourcedir . '/Subs-Post.php');
 		adminNotify('approval', $memberID, $regOptions['username']);
 	}
 

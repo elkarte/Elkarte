@@ -1,14 +1,11 @@
 <?php
 
 /**
- * Simple Machines Forum (SMF)
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD https://github.com/Spuds/Dialogo/blob/master/license.md
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines Forum contributors
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
 /**

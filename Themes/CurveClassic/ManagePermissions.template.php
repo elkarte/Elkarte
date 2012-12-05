@@ -69,7 +69,8 @@ function template_permission_index()
 
 		if (!empty($group['children']))
 			echo '
-							<br /><span class="smalltext">', $txt['permissions_includes_inherited'], ': &quot;', implode('&quot;, &quot;', $group['children']), '&quot;</span>';
+							<br />
+							<span class="smalltext">', $txt['permissions_includes_inherited'], ': &quot;', implode('&quot;, &quot;', $group['children']), '&quot;</span>';
 
 		echo '
 						</td>

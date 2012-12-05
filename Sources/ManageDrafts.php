@@ -11,7 +11,7 @@
  * @copyright 2012 Simple Machines Forum contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
 if (!defined('DIALOGO'))

@@ -236,7 +236,8 @@ function template_main()
 			else
 				echo '
 									<img src="'. $message['member']['online']['image_href']. '" alt="" />';
-		}
+		}			
+		
 
 		// Show a link to the member's profile.
 		echo '

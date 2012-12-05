@@ -300,7 +300,7 @@ function ShowXmlFeed()
 
 	<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 	<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-	<generator uri="http://www.dialogoforum.org" version="', strtr($forum_version, array('DIALOGO' => '')), '">DIALOGO</generator>
+	<generator uri="http://www.dialogocommunity.org" version="', strtr($forum_version, array('DIALOGO' => '')), '">DIALOGO</generator>
 	<author>
 		<name>', strip_tags($context['forum_name']), '</name>
 	</author>';

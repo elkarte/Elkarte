@@ -402,6 +402,7 @@ function updateDbLastError($time)
 	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
 	@touch($boarddir . '/' . 'Settings.php');
 }
+
 /**
  * Saves the admins current preferences to the database.
  */

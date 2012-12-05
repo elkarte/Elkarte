@@ -363,7 +363,7 @@ function display_db_error()
 	set_fatal_error_headers();
 
 	// For our purposes, we're gonna want this on if at all possible.
-	$modSettings['cache_enable'] = '1';
+	$modSettings['cache_enable'] = 1;
 
 	if (($temp = cache_get_data('db_last_error', 600)) !== null)
 		$db_last_error = max($db_last_error, $temp);

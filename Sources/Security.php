@@ -1278,8 +1278,7 @@ if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
 // Can\'t find it... just forget it.
 else
 	exit;
-
-?>');
+');
 			fclose($fh);
 		}
 		$errors[] = 'index-php_cannot_create_file';
