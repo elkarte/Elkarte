@@ -350,7 +350,7 @@ function UnapprovedAttachments()
 		checkSession('request');
 
 		// This will be handy.
-		require_once($sourcedir . '/ManageAttachments.php');
+		require_once($sourcedir . '/Subs-Attachments.php');
 
 		// Confirm the attachments are eligible for changing!
 		$request = $smcFunc['db_query']('', '
@@ -378,7 +378,7 @@ function UnapprovedAttachments()
 		if (!empty($attachments))
 		{
 			if ($curAction == 'approve')
-				ApproveAttachments($attachments);
+				approveAttachments($attachments);
 			else
 				removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 		}
@@ -760,7 +760,7 @@ function approveAllData()
 
 	if (!empty($attaches))
 	{
-		require_once($sourcedir . '/ManageAttachments.php');
+		require_once($sourcedir . '/Subs-Attachments.php');
 		ApproveAttachments($attaches);
 	}
 }

@@ -823,6 +823,9 @@ function RemoveAttachmentByAge()
 
 	// @todo Ignore messages in topics that are stickied?
 
+	// someone has to do the dirty work
+	require_once($sourcedir . '/Subs-Attachments.php');
+
 	// Deleting an attachment?
 	if ($_REQUEST['type'] != 'avatars')
 	{
@@ -862,6 +865,9 @@ function RemoveAttachmentBySize()
 
 	checkSession('post', 'admin');
 
+	// we'll need this
+	require_once($sourcedir . '/Subs-Attachments.php');
+
 	// Find humungous attachments.
 	$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
 
@@ -893,6 +899,9 @@ function RemoveAttachment()
 
 	if (!empty($_POST['remove']))
 	{
+		// we'll need this
+		require_once($sourcedir . '/Subs-Attachments.php');
+
 		$attachments = array();
 		// There must be a quicker way to pass this safety test??
 		foreach ($_POST['remove'] as $removeID => $dummy)
@@ -937,6 +946,9 @@ function RemoveAllAttachments()
 
 	checkSession('get', 'admin');
 
+	// lots of work to do
+	require_once($sourcedir . '/Subs-Attachments.php');
+
 	$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
 	if (!isset($_POST['notice']))
@@ -955,168 +967,6 @@ function RemoveAllAttachments()
 		);
 
 	redirectexit('action=admin;area=manageattachments;sa=maintenance');
-}
-
-/**
- * Removes attachments or avatars based on a given query condition.
- * Called by several remove avatar/attachment functions in this file.
- * It removes attachments based that match the $condition.
- * It allows query_types 'messages' and 'members', whichever is need by the
- * $condition parameter.
- * It does no permissions check.
- * @internal
- *
- * @param array $condition
- * @param string $query_type
- * @param bool $return_affected_messages = false
- * @param bool $autoThumbRemoval = true
- */
-function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
-{
-	global $modSettings, $smcFunc;
-
-	// @todo This might need more work!
-	$new_condition = array();
-	$query_parameter = array(
-		'thumb_attachment_type' => 3,
-	);
-	$do_logging = array();
-
-	if (is_array($condition))
-	{
-		foreach ($condition as $real_type => $restriction)
-		{
-			// Doing a NOT?
-			$is_not = substr($real_type, 0, 4) == 'not_';
-			$type = $is_not ? substr($real_type, 4) : $real_type;
-
-			if (in_array($type, array('id_member', 'id_attach', 'id_msg')))
-				$new_condition[] = 'a.' . $type . ($is_not ? ' NOT' : '') . ' IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
-			elseif ($type == 'attachment_type')
-				$new_condition[] = 'a.attachment_type = {int:' . $real_type . '}';
-			elseif ($type == 'poster_time')
-				$new_condition[] = 'm.poster_time < {int:' . $real_type . '}';
-			elseif ($type == 'last_login')
-				$new_condition[] = 'mem.last_login < {int:' . $real_type . '}';
-			elseif ($type == 'size')
-				$new_condition[] = 'a.size > {int:' . $real_type . '}';
-			elseif ($type == 'id_topic')
-				$new_condition[] = 'm.id_topic IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
-
-			// Add the parameter!
-			$query_parameter[$real_type] = $restriction;
-
-			if ($type == 'do_logging')
-				$do_logging = $condition['id_attach'];
-		}
-		$condition = implode(' AND ', $new_condition);
-	}
-
-	// Delete it only if it exists...
-	$msgs = array();
-	$attach = array();
-	$parents = array();
-
-	// Get all the attachment names and id_msg's.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			a.id_folder, a.filename, a.file_hash, a.attachment_type, a.id_attach, a.id_member' . ($query_type == 'messages' ? ', m.id_msg' : ', a.id_msg') . ',
-			thumb.id_folder AS thumb_folder, IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.filename AS thumb_filename, thumb.file_hash AS thumb_file_hash, thumb_parent.id_attach AS id_parent
-		FROM {db_prefix}attachments AS a' .($query_type == 'members' ? '
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)' : ($query_type == 'messages' ? '
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)' : '')) . '
-			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
-			LEFT JOIN {db_prefix}attachments AS thumb_parent ON (thumb.attachment_type = {int:thumb_attachment_type} AND thumb_parent.id_thumb = a.id_attach)
-		WHERE ' . $condition,
-		$query_parameter
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Figure out the "encrypted" filename and unlink it ;).
-		if ($row['attachment_type'] == 1)
-		{
-			// if attachment_type = 1, it's... an avatar in a custom avatar directory.
-			// wasn't it obvious? :P
-			// @todo look again at this.
-			@unlink($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
-		}
-		else
-		{
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-			@unlink($filename);
-
-			// If this was a thumb, the parent attachment should know about it.
-			if (!empty($row['id_parent']))
-				$parents[] = $row['id_parent'];
-
-			// If this attachments has a thumb, remove it as well.
-			if (!empty($row['id_thumb']) && $autoThumbRemoval)
-			{
-				$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
-				@unlink($thumb_filename);
-				$attach[] = $row['id_thumb'];
-			}
-		}
-
-		// Make a list.
-		if ($return_affected_messages && empty($row['attachment_type']))
-			$msgs[] = $row['id_msg'];
-		$attach[] = $row['id_attach'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Removed attachments don't have to be updated anymore.
-	$parents = array_diff($parents, $attach);
-	if (!empty($parents))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}attachments
-			SET id_thumb = {int:no_thumb}
-			WHERE id_attach IN ({array_int:parent_attachments})',
-			array(
-				'parent_attachments' => $parents,
-				'no_thumb' => 0,
-			)
-		);
-
-	if (!empty($do_logging))
-	{
-		// In order to log the attachments, we really need their message and filename
-		$request = $smcFunc['db_query']('', '
-			SELECT m.id_msg, a.filename
-			FROM {db_prefix}attachments AS a
-				INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
-			WHERE a.id_attach IN ({array_int:attachments})
-				AND a.attachment_type = {int:attachment_type}',
-			array(
-				'attachments' => $do_logging,
-				'attachment_type' => 0,
-			)
-		);
-
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			logAction(
-				'remove_attach',
-				array(
-					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
-				)
-			);
-		$smcFunc['db_free_result']($request);
-	}
-
-	if (!empty($attach))
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}attachments
-			WHERE id_attach IN ({array_int:attachment_list})',
-			array(
-				'attachment_list' => $attach,
-			)
-		);
-
-	call_integration_hook('integrate_remove_attachments', array($attach));
-
-	if ($return_affected_messages)
-		return array_unique($msgs);
 }
 
 /**
@@ -1804,101 +1654,17 @@ function ApproveAttach()
 		fatal_lang_error('no_access', false);
 
 	// Finally, we are there. Follow through!
+	require_once($sourcedir . '/Subs-Attachments.php');
 	if ($is_approve)
 	{
 		// Checked and deemed worthy.
-		ApproveAttachments($attachments);
+		approveAttachments($attachments);
 	}
 	else
 		removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 
 	// Return to the topic....
 	redirectexit($redirect);
-}
-
-/**
- * Approve an attachment, or maybe even more - no permission check!
- *
- * @param array $attachments
- */
-function ApproveAttachments($attachments)
-{
-	global $smcFunc;
-
-	if (empty($attachments))
-		return 0;
-
-	// For safety, check for thumbnails...
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			a.id_attach, a.id_member, IFNULL(thumb.id_attach, 0) AS id_thumb
-		FROM {db_prefix}attachments AS a
-			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
-		WHERE a.id_attach IN ({array_int:attachments})
-			AND a.attachment_type = {int:attachment_type}',
-		array(
-			'attachments' => $attachments,
-			'attachment_type' => 0,
-		)
-	);
-	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Update the thumbnail too...
-		if (!empty($row['id_thumb']))
-			$attachments[] = $row['id_thumb'];
-
-		$attachments[] = $row['id_attach'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	if (empty($attachments))
-		return 0;
-
-	// Approving an attachment is not hard - it's easy.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}attachments
-		SET approved = {int:is_approved}
-		WHERE id_attach IN ({array_int:attachments})',
-		array(
-			'attachments' => $attachments,
-			'is_approved' => 1,
-		)
-	);
-
-	// In order to log the attachments, we really need their message and filename
-	$request = $smcFunc['db_query']('', '
-		SELECT m.id_msg, a.filename
-		FROM {db_prefix}attachments AS a
-			INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
-		WHERE a.id_attach IN ({array_int:attachments})
-			AND a.attachment_type = {int:attachment_type}',
-		array(
-			'attachments' => $attachments,
-			'attachment_type' => 0,
-		)
-	);
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		logAction(
-			'approve_attach',
-			array(
-				'message' => $row['id_msg'],
-				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
-			)
-		);
-	$smcFunc['db_free_result']($request);
-
-	// Remove from the approval queue.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}approval_queue
-		WHERE id_attach IN ({array_int:attachments})',
-		array(
-			'attachments' => $attachments,
-		)
-	);
-
-	call_integration_hook('integrate_approve_attachments', array($attachments));
 }
 
 /**
