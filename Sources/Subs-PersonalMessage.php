@@ -390,7 +390,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 }
 
 /**
- * Sends an personal message from the specified person to the specified people
+ * Sends a personal message from the specified person to the specified people
  * ($from defaults to the user)
  *
  * @param array $recipients - an array containing the arrays 'to' and 'bcc', both containing id_member's.
@@ -409,8 +409,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
 
-	// Needed for our email functions
+	// Needed for our email and post functions
 	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($sourcedir . '/Subs-Post.php');
 
 	$onBehalf = $from !== null;
 
