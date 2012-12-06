@@ -462,10 +462,6 @@ function MessageFolder()
 			fatal_lang_error('no_access', false);
 	}
 
-	// Set up the page index.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=pm;f=' . $context['folder'] . (isset($_REQUEST['l']) ? ';l=' . (int) $_REQUEST['l'] : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
-	$context['start'] = $start;
-
 	// Determine the navigation context (especially useful for the wireless template).
 	$context['links'] = array(
 		'first' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=0' : '',
@@ -761,12 +757,17 @@ function MessageFolder()
 	else
 		$messages_request = false;
 
+	// prepare some items for the template
 	$context['can_send_pm'] = allowedTo('pm_send');
 	$context['can_send_email'] = allowedTo('send_email_to_members');
 	$context['sub_template'] = 'folder';
 	$context['page_title'] = $txt['pm_inbox'];
 	$context['sort_direction'] = $descending ? 'down' : 'up';
 	$context['sort_by'] = $sort_by;
+
+	// Set up the page index.
+	$context['page_index'] = constructPageIndex($scripturl . '?action=pm;f=' . $context['folder'] . (isset($_REQUEST['l']) ? ';l=' . (int) $_REQUEST['l'] : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
+	$context['start'] = $start;
 
 	// Finally mark the relevant messages as read.
 	if ($context['folder'] != 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
