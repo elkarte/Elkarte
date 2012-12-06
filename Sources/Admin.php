@@ -654,7 +654,7 @@ function AdminHome()
 }
 
 /**
- * Get the content of an admin information file from the database.
+ * Get admin information from the database.
  */
 function DisplayAdminFile()
 {
