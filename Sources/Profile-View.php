@@ -182,46 +182,54 @@ function summary($memID)
 	}
 
 	// Load up the most recent attachments for this user for use in profile views etc.
-	$limit = 8;
-	$attachments = list_getAttachments(0, $limit, 'm.poster_time DESC', boardsAllowedTo('view_attachments'), $context['member']['id']);
-
-	// load them in to $context for use in the template
-	$i = 0;
 	$context['thumbs'] = array();
-	$mime_images_url = $settings['default_images_url'] . '/mime_images/';
-	$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
-
-	for ($i = 0, $count = count($attachments); $i < $count; $i++)
+	if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 	{
-		$context['thumbs'][$i] = array(
-			'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
-			'img' => '',
-		);
+		$limit = 8;
+		$boardsAllowed = boardsAllowedTo('view_attachments');
+		if (empty($boardsAllowed))
+			$boardsAllowed = array(-1);
+		$attachments = list_getAttachments(0, $limit, 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
 
-		// Show a thumbnail image well?
-		if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
+		// load them in to $context for use in the template
+		$i = 0;
+		
+		// @todo keep or loose the mime thumbs ... useful at all?
+		$mime_images_url = $settings['default_images_url'] . '/mime_images/';
+		$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
+
+		for ($i = 0, $count = count($attachments); $i < $count; $i++)
 		{
-			if (!empty($attachments[$i]['id_thumb']))
-				$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="' . $attachments[$i]['subject'] . '" alt="" />';
-			else
+			$context['thumbs'][$i] = array(
+				'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
+				'img' => '',
+			);
+
+			// Show a thumbnail image well?
+			if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
 			{
-				// no thumbnail available ... use html instead
-				if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
+				if (!empty($attachments[$i]['id_thumb']))
+					$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="' . $attachments[$i]['subject'] . '" alt="" />';
+				else
 				{
-					if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
-						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
-					else
-						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+					// no thumbnail available ... use html instead
+					if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
+					{
+						if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
+							$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+						else
+							$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+					}
 				}
 			}
-		}
-		// Not an image so lets set a mime thumbnail based off the filetype
-		else
-		{
-			if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
-				$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight']. '" />';
+			// Not an image so lets set a mime thumbnail based off the filetype
 			else
-				$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" />';
+			{
+				if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight']. '" />';
+				else
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" />';
+			}
 		}
 	}
 
@@ -679,7 +687,6 @@ function showAttachments($memID)
 
 	// Create the request list.
 	createList($listOptions);
-
 }
 
 /**
