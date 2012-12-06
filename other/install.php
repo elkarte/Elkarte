@@ -15,7 +15,7 @@
  *
  */
 
-$GLOBALS['current_version'] = '1.0 Alpha 1';
+$GLOBALS['current_version'] = '1.0 Alpha';
 $GLOBALS['db_script_version'] = '1-0';
 
 $GLOBALS['required_php_version'] = '5.1.0';

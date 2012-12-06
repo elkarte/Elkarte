@@ -16,7 +16,7 @@
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 Alpha 1');
+define('CURRENT_VERSION', '1.0 Alpha');
 define('CURRENT_LANG_VERSION', '1.0');
 
 $GLOBALS['required_php_version'] = '5.1.0';

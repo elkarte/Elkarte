@@ -35,7 +35,7 @@ class standard_search
 	 *
 	 * @var type
 	 */
-	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
+	public $min_smf_version = 'DIALOGO 1.0 Alpha';
 
 	/**
 	 * Standard search is supported by default.

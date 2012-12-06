@@ -37,7 +37,7 @@ template_ssi_above();
 ?>
 
 			<h2>SSI.php Functions</h2>
-			<p><strong>Current Version:</strong> 1.0 Alpha 1</p>
+			<p><strong>Current Version:</strong> 1.0 Alpha</p>
 			<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
 			<h2>Include Code</h2>
