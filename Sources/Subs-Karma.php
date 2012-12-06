@@ -52,7 +52,7 @@ function lastActionOn($id_executor, $id_target)
 		list ($action) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	return $action;
+	return isset($action) ? $action : null;
 }
 
 /**
@@ -75,7 +75,7 @@ function addKarma($id_executor, $id_target, $direction)
 	);
 
 	// Change by one.
-	updateMemberData($_REQUEST['uid'], array($dir == 1 ? 'karma_good' : 'karma_bad' => '+'));
+	updateMemberData($_REQUEST['uid'], array($direction == 1 ? 'karma_good' : 'karma_bad' => '+'));
 }
 
 /**
