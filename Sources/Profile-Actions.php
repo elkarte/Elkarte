@@ -165,7 +165,7 @@ function issueWarning($memID)
 			// Send the PM?
 			else
 			{
-				require_once($sourcedir . '/Subs-Post.php');
+				require_once($sourcedir . '/Subs-PersonalMessage.php');
 				$from = array(
 					'id' => 0,
 					'name' => $context['forum_name'],
