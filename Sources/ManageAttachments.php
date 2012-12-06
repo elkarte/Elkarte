@@ -817,7 +817,7 @@ function MoveAvatars()
  */
 function RemoveAttachmentByAge()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $sourcedir;
 
 	checkSession('post', 'admin');
 
@@ -861,7 +861,7 @@ function RemoveAttachmentByAge()
  */
 function RemoveAttachmentBySize()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $sourcedir;
 
 	checkSession('post', 'admin');
 
@@ -893,7 +893,7 @@ function RemoveAttachmentBySize()
  */
 function RemoveAttachment()
 {
-	global $txt, $smcFunc, $language;
+	global $txt, $smcFunc, $language, $sourcedir;
 
 	checkSession('post');
 
@@ -942,7 +942,7 @@ function RemoveAttachment()
  */
 function RemoveAllAttachments()
 {
-	global $txt, $smcFunc;
+	global $txt, $smcFunc, $sourcedir;
 
 	checkSession('get', 'admin');
 
@@ -1583,7 +1583,7 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
  */
 function ApproveAttach()
 {
-	global $smcFunc;
+	global $smcFunc, $sourcedir;
 
 	// Security is our primary concern...
 	checkSession('get');
