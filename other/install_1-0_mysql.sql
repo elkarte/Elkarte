@@ -1661,7 +1661,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
-VALUES ('smfVersion', '{$smf_version}'),
+VALUES ('ourVersion', '{$current_version}'),
 	('news', '{$default_news}'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),

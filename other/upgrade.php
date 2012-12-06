@@ -643,7 +643,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['ourVersion']) || $modSettings['ourVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Dialogo Install!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Dialogo Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -2126,12 +2126,12 @@ function changeSettings($config_vars)
 	fclose($fp);
 
 	$fp = fopen($boarddir . '/Settings.php', 'r+');
-	for ($i = 0; $i < $end; $i++)
+	$lines = count($settingsArray);
+	for ($i = 0; $i < $lines; $i++)
 	{
 		if (isset($settingsArray[$i]))
 			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
 	}
-	fwrite($fp, rtrim($settingsArray[$i]));
 	fclose($fp);
 }
 function updateLastError()
@@ -3835,17 +3835,6 @@ function template_upgrade_options()
 						</td>
 						<td width="100%">
 							<label for="empty_error">Empty error log before upgrading</label>
-						</td>
-					</tr>
-					<tr valign="top">
-						<td width="2%">
-							<input type="checkbox" name="stats" id="stats" value="1"', empty($modSettings['allow_sm_stats']) ? '' : ' checked="checked"', ' class="input_check" />
-						</td>
-						<td width="100%">
-							<label for="stats">
-								Allow Simple Machines to Collect Basic Stats Monthly.<br />
-								<span class="smalltext">If enabled, this will allow Simple Machines to visit your site once a month to collect basic statistics. This will help us make decisions as to which configurations to optimise the software for. For more information please visit our <a href="http://www.simplemachines.org/about/stats.php" target="_blank">info page</a>.</span>
-							</label>
 						</td>
 					</tr>
 				</table>

@@ -1922,7 +1922,7 @@ function updateSettingsFile($vars)
 		fwrite($fp, "<?php\n");
 
 	$lines = count($settingsArray);
-	for ($i = 0; $i < $lines - 1; $i++)
+	for ($i = 0; $i < $lines; $i++)
 	{
 		// Don't just write a bunch of blank lines.
 		if ($settingsArray[$i] != '' || @$settingsArray[$i - 1] != '')
