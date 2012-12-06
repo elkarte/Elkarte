@@ -29,7 +29,7 @@ if (!defined('DIALOGO'))
  */
 function ModifyKarma()
 {
-	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context;
+	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir;
 
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))
