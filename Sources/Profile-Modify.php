@@ -2756,8 +2756,8 @@ function profileSaveAvatarData(&$value)
 				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
-					require_once($sourcedir . '/Subs-Graphics.php');
-					if (downloadAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
+					require_once($sourcedir . '/Subs-Attachments.php');
+					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
 					{
 						$profile_vars['avatar'] = '';
 						$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
@@ -2800,8 +2800,8 @@ function profileSaveAvatarData(&$value)
 					@chmod($uploadDir . '/avatar_tmp_' . $memID, 0644);
 
 					// @todo remove this require when appropriate
-					require_once($sourcedir . '/Subs-Graphics.php');
-					if (!downloadAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+					require_once($sourcedir . '/Subs-Attachments.php');
+					if (!saveAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
 						return 'bad_avatar';
 
 					// Reset attachment avatar data.
