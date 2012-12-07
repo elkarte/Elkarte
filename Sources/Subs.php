@@ -1695,7 +1695,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
 							// For images, we'll want this.
-							require_once($sourcedir . '/Subs-Attachment.php');
+							require_once($sourcedir . '/Subs-Attachments.php');
 							list ($width, $height) = url_image_size($imgtag);
 
 							if (!empty($modSettings['max_image_width']) && $width > $modSettings['max_image_width'])

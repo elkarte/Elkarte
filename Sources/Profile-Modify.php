@@ -1655,89 +1655,6 @@ function pmprefs($memID)
 }
 
 /**
- * Recursive function to retrieve server-stored avatar files
- *
- * @param string $directory
- * @param int $level
- * @return array
- */
-function getAvatars($directory, $level)
-{
-	global $context, $txt, $modSettings;
-
-	$result = array();
-
-	// Open the directory..
-	$dir = dir($modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory);
-	$dirs = array();
-	$files = array();
-
-	if (!$dir)
-		return array();
-
-	while ($line = $dir->read())
-	{
-		if (in_array($line, array('.', '..', 'blank.png', 'index.php')))
-			continue;
-
-		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
-			$dirs[] = $line;
-		else
-			$files[] = $line;
-	}
-	$dir->close();
-
-	// Sort the results...
-	natcasesort($dirs);
-	natcasesort($files);
-
-	if ($level == 0)
-	{
-		$result[] = array(
-			'filename' => 'blank.png',
-			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
-			'name' => $txt['no_pic'],
-			'is_dir' => false
-		);
-	}
-
-	foreach ($dirs as $line)
-	{
-		$tmp = getAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
-		if (!empty($tmp))
-			$result[] = array(
-				'filename' => htmlspecialchars($line),
-				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
-				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',
-				'is_dir' => true,
-				'files' => $tmp
-		);
-		unset($tmp);
-	}
-
-	foreach ($files as $line)
-	{
-		$filename = substr($line, 0, (strlen($line) - strlen(strrchr($line, '.'))));
-		$extension = substr(strrchr($line, '.'), 1);
-
-		// Make sure it is an image.
-		if (strcasecmp($extension, 'gif') != 0 && strcasecmp($extension, 'jpg') != 0 && strcasecmp($extension, 'jpeg') != 0 && strcasecmp($extension, 'png') != 0 && strcasecmp($extension, 'bmp') != 0)
-			continue;
-
-		$result[] = array(
-			'filename' => htmlspecialchars($line),
-			'checked' => $line == $context['member']['avatar']['server_pic'],
-			'name' => htmlspecialchars(str_replace('_', ' ', $filename)),
-			'is_dir' => false
-		);
-		if ($level == 1)
-			$context['avatar_list'][] = $directory . '/' . $line;
-	}
-
-	return $result;
-}
-
-/**
  * @todo needs a description
  *
  * @param int $memID id_member
@@ -2530,8 +2447,9 @@ function profileLoadAvatarData()
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
 	{
+		require_once($sourcedir . '/Subs-Attachments.php');
 		$context['avatar_list'] = array();
-		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getAvatars('', 0) : array();
+		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
 	}
 	else
 		$context['avatars'] = array();

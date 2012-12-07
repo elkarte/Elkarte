@@ -371,7 +371,7 @@ function fixTags(&$message)
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
 	{
 		// We'll need this for image processing
-		require_once($sourcedir . '/Subs-Attachment.php');
+		require_once($sourcedir . '/Subs-Attachments.php');
 
 		// Find all the img tags - with or without width and height.
 		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);

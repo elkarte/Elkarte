@@ -15,6 +15,8 @@
  *
  * This file handles the uploading and creation of attachments
  * as well as the auto management of the attachment directories.
+ * Note to enhance documentation later:
+ * attachment_type = 3 is a thumbnail, etc.
  *
  */
 
@@ -1491,4 +1493,184 @@ function getAttachments($messages)
 		$attachments[$row['id_msg']][] = $row;
 
 	return $attachments;
+}
+
+/**
+ * How many attachments we have overall.
+ *
+ * @return int
+ */
+function getAttachmentCount()
+{
+	global $smcFunc;
+
+	// Get the number of attachments....
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:attachment_type}
+			AND id_member = {int:guest_id_member}',
+		array(
+			'attachment_type' => 0,
+			'guest_id_member' => 0,
+		)
+	);
+	list ($num_attachments) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $num_attachments;
+}
+
+/**
+ * How many avatars do we have. Need to know. :P
+ *
+ * @return int
+ */
+function getAvatarCount()
+{
+	global $smcFunc;
+
+	// Get the avatar amount....
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments
+		WHERE id_member != {int:guest_id_member}',
+		array(
+			'guest_id_member' => 0,
+		)
+	);
+	list ($num_avatars) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $num_avatars;
+}
+
+/**
+ * Get the attachments directories, as an array.
+ *
+ * @return array, the attachments directory/directories
+ */
+function getAttachmentDirs()
+{
+	global $modSettings, $boarddir;
+
+	if (!empty($modSettings['currentAttachmentUploadDir']))
+		$attach_dirs = unserialize($modSettings['attachmentUploadDir']);
+	elseif (!empty($modSettings['attachmentUploadDir']))
+		$attach_dirs = array($modSettings['attachmentUploadDir']);
+	else
+		$attach_dirs = array($boarddir . '/attachments');
+
+	return $attach_dirs;
+}
+
+/**
+ * Get all avatars information... as long as they're in default directory still?
+ *
+ * @return array, avatars information
+ */
+function getAvatarsDefault()
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_attach, id_folder, id_member, filename, file_hash
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:attachment_type}
+			AND id_member > {int:guest_id_member}',
+		array(
+			'attachment_type' => 0,
+			'guest_id_member' => 0,
+		)
+	);
+
+	$avatars = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$avatars[] = $row;
+	$smcFunc['db_free_result']($request);
+
+	return $avatars;
+}
+
+/**
+ * Recursive function to retrieve server-stored avatar files
+ *
+ * @param string $directory
+ * @param int $level
+ * @return array
+ */
+function getServerStoredAvatars($directory, $level)
+{
+	global $context, $txt, $modSettings;
+
+	$result = array();
+
+	// Open the directory..
+	$dir = dir($modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory);
+	$dirs = array();
+	$files = array();
+
+	if (!$dir)
+		return array();
+
+	while ($line = $dir->read())
+	{
+		if (in_array($line, array('.', '..', 'blank.gif', 'index.php')))
+			continue;
+
+		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
+			$dirs[] = $line;
+		else
+			$files[] = $line;
+	}
+	$dir->close();
+
+	// Sort the results...
+	natcasesort($dirs);
+	natcasesort($files);
+
+	if ($level == 0)
+	{
+		$result[] = array(
+			'filename' => 'blank.gif',
+			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.gif')),
+			'name' => $txt['no_pic'],
+			'is_dir' => false
+		);
+	}
+
+	foreach ($dirs as $line)
+	{
+		$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
+		if (!empty($tmp))
+		$result[] = array(
+				'filename' => htmlspecialchars($line),
+				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
+				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',
+				'is_dir' => true,
+				'files' => $tmp
+		);
+		unset($tmp);
+	}
+
+	foreach ($files as $line)
+	{
+		$filename = substr($line, 0, (strlen($line) - strlen(strrchr($line, '.'))));
+		$extension = substr(strrchr($line, '.'), 1);
+
+		// Make sure it is an image.
+		if (strcasecmp($extension, 'gif') != 0 && strcasecmp($extension, 'jpg') != 0 && strcasecmp($extension, 'jpeg') != 0 && strcasecmp($extension, 'png') != 0 && strcasecmp($extension, 'bmp') != 0)
+			continue;
+
+		$result[] = array(
+			'filename' => htmlspecialchars($line),
+			'checked' => $line == $context['member']['avatar']['server_pic'],
+			'name' => htmlspecialchars(str_replace('_', ' ', $filename)),
+			'is_dir' => false
+		);
+		if ($level == 1)
+			$context['avatar_list'][] = $directory . '/' . $line;
+	}
+
+	return $result;
 }
