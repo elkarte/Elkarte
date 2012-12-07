@@ -83,11 +83,12 @@ function validateSession($type = 'admin')
 			return;
 		}
 	}
+
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_revalidate();
+		openID_revalidate();
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);

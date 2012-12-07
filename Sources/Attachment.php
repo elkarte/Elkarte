@@ -207,4 +207,3 @@ function Download()
 	obExit(false);
 }
 
-?>

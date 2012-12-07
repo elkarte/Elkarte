@@ -530,7 +530,7 @@ function ModifyProfile($post_errors = array())
 			if (!empty($user_settings['openid_uri']))
 			{
 				require_once($sourcedir . '/Subs-OpenID.php');
-				smf_openID_revalidate();
+				openID_revalidate();
 			}
 			else
 			{

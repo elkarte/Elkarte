@@ -22,29 +22,29 @@ if (!defined('DIALOGO'))
 
 /**
  * Openid_uri is the URI given by the user
- * Validates the URI and changes it to a fully canonicalize URL
+ * Validates the URI and changes it to a fully canonical URL
  * Determines the IDP server and delegation
  * Optional array of fields to restore when validation complete.
  * Redirects the user to the IDP for validation
- * Enter description here ...
+ *
  * @param string $openid_uri
  * @param bool $return = false
  * @param array $save_fields = array()
  * @param string $return_action = null
  * @return string
  */
-function smf_openID_validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
+function openID_validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 {
 	global $sourcedir, $scripturl, $boardurl, $modSettings;
 
-	$openid_url = smf_openID_canonize($openid_uri);
+	$openid_url = openID_canonize($openid_uri);
 
-	$response_data = smf_openID_getServerInfo($openid_url);
+	$response_data = openID_getServerInfo($openid_url);
 	if ($response_data === false)
 		return 'no_data';
 
-	if (($assoc = smf_openID_getAssociation($response_data['server'])) == null)
-		$assoc = smf_openID_makeAssociation($response_data['server']);
+	if (($assoc = openID_getAssociation($response_data['server'])) == null)
+		$assoc = openID_makeAssociation($response_data['server']);
 
 	// Before we go wherever it is we are going, store the GET and POST data, because it might be useful when we get back.
 	$request_time = time();
@@ -68,7 +68,7 @@ function smf_openID_validate($openid_uri, $return = false, $save_fields = array(
 	);
 
 	// If they are logging in but don't yet have an account or they are registering, let's request some additional information
-	if (($_REQUEST['action'] == 'login2' && !smf_openid_member_exists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
+	if (($_REQUEST['action'] == 'login2' && !openid_member_exists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
 	{
 		// Email is required.
 		$parameters[] = 'openid.sreg.required=email';
@@ -85,10 +85,12 @@ function smf_openID_validate($openid_uri, $return = false, $save_fields = array(
 }
 
 /**
- * Revalidate a user using OpenID. Note that this function will not return when authentication is required.
+ * Revalidate a user using OpenID.
+ * Note that this function will not return when authentication is required.
+ *
  * @return boolean
  */
-function smf_openID_revalidate()
+function openID_revalidate()
 {
 	global $user_settings;
 
@@ -98,20 +100,21 @@ function smf_openID_revalidate()
 		return true;
 	}
 	else
-		smf_openID_validate($user_settings['openid_uri'], false, null, 'revalidate');
+		openID_validate($user_settings['openid_uri'], false, null, 'revalidate');
 
 	// We shouldn't get here.
 	trigger_error('Hacking attempt...', E_USER_ERROR);
 }
 
 /**
- * @todo Enter description here ...
+ * Retrieve an existing, not expired, association if there is any.
+ *
  * @param string $server
  * @param string $handle = null
  * @param bool $no_delete = false
  * @return array
  */
-function smf_openID_getAssociation($server, $handle = null, $no_delete = false)
+function openID_getAssociation($server, $handle = null, $no_delete = false)
 {
 	global $smcFunc;
 
@@ -150,11 +153,12 @@ function smf_openID_getAssociation($server, $handle = null, $no_delete = false)
 }
 
 /**
- * @todo Enter description here ...
+ * Create and store an association to the given server.
+ *
  * @param string $server
  * @return array
  */
-function smf_openID_makeAssociation($server)
+function openID_makeAssociation($server)
 {
 	global $smcFunc, $modSettings, $p;
 
@@ -163,7 +167,7 @@ function smf_openID_makeAssociation($server)
 	);
 
 	// We'll need to get our keys for the Diffie-Hellman key exchange.
-	$dh_keys = smf_openID_setup_DH();
+	$dh_keys = openID_setup_DH();
 
 	// If we don't support DH we'll have to see if the provider will accept no encryption.
 	if ($dh_keys === false)
@@ -227,7 +231,12 @@ function smf_openID_makeAssociation($server)
 	);
 }
 
-function smf_openID_removeAssociation($handle)
+/**
+ * Delete an existing association from the database.
+ *
+ * @param string $handle
+ */
+function openID_removeAssociation($handle)
 {
 	global $smcFunc;
 
@@ -240,7 +249,10 @@ function smf_openID_removeAssociation($handle)
 	);
 }
 
-function smf_openID_return()
+/**
+ * Callback action handler for OpenID
+ */
+function OpenIDReturn()
 {
 	global $smcFunc, $user_info, $user_profile, $sourcedir, $modSettings, $context, $sc, $user_settings;
 
@@ -262,12 +274,12 @@ function smf_openID_return()
 
 	// Did they tell us to remove any associations?
 	if (!empty($_GET['openid_invalidate_handle']))
-		smf_openid_removeAssociation($_GET['openid_invalidate_handle']);
+		openid_removeAssociation($_GET['openid_invalidate_handle']);
 
-	$server_info = smf_openid_getServerInfo($_GET['openid_identity']);
+	$server_info = openid_getServerInfo($_GET['openid_identity']);
 
 	// Get the association data.
-	$assoc = smf_openID_getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
+	$assoc = openID_getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
 	if ($assoc === null)
 		fatal_lang_error('openid_no_assoc');
 
@@ -388,10 +400,11 @@ function smf_openID_return()
 }
 
 /**
- * @todo Enter description here ...
+ * Fix the URI to a canonical form
+ *
  * @param string $uri
  */
-function smf_openID_canonize($uri)
+function openID_canonize($uri)
 {
 	// @todo Add in discovery.
 
@@ -405,11 +418,12 @@ function smf_openID_canonize($uri)
 }
 
 /**
- * @todo Enter description here ...
+ * Check if the URI is already registered for an existing member
+ *
  * @param string $uri
  * @return array
  */
-function smf_openid_member_exists($url)
+function openid_member_exists($url)
 {
 	global $smcFunc;
 
@@ -432,7 +446,7 @@ function smf_openid_member_exists($url)
  * @param bool $regenerate = false
  * @return array|false return false on failure or an array() on success
  */
-function smf_openID_setup_DH($regenerate = false)
+function openID_setup_DH($regenerate = false)
 {
 	global $p, $g;
 
@@ -447,14 +461,16 @@ function smf_openID_setup_DH($regenerate = false)
 	// Make sure the scale is set.
 	bcscale(0);
 
-	return smf_openID_get_keys($regenerate);
+	return openID_get_keys($regenerate);
 }
 
 /**
- * @todo Enter description here ...
+ * Retrieve DH keys from the store.
+ * It generates them if they're not stored or $regerate parameter is true.
+ *
  * @param bool $regenerate
  */
-function smf_openID_get_keys($regenerate)
+function openID_get_keys($regenerate)
 {
 	global $modSettings, $p, $g;
 
@@ -470,7 +486,7 @@ function smf_openID_get_keys($regenerate)
 	}
 
 	// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big interger math.  This will take a few seconds.
-	$private = smf_openid_generate_private_key();
+	$private = openid_generate_private_key();
 	$public = bcpowmod($g, $private, $p);
 
 	// Now that we did all that work, lets save it so we don't have to keep doing it.
@@ -484,10 +500,11 @@ function smf_openID_get_keys($regenerate)
 }
 
 /**
- * @todo Enter description here ...
+ * Generate private key
+ *
  * @return float
  */
-function smf_openid_generate_private_key()
+function openid_generate_private_key()
 {
 	global $p;
 	static $cache = array();
@@ -523,11 +540,12 @@ function smf_openid_generate_private_key()
 
 /**
  *
- * Enter description here ...
+ * Retrieve server information.
+ *
  * @param string $openid_url
  * @return boolean|array
  */
-function smf_openID_getServerInfo($openid_url)
+function openID_getServerInfo($openid_url)
 {
 	global $sourcedir;
 
