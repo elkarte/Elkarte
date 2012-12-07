@@ -1201,6 +1201,9 @@ function ModifySignatureSettings($return_config = false)
 							// If the dimensions are still not fixed - we need to check the actual image.
 							if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 							{
+								// We'll mess up with images, who knows.
+								require_once($sourcedir . '/Subs-Attachment.php');
+
 								$sizes = url_image_size($matches[7][$key]);
 								if (is_array($sizes))
 								{
