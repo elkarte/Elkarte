@@ -148,6 +148,7 @@
 			}
 		};
 
+
 		init = function() {
 			base.opts    = $.extend({}, $.sceditor.BBCodeParser.defaults, options);
 			base.bbcodes = $.sceditorBBCodePlugin.bbcodes;
@@ -1132,7 +1133,8 @@
 		 * @private
 		 */
 		var validChildren = {
-			list: ['li'],
+			ul: ['li'],
+			ol: ['li'],
 			table: ['tr'],
 			tr: ['td', 'th'],
 			code: ['br', 'p', 'div']
@@ -1143,6 +1145,7 @@
 		 * @type {Object}
 		 */
 		var propertyCache = {};
+
 
 		/**
 		 * Initializer
@@ -1188,7 +1191,6 @@
 						}
 					);
 				} },
-				// @todo: check overlapping
 				size: { txtExec: function(caller) {
 					var editor = this;
 
@@ -1211,9 +1213,9 @@
 						}
 					);
 				} },
-				bulletlist: { txtExec: ["[list]\n[li]", "[/li]\n[li][/li]\n[/list]"] },
-				orderedlist: { txtExec: ["[list type=decimal]\n[li]", "[/li]\n[li][/li]\n[/list]"] },
-				table: { txtExec: ["[table]\n[tr]\n[td]", "[/td]\n[/tr]\n[/table]"] },
+				bulletlist: { txtExec: ["[ul][li]", "[/li][/ul]"] },
+				orderedlist: { txtExec: ["[ol][li]", "[/li][/ol]"] },
+				table: { txtExec: ["[table][tr][td]", "[/td][/tr][/table]"] },
 				horizontalrule: { txtExec: ["[hr]"] },
 				code: { txtExec: ["[code]", "[/code]"] },
 				image: { txtExec: function(caller, selected) {
@@ -1657,7 +1659,6 @@
 		if((m = color.match(/#([0-f])([0-f])([0-f])\s*?$/i)))
 			return '#' + m[1] + m[1] + m[2] + m[2] + m[3] + m[3];
 
-
 		return color;
 	};
 
@@ -1825,54 +1826,27 @@
 				if(element.nodeName.toLowerCase() !== "font" || !(color = $element.attr('color')))
 					color = element.style.color || $element.css('color');
 
-
 				return '[color=' + $.sceditorBBCodePlugin.normaliseColour(color) + ']' + content + '[/color]';
 			},
 			html: function(token, attrs, content) {
 				return '<font color="' + attrs.defaultattr + '">' + content + '</font>';
 			}
 		},
-		black: {
-			html: '<font color="black">{0}</font>'
-		},
-		blue: {
-			html: '<font color="blue">{0}</font>'
-		},
-		green: {
-			html: '<font color="green">{0}</font>'
-		},
-		red: {
-			html: '<font color="red">{0}</font>'
-		},
-		white: {
-			html: '<font color="white">{0}</font>'
-		},		
 		// END_COMMAND
 
 		// START_COMMAND: Lists
-		list: {
-			breakStart: true,
-			isInline: false,
-			skipLastLineBreak: true,
-			html: function(element, attrs, content) {
-				var style = '';
-				var code = 'ul';
-				if (attrs.type)
-					style = 'style="list-style-type: ' + attrs.type + '"';
-				return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
-			}
-		},
 		ul: {
 			tags: {
 				ul: null
 			},
 			breakStart: true,
-			format: function(element, content) {
-				if ($(element[0]).css('list-style-type') == 'disc')
-					return '[list]' + content + '[/list]';
-				else
-					return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';
-			},
+			isInline: false,
+			skipLastLineBreak: true,
+			format: "[ul]{0}[/ul]",
+			html: '<ul>{0}</ul>'
+		},
+		list: {
+			breakStart: true,
 			isInline: false,
 			skipLastLineBreak: true,
 			html: '<ul>{0}</ul>'
@@ -1884,7 +1858,7 @@
 			breakStart: true,
 			isInline: false,
 			skipLastLineBreak: true,
-			format: "[list type=decimal]{0}[/list]",
+			format: "[ol]{0}[/ol]",
 			html: '<ol>{0}</ol>'
 		},
 		li: {
@@ -2032,7 +2006,6 @@
 				if(url.substr(0, 7) === 'mailto:')
 					return '[email=' + url.substr(7) + ']' + content + '[/email]';
 
-
 				return '[url=' + decodeURI(url) + ']' + content + '[/url]';
 			},
 			html: function(token, attrs, content) {
@@ -2058,74 +2031,35 @@
 		// START_COMMAND: Quote
 		quote: {
 			tags: {
-				blockquote: null,
-				cite: null
+				blockquote: null
 			},
-			isBlock: true,
+			isInline: false,
 			format: function(element, content) {
-				var author = '',
-					date = '',
-					link = '',
-					$elm  = $(element);
+				var	author = '',
+					$elm  = $(element),
+					$cite = $elm.children("cite").first();
 
-				if (element[0].tagName.toLowerCase() == 'cite')
-					return '';
-					
-				if ($elm.attr('author'))
-					author = ' author=' + $elm.attr('author').php_unhtmlspecialchars();
-				if ($elm.attr('date'))
-					date = ' date=' + $elm.attr('date');
-				if ($elm.attr('link'))
-					link = ' link=' + $elm.attr('link');
+				if($cite.length === 1 || $elm.data("author")) {
+					author = $cite.text() || $elm.data("author");
 
-				return '[quote' + author + date + link + ']' + content + '[/quote]';
+					$elm.data("author", author);
+					$cite.remove();
+
+					$elm.children("cite").replaceWith(function() {
+						return $(this).text();
+					});
+
+					content	= this.elementToBbcode($(element));
+					author  = '=' + author;
+				}
+
+				return '[quote' + author + ']' + content + '[/quote]';
 			},
-			attrs: function () {
-				return ['author', 'date', 'link'];
-			},
-			html: function(element, attrs, content) {
-				var attr_author = '', 
-					sAuthor = '',
-					attr_date = '',
-					sDate = '',
-					attr_link = '',
-					sLink = '';
-					
-				// Author tag in the quote ?
-				if(typeof attrs.author !== "undefined")
-				{
-					attr_author = attrs.author;
-					sAuthor = bbc_quote_from + ': ' + attr_author;
-				}
+			html: function(token, attrs, content) {
+				if(typeof attrs.defaultattr !== "undefined")
+					content = '<cite>' + attrs.defaultattr + '</cite>' + content;
 
-				// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
-				for (var key in attrs)
-				{
-					if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
-					{
-						attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
-
-						sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : smf_scripturl + '?' + attr_link;
-						sAuthor = sAuthor == '' ? '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>' : '<a href="' + sLink + '">' + sAuthor + '</a>';
-					}
-				}
-
-				// A date perhaps
-				if(typeof attrs.date !== "undefined")
-				{
-					attr_date = attrs.date;
-					sDate = '<date timestamp="' + attr_date + '">' + new Date(attrs.date * 1000) + '</date>';
-				}
-
-				// build the blockquote up with the data
-				if (sAuthor == '' && sDate == '')
-					sAuthor = bbc_quote;
-				else
-					sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
-
-				content = '<blockquote author="' + attr_author + '" date="' + attr_date + '" link="' + attr_link + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
-
-				return content;
+				return '<blockquote>' + content + '</blockquote>';
 			}
 		},
 		// END_COMMAND
@@ -2137,45 +2071,11 @@
 			},
 			isInline: false,
 			allowedChildren: ['#', '#newline'],
-			format: function(element, content) {
-				var from = '';
-				
-				if ($(element[0]).hasClass('php'))
-					return '[php]' + content.replace('&#91;', '[') + '[/php]';
-
-				if ($(element).children("cite:first").length === 1)
-				{
-					from = $(element).children("cite:first").text();
-					$(element).attr({'from': from.php_htmlspecialchars()});
-					from = '=' + from;
-					content = '';
-					$(element).children("cite:first").remove();
-					content = this.elementToBbcode($(element));
-				}
-				else
-				{
-					if ($(element).attr('from') !== "undefined")
-					{
-						from = '=' + $(element).attr('from').php_unhtmlspecialchars();
-					}
-				}
-
-				return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
-			},
-			html:  function(element, attrs, content) {
-				var from = '';
-				if(typeof attrs.defaultattr !== "undefined")
-					from = '<cite>' + attrs.defaultattr + '</cite>';
-
-				return '<code>' + from + content.replace('[', '&#91;') + '</code>'
-			}
-		},
-		php: {
-			isInline: false,
-			format: "[php]{0}[/php]",
-			html: '<code class="php">{0}</code>'
+			format: "[code]{0}[/code]",
+			html: '<code>{0}</code>'
 		},
 		// END_COMMAND
+
 
 		// START_COMMAND: Left
 		left: {
@@ -2240,6 +2140,7 @@
 		},
 		// END_COMMAND
 
+
 		// START_COMMAND: Rtl
 		rtl: {
 			styles: {
@@ -2260,96 +2161,6 @@
 		},
 		// END_COMMAND
 
-		// START_COMMAND: Abbr
-		abbr: {
-			tags: {
-				abbr: {
-					title: null
-				}
-			},
-			format: function(element, content) {
-				return '[abbr=' + element.attr('title') + ']' + content + '[/abbr]';
-			},
-			html: function(element, attrs, content) {
-				if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
-					return content;
-
-				return '<abbr title="' + attrs.defaultattr + '">' + content + '</abbr>';
-			}
-		},
-		// END_COMMAND
-		
-		// START_COMMAND: Acronym
-		acronym: {
-			tags: {
-				acronym: {
-					title: null
-				}
-			},
-			format: function(element, content) {
-				return '[acronym=' + element.attr('title') + ']' + content + '[/acronym]';
-			},
-			html: function(element, attrs, content) {
-				if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
-					return content;
-
-				return '<acronym title="' + attrs.defaultattr + '">' + content + '</acronym>';
-			}
-		},
-		// END_COMMAND
-		
-		// START_COMMAND: Bdo
-		bdo: {
-			tags: {
-				bdo: {
-					dir: null
-				}
-			},
-			format: function(element, content) {
-				return '[bdo=' + element.attr('dir') + ']' + content + '[/bdo]';
-			},
-			html: function(element, attrs, content) {
-				if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
-					return content;
-				if (attrs.defaultattr != 'rtl' && attrs.defaultattr != 'ltr')
-					return '[bdo=' + attrs.defaultattr + ']' + content + '[/bdo]';
-
-				return '<bdo dir="' + attrs.defaultattr + '">' + content + '</bdo>';
-			}
-		},
-		// END_COMMAND
-		
-		// START_COMMAND: Tt
-		tt: {
-			tags: {
-				tt: null
-			},
-			format: "[tt]{0}[/tt]",
-			html: '<tt>{0}</tt>'
-		},
-		// END_COMMAND
-		
-		// START_COMMAND: Pre
-		pre: {
-			tags: {
-				pre: null
-			},
-			isBlock: true,
-			format: "[pre]{0}[/pre]",
-			html: "<pre>{0}</pre>\n"
-		},
-		// END_COMMAND
-		
-		// START_COMMAND: Move
-		move: {
-			tags: {
-				marquee: null
-			},
-			format: "[move]{0}[/move]",
-			html: '<marquee>{0}</marquee>'
-		},
-		// END_COMMAND
-		
 		// START_COMMAND: Hr
 		hr: {
 			tags: {
@@ -2361,6 +2172,7 @@
 			html: '<hr />'
 		},
 		// END_COMMAND
+
 
 		// this is here so that commands above can be removed
 		// without having to remove the , after the last one.

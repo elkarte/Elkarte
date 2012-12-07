@@ -1329,6 +1329,7 @@ function loadLocale()
 	loadLanguage('Editor');
 
 	$context['template_layers'] = array();
+
 	// Lets make sure we aren't going to output anything nasty.
 	@ob_end_clean();
 	if (!empty($modSettings['enableCompressedOutput']))
@@ -1481,12 +1482,14 @@ function create_control_richedit($editorOptions)
 		loadJavascriptFile('editor.js', array('default_theme' => true), 'smf_editor');
 		loadJavascriptFile('jquery.sceditor.js', array('default_theme' => true));
 		loadJavascriptFile('jquery.sceditor.bbcode.js', array('default_theme' => true));
+		loadJavascriptFile('jquery.sceditor.dialogo.js', array('default_theme' => true));
 		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
 		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
 		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
+	
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
 			loadJavascriptFile($scripturl . '?action=loadeditorlocale', array(), 'sceditor_language');
@@ -1666,7 +1669,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Allow mods to modify BBC buttons.
-		// Note: pass the array here is not necessary and is deprecated, but it is ketp for backward compatibility with 2.0
+		// Note: pass the array here is not necessary and is deprecated, but it is kept for backward compatibility with 2.0
 		call_integration_hook('integrate_bbc_buttons', array(&$context['bbc_tags']));
 
 		// Show the toggle?
@@ -1726,11 +1729,12 @@ function create_control_richedit($editorOptions)
 		{
 			if (!isset($context['bbc_toolbar'][$row]))
 				$context['bbc_toolbar'][$row] = array();
+
 			$tagsRow = array();
 			foreach ($tagRow as $tag)
 			{
-			 if (!empty($tag))
-			 {
+				if (!empty($tag))
+				{
 					if (empty($context['disabled_tags'][$tag['code']]))
 					{
 						$tagsRow[] = $tag['code'];
@@ -1761,14 +1765,17 @@ function create_control_richedit($editorOptions)
 				}
 			}
 
-			if ($row == 0)
+			if ($row === 0)
 			{
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
 				$tagsRow = array();
+
 				if (!isset($context['disabled_tags']['font']))
 					$tagsRow[] = 'font';
+
 				if (!isset($context['disabled_tags']['size']))
 					$tagsRow[] = 'size';
+
 				if (!isset($context['disabled_tags']['color']))
 					$tagsRow[] = 'color';
 			}
@@ -1786,6 +1793,7 @@ function create_control_richedit($editorOptions)
 			if (!empty($tagsRow))
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
 		}
+
 		if (!empty($bbcodes_styles))
 			$context['html_headers'] .= '
 		<style type="text/css">' . $bbcodes_styles . '

@@ -32,13 +32,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		</div>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script type="text/javascript"><!-- // --><![CDATA[
-			$(document).ready(function() {
-				', !empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
-
+			$(document).ready(function(){',
+			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditorBBCodePlugin({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
-					emoticonsCompat: true,',
-					!empty($editor_context['locale']) ? '
+					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white"';
 
@@ -62,6 +60,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						{';
 
 				$numRows = count($smileyRows);
+
 				// This is needed because otherwise the editor will remove all the duplicate (empty) keys and leave only 1 additional line
 				$emptyPlaceholder = 0;
 				foreach ($smileyRows as $smileyRow)
@@ -69,7 +68,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					foreach ($smileyRow['smileys'] as $smiley)
 					{
 						echo '
-								', JavaScriptEscape($smiley['code']), ': ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), empty($smiley['isLast']) ? ',' : '';
+							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 					}
 					if (empty($smileyRow['isLast']) && $numRows != 1)
 						echo ',
@@ -91,6 +90,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			echo ',
 					toolbar: "emoticon,';
 			$count_tags = count($context['bbc_tags']);
+
+			// create the tooltag to display the buttons in the editor
 			foreach ($context['bbc_toolbar'] as $i => $buttonRow)
 			{
 				echo implode('|', $buttonRow);
@@ -98,6 +99,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				if (!empty($count_tags))
 					echo '||';
 			}
+
 
 			echo '",';
 		}
@@ -112,26 +114,24 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_context['rich_active'] ? '' : '
 				$("#' . $editor_id . '").data("sceditor").setTextMode();', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
-				{
-					$("#' . $editor_id . '").data("sceditor").setTextMode();
 					$(".sceditor-button-source").hide();
-				}', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
+				', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
 				$(".sceditor-container").find("textarea").each(function() {$(this).css({border: "1px solid red"})});
 				$(".sceditor-container").find("iframe").each(function() {$(this).css({border: "1px solid red"})});' : '', '
 			});';
 
 		// Now for backward compatibility let's collect few infos in the good ol' style
 		echo '
-				var oEditorHandle_', $editor_id, ' = new smc_Editor({
-					sUniqueId: ', JavaScriptEscape($editor_id), ',
-					sEditWidth: ', JavaScriptEscape($editor_context['width']), ',
-					sEditHeight: ', JavaScriptEscape($editor_context['height']), ',
-					bRichEditOff: ', empty($modSettings['disable_wysiwyg']) ? 'false' : 'true', ',
-					oSmileyBox: null,
-					oBBCBox: null
-				});
-				smf_editorArray[smf_editorArray.length] = oEditorHandle_', $editor_id, ';
-			// ]]></script>';
+			var oEditorHandle_', $editor_id, ' = new smc_Editor({
+				sUniqueId: ', JavaScriptEscape($editor_id), ',
+				sEditWidth: ', JavaScriptEscape($editor_context['width']), ',
+				sEditHeight: ', JavaScriptEscape($editor_context['height']), ',
+				bRichEditOff: ', empty($modSettings['disable_wysiwyg']) ? 'false' : 'true', ',
+				oSmileyBox: null,
+				oBBCBox: null
+			});
+			smf_editorArray[smf_editorArray.length] = oEditorHandle_', $editor_id, ';
+		// ]]></script>';
 }
 
 function template_control_richedit_buttons($editor_id)

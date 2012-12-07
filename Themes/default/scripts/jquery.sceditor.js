@@ -37,7 +37,7 @@
 
 		toolbarButton:	'<a class="sceditor-button sceditor-button-{name}" data-sceditor-command="{name}" unselectable="on"><div unselectable="on">{dispName}</div></a>',
 
-		emoticon:	'<img src="{url}" data-sceditor-emoticon="{key}" alt="{key}" />',
+		emoticon:	'<img src="{url}" data-sceditor-emoticon="{key}" alt="{key}" title="{tooltip}" />',
 
 		fontOpt:	'<a class="sceditor-font-option" href="#" data-font="{font}"><font face="{font}">{font}</font></a>',
 
@@ -712,7 +712,7 @@
 			{
 				$.each(base.opts.emoticons, function (idx, emoticons) {
 					$.each(emoticons, function (key, url) {
-						base.opts.emoticons[idx][key] = base.opts.emoticonsRoot + url;
+						base.opts.emoticons[idx][key] = base.opts.emoticonsRoot + (url.url || url);
 					});
 				});
 			}
@@ -722,7 +722,7 @@
 
 			$.each(emoticons, function (key, url) {
 				emoticon     = document.createElement('img');
-				emoticon.src = url;
+				emoticon.src = url.url || url;
 				preLoadCache.push(emoticon);
 			});
 		};
@@ -1267,7 +1267,11 @@
 
 				html = html.replace(
 					new RegExp(reg, 'gm'),
-					group + _tmpl('emoticon', {key: key, url: url})
+					group + _tmpl('emoticon', {
+						key: key,
+						url: url.url || url,
+						tooltip: url.tooltip || key
+					})
 				);
 			});
 
@@ -2204,8 +2208,9 @@
 				appendEmoticon = function (code, emoticon) {
 					line.append($('<img />')
 							.attr({
-								src: emoticon,
-								alt: code
+								src: $.isPlainObject(emoticon) ? emoticon.url : emoticon,
+								alt: code,
+								title: $.isPlainObject(emoticon) ? emoticon.tooltip || code : code,
 							})
 							.click(function (e) {
 								editor.insert($(this).attr('alt') + end);
@@ -2265,7 +2270,11 @@
 					$.each($.extend({}, editor.opts.emoticons.more, editor.opts.emoticons.dropdown, editor.opts.emoticons.hidden), function(key, url) {
 						editor.EmoticonsCache[pos++] = [
 							key,
-							_tmpl("emoticon", {key: key, url: url})
+							_tmpl("emoticon", {
+								key: key,
+								url: url.url || url,
+								tooltip: url.tooltip || key
+							})
 						];
 					});
 
@@ -2447,7 +2456,6 @@
 			tooltip: "Right-to-Left"
 		},
 		// END_COMMAND
-
 
 		// START_COMMAND: Print
 		print: {
@@ -3620,268 +3628,3 @@
 		return ret.length === 1 ? ret[0] : $(ret);
 	};
 })(jQuery, window, document);
-
-/**
- * SCEditor
- *
- * exension methods 
- */
-(function($) {
-	var extensionMethods = {
-		InsertText: function(text, bClear) {
-			var bIsSource = this.inSourceMode();
-
-			// @TODO make it put the quote close to the current selection
-			if (!bIsSource)
-				this.toggleSourceMode();
-
-			var current_value = bClear ? text + "\n" : this.getSourceEditorValue(false) + "\n" + text + "\n";
-			this.setSourceEditorValue(current_value);
-
-			if (!bIsSource)
-				this.toggleSourceMode();
-
-		},
-		getText: function(filter) {
-			var current_value = '';
-			
-			if(this.inSourceMode())
-				current_value = this.getSourceEditorValue(false);
-			else
-				current_value  = this.getWysiwygEditorValue(filter);
-
-			return current_value;
-		},
-		appendEmoticon: function (code, emoticon) {
-			if (emoticon == '')
-				line.append($('<br />'));
-			else
-				line.append($('<img />')
-					.attr({
-						src: emoticon,
-						alt: code,
-					})
-					.click(function (e) {
-						var	start = '', end = '';
-						
-						if (base.opts.emoticonsCompat)
-						{
-							start = '<span> ';
-							end   = ' </span>';
-						}
-
-						if (base.inSourceMode())
-							base.sourceEditorInsertText(' ' + $(this).attr('alt') + ' ');
-						else
-							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
-
-						e.preventDefault();
-					})
-				);
-
-			if (line.children().length > 0)
-				content.append(line);
-
-			$(".sceditor-toolbar").append(content);
-		},
-		storeLastState: function (){
-			this.wasSource = this.inSourceMode();
-		},
-		setTextMode: function () {
-			if (!this.inSourceMode())
-				this.toggleSourceMode();
-		},
-		createPermanentDropDown: function() {
-				var	emoticons	= $.extend({}, this.opts.emoticons.dropdown);
-				var popup_exists = false;
-				content = $('<div class="sceditor-insertemoticon" />');
-				line = $('<div />');
-
-				base = this;
-				for (smiley_popup in this.opts.emoticons.popup)
-				{
-					popup_exists = true;
-					break;
-				}
-				if (popup_exists)
-				{
-					this.opts.emoticons.more = this.opts.emoticons.popup;
-					moreButton = $('<div class="sceditor-more-button" />').attr({'class': "sceditor-more"}).text('[' + this._('More') + ']').click(function () {
-						if ($(".sceditor-smileyPopup").length > 0)
-						{
-							$(".sceditor-smileyPopup").fadeIn('fast');
-						}
-						else
-						{
-							var emoticons = $.extend({}, base.opts.emoticons.popup);
-							var popup_position;
-							var titlebar = $('<div class="catbg sceditor-popup-grip"/>');
-							popupContent = $('<div id="sceditor-popup"/>');
-							allowHide = true;
-							line = $('<div id="sceditor-popup-smiley"/>');
-							adjheight = 0;
-
-							popupContent.append(titlebar);
-							closeButton = $('<span />').text('[' + base._('Close') + ']').click(function () {
-								$(".sceditor-smileyPopup").fadeOut('fast');
-							});
-
-							$.each(emoticons, base.appendEmoticon);
-
-							if (line.children().length > 0)
-								popupContent.append(line);
-							if (typeof closeButton !== "undefined")
-								popupContent.append(closeButton);
-
-							// IE needs unselectable attr to stop it from unselecting the text in the editor.
-							// The editor can cope if IE does unselect the text it's just not nice.
-							if(base.ieUnselectable !== false) {
-								content = $(content);
-								content.find(':not(input,textarea)').filter(function() { return this.nodeType===1; }).attr('unselectable', 'on');
-							}
-
-							$dropdown = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
-							$dropdown.appendTo($('body'));
-							dropdownIgnoreLastClick = true;
-							adjheight = closeButton.height() + titlebar.height();
-							$dropdown.css({
-								position: "fixed",
-								top: $(window).height() * 0.2,
-								left: $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2),
-								"max-width": "50%",
-								"max-height": "50%",
-							}).find('#sceditor-popup-smiley').css({
-								height: $dropdown.height() - adjheight,
-								"overflow": "auto"
-							});
-
-							$('.sceditor-smileyPopup').animaDrag({ 
-								speed: 150, 
-								interval: 120, 
-								during: function(e) {
-									$(this).height(this.startheight);
-									$(this).width(this.startwidth);
-								},
-								before: function(e) {
-									this.startheight = $(this).innerHeight();
-									this.startwidth = $(this).innerWidth();
-								},
-								grip: '.sceditor-popup-grip' 
-							});
-							
-							// stop clicks within the dropdown from being handled
-							$dropdown.click(function (e) {
-								e.stopPropagation();
-							});
-						}
-					});
-				}
-				$.each(emoticons, base.appendEmoticon);
-				if (typeof moreButton !== "undefined")
-					content.append(moreButton);
-		}
-	};
-
-	$.extend(true, $['sceditor'].prototype, extensionMethods);
-})(jQuery);
-
-// Add in our custom bbc buttons
-$.sceditor.command.set(
-	'ftp',
-	{
-		exec: function (caller) {
-			var	editor  = this,
-			content = $(this._('<form><div><label for="link">{0}</label> <input type="text" id="link" value="ftp://" /></div>' +
-					'<div><label for="des">{1}</label> <input type="text" id="des" value="" /></div></form>',
-				this._("URL:"),
-				this._("Description (optional):")
-			))
-			.submit(function () {return false;});
-
-			content.append($(
-				this._('<div><input type="button" class="button" value="{0}" /></div>',
-					this._("Insert")
-				)).click(function (e) {
-				var val = $(this).parent("form").find("#link").val(),
-					description = $(this).parent("form").find("#des").val();
-
-				if(val !== "" && val !== "ftp://") {
-					// needed for IE to reset the last range
-					editor.focus();
-
-					if(!editor.getRangeHelper().selectedHtml() || description)
-					{
-						if(!description)
-							description = val;
-						
-						editor.wysiwygEditorInsertHtml('<a href="' + val + '">' + description + '</a>');
-					}
-					else
-						editor.execCommand("createlink", val);
-				}
-
-				editor.closeDropDown(true);
-				e.preventDefault();
-			}));
-
-			editor.createDropDown(caller, "insertlink", content);
-		},
-		txtExec: ["[ftp]", "[/ftp]"],
-		tooltip: 'Insert FTP Link',
-	}
-);
-
-$.sceditor.command.set(
-	'glow',
-	{
-		exec: function () {
-			this.wysiwygEditorInsertHtml('[glow=red,2,300]', '[/glow]');
-		},
-		txtExec: ["[glow=red,2,300]", "[/glow]"],
-		tooltip: 'Glow',
-	}
-);
-
-$.sceditor.command.set(
-	'shadow',
-	{
-		exec: function () {
-			this.wysiwygEditorInsertHtml('[shadow=red,left]', '[/shadow]');
-		},
-		txtExec: ["[shadow=red,left]", "[/shadow]"],
-		tooltip: 'Shadow',
-	}
-);
-
-$.sceditor.command.set(
-	'tt',
-	{
-		exec: function () {
-			this.wysiwygEditorInsertHtml('<tt>', '</tt>');
-		},
-		txtExec: ["[tt]", "[/tt]"],
-		tooltip: 'Teletype',
-	}
-);
-
-$.sceditor.command.set(
-	'pre',
-	{
-		exec: function () {
-			this.wysiwygEditorInsertHtml('<pre>', '</pre>');
-		},
-		txtExec: ["[pre]", "[/pre]"],
-		tooltip: 'Pre',
-	}
-);
-
-$.sceditor.command.set(
-	'move',
-	{
-		exec: function () {
-			this.wysiwygEditorInsertHtml('<marquee>', '</marquee>');
-		},
-		txtExec: ["[move]", "[/move]"],
-		tooltip: 'Move',
-	}
-);
