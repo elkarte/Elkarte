@@ -154,6 +154,10 @@ foreach ($incontext['steps'] as $num => $step)
 // Actually do the template stuff.
 installExit();
 
+/**
+ * Initialization step. Called at each request.
+ * It either sets up variables for other steps, or handle a few requests on its own.
+ */
 function initialize_inputs()
 {
 	global $databases, $incontext;
@@ -273,7 +277,9 @@ function initialize_inputs()
 	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 }
 
-// Load the list of language files, and the current language file.
+/**
+ * Load the list of language files, and the current language file.
+ */
 function load_lang_file()
 {
 	global $txt, $incontext;
@@ -345,7 +351,9 @@ function load_lang_file()
 	require_once(dirname(__FILE__) . '/Themes/default/languages/' . $_SESSION['installer_temp_lang']);
 }
 
-// This handy function loads some settings and the like.
+/**
+ * This handy function loads some settings and the like.
+ */
 function load_database()
 {
 	global $db_prefix, $db_connection, $db_character_set, $sourcedir, $language;
@@ -373,7 +381,10 @@ function load_database()
 	}
 }
 
-// This is called upon exiting the installer, for template etc.
+/**
+ * This is called upon exiting the installer, for template etc.
+ * @param bool $fallThrough
+ */
 function installExit($fallThrough = false)
 {
 	global $incontext, $installurl, $txt;
@@ -485,6 +496,9 @@ function Welcome()
 	return false;
 }
 
+/**
+ * Verify and try to make writable the files and folders that need to be.
+ */
 function CheckFilesWritable()
 {
 	global $txt, $incontext;
@@ -679,6 +693,9 @@ function CheckFilesWritable()
 	return true;
 }
 
+/**
+ * Ask for database settings, verify and save them.
+ */
 function DatabaseSettings()
 {
 	global $txt, $databases, $incontext, $smcFunc, $sourcedir;
@@ -888,7 +905,9 @@ function DatabaseSettings()
 	return false;
 }
 
-// Let's start with basic forum type settings.
+/**
+ * Basic forum type settings.
+ */
 function ForumSettings()
 {
 	global $txt, $incontext, $databases, $smcFunc, $db_connection, $db_type;
@@ -970,7 +989,9 @@ function ForumSettings()
 	return false;
 }
 
-// Step one: Do the SQL thang.
+/**
+ * Step one. Populate database.
+ */
 function DatabasePopulation()
 {
 	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $sourcedir, $db_prefix, $incontext, $db_name, $boardurl;
@@ -1212,7 +1233,9 @@ function DatabasePopulation()
 	return false;
 }
 
-// Ask for the administrator login information.
+/**
+ * Ask for the administrator login information.
+ */
 function AdminAccount()
 {
 	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir;
@@ -1378,7 +1401,9 @@ function AdminAccount()
 	return false;
 }
 
-// Final step, clean up and a complete message!
+/**
+ * Final step, clean up and a complete message!
+ */
 function DeleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
@@ -1524,7 +1549,13 @@ function DeleteInstall()
 	return false;
 }
 
-// http://www.faqs.org/rfcs/rfc959.html
+/**
+ * FTP connection class.
+ * The installer will try to use this when it needs writable files
+ *  and it fails to make them writable otherwise.
+ *
+ * Credit: http://www.faqs.org/rfcs/rfc959.html
+ */
 class ftp_connection
 {
 	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
@@ -1940,7 +1971,9 @@ function updateDbLastError()
 	return true;
 }
 
-// Create an .htaccess file to prevent mod_security. Dialogo has filtering built-in.
+/**
+ * Create an .htaccess file to prevent mod_security. Dialogo has filtering built-in.
+ */
 function fixModSecurity()
 {
 	$htaccess_addition = '
@@ -2105,7 +2138,9 @@ function template_install_below()
 </html>';
 }
 
-// Welcome them to the wonderful world of Dialogo!
+/**
+ * Welcome them to the wonderful world of Dialogo!
+ */
 function template_welcome_message()
 {
 	global $incontext, $installurl, $txt;
@@ -2157,7 +2192,9 @@ function template_welcome_message()
 		// ]]></script>';
 }
 
-// A shortcut for any warning stuff.
+/**
+ * A shortcut for any warning stuff.
+ */
 function template_warning_divs()
 {
 	global $txt, $incontext;
@@ -2249,7 +2286,9 @@ function template_chmod_files()
 		<a href="', $incontext['form_url'], '">', $txt['error_message_click'], '</a> ', $txt['ftp_setup_again'];
 }
 
-// Get the database settings prepared.
+/**
+ * Template for the database settings form.
+ */
 function template_database_settings()
 {
 	global $incontext, $installurl, $txt;
@@ -2367,7 +2406,9 @@ function template_database_settings()
 	// ]]></script>';
 }
 
-// Stick in their forum settings.
+/**
+ * Stick in their forum settings.
+ */
 function template_forum_settings()
 {
 	global $incontext, $installurl, $txt;
@@ -2418,7 +2459,9 @@ function template_forum_settings()
 		</table>';
 }
 
-// Show results of the database population.
+/**
+ * Show results of the database population.
+ */
 function template_populate_database()
 {
 	global $incontext, $installurl, $txt;
@@ -2459,7 +2502,9 @@ function template_populate_database()
 	<input type="hidden" name="pop_done" value="1" />';
 }
 
-// Create the admin account.
+/**
+ * Template for the form to create the admin account.
+ */
 function template_admin_account()
 {
 	global $incontext, $installurl, $txt;
@@ -2509,7 +2554,9 @@ function template_admin_account()
 		</div>';
 }
 
-// Tell them it's done, and to delete.
+/**
+ * Tell them it's done, and to delete.
+ */
 function template_delete_install()
 {
 	global $incontext, $installurl, $txt, $boardurl;
