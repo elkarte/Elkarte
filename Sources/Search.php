@@ -23,7 +23,7 @@ if (!defined('DIALOGO'))
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'DIALOGO 1.0 Alpha 1',
+	'forum_version' => 'DIALOGO 1.0 Alpha',
 	// This is the minimum version of DIALOGO that an API could have been written for to work. (strtr to stop accidentally updating version on release)
 	'search_version' => strtr('DIALOGO 1+0=Alpha=1', array('+' => '.', '=' => ' ')),
 );

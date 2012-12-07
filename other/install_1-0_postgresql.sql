@@ -1823,7 +1823,7 @@ CREATE INDEX {$db_prefix}messages_related_ip ON {$db_prefix}messages (id_member,
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Simple Machines', 'info@simplemachines.org', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Dialogo', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -2150,7 +2150,7 @@ CREATE TABLE {$db_prefix}settings (
 # Dumping data for table `settings`
 #
 
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smfVersion', '{$smf_version}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ourVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
