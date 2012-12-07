@@ -1215,7 +1215,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	removeAttachments(array('id_member' => $memID));
 
-	$id_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['currentAttachmentUploadDir'] : 1;
+	$id_folder = getAttachmentPathID();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
 	$smcFunc['db_insert']('',
 		'{db_prefix}attachments',
@@ -1231,41 +1231,26 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	);
 	$attachID = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
 
-	// Retain this globally in case the script wants it.
-	$modSettings['new_avatar_data'] = array(
-		'id' => $attachID,
-		'filename' => $destName,
-		'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
-	);
+	// First, the temporary file will have the .tmp extension.
+	$tempName = getAvatarPath() . '/' . $destName . '.tmp';
 
-	$destName = (empty($modSettings['custom_avatar_enabled']) ? (is_array($modSettings['attachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']] : $modSettings['attachmentUploadDir']) : $modSettings['custom_avatar_dir']) . '/' . $destName . '.tmp';
+	// The destination filename will depend on whether custom dir for avatars has been set
+	$destName = getAvatarPath() . '/' . $destName;
+	$path = getAttachmentPath();
+	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
 
 	// Resize it.
 	require_once $sourcedir . '/Subs-Graphics.php';
 	if (!empty($modSettings['avatar_download_png']))
-		$success = resizeImageFile($temporary_path, $destName, $max_width, $max_height, 3);
-	else
-		$success = resizeImageFile($temporary_path, $destName, $max_width, $max_height);
-
-	// Remove the .tmp extension.
-	$destName = substr($destName, 0, -4);
+		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
+ 	else
+		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
 
 	if ($success)
 	{
-		// Walk the right path.
-		if (!empty($modSettings['currentAttachmentUploadDir']))
-		{
-			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-			$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-		}
-		else
-			$path = $modSettings['attachmentUploadDir'];
-
 		// Remove the .tmp extension from the attachment.
-		if (rename($destName . '.tmp', empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash))
+		if (rename($tempName, $destName))
 		{
-			$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
 			list ($width, $height) = getimagesize($destName);
 			$mime_type = 'image/' . $ext;
 
@@ -1283,6 +1268,13 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 					'mime_type' => $mime_type,
 				)
 			);
+
+			// Retain this globally in case the script wants it.
+			$modSettings['new_avatar_data'] = array(
+				'id' => $attachID,
+				'filename' => $destName,
+				'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
+			);
 			return true;
 		}
 		else
@@ -1298,7 +1290,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 			)
 		);
 
-		@unlink($destName . '.tmp');
+		@unlink($tempName);
 		return false;
 	}
 }
@@ -1417,4 +1409,86 @@ function getAvatarPath()
 	global $modSettings;
 
 	return empty($modSettings['custom_avatar_enabled']) ? getAttachmentPath() : $modSettings['custom_avatar_dir'];
+}
+
+/**
+ * Little utility function for the endless $id_folder computation for attachments.
+ * This returns the id of the folder where the attachment or avatar will be saved.
+ * If multiple attachment directories are not enabled, this will be 1 by default.
+ *
+ * @return int, return 1 if multiple attachment directories are not enabled,
+ * or the id of the current attachment directory otherwise.
+ */
+function getAttachmentPathID()
+{
+	global $modSettings;
+
+	// utility function for the endless $id_folder computation for attachments.
+	return !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['currentAttachmentUploadDir'] : 1;
+}
+
+/**
+ * Returns the ID of the folder avatars are currently saved in.
+ *
+ * @return int, returns 1 if custom avatar directory is enabled,
+ * and the ID of the current attachment folder otherwise.
+ * NB: the latter could also be 1.
+ */
+function getAvatarPathID()
+{
+	global $modSettings;
+
+	// Little utility function for the endless $id_folder computation for avatars.
+	if (!empty($modSettings['custom_avatar_enabled']))
+		return 1;
+	else
+		return getAttachmentPathID();
+}
+
+/**
+ * Get all attachments associated with a set of posts.
+ * This does not check permissions.
+ *
+ * @param $messages
+ */
+function getAttachments($messages)
+{
+	global $smcFunc, $modSettings;
+
+	$attachments = array();
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
+			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
+			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
+    	FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
+			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
+		WHERE a.id_msg IN ({array_int:message_list})
+			AND a.attachment_type = {int:attachment_type}',
+		array(
+			'message_list' => $messages,
+			'attachment_type' => 0,
+			'is_approved' => 1,
+		)
+	);
+	$temp = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if (!$row['approved'] && $modSettings['postmod_active'] && !allowedTo('approve_posts') && (!isset($all_posters[$row['id_msg']]) || $all_posters[$row['id_msg']] != $user_info['id']))
+			continue;
+
+		$temp[$row['id_attach']] = $row;
+
+		if (!isset($attachments[$row['id_msg']]))
+			$attachments[$row['id_msg']] = array();
+	}
+	$smcFunc['db_free_result']($request);
+
+	// This is better than sorting it with the query...
+	ksort($temp);
+
+	foreach ($temp as $row)
+		$attachments[$row['id_msg']][] = $row;
+
+	return $attachments;
 }

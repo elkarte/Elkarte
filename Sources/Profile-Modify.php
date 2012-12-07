@@ -2660,25 +2660,8 @@ function profileSaveAvatarData(&$value)
 	require_once($sourcedir . '/Subs-Attachments.php');
 
 	// We need to know where we're going to be putting it..
-	if (!empty($modSettings['custom_avatar_enabled']))
-	{
-		$uploadDir = $modSettings['custom_avatar_dir'];
-		$id_folder = 1;
-	}
-	elseif (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-
-		// Just use the current path for temp files.
-		$uploadDir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-		$id_folder = $modSettings['currentAttachmentUploadDir'];
-	}
-	else
-	{
-		$uploadDir = $modSettings['attachmentUploadDir'];
-		$id_folder = 1;
-	}
+	$uploadDir = getAvatarPath();
+	$id_folder = getAvatarPathID();
 
 	$downloadedExternalAvatar = false;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
