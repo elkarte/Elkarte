@@ -261,7 +261,7 @@ function smf_main()
 		'movetopic2' => array('MoveTopic.php', 'MoveTopic2'),
 		'notify' => array('Notify.php', 'Notify'),
 		'notifyboard' => array('Notify.php', 'BoardNotify'),
-		'openidreturn' => array('Subs-OpenID.php', 'smf_openID_return'),
+		'openidreturn' => array('Subs-OpenID.php', 'OpenIDReturn'),
 		'pm' => array('PersonalMessage.php', 'MessageMain'),
 		'post' => array('Post.php', 'Post'),
 		'post2' => array('Post.php', 'Post2'),

@@ -468,7 +468,7 @@ function Register2($verifiedOpenID = false)
 				$save_variables[$k] = $v;
 
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_validate($_POST['openid_identifier'], false, $save_variables);
+		openID_validate($_POST['openid_identifier'], false, $save_variables);
 	}
 	// If we've come from OpenID set up some default stuff.
 	elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))

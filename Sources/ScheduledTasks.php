@@ -454,7 +454,7 @@ function scheduled_daily_maintenance()
 	if (!empty($modSettings['enableOpenID']))
 	{
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_setup_DH(true);
+		openID_setup_DH(true);
 	}
 	elseif (!empty($modSettings['dh_keys']))
 		$smcFunc['db_query']('', '
