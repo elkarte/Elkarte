@@ -1027,7 +1027,7 @@ function DatabasePopulation()
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$our_version}' => $GLOBALS['current_version'],
+		'{$current_version}' => $GLOBALS['current_version'],
 		'{$current_time}' => time(),
 		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 	);
