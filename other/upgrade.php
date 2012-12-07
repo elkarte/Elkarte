@@ -641,7 +641,7 @@ if (!isset($settings['default_theme_url']))
 if (!isset($settings['default_theme_dir']))
 	$settings['default_theme_dir'] = $modSettings['theme_dir'];
 
-$upcontext['is_large_forum'] = (empty($modSettings['ourVersion']) || $modSettings['ourVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
+$upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
 $upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Dialogo Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
 
@@ -1434,12 +1434,13 @@ function DatabaseChanges()
 	$upcontext['page_title'] = 'Database Changes';
 
 	// All possible files.
-	// Name, <version, insert_on_complete
+	// Name, version, insert_on_complete.
 	$files = array(
 		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
 		array('upgrade_2-0_' . $db_type . '.sql', '2.1', '2.1 dev0'),
-		array('upgrade_2-1_' . $db_type . '.sql', '3.0', CURRENT_VERSION),
+		// array('upgrade_2-1_' . $db_type . '.sql', '3.0', '3.0 dev0'),
+		array('upgrade_dia_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
 	);
 
 	// How many files are there in total?
@@ -1450,7 +1451,9 @@ function DatabaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < $file[1])
+			if (!isset($modSettings['ourVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
+				$upcontext['file_count']++;
+			elseif (!isset($modSettings['ourVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['ourVersion'] < $file[1]))
 				$upcontext['file_count']++;
 		}
 	}
@@ -3618,7 +3621,7 @@ function template_welcome_message()
 	$upcontext['chmod_in_form'] = true;
 	template_chmod();
 
-	// For large, pre 1.1 RC2 forums give them a warning about the possible impact of this upgrade!
+	// For large, SMF pre-1.1 RC2 forums give them a warning about the possible impact of this upgrade!
 	if ($upcontext['is_large_forum'])
 		echo '
 		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background-color: #ffe4e9;">
