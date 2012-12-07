@@ -149,8 +149,8 @@ function list_getLanguagesList()
 	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl;
 
 	// We're going to use this URL.
-	// @todo no we are not, this needs to be changed
-	$url = 'http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('SMF ' => '')));
+	// @todo no we are not, this needs to be changed - again
+	$url = 'http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => '')));
 
 	// Load the class file and stick it into an array.
 	require_once($sourcedir . '/Class-Package.php');
@@ -158,9 +158,9 @@ function list_getLanguagesList()
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))
-		$context['smf_error'] = 'no_response';
+		$context['langfile_error'] = 'no_response';
 	elseif (!$language_list->exists('languages/language'))
-		$context['smf_error'] = 'no_files';
+		$context['langfile_error'] = 'no_files';
 	else
 	{
 		$language_list = $language_list->path('languages[0]');
@@ -182,14 +182,14 @@ function list_getLanguagesList()
 			);
 		}
 		if (empty($smf_languages))
-			$context['smf_error'] = 'no_files';
+			$context['langfile_error'] = 'no_files';
 		else
 			return $smf_languages;
 	}
 }
 
 /**
- * Download a language file from the Simple Machines website.
+ * Download a language file from the website.
  * Requires a valid download ID ("did") in the URL.
  * Also handles installing language files.
  * Attempts to chmod things as needed.
@@ -244,8 +244,8 @@ function DownloadLanguage()
 		// Otherwise, go go go!
 		elseif (!empty($install_files))
 		{
-			// @todo
-			$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
+			// @todo retrieve the language pack per naming pattern from our sites
+			$archive_content = read_tgz_file('http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
 			// Make sure the files aren't stuck in the cache.
 			package_flush_cache();
 			$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -256,7 +256,7 @@ function DownloadLanguage()
 
 	// @todo Open up the old china.
 	if (!isset($archive_content))
-		$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
+		$archive_content = read_tgz_file('http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 
 	if (empty($archive_content))
 		fatal_error($txt['add_language_error_no_response']);
