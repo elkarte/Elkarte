@@ -447,13 +447,13 @@ function template_add_language()
 						<input type="text" name="smf_add" size="40" value="', !empty($context['smf_search_term']) ? $context['smf_search_term'] : '', '" class="input_text" />';
 
 	// Do we have some errors? Too bad.
-	if (!empty($context['smf_error']))
+	if (!empty($context['langfile_error']))
 	{
 		// Display a little error box.
 		echo '
 						<div>
 							<br />
-							<p class="errorbox">', $txt['add_language_error_' . $context['smf_error']], '</p>
+							<p class="errorbox">', $txt['add_language_error_' . $context['langfile_error']], '</p>
 						</div>';
 	}
 

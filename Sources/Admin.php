@@ -774,7 +774,6 @@ function AdminSearchInternal()
 		array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
 		array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
 		array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
-		// Mod authors if you want to be "real freaking good" then add any setting pages for your mod BELOW this line!
 		array('ManageAttachmentSettings', 'area=manageattachments;sa=attachments'),
 		array('ManageAvatarSettings', 'area=manageattachments;sa=avatars'),
 		array('ModifyCalendarSettings', 'area=managecalendar;sa=settings'),
@@ -901,14 +900,15 @@ function AdminSearchMember()
 }
 
 /**
- * This file allows the user to search the SM online manual for a little of help.
+ * This file allows the user to search the wiki documentation
+ *  for a little help.
  */
 function AdminSearchOM()
 {
 	global $context, $sourcedir;
 
-	$context['doc_apiurl'] = 'http://wiki.simplemachines.org/api.php';
-	$context['doc_scripturl'] = 'http://wiki.simplemachines.org/smf/';
+	$context['doc_apiurl'] = 'https://github.com/Spuds/Dialogo/wiki//api.php';
+	$context['doc_scripturl'] = 'https://github.com/Spuds/Dialogo/wiki/';
 
 	// Set all the parameters search might expect.
 	$postVars = explode(' ', $context['search_term']);
@@ -923,7 +923,7 @@ function AdminSearchOM()
 	// Get the results from the doc site.
 	require_once($sourcedir . '/Subs-Package.php');
 	// Demo URL:
-	// http://wiki.simplemachines.org/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
+	// https://github.com/Spuds/Dialogo/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 	// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
