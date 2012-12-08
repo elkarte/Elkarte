@@ -1398,11 +1398,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$smcFunc['db_free_result']($result);
 
 		if (!empty($themeData[-1]))
+		{
 			foreach ($themeData[-1] as $k => $v)
 			{
 				if (!isset($themeData[$member][$k]))
 					$themeData[$member][$k] = $v;
 			}
+		}
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);

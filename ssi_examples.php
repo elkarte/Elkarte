@@ -525,7 +525,7 @@ function template_ssi_above()
 			<div id="header"><div class="frame">
 				<div id="top_section">
 					<h1 class="forumtitle">SSI.php Examples</h1>
-					<img id="smflogo" src="Themes/default/images/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />
+					<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
 				</div>
 				<div id="upper_section" class="middletext" style="overflow: hidden;">
 					<div class="user"></div>

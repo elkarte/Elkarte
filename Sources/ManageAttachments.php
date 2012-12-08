@@ -1689,7 +1689,7 @@ function ManageAttachmentPaths()
 	{
 		checkSession();
 
-		$_POST['current_dir'] = (int) $_POST['current_dir'];
+		$_POST['current_dir'] = isset($_POST['current_dir']) ? (int) $_POST['current_dir'] : 0;
 		$new_dirs = array();
 		foreach ($_POST['dirs'] as $id => $path)
 		{

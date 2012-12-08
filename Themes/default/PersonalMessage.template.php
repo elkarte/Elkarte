@@ -14,7 +14,6 @@
  * @version 1.0 Alpha
  */
 
-
 // This is the main sidebar for the personal messages section.
 function template_pm_above()
 {
@@ -286,6 +285,7 @@ function template_folder()
 					</ul>
 				</li>
 				<li class="icons">', $message['member']['group_icons'], '</li>';
+
 			// Show the member's primary group (like 'Administrator') if they have one.
 			if (isset($message['member']['group']) && $message['member']['group'] != '')
 				echo '
