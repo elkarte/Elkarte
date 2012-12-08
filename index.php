@@ -237,6 +237,7 @@ function smf_main()
 		'credits' => array('Who.php', 'Credits'),
 		'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
 		'dlattach' => array('Attachment.php', 'Download'),
+		'disregardtopic' => array('Notify.php', 'TopicDisregard'),
 		'editpoll' => array('Poll.php', 'EditPoll'),
 		'editpoll2' => array('Poll.php', 'EditPoll2'),
 		'emailuser' => array('SendTopic.php', 'EmailUser'),

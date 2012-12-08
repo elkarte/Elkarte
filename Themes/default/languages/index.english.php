@@ -373,6 +373,8 @@ $txt['valid_email'] = 'This must be a valid email address.';
 $txt['info_center_title'] = '%1$s - Info Center';
 
 $txt['send_topic'] = 'Send this topic';
+$txt['disregard'] = 'Disregard';
+$txt['undisregard'] = 'Stop disregarding';
 
 $txt['sendtopic_title'] = 'Send the topic &quot;%1$s&quot; to a friend.';
 $txt['sendtopic_sender_name'] = 'Your name';
