@@ -261,4 +261,3 @@ function load_user_drafts($member_id, $topic = false, $draft_type = 0, $drafts_k
 
 	return $user_drafts;
 }
-

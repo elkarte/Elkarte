@@ -5,12 +5,6 @@
  * @copyright Dialogo Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
  * @version 1.0 Alpha
  *
  * This file contains all the functions that allow for the saving,
@@ -163,6 +157,7 @@ function savePMDraft(&$post_errors, $recipientList)
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_pm_draft;
 			$context['draft_saved_on'] = $draft_info['poster_time'];
+			obExit();
 		}
 
 		return true;
@@ -224,6 +219,7 @@ function savePMDraft(&$post_errors, $recipientList)
 		$context['sub_template'] = 'xml_draft';
 		$context['id_draft'] = $id_pm_draft;
 		$context['draft_saved_on'] = time();
+		obExit();
 	}
 
 	return;
