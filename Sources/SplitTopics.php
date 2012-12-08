@@ -768,12 +768,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg']);
 
-		$smcFunc['db_insert']('ignore',
-			'{db_prefix}log_topics',
-			array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int'),
-			$replaceEntries,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1449,12 +1445,8 @@ function MergeExecute($topics = array())
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int'),
-			$replaceEntries,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);
 
 		// Get rid of the old log entries.

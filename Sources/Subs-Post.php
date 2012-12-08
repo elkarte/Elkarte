@@ -1117,12 +1117,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			$smcFunc['db_insert']('ignore',
-				'{db_prefix}log_topics',
-				array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-				array($topicOptions['id'], $posterOptions['id'], $msgOptions['id']),
-				array('id_topic', 'id_member')
-			);
+			require_once($sourcedir . '/Subs-Topic.php');
+			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id']), false);
 		}
 	}
 
@@ -1280,12 +1276,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			$smcFunc['db_insert']('ignore',
-				'{db_prefix}log_topics',
-				array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-				array($topicOptions['id'], $user_info['id'], $modSettings['maxMsgID']),
-				array('id_topic', 'id_member')
-			);
+			require_once($sourcedir . '/Subs-Topic.php');
+			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID']), false);
 		}
 	}
 

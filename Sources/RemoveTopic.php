@@ -527,12 +527,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycled topic as read.
 			if (!$user_info['is_guest'])
-				$smcFunc['db_insert']('replace',
-					'{db_prefix}log_topics',
-					array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-					array($topicID, $user_info['id'], $modSettings['maxMsgID']),
-					array('id_topic', 'id_member')
-				);
+				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID']), true);
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])

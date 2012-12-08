@@ -1166,14 +1166,9 @@ function QuickModeration()
 	{
 		$markArray = array();
 		foreach ($markCache as $topic)
-			$markArray[] = array($modSettings['maxMsgID'], $user_info['id'], $topic);
-
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			$markArray,
-			array('id_member', 'id_topic')
-		);
+			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID']);
+		
+		markTopicsRead($markArray, true);
 	}
 
 	foreach ($moveCache as $topic)

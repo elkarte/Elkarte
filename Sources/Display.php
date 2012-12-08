@@ -91,14 +91,7 @@ function Display()
 	// Add 1 to the number of views of this topic (except for robots).
 	if (!$user_info['possibly_robot'] && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET num_views = num_views + 1
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-			)
-		);
+		increaseViewCounter($topic);
 
 		$_SESSION['last_read_topic'] = $topic;
 	}
@@ -788,18 +781,7 @@ function Display()
 		if ($mark_at_msg >= $topicinfo['id_last_msg'])
 			$mark_at_msg = $modSettings['maxMsgID'];
 		if ($mark_at_msg >= $topicinfo['new_from'])
-		{
-			$smcFunc['db_insert']($topicinfo['new_from'] == 0 ? 'ignore' : 'replace',
-				'{db_prefix}log_topics',
-				array(
-					'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int',
-				),
-				array(
-					$user_info['id'], $topic, $mark_at_msg,
-				),
-				array('id_member', 'id_topic')
-			);
-		}
+			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg), $topicinfo['new_from'] !== 0);
 
 		updateReadNotificationsFor($topic, $board);
 

@@ -183,14 +183,10 @@ function MarkRead()
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
-			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], (int) $id_topic);
+			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			$markRead,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($markRead, true);
 
 		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
@@ -262,12 +258,8 @@ function MarkRead()
 		}
 
 		// Blam, unread!
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			array($earlyMsg, $user_info['id'], $topic),
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead(array($user_info['id'], $topic, $earlyMsg), true);
 
 		redirectexit('board=' . $board . '.0');
 	}
