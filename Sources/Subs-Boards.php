@@ -143,7 +143,7 @@ function markBoardsRead($boards, $unread = false)
  */
 function MarkRead()
 {
-	global $board, $topic, $user_info, $board_info, $modSettings, $smcFunc;
+	global $board, $topic, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir;
 
 	// No Guests allowed!
 	is_not_guest();
@@ -199,14 +199,10 @@ function MarkRead()
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
-			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], $id_topic, (isset($logged_topics[$topic]) ? $logged_topics[$topic] : 0));
+			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int', 'disregarded' => 'int'),
-			$markRead,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($markRead, true);
 
 		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
@@ -281,12 +277,8 @@ function MarkRead()
 		}
 
 		// Blam, unread!
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int', 'disregarded' => 'int'),
-			array($earlyMsg, $user_info['id'], $topic, $topicinfo['disregarded']),
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead(array($user_info['id'], $topic, $earlyMsg), true);
 
 		redirectexit('board=' . $board . '.0');
 	}
@@ -897,7 +889,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		$topics[] = $row['id_topic'];
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/Subs-Topic.php');
 	removeTopics($topics, false);
 
 	// Delete the board's logs.
@@ -1214,4 +1206,69 @@ function isChildOf($child, $parent)
 		return true;
 
 	return isChildOf($boards[$child]['parent'], $parent);
+}
+
+/**
+ * Returns whether this member has notification turned on for the specified board.
+ *
+ * @param int $id_member
+ * @param int $id_board
+ * @return bool
+ */
+function hasBoardNotification($id_member, $id_board)
+{
+	global $smcFunc, $user_info, $board;
+
+	// Find out if they have notification set for this board already.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member
+		FROM {db_prefix}log_notify
+		WHERE id_member = {int:current_member}
+			AND id_board = {int:current_board}
+		LIMIT 1',
+		array(
+			'current_board' => $board,
+			'current_member' => $user_info['id'],
+		)
+	);
+	$hasNotification = $smcFunc['db_num_rows']($request) != 0;
+	$smcFunc['db_free_result']($request);
+
+	return hasNotification;
+}
+
+/**
+ * Set board notification on or off for the given member.
+ *
+ * @param int $id_member
+ * @param int $id_board
+ * @param bool $on = false
+ */
+function setBoardNotification($id_member, $id_board, $on = false)
+{
+	global $smcFunc;
+
+	if ($on)
+	{
+		// Turn notification on.  (note this just blows smoke if it's already on.)
+		$smcFunc['db_insert']('ignore',
+			'{db_prefix}log_notify',
+			array('id_member' => 'int', 'id_board' => 'int'),
+			array($id_member, $id_board),
+			array('id_member', 'id_board')
+		);
+	}
+	else
+	{
+		// Turn notification off for this board.
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}log_notify
+			WHERE id_member = {int:current_member}
+				AND id_board = {int:current_board}',
+			array(
+				'current_board' => $id_board,
+				'current_member' => $id_member,
+			)
+		);
+	}
 }

@@ -193,7 +193,7 @@ function summary($memID)
 
 		// load them in to $context for use in the template
 		$i = 0;
-		
+
 		// @todo keep or loose the mime thumbs ... useful at all?
 		$mime_images_url = $settings['default_images_url'] . '/mime_images/';
 		$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';

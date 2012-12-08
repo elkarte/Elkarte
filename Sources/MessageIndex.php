@@ -848,7 +848,7 @@ function QuickModeration()
 			$stickyCache[] = $topic;
 		elseif ($action == 'move')
 		{
-			require_once($sourcedir . '/MoveTopic.php');
+			require_once($sourcedir . '/Subs-Topic.php');
 			moveTopicConcurrence();
 
 			// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
@@ -946,7 +946,7 @@ function QuickModeration()
 
 		$moveCache = $moveCache2;
 
-		require_once($sourcedir . '/MoveTopic.php');
+		require_once($sourcedir . '/Subs-Topic.php');
 
 		// Do the actual moves...
 		foreach ($moveTos as $to => $topics)
@@ -1054,7 +1054,7 @@ function QuickModeration()
 				sendNotifications($topic, 'remove');
 			}
 
-			require_once($sourcedir . '/RemoveTopic.php');
+			require_once($sourcedir . '/Subs-Topic.php');
 			removeTopics($removeCache);
 		}
 	}
@@ -1181,14 +1181,9 @@ function QuickModeration()
 
 		$markArray = array();
 		foreach ($markCache as $topic)
-			$markArray[] = array($modSettings['maxMsgID'], $user_info['id'], $topic, (isset($logged_topics[$topic]) ? $logged_topics[$topic] : 0));
+			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int', 'disregarded' => 'int'),
-			$markArray,
-			array('id_member', 'id_topic')
-		);
+		markTopicsRead($markArray, true);
 	}
 
 	foreach ($moveCache as $topic)
