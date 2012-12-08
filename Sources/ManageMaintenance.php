@@ -1985,7 +1985,7 @@ function MaintainMassMoveTopics()
 			}
 
 			// Lets move them.
-			require_once($sourcedir . '/MoveTopic.php');
+			require_once($sourcedir . '/Subs-Topic.php');
 			moveTopics($topics, $id_board_to);
 
 			// We've done at least ten more topics.

@@ -598,8 +598,8 @@ function deleteAccount2($memID)
 		// @todo Should this check board permissions?
 		if ($_POST['remove_type'] != 'none' && allowedTo('moderate_forum'))
 		{
-			// Include RemoveTopics - essential for this type of work!
-			require_once($sourcedir . '/RemoveTopic.php');
+			// Include Subs-Topic.php - essential for this type of work!
+			require_once($sourcedir . '/Subs-Topic.php');
 
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')

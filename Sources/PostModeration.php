@@ -778,7 +778,7 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/Subs-Topic.php');
 	if ($current_view == 'topics')
 	{
 		removeTopics($messages);

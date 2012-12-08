@@ -42,6 +42,9 @@ function Display()
 
 	// Load the template
 	loadTemplate('Display');
+	
+	// And the topic functions
+	require_once($sourcedir . '/Subs-Topic.php');
 
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -73,56 +76,11 @@ function Display()
 		// No use in calculating the next topic if there's only one.
 		if ($board_info['num_topics'] > 1)
 		{
-			// Just prepare some variables that are used in the query.
-			$gt_lt = $_REQUEST['prev_next'] == 'prev' ? '>' : '<';
-			$order = $_REQUEST['prev_next'] == 'prev' ? '' : ' DESC';
-
-			$request = $smcFunc['db_query']('', '
-				SELECT t2.id_topic
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}topics AS t2 ON (' . (empty($modSettings['enableStickyTopics']) ? '
-					t2.id_last_msg ' . $gt_lt . ' t.id_last_msg' : '
-					(t2.id_last_msg ' . $gt_lt . ' t.id_last_msg AND t2.is_sticky ' . $gt_lt . '= t.is_sticky) OR t2.is_sticky ' . $gt_lt . ' t.is_sticky') . ')
-				WHERE t.id_topic = {int:current_topic}
-					AND t2.id_board = {int:current_board}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-					AND (t2.approved = {int:is_approved} OR (t2.id_member_started != {int:id_member_started} AND t2.id_member_started = {int:current_member}))') . '
-				ORDER BY' . (empty($modSettings['enableStickyTopics']) ? '' : ' t2.is_sticky' . $order . ',') . ' t2.id_last_msg' . $order . '
-				LIMIT 1',
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-					'is_approved' => 1,
-					'id_member_started' => 0,
-				)
-			);
-
-			// No more left.
-			if ($smcFunc['db_num_rows']($request) == 0)
-			{
-				$smcFunc['db_free_result']($request);
-
-				// Roll over - if we're going prev, get the last - otherwise the first.
-				$request = $smcFunc['db_query']('', '
-					SELECT id_topic
-					FROM {db_prefix}topics
-					WHERE id_board = {int:current_board}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
-					ORDER BY' . (empty($modSettings['enableStickyTopics']) ? '' : ' is_sticky' . $order . ',') . ' id_last_msg' . $order . '
-					LIMIT 1',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-						'is_approved' => 1,
-						'id_member_started' => 0,
-					)
-				);
-			}
-
-			// Now you can be sure $topic is the id_topic to view.
-			list ($topic) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
+			$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
+			$includeStickies = !empty($modSettings['enableStickyTopics']);
+			
+			$topic = $_REQUEST['prev_next'] === 'prev' ? getPreviousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : getNextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
+			
 			$context['current_topic'] = $topic;
 		}
 
@@ -843,44 +801,7 @@ function Display()
 			);
 		}
 
-		// Check for notifications on this topic OR board.
-		$request = $smcFunc['db_query']('', '
-			SELECT sent, id_topic
-			FROM {db_prefix}log_notify
-			WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
-				AND id_member = {int:current_member}
-			LIMIT 2',
-			array(
-				'current_board' => $board,
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-			)
-		);
-		$do_once = true;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// Find if this topic is marked for notification...
-			if (!empty($row['id_topic']))
-				$context['is_marked_notify'] = true;
-
-			// Only do this once, but mark the notifications as "not sent yet" for next time.
-			if (!empty($row['sent']) && $do_once)
-			{
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}log_notify
-					SET sent = {int:is_not_sent}
-					WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
-						AND id_member = {int:current_member}',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-						'current_topic' => $topic,
-						'is_not_sent' => 0,
-					)
-				);
-				$do_once = false;
-			}
-		}
+		updateReadNotificationsFor($topic, $board);
 
 		// Have we recently cached the number of new topics in this board, and it's still a lot?
 		if (isset($_REQUEST['topicseen']) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
@@ -889,23 +810,7 @@ function Display()
 		elseif (isset($_REQUEST['topicseen']))
 		{
 			// Use the mark read tables... and the last visit to figure out if this should be read or not.
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}topics AS t
-					LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = {int:current_board} AND lb.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				WHERE t.id_board = {int:current_board}
-					AND t.id_last_msg > IFNULL(lb.id_msg, 0)
-					AND t.id_last_msg > IFNULL(lt.id_msg, 0)' . (empty($_SESSION['id_msg_last_visit']) ? '' : '
-					AND t.id_last_msg > {int:id_msg_last_visit}'),
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'id_msg_last_visit' => (int) $_SESSION['id_msg_last_visit'],
-				)
-			);
-			list ($numNewTopics) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 			// If there're no real new topics in this board, mark the board as seen.
 			if (empty($numNewTopics))

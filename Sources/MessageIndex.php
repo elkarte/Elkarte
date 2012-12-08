@@ -848,7 +848,7 @@ function QuickModeration()
 			$stickyCache[] = $topic;
 		elseif ($action == 'move')
 		{
-			require_once($sourcedir . '/MoveTopic.php');
+			require_once($sourcedir . '/Subs-Topic.php');
 			moveTopicConcurrence();
 
 			// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
@@ -946,7 +946,7 @@ function QuickModeration()
 
 		$moveCache = $moveCache2;
 
-		require_once($sourcedir . '/MoveTopic.php');
+		require_once($sourcedir . '/Subs-Topic.php');
 
 		// Do the actual moves...
 		foreach ($moveTos as $to => $topics)
@@ -1054,7 +1054,7 @@ function QuickModeration()
 				sendNotifications($topic, 'remove');
 			}
 
-			require_once($sourcedir . '/RemoveTopic.php');
+			require_once($sourcedir . '/Subs-Topic.php');
 			removeTopics($removeCache);
 		}
 	}

@@ -1735,7 +1735,7 @@ function scheduled_remove_topic_redirect()
 	// Zap, your gone
 	if (count($topics) > 0)
 	{
-		require_once($sourcedir . '/RemoveTopic.php');
+		require_once($sourcedir . '/Subs-Topic.php');
 		removeTopics($topics, false, true);
 	}
 

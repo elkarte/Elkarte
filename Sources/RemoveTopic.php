@@ -35,6 +35,9 @@ function RemoveTopic2()
 
 	// This file needs to be included for sendNotifications().
 	require_once($sourcedir . '/Subs-Post.php');
+	
+	// This needs to be included for all the topic db functions
+	require_once($sourcedir . '/Subs-Topic.php');
 
 	// Trying to fool us around, are we?
 	if (empty($topic))
@@ -221,342 +224,6 @@ function RemoveOldTopics2()
 }
 
 /**
- * Removes the passed id_topic's. (permissions are NOT checked here!).
- *
- * @param array/int $topics The topics to remove (can be an id or an array of ids).
- * @param bool $decreasePostCount if true users' post count will be reduced
- * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
- */
-function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
-{
-	global $sourcedir, $modSettings, $smcFunc;
-
-	// Nothing to do?
-	if (empty($topics))
-		return;
-	// Only a single topic.
-	if (is_numeric($topics))
-		$topics = array($topics);
-
-	// Decrease the post counts.
-	if ($decreasePostCount)
-	{
-		$requestMembers = $smcFunc['db_query']('', '
-			SELECT m.id_member, COUNT(*) AS posts
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE m.id_topic IN ({array_int:topics})
-				AND m.icon != {string:recycled}
-				AND b.count_posts = {int:do_count_posts}
-				AND m.approved = {int:is_approved}
-			GROUP BY m.id_member',
-			array(
-				'do_count_posts' => 0,
-				'recycled' => 'recycled',
-				'topics' => $topics,
-				'is_approved' => 1,
-			)
-		);
-		if ($smcFunc['db_num_rows']($requestMembers) > 0)
-		{
-			while ($rowMembers = $smcFunc['db_fetch_assoc']($requestMembers))
-				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
-		}
-		$smcFunc['db_free_result']($requestMembers);
-	}
-
-	// Recycle topics that aren't in the recycle board...
-	if (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 && !$ignoreRecycling)
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_topic, id_board, unapproved_posts, approved
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:topics})
-				AND id_board != {int:recycle_board}
-			LIMIT ' . count($topics),
-			array(
-				'recycle_board' => $modSettings['recycle_board'],
-				'topics' => $topics,
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) > 0)
-		{
-			// Get topics that will be recycled.
-			$recycleTopics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if (function_exists('apache_reset_timeout'))
-					@apache_reset_timeout();
-
-				$recycleTopics[] = $row['id_topic'];
-
-				// Set the id_previous_board for this topic - and make it not sticky.
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET id_previous_board = {int:id_previous_board}, is_sticky = {int:not_sticky}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'id_previous_board' => $row['id_board'],
-						'id_topic' => $row['id_topic'],
-						'not_sticky' => 0,
-					)
-				);
-			}
-			$smcFunc['db_free_result']($request);
-
-			// Mark recycled topics as recycled.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET icon = {string:recycled}
-				WHERE id_topic IN ({array_int:recycle_topics})',
-				array(
-					'recycle_topics' => $recycleTopics,
-					'recycled' => 'recycled',
-				)
-			);
-
-			// Move the topics to the recycle board.
-			require_once($sourcedir . '/MoveTopic.php');
-			moveTopics($recycleTopics, $modSettings['recycle_board']);
-
-			// Close reports that are being recycled.
-			require_once($sourcedir . '/ModerationCenter.php');
-
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_reported
-				SET closed = {int:is_closed}
-				WHERE id_topic IN ({array_int:recycle_topics})',
-				array(
-					'recycle_topics' => $recycleTopics,
-					'is_closed' => 1,
-				)
-			);
-
-			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports();
-
-			// Topics that were recycled don't need to be deleted, so subtract them.
-			$topics = array_diff($topics, $recycleTopics);
-		}
-		else
-			$smcFunc['db_free_result']($request);
-	}
-
-	// Still topics left to delete?
-	if (empty($topics))
-		return;
-
-	$adjustBoards = array();
-
-	// Find out how many posts we are deleting.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
-			SUM(num_replies) AS num_replies
-		FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:topics})
-		GROUP BY id_board, approved',
-		array(
-			'topics' => $topics,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
-		{
-			$adjustBoards[$row['id_board']] = array(
-				'num_posts' => 0,
-				'num_topics' => 0,
-				'unapproved_posts' => 0,
-				'unapproved_topics' => 0,
-				'id_board' => $row['id_board']
-			);
-		}
-		// Posts = (num_replies + 1) for each approved topic.
-		$adjustBoards[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? $row['num_topics'] : 0);
-		$adjustBoards[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
-
-		// Add the topics to the right type.
-		if ($row['approved'])
-			$adjustBoards[$row['id_board']]['num_topics'] += $row['num_topics'];
-		else
-			$adjustBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Decrease the posts/topics...
-	foreach ($adjustBoards as $stats)
-	{
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
-
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
-				num_topics = CASE WHEN {int:num_topics} > num_topics THEN 0 ELSE num_topics - {int:num_topics} END,
-				unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END,
-				unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $stats['id_board'],
-				'num_posts' => $stats['num_posts'],
-				'num_topics' => $stats['num_topics'],
-				'unapproved_posts' => $stats['unapproved_posts'],
-				'unapproved_topics' => $stats['unapproved_topics'],
-			)
-		);
-	}
-
-	// Remove Polls.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_poll
-		FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:topics})
-			AND id_poll > {int:no_poll}
-		LIMIT ' . count($topics),
-		array(
-			'no_poll' => 0,
-			'topics' => $topics,
-		)
-	);
-	$polls = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$polls[] = $row['id_poll'];
-	$smcFunc['db_free_result']($request);
-
-	if (!empty($polls))
-	{
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}polls
-			WHERE id_poll IN ({array_int:polls})',
-			array(
-				'polls' => $polls,
-			)
-		);
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}poll_choices
-			WHERE id_poll IN ({array_int:polls})',
-			array(
-				'polls' => $polls,
-			)
-		);
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_polls
-			WHERE id_poll IN ({array_int:polls})',
-			array(
-				'polls' => $polls,
-			)
-		);
-	}
-
-	// Get rid of the attachment, if it exists.
-	require_once($sourcedir . '/Subs-Attachments.php');
-	$attachmentQuery = array(
-		'attachment_type' => 0,
-		'id_topic' => $topics,
-	);
-	removeAttachments($attachmentQuery, 'messages');
-
-	// Delete possible search index entries.
-	if (!empty($modSettings['search_custom_index_config']))
-	{
-		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
-
-		$words = array();
-		$messages = array();
-		$request = $smcFunc['db_query']('', '
-			SELECT id_msg, body
-			FROM {db_prefix}messages
-			WHERE id_topic IN ({array_int:topics})',
-			array(
-				'topics' => $topics,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
-
-			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
-			$messages[] = $row['id_msg'];
-		}
-		$smcFunc['db_free_result']($request);
-		$words = array_unique($words);
-
-		if (!empty($words) && !empty($messages))
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}log_search_words
-				WHERE id_word IN ({array_int:word_list})
-					AND id_msg IN ({array_int:message_list})',
-				array(
-					'word_list' => $words,
-					'message_list' => $messages,
-				)
-			);
-	}
-
-	// Delete anything related to the topic.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}messages
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}calendar
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_topics
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_search_subjects
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
-
-	// Maybe there's a mod that wants to delete topic related data of its own
- 	call_integration_hook('integrate_remove_topics', array($topics));
-
-	// Update the totals...
-	updateStats('message');
-	updateStats('topic');
-	updateSettings(array(
-		'calendar_updated' => time(),
-	));
-
-	require_once($sourcedir . '/Subs-Post.php');
-	$updates = array();
-	foreach ($adjustBoards as $stats)
-		$updates[] = $stats['id_board'];
-	updateLastMessages($updates);
-}
-
-/**
  * Remove a specific message (including permission checks).
  * - normally, local and global should be the localCookies and globalCookies settings, respectively.
  * - uses boardurl to determine these two things.
@@ -707,6 +374,9 @@ function removeMessage($message, $decreasePostCount = true)
 		if (!empty($row['num_replies']))
 			fatal_lang_error('delFirstPost', false);
 
+		// This needs to be included for topic functions
+		require_once($sourcedir . '/Subs-Topic.php');
+		
 		removeTopics($row['id_topic']);
 		return true;
 	}
@@ -1016,7 +686,7 @@ function RestoreTopic()
 	isAllowedTo('move_any', $modSettings['recycle_board']);
 
 	// We need this file.
-	require_once($sourcedir . '/MoveTopic.php');
+	require_once($sourcedir . '/Subs-Topic.php');
 
 	$unfound_messages = array();
 	$topics_to_restore = array();
@@ -1371,6 +1041,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$topic_exists = true;
 	if ($smcFunc['db_num_rows']($request) == 0)
 	{
+		require_once($sourcedir . '/Subs-Topic.php');
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
