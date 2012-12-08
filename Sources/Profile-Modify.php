@@ -2401,7 +2401,7 @@ function profileLoadSignatureData()
  */
 function profileLoadAvatarData()
 {
-	global $context, $cur_profile, $modSettings, $scripturl;
+	global $context, $cur_profile, $modSettings, $scripturl, $sourcedir;
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 

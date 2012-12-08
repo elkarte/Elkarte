@@ -1414,7 +1414,7 @@ function getAvatarPath()
 }
 
 /**
- * Little utility function for the endless $id_folder computation for attachments.
+ * Little utility function for the $id_folder computation for attachments.
  * This returns the id of the folder where the attachment or avatar will be saved.
  * If multiple attachment directories are not enabled, this will be 1 by default.
  *

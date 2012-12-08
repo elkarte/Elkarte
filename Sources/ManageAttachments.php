@@ -667,7 +667,7 @@ function list_getNumFiles($browse_type)
  */
 function MaintainFiles()
 {
-	global $context, $modSettings, $txt, $smcFunc;
+	global $context, $modSettings, $txt, $smcFunc, $sourcedir;
 
 	$context['sub_template'] = 'maintenance';
 
