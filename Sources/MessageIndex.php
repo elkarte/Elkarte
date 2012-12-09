@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  *
  * This file is what shows the listing of topics in a board.
- * It's just one or two functions, but don't under estimate it ;).
+ * It's just one or two functions, but don't underestimate it ;).
  *
  */
 
@@ -1152,7 +1152,7 @@ function QuickModeration()
 		$smcFunc['db_query']('', '
 			SELECT id_topic, disregarded
 			FROM {db_prefix}log_topics
-			WHERE id_topic IN ({array_int:selected_topics}
+			WHERE id_topic IN ({array_int:selected_topics})
 				AND id_member = {int:current_user}',
 			array(
 				'selected_topics' => $markCache,
