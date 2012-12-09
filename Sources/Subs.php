@@ -3194,7 +3194,7 @@ function template_javascript($do_defered = false)
 
 			if (!empty($combine_name))
 				echo '
-	<script type="text/javascript" src="', $combine_name, '" id="jscombined' . ($do_defered ? 'top' : 'bottom') .'"></script>';
+	<script type="text/javascript" src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
 		else
 		{
@@ -3203,7 +3203,7 @@ function template_javascript($do_defered = false)
 			{
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id,'"' , !empty($js_file['options']['async']) ? ' async="async"' : '' ,'></script>';
+	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
 
 				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
 				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
@@ -3232,9 +3232,6 @@ function template_javascript($do_defered = false)
 		echo '
 	// ]]></script>';
 	}
-
-
-
 
 	// Inline JavaScript - Actually useful some times!
 	if (!empty($context['javascript_inline']))
