@@ -119,8 +119,10 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 		);
 	}
 
-	list ($_GET['start']) = $smcFunc['db_fetch_row']($request);
+	list ($count) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
+
+	return $count;
 }
 
 /**
