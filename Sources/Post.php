@@ -1829,7 +1829,7 @@ function Post2()
 
 	// If we had a draft for this, its time to remove it since it was just posted
 	if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
-		deleteDrafts($_POST['id_draft']);
+		deleteDrafts($_POST['id_draft'], $user_info['id']);
 
 	// Editing or posting an event?
 	if (isset($_POST['calendar']) && (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1))

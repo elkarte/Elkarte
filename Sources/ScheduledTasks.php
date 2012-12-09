@@ -1775,8 +1775,8 @@ function scheduled_remove_old_drafts()
 	// If we have old one, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($sourcedir . '/Drafts.php');
-		deleteDrafts($drafts, false);
+		require_once($sourcedir . '/Subs-Drafts.php');
+		deleteDrafts($drafts, -1, false);
 	}
 
 	return true;
