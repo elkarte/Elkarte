@@ -37,7 +37,7 @@ if (!defined('DIALOGO'))
 function Post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
-	global $user_info, $sc, $board_info, $context, $settings;
+	global $user_info, $context, $settings;
 	global $sourcedir, $options, $smcFunc, $language;
 
 	loadLanguage('Post');
@@ -460,7 +460,7 @@ function Post($post_errors = array())
 		}
 
 		// Only show the preview stuff if they hit Preview.
-		if (($really_previewing == true || isset($_REQUEST['xml'])) && !isset($_POST['id_draft']))
+		if (($really_previewing === true || isset($_REQUEST['xml'])) && !isset($_REQUEST['save_draft']))
 		{
 			// Set up the preview message and subject and censor them...
 			$context['preview_message'] = $form_message;
@@ -474,7 +474,6 @@ function Post($post_errors = array())
 			if ($form_subject != '')
 			{
 				$context['preview_subject'] = $form_subject;
-
 				censorText($context['preview_subject']);
 			}
 			else
