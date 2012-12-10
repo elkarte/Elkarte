@@ -32,6 +32,10 @@ class site_Dispatcher
 	private $_function_name;
 	private $_controller_name;
 
+	/**
+	 * Create an instance and initialize it.
+	 * This does all the work to figure out which file and function/method needs called.
+	 */
 	public function __construct()
 	{
 		global $board, $topic, $sourcedir, $modSettings, $settings, $user_info, $maintenance;
@@ -245,6 +249,9 @@ class site_Dispatcher
 		}
 	}
 
+	/**
+	 * Relay control to the respective function or method.
+	 */
 	public function dispatch()
 	{
 		require_once ($this->_file_name);
