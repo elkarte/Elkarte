@@ -270,7 +270,7 @@ class site_Dispatcher
 		{
 			$controller = new $this->_controller_name();
 
-			if (method_exists($controller, $this->_function_name()))
+			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
 			elseif (method_exists($this->controller, 'index'))
 				$controller->index();
