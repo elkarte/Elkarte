@@ -76,20 +76,10 @@ class site_Dispatcher
 		}
 		elseif (empty($_GET['action']))
 		{
-			// home page (no topic, no board, no action): board index
+			// home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Unless someone has registered a home page through the hook...
-				$defaultActions = call_integration_hook('integrate_default_action');
-				foreach ($defaultActions as $defaultAction)
-				{
-					$call = strpos($defaultAction, '::') !== false ? explode('::', $defaultAction) : $defaultAction;
-					if (!empty($call) && is_callable($call))
-					{
-						 $this->_function_name = $call;
-						 break;
-					}
-				}
+				// @todo Unless we have a custom home page registered...
 
 				// was it, wasn't it....
 				if (empty($this->_function_name))
@@ -98,13 +88,13 @@ class site_Dispatcher
 					$this->_function_name = $default_action['function'];
 				}
 			}
-			// ?board=b, no topic, no action: message index
+			// ?board=b message index
 			elseif (empty($topic))
 			{
 				$this->_file_name = $sourcedir . '/MessageIndex.php';
 				$this->_function_name = 'MessageIndex';
 			}
-			// board=b;topic=t, no action: topic display
+			// board=b;topic=t topic display
 			else
 			{
 				$this->_file_name = $sourcedir . '/Display.php';
@@ -117,7 +107,7 @@ class site_Dispatcher
 			return;
 
 		// Start with our nice and cozy err... *cough*
-		// $_GET['action'] array - $_GET['action'] => array($file, $function).
+		// $_GET['action'] => array($file, $function).
 		$actionArray = array(
 			'activate' => array('Register.php', 'Activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
