@@ -49,10 +49,10 @@ class site_Dispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'login2' || $_REQUEST['action'] == 'logout'))
+			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
 				$this->_file_name = $sourcedir . '/LogInOut.php';
-				$this->_function_name = $_REQUEST['action'] == 'login2' ? 'Login2' : 'Logout';
+				$this->_function_name = $_GET['action'] == 'login2' ? 'Login2' : 'Logout';
 			}
 			// "maintenance mode" page
 			else
@@ -61,8 +61,8 @@ class site_Dispatcher
 				$this->_function_name = 'InMaintenance';
 			}
 		}
-		// If guest access is off, a guest can only do one of the very few following actions.
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
+		// If guest access is off, a guest is kicked out... politely. :P
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
 			$this->_file_name = $sourcedir . '/Subs-Auth.php';
 			$this->_function_name = 'KickGuest';
@@ -103,7 +103,7 @@ class site_Dispatcher
 			return;
 
 		// Start with our nice and cozy err... *cough*
-		// $_REQUEST['action'] array - $_REQUEST['action'] => array($file, $function).
+		// $_GET['action'] array - $_GET['action'] => array($file, $function).
 		$actionArray = array(
 			'activate' => array('Register.php', 'Activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
