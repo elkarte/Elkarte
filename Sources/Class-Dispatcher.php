@@ -40,12 +40,14 @@ class site_Dispatcher
 	{
 		global $board, $topic, $sourcedir, $modSettings, $settings, $user_info, $maintenance;
 
+		// default action of the forum: board index
+		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
 			'file' => $sourcedir . '/BoardIndex.php',
 			'function' => 'BoardIndex'
 		);
 
-		// Is the forum in maintenance mode? (doesn't apply to administrators.)
+		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
@@ -61,7 +63,7 @@ class site_Dispatcher
 				$this->_function_name = 'InMaintenance';
 			}
 		}
-		// If guest access is off, a guest is kicked out... politely. :P
+		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
 			$this->_file_name = $sourcedir . '/Subs-Auth.php';
@@ -69,28 +71,35 @@ class site_Dispatcher
 		}
 		elseif (empty($_GET['action']))
 		{
-			// Action and board are both empty: BoardIndex
-			// Unless it's the default action registered through the hook.
+			// home page (no topic, no board, no action): board index
 			if (empty($board) && empty($topic))
 			{
+				// Unless someone has registered a home page through the hook...
 				$defaultActions = call_integration_hook('integrate_default_action');
 				foreach ($defaultActions as $defaultAction)
 				{
 					$call = strpos($defaultAction, '::') !== false ? explode('::', $defaultAction) : $defaultAction;
 					if (!empty($call) && is_callable($call))
-						return $call;
+					{
+						 $this->_function_name = $call;
+						 break;
+					}
 				}
 
-				$this->_file_name = $default_action['file'];
-				$this->_function_name = $default_action['function'];
+				// was it, wasn't it....
+				if (empty($this->_function_name))
+				{
+					$this->_file_name = $default_action['file'];
+					$this->_function_name = $default_action['function'];
+				}
 			}
-			// Topic is empty, and action is empty.... MessageIndex!
+			// ?board=b, no topic, no action: message index
 			elseif (empty($topic))
 			{
 				$this->_file_name = $sourcedir . '/MessageIndex.php';
 				$this->_function_name = 'MessageIndex';
 			}
-			// Board is not empty... topic is not empty... action is empty.. Display!
+			// board=b;topic=t, no action: topic display
 			else
 			{
 				$this->_file_name = $sourcedir . '/Display.php';
@@ -182,7 +191,7 @@ class site_Dispatcher
 			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
 		);
 
-		// Allow modifying $actionArray easily.
+		// allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
