@@ -1,0 +1,275 @@
+<?php
+
+/**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ */
+
+if (!defined('DIALOGO'))
+	die('Hacking attempt...');
+
+/**
+ * Dispatch the request to the function or method registered to handle it.
+ * Try first the critical functionality (maintenance, no guest access)
+ * Then, in order:
+ *   forum's main actions: board index, message index, display topic
+ *   the current/legacy file/functions registered by Dialogo core
+ * Fall back to naming patterns:
+ *   filename=[action].php function=[sa]
+ *   filename=[action].controller.php method=action_[sa]
+ *   filename=[action]-Controller.php method=action_[sa]
+ *
+ * An add-on files to handle custom actions will be called if they follow
+ * any of these patterns.
+ */
+class site_Dispatcher
+{
+	private $_file_name;
+	private $_function_name;
+	private $_controller_name;
+
+	public function __construct()
+	{
+		global $board, $topic, $sourcedir, $modSettings, $settings, $user_info, $maintenance;
+
+		$default_action = array(
+			'file' => $sourcedir . '/BoardIndex.php',
+			'function' => 'BoardIndex'
+		);
+
+		// Is the forum in maintenance mode? (doesn't apply to administrators.)
+		if (!empty($maintenance) && !allowedTo('admin_forum'))
+		{
+			// You can only login.... otherwise, you're getting the "maintenance mode" display.
+			if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'login2' || $_REQUEST['action'] == 'logout'))
+			{
+				$this->_file_name = $sourcedir . '/LogInOut.php';
+				$this->_function_name = $_REQUEST['action'] == 'login2' ? 'Login2' : 'Logout';
+			}
+			// Don't even try it, sonny.
+			else
+			{
+				$this->_file_name = $sourcedir . '/Subs-Auth.php';
+				$this->_function_name = 'InMaintenance';
+			}
+		}
+		// If guest access is off, a guest can only do one of the very few following actions.
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
+		{
+			$this->_file_name = $sourcedir . '/Subs-Auth.php';
+			$this->_function_name = 'KickGuest';
+		}
+		elseif (empty($_GET['action']))
+		{
+			// Action and board are both empty... BoardIndex!
+			// Unless someone else wants to do something different.
+			if (empty($board) && empty($topic))
+			{
+				$defaultActions = call_integration_hook('integrate_default_action');
+				foreach ($defaultActions as $defaultAction)
+				{
+					$call = strpos($defaultAction, '::') !== false ? explode('::', $defaultAction) : $defaultAction;
+					if (!empty($call) && is_callable($call))
+						return $call;
+				}
+
+				$this->_file_name = $default_action['file'];
+				$this->_function_name = $default_action['function'];
+			}
+			// Topic is empty, and action is empty.... MessageIndex!
+			elseif (empty($topic))
+			{
+				$this->_file_name = $sourcedir . '/MessageIndex.php';
+				$this->_function_name = 'MessageIndex';
+			}
+			// Board is not empty... topic is not empty... action is empty.. Display!
+			else
+			{
+				$this->_file_name = $sourcedir . '/Display.php';
+				$this->_function_name = 'Display';
+			}
+		}
+
+		// now this return won't be cool, but lets do it
+		if (!empty($this->_file_name) && !empty($this->_function_name))
+			return;
+
+		// Start with our nice and cozy err... *cough*
+		// Here's the monstrous $_REQUEST['action'] array - $_REQUEST['action'] => array($file, $function).
+		$actionArray = array(
+			'activate' => array('Register.php', 'Activate'),
+			'admin' => array('Admin.php', 'AdminMain'),
+			'announce' => array('Post.php', 'AnnounceTopic'),
+			'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
+			'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
+			'calendar' => array('Calendar.php', 'CalendarMain'),
+			'collapse' => array('BoardIndex.php', 'CollapseCategory'),
+			'contact' => array('Register.php', 'ContactForm'),
+			'coppa' => array('Register.php', 'CoppaForm'),
+			'credits' => array('Who.php', 'Credits'),
+			'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
+			'dlattach' => array('Attachment.php', 'Download'),
+			'disregardtopic' => array('Notify.php', 'TopicDisregard'),
+			'editpoll' => array('Poll.php', 'EditPoll'),
+			'editpoll2' => array('Poll.php', 'EditPoll2'),
+			'emailuser' => array('SendTopic.php', 'EmailUser'),
+			'findmember' => array('Subs-Auth.php', 'JSMembers'),
+			'groups' => array('Groups.php', 'Groups'),
+			// 'help' => array('Help.php', 'ShowHelp'),
+			// 'helpadmin' => array('Help.php', 'ShowAdminHelp'),
+			'jsmodify' => array('Post.php', 'JavaScriptModify'),
+			'jsoption' => array('Themes.php', 'SetJavaScript'),
+			'loadeditorlocale' => array('Subs-Editor.php', 'loadLocale'),
+			'lock' => array('Topic.php', 'LockTopic'),
+			'lockvoting' => array('Poll.php', 'LockVoting'),
+			'login' => array('LogInOut.php', 'Login'),
+			'login2' => array('LogInOut.php', 'Login2'),
+			'logout' => array('LogInOut.php', 'Logout'),
+			'markasread' => array('Subs-Boards.php', 'MarkRead'),
+			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
+			'mlist' => array('Memberlist.php', 'Memberlist'),
+			'moderate' => array('ModerationCenter.php', 'ModerationMain'),
+			'modifykarma' => array('Karma.php', 'ModifyKarma'),
+			'movetopic' => array('MoveTopic.php', 'MoveTopic'),
+			'movetopic2' => array('MoveTopic.php', 'MoveTopic2'),
+			'notify' => array('Notify.php', 'Notify'),
+			'notifyboard' => array('Notify.php', 'BoardNotify'),
+			'openidreturn' => array('Subs-OpenID.php', 'OpenIDReturn'),
+			'pm' => array('PersonalMessage.php', 'MessageMain'),
+			'post' => array('Post.php', 'Post'),
+			'post2' => array('Post.php', 'Post2'),
+			'printpage' => array('Printpage.php', 'PrintTopic'),
+			'profile' => array('Profile.php', 'ModifyProfile'),
+			'quotefast' => array('Post.php', 'QuoteFast'),
+			'quickmod' => array('MessageIndex.php', 'QuickModeration'),
+			'quickmod2' => array('Display.php', 'QuickInTopicModeration'),
+			'recent' => array('Recent.php', 'RecentPosts'),
+			'register' => array('Register.php', 'Register'),
+			'register2' => array('Register.php', 'Register2'),
+			'reminder' => array('Reminder.php', 'RemindMe'),
+			'removepoll' => array('Poll.php', 'RemovePoll'),
+			'removetopic2' => array('RemoveTopic.php', 'RemoveTopic2'),
+			'reporttm' => array('SendTopic.php', 'ReportToModerator'),
+			'requestmembers' => array('Subs-Auth.php', 'RequestMembers'),
+			'restoretopic' => array('RemoveTopic.php', 'RestoreTopic'),
+			'search' => array('Search.php', 'PlushSearch1'),
+			'search2' => array('Search.php', 'PlushSearch2'),
+			'sendtopic' => array('SendTopic.php', 'EmailUser'),
+			'suggest' => array('Subs-Editor.php', 'AutoSuggestHandler'),
+			'spellcheck' => array('Subs-Post.php', 'SpellCheck'),
+			'splittopics' => array('SplitTopics.php', 'SplitTopics'),
+			'stats' => array('Stats.php', 'DisplayStats'),
+			'sticky' => array('Topic.php', 'Sticky'),
+			'theme' => array('Themes.php', 'ThemesMain'),
+			'trackip' => array('Profile-View.php', 'trackIP'),
+			'unread' => array('Recent.php', 'UnreadTopics'),
+			'unreadreplies' => array('Recent.php', 'UnreadTopics'),
+			'verificationcode' => array('Register.php', 'VerificationCode'),
+			'viewprofile' => array('Profile.php', 'ModifyProfile'),
+			'vote' => array('Poll.php', 'Vote'),
+			'viewquery' => array('ViewQuery.php', 'ViewQuery'),
+			'viewsmfile' => array('Admin.php', 'DisplayAdminFile'),
+			'who' => array('Who.php', 'Who'),
+			'.xml' => array('News.php', 'ShowXmlFeed'),
+			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
+		);
+
+		// Allow modifying $actionArray easily.
+		call_integration_hook('integrate_actions', array(&$actionArray));
+
+		// Is it in core legacy actions?
+		if (isset($actionArray[$_GET['action']]))
+		{
+			$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+			$this->_function_name = $actionArray[$_GET['action']][1];
+		}
+		// fall back to naming patterns.
+		// add-ons can use any of them, and it should Just Work (tm).
+		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
+		{
+			// i.e. action=help => Help.php...
+			// except the function name doesn't fit the pattern
+			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
+			{
+				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
+				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+					$this->_function_name = 'action_' . $_GET['sa'];
+				else
+					$this->_function_name = 'index';
+			}
+			// action=drafts => Drafts.controller.php
+			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
+			// ... if it ain't there yet, no problem.
+			elseif (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			{
+				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action'] . '.controller.php');
+				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
+				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+					$this->_function_name = 'action_' . $_GET['sa'];
+				else
+					$this->_function_name = 'index';
+			}
+			// or... an add-on can do just this!
+			// action=gallery => Gallery-Controller.php
+			// sa=upload => action_upload()
+			elseif (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '-Controller.php'))
+			{
+				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '-Controller.php';
+				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
+				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+					$this->_function_name = 'action_' . $_GET['sa'];
+				else
+					$this->_function_name = 'index';
+			}
+		}
+
+		// Get the function and file to include - if it's not there, go for the default action
+		if (empty($this->_file_name) || empty($this->_function_name))
+		{
+			// Catch the action with the theme?
+			if (!empty($settings['catch_action']))
+			{
+				require_once($sourcedir . '/Themes.php');
+				return 'WrapAction';
+			}
+			else
+			{
+				// we still haven't found what we're looking for...
+				$this->_file_name = $default_action['file'];
+				$this->_function_name = $default_action['function'];
+			}
+		}
+	}
+
+	public function dispatch()
+	{
+		require_once ($this->_file_name);
+
+		if (!empty($this->_controller_name))
+		{
+			$controller = new $this->_controller_name();
+
+			if (method_exists($controller, $this->_function_name()))
+				$controller->{$this->_function_name}();
+			elseif (method_exists($this->controller, 'index'))
+				$controller->index();
+			// fall back
+			else
+			{
+				// things went pretty bad, huh?
+				// board index :P
+				require_once($sourcedir . '/BoardIndex.php');
+				return 'BoardIndex';
+			}
+		}
+		else
+		{
+			// it must be a good ole' function
+			call_user_func($this->_function_name);
+		}
+	}
+}
