@@ -158,7 +158,7 @@ class site_Dispatcher
 			'recent' => array('Recent.php', 'RecentPosts'),
 			'register' => array('Register.php', 'Register'),
 			'register2' => array('Register.php', 'Register2'),
-			'reminder' => array('Reminder.php', 'RemindMe'),
+			// 'reminder' => array('Reminder.php', 'RemindMe'),
 			'removepoll' => array('Poll.php', 'RemovePoll'),
 			'removetopic2' => array('RemoveTopic.php', 'RemoveTopic2'),
 			'reporttm' => array('SendTopic.php', 'ReportToModerator'),
