@@ -48,13 +48,13 @@ class site_Dispatcher
 		// Is the forum in maintenance mode? (doesn't apply to administrators.)
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
-			// You can only login.... otherwise, you're getting the "maintenance mode" display.
+			// You can only login
 			if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'login2' || $_REQUEST['action'] == 'logout'))
 			{
 				$this->_file_name = $sourcedir . '/LogInOut.php';
 				$this->_function_name = $_REQUEST['action'] == 'login2' ? 'Login2' : 'Logout';
 			}
-			// Don't even try it, sonny.
+			// "maintenance mode" page
 			else
 			{
 				$this->_file_name = $sourcedir . '/Subs-Auth.php';
@@ -69,8 +69,8 @@ class site_Dispatcher
 		}
 		elseif (empty($_GET['action']))
 		{
-			// Action and board are both empty... BoardIndex!
-			// Unless someone else wants to do something different.
+			// Action and board are both empty: BoardIndex
+			// Unless it's the default action registered through the hook.
 			if (empty($board) && empty($topic))
 			{
 				$defaultActions = call_integration_hook('integrate_default_action');
@@ -103,7 +103,7 @@ class site_Dispatcher
 			return;
 
 		// Start with our nice and cozy err... *cough*
-		// Here's the monstrous $_REQUEST['action'] array - $_REQUEST['action'] => array($file, $function).
+		// $_REQUEST['action'] array - $_REQUEST['action'] => array($file, $function).
 		$actionArray = array(
 			'activate' => array('Register.php', 'Activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
@@ -123,8 +123,8 @@ class site_Dispatcher
 			'emailuser' => array('SendTopic.php', 'EmailUser'),
 			'findmember' => array('Subs-Auth.php', 'JSMembers'),
 			'groups' => array('Groups.php', 'Groups'),
-			// 'help' => array('Help.php', 'ShowHelp'),
-			// 'helpadmin' => array('Help.php', 'ShowAdminHelp'),
+			'help' => array('Help.php', 'ShowHelp'),
+			'helpadmin' => array('Help.php', 'ShowAdminHelp'),
 			'jsmodify' => array('Post.php', 'JavaScriptModify'),
 			'jsoption' => array('Themes.php', 'SetJavaScript'),
 			'loadeditorlocale' => array('Subs-Editor.php', 'loadLocale'),
@@ -196,7 +196,7 @@ class site_Dispatcher
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// i.e. action=help => Help.php...
-			// except the function name doesn't fit the pattern
+			// if the function name fits the pattern, that'd be 'index'...
 			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
 			{
 				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
@@ -231,14 +231,15 @@ class site_Dispatcher
 			}
 		}
 
-		// Get the function and file to include - if it's not there, go for the default action
+		// the file and function weren't found yet?
 		if (empty($this->_file_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
+			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				require_once($sourcedir . '/Themes.php');
-				return 'WrapAction';
+				$this->_file_name = $sourcedir . '/Themes.php';
+				$this->_function_name = 'WrapAction';
 			}
 			else
 			{
