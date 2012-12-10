@@ -28,9 +28,14 @@ if (!defined('DIALOGO'))
  */
 class site_Dispatcher
 {
+	// file name to load
 	private $_file_name;
+	// function or method to call
 	private $_function_name;
+	// class name, for object oriented controllers
 	private $_controller_name;
+	// name of pre_dispatch function, for procedural controllers
+	private $_pre_dispatch_func;
 
 	/**
 	 * Create an instance and initialize it.
@@ -209,10 +214,16 @@ class site_Dispatcher
 			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
 			{
 				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
+
+				// procedural controller... we might need to pre dispatch to its main function
+				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
+				$this->_pre_dispatch_func = $_GET['action'];
+
+				// then, figure out the function for the subaction
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
-					$this->_function_name = 'index';
+					$this->_function_name = 'action_index';
 			}
 			// action=drafts => Drafts.controller.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
@@ -224,7 +235,7 @@ class site_Dispatcher
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
-					$this->_function_name = 'index';
+					$this->_function_name = 'action_index';
 			}
 			// or... an add-on can do just this!
 			// action=gallery => Gallery-Controller.php
@@ -236,7 +247,7 @@ class site_Dispatcher
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
-					$this->_function_name = 'index';
+					$this->_function_name = 'action_index';
 			}
 		}
 
@@ -270,6 +281,10 @@ class site_Dispatcher
 		{
 			$controller = new $this->_controller_name();
 
+			// pre-dispatch (load templates and stuff)
+			if (method_exists($controller, 'pre_dispatch'))
+				$controller->pre_dispatch();
+
 			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
 			elseif (method_exists($this->controller, 'index'))
@@ -285,6 +300,10 @@ class site_Dispatcher
 		}
 		else
 		{
+			// pre-dispatch (load templates and stuff)
+			// for procedural controllers, we know this name (instance var)
+			call_user_func($this->_pre_dispatch_func);
+
 			// it must be a good ole' function
 			call_user_func($this->_function_name);
 		}
