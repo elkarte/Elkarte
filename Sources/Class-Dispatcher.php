@@ -217,7 +217,7 @@ class site_Dispatcher
 
 				// procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
-				$this->_pre_dispatch_func = $_GET['action'];
+				$this->_pre_dispatch_func = 'pre_' . $_GET['action'];
 
 				// then, figure out the function for the subaction
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
