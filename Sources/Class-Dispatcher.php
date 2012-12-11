@@ -178,7 +178,7 @@ class site_Dispatcher
 			'viewprofile' => array('Profile.php', 'ModifyProfile'),
 			'vote' => array('Poll.php', 'action_vote'),
 			'viewquery' => array('ViewQuery.php', 'ViewQuery'),
-			'viewadminfile' => array('Admin.php', 'DisplayAdminFile'),
+			'viewadminfile' => array('Admin.php', 'action_viewadminfile'),
 			// 'who' => array('Who.php', 'action_who'),
 			'.xml' => array('News.php', 'ShowXmlFeed'),
 			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),

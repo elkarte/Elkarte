@@ -655,8 +655,9 @@ function AdminHome()
 
 /**
  * Get admin information from the database.
+ * Accessed by ?action=viewadminfile.
  */
-function DisplayAdminFile()
+function action_viewadminfile()
 {
 	global $context, $modSettings, $smcFunc;
 
