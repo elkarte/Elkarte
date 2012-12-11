@@ -131,8 +131,8 @@ function template_admin()
 	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-news.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
@@ -317,9 +317,9 @@ function template_credits()
 	// Now we just have to include the script and wait ;).
 	echo '
 		// ]]></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-news.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-support.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '
@@ -556,7 +556,7 @@ function template_view_versions()
 	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	   file categories. (sources, languages, and templates.) */
 	echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=detailed-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oViewVersions = new smf_ViewVersions({
 				aKnownLanguages: [

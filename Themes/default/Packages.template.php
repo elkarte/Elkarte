@@ -559,7 +559,7 @@ function template_browse()
 
 		if (empty($modSettings['disable_smf_js']))
 			echo '
-			<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-packages.js"></script>';
+			<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-packages.js"></script>';
 
 		echo '
 			<script type="text/javascript"><!-- // --><![CDATA[

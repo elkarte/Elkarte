@@ -185,7 +185,7 @@ function template_main()
 
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-themes.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-themes.js"></script>';
 
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
