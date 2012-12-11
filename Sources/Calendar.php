@@ -30,7 +30,7 @@ if (!defined('DIALOGO'))
  * It goes to the month and year passed in 'month' and 'year' by get or post.
  * It is accessed through ?action=calendar.
  */
-function CalendarMain()
+function action_calendar()
 {
 	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir;
 
@@ -39,7 +39,7 @@ function CalendarMain()
 
 	// Doing something other than calendar viewing?
 	$subActions = array(
-		'ical' => 'iCalDownload',
+		'ical' => 'action_ical',
 		'post' => 'CalendarPost',
 	);
 
@@ -334,11 +334,12 @@ function CalendarPost()
  * follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
  * sets events as all day events since we don't have hourly events
  * will honor and set multi day events
- * sets a sequence number if the event has been modified
+ * sets a sequence number if the event has been modified.
+ * Accessed by action=calendar;sa=ical
  *
  * @todo .... allow for week or month export files as well?
  */
-function iCalDownload()
+function action_ical()
 {
 	global $smcFunc, $sourcedir, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 

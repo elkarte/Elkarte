@@ -113,7 +113,7 @@ class site_Dispatcher
 			'admin' => array('Admin.php', 'AdminMain'),
 			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
-			'calendar' => array('Calendar.php', 'CalendarMain'),
+			'calendar' => array('Calendar.php', 'action_calendar'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
 			'contact' => array('Register.php', 'action_contactform'),
 			'coppa' => array('Register.php', 'action_coppa'),
