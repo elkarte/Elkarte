@@ -284,10 +284,10 @@ function action_email()
  * Gathers data from the user to report abuse to the moderator(s).
  * Uses the ReportToModerator template, main sub template.
  * Requires the report_any permission.
- * Uses ReportToModerator2() if post data was sent.
+ * Uses action_reporttm2() if post data was sent.
  * Accessed through ?action=reporttm.
  */
-function ReportToModerator()
+function action_reporttm()
 {
 	global $txt, $topic, $sourcedir, $modSettings, $user_info, $context, $smcFunc;
 
@@ -296,9 +296,9 @@ function ReportToModerator()
 	// You can't use this if it's off or you are not allowed to do it.
 	isAllowedTo('report_any');
 
-	// If they're posting, it should be processed by ReportToModerator2.
+	// If they're posting, it should be processed by action_reporttm2.
 	if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && empty($context['post_errors']))
-		ReportToModerator2();
+		action_reporttm2();
 
 	// We need a message ID to check!
 	if (empty($_REQUEST['msg']) && empty($_REQUEST['mid']))
@@ -356,10 +356,10 @@ function ReportToModerator()
  * Send the emails.
  * Sends off emails to all the moderators.
  * Sends to administrators and global moderators. (1 and 2)
- * Called by ReportToModerator(), and thus has the same permission and setting requirements as it does.
+ * Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
  * Accessed through ?action=reporttm when posting.
  */
-function ReportToModerator2()
+function action_reporttm2()
 {
 	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $sourcedir, $language, $context, $smcFunc;
 
@@ -418,7 +418,7 @@ function ReportToModerator2()
 		foreach ($post_errors as $post_error)
 			$context['post_errors'][] = $txt['error_' . $post_error];
 
-		return ReportToModerator();
+		return action_reporttm();
 	}
 
 	// Get the basic topic information, and make sure they can see it.

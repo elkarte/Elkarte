@@ -160,7 +160,7 @@ class site_Dispatcher
 			// 'reminder' => array('Reminder.php', 'RemindMe'),
 			'removepoll' => array('Poll.php', 'action_removepoll'),
 			'removetopic2' => array('RemoveTopic.php', 'action_removetopic2'),
-			'reporttm' => array('Emailuser.php', 'ReportToModerator'),
+			'reporttm' => array('Emailuser.php', 'action_reporttm'),
 			'requestmembers' => array('Members.php', 'action_requestmembers'),
 			'restoretopic' => array('RemoveTopic.php', 'action_restoretopic'),
 			'search' => array('Search.php', 'PlushSearch1'),
