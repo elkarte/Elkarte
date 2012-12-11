@@ -23,10 +23,13 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * This helps organize things...
- * @todo this should be a simple dispatcher....
+ * This is the main function of personal messages, called before the action handler.
+ * It should set the context, load templates and language file(s), as necessary
+ * for the function that will be called.
+ *
+ * @todo this should be a (pre)dispatcher.
  */
-function MessageMain()
+function action_pm()
 {
 	global $txt, $scripturl, $sourcedir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
 

@@ -1322,7 +1322,7 @@ function sort_array_length($a, $b)
 /**
  * Creates the javascript code for localization of the editor (SCEditor)
  */
-function loadLocale()
+function action_loadeditorlocale()
 {
 	global $context, $txt, $editortxt, $modSettings;
 

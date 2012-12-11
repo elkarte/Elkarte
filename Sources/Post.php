@@ -2381,7 +2381,7 @@ function QuoteFast()
  * Used to edit the body or subject of a message inline
  * called from action=jsmodify from script and topic js
  */
-function JavaScriptModify()
+function action_jsmodify()
 {
 	global $sourcedir, $modSettings, $board, $topic, $txt;
 	global $user_info, $context, $smcFunc, $language;

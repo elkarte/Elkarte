@@ -1633,7 +1633,7 @@ function WrapAction()
  * - accessed via ?action=jsoption;var=variable;val=value;session_var=sess_id.
  * - does not log access to the Who's Online log. (in index.php..)
  */
-function SetJavaScript()
+function action_jsoption()
 {
 	global $settings, $user_info, $smcFunc, $options;
 
