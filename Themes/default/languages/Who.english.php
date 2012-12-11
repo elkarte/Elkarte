@@ -31,7 +31,7 @@ $txt['whoall_credits'] = 'Viewing credits page.';
 $txt['whoall_emailuser'] = 'Sending email to another member.';
 $txt['whoall_groups'] = 'Viewing the member groups page.';
 $txt['whoall_help'] = 'Viewing the <a href="' . $scripturl . '?action=help">help page</a>.';
-$txt['whoall_helpadmin'] = 'Viewing a help popup.';
+$txt['whoall_quickhelp'] = 'Viewing a help popup.';
 $txt['whoall_pm'] = 'Viewing their messages.';
 $txt['whoall_login'] = 'Logging into the forum.';
 $txt['whoall_login2'] = 'Logging into the forum.';

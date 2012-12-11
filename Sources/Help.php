@@ -26,7 +26,7 @@ if (!defined('DIALOGO'))
  * It is accessed by ?action=help.
  * @uses Help template and Manual language file.
  */
-function ShowHelp()
+function action_help()
 {
 	global $scripturl, $context, $txt;
 
@@ -66,11 +66,11 @@ function ShowHelp()
  * It shows a popup for administrative or user help.
  * It uses the help parameter to decide what string to display and where to get
  * the string from. ($helptxt or $txt?)
- * It is accessed via ?action=helpadmin;help=?.
+ * It is accessed via ?action=quickhelp;help=?.
  * @uses ManagePermissions language file, if the help starts with permissionhelp.
  * @uses Help template, popup sub template, no layers.
  */
-function ShowAdminHelp()
+function action_quickhelp()
 {
 	global $txt, $helptxt, $context, $scripturl;
 
@@ -90,7 +90,7 @@ function ShowAdminHelp()
 	loadTemplate('Help');
 
 	// Allow mods to load their own language file here
- 	call_integration_hook('integrate_helpadmin');
+ 	call_integration_hook('integrate_quickhelp');
 
 	// Set the page title to something relevant.
 	$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
