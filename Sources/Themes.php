@@ -45,7 +45,7 @@ if (!defined('DIALOGO'))
  * Requires the user not be a guest. (@todo what?)
  * Accessed via ?action=admin;area=theme.
  */
-function ThemesMain()
+function action_thememain()
 {
 	global $txt, $context, $scripturl;
 

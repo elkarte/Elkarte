@@ -171,7 +171,7 @@ function AdminMain()
 				'current_theme' => array(
 					'label' => $txt['theme_current_settings'],
 					'file' => 'Themes.php',
-					'function' => 'ThemesMain',
+					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_current_theme',
@@ -179,7 +179,7 @@ function AdminMain()
 				'theme' => array(
 					'label' => $txt['theme_admin'],
 					'file' => 'Themes.php',
-					'function' => 'ThemesMain',
+					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_themes',
