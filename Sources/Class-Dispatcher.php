@@ -139,7 +139,7 @@ class site_Dispatcher
 			'logout' => array('LogInOut.php', 'action_logout'),
 			'markasread' => array('Subs-Boards.php', 'MarkRead'),
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
-			'mlist' => array('Memberlist.php', 'Memberlist'),
+			'memberlist' => array('Memberlist.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.php', 'ModerationMain'),
 			'modifykarma' => array('Karma.php', 'ModifyKarma'),
 			'movetopic' => array('MoveTopic.php', 'MoveTopic'),
