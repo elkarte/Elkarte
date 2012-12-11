@@ -59,7 +59,7 @@ class site_Dispatcher
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
 				$this->_file_name = $sourcedir . '/LogInOut.php';
-				$this->_function_name = $_GET['action'] == 'login2' ? 'Login2' : 'Logout';
+				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
@@ -134,9 +134,9 @@ class site_Dispatcher
 			'loadeditorlocale' => array('Subs-Editor.php', 'loadLocale'),
 			'lock' => array('Topic.php', 'LockTopic'),
 			'lockvoting' => array('Poll.php', 'LockVoting'),
-			'login' => array('LogInOut.php', 'Login'),
-			'login2' => array('LogInOut.php', 'Login2'),
-			'logout' => array('LogInOut.php', 'Logout'),
+			'login' => array('LogInOut.php', 'action_login'),
+			'login2' => array('LogInOut.php', 'action_login2'),
+			'logout' => array('LogInOut.php', 'action_logout'),
 			'markasread' => array('Subs-Boards.php', 'MarkRead'),
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
 			'mlist' => array('Memberlist.php', 'Memberlist'),
