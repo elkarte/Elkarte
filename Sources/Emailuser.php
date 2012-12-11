@@ -38,7 +38,7 @@ function pre_emailuser()
 /**
  * Default action handler (when no ;sa is specified)
  */
-function action_index()
+function action_emailuser()
 {
 	// default action: action_sendtopic()
 	action_sendtopic();
