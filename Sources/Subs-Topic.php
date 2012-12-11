@@ -1050,3 +1050,37 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 
 	return $topic;
 }
+
+/**
+ * Set off/on unread reply subscription for a topic
+ *
+ * @param int $id_member
+ * @param int $topic
+ * @param bool $on = false
+ */
+function setTopicRegard($id_member, $topic, $on = false)
+{
+	global $smcFunc, $user_info;
+	
+	// find the current entry if it exists that is
+	$request = $smcFunc['db_query']('', '
+		SELECT id_msg
+		FROM {db_prefix}log_topics
+		WHERE id_member = {int:current_user}
+			AND id_topic = {int:current_topic}',
+		array(
+			'current_user' => $user_info['id'],
+			'current_topic' => $topic,
+		)
+	);
+	list($was_set) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+	
+	// Set topic disregard on/off for this topic.
+	$smcFunc['db_insert'](empty($was_set) ? 'ignore' : 'replace',
+		'{db_prefix}log_topics',
+		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int'),
+		array($id_member, $topic, $was_set ? $was_set : 0, $on ? 1 : 0),
+		array('id_member', 'id_topic')
+	);
+}

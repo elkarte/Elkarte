@@ -924,10 +924,15 @@ function showDisregarded($memID)
 
 /**
  * Get the relevant topics in the disregarded list
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID
  */
 function list_getDisregarded($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $board, $modSettings, $context;
+	global $smcFunc;
 
 	// Get the list of topics we can see
 	$request = $smcFunc['db_query']('', '
@@ -949,35 +954,39 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 			'limit' => $items_per_page,
 		)
 	);
-
 	$topics = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$topics[] = $row['id_topic'];
-
 	$smcFunc['db_free_result']($request);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-			LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
-		WHERE t.id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
+	// Any topics found?
 	$topicsInfo = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$topicsInfo[] = $row;
-	$smcFunc['db_free_result']($request);
+	if (!empty($topics))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
+				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
+			WHERE t.id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$topicsInfo[] = $row;
+		$smcFunc['db_free_result']($request);
+	}
 
 	return $topicsInfo;
 }
 
 /**
- * Count the topics in the disregarded list
+ * Count the number of topics in the disregarded list
+ *
+ * @param int $memID
  */
 function list_getNumDisregarded($memID)
 {
