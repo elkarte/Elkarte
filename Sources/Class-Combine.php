@@ -232,7 +232,7 @@ class site_Combiner
 			$this->_archive_filenames .= $file['basename'] . ' ';
 
 		// add in the actual theme url to make the sha1 unique to this hive
-		$this->_archive_filenames = $settings['actual_theme_url'] . trim($this->_archive_filenames);
+		$this->_archive_filenames = $settings['actual_theme_url'] . '/' . trim($this->_archive_filenames);
 
 		// save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;

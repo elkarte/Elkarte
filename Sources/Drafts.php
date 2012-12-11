@@ -87,9 +87,6 @@ function saveDraft(&$post_errors)
 		// some items to return to the form
 		$context['draft_saved'] = true;
 		$context['id_draft'] = $id_draft;
-
-		// cleanup
-		unset($_POST['save_draft']);
 	}
 	// otherwise creating a new draft
 	else
@@ -104,10 +101,10 @@ function saveDraft(&$post_errors)
 		}
 		else
 			$post_errors[] = 'draft_not_saved';
-
-		// cleanup
-		unset($_POST['save_draft']);
 	}
+	
+	// cleanup
+	unset($_POST['save_draft']);
 
 	// if we were called from the autosave function, send something back
 	if (!empty($id_draft) && isset($_REQUEST['xml']) && (!in_array('session_timeout', $post_errors)))
@@ -293,38 +290,6 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 }
 
 /**
- * Deletes one or many drafts from the DB
- * Validates the drafts are from the user
- * If supplied an array of drafts will attempt to remove all of them
- *
- * @param int $id_draft
- * @param bool $check
- * @return boolean
- */
-function deleteDrafts($id_draft, $check = true)
-{
-	global $user_info, $smcFunc;
-
-	// Only a single draft.
-	if (is_numeric($id_draft))
-		$id_draft = array($id_draft);
-
-	// can't delete nothing
-	if (empty($id_draft) || ($check && empty($user_info['id'])))
-		return false;
-
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}user_drafts
-		WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
-			AND  id_member = {int:id_member}' : ''),
-		array (
-			'id_draft' => $id_draft,
-			'id_member' => empty($user_info['id']) ? -1 : $user_info['id'],
-		)
-	);
-}
-
-/**
  * Loads in a group of drafts for the user of a given type (0/posts, 1/pm's)
  * loads a specific draft for forum use if selected.
  * Used in the posting screens to allow draft selection
@@ -359,14 +324,14 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
 		// Post drafts
 		if ($draft_type === 0)
 			$context['drafts'][] = array(
-				'subject' => censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
 				'poster_time' => timeformat($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . $draft['subject'] . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		// PM drafts
 		elseif ($draft_type === 1)
 			$context['drafts'][] = array(
-				'subject' => censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
 				'poster_time' => timeformat($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
@@ -395,17 +360,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 		checkSession('get');
 		$id_delete = (int) $_REQUEST['delete'];
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}user_drafts
-			WHERE id_draft = {int:id_draft}
-				AND id_member = {int:id_member}
-			LIMIT 1',
-			array(
-				'id_draft' => $id_delete,
-				'id_member' => $memID,
-			)
-		);
-
+		deleteDrafts($id_delete, $memID);
 		redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 	}
 
@@ -475,7 +430,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 
 		$row['subject'] = $smcFunc['htmltrim']($row['subject']);
 		if (empty($row['subject']))
-			$row['subject'] = $txt['no_subject'];
+			$row['subject'] = $txt['drafts_none'];
 
 		censorText($row['body']);
 		censorText($row['subject']);
@@ -490,11 +445,11 @@ function showProfileDrafts($memID, $draft_type = 0)
 			'alternate' => $counter % 2,
 			'board' => array(
 				'name' => $row['bname'],
-				'id' => $row['id_board']
+				'id' => $row['id_board'],
 			),
 			'topic' => array(
 				'id' => $row['id_topic'],
-				'link' => empty($row['id']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+				'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			),
 			'subject' => $row['subject'],
 			'time' => timeformat($row['poster_time']),

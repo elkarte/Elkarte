@@ -114,7 +114,7 @@ class sphinxql_search
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinxql_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
 	}
 
 	/**

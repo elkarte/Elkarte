@@ -1698,7 +1698,7 @@ function MessagePost2()
 
 		// If we had a PM draft for this one, then its time to remove it since it was just sent
 		if ($context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
-			deleteDrafts($_POST['id_pm_draft']);
+			deleteDrafts($_POST['id_pm_draft'], $user_info['id']);
 	}
 
 	// Go back to the where they sent from, if possible...

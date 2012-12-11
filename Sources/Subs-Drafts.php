@@ -261,3 +261,35 @@ function load_user_drafts($member_id, $topic = false, $draft_type = 0, $drafts_k
 
 	return $user_drafts;
 }
+
+/**
+ * Deletes one or many drafts from the DB
+ * Validates the drafts are from the user
+ * If supplied an array of drafts will attempt to remove all of them
+ *
+ * @param int $id_draft
+ * @param bool $check
+ * @return boolean
+ */
+function deleteDrafts($id_draft, $member_id = -1, $check = true)
+{
+	global $smcFunc;
+
+	// Only a single draft.
+	if (is_numeric($id_draft))
+		$id_draft = array($id_draft);
+
+	// can't delete nothing
+	if (empty($id_draft))
+		return false;
+
+	$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}user_drafts
+			WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
+				AND  id_member = {int:id_member}' : ''),
+			array (
+				'id_draft' => $id_draft,
+				'id_member' => $member_id ,
+			)
+		);
+}

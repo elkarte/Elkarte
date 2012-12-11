@@ -676,6 +676,9 @@ function QuickModeration()
 
 	// Check the session = get or post.
 	checkSession('request');
+	
+	// Some help we may need
+	require_once($sourcedir . '/Subs-Topic.php');
 
 	// Lets go straight to the restore area.
 	if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
@@ -833,7 +836,6 @@ function QuickModeration()
 			$stickyCache[] = $topic;
 		elseif ($action == 'move')
 		{
-			require_once($sourcedir . '/Subs-Topic.php');
 			moveTopicConcurrence();
 
 			// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
@@ -930,8 +932,6 @@ function QuickModeration()
 		$smcFunc['db_free_result']($request);
 
 		$moveCache = $moveCache2;
-
-		require_once($sourcedir . '/Subs-Topic.php');
 
 		// Do the actual moves...
 		foreach ($moveTos as $to => $topics)
@@ -1039,7 +1039,6 @@ function QuickModeration()
 				sendNotifications($topic, 'remove');
 			}
 
-			require_once($sourcedir . '/Subs-Topic.php');
 			removeTopics($removeCache);
 		}
 	}
