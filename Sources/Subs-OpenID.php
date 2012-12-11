@@ -358,7 +358,7 @@ function OpenIDReturn()
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
 			require_once($sourcedir . '/Register.php');
-			return Register2(true);
+			return action_register2(true);
 		}
 		else
 			redirectexit('action=register');

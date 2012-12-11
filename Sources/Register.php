@@ -24,10 +24,11 @@ if (!defined('DIALOGO'))
 
 /**
  * Begin the registration process.
+ * Accessed by ?action=register
  *
  * @param array $reg_errors = array()
  */
-function Register($reg_errors = array())
+function action_register($reg_errors = array())
 {
 	global $txt, $boarddir, $context, $settings, $modSettings, $user_info;
 	global $language, $scripturl, $smcFunc, $sourcedir, $smcFunc, $cur_profile;
@@ -213,10 +214,13 @@ function Register($reg_errors = array())
 
 /**
  * Actually register the member.
+ * @todo split this function in two functions:
+ *  - a function that handles action=register2, which needs no parameter;
+ *  - a function that processes the case of OpenID verification.
  *
  * @param bool $verifiedOpenID = false
  */
-function Register2($verifiedOpenID = false)
+function action_register2($verifiedOpenID = false)
 {
 	global $scripturl, $txt, $modSettings, $context, $sourcedir;
 	global $user_info, $options, $settings, $smcFunc;
@@ -526,9 +530,10 @@ function Register2($verifiedOpenID = false)
 }
 
 /**
- * @todo needs description
+ * Verify the activation code, and activate the user if correct.
+ * Accessed by ?action=activate
  */
-function Activate()
+function action_activate()
 {
 	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $language, $user_info;
 
@@ -685,8 +690,9 @@ function Activate()
 
 /**
  * This function will display the contact information for the forum, as well a form to fill in.
+ * Accessed by action=coppa
  */
-function CoppaForm()
+function action_coppa()
 {
 	global $context, $modSettings, $txt, $smcFunc;
 
@@ -768,8 +774,9 @@ function CoppaForm()
 
 /**
  * Show the verification code or let it hear.
+ * Accessed by ?action=verificationcode
  */
-function VerificationCode()
+function action_verificationcode()
 {
 	global $sourcedir, $modSettings, $context, $scripturl;
 
@@ -860,7 +867,7 @@ function RegisterCheckUsername()
  * Shows the contact form for the user to fill out
  * Needs to be enabled to be used
  */
-function ContactForm()
+function action_contactform()
 {
 	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
 
