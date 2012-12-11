@@ -213,7 +213,7 @@ class site_Dispatcher
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
-					$this->_function_name = 'action_index';
+					$this->_function_name = 'action_' . $_GET['action'];
 			}
 			// action=drafts => Drafts.controller.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
