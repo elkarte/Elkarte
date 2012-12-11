@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  *
  * This file takes care of actions on topics:
- * lock/unlock a topic, sticky/unsticky it,
+ * lock/unlock a topic, sticky/unsticky it
  *
  */
 
@@ -29,9 +29,9 @@ if (!defined('DIALOGO'))
  *  - requires the lock_own or lock_any permission.
  *  - logs the action to the moderator log.
  *  - returns to the topic after it is done.
- *  - it is accessed via ?action=lock.
+ *  - it is accessed via ?action=topic;sa=lock.
 */
-function LockTopic()
+function action_lock()
 {
 	global $topic, $user_info, $sourcedir, $board, $smcFunc;
 
@@ -106,9 +106,9 @@ function LockTopic()
  *  - requires the make_sticky permission.
  *  - adds an entry to the moderator log.
  *  - when done, sends the user back to the topic.
- *  - accessed via ?action=sticky.
+ *  - accessed via ?action=topic;sa=sticky.
  */
-function Sticky()
+function action_sticky()
 {
 	global $modSettings, $topic, $board, $sourcedir, $smcFunc;
 
