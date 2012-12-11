@@ -142,8 +142,8 @@ function ModifyProfile($post_errors = array())
 				),
 				'tracking' => array(
 					'label' => $txt['trackUser'],
-					'file' => 'Profile-View.php',
-					'function' => 'tracking',
+					'file' => 'Tracking.php',
+					'function' => 'action_tracking',
 					'subsections' => array(
 						'activity' => array($txt['trackActivity'], 'moderate_forum'),
 						'ip' => array($txt['trackIP'], 'moderate_forum'),
