@@ -292,7 +292,8 @@ class site_Dispatcher
 		{
 			// pre-dispatch (load templates and stuff)
 			// for procedural controllers, we know this name (instance var)
-			call_user_func($this->_pre_dispatch_func);
+			if (!empty($this->_pre_dispatch_func) && function_exists($this->_pre_dispatch_func))
+				call_user_func($this->_pre_dispatch_func);
 
 			// it must be a good ole' function
 			call_user_func($this->_function_name);
