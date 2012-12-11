@@ -61,7 +61,6 @@ function action_tracking($memID)
 	$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$context['tracking_area']][1] . ' - ' . $user_profile[$memID]['real_name'];
 
 	// Pass on to the actual function.
-	$context['sub_template'] = $subActions[$context['tracking_area']][0];
 	$subActions[$context['tracking_area']][0]($memID);
 }
 
@@ -284,6 +283,7 @@ function action_trackactivity($memID)
 			$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		$smcFunc['db_free_result']($request);
 	}
+	$context['sub_template'] = 'trackActivity';
 }
 
 /**
@@ -711,6 +711,7 @@ function action_trackip($memID = 0)
 				$context['auto_whois_server'] = $whois;
 		}
 	}
+	$context['sub_template'] = 'trackIP';
 }
 
 /**
