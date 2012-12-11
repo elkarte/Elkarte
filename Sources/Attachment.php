@@ -21,7 +21,7 @@
  * The default action is to download an attachment.
  * This allows ?action=attachment to be forwarded to action_dlattach()
  */
-function action_index()
+function action_attachment()
 {
 	// default action to execute
 	action_dlattach();

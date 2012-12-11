@@ -168,7 +168,7 @@ class site_Dispatcher
 			'suggest' => array('Suggest.php', 'action_suggest'),
 			'spellcheck' => array('Subs-Post.php', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.php', 'action_splittopics'),
-			'stats' => array('Stats.php', 'action_displaystats'),
+			'stats' => array('Stats.php', 'action_stats'),
 			// 'sticky' => array('Topic.php', 'Sticky'),
 			'theme' => array('Themes.php', 'action_thememain'),
 			'trackip' => array('Profile-View.php', 'trackIP'),

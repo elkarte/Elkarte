@@ -23,7 +23,7 @@ if (!defined('DIALOGO'))
 /**
  * Default (sub)action for ?action=announce
  */
-function action_index()
+function action_announce()
 {
 	// default for action=announce: action_selectgroup() function.
 	action_selectgroup();

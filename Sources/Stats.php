@@ -28,7 +28,7 @@ if (!defined('DIALOGO'))
  * requires the view_stats permission.
  * accessed from ?action=stats.
  */
-function action_displaystats()
+function action_stats()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc;
 
@@ -638,7 +638,7 @@ function action_displaystats()
 
 /**
  * Loads the statistics on a daily basis in $context.
- * called by action_displaystats().
+ * called by action_stats().
  * @param string $condition_string
  * @param array $condition_parameters = array()
  */
