@@ -49,7 +49,7 @@ class site_Dispatcher
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
 			'file' => $sourcedir . '/BoardIndex.php',
-			'function' => 'BoardIndex'
+			'function' => 'action_boardindex'
 		);
 
 		// Maintenance mode: you're out of here unless you're admin
@@ -115,7 +115,7 @@ class site_Dispatcher
 			'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
 			'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
 			'calendar' => array('Calendar.php', 'CalendarMain'),
-			'collapse' => array('BoardIndex.php', 'CollapseCategory'),
+			'collapse' => array('BoardIndex.php', 'action_collapse'),
 			'contact' => array('Register.php', 'ContactForm'),
 			'coppa' => array('Register.php', 'CoppaForm'),
 			'credits' => array('Who.php', 'Credits'),
@@ -284,7 +284,7 @@ class site_Dispatcher
 				// things went pretty bad, huh?
 				// board index :P
 				require_once($sourcedir . '/BoardIndex.php');
-				return 'BoardIndex';
+				return 'action_boardindex';
 			}
 		}
 		else
