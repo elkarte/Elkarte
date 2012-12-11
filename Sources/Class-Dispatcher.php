@@ -177,11 +177,11 @@ class site_Dispatcher
 			'verificationcode' => array('Register.php', 'action_verificationcode'),
 			'viewprofile' => array('Profile.php', 'ModifyProfile'),
 			'vote' => array('Poll.php', 'action_vote'),
-			'viewquery' => array('ViewQuery.php', 'ViewQuery'),
+			'viewquery' => array('ViewQuery.php', 'action_viewquery'),
 			'viewadminfile' => array('Admin.php', 'action_viewadminfile'),
 			// 'who' => array('Who.php', 'action_who'),
-			'.xml' => array('News.php', 'ShowXmlFeed'),
-			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
+			'.xml' => array('News.php', 'action_showfeed'),
+			'xmlhttp' => array('Xml.php', 'action_xmlhttp'),
 		);
 
 		// allow to extend or change $actionArray through a hook

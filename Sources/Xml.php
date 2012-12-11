@@ -20,8 +20,10 @@
 if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
-
-function XMLhttpMain()
+/**
+ * Main function for action=xmlhttp.
+ */
+function action_xmlhttp()
 {
 	loadTemplate('Xml');
 

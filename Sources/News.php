@@ -35,7 +35,7 @@ if (!defined('DIALOGO'))
  *
  * @uses Stats language file.
  */
-function ShowXmlFeed()
+function action_showfeed()
 {
 	global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
 	global $query_this_board, $smcFunc, $forum_version, $cdata_override;
