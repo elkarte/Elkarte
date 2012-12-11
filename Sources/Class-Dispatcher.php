@@ -118,7 +118,7 @@ class site_Dispatcher
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
 			'contact' => array('Register.php', 'ContactForm'),
 			'coppa' => array('Register.php', 'CoppaForm'),
-			'credits' => array('Who.php', 'Credits'),
+			'credits' => array('Who.php', 'action_credits'),
 			'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
 			'dlattach' => array('Attachment.php', 'action_dlattach'),
 			'disregardtopic' => array('Notify.php', 'TopicDisregard'),
@@ -180,7 +180,7 @@ class site_Dispatcher
 			'vote' => array('Poll.php', 'Vote'),
 			'viewquery' => array('ViewQuery.php', 'ViewQuery'),
 			'viewsmfile' => array('Admin.php', 'DisplayAdminFile'),
-			'who' => array('Who.php', 'Who'),
+			// 'who' => array('Who.php', 'action_who'),
 			'.xml' => array('News.php', 'ShowXmlFeed'),
 			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
 		);

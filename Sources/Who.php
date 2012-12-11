@@ -22,6 +22,15 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
+ * Default action to be called for this controller.
+ */
+function action_index()
+{
+	// default for ?action=who
+	action_who();
+}
+
+/**
  * Who's online, and what are they doing?
  * This function prepares the who's online data for the Who template.
  * It requires the who_view permission.
@@ -31,7 +40,7 @@ if (!defined('DIALOGO'))
  * @uses Who template, main sub-template
  * @uses Who language file.
  */
-function Who()
+function action_who()
 {
 	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext, $smcFunc;
 
@@ -520,11 +529,13 @@ function determineActions($urls, $preferred_prefix = false)
 }
 
 /**
- * It prepares credit and copyright information for the credits page or the admin page
+ * It prepares credit and copyright information for the credits page or the admin page.
+ * @todo two functions: split the data from loading templates and stuff, and remove the parameter.
+ *  - a function for action=who;sa=credits, and another for the data needed for this and admin.
  *
  * @param bool $in_admin = false, if parameter is true the it will not load the sub-template nor the template file
  */
-function Credits($in_admin = false)
+function action_credits($in_admin = false)
 {
 	global $context, $smcFunc, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info;
 

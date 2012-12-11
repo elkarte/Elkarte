@@ -563,7 +563,7 @@ function AdminHome()
 
 	// Load the credits stuff.
 	require_once($sourcedir . '/Who.php');
-	Credits(true);
+	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.
 	$context['time_format'] = urlencode($user_info['time_format']);
