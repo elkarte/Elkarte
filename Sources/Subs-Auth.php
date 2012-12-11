@@ -468,56 +468,6 @@ function JSMembers()
 }
 
 /**
- * Outputs each member name on its own line.
- * - used by javascript to find members matching the request.
- */
-function RequestMembers()
-{
-	global $user_info, $txt, $smcFunc;
-
-	checkSession('get');
-
-	$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search']));
-	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-	if (function_exists('iconv'))
-		header('Content-Type: text/plain; charset=UTF-8');
-
-	$request = $smcFunc['db_query']('', '
-		SELECT real_name
-		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
-			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
-		array(
-			'buddy_list' => $user_info['buddies'],
-			'search' => $_REQUEST['search'],
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if (function_exists('iconv'))
-		{
-			$utf8 = iconv($txt['lang_character_set'], 'UTF-8', $row['real_name']);
-			if ($utf8)
-				$row['real_name'] = $utf8;
-		}
-
-		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
-
-		if (preg_match('~&#\d+;~', $row['real_name']) != 0)
-			$row['real_name'] = preg_replace_callback('~&#(\d+);~', 'fixchar__callback', $row['real_name']);
-
-		echo $row['real_name'], "\n";
-	}
-	$smcFunc['db_free_result']($request);
-
-	obExit(false);
-}
-
-/**
  * Generates a random password for a user and emails it to them.
  * - called by Profile.php when changing someone's username.
  * - checks the validity of the new username.
