@@ -670,7 +670,7 @@ function MessageIndex()
  * Allows for moderation from the message index.
  * @todo refactor this...
  */
-function QuickModeration()
+function action_quickmod()
 {
 	global $sourcedir, $board, $user_info, $modSettings, $smcFunc, $context;
 

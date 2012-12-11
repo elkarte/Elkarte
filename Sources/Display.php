@@ -1369,8 +1369,9 @@ function approved_attach_sort($a, $b)
 
 /**
  * In-topic quick moderation.
+ * Accessed by ?action=quickmod2
  */
-function QuickInTopicModeration()
+function action_quickmod2()
 {
 	global $sourcedir, $topic, $board, $user_info, $smcFunc, $modSettings, $context;
 

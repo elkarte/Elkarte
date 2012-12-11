@@ -867,7 +867,7 @@ function RegisterCheckUsername()
  * Shows the contact form for the user to fill out
  * Needs to be enabled to be used
  */
-function action_contactform()
+function action_contact()
 {
 	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
 

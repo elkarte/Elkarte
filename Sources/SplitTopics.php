@@ -28,7 +28,7 @@ if (!defined('DIALOGO'))
  * requires the split_any permission.
  * is accessed with ?action=splittopics.
  */
-function SplitTopics()
+function action_splittopics()
 {
 	global $topic, $sourcedir;
 
@@ -966,7 +966,7 @@ function MergeIndex()
  *
  * the merge options screen:
  * * shows topics to be merged and allows to set some merge options.
- * * is accessed by ?action=mergetopics;sa=options.and can also internally be called by QuickModeration() (Subs-Boards.php).
+ * * is accessed by ?action=mergetopics;sa=options.and can also internally be called by action_quickmod().
  * * uses 'merge_extra_options' sub template of the SplitTopics template.
  *
  * the actual merge:

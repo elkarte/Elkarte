@@ -25,6 +25,7 @@ if (!defined('DIALOGO'))
  * It initialises all the basic context required for the admin center.
  * It passes execution onto the relevant admin section.
  * If the passed section is not found it shows the admin home page.
+ * Accessed by ?action=admin.
  */
 function AdminMain()
 {

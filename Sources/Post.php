@@ -2276,7 +2276,7 @@ function getTopic()
  * uses special (sadly browser dependent) javascript to parse entities for internationalization reasons.
  * accessed with ?action=quotefast.
  */
-function QuoteFast()
+function action_quotefast()
 {
 	global $modSettings, $user_info, $txt, $settings, $context;
 	global $sourcedir, $smcFunc;

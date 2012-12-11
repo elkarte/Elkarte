@@ -25,7 +25,7 @@ if (!defined('DIALOGO'))
  *
  * @param bool $dont_call = false
  */
-function action_moderationcenter($dont_call = false)
+function action_modcenter($dont_call = false)
 {
 	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $options, $smcFunc;
 
