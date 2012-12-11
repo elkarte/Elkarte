@@ -29,16 +29,16 @@ function action_xmlhttp()
 
 	$sub_actions = array(
 		'jumpto' => array(
-			'function' => 'GetJumpTo',
+			'function' => 'action_jumpto',
 		),
 		'messageicons' => array(
-			'function' => 'ListMessageIcons',
+			'function' => 'action_messageicons',
 		),
 		'corefeatures' => array(
-			'function' => 'EnableCoreFeatures',
+			'function' => 'action_corefeatures',
 		),
 		'previews' => array(
-			'function' => 'RetrievePreview',
+			'function' => 'action_previews',
 		),
 	);
 
@@ -54,7 +54,7 @@ function action_xmlhttp()
 /**
  * Get a list of boards and categories used for the jumpto dropdown.
  */
-function GetJumpTo()
+function action_jumpto()
 {
 	global $user_info, $context, $smcFunc, $sourcedir;
 
@@ -77,7 +77,7 @@ function GetJumpTo()
 	$context['sub_template'] = 'jump_to';
 }
 
-function ListMessageIcons()
+function action_messageicons()
 {
 	global $context, $sourcedir, $board;
 
@@ -87,7 +87,7 @@ function ListMessageIcons()
 	$context['sub_template'] = 'message_icons';
 }
 
-function EnableCoreFeatures()
+function action_corefeatures()
 {
 	global $context, $smcFunc, $sourcedir, $modSettings, $txt, $boarddir, $settings;
 
@@ -187,7 +187,7 @@ function EnableCoreFeatures()
 	);
 }
 
-function RetrievePreview()
+function action_previews()
 {
 	global $context;
 
