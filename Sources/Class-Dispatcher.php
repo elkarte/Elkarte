@@ -165,7 +165,7 @@ class site_Dispatcher
 			'restoretopic' => array('RemoveTopic.php', 'action_restoretopic'),
 			'search' => array('Search.php', 'PlushSearch1'),
 			'search2' => array('Search.php', 'PlushSearch2'),
-			'suggest' => array('Subs-Editor.php', 'AutoSuggestHandler'),
+			'suggest' => array('Suggest.php', 'action_suggest'),
 			'spellcheck' => array('Subs-Post.php', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.php', 'SplitTopics'),
 			'stats' => array('Stats.php', 'DisplayStats'),
