@@ -34,7 +34,7 @@ if (!defined('DIALOGO'))
  *
  *  @param array $post_errors holds any errors found tyring to post
  */
-function Post($post_errors = array())
+function action_post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
@@ -1158,7 +1158,7 @@ function Post($post_errors = array())
  * sends off notifications, and allows for announcements and moderation.
  * accessed from ?action=post2.
  */
-function Post2()
+function action_post2()
 {
 	global $board, $topic, $txt, $modSettings, $sourcedir, $context;
 	global $user_info, $board_info, $options, $smcFunc;
@@ -1179,7 +1179,7 @@ function Post2()
 
 	// Previewing? Go back to start.
 	if (isset($_REQUEST['preview']))
-		return Post();
+		return action_post();
 
 	// Prevent double submission of this form.
 	checkSubmitOnce('check');
@@ -1333,14 +1333,14 @@ function Post2()
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
 			saveDraft($post_errors);
-			return Post();
+			return action_post();
 		}
 
-		// If the number of replies has changed, if the setting is enabled, go back to Post() - which handles the error.
+		// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
 		if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
 		{
 			$_REQUEST['preview'] = true;
-			return Post();
+			return action_post();
 		}
 
 		$posterIsGuest = $user_info['is_guest'];
@@ -1378,7 +1378,7 @@ function Post2()
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
 			saveDraft($post_errors);
-			return Post();
+			return action_post();
 		}
 
 		$posterIsGuest = $user_info['is_guest'];
@@ -1461,7 +1461,7 @@ function Post2()
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
 			saveDraft($post_errors);
-			return Post();
+			return action_post();
 		}
 
 		$posterIsGuest = empty($row['id_member']);
@@ -1597,7 +1597,7 @@ function Post2()
 		// Previewing.
 		$_REQUEST['preview'] = true;
 
-		return Post($post_errors);
+		return action_post($post_errors);
 	}
 
 	// Make sure the user isn't spamming the board.

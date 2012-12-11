@@ -160,7 +160,7 @@ function action_calendar()
 /**
  * This function processes posting/editing/deleting a calendar event.
  *
- * 	- calls Post() function if event is linked to a post.
+ * 	- calls action_post() function if event is linked to a post.
  *  - calls insertEvent() to insert the event if not linked to post.
  *
  * It requires the calendar_post permission to use.
@@ -200,7 +200,7 @@ function CalendarPost()
 		{
 			$_REQUEST['calendar'] = 1;
 			require_once($sourcedir . '/Post.php');
-			return Post();
+			return action_post();
 		}
 		// New...
 		elseif ($_REQUEST['eventid'] == -1)
@@ -260,7 +260,7 @@ function CalendarPost()
 	{
 		$_REQUEST['calendar'] = 1;
 		require_once($sourcedir . '/Post.php');
-		return Post();
+		return action_post();
 	}
 
 	// New?
