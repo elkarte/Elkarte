@@ -140,7 +140,7 @@ class site_Dispatcher
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
 			'memberlist' => array('Memberlist.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.php', 'ModerationMain'),
-			'modifykarma' => array('Karma.php', 'ModifyKarma'),
+			'karma' => array('Karma.php', 'action_karma'),
 			'movetopic' => array('MoveTopic.php', 'MoveTopic'),
 			'movetopic2' => array('MoveTopic.php', 'MoveTopic2'),
 			'notify' => array('Notify.php', 'Notify'),
