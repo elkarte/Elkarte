@@ -3695,19 +3695,19 @@ function setupMenuContext()
 					),
 				),
 			),
-			'mlist' => array(
+			'memberlist' => array(
 				'title' => $txt['members_title'],
-				'href' => $scripturl . '?action=mlist',
+				'href' => $scripturl . '?action=memberlist',
 				'show' => $context['allow_memberlist'],
 				'sub_buttons' => array(
 					'mlist_view' => array(
 						'title' => $txt['mlist_menu_view'],
-						'href' => $scripturl . '?action=mlist',
+						'href' => $scripturl . '?action=memberlist',
 						'show' => true,
 					),
 					'mlist_search' => array(
 						'title' => $txt['mlist_search'],
-						'href' => $scripturl . '?action=mlist;sa=search',
+						'href' => $scripturl . '?action=memberlist;sa=search',
 						'show' => true,
 						'is_last' => true,
 					),

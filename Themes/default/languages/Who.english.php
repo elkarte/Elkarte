@@ -106,7 +106,7 @@ $txt['whoallow_mailing'] = 'Sending a forum email.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
 $txt['whoallow_moderate'] = 'Viewing the <a href="' . $scripturl . '?action=moderate">Moderation Center</a>.';
-$txt['whoallow_mlist'] = 'Viewing the <a href="' . $scripturl . '?action=mlist">memberlist</a>.';
+$txt['whoallow_mlist'] = 'Viewing the <a href="' . $scripturl . '?action=memberlist">memberlist</a>.';
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="' . $scripturl . '?action=search">Searching</a> the forum.';
