@@ -49,7 +49,7 @@ function action_groups()
 	{
 		require_once($sourcedir . '/ModerationCenter.php');
 		$_GET['area'] = $_REQUEST['sa'] == 'requests' ? 'groups' : 'viewgroups';
-		ModerationMain(true);
+		action_moderationcenter(true);
 	}
 	// Otherwise add something to the link tree, for normal people.
 	else

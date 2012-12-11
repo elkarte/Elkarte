@@ -252,7 +252,7 @@ function openID_removeAssociation($handle)
 /**
  * Callback action handler for OpenID
  */
-function OpenIDReturn()
+function action_openidreturn()
 {
 	global $smcFunc, $user_info, $user_profile, $sourcedir, $modSettings, $context, $sc, $user_settings;
 
