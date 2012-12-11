@@ -120,7 +120,7 @@ class site_Dispatcher
 			'coppa' => array('Register.php', 'CoppaForm'),
 			'credits' => array('Who.php', 'Credits'),
 			'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
-			'dlattach' => array('Attachment.php', 'Download'),
+			'dlattach' => array('Attachment.php', 'action_dlattach'),
 			'disregardtopic' => array('Notify.php', 'TopicDisregard'),
 			'editpoll' => array('Poll.php', 'EditPoll'),
 			'editpoll2' => array('Poll.php', 'EditPoll2'),
