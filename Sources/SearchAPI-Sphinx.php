@@ -149,26 +149,12 @@ class sphinx_search
 	{
 		global $modSettings, $smcFunc;
 
-		$subwords = text2words($word, $this->min_word_length, true);
+		$subwords = text2words($word, null, false);
 
-		if (empty($modSettings['search_force_index']))
-			$wordsSearch['words'][] = $word;
-
-		// Excluded phrases don't benefit from being split into subwords.
-		if (count($subwords) > 1 && $isExcluded)
-			continue;
-		else
-		{
-			foreach ($subwords as $subword)
-			{
-				if ($smcFunc['strlen']($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
-				{
-					$wordsSearch['indexed_words'][] = $subword;
-					if ($isExcluded)
-						$wordsExclude[] = $subword;
-				}
-			}
-		}
+		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
+		$wordsSearch['indexed_words'][] = $fulltextWord;
+		if ($isExcluded)
+			$wordsExclude[] = $fulltextWord;
 	}
 
 	/*
@@ -237,7 +223,7 @@ class sphinx_search
 				$query = '@(subject) ' . $query;
 
 			// Execute the search query.
-			$request = $mySphinx->Query($query, 'smf_index');
+			$request = $mySphinx->Query($query, 'dialogo_index');
 
 			// Can a connection to the daemon be made?
 			if ($request === false)
@@ -253,6 +239,7 @@ class sphinx_search
 				'matches' => array(),
 				'num_results' => $request['total'],
 			);
+
 			if (isset($request['matches']))
 			{
 				foreach ($request['matches'] as $msgID => $match)
