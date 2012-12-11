@@ -161,7 +161,7 @@ class site_Dispatcher
 			// 'reminder' => array('Reminder.php', 'RemindMe'),
 			'removepoll' => array('Poll.php', 'RemovePoll'),
 			'removetopic2' => array('RemoveTopic.php', 'RemoveTopic2'),
-			'reporttm' => array('SendTopic.php', 'ReportToModerator'),
+			'reporttm' => array('Emailuser.php', 'ReportToModerator'),
 			'requestmembers' => array('Subs-Auth.php', 'RequestMembers'),
 			'restoretopic' => array('RemoveTopic.php', 'RestoreTopic'),
 			'search' => array('Search.php', 'PlushSearch1'),

@@ -13,7 +13,8 @@
  *
  * @version 1.0 Alpha
  *
- * The functions in this file deal with sending topics to a friend or moderator
+ * The functions in this file deal with sending topics to a friend or moderator,
+ * and email to a user.
  *
  */
 
@@ -21,27 +22,26 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * The main handling function for sending specialist (Or otherwise) emails to a user.
+ * This function initializes or sets up the necessary, for the other actions
  */
-function EmailUser()
+function pre_emailuser()
 {
-	global $topic, $txt, $context, $scripturl, $sourcedir, $smcFunc;
+	global $context;
 
 	// Don't index anything here.
 	$context['robot_no_index'] = true;
 
 	// Load the template.
 	loadTemplate('SendTopic');
+}
 
-	$sub_actions = array(
-		'email' => 'CustomEmail',
-		'sendtopic' => 'SendTopic',
-	);
-
-	if (!isset($_GET['sa']) || !isset($sub_actions[$_GET['sa']]))
-		$_GET['sa'] = 'sendtopic';
-
-	$sub_actions[$_GET['sa']]();
+/**
+ * Default action handler (when no ;sa is specified)
+ */
+function action_index()
+{
+	// default action: action_sendtopic()
+	action_sendtopic();
 }
 
 /**
@@ -51,7 +51,7 @@ function EmailUser()
  * Redirects back to the first page of the topic when done.
  * Is accessed via ?action=emailuser;sa=sendtopic.
  */
-function SendTopic()
+function action_sendtopic()
 {
 	global $topic, $txt, $context, $scripturl, $sourcedir, $smcFunc, $modSettings;
 
@@ -152,8 +152,9 @@ function SendTopic()
  * Send an email to the user - allow the sender to write the message.
  * Can either be passed a user ID as uid or a message id as msg.
  * Does not check permissions for a message ID as there is no information disclosed.
+ * ?action=emailuser;sa=email
  */
-function CustomEmail()
+function action_email()
 {
 	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl, $sourcedir;
 
