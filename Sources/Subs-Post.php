@@ -520,7 +520,7 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
  * It has problems with internationalization.
  * It is accessed via ?action=spellcheck.
  */
-function SpellCheck()
+function action_spellcheck()
 {
 	global $txt, $context, $smcFunc;
 

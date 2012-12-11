@@ -166,7 +166,7 @@ class site_Dispatcher
 			'search' => array('Search.php', 'PlushSearch1'),
 			'search2' => array('Search.php', 'PlushSearch2'),
 			'suggest' => array('Subs-Editor.php', 'AutoSuggestHandler'),
-			'spellcheck' => array('Subs-Post.php', 'SpellCheck'),
+			'spellcheck' => array('Subs-Post.php', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.php', 'SplitTopics'),
 			'stats' => array('Stats.php', 'DisplayStats'),
 			// 'sticky' => array('Topic.php', 'Sticky'),
