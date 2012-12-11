@@ -22,15 +22,6 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Default action to be called for this controller.
- */
-function action_index()
-{
-	// default for ?action=who
-	action_who();
-}
-
-/**
  * Who's online, and what are they doing?
  * This function prepares the who's online data for the Who template.
  * It requires the who_view permission.

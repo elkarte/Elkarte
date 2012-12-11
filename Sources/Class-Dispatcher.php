@@ -136,7 +136,7 @@ class site_Dispatcher
 			'login' => array('LogInOut.php', 'action_login'),
 			'login2' => array('LogInOut.php', 'action_login2'),
 			'logout' => array('LogInOut.php', 'action_logout'),
-			// 'markasread' => array('Markasread.php', 'action_markasread'),
+			'markasread' => array('Markasread.php', 'action_markasread'),
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
 			'memberlist' => array('Memberlist.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.php', 'action_moderationcenter'),
