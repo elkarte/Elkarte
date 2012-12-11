@@ -111,7 +111,7 @@ class site_Dispatcher
 		$actionArray = array(
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
-			'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
+			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
 			'calendar' => array('Calendar.php', 'CalendarMain'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),

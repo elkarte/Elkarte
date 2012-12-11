@@ -761,7 +761,7 @@ function approveAllData()
 	if (!empty($attaches))
 	{
 		require_once($sourcedir . '/Subs-Attachments.php');
-		ApproveAttachments($attaches);
+		approveAttachments($attaches);
 	}
 }
 
