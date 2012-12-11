@@ -125,7 +125,7 @@ class site_Dispatcher
 			'editpoll2' => array('Poll.php', 'action_editpoll2'),
 			// 'emailuser' => array('SendTopic.php', 'EmailUser'),
 			'findmember' => array('Members.php', 'action_findmember'),
-			'groups' => array('Groups.php', 'Groups'),
+			'groups' => array('Groups.php', 'action_groups'),
 			'help' => array('Help.php', 'ShowHelp'),
 			'helpadmin' => array('Help.php', 'ShowAdminHelp'),
 			'jsmodify' => array('Post.php', 'JavaScriptModify'),

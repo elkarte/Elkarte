@@ -146,13 +146,13 @@ function ModerationMain($dont_call = false)
 				'groups' => array(
 					'label' => $txt['mc_group_requests'],
 					'file' => 'Groups.php',
-					'function' => 'Groups',
+					'function' => 'action_groups',
 					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				),
 				'viewgroups' => array(
 					'label' => $txt['mc_view_groups'],
 					'file' => 'Groups.php',
-					'function' => 'Groups',
+					'function' => 'action_groups',
 				),
 			),
 		),
@@ -499,6 +499,7 @@ function ModBlockReportedPosts()
 
 /**
  * Show a list of all the group requests they can see.
+ * Checks permissions for group moderation.
  */
 function ModBlockGroupRequests()
 {
@@ -736,7 +737,7 @@ function ModerateGroups()
 
 	// Setup the subactions...
 	$subactions = array(
-		'requests' => 'GroupRequests',
+		'requests' => 'action_requests',
 		'view' => 'ViewGroups',
 	);
 
