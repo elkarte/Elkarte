@@ -1479,11 +1479,10 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile('editor.js', array('default_theme' => true), 'smf_editor');
-		loadJavascriptFile('jquery.sceditor.js', array('default_theme' => true));
-		loadJavascriptFile('jquery.sceditor.bbcode.js', array('default_theme' => true));
-		loadJavascriptFile('jquery.sceditor.dialogo.js', array('default_theme' => true));
-		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
+		loadJavascriptFile(
+			array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'),
+			array('default_theme' => true)
+		);
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';

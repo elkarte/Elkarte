@@ -3177,8 +3177,29 @@ function template_footer()
 function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $sourcedir;
-
-	$loadjquery = false;
+	
+	// First up, load jquery
+	if (isset($modSettings['jquery_source']) && !$do_defered)
+	{
+		switch ($modSettings['jquery_source'])
+		{
+			case 'cdn':
+				echo '
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" id="jquery"></script>';
+				break;
+			case 'local':
+				echo '
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.7.2.min.js" id="jquery"></script>';
+				break;
+			case 'auto':
+				echo '
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" id="jquery"></script>
+	<script type="text/javascript"><!-- // --><![CDATA[
+		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.7.2.min.js"><\/script>\');
+	// ]]></script>';
+				break;
+		}
+	}
 
 	// Use this hook to work with Javascript files and vars pre output
 	call_integration_hook('pre_javascript_output');
@@ -3190,7 +3211,7 @@ function template_javascript($do_defered = false)
 		{
 			require_once($sourcedir . '/Class-Combine.php');
 			$combiner = new site_Combiner;
-			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered, $loadjquery);
+			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
 			if (!empty($combine_name))
 				echo '
@@ -3212,13 +3233,6 @@ function template_javascript($do_defered = false)
 		}
 	}
 
-	// load JQuery if needed
-	if (!empty($loadjquery))
-		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.2.min.js"><\/script>\');
-	// ]]></script>';
-
 	// Output the declared Javascript variables.
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
@@ -3232,9 +3246,6 @@ function template_javascript($do_defered = false)
 		echo '
 	// ]]></script>';
 	}
-
-
-
 
 	// Inline JavaScript - Actually useful some times!
 	if (!empty($context['javascript_inline']))
