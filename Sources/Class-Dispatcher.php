@@ -149,7 +149,7 @@ class site_Dispatcher
 			'pm' => array('PersonalMessage.php', 'MessageMain'),
 			'post' => array('Post.php', 'Post'),
 			'post2' => array('Post.php', 'Post2'),
-			'printpage' => array('Printpage.php', 'PrintTopic'),
+			// 'printpage' => array('Topic.php', 'action_printpage'),
 			'profile' => array('Profile.php', 'ModifyProfile'),
 			'quotefast' => array('Post.php', 'QuoteFast'),
 			'quickmod' => array('MessageIndex.php', 'QuickModeration'),
