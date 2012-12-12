@@ -178,10 +178,10 @@ function action_showfeed()
 
 	// List all the different types of data they can pull.
 	$subActions = array(
-		'recent' => array('getXmlRecent', 'recent-post'),
-		'news' => array('getXmlNews', 'article'),
-		'members' => array('getXmlMembers', 'member'),
-		'profile' => array('getXmlProfile', null),
+		'recent' => array('action_xmlrecent', 'recent-post'),
+		'news' => array('action_xmlnews', 'article'),
+		'members' => array('action_xmlmembers', 'member'),
+		'profile' => array('action_xmlprofile', null),
 	);
 
 	// Easy adding of sub actions
@@ -378,7 +378,7 @@ function fix_possible_url($val)
 
 /**
  * Ensures supplied data is properly encpsulated in cdata xml tags
- * Called from getXmlProfile in News.php
+ * Called from action_xmlprofile in News.php
  *
  * @param type $data
  * @param type $ns
@@ -530,7 +530,7 @@ function dumpTags($data, $i, $tag = null, $xml_format = '')
  * @param string $xml_format
  * @return array
  */
-function getXmlMembers($xml_format)
+function action_xmlmembers($xml_format)
 {
 	global $scripturl, $smcFunc;
 
@@ -595,7 +595,7 @@ function getXmlMembers($xml_format)
  * @param $xml_format
  * @return array, array of topics
  */
-function getXmlNews($xml_format)
+function action_xmlnews($xml_format)
 {
 	global $user_info, $scripturl, $modSettings, $board;
 	global $query_this_board, $smcFunc, $settings, $context;
@@ -729,7 +729,7 @@ function getXmlNews($xml_format)
  * @param $xml_format
  * @return array, of recent posts
  */
-function getXmlRecent($xml_format)
+function action_xmlrecent($xml_format)
 {
 	global $user_info, $scripturl, $modSettings, $board;
 	global $query_this_board, $smcFunc, $settings, $context;
@@ -890,7 +890,7 @@ function getXmlRecent($xml_format)
  * @param $xml_format
  * @return array, of profile data.
  */
-function getXmlProfile($xml_format)
+function action_xmlprofile($xml_format)
 {
 	global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 

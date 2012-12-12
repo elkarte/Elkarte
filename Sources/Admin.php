@@ -973,7 +973,7 @@ function AdminLogs()
 		'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
 		'adminlog' => array('Modlog.php', 'ViewModlog'),
 		'modlog' => array('Modlog.php', 'ViewModlog', 'disabled' => !in_array('ml', $context['admin_features'])),
-		'banlog' => array('ManageBans.php', 'BanLog'),
+		'banlog' => array('ManageBans.php', 'action_log'),
 		'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 		'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
 		'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),
