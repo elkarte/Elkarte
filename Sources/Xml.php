@@ -238,8 +238,7 @@ function newsletterpreview()
 {
 	global $context, $sourcedir, $smcFunc, $txt;
 
-	require_once($sourcedir . '/Subs-Post.php');
-	require_once($sourcedir . '/ManageNews.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 	loadLanguage('Errors');
 
 	$context['post_error']['messages'] = array();
@@ -260,7 +259,7 @@ function sig_preview()
 {
 	global $context, $sourcedir, $smcFunc, $txt, $user_info;
 
-	require_once($sourcedir . '/Profile-Modify.php');
+	require_once($sourcedir . '/ProfileOptions.php');
 	loadLanguage('Profile');
 	loadLanguage('Errors');
 

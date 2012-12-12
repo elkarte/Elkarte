@@ -150,7 +150,7 @@ function action_register($reg_errors = array())
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($sourcedir . '/Profile-Modify.php');
+		require_once($sourcedir . '/ProfileOptions.php');
 
 		// Setup some important context.
 		loadLanguage('Profile');
@@ -500,7 +500,7 @@ function action_register2($verifiedOpenID = false)
 	if (!empty($_POST['customfield']))
 	{
 		require_once($sourcedir . '/Profile.php');
-		require_once($sourcedir . '/Profile-Modify.php');
+		require_once($sourcedir . '/ProfileOptions.php');
 		makeCustomFieldChanges($memberID, 'register');
 	}
 

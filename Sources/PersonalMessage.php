@@ -2187,7 +2187,7 @@ function action_messagelabels()
  * Allows to edit Personal Message Settings.
  *
  * @uses Profile.php
- * @uses Profile-Modify.php
+ * @uses ProfileOptions.php
  * @uses Profile template.
  * @uses Profile language file.
  */
@@ -2198,7 +2198,7 @@ function action_messagesettings()
 
 	// Need this for the display.
 	require_once($sourcedir . '/Profile.php');
-	require_once($sourcedir . '/Profile-Modify.php');
+	require_once($sourcedir . '/ProfileOptions.php');
 
 	// We want them to submit back to here.
 	$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';

@@ -172,7 +172,7 @@ function ModifyProfile($post_errors = array())
 			'areas' => array(
 				'account' => array(
 					'label' => $txt['account'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'account',
 					'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
 					'sc' => 'post',
@@ -185,7 +185,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'forumprofile' => array(
 					'label' => $txt['forumprofile'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'forumProfile',
 					'sc' => 'post',
 					'token' => 'profile-fp%u',
@@ -196,7 +196,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'theme' => array(
 					'label' => $txt['theme'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'theme',
 					'sc' => 'post',
 					'token' => 'profile-th%u',
@@ -207,7 +207,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'authentication' => array(
 					'label' => $txt['authentication'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'authentication',
 					'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
 					'sc' => 'post',
@@ -221,7 +221,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'notification' => array(
 					'label' => $txt['notification'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'notification',
 					'sc' => 'post',
 					'token' => 'profile-nt%u',
@@ -233,7 +233,7 @@ function ModifyProfile($post_errors = array())
 				// Without profile_extra_own, settings are accessible from the PM section.
 				'pmprefs' => array(
 					'label' => $txt['pmprefs'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'pmprefs',
 					'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 					'sc' => 'post',
@@ -245,7 +245,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'ignoreboards' => array(
 					'label' => $txt['ignoreboards'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'ignoreboards',
 					'enabled' => !empty($modSettings['allow_ignore_boards']),
 					'sc' => 'post',
@@ -257,7 +257,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'lists' => array(
 					'label' => $txt['editBuddyIgnoreLists'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'editBuddyIgnoreLists',
 					'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 					'sc' => 'post',
@@ -273,7 +273,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'groupmembership' => array(
 					'label' => $txt['groupmembership'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'groupMembership',
 					'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 					'sc' => 'request',
@@ -592,7 +592,7 @@ function ModifyProfile($post_errors = array())
 		{
 			$force_redirect = true;
 			// Ensure we include this.
-			require_once($sourcedir . '/Profile-Modify.php');
+			require_once($sourcedir . '/ProfileOptions.php');
 			saveProfileChanges($profile_vars, $post_errors, $memID);
 		}
 
