@@ -155,7 +155,7 @@ function action_notifyboard()
 function action_disregardtopic()
 {
 	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
-	
+
 	// our topic functions are here
 	require_once($sourcedir . '/Subs-Topic.php');
 
