@@ -23,7 +23,7 @@ if (!defined('DIALOGO'))
 /**
  * Browse the list of package servers, add servers...
  */
-function PackageGet()
+function PackageServers()
 {
 	global $txt, $scripturl, $context, $boarddir, $sourcedir, $modSettings;
 

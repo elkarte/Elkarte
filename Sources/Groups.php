@@ -31,9 +31,9 @@ function action_groups()
 
 	// The sub-actions that we can do. Format "Function Name, Mod Bar Index if appropriate".
 	$subActions = array(
-		'index' => array('action_list', 'view_groups'),
-		'members' => array('action_members', 'view_groups'),
-		'requests' => array('action_requests', 'group_requests'),
+		'index' => array('action_grouplist', 'view_groups'),
+		'members' => array('action_groupmembers', 'view_groups'),
+		'requests' => array('action_grouprequests', 'group_requests'),
 	);
 
 	// Default to sub action 'index' or 'settings' depending on permissions.
@@ -69,7 +69,7 @@ function action_groups()
 /**
  * This very simply lists the groups, nothing snazy.
  */
-function action_list()
+function action_grouplist()
 {
 	global $txt, $context, $sourcedir;
 
@@ -296,7 +296,7 @@ function list_getGroupCount()
  * @uses ManageMembergroups template, group_members sub template.
  * @todo: use createList
  */
-function action_members()
+function action_groupmembers()
 {
 	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $smcFunc;
 
@@ -544,7 +544,7 @@ function action_members()
 /**
  * Show and manage all group requests.
  */
-function action_requests()
+function action_grouprequests()
 {
 	global $txt, $context, $scripturl, $user_info, $sourcedir, $smcFunc, $modSettings, $language;
 

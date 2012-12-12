@@ -737,7 +737,7 @@ function ModerateGroups()
 
 	// Setup the subactions...
 	$subactions = array(
-		'requests' => 'action_requests',
+		'requests' => 'action_grouprequests',
 		'view' => 'ViewGroups',
 	);
 

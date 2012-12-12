@@ -30,8 +30,8 @@ function Packages()
 	// @todo Remove this!
 	if (isset($_GET['get']) || isset($_GET['pgdownload']))
 	{
-		require_once($sourcedir . '/PackageGet.php');
-		return PackageGet();
+		require_once($sourcedir . '/PackageServers.php');
+		return PackageServers();
 	}
 
 	isAllowedTo('admin_forum');
