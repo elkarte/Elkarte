@@ -37,7 +37,7 @@ function action_postmoderation()
 	// Allowed sub-actions, you know the drill by now!
 	$subactions = array(
 		'approve' => 'action_approve',
-		'attachments' => 'action_attachments',
+		'attachments' => 'action_unapproved_attachments',
 		'replies' => 'action_unapproved',
 		'topics' => 'action_unapproved',
 	);
@@ -312,7 +312,7 @@ function action_unapproved()
 /**
  * View all unapproved attachments.
  */
-function action_attachments()
+function action_unapproved_attachments()
 {
 	global $txt, $scripturl, $context, $user_info, $sourcedir, $smcFunc, $modSettings;
 
@@ -525,7 +525,7 @@ function action_attachments()
 }
 
 /**
- * Callback function for action_attachments
+ * Callback function for action_unapproved_attachments
  * retrieve all the attachments waiting for approval the approver can approve
  *
  * @param int $start
@@ -605,7 +605,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 }
 
 /**
- * Callback function for action_attachments
+ * Callback function for action_unapproved_attachments
  * count all the attachments waiting for approval that this approver can approve
  *
  * @param string $approve_query additional restrictions based on the boards the approver can see

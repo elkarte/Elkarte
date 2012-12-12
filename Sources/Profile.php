@@ -341,8 +341,8 @@ function ModifyProfile($post_errors = array())
 					),
 				),
 				'activateaccount' => array(
-					'file' => 'Profile-Actions.php',
-					'function' => 'activateAccount',
+					'file' => 'Members.php',
+					'function' => 'action_activateprofile',
 					'sc' => 'get',
 					'token' => 'profile-aa%u',
 					'select' => 'summary',
@@ -405,7 +405,8 @@ function ModifyProfile($post_errors = array())
 	$current_area = $profile_include_data['current_area'];
 	$context['menu_item_selected'] = $current_area;
 
-	// Before we go any further, let's work on the area we've said is valid. Note this is done here just in case we ever compromise the menu function in error!
+	// Before we go any further, let's work on the area we've said is valid.
+	// Note this is done here just in case we ever compromise the menu function in error!
 	$context['completed_save'] = false;
 	$context['do_preview'] = isset($_REQUEST['preview_signature']);
 
@@ -563,7 +564,7 @@ function ModifyProfile($post_errors = array())
 		if ($current_area == 'activateaccount')
 		{
 			if (empty($post_errors))
-				activateAccount($memID);
+				action_activateprofile($memID);
 		}
 		elseif ($current_area == 'deleteaccount')
 		{
