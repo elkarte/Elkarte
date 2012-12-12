@@ -85,7 +85,6 @@ class site_Combiner
 		// init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $boardurl . '/cache';
-		$this->_loadjquery = false;
 	}
 
 	/**
@@ -93,9 +92,8 @@ class site_Combiner
 	 *
 	 * @param array $files -- array created by loadjavascriptfile function
 	 * @param bool $do_defered
-	 * @param bool $loadjquery
 	 */
-	public function site_js_combine($files, $do_defered, &$loadjquery)
+	public function site_js_combine($files, $do_defered)
 	{
 		global $modSettings, $sourcedir;
 
@@ -118,10 +116,6 @@ class site_Combiner
 			elseif ((!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer'])))
 				echo '
 	<script type="text/javascript" src="', $file['filename'], '" id="', $id,'"' , !empty($file['options']['async']) ? ' async="async"' : '' ,'></script>';
-
-			// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
-			if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
-				$loadjquery = true;
 		}
 
 		// nothing to do, then we are done

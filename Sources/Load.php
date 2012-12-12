@@ -1717,20 +1717,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
 	);
 
-	// Add the JQuery library to the list of files to load.
-	if (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'cdn')
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', array(), 'jquery');
-	elseif (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'local')
-		loadJavascriptFile('jquery-1.7.2.min.js', array('default_theme' => true, 'seed' => false), 'jquery');
-	// Auto loading? template_javascript() will take care of the local half of this.
-	else
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', array(), 'jquery');
-
-	// Queue our JQuery plugins!
-	loadJavascriptFile('smf_jquery_plugins.js', array('default_theme' => true));
-
-	// script.js and theme.js, always required, so always add them! Makes index.template.php cleaner and all.
-	loadJavascriptFile('script.js', array('default_theme' => true), 'smf_scripts');
+	// Queue our Javascript
+	loadJavascriptFile(
+		array('smf_jquery_plugins.js', 'script.js'),
+		array('default_theme' => true)
+	);
 	loadJavascriptFile('theme.js', array(), 'theme_scripts');
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
@@ -1911,14 +1902,14 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * 	- ['default_theme'] (true/false): force use of default theme url
  * 	- ['force_current'] (true/false): if this is false, we will attempt to load the file from the default theme if not found in the current theme
  *  - ['validate'] (true/false): if true script will validate the local file exists
- *  - ['seed'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  * @param string $id
  */
 function loadCSSFile($filename, $params = array(), $id = '')
 {
 	global $settings, $context;
 
-	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
 
@@ -1940,7 +1931,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 			// Maybe the default theme has it?
 			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
 			{
-				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
+				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['stale']);
 				$params['dir'] = $settings['default_theme_dir'] . '/css/';
 				$params['url'] = $settings['default_theme_url'];
 			}
@@ -1948,7 +1939,7 @@ function loadCSSFile($filename, $params = array(), $id = '')
 				$filename = false;
 		}
 		else
-			$filename = $settings[$theme . '_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
+			$filename = $settings[$theme . '_url'] . '/css/' . $filename . ($has_seed ? '' : $params['stale']);
 	}
 
 	// Add it to the array for use in the template
@@ -1958,8 +1949,11 @@ function loadCSSFile($filename, $params = array(), $id = '')
 
 /**
  * Add a Javascript file for output later
-
- * @param string $filename
+ * 
+ * Can be passed an array of filenames, all which will have the same parameters applied, if you 
+ * need specific parameters on a per file basis, call it multiple times
+ *
+ * @param array $filenames
  * @param array $params
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
@@ -1969,51 +1963,59 @@ function loadCSSFile($filename, $params = array(), $id = '')
  *    default theme if not found in the current theme
  *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
  *  - ['validate'] (true/false): if true script will validate the local file exists
- *  - ['seed'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
  * @param string $id
  */
-function loadJavascriptFile($filename, $params = array(), $id = '')
+function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
 	global $settings, $context;
 
-	if (empty($filename))
+	if (empty($filenames))
 		return;
-
-	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
+		
+	if (!is_array($filenames))
+		$filenames = array($filenames);
+		
+	// static values for all these files
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
 	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
 
-	// account for shorthand like admin.js?alp21 filenames
-	$has_seed = strpos($filename, '.js?');
-	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
-	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
-
-	// Is this a local file?
-	if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+	// All the files in this group use the same parameters
+	foreach ($filenames as $filename)
 	{
-		$params['local'] = true;
-		$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
+		// account for shorthand like admin.js?alp21 filenames
+		$has_seed = strpos($filename, '.js?');
+		$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
+		$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
-		// Are we validating it exists on disk?
-		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
+		// Is this a local file?
+		if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
 		{
-			// can't find it in this theme, how about the default?
-			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
+			$params['local'] = true;
+			$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
+
+			// Are we validating it exists on disk?
+			if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
 			{
-				$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['seed']);
-				$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+				// can't find it in this theme, how about the default?
+				if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
+				{
+					$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['stale']);
+					$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+				}
+				else
+					$filename = false;
 			}
 			else
-				$filename = false;
+				$filename = $settings[$theme . '_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['stale']);
 		}
-		else
-			$filename = $settings[$theme . '_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['seed']);
-	}
 
-	// Add it to the array for use in the template
-	if (!empty($filename))
-		$context['javascript_files'][$id] = array('filename' => $filename, 'options' => $params);
+		// Add it to the array for use in the template
+		if (!empty($filename))
+			$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+	}
 }
 
 /**

@@ -165,13 +165,13 @@ class sphinxql_search
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
+		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
-			$query = 'SELECT * FROM smf_index';
+			$query = 'SELECT * FROM dialogo_index';
 
 			// Construct the (binary mode) query.
 			$where_match = $this->_constructQuery($search_params['search']);
@@ -224,8 +224,10 @@ class sphinxql_search
 
 			// Get the relevant information from the search results.
 			$cached_results = array(
+				'num_results' => 0,
 				'matches' => array(),
 			);
+			
 			if (mysql_num_rows($request) != 0)
 				while($match = mysql_fetch_assoc($request))
 					$cached_results['matches'][$match['id']] = array(
@@ -237,10 +239,10 @@ class sphinxql_search
 			mysql_free_result($request);
 			mysql_close($mySphinx);
 
-			$cached_results['total'] = count($cached_results['matches']);
+			$cached_results['num_results'] = count($cached_results['matches']);
 
 			// Store the search results in the cache.
-			cache_put_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			cache_put_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}
 
 		$participants = array();
@@ -255,7 +257,7 @@ class sphinxql_search
 		foreach ($search_words as $orIndex => $words)
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
 
-		return $cached_results['total'];
+		return $cached_results['num_results'];
 	}
 
 	/**
