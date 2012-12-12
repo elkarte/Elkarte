@@ -300,8 +300,8 @@ function ModifyProfile($post_errors = array())
 				'issuewarning' => array(
 					'label' => $txt['profile_issue_warning'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-					'file' => 'Profile-Actions.php',
-					'function' => 'issueWarning',
+					'file' => 'ProfileAccount.php',
+					'function' => 'action_issuewarning',
 					'token' => 'profile-iw%u',
 					'enabled' => !$context['user']['is_owner'],
 					'permission' => array(
@@ -320,8 +320,8 @@ function ModifyProfile($post_errors = array())
 				),
 				'subscriptions' => array(
 					'label' => $txt['subscriptions'],
-					'file' => 'Profile-Actions.php',
-					'function' => 'subscriptions',
+					'file' => 'ProfileSubscriptions.php',
+					'function' => 'action_subscriptions',
 					'enabled' => !empty($modSettings['paid_enabled']),
 					'permission' => array(
 						'own' => array('profile_view_own'),
@@ -330,8 +330,8 @@ function ModifyProfile($post_errors = array())
 				),
 				'deleteaccount' => array(
 					'label' => $txt['deleteAccount'],
-					'file' => 'Profile-Actions.php',
-					'function' => 'deleteAccount',
+					'file' => 'ProfileAccount.php',
+					'function' => 'action_deleteaccount',
 					'sc' => 'post',
 					'token' => 'profile-da%u',
 					'password' => true,
@@ -341,7 +341,7 @@ function ModifyProfile($post_errors = array())
 					),
 				),
 				'activateaccount' => array(
-					'file' => 'Profile-Actions.php',
+					'file' => 'ProfileAccount.php',
 					'function' => 'action_activateaccount',
 					'sc' => 'get',
 					'token' => 'profile-aa%u',
@@ -507,7 +507,8 @@ function ModifyProfile($post_errors = array())
 			'name' => $profile_include_data['subsections'][$profile_include_data['current_subsection']][0],
 		);
 
-	// Set the template for this area and add the profile layer.
+	// Set the template for this area... if you still can :P
+	// and add the profile layer.
 	$context['sub_template'] = $profile_include_data['function'];
 	$context['template_layers'][] = 'profile';
 
@@ -570,7 +571,7 @@ function ModifyProfile($post_errors = array())
 		{
 			if (empty($post_errors))
 			{
-				deleteAccount2($memID);
+				action_deleteaccount2($memID);
 				redirectexit();
 			}
 		}

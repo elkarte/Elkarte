@@ -1341,7 +1341,6 @@ function editBuddyIgnoreLists($memID)
 	);
 
 	// Pass on to the actual function.
-	$context['sub_template'] = $subActions[$context['list_area']][0];
 	$subActions[$context['list_area']][0]($memID);
 }
 
@@ -1354,6 +1353,9 @@ function editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext, $smcFunc;
+
+	// We want to view what we're doing :P
+	$context['sub_template'] = 'editBuddies';
 
 	// For making changes!
 	$buddiesArray = explode(',', $user_profile[$memID]['buddy_list']);
@@ -1473,6 +1475,9 @@ function editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext, $smcFunc;
+
+	// We want to view what we're doing :P
+	$context['sub_template'] = 'editIgnoreList';
 
 	// For making changes!
 	$ignoreArray = explode(',', $user_profile[$memID]['pm_ignore_list']);

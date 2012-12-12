@@ -28,7 +28,7 @@ if (!defined('DIALOGO'))
  *
  * @uses raw_data sub-template.
  */
-function RepairBoards()
+function action_repairboards()
 {
 	global $txt, $context, $sourcedir, $salvageBoardID;
 

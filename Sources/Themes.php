@@ -61,15 +61,15 @@ function action_thememain()
 
 	// Theme administration, removal, choice, or installation...
 	$subActions = array(
-		'admin' => 'ThemeAdmin',
-		'list' => 'ThemeList',
+		'admin' => 'action_admintheme',
+		'list' => 'action_themelist',
 		'reset' => 'SetThemeOptions',
 		'options' => 'SetThemeOptions',
-		'install' => 'ThemeInstall',
-		'remove' => 'RemoveTheme',
-		'pick' => 'PickTheme',
-		'edit' => 'EditTheme',
-		'copy' => 'CopyTemplate',
+		'install' => 'action_installtheme',
+		'remove' => 'action_removetheme',
+		'pick' => 'action_picktheme',
+		'edit' => 'action_edittheme',
+		'copy' => 'action_copytemplate',
 	);
 
 	// @todo Layout Settings?
@@ -113,7 +113,7 @@ function action_thememain()
  *  @uses Themes template
  *  @uses Admin language file
  */
-function ThemeAdmin()
+function action_admintheme()
 {
 	global $context, $boarddir, $modSettings, $smcFunc;
 
@@ -193,7 +193,7 @@ function ThemeAdmin()
  * This function lists the available themes and provides an interface to reset
  * the paths of all the installed themes.
  */
-function ThemeList()
+function action_themelist()
 {
 	global $context, $boarddir, $boardurl, $smcFunc;
 
@@ -696,7 +696,7 @@ function SetThemeOptions()
  * Administrative global settings.
  * - saves and requests global theme settings. ($settings)
  * - loads the Admin language file.
- * - calls ThemeAdmin() if no theme is specified. (the theme center.)
+ * - calls action_admintheme() if no theme is specified. (the theme center.)
  * - requires admin_forum permission.
  * - accessed with ?action=admin;area=theme;sa=list&th=xx.
  */
@@ -705,7 +705,7 @@ function SetThemeSettings()
 	global $txt, $context, $settings, $modSettings, $sourcedir, $smcFunc;
 
 	if (empty($_GET['th']) && empty($_GET['id']))
-		return ThemeAdmin();
+		return action_admintheme();
 	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
 	// Select the best fitting tab.
@@ -877,7 +877,7 @@ function SetThemeSettings()
  * - requires an administrator.
  * - accessed with ?action=admin;area=theme;sa=remove.
  */
-function RemoveTheme()
+function action_removetheme()
 {
 	global $modSettings, $context, $smcFunc;
 
@@ -948,7 +948,7 @@ function RemoveTheme()
  * @todo thought so... Might be better to split this file in ManageThemes and Themes,
  * with centralized admin permissions on ManageThemes.
  */
-function PickTheme()
+function action_picktheme()
 {
 	global $txt, $context, $modSettings, $user_info, $language, $smcFunc, $settings, $scripturl;
 
@@ -1288,7 +1288,7 @@ function PickTheme()
  * Requires admin_forum.
  * Accessed with ?action=admin;area=theme;sa=install.
  */
-function ThemeInstall()
+function action_installtheme()
 {
 	global $sourcedir, $boarddir, $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
 
@@ -1712,7 +1712,7 @@ function action_jsoption()
  * - uses the Themes template and edit_template/edit_style sub template.
  * - accessed via ?action=admin;area=theme;sa=edit
  */
-function EditTheme()
+function action_edittheme()
 {
 	global $context, $settings, $scripturl, $boarddir, $smcFunc;
 
@@ -2059,7 +2059,7 @@ function get_file_listing($path, $relative)
  * Makes a copy of a template file in a new location
  * @uses Themes template, copy_template sub-template.
  */
-function CopyTemplate()
+function action_copytemplate()
 {
 	global $context, $settings, $smcFunc;
 
