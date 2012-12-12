@@ -2881,21 +2881,12 @@ function setupThemeContext($forceload = false)
 	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
 	{
 		// @todo Move this over to script.js?
-		$context['html_headers'] .= '
-	<script type="text/javascript"><!-- // --><![CDATA[
+		addInlineJavascript('
 		var smf_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';';
-
-		if (!isBrowser('ie'))
-			$context['html_headers'] .= '
-	window.addEventListener("load", smf_avatarResize, false);';
-		else
-			$context['html_headers'] .= '
-	var window_oldAvatarOnload = window.onload;
-	window.onload = smf_avatarResize;';
-
-		$context['html_headers'] .= '
-	// ]]></script>';
+		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		window.addEventListener("load", smf_avatarResize, false);' : '
+		var window_oldAvatarOnload = window.onload;
+		window.onload = smf_avatarResize;'));
 	}
 
 	// This looks weird, but it's because BoardIndex.php references the variable.
@@ -2914,10 +2905,7 @@ function setupThemeContext($forceload = false)
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		$context['html_headers'] .= '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var smf_scripturl = "' . $scripturl . '";
-	// ]]></script>';
+		addJavascriptVar('smf_scripturl', $scripturl);
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';

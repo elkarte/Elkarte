@@ -347,29 +347,27 @@ function ModifyMailSettings($return_config = false)
 
 	prepareDBSettingContext($config_vars);
 
-	$context['settings_insert_above'] = '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	$javascript = '
 		var bDay = {';
 
 	$i = 0;
 	foreach ($processedBirthdayEmails as $index => $email)
 	{
 		$is_last = ++$i == count($processedBirthdayEmails);
-		$context['settings_insert_above'] .= '
+		$javascript .= '
 			' . $index . ': {
 				subject: ' . JavaScriptEscape($email['subject']) . ',
 				body: ' . JavaScriptEscape(nl2br($email['body'])) . '
 			}' . (!$is_last ? ',' : '');
 	}
-	$context['settings_insert_above'] .= '
+	addInlineJavascript($javascript . '
 		};
 		function fetch_birthday_preview()
 		{
 			var index = document.getElementById(\'birthday_email\').value;
 			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
-		}
-	// ]]></script>';
+		}', true);
 }
 
 /**
