@@ -341,8 +341,8 @@ function ModifyProfile($post_errors = array())
 					),
 				),
 				'activateaccount' => array(
-					'file' => 'Members.php',
-					'function' => 'action_activateprofile',
+					'file' => 'Profile-Actions.php',
+					'function' => 'action_activateaccount',
 					'sc' => 'get',
 					'token' => 'profile-aa%u',
 					'select' => 'summary',
@@ -564,7 +564,7 @@ function ModifyProfile($post_errors = array())
 		if ($current_area == 'activateaccount')
 		{
 			if (empty($post_errors))
-				action_activateprofile($memID);
+				action_activateaccount($memID);
 		}
 		elseif ($current_area == 'deleteaccount')
 		{

@@ -884,3 +884,47 @@ function subscriptions($memID)
 	else
 		$context['sub_template'] = 'user_subscription';
 }
+
+/**
+ * Activate an account.
+ * This function is called from the profile account actions area.
+ *
+ * @param int $memID the member ID
+ */
+function action_activateaccount($memID)
+{
+	global $sourcedir, $context, $user_profile, $modSettings, $user_info;
+
+	isAllowedTo('moderate_forum');
+
+	if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
+	{
+		// If we are approving the deletion of an account, we do something special ;)
+		if ($user_profile[$memID]['is_activated'] == 4)
+		{
+			require_once($sourcedir . '/Subs-Members.php');
+			deleteMembers($context['id_member']);
+			redirectexit();
+		}
+
+		// Let the integrations know of the activation.
+		call_integration_hook('integrate_activate', array($user_profile[$memID]['member_name']));
+
+		// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
+		updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
+
+		// Log what we did?
+		require_once($sourcedir . '/Logging.php');
+		logAction('approve_member', array('member' => $memID), 'admin');
+
+		// If we are doing approval, update the stats for the member just in case.
+		if (in_array($user_profile[$memID]['is_activated'], array(3, 4, 13, 14)))
+			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+
+		// Make sure we update the stats too.
+		updateStats('member', false);
+	}
+
+	// Leave it be...
+	redirectexit('action=profile;u=' . $memID . ';area=summary');
+}
