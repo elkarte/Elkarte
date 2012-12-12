@@ -28,6 +28,7 @@ function action_announce()
 	// default for action=announce: action_selectgroup() function.
 	action_selectgroup();
 }
+
 /**
  * Set up the context for the announce topic function (action=announce).
  * This function is called before the flow is redirected to action_selectgroup() or action_send().
