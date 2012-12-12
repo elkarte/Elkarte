@@ -19,12 +19,12 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Tracking main function.
+ * Profile history main function.
  * Re-directs to sub-actions (@todo it should only set the context)
  *
  * @param int $memID id_member
  */
-function action_tracking($memID)
+function action_history($memID)
 {
 	global $sourcedir, $context, $txt, $scripturl, $modSettings, $user_profile;
 
@@ -35,16 +35,16 @@ function action_tracking($memID)
 		'logins' => array('action_tracklogin', $txt['trackLogins']),
 	);
 
-	$context['tracking_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
+	$context['history_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
 
 	// @todo what is $types? it is never set so this will never be true
-	if (isset($types[$context['tracking_area']][1]))
-		require_once($sourcedir . '/' . $types[$context['tracking_area']][1]);
+	if (isset($types[$context['history_area']][1]))
+		require_once($sourcedir . '/' . $types[$context['history_area']][1]);
 
 	// Create the tabs for the template.
 	$context[$context['profile_menu_name']]['tab_data'] = array(
-		'title' => $txt['tracking'],
-		'description' => $txt['tracking_description'],
+		'title' => $txt['history'],
+		'description' => $txt['history_description'],
 		'icon' => 'profile_hd.png',
 		'tabs' => array(
 			'activity' => array(),
@@ -58,14 +58,14 @@ function action_tracking($memID)
 		unset($context[$context['profile_menu_name']]['tab_data']['edits']);
 
 	// Set a page title.
-	$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$context['tracking_area']][1] . ' - ' . $user_profile[$memID]['real_name'];
+	$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$context['history_area']][1] . ' - ' . $user_profile[$memID]['real_name'];
 
 	// Pass on to the actual function.
-	$subActions[$context['tracking_area']][0]($memID);
+	$subActions[$context['history_area']][0]($memID);
 }
 
 /**
- * Subaction for profile tracking actions: track activity.
+ * Subaction for profile history actions: activity log.
  *
  * @param int $memID id_member
  */
@@ -88,7 +88,7 @@ function action_trackactivity($memID)
 		'title' => $txt['errors_by'] . ' ' . $context['member']['name'],
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'no_items_label' => $txt['no_errors_from_user'],
-		'base_href' => $scripturl . '?action=profile;area=tracking;sa=user;u=' . $memID,
+		'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $memID,
 		'default_sort_col' => 'date',
 		'get_items' => array(
 			'function' => 'list_getUserErrors',
@@ -111,7 +111,7 @@ function action_trackactivity($memID)
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<a href="' . $scripturl . '?action=profile;area=tracking;sa=ip;searchip=%1$s;u=' . $memID. '">%1$s</a>',
+						'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $memID. '">%1$s</a>',
 						'params' => array(
 							'ip' => false,
 						),
@@ -206,7 +206,7 @@ function action_trackactivity($memID)
 	$context['ips'] = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=tracking;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
+		$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
 		$ips[] = $row['poster_ip'];
 	}
 	$smcFunc['db_free_result']($request);
@@ -224,7 +224,7 @@ function action_trackactivity($memID)
 	$context['error_ips'] = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=tracking;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
+		$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
 		$ips[] = $row['ip'];
 	}
 	$smcFunc['db_free_result']($request);
@@ -431,7 +431,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 /**
  * Track an IP address.
  * Accessed through ?action=trackip
- * and through ?action=profile;area=tracking;sa=ip
+ * and through ?action=profile;area=history;sa=ip
  *
  * @param int $memID = 0 id_member
  */
@@ -455,7 +455,7 @@ function action_trackip($memID = 0)
 	else
 	{
 		$context['ip'] = $user_profile[$memID]['member_ip'];
-		$context['base_url'] = $scripturl . '?action=profile;area=tracking;sa=ip;u=' . $memID;
+		$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $memID;
 	}
 
 	// Searching?
@@ -468,7 +468,7 @@ function action_trackip($memID = 0)
 	$ip_var = str_replace('*', '%', $context['ip']);
 	$ip_string = strpos($ip_var, '%') === false ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
 
-	if (empty($context['tracking_area']))
+	if (empty($context['history_area']))
 		$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
 
 	$request = $smcFunc['db_query']('', '
@@ -717,7 +717,7 @@ function action_trackip($memID = 0)
 /**
  * Tracks the logins of a given user.
  * Accessed by ?action=trackip
- * and ?action=profile;area=tracking;sa=ip
+ * and ?action=profile;area=history;sa=ip
  *
  * @param int $memID = 0 id_member
  */
@@ -732,7 +732,7 @@ function action_tracklogin($memID = 0)
 	if ($memID == 0)
 		$context['base_url'] = $scripturl . '?action=trackip';
 	else
-		$context['base_url'] = $scripturl . '?action=profile;area=tracking;sa=ip;u=' . $memID;
+		$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $memID;
 
 	// Start with the user messages.
 	$listOptions = array(
@@ -889,7 +889,7 @@ function action_trackedits($memID)
 		'title' => $txt['trackEdits'],
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'no_items_label' => $txt['trackEdit_no_edits'],
-		'base_href' => $scripturl . '?action=profile;area=tracking;sa=edits;u=' . $memID,
+		'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $memID,
 		'default_sort_col' => 'time',
 		'get_items' => array(
 			'function' => 'list_getProfileEdits',

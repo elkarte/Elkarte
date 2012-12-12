@@ -140,10 +140,10 @@ function ModifyProfile($post_errors = array())
 						'any' => 'manage_permissions',
 					),
 				),
-				'tracking' => array(
-					'label' => $txt['trackUser'],
-					'file' => 'Tracking.php',
-					'function' => 'action_tracking',
+				'history' => array(
+					'label' => $txt['history'],
+					'file' => 'ProfileHistory.php',
+					'function' => 'action_history',
 					'subsections' => array(
 						'activity' => array($txt['trackActivity'], 'moderate_forum'),
 						'ip' => array($txt['trackIP'], 'moderate_forum'),

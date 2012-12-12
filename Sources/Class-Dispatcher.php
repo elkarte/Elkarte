@@ -171,7 +171,7 @@ class site_Dispatcher
 			'stats' => array('Stats.php', 'action_stats'),
 			// 'sticky' => array('Topic.php', 'Sticky'),
 			'theme' => array('Themes.php', 'action_thememain'),
-			'trackip' => array('Tracking.php', 'action_trackip'),
+			'trackip' => array('ProfileHistory.php', 'action_trackip'),
 			'unread' => array('Recent.php', 'action_unread'),
 			'unreadreplies' => array('Recent.php', 'action_unread'),
 			'verificationcode' => array('Register.php', 'action_verificationcode'),

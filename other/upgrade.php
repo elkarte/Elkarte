@@ -571,7 +571,7 @@ if (!class_exists('ftp_connection'))
 	}
 }
 
-// Have we got tracking data - if so use it (It will be clean!)
+// Have we got log data - if so use it (It will be clean!)
 if (isset($_GET['data']))
 {
 	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']));
