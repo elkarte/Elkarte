@@ -90,7 +90,7 @@ function action_pm()
 			'unread_messages' => 0,
 		);
 
-		ApplyRules();
+		applyRules();
 		updateMemberData($user_info['id'], array('new_pm' => 0));
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}pm_recipients
@@ -154,24 +154,24 @@ function action_pm()
 
 	// Finally all the things we know how to do
 	$subActions = array(
-		'manlabels' => 'ManageLabels',
-		'manrules' => 'ManageRules',
-		'pmactions' => 'MessageActionsApply',
-		'prune' => 'MessagePrune',
-		'removeall' => 'MessageKillAllQuery',
-		'removeall2' => 'MessageKillAll',
-		'report' => 'ReportMessage',
+		'manlabels' => 'action_messagelabels',
+		'manrules' => 'action_messagerules',
+		'pmactions' => 'action_messageactions',
+		'prune' => 'action_messageprune',
+		'removeall' => 'action_removemessage',
+		'removeall2' => 'action_removemessage2',
+		'report' => 'action_reportmessage',
 		'search' => array('Search.php','MessageSearch'),
 		'search2' => array('Search.php','MessageSearch2'),
-		'send' => 'MessagePost',
-		'send2' => 'MessagePost2',
-		'settings' => 'MessageSettings',
-		'showpmdrafts' => 'MessageDrafts',
+		'send' => 'action_sendmessage',
+		'send2' => 'action_sendmessage2',
+		'settings' => 'action_messagesettings',
+		'showpmdrafts' => 'action_messagedrafts',
 	);
 
 	// Known action, go to it, otherwise the inbox for you
 	if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		MessageFolder();
+		action_messagefolder();
 	else
 	{
 		if (!isset($_REQUEST['xml']))
@@ -345,7 +345,7 @@ function messageIndexBar($area)
 /**
  * A folder, ie. inbox/sent etc.
  */
-function MessageFolder()
+function action_messagefolder()
 {
 	global $txt, $scripturl, $modSettings, $context, $subjects_request;
 	global $messages_request, $user_info, $recipients, $options, $smcFunc, $memberContext, $user_settings;
@@ -934,7 +934,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
 /**
  * Send a new message?
  */
-function MessagePost()
+function action_sendmessage()
 {
 	global $txt, $sourcedir, $scripturl, $modSettings;
 	global $context, $options, $smcFunc, $language, $user_info;
@@ -1221,7 +1221,7 @@ function MessagePost()
 /**
  * This function allows the user to view their PM drafts
  */
-function MessageDrafts()
+function action_messagedrafts()
 {
 	global $sourcedir, $user_info;
 
@@ -1420,7 +1420,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 /**
  * Send it!
  */
-function MessagePost2()
+function action_sendmessage2()
 {
 	global $txt, $context, $sourcedir;
 	global $user_info, $modSettings, $scripturl, $smcFunc;
@@ -1712,7 +1712,7 @@ function MessagePost2()
 /**
  * This function performs all additional stuff...
  */
-function MessageActionsApply()
+function action_messageactions()
 {
 	global $txt, $context, $user_info, $options, $smcFunc;
 
@@ -1870,7 +1870,7 @@ function MessageActionsApply()
 /**
  * Are you sure you want to PERMANENTLY (mostly) delete ALL your messages?
  */
-function MessageKillAllQuery()
+function action_removemessage()
 {
 	global $txt, $context;
 
@@ -1886,7 +1886,7 @@ function MessageKillAllQuery()
 /**
  * Delete ALL the messages!
  */
-function MessageKillAll()
+function action_removemessage2()
 {
 	global $context;
 
@@ -1906,7 +1906,7 @@ function MessageKillAll()
 /**
  * This function allows the user to delete all messages older than so many days.
  */
-function MessagePrune()
+function action_messageprune()
 {
 	global $txt, $context, $user_info, $scripturl, $smcFunc;
 
@@ -1976,7 +1976,7 @@ function MessagePrune()
 /**
  * This function handles adding, deleting and editing labels on messages.
  */
-function ManageLabels()
+function action_messagelabels()
 {
 	global $txt, $context, $user_info, $scripturl, $smcFunc;
 
@@ -2007,7 +2007,7 @@ function ManageLabels()
 		$rule_changes = array();
 
 		// Will most likely need this.
-		LoadRules();
+		loadRules();
 
 		// Adding a new label?
 		if (isset($_POST['add']))
@@ -2191,7 +2191,7 @@ function ManageLabels()
  * @uses Profile template.
  * @uses Profile language file.
  */
-function MessageSettings()
+function action_messagesettings()
 {
 	global $txt, $user_settings, $user_info, $context, $sourcedir, $smcFunc;
 	global $scripturl, $profile_vars, $cur_profile, $user_profile;
@@ -2252,7 +2252,7 @@ function MessageSettings()
  *
  * @uses report_message sub-template.
  */
-function ReportMessage()
+function action_reportmessage()
 {
 	global $txt, $context, $scripturl, $sourcedir;
 	global $user_info, $language, $modSettings, $smcFunc;
@@ -2421,7 +2421,7 @@ function ReportMessage()
 /**
  * List all rules, and allow adding/entering etc...
  */
-function ManageRules()
+function action_messagerules()
 {
 	global $txt, $context, $user_info, $scripturl, $smcFunc;
 
@@ -2435,7 +2435,7 @@ function ManageRules()
 	$context['sub_template'] = 'rules';
 
 	// Load them... load them!!
-	LoadRules();
+	loadRules();
 
 	// Likely to need all the groups!
 	$request = $smcFunc['db_query']('', '
@@ -2469,7 +2469,7 @@ function ManageRules()
 	{
 		checkSession('get');
 
-		ApplyRules(true);
+		applyRules(true);
 		redirectexit('action=pm;sa=manrules');
 	}
 	// Editing a specific one?
@@ -2651,7 +2651,7 @@ function ManageRules()
  *
  * @param bool $all_messages = false
  */
-function ApplyRules($all_messages = false)
+function applyRules($all_messages = false)
 {
 	global $user_info, $smcFunc, $context, $options;
 
@@ -2758,7 +2758,7 @@ function ApplyRules($all_messages = false)
  *
  * @param bool $reload = false
  */
-function LoadRules($reload = false)
+function loadRules($reload = false)
 {
 	global $user_info, $context, $smcFunc;
 
