@@ -90,7 +90,7 @@ function ModifyProfile($post_errors = array())
 			'areas' => array(
 				'summary' => array(
 					'label' => $txt['summary'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'summary',
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -99,7 +99,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'statistics' => array(
 					'label' => $txt['statPanel'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'statPanel',
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -108,7 +108,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'showposts' => array(
 					'label' => $txt['showPosts'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'showPosts',
 					'subsections' => array(
 						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -133,7 +133,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'permissions' => array(
 					'label' => $txt['showPermissions'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'showPermissions',
 					'permission' => array(
 						'own' => 'manage_permissions',
@@ -158,7 +158,7 @@ function ModifyProfile($post_errors = array())
 				'viewwarning' => array(
 					'label' => $txt['profile_view_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'viewWarning',
 					'permission' => array(
 						'own' => 'profile_view_own',
