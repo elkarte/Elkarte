@@ -440,7 +440,7 @@ function AdminMain()
 				'mailqueue' => array(
 					'label' => $txt['mailqueue_title'],
 					'file' => 'ManageMail.php',
-					'function' => 'ManageMail',
+					'function' => 'action_managemail',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_mail',
 					'subsections' => array(
@@ -765,7 +765,8 @@ function AdminSearchInternal()
 		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
 	);
 
-	// This is a special array of functions that contain setting data - we query all these to simply pull all setting bits!
+	// This is a special array of functions that contain setting data
+	// - we query all these to simply pull all setting bits!
 	$settings_search = array(
 		array('ModifyCoreFeatures', 'area=corefeatures'),
 		array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
