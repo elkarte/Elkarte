@@ -111,6 +111,7 @@ class site_Dispatcher
 		$actionArray = array(
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
+			'announce' => array('Announce.controller.php', '', true),
 			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Members.php', 'action_buddy'),
 			'calendar' => array('Calendar.php', 'action_calendar'),
@@ -190,8 +191,24 @@ class site_Dispatcher
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
-			$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
-			$this->_function_name = $actionArray[$_GET['action']][1];
+			// Is it an object oriented controller?
+			// alternative: strpos($actionArray[$_GET['action']][0], 'controller') !== false
+			if (isset($actionArray[$_GET['action']][2]))
+			{
+				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
+				if (!empty($actionArray[$_GET['action']][1]))
+					$this->_function_name = $actionArray[$_GET['action']][1];
+				elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+					$this->_function_name = 'action_' . $_GET['sa'];
+				else
+					$this->_function_name = 'action_index';
+			}
+			else
+			{
+				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_function_name = $actionArray[$_GET['action']][1];
+			}
 		}
 		// fall back to naming patterns.
 		// add-ons can use any of them, and it should Just Work (tm).
@@ -263,6 +280,8 @@ class site_Dispatcher
 	 */
 	public function dispatch()
 	{
+		global $sourcedir;
+
 		require_once ($this->_file_name);
 
 		if (!empty($this->_controller_name))
