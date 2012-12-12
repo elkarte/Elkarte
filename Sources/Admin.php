@@ -971,8 +971,8 @@ function AdminLogs()
 	// These are the logs they can load.
 	$log_functions = array(
 		'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
-		'adminlog' => array('Modlog.php', 'ViewModlog'),
-		'modlog' => array('Modlog.php', 'ViewModlog', 'disabled' => !in_array('ml', $context['admin_features'])),
+		'adminlog' => array('Modlog.php', 'action_modlog'),
+		'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
 		'banlog' => array('ManageBans.php', 'action_log'),
 		'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 		'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),

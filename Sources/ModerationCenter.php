@@ -83,7 +83,7 @@ function action_modcenter($dont_call = false)
 					'label' => $txt['modlog_view'],
 					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
 					'file' => 'Modlog.php',
-					'function' => 'ViewModlog',
+					'function' => 'action_modlog',
 				),
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],

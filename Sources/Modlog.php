@@ -23,14 +23,14 @@ if (!defined('DIALOGO'))
 
 /**
  * Prepares the information from the moderation log for viewing.
- * Show the moderation log.
+ * Show the moderation log, or admin log...
  * Disallows the deletion of events within twenty-four hours of now.
- * Requires the admin_forum permission.
+ * Requires the admin_forum permission for admin log.
  * Accessed via ?action=moderate;area=modlog.
  *
  * @uses Modlog template, main sub-template.
  */
-function ViewModlog()
+function action_modlog()
 {
 	global $txt, $modSettings, $context, $scripturl, $sourcedir, $user_info, $smcFunc, $settings;
 
@@ -309,7 +309,7 @@ function ViewModlog()
 
 /**
  * Get the number of mod log entries.
- * Callback for createList() in ViewModlog().
+ * Callback for createList() in action_modlog().
  *
  * @param $query_string
  * @param $query_params
@@ -346,7 +346,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 
 /**
  * Gets the moderation log entries that match the specified parameters.
- * Callback for createList() in ViewModlog().
+ * Callback for createList() in action_modlog().
  *
  * @param $start
  * @param $items_per_page

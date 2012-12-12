@@ -40,7 +40,7 @@ function PackageServers()
 	$subActions = array(
 		'servers' => 'action_servers',
 		'add' => 'action_addserver',
-		'browse' => 'action_browsepackages',
+		'browse' => 'action_browseserver',
 		'download' => 'action_downloadpackage',
 		'remove' => 'action_removeserver',
 		'upload' => 'action_uploadpackage',
@@ -182,7 +182,7 @@ function action_servers()
 /**
  * Browse a server's list of packages.
  */
-function action_browsepackages()
+function action_browseserver()
 {
 	global $txt, $boardurl, $context, $scripturl, $boarddir, $sourcedir, $forum_version, $context, $smcFunc;
 
