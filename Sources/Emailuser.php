@@ -32,7 +32,7 @@ function pre_emailuser()
 	$context['robot_no_index'] = true;
 
 	// Load the template.
-	loadTemplate('SendTopic');
+	loadTemplate('Emailuser');
 }
 
 /**
@@ -46,7 +46,7 @@ function action_emailuser()
 
 /**
  * Send a topic to a friend.
- * Uses the SendTopic template, with the main sub template.
+ * Uses the Emailuser template, with the main sub template.
  * Requires the send_topic permission.
  * Redirects back to the first page of the topic when done.
  * Is accessed via ?action=emailuser;sa=sendtopic.
@@ -339,7 +339,7 @@ function action_reporttm()
 
 	// Show the inputs for the comment, etc.
 	loadLanguage('Post');
-	loadTemplate('SendTopic');
+	loadTemplate('Emailuser');
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
 	$context['email_address'] = !isset($_POST['email']) ? '' : trim($_POST['email']);

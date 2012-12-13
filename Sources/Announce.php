@@ -49,7 +49,7 @@ function pre_announce()
 		fatal_lang_error('topic_gone', false);
 
 	loadLanguage('Post');
-	loadTemplate('Post');
+	loadTemplate('Announce');
 
 	$context['page_title'] = $txt['announce_topic'];
 }
