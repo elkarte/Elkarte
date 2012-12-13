@@ -1508,8 +1508,8 @@ function create_control_richedit($editorOptions)
 		<form name="spell_form" id="spell_form" method="post" accept-charset="' . $context['character_set'] . '" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
-		</form>
-		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+		</form>';
+	loadJavascriptFile('spellcheck.js', array('validate' => true, 'defer' => true));
 		}
 	}
 
@@ -1962,8 +1962,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		// Some javascript ma'am?
 		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			$context['html_headers'] .= '
-		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/captcha.js"></script>';
+			loadJavascriptFile('captcha.js', array('validate' => true));
 
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 
@@ -1990,10 +1989,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 	// Add javascript for the object.
 	if ($context['controls']['verification'][$verificationOptions['id']]['show_visual'])
-		$context['insert_after_template'] .= '
-			<script type="text/javascript"><!-- // --><![CDATA[
-				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');
-			// ]]></script>';
+		addInlineJavascript('
+				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');', true);
 
 	// Is there actually going to be anything?
 	if (empty($thisVerification['show_visual']) && empty($thisVerification['number_questions']))
