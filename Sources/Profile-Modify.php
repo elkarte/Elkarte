@@ -1655,89 +1655,6 @@ function pmprefs($memID)
 }
 
 /**
- * Recursive function to retrieve server-stored avatar files
- *
- * @param string $directory
- * @param int $level
- * @return array
- */
-function getAvatars($directory, $level)
-{
-	global $context, $txt, $modSettings;
-
-	$result = array();
-
-	// Open the directory..
-	$dir = dir($modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory);
-	$dirs = array();
-	$files = array();
-
-	if (!$dir)
-		return array();
-
-	while ($line = $dir->read())
-	{
-		if (in_array($line, array('.', '..', 'blank.png', 'index.php')))
-			continue;
-
-		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
-			$dirs[] = $line;
-		else
-			$files[] = $line;
-	}
-	$dir->close();
-
-	// Sort the results...
-	natcasesort($dirs);
-	natcasesort($files);
-
-	if ($level == 0)
-	{
-		$result[] = array(
-			'filename' => 'blank.png',
-			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
-			'name' => $txt['no_pic'],
-			'is_dir' => false
-		);
-	}
-
-	foreach ($dirs as $line)
-	{
-		$tmp = getAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
-		if (!empty($tmp))
-			$result[] = array(
-				'filename' => htmlspecialchars($line),
-				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
-				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',
-				'is_dir' => true,
-				'files' => $tmp
-		);
-		unset($tmp);
-	}
-
-	foreach ($files as $line)
-	{
-		$filename = substr($line, 0, (strlen($line) - strlen(strrchr($line, '.'))));
-		$extension = substr(strrchr($line, '.'), 1);
-
-		// Make sure it is an image.
-		if (strcasecmp($extension, 'gif') != 0 && strcasecmp($extension, 'jpg') != 0 && strcasecmp($extension, 'jpeg') != 0 && strcasecmp($extension, 'png') != 0 && strcasecmp($extension, 'bmp') != 0)
-			continue;
-
-		$result[] = array(
-			'filename' => htmlspecialchars($line),
-			'checked' => $line == $context['member']['avatar']['server_pic'],
-			'name' => htmlspecialchars(str_replace('_', ' ', $filename)),
-			'is_dir' => false
-		);
-		if ($level == 1)
-			$context['avatar_list'][] = $directory . '/' . $line;
-	}
-
-	return $result;
-}
-
-/**
  * @todo needs a description
  *
  * @param int $memID id_member
@@ -2484,7 +2401,7 @@ function profileLoadSignatureData()
  */
 function profileLoadAvatarData()
 {
-	global $context, $cur_profile, $modSettings, $scripturl;
+	global $context, $cur_profile, $modSettings, $scripturl, $sourcedir;
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
@@ -2530,8 +2447,9 @@ function profileLoadAvatarData()
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
 	{
+		require_once($sourcedir . '/Subs-Attachments.php');
 		$context['avatar_list'] = array();
-		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getAvatars('', 0) : array();
+		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
 	}
 	else
 		$context['avatars'] = array();
@@ -2660,25 +2578,8 @@ function profileSaveAvatarData(&$value)
 	require_once($sourcedir . '/Subs-Attachments.php');
 
 	// We need to know where we're going to be putting it..
-	if (!empty($modSettings['custom_avatar_enabled']))
-	{
-		$uploadDir = $modSettings['custom_avatar_dir'];
-		$id_folder = 1;
-	}
-	elseif (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-
-		// Just use the current path for temp files.
-		$uploadDir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-		$id_folder = $modSettings['currentAttachmentUploadDir'];
-	}
-	else
-	{
-		$uploadDir = $modSettings['attachmentUploadDir'];
-		$id_folder = 1;
-	}
+	$uploadDir = getAvatarPath();
+	$id_folder = getAvatarPathID();
 
 	$downloadedExternalAvatar = false;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
@@ -2756,8 +2657,8 @@ function profileSaveAvatarData(&$value)
 				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
-					require_once($sourcedir . '/Subs-Graphics.php');
-					if (downloadAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
+					require_once($sourcedir . '/Subs-Attachments.php');
+					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
 					{
 						$profile_vars['avatar'] = '';
 						$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
@@ -2800,8 +2701,8 @@ function profileSaveAvatarData(&$value)
 					@chmod($uploadDir . '/avatar_tmp_' . $memID, 0644);
 
 					// @todo remove this require when appropriate
-					require_once($sourcedir . '/Subs-Graphics.php');
-					if (!downloadAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+					require_once($sourcedir . '/Subs-Attachments.php');
+					if (!saveAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
 						return 'bad_avatar';
 
 					// Reset attachment avatar data.

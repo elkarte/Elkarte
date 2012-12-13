@@ -667,42 +667,21 @@ function list_getNumFiles($browse_type)
  */
 function MaintainFiles()
 {
-	global $context, $modSettings, $txt, $smcFunc;
+	global $context, $modSettings, $txt, $smcFunc, $sourcedir;
 
 	$context['sub_template'] = 'maintenance';
 
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-		$attach_dirs = unserialize($modSettings['attachmentUploadDir']);
-	else
-		$attach_dirs = array($modSettings['attachmentUploadDir']);
+	// We're working with them attachments here!
+	require_once($sourcedir . '/Subs-Attachments.php');
 
-	// Get the number of attachments....
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}attachments
-		WHERE attachment_type = {int:attachment_type}
-			AND id_member = {int:guest_id_member}',
-		array(
-			'attachment_type' => 0,
-			'guest_id_member' => 0,
-		)
-	);
-	list ($context['num_attachments']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-	$context['num_attachments'] = comma_format($context['num_attachments'], 0);
+	// we need our attachments directories...
+	$attach_dirs = getAttachmentDirs();
 
-	// Also get the avatar amount....
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}attachments
-		WHERE id_member != {int:guest_id_member}',
-		array(
-			'guest_id_member' => 0,
-		)
-	);
-	list ($context['num_avatars']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-	$context['num_avatars'] = comma_format($context['num_avatars'], 0);
+	// Get the number of attachments...
+	$context['num_attachments'] = comma_format(getAttachmentCount(), 0);
+
+	// Also get the avatar amount...
+	$context['num_avatars'] = comma_format(getAvatarCount(), 0);
 
 	// Check the size of all the directories.
 	$request = $smcFunc['db_query']('', '

@@ -1246,18 +1246,8 @@ function loadAttachmentContext($id_msg)
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 					{
 						// So what folder are we putting this image in?
-						if (!empty($modSettings['currentAttachmentUploadDir']))
-						{
-							if (!is_array($modSettings['attachmentUploadDir']))
-								$modSettings['attachmentUploadDir'] = @unserialize($modSettings['attachmentUploadDir']);
-							$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-							$id_folder_thumb = $modSettings['currentAttachmentUploadDir'];
-						}
-						else
-						{
-							$path = $modSettings['attachmentUploadDir'];
-							$id_folder_thumb = 1;
-						}
+						$path = getAttachmentPath();
+						$id_folder_thumb = getAttachmentPathID();
 
 						// Calculate the size of the created thumbnail.
 						$size = @getimagesize($filename . '_thumb');

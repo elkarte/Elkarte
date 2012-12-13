@@ -15,6 +15,8 @@
  *
  * This file handles the uploading and creation of attachments
  * as well as the auto management of the attachment directories.
+ * Note to enhance documentation later:
+ * attachment_type = 3 is a thumbnail, etc.
  *
  */
 
@@ -1184,4 +1186,491 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 
 	if ($return_affected_messages)
 		return array_unique($msgs);
+}
+
+/**
+ * Saves a file and stores it locally for avatar use by id_member.
+ * - supports GIF, JPG, PNG, BMP and WBMP formats.
+ * - detects if GD2 is available.
+ * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
+ * - updates the database info for the member's avatar.
+ * - returns whether the download and resize was successful.
+ * @uses Subs-Graphics.php
+ *
+ * @param string $temporary_path the full path to the temporary file
+ * @param int $memID member ID
+ * @param int $max_width
+ * @param int $max_height
+ * @return boolean whether the download and resize was successful.
+ *
+ */
+function saveAvatar($temporary_path, $memID, $max_width, $max_height)
+{
+	global $modSettings, $sourcedir, $smcFunc;
+
+	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
+	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
+
+	// Just making sure there is a non-zero member.
+	if (empty($memID))
+		return false;
+
+	removeAttachments(array('id_member' => $memID));
+
+	$id_folder = getAttachmentPathID();
+	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+	$smcFunc['db_insert']('',
+		'{db_prefix}attachments',
+		array(
+			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int',
+			'id_folder' => 'int',
+		),
+		array(
+			$memID, empty($modSettings['custom_avatar_enabled']) ? 0 : 1, $destName, $avatar_hash, $ext, 1,
+			$id_folder,
+		),
+		array('id_attach')
+	);
+	$attachID = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+
+	// First, the temporary file will have the .tmp extension.
+	$tempName = getAvatarPath() . '/' . $destName . '.tmp';
+
+	// The destination filename will depend on whether custom dir for avatars has been set
+	$destName = getAvatarPath() . '/' . $destName;
+	$path = getAttachmentPath();
+	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
+
+	// Resize it.
+	require_once $sourcedir . '/Subs-Graphics.php';
+	if (!empty($modSettings['avatar_download_png']))
+		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
+ 	else
+		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
+
+	if ($success)
+	{
+		// Remove the .tmp extension from the attachment.
+		if (rename($tempName, $destName))
+		{
+			list ($width, $height) = getimagesize($destName);
+			$mime_type = 'image/' . $ext;
+
+			// Write filesize in the database.
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}attachments
+				SET size = {int:filesize}, width = {int:width}, height = {int:height},
+					mime_type = {string:mime_type}
+				WHERE id_attach = {int:current_attachment}',
+				array(
+					'filesize' => filesize($destName),
+					'width' => (int) $width,
+					'height' => (int) $height,
+					'current_attachment' => $attachID,
+					'mime_type' => $mime_type,
+				)
+			);
+
+			// Retain this globally in case the script wants it.
+			$modSettings['new_avatar_data'] = array(
+				'id' => $attachID,
+				'filename' => $destName,
+				'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
+			);
+			return true;
+		}
+		else
+			return false;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}attachments
+			WHERE id_attach = {int:current_attachment}',
+			array(
+				'current_attachment' => $attachID,
+			)
+		);
+
+		@unlink($tempName);
+		return false;
+	}
+}
+
+/**
+ * Get the size of a specified image with better error handling.
+ * @todo see if it's better in Subs-Graphics, but one step at the time.
+ * Uses getimagesize() to determine the size of a file.
+ * Attempts to connect to the server first so it won't time out.
+ *
+ * @param string $url
+ * @return array or false, the image size as array (width, height), or false on failure
+ */
+function url_image_size($url)
+{
+	global $sourcedir;
+
+	// Make sure it is a proper URL.
+	$url = str_replace(' ', '%20', $url);
+
+	// Can we pull this from the cache... please please?
+	if (($temp = cache_get_data('url_image_size-' . md5($url), 240)) !== null)
+		return $temp;
+	$t = microtime();
+
+	// Get the host to pester...
+	preg_match('~^\w+://(.+?)/(.*)$~', $url, $match);
+
+	// Can't figure it out, just try the image size.
+	if ($url == '' || $url == 'http://' || $url == 'https://')
+	{
+		return false;
+	}
+	elseif (!isset($match[1]))
+	{
+		$size = @getimagesize($url);
+	}
+	else
+	{
+		// Try to connect to the server... give it half a second.
+		$temp = 0;
+		$fp = @fsockopen($match[1], 80, $temp, $temp, 0.5);
+
+		// Successful?  Continue...
+		if ($fp != false)
+		{
+			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
+			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/DIALOGO' . "\r\n" . 'Connection: close' . "\r\n\r\n");
+
+			// Read in the HTTP/1.1 or whatever.
+			$test = substr(fgets($fp, 11), -1);
+			fclose($fp);
+
+			// See if it returned a 404/403 or something.
+			if ($test < 4)
+			{
+				$size = @getimagesize($url);
+
+				// This probably means allow_url_fopen is off, let's try GD.
+				if ($size === false && function_exists('imagecreatefromstring'))
+				{
+					include_once($sourcedir . '/Subs-Package.php');
+
+					// It's going to hate us for doing this, but another request...
+					$image = @imagecreatefromstring(fetch_web_data($url));
+					if ($image !== false)
+					{
+						$size = array(imagesx($image), imagesy($image));
+						imagedestroy($image);
+					}
+				}
+			}
+		}
+	}
+
+	// If we didn't get it, we failed.
+	if (!isset($size))
+		$size = false;
+
+	// If this took a long time, we may never have to do it again, but then again we might...
+	if (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $t)) > 0.8)
+		cache_put_data('url_image_size-' . md5($url), $size, 240);
+
+	// Didn't work.
+	return $size;
+}
+
+/**
+ * The current attachments path:
+ *  - $boarddir . '/attachments', if nothing is set yet.
+ *  - if the forum is using multiple attachments directories, the current path
+ *  - it is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
+ *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+ */
+function getAttachmentPath()
+{
+	global $modSettings, $boarddir;
+
+	// Make sure this thing exists and it is unserialized
+	if (empty($modSettings['attachmentUploadDir']))
+		$attachmentDir = $boarddir . '/attachments';
+	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
+		$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
+	else
+		$attachmentDir = $modSettings['attachmentUploadDir'];
+
+	return is_array($attachmentDir) ? $attachmentDir[$modSettings['currentAttachmentUploadDir']] : $attachmentDir;
+}
+
+/**
+ * The avatars path: if custom avatar directory is set, that's it.
+ * Otherwise, it's attachments path.
+ */
+function getAvatarPath()
+{
+	global $modSettings;
+
+	return empty($modSettings['custom_avatar_enabled']) ? getAttachmentPath() : $modSettings['custom_avatar_dir'];
+}
+
+/**
+ * Little utility function for the $id_folder computation for attachments.
+ * This returns the id of the folder where the attachment or avatar will be saved.
+ * If multiple attachment directories are not enabled, this will be 1 by default.
+ *
+ * @return int, return 1 if multiple attachment directories are not enabled,
+ * or the id of the current attachment directory otherwise.
+ */
+function getAttachmentPathID()
+{
+	global $modSettings;
+
+	// utility function for the endless $id_folder computation for attachments.
+	return !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['currentAttachmentUploadDir'] : 1;
+}
+
+/**
+ * Returns the ID of the folder avatars are currently saved in.
+ *
+ * @return int, returns 1 if custom avatar directory is enabled,
+ * and the ID of the current attachment folder otherwise.
+ * NB: the latter could also be 1.
+ */
+function getAvatarPathID()
+{
+	global $modSettings;
+
+	// Little utility function for the endless $id_folder computation for avatars.
+	if (!empty($modSettings['custom_avatar_enabled']))
+		return 1;
+	else
+		return getAttachmentPathID();
+}
+
+/**
+ * Get all attachments associated with a set of posts.
+ * This does not check permissions.
+ *
+ * @param $messages
+ */
+function getAttachments($messages)
+{
+	global $smcFunc, $modSettings;
+
+	$attachments = array();
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
+			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
+			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
+    	FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
+			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
+		WHERE a.id_msg IN ({array_int:message_list})
+			AND a.attachment_type = {int:attachment_type}',
+		array(
+			'message_list' => $messages,
+			'attachment_type' => 0,
+			'is_approved' => 1,
+		)
+	);
+	$temp = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if (!$row['approved'] && $modSettings['postmod_active'] && !allowedTo('approve_posts') && (!isset($all_posters[$row['id_msg']]) || $all_posters[$row['id_msg']] != $user_info['id']))
+			continue;
+
+		$temp[$row['id_attach']] = $row;
+
+		if (!isset($attachments[$row['id_msg']]))
+			$attachments[$row['id_msg']] = array();
+	}
+	$smcFunc['db_free_result']($request);
+
+	// This is better than sorting it with the query...
+	ksort($temp);
+
+	foreach ($temp as $row)
+		$attachments[$row['id_msg']][] = $row;
+
+	return $attachments;
+}
+
+/**
+ * How many attachments we have overall.
+ *
+ * @return int
+ */
+function getAttachmentCount()
+{
+	global $smcFunc;
+
+	// Get the number of attachments....
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:attachment_type}
+			AND id_member = {int:guest_id_member}',
+		array(
+			'attachment_type' => 0,
+			'guest_id_member' => 0,
+		)
+	);
+	list ($num_attachments) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $num_attachments;
+}
+
+/**
+ * How many avatars do we have. Need to know. :P
+ *
+ * @return int
+ */
+function getAvatarCount()
+{
+	global $smcFunc;
+
+	// Get the avatar amount....
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments
+		WHERE id_member != {int:guest_id_member}',
+		array(
+			'guest_id_member' => 0,
+		)
+	);
+	list ($num_avatars) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $num_avatars;
+}
+
+/**
+ * Get the attachments directories, as an array.
+ *
+ * @return array, the attachments directory/directories
+ */
+function getAttachmentDirs()
+{
+	global $modSettings, $boarddir;
+
+	if (!empty($modSettings['currentAttachmentUploadDir']))
+		$attach_dirs = unserialize($modSettings['attachmentUploadDir']);
+	elseif (!empty($modSettings['attachmentUploadDir']))
+		$attach_dirs = array($modSettings['attachmentUploadDir']);
+	else
+		$attach_dirs = array($boarddir . '/attachments');
+
+	return $attach_dirs;
+}
+
+/**
+ * Get all avatars information... as long as they're in default directory still?
+ *
+ * @return array, avatars information
+ */
+function getAvatarsDefault()
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_attach, id_folder, id_member, filename, file_hash
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:attachment_type}
+			AND id_member > {int:guest_id_member}',
+		array(
+			'attachment_type' => 0,
+			'guest_id_member' => 0,
+		)
+	);
+
+	$avatars = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$avatars[] = $row;
+	$smcFunc['db_free_result']($request);
+
+	return $avatars;
+}
+
+/**
+ * Recursive function to retrieve server-stored avatar files
+ *
+ * @param string $directory
+ * @param int $level
+ * @return array
+ */
+function getServerStoredAvatars($directory, $level)
+{
+	global $context, $txt, $modSettings;
+
+	$result = array();
+
+	// Open the directory..
+	$dir = dir($modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory);
+	$dirs = array();
+	$files = array();
+
+	if (!$dir)
+		return array();
+
+	while ($line = $dir->read())
+	{
+		if (in_array($line, array('.', '..', 'blank.gif', 'index.php')))
+			continue;
+
+		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
+			$dirs[] = $line;
+		else
+			$files[] = $line;
+	}
+	$dir->close();
+
+	// Sort the results...
+	natcasesort($dirs);
+	natcasesort($files);
+
+	if ($level == 0)
+	{
+		$result[] = array(
+			'filename' => 'blank.gif',
+			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.gif')),
+			'name' => $txt['no_pic'],
+			'is_dir' => false
+		);
+	}
+
+	foreach ($dirs as $line)
+	{
+		$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
+		if (!empty($tmp))
+		$result[] = array(
+				'filename' => htmlspecialchars($line),
+				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
+				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',
+				'is_dir' => true,
+				'files' => $tmp
+		);
+		unset($tmp);
+	}
+
+	foreach ($files as $line)
+	{
+		$filename = substr($line, 0, (strlen($line) - strlen(strrchr($line, '.'))));
+		$extension = substr(strrchr($line, '.'), 1);
+
+		// Make sure it is an image.
+		if (strcasecmp($extension, 'gif') != 0 && strcasecmp($extension, 'jpg') != 0 && strcasecmp($extension, 'jpeg') != 0 && strcasecmp($extension, 'png') != 0 && strcasecmp($extension, 'bmp') != 0)
+			continue;
+
+		$result[] = array(
+			'filename' => htmlspecialchars($line),
+			'checked' => $line == $context['member']['avatar']['server_pic'],
+			'name' => htmlspecialchars(str_replace('_', ' ', $filename)),
+			'is_dir' => false
+		);
+		if ($level == 1)
+			$context['avatar_list'][] = $directory . '/' . $line;
+	}
+
+	return $result;
 }
