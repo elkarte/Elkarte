@@ -297,3 +297,35 @@ function destroyMenu($menu_id = 'last')
 
 	unset($context[$menu_name]);
 }
+
+/**
+ * Call the function or method for the selected menu item.
+ * $selectedMenu is the array of menu information,
+ *  with the format as retrieved from createMenu()
+ *
+ * $selectedMenu['function'] can be an array or a string:
+ *  an array, array('controller_name', 'method_name')
+ *  a string, 'function_name'
+ *
+ * @param array $selectedMenu
+ */
+function callMenu($selectedMenu)
+{
+	// We use only $selectedMenu['function']
+	// which can be, for example for object oriented controllers:
+	// function'     an array, array('ManageAttachments_Controller', 'action_attachments')
+	// or, for procedural controllers
+	// 'function'     a string, 'action_managemail'
+
+	if (is_array($selectedMenu['function']))
+	{
+		// 'function' => array ('controller_name', 'method_name')
+		$controller = new $selectedMenu['function'][0]();
+		$controller->{$selectedMenu['function'][1]}();
+	}
+	else
+	{
+		// a single function name... call it over!
+		$selectedMenu['function']();
+	}
+}
