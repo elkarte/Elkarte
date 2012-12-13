@@ -107,12 +107,14 @@ class site_Dispatcher
 			return;
 
 		// Start with our nice and cozy err... *cough*
-		// $_GET['action'] => array($file, $function).
+		// Format:
+		// $_GET['action'] => array($file, $function)
+		// $_GET['action'] => array($file, $class, $method)
 		$actionArray = array(
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
-			'announce' => array('Announce.controller.php', '', true),
-			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
+			'announce' => array('Announce.controller.php', 'Announce_Controller', ''),
+			'attachapprove' => array('ManageAttachments.php', 'ManageAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.php', 'action_buddy'),
 			'calendar' => array('Calendar.php', 'action_calendar'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
@@ -191,19 +193,22 @@ class site_Dispatcher
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
-			// Is it an object oriented controller?
-			// alternative: strpos($actionArray[$_GET['action']][0], 'controller') !== false
+			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
 			{
 				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
-				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
-				if (!empty($actionArray[$_GET['action']][1]))
-					$this->_function_name = $actionArray[$_GET['action']][1];
+				$this->_controller_name = $actionArray[$_GET['action']][1];
+
+				// if the method is coded in, use it
+				if (!empty($actionArray[$_GET['action']][2]))
+					$this->_function_name = $actionArray[$_GET['action']][2];
+				// otherwise fall back to naming patterns
 				elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
 					$this->_function_name = 'action_index';
 			}
+			// then it's one of our legacy functions
 			else
 			{
 				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
@@ -215,7 +220,7 @@ class site_Dispatcher
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// i.e. action=help => Help.php...
-			// if the function name fits the pattern, that'd be 'index'...
+			// if the function name fits the pattern, that'd be 'show'...
 			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
 			{
 				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
@@ -292,10 +297,11 @@ class site_Dispatcher
 			if (method_exists($controller, 'pre_dispatch'))
 				$controller->pre_dispatch();
 
+			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
-			elseif (method_exists($this->controller, 'index'))
-				$controller->index();
+			elseif (method_exists($this->controller, 'action_index'))
+				$controller->action_index();
 			// fall back
 			else
 			{
