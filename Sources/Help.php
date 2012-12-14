@@ -34,7 +34,7 @@ function ShowHelp()
 	loadLanguage('Manual');
 
 	// We need to know where our wiki is.
-	$context['wiki_url'] = 'https://github.com/Spuds/SMF21se/wiki';
+	$context['wiki_url'] = 'https://github.com/Spuds/dialogo/wiki';
 
 	// Sections were are going to link...
 	$context['manual_sections'] = array(
