@@ -23,14 +23,14 @@ if (!defined('DIALOGO'))
 
 /**
  * Prepares the information from the moderation log for viewing.
- * Show the moderation log.
+ * Show the moderation log, or admin log...
  * Disallows the deletion of events within twenty-four hours of now.
- * Requires the admin_forum permission.
+ * Requires the admin_forum permission for admin log.
  * Accessed via ?action=moderate;area=modlog.
  *
  * @uses Modlog template, main sub-template.
  */
-function ViewModlog()
+function action_modlog()
 {
 	global $txt, $modSettings, $context, $scripturl, $sourcedir, $user_info, $smcFunc, $settings;
 
@@ -160,7 +160,7 @@ function ViewModlog()
 	// This is all the information required for a watched user listing.
 	$listOptions = array(
 		'id' => 'moderation_log_list',
-		'title' => '<a href="' . $scripturl . '?action=helpadmin;help=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a> ' . $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log'],
+		'title' => '<a href="' . $scripturl . '?action=quickhelp;help=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a> ' . $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log'],
 		'width' => '100%',
 		'items_per_page' => $context['displaypage'],
 		'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
@@ -309,7 +309,7 @@ function ViewModlog()
 
 /**
  * Get the number of mod log entries.
- * Callback for createList() in ViewModlog().
+ * Callback for createList() in action_modlog().
  *
  * @param $query_string
  * @param $query_params
@@ -346,7 +346,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 
 /**
  * Gets the moderation log entries that match the specified parameters.
- * Callback for createList() in ViewModlog().
+ * Callback for createList() in action_modlog().
  *
  * @param $start
  * @param $items_per_page

@@ -25,9 +25,9 @@ if (!defined('DIALOGO'))
  * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
  * Requires the karma_edit permission, and that the user isn't a guest.
  * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
- * It is accessed via ?action=modifykarma.
+ * It is accessed via ?action=karma, sa=smite or sa=applaud.
  */
-function ModifyKarma()
+function action_karma()
 {
 	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir;
 

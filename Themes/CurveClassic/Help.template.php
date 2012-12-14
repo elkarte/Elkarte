@@ -171,7 +171,7 @@ function template_manual()
 
 	echo '
 					</ul>
-					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=credits'), '</p>
+					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=who;sa=credits'), '</p>
 				</div>
 			</div>';
 }

@@ -90,7 +90,7 @@ function ModifyProfile($post_errors = array())
 			'areas' => array(
 				'summary' => array(
 					'label' => $txt['summary'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'summary',
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -99,7 +99,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'statistics' => array(
 					'label' => $txt['statPanel'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'statPanel',
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -108,7 +108,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'showposts' => array(
 					'label' => $txt['showPosts'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'showPosts',
 					'subsections' => array(
 						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -133,17 +133,17 @@ function ModifyProfile($post_errors = array())
 				),
 				'permissions' => array(
 					'label' => $txt['showPermissions'],
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'showPermissions',
 					'permission' => array(
 						'own' => 'manage_permissions',
 						'any' => 'manage_permissions',
 					),
 				),
-				'tracking' => array(
-					'label' => $txt['trackUser'],
-					'file' => 'Profile-View.php',
-					'function' => 'tracking',
+				'history' => array(
+					'label' => $txt['history'],
+					'file' => 'ProfileHistory.php',
+					'function' => 'action_history',
 					'subsections' => array(
 						'activity' => array($txt['trackActivity'], 'moderate_forum'),
 						'ip' => array($txt['trackIP'], 'moderate_forum'),
@@ -158,7 +158,7 @@ function ModifyProfile($post_errors = array())
 				'viewwarning' => array(
 					'label' => $txt['profile_view_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-					'file' => 'Profile-View.php',
+					'file' => 'ProfileInfo.php',
 					'function' => 'viewWarning',
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -172,7 +172,7 @@ function ModifyProfile($post_errors = array())
 			'areas' => array(
 				'account' => array(
 					'label' => $txt['account'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'account',
 					'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
 					'sc' => 'post',
@@ -185,7 +185,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'forumprofile' => array(
 					'label' => $txt['forumprofile'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'forumProfile',
 					'sc' => 'post',
 					'token' => 'profile-fp%u',
@@ -196,7 +196,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'theme' => array(
 					'label' => $txt['theme'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'theme',
 					'sc' => 'post',
 					'token' => 'profile-th%u',
@@ -207,7 +207,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'authentication' => array(
 					'label' => $txt['authentication'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'authentication',
 					'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
 					'sc' => 'post',
@@ -221,7 +221,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'notification' => array(
 					'label' => $txt['notification'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'notification',
 					'sc' => 'post',
 					'token' => 'profile-nt%u',
@@ -233,7 +233,7 @@ function ModifyProfile($post_errors = array())
 				// Without profile_extra_own, settings are accessible from the PM section.
 				'pmprefs' => array(
 					'label' => $txt['pmprefs'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'pmprefs',
 					'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 					'sc' => 'post',
@@ -245,7 +245,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'ignoreboards' => array(
 					'label' => $txt['ignoreboards'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'ignoreboards',
 					'enabled' => !empty($modSettings['allow_ignore_boards']),
 					'sc' => 'post',
@@ -257,7 +257,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'lists' => array(
 					'label' => $txt['editBuddyIgnoreLists'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'editBuddyIgnoreLists',
 					'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 					'sc' => 'post',
@@ -273,7 +273,7 @@ function ModifyProfile($post_errors = array())
 				),
 				'groupmembership' => array(
 					'label' => $txt['groupmembership'],
-					'file' => 'Profile-Modify.php',
+					'file' => 'ProfileOptions.php',
 					'function' => 'groupMembership',
 					'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 					'sc' => 'request',
@@ -300,8 +300,8 @@ function ModifyProfile($post_errors = array())
 				'issuewarning' => array(
 					'label' => $txt['profile_issue_warning'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-					'file' => 'Profile-Actions.php',
-					'function' => 'issueWarning',
+					'file' => 'ProfileAccount.php',
+					'function' => 'action_issuewarning',
 					'token' => 'profile-iw%u',
 					'enabled' => !$context['user']['is_owner'],
 					'permission' => array(
@@ -320,8 +320,8 @@ function ModifyProfile($post_errors = array())
 				),
 				'subscriptions' => array(
 					'label' => $txt['subscriptions'],
-					'file' => 'Profile-Actions.php',
-					'function' => 'subscriptions',
+					'file' => 'ProfileSubscriptions.php',
+					'function' => 'action_subscriptions',
 					'enabled' => !empty($modSettings['paid_enabled']),
 					'permission' => array(
 						'own' => array('profile_view_own'),
@@ -330,8 +330,8 @@ function ModifyProfile($post_errors = array())
 				),
 				'deleteaccount' => array(
 					'label' => $txt['deleteAccount'],
-					'file' => 'Profile-Actions.php',
-					'function' => 'deleteAccount',
+					'file' => 'ProfileAccount.php',
+					'function' => 'action_deleteaccount',
 					'sc' => 'post',
 					'token' => 'profile-da%u',
 					'password' => true,
@@ -341,8 +341,8 @@ function ModifyProfile($post_errors = array())
 					),
 				),
 				'activateaccount' => array(
-					'file' => 'Profile-Actions.php',
-					'function' => 'activateAccount',
+					'file' => 'ProfileAccount.php',
+					'function' => 'action_activateaccount',
 					'sc' => 'get',
 					'token' => 'profile-aa%u',
 					'select' => 'summary',
@@ -405,7 +405,8 @@ function ModifyProfile($post_errors = array())
 	$current_area = $profile_include_data['current_area'];
 	$context['menu_item_selected'] = $current_area;
 
-	// Before we go any further, let's work on the area we've said is valid. Note this is done here just in case we ever compromise the menu function in error!
+	// Before we go any further, let's work on the area we've said is valid.
+	// Note this is done here just in case we ever compromise the menu function in error!
 	$context['completed_save'] = false;
 	$context['do_preview'] = isset($_REQUEST['preview_signature']);
 
@@ -506,7 +507,8 @@ function ModifyProfile($post_errors = array())
 			'name' => $profile_include_data['subsections'][$profile_include_data['current_subsection']][0],
 		);
 
-	// Set the template for this area and add the profile layer.
+	// Set the template for this area... if you still can :P
+	// and add the profile layer.
 	$context['sub_template'] = $profile_include_data['function'];
 	$context['template_layers'][] = 'profile';
 
@@ -563,13 +565,13 @@ function ModifyProfile($post_errors = array())
 		if ($current_area == 'activateaccount')
 		{
 			if (empty($post_errors))
-				activateAccount($memID);
+				action_activateaccount($memID);
 		}
 		elseif ($current_area == 'deleteaccount')
 		{
 			if (empty($post_errors))
 			{
-				deleteAccount2($memID);
+				action_deleteaccount2($memID);
 				redirectexit();
 			}
 		}
@@ -591,7 +593,7 @@ function ModifyProfile($post_errors = array())
 		{
 			$force_redirect = true;
 			// Ensure we include this.
-			require_once($sourcedir . '/Profile-Modify.php');
+			require_once($sourcedir . '/ProfileOptions.php');
 			saveProfileChanges($profile_vars, $post_errors, $memID);
 		}
 

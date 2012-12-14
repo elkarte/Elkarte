@@ -254,7 +254,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s), if they exist.
-	require_once($sourcedir . '/ManageAttachments.php');
+	require_once($sourcedir . '/Subs-Attachments.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -734,7 +734,7 @@ function increaseViewCounter($id_topic)
 
 /**
  * Mark topic(s) as read by the given member, at the specified message.
- * 
+ *
  * @param array $mark_topics array($id_member, $id_topic, $id_msg)
  * @param bool $was_set = false - whether the topic has been previously read by the user
  */

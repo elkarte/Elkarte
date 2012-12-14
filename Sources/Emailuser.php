@@ -13,7 +13,8 @@
  *
  * @version 1.0 Alpha
  *
- * The functions in this file deal with sending topics to a friend or moderator
+ * The functions in this file deal with sending topics to a friend or moderator,
+ * and email to a user.
  *
  */
 
@@ -21,37 +22,36 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * The main handling function for sending specialist (Or otherwise) emails to a user.
+ * This function initializes or sets up the necessary, for the other actions
  */
-function EmailUser()
+function pre_emailuser()
 {
-	global $topic, $txt, $context, $scripturl, $sourcedir, $smcFunc;
+	global $context;
 
 	// Don't index anything here.
 	$context['robot_no_index'] = true;
 
 	// Load the template.
-	loadTemplate('SendTopic');
+	loadTemplate('Emailuser');
+}
 
-	$sub_actions = array(
-		'email' => 'CustomEmail',
-		'sendtopic' => 'SendTopic',
-	);
-
-	if (!isset($_GET['sa']) || !isset($sub_actions[$_GET['sa']]))
-		$_GET['sa'] = 'sendtopic';
-
-	$sub_actions[$_GET['sa']]();
+/**
+ * Default action handler (when no ;sa is specified)
+ */
+function action_emailuser()
+{
+	// default action: action_sendtopic()
+	action_sendtopic();
 }
 
 /**
  * Send a topic to a friend.
- * Uses the SendTopic template, with the main sub template.
+ * Uses the Emailuser template, with the main sub template.
  * Requires the send_topic permission.
  * Redirects back to the first page of the topic when done.
  * Is accessed via ?action=emailuser;sa=sendtopic.
  */
-function SendTopic()
+function action_sendtopic()
 {
 	global $topic, $txt, $context, $scripturl, $sourcedir, $smcFunc, $modSettings;
 
@@ -152,8 +152,9 @@ function SendTopic()
  * Send an email to the user - allow the sender to write the message.
  * Can either be passed a user ID as uid or a message id as msg.
  * Does not check permissions for a message ID as there is no information disclosed.
+ * ?action=emailuser;sa=email
  */
-function CustomEmail()
+function action_email()
 {
 	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl, $sourcedir;
 
@@ -283,10 +284,10 @@ function CustomEmail()
  * Gathers data from the user to report abuse to the moderator(s).
  * Uses the ReportToModerator template, main sub template.
  * Requires the report_any permission.
- * Uses ReportToModerator2() if post data was sent.
+ * Uses action_reporttm2() if post data was sent.
  * Accessed through ?action=reporttm.
  */
-function ReportToModerator()
+function action_reporttm()
 {
 	global $txt, $topic, $sourcedir, $modSettings, $user_info, $context, $smcFunc;
 
@@ -295,9 +296,9 @@ function ReportToModerator()
 	// You can't use this if it's off or you are not allowed to do it.
 	isAllowedTo('report_any');
 
-	// If they're posting, it should be processed by ReportToModerator2.
+	// If they're posting, it should be processed by action_reporttm2.
 	if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && empty($context['post_errors']))
-		ReportToModerator2();
+		action_reporttm2();
 
 	// We need a message ID to check!
 	if (empty($_REQUEST['msg']) && empty($_REQUEST['mid']))
@@ -338,7 +339,7 @@ function ReportToModerator()
 
 	// Show the inputs for the comment, etc.
 	loadLanguage('Post');
-	loadTemplate('SendTopic');
+	loadTemplate('Emailuser');
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
 	$context['email_address'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
@@ -355,10 +356,10 @@ function ReportToModerator()
  * Send the emails.
  * Sends off emails to all the moderators.
  * Sends to administrators and global moderators. (1 and 2)
- * Called by ReportToModerator(), and thus has the same permission and setting requirements as it does.
+ * Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
  * Accessed through ?action=reporttm when posting.
  */
-function ReportToModerator2()
+function action_reporttm2()
 {
 	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $sourcedir, $language, $context, $smcFunc;
 
@@ -417,7 +418,7 @@ function ReportToModerator2()
 		foreach ($post_errors as $post_error)
 			$context['post_errors'][] = $txt['error_' . $post_error];
 
-		return ReportToModerator();
+		return action_reporttm();
 	}
 
 	// Get the basic topic information, and make sure they can see it.

@@ -38,7 +38,7 @@ $GLOBALS['search_versions'] = array(
  * - decodes and loads search parameters given in the URL (if any).
  * - the form redirects to index.php?action=search2.
  */
-function PlushSearch1()
+function action_plushsearch1()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc, $sourcedir;
 
@@ -249,7 +249,7 @@ function PlushSearch1()
  * - stores the results into the search cache.
  * - show the results of the search query.
  */
-function PlushSearch2()
+function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $sourcedir, $txt, $db_connection;
 	global $user_info, $context, $options, $messages_request, $boards_can;
@@ -257,7 +257,7 @@ function PlushSearch2()
 
 	// if comming from the quick search box, and we want to search on members, well we need to do that ;)
 	if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
-		redirectexit($scripturl . '?action=mlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
+		redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
 		fatal_lang_error('loadavg_search_disabled', false);
@@ -975,7 +975,7 @@ function PlushSearch2()
 	if (!empty($context['search_errors']))
 	{
 		$_REQUEST['params'] = $context['params'];
-		return PlushSearch1();
+		return action_plushsearch1();
 	}
 
 	// Spam me not, Spam-a-lot?
@@ -1499,7 +1499,7 @@ function PlushSearch2()
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
 						$_REQUEST['params'] = $context['params'];
-						return PlushSearch1();
+						return action_plushsearch1();
 					}
 					elseif (!empty($indexedResults))
 					{

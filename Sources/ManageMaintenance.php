@@ -301,7 +301,7 @@ function MaintainFindFixErrors()
 	validateToken('admin-maint');
 
 	require_once($sourcedir . '/RepairBoards.php');
-	RepairBoards();
+	action_repairboards();
 }
 
 /**

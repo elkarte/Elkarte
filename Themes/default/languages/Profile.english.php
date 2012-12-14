@@ -468,8 +468,8 @@ $txt['pm_display_mode_linked'] = 'As a conversation';
 // Use entities in the below string.
 $txt['pm_recommend_enable_outbox'] = 'To make the most of this setting we suggest you enable &quot;Save a copy of each Personal Message in my sent items by default&quot;\\n\\nThis will help ensure that the conversations flow better as you can see both sides of the conversation.';
 
-$txt['tracking'] = 'Tracking';
-$txt['tracking_description'] = 'This section allows you to review certain profile actions performed on this member\'s profile as well as track their IP address and login history.';
+$txt['history'] = 'History';
+$txt['history_description'] = 'This section allows you to review certain profile actions performed on this member\'s profile as well as track their IP address and login history.';
 
 $txt['trackEdits'] = 'Profile Edits';
 $txt['trackEdit_deleted_member'] = 'Deleted Member';
