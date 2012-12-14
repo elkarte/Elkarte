@@ -23,9 +23,10 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Main dispatcher. This function checks permissions and passes control through to the relevant section.
+ * Main dispatcher.
+ * This function checks permissions and passes control through to the relevant section.
  */
-function ManageMail()
+function action_managemail()
 {
 	global $context, $txt, $scripturl, $modSettings, $sourcedir;
 
@@ -42,8 +43,8 @@ function ManageMail()
 	$context['sub_template'] = 'show_settings';
 
 	$subActions = array(
-		'browse' => 'BrowseMailQueue',
-		'clear' => 'ClearMailQueue',
+		'browse' => 'action_browsemail',
+		'clear' => 'action_clear',
 		'settings' => 'ModifyMailSettings',
 	);
 
@@ -67,7 +68,7 @@ function ManageMail()
 /**
  * Display the mail queue...
  */
-function BrowseMailQueue()
+function action_browsemail()
 {
 	global $scripturl, $context, $modSettings, $txt, $smcFunc;
 	global $sourcedir;
@@ -373,7 +374,7 @@ function ModifyMailSettings($return_config = false)
 /**
  * This function clears the mail queue of all emails, and at the end redirects to browse.
  */
-function ClearMailQueue()
+function action_clear()
 {
 	global $sourcedir, $smcFunc;
 
@@ -408,7 +409,7 @@ function ClearMailQueue()
 		pauseMailQueueClear();
 	}
 
-	return BrowseMailQueue();
+	return action_browsemail();
 }
 
 /**

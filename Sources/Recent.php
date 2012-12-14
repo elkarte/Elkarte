@@ -76,8 +76,9 @@ function getLastPost()
 
 /**
  * Find the ten most recent posts.
+ * Accessed by action=recent.
  */
-function RecentPosts()
+function action_recent()
 {
 	global $txt, $scripturl, $user_info, $context, $modSettings, $sourcedir, $board, $smcFunc;
 
@@ -420,8 +421,9 @@ function RecentPosts()
 
 /**
  * Find unread topics and replies.
+ * Accessed by action=unread and action=unreadreplies
  */
-function UnreadTopics()
+function action_unread()
 {
 	global $board, $txt, $scripturl, $sourcedir;
 	global $user_info, $context, $settings, $modSettings, $smcFunc, $options;

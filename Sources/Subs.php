@@ -2619,7 +2619,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewsmfile') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
@@ -3695,19 +3695,19 @@ function setupMenuContext()
 					),
 				),
 			),
-			'mlist' => array(
+			'memberlist' => array(
 				'title' => $txt['members_title'],
-				'href' => $scripturl . '?action=mlist',
+				'href' => $scripturl . '?action=memberlist',
 				'show' => $context['allow_memberlist'],
 				'sub_buttons' => array(
 					'mlist_view' => array(
 						'title' => $txt['mlist_menu_view'],
-						'href' => $scripturl . '?action=mlist',
+						'href' => $scripturl . '?action=memberlist',
 						'show' => true,
 					),
 					'mlist_search' => array(
 						'title' => $txt['mlist_search'],
-						'href' => $scripturl . '?action=mlist;sa=search',
+						'href' => $scripturl . '?action=memberlist;sa=search',
 						'show' => true,
 						'is_last' => true,
 					),

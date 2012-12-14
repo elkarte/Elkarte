@@ -102,7 +102,7 @@ function saveDraft(&$post_errors)
 		else
 			$post_errors[] = 'draft_not_saved';
 	}
-	
+
 	// cleanup
 	unset($_POST['save_draft']);
 

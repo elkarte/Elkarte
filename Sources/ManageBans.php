@@ -25,7 +25,7 @@ if (!defined('DIALOGO'))
  * Ban center. The main entrance point for all ban center functions.
  * It is accesssed by ?action=admin;area=ban.
  * It choses a function based on the 'sa' parameter, like many others.
- * The default sub-action is BanList().
+ * The default sub-action is action_list().
  * It requires the ban_members permission.
  * It initializes the admin tabs.
  *
@@ -41,11 +41,11 @@ function Ban()
 
 	$subActions = array(
 		'add' => 'BanEdit',
-		'browse' => 'BanBrowseTriggers',
-		'edittrigger' => 'BanEditTrigger',
+		'browse' => 'action_browse',
+		'edittrigger' => 'action_edittrigger',
 		'edit' => 'BanEdit',
-		'list' => 'BanList',
-		'log' => 'BanLog',
+		'list' => 'action_list',
+		'log' => 'action_log',
 	);
 
 	call_integration_hook('integrate_manage_bans', array($subActions));
@@ -99,7 +99,7 @@ function Ban()
  *
  * @uses the main ManageBans template.
  */
-function BanList()
+function action_list()
 {
 	global $txt, $context, $ban_request, $ban_counts, $scripturl;
 	global $user_info, $smcFunc, $sourcedir;
@@ -1042,7 +1042,7 @@ function BanEdit()
  *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
  *  - uses the ban_edit_trigger sub template of ManageBans.
  */
-function BanEditTrigger()
+function action_edittrigger()
 {
 	global $context, $smcFunc;
 
@@ -1131,7 +1131,7 @@ function BanEditTrigger()
  *
  * @uses ManageBans template, browse_triggers sub template.
  */
-function BanBrowseTriggers()
+function action_browse()
 {
 	global $modSettings, $context, $scripturl, $smcFunc, $txt;
 	global $sourcedir, $settings;
@@ -1414,7 +1414,7 @@ function list_getNumBanTriggers($trigger_type)
  *  - allows sorting of several columns.
  *  - also handles deletion of (a selection of) log entries.
  */
-function BanLog()
+function action_log()
 {
 	global $scripturl, $context, $smcFunc, $sourcedir, $txt;
 	global $context;

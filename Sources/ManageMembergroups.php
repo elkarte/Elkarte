@@ -40,7 +40,7 @@ function ModifyMembergroups()
 		'delete' => array('DeleteMembergroup', 'manage_membergroups'),
 		'edit' => array('EditMembergroup', 'manage_membergroups'),
 		'index' => array('MembergroupIndex', 'manage_membergroups'),
-		'members' => array('MembergroupMembers', 'manage_membergroups', 'Groups.php'),
+		'members' => array('action_groupmembers', 'manage_membergroups', 'Groups.php'),
 		'settings' => array('ModifyMembergroupsettings', 'admin_forum'),
 	);
 
@@ -119,9 +119,9 @@ function MembergroupIndex()
 
 						// Add a help option for moderator and administrator.
 						if ($rowData[\'id_group\'] == 1)
-							$group_name .= sprintf(\' (<a href="%1$s?action=helpadmin;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
 						elseif ($rowData[\'id_group\'] == 3)
-							$group_name .= sprintf(\' (<a href="%1$s?action=helpadmin;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
 
 						return $group_name;
 					'),

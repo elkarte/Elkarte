@@ -29,7 +29,7 @@ if (!defined('DIALOGO'))
  * - Is accessed via ?action=viewquery.
  * - Strings in this function have not been internationalized.
  */
-function ViewQuery()
+function action_viewquery()
 {
 	global $scripturl, $user_info, $settings, $context, $db_connection, $modSettings, $boarddir, $smcFunc, $txt, $db_show_debug;
 

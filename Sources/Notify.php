@@ -31,7 +31,7 @@ if (!defined('DIALOGO'))
  *
  * @uses Notify template, main sub-template
  */
-function Notify()
+function action_notify()
 {
 	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $smcFunc;
 
@@ -91,7 +91,7 @@ function Notify()
  *
  * @uses Notify template, notify_board sub-template.
  */
-function BoardNotify()
+function action_notifyboard()
 {
 	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $smcFunc;
 
@@ -152,10 +152,10 @@ function BoardNotify()
  * Upon successful completion of action will direct user back to topic.
  * Accessed via ?action=disregardtopic.
  */
-function TopicDisregard()
+function action_disregardtopic()
 {
 	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
-	
+
 	// our topic functions are here
 	require_once($sourcedir . '/Subs-Topic.php');
 

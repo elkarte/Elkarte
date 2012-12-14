@@ -30,7 +30,7 @@ if (!defined('DIALOGO'))
  *  @uses the protocol_login sub-template in the Wireless template,
  *   if you are using a wireless device
  */
-function Login()
+function action_login()
 {
 	global $txt, $context, $scripturl, $user_info;
 
@@ -76,7 +76,7 @@ function Login()
  * - accessed from ?action=login2, by forms.
  * On error, uses the same templates Login() uses.
  */
-function Login2()
+function action_login2()
 {
 	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
 	global $cookiename, $maintenance, $modSettings, $context, $sc, $sourcedir;
@@ -568,7 +568,7 @@ function DoLogin()
  * @param bool $internal if true, it doesn't check the session
  * @param $redirect
  */
-function Logout($internal = false, $redirect = true)
+function action_logout($internal = false, $redirect = true)
 {
 	global $sourcedir, $user_info, $user_settings, $context, $modSettings, $smcFunc;
 

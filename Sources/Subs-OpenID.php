@@ -252,7 +252,7 @@ function openID_removeAssociation($handle)
 /**
  * Callback action handler for OpenID
  */
-function OpenIDReturn()
+function action_openidreturn()
 {
 	global $smcFunc, $user_info, $user_profile, $sourcedir, $modSettings, $context, $sc, $user_settings;
 
@@ -358,7 +358,7 @@ function OpenIDReturn()
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
 			require_once($sourcedir . '/Register.php');
-			return Register2(true);
+			return action_register2(true);
 		}
 		else
 			redirectexit('action=register');

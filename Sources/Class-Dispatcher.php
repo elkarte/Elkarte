@@ -49,7 +49,7 @@ class site_Dispatcher
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
 			'file' => $sourcedir . '/BoardIndex.php',
-			'function' => 'BoardIndex'
+			'function' => 'action_boardindex'
 		);
 
 		// Maintenance mode: you're out of here unless you're admin
@@ -59,7 +59,7 @@ class site_Dispatcher
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
 				$this->_file_name = $sourcedir . '/LogInOut.php';
-				$this->_function_name = $_GET['action'] == 'login2' ? 'Login2' : 'Logout';
+				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
@@ -107,83 +107,85 @@ class site_Dispatcher
 			return;
 
 		// Start with our nice and cozy err... *cough*
-		// $_GET['action'] => array($file, $function).
+		// Format:
+		// $_GET['action'] => array($file, $function)
+		// $_GET['action'] => array($file, $class, $method)
 		$actionArray = array(
-			'activate' => array('Register.php', 'Activate'),
+			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
-			'announce' => array('Post.php', 'AnnounceTopic'),
-			'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
-			'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
-			'calendar' => array('Calendar.php', 'CalendarMain'),
-			'collapse' => array('BoardIndex.php', 'CollapseCategory'),
-			'contact' => array('Register.php', 'ContactForm'),
-			'coppa' => array('Register.php', 'CoppaForm'),
-			'credits' => array('Who.php', 'Credits'),
-			'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
-			'dlattach' => array('Attachment.php', 'Download'),
-			'disregardtopic' => array('Notify.php', 'TopicDisregard'),
-			'editpoll' => array('Poll.php', 'EditPoll'),
-			'editpoll2' => array('Poll.php', 'EditPoll2'),
-			'emailuser' => array('SendTopic.php', 'EmailUser'),
-			'findmember' => array('Subs-Auth.php', 'JSMembers'),
-			'groups' => array('Groups.php', 'Groups'),
-			'help' => array('Help.php', 'ShowHelp'),
-			'helpadmin' => array('Help.php', 'ShowAdminHelp'),
-			'jsmodify' => array('Post.php', 'JavaScriptModify'),
-			'jsoption' => array('Themes.php', 'SetJavaScript'),
-			'loadeditorlocale' => array('Subs-Editor.php', 'loadLocale'),
-			'lock' => array('Topic.php', 'LockTopic'),
-			'lockvoting' => array('Poll.php', 'LockVoting'),
-			'login' => array('LogInOut.php', 'Login'),
-			'login2' => array('LogInOut.php', 'Login2'),
-			'logout' => array('LogInOut.php', 'Logout'),
-			'markasread' => array('Subs-Boards.php', 'MarkRead'),
+			// 'announce' => array('Announce.php', 'action_announce'),
+			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
+			'buddy' => array('Members.php', 'action_buddy'),
+			'calendar' => array('Calendar.php', 'action_calendar'),
+			'collapse' => array('BoardIndex.php', 'action_collapse'),
+			'contact' => array('Register.php', 'action_contact'),
+			'coppa' => array('Register.php', 'action_coppa'),
+			'credits' => array('Who.php', 'action_credits'),
+			'deletemsg' => array('RemoveTopic.php', 'action_deletemsg'),
+			'dlattach' => array('Attachment.php', 'action_dlattach'),
+			'disregardtopic' => array('Notify.php', 'action_disregardtopic'),
+			'editpoll' => array('Poll.php', 'action_editpoll'),
+			'editpoll2' => array('Poll.php', 'action_editpoll2'),
+			// 'emailuser' => array('Emailuser.php', 'action_emailuser'),
+			'findmember' => array('Members.php', 'action_findmember'),
+			'groups' => array('Groups.php', 'action_groups'),
+			'help' => array('Help.php', 'action_help'),
+			'quickhelp' => array('Help.php', 'action_quickhelp'),
+			'jsmodify' => array('Post.php', 'action_jsmodify'),
+			'jsoption' => array('Themes.php', 'action_jsoption'),
+			'loadeditorlocale' => array('Subs-Editor.php', 'action_loadlocale'),
+			'lock' => array('Topic.php', 'action_lock'), // done
+			'lockvoting' => array('Poll.php', 'action_lockvoting'),
+			'login' => array('LogInOut.php', 'action_login'),
+			'login2' => array('LogInOut.php', 'action_login2'),
+			'logout' => array('LogInOut.php', 'action_logout'),
+			'markasread' => array('Markasread.php', 'action_markasread'),
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
-			'mlist' => array('Memberlist.php', 'Memberlist'),
-			'moderate' => array('ModerationCenter.php', 'ModerationMain'),
-			'modifykarma' => array('Karma.php', 'ModifyKarma'),
-			'movetopic' => array('MoveTopic.php', 'MoveTopic'),
-			'movetopic2' => array('MoveTopic.php', 'MoveTopic2'),
-			'notify' => array('Notify.php', 'Notify'),
-			'notifyboard' => array('Notify.php', 'BoardNotify'),
-			'openidreturn' => array('Subs-OpenID.php', 'OpenIDReturn'),
-			'pm' => array('PersonalMessage.php', 'MessageMain'),
-			'post' => array('Post.php', 'Post'),
-			'post2' => array('Post.php', 'Post2'),
-			'printpage' => array('Printpage.php', 'PrintTopic'),
+			'memberlist' => array('Memberlist.php', 'pre_memberlist'),
+			'moderate' => array('ModerationCenter.php', 'action_modcenter'),
+			'karma' => array('Karma.php', 'action_karma'),
+			'movetopic' => array('MoveTopic.php', 'action_movetopic'),
+			'movetopic2' => array('MoveTopic.php', 'action_movetopic2'),
+			'notify' => array('Notify.php', 'action_notify'),
+			'notifyboard' => array('Notify.php', 'action_notifyboard'),
+			'openidreturn' => array('Subs-OpenID.php', 'action_openidreturn'),
+			'pm' => array('PersonalMessage.php', 'action_pm'),
+			'post' => array('Post.php', 'action_post'),
+			'post2' => array('Post.php', 'action_post2'),
+			'printpage' => array('Topic.php', 'action_printpage'), // done
 			'profile' => array('Profile.php', 'ModifyProfile'),
-			'quotefast' => array('Post.php', 'QuoteFast'),
-			'quickmod' => array('MessageIndex.php', 'QuickModeration'),
-			'quickmod2' => array('Display.php', 'QuickInTopicModeration'),
-			'recent' => array('Recent.php', 'RecentPosts'),
-			'register' => array('Register.php', 'Register'),
-			'register2' => array('Register.php', 'Register2'),
-			'reminder' => array('Reminder.php', 'RemindMe'),
-			'removepoll' => array('Poll.php', 'RemovePoll'),
-			'removetopic2' => array('RemoveTopic.php', 'RemoveTopic2'),
-			'reporttm' => array('SendTopic.php', 'ReportToModerator'),
-			'requestmembers' => array('Subs-Auth.php', 'RequestMembers'),
-			'restoretopic' => array('RemoveTopic.php', 'RestoreTopic'),
-			'search' => array('Search.php', 'PlushSearch1'),
-			'search2' => array('Search.php', 'PlushSearch2'),
-			'sendtopic' => array('SendTopic.php', 'EmailUser'),
-			'suggest' => array('Subs-Editor.php', 'AutoSuggestHandler'),
-			'spellcheck' => array('Subs-Post.php', 'SpellCheck'),
-			'splittopics' => array('SplitTopics.php', 'SplitTopics'),
-			'stats' => array('Stats.php', 'DisplayStats'),
-			'sticky' => array('Topic.php', 'Sticky'),
-			'theme' => array('Themes.php', 'ThemesMain'),
-			'trackip' => array('Profile-View.php', 'trackIP'),
-			'unread' => array('Recent.php', 'UnreadTopics'),
-			'unreadreplies' => array('Recent.php', 'UnreadTopics'),
-			'verificationcode' => array('Register.php', 'VerificationCode'),
+			'quotefast' => array('Post.php', 'action_quotefast'),
+			'quickmod' => array('MessageIndex.php', 'action_quickmod'),
+			'quickmod2' => array('Display.php', 'action_quickmod2'),
+			'recent' => array('Recent.php', 'action_recent'),
+			'register' => array('Register.php', 'action_register'),
+			'register2' => array('Register.php', 'action_register2'),
+			// 'reminder' => array('Reminder.php', ''),
+			'removepoll' => array('Poll.php', 'action_removepoll'),
+			'removetopic2' => array('RemoveTopic.php', 'action_removetopic2'),
+			'reporttm' => array('Emailuser.php', 'action_reporttm'),
+			'requestmembers' => array('Members.php', 'action_requestmembers'),
+			'restoretopic' => array('RemoveTopic.php', 'action_restoretopic'),
+			'search' => array('Search.php', 'action_plushsearch1'),
+			'search2' => array('Search.php', 'action_plushsearch2'),
+			// 'sendtopic' => array('Emailuser.php', 'action_sendtopic'),
+			'suggest' => array('Suggest.php', 'action_suggest'),
+			'spellcheck' => array('Subs-Post.php', 'action_spellcheck'),
+			'splittopics' => array('SplitTopics.php', 'action_splittopics'),
+			'stats' => array('Stats.php', 'action_stats'),
+			'sticky' => array('Topic.php', 'action_sticky'), // done
+			'theme' => array('Themes.php', 'action_thememain'),
+			'trackip' => array('ProfileHistory.php', 'action_trackip'),
+			'unread' => array('Recent.php', 'action_unread'),
+			'unreadreplies' => array('Recent.php', 'action_unread'),
+			'verificationcode' => array('Register.php', 'action_verificationcode'),
 			'viewprofile' => array('Profile.php', 'ModifyProfile'),
-			'vote' => array('Poll.php', 'Vote'),
-			'viewquery' => array('ViewQuery.php', 'ViewQuery'),
-			'viewsmfile' => array('Admin.php', 'DisplayAdminFile'),
-			'who' => array('Who.php', 'Who'),
-			'.xml' => array('News.php', 'ShowXmlFeed'),
-			'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
+			'vote' => array('Poll.php', 'action_vote'),
+			'viewquery' => array('ViewQuery.php', 'action_viewquery'),
+			'viewadminfile' => array('Admin.php', 'action_viewadminfile'),
+			'who' => array('Who.php', 'action_who'), // done
+			'.xml' => array('News.php', 'action_showfeed'),
+			'xmlhttp' => array('Xml.php', 'action_xmlhttp'),
 		);
 
 		// allow to extend or change $actionArray through a hook
@@ -192,15 +194,34 @@ class site_Dispatcher
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
-			$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
-			$this->_function_name = $actionArray[$_GET['action']][1];
+			// is it an object oriented controller?
+			if (isset($actionArray[$_GET['action']][2]))
+			{
+				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_controller_name = $actionArray[$_GET['action']][1];
+
+				// if the method is coded in, use it
+				if (!empty($actionArray[$_GET['action']][2]))
+					$this->_function_name = $actionArray[$_GET['action']][2];
+				// otherwise fall back to naming patterns
+				elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+					$this->_function_name = 'action_' . $_GET['sa'];
+				else
+					$this->_function_name = 'action_index';
+			}
+			// then it's one of our legacy functions
+			else
+			{
+				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_function_name = $actionArray[$_GET['action']][1];
+			}
 		}
 		// fall back to naming patterns.
 		// add-ons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// i.e. action=help => Help.php...
-			// if the function name fits the pattern, that'd be 'index'...
+			// if the function name fits the pattern, that'd be 'show'...
 			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
 			{
 				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
@@ -265,6 +286,8 @@ class site_Dispatcher
 	 */
 	public function dispatch()
 	{
+		global $sourcedir;
+
 		require_once ($this->_file_name);
 
 		if (!empty($this->_controller_name))
@@ -275,17 +298,18 @@ class site_Dispatcher
 			if (method_exists($controller, 'pre_dispatch'))
 				$controller->pre_dispatch();
 
+			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
-			elseif (method_exists($this->controller, 'index'))
-				$controller->index();
+			elseif (method_exists($this->controller, 'action_index'))
+				$controller->action_index();
 			// fall back
 			else
 			{
 				// things went pretty bad, huh?
 				// board index :P
 				require_once($sourcedir . '/BoardIndex.php');
-				return 'BoardIndex';
+				return 'action_boardindex';
 			}
 		}
 		else
