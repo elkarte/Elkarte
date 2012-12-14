@@ -43,7 +43,7 @@ function action_managemail()
 	$context['sub_template'] = 'show_settings';
 
 	$subActions = array(
-		'browse' => 'action_browse',
+		'browse' => 'action_browsemail',
 		'clear' => 'action_clear',
 		'settings' => 'ModifyMailSettings',
 	);
@@ -68,7 +68,7 @@ function action_managemail()
 /**
  * Display the mail queue...
  */
-function action_browse()
+function action_browsemail()
 {
 	global $scripturl, $context, $modSettings, $txt, $smcFunc;
 	global $sourcedir;
@@ -409,7 +409,7 @@ function action_clear()
 		pauseMailQueueClear();
 	}
 
-	return action_browse();
+	return action_browsemail();
 }
 
 /**
