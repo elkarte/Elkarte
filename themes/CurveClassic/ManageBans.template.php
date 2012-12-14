@@ -20,7 +20,7 @@ function template_ban_edit()
 
 	echo '
 	<div id="manage_bans">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=ban;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="if (this.ban_name.value == \'\') {alert(\'', $txt['ban_name_empty'], '\'); return false;} if (this.partial_ban.checked &amp;&amp; !(this.cannot_post.checked || this.cannot_register.checked || this.cannot_login.checked)) {alert(\'', $txt['ban_restriction_empty'], '\'); return false;}">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=ban;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirmBan(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['ban']['is_new'] ? $txt['ban_add_new'] : $txt['ban_edit'] . ' \'' . $context['ban']['name'] . '\'', '
@@ -192,6 +192,7 @@ function template_ban_edit()
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-bet_token_var'], '" value="', $context['admin-bet_token'], '" />
 			</div>
+		</div>
 		</form>';
 
 	if (!$context['ban']['is_new'] && empty($context['ban_suggestions']))
@@ -203,7 +204,6 @@ function template_ban_edit()
 
 	echo '
 	</div>
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var fUpdateStatus = function ()
 		{
@@ -235,7 +235,21 @@ function template_ban_edit()
 		}
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');';
 
-	echo '// ]]></script>';
+	echo '
+		function confirmBan(aForm)
+		{
+			if (aForm.ban_name.value == \'\')
+			{
+				alert(\'', $txt['ban_name_empty'], '\');
+				return false;
+			}
+
+			if (aForm.partial_ban.checked && !(aForm.cannot_post.checked || aForm.cannot_register.checked || aForm.cannot_login.checked))
+			{
+				alert(\'', $txt['ban_restriction_empty'], '\');
+				return false;
+			}
+		}// ]]></script>';
 }
 
 function template_ban_edit_trigger()
