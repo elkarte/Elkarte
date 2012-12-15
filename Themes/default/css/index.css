@@ -2070,7 +2070,7 @@ div#pollmoderation {
 	border: none;
 }
 .poster .dropmenu>li.sfhover>ul, .poster .dropmenu>li:hover>ul  {
-	top: 3em;
+	top: 100%;
 	float: none;
 	left: 0;
 	padding: 6px 0.5em 4px  0.5em;
@@ -2496,7 +2496,7 @@ ul.post_options li {
 	margin: -1px 0 0 0;
 	padding: 10px;
 }
-#postAttachment2 {
+#postAttachment, #postAttachment2 {
 	overflow: hidden;
 }
 #postAttachment dd, #postAttachment2 dd {
