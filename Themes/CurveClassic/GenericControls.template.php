@@ -100,7 +100,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					echo '||';
 			}
 
-
 			echo '",';
 		}
 		else
@@ -114,11 +113,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_context['rich_active'] ? '' : '
 				$("#' . $editor_id . '").data("sceditor").setTextMode();', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
-					$(".sceditor-button-source").hide();
-				', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
+					$(".sceditor-button-source").hide();',
+				isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
 				$(".sceditor-container").find("textarea").each(function() {$(this).css({border: "1px solid red"})});
-				$(".sceditor-container").find("iframe").each(function() {$(this).css({border: "1px solid red"})});' : '', '
-			});';
+				$(".sceditor-container").find("iframe").each(function() {$(this).css({border: "1px solid red"})});' : '',
+			'});';
 
 		// Now for backward compatibility let's collect few infos in the good ol' style
 		echo '
