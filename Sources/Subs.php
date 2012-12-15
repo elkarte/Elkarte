@@ -2462,8 +2462,6 @@ function parsesmileys(&$message)
  */
 function highlight_php_code($code)
 {
-	global $context;
-
 	// Remove special characters.
 	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'DIALOGO_TAB();', '&#91;' => '[')));
 
