@@ -1030,11 +1030,9 @@ function template_edit_style()
 					', $txt['theme_edit_no_save'], ': ', $context['allow_save_filename'], '<br />';
 
 	echo '
-					<textarea name="entire_file" cols="80" rows="20" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . '; font-family: monospace; margin-top: 1ex; white-space: pre;" onkeyup="setPreviewTimeout();" onchange="refreshPreview(true);">', $context['entire_file'], '</textarea><br />
-					<div class="padding righttext">
-						<input type="submit" name="save" value="', $txt['theme_edit_save'], '"', $context['allow_save'] ? '' : ' disabled="disabled"', ' style="margin-top: 1ex;" class="button_submit" />
-						<input type="button" value="', $txt['themeadmin_edit_preview'], '" onclick="refreshPreview(false);" class="button_submit" />
-					</div>
+					<textarea name="entire_file" cols="80" rows="20" class="edit_file" onkeyup="setPreviewTimeout();" onchange="refreshPreview(true);">', $context['entire_file'], '</textarea><br />
+					<input type="submit" name="save" value="', $txt['theme_edit_save'], '"', $context['allow_save'] ? '' : ' disabled="disabled"', ' class="button_submit" />
+					<input type="button" value="', $txt['themeadmin_edit_preview'], '" onclick="refreshPreview(false);" class="button_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="filename" value="', $context['edit_filename'], '" />
@@ -1083,11 +1081,9 @@ function template_edit_template()
 					</div>';
 
 	echo '
-					<div class="padding righttext">
-						<input type="submit" name="save" value="', $txt['theme_edit_save'], '"', $context['allow_save'] ? '' : ' disabled="disabled"', ' class="button_submit" />
-						<input type="hidden" name="filename" value="', $context['edit_filename'], '" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</div>
+					<input type="submit" name="save" value="', $txt['theme_edit_save'], '"', $context['allow_save'] ? '' : ' disabled="disabled"', ' class="button_submit" />
+					<input type="hidden" name="filename" value="', $context['edit_filename'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
 		</form>

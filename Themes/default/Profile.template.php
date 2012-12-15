@@ -701,6 +701,7 @@ function template_editIgnoreList()
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
+						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit floatnone" />
 					</dd>
 				</dl>';
 
@@ -710,7 +711,6 @@ function template_editIgnoreList()
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit" />
 			</div>
 		</div>
 	</form>
@@ -718,8 +718,8 @@ function template_editIgnoreList()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
+			sSessionId: smf_session_id,
+			sSessionVar: smf_session_var,
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
@@ -1894,9 +1894,7 @@ function template_groupMembership()
 
 		if ($context['can_edit_primary'])
 			echo '
-			<div class="padding righttext">
-				<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />
-			</div>';
+			<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />';
 
 		// Any groups they can join?
 		if (!empty($context['groups']['available']))

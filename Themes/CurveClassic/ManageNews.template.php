@@ -174,8 +174,8 @@ function template_email_members()
 		});
 		var oExcludeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
+			sSessionId: smf_session_id,
+			sSessionVar: smf_session_var,
 			sSuggestId: \'exclude_members\',
 			sControlId: \'exclude_members\',
 			sSearchType: \'member\',
