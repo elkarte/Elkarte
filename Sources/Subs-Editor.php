@@ -1193,7 +1193,6 @@ function legalise_bbc($text)
 						$inlineElements[$elementContent] = $tag;
 					}
 				}
-
 			}
 
 			// Closing tag.
@@ -1463,6 +1462,9 @@ function create_control_richedit($editorOptions)
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
 
+	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
+	loadLanguage('Drafts');
+
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
@@ -1509,7 +1511,7 @@ function create_control_richedit($editorOptions)
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
 		</form>';
-	loadJavascriptFile('spellcheck.js', array('validate' => true, 'defer' => true));
+			loadJavascriptFile('spellcheck.js', array('validate' => true, 'defer' => true));
 		}
 	}
 
