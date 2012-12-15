@@ -1875,52 +1875,71 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * @param array $params
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
- * 	- ['default_theme'] (true/false): force use of default theme url
- * 	- ['force_current'] (true/false): if this is false, we will attempt to load the file from the default theme if not found in the current theme
- *  - ['validate'] (true/false): if true script will validate the local file exists
+ * 	- ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *
  * @param string $id
  */
-function loadCSSFile($filename, $params = array(), $id = '')
+function loadCSSFile($filenames, $params = array(), $id = '')
 {
 	global $settings, $context;
 
+	if (empty($filenames))
+		return;
+
+	if (!is_array($filenames))
+		$filenames = array($filenames);
+
+	// static values for all these settings
 	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
-	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
-	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
+	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
-	// account for shorthand like admin.css?alp21 filenames
-	$has_seed = strpos($filename, '.css?');
-	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 4) : $filename;
-	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
-
-	// Is this a local file?
-	if (strpos($filename, 'http') === false || !empty($params['local']))
+	// Whoa ... we've done this before yes?
+	$cache_name = 'load_css_' . md5($settings['theme_dir'] . implode('_', $filenames));
+	if (($temp = cache_get_data($cache_name, 600)) !== null)
+		$context['css_files'] = $temp;
+	else
 	{
-		$params['local'] = true;
-		$params['dir'] = $settings[$theme . '_dir'] . '/css/';
-		$params['url'] = $settings[$theme . '_url'];
-
-		// Are we validating the the file exists?
-		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/css/' . $filename))
+		// All the files in this group use the parameters as defined above
+		foreach ($filenames as $filename)
 		{
-			// Maybe the default theme has it?
-			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
-			{
-				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['stale']);
-				$params['dir'] = $settings['default_theme_dir'] . '/css/';
-				$params['url'] = $settings['default_theme_url'];
-			}
-			else
-				$filename = false;
-		}
-		else
-			$filename = $settings[$theme . '_url'] . '/css/' . $filename . ($has_seed ? '' : $params['stale']);
-	}
+			// account for shorthand like admin.css?xyz11 filenames
+			$has_cache_staler = strpos($filename, '.css?');
+			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 4) : $filename;
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
-	// Add it to the array for use in the template
-	if (!empty($filename))
-		$context['css_files'][$id] = array('filename' => $filename, 'options' => $params);
+			// Is this a local file?
+			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+			{
+				$params['local'] = true;
+				$params['dir'] = $settings['theme_dir'] . '/css/';
+				$params['url'] = $settings['theme_url'];
+
+				// Fallback if needed?
+				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/css/' . $filename))
+				{
+					// Fallback if we are not already in the default theme
+					if (file_exists($settings['default_theme_dir'] . '/css/' . $filename))
+					{
+						$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+						$params['dir'] = $settings['default_theme_dir'] . '/css/';
+						$params['url'] = $settings['default_theme_url'];
+					}
+					else
+						$filename = false;
+				}
+				else
+					$filename = $settings['theme_url'] . '/css/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+			}
+
+			// Add it to the array for use in the template
+			if (!empty($filename))
+				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+		}
+		
+		// Save this build
+		cache_put_data($cache_name, $context['css_files'], 600);
+	}
 }
 
 /**
@@ -1933,12 +1952,9 @@ function loadCSSFile($filename, $params = array(), $id = '')
  * @param array $params
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
- * 	- ['default_theme'] (true/false): force use of default theme url
  * 	- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- * 	- ['force_current'] (true/false): if this is false, we will attempt to load the file from the
- *    default theme if not found in the current theme
+ * 	- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
  *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- *  - ['validate'] (true/false): if true script will validate the local file exists
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
  * @param string $id
@@ -1949,48 +1965,58 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 
 	if (empty($filenames))
 		return;
-		
+
 	if (!is_array($filenames))
 		$filenames = array($filenames);
-		
+
 	// static values for all these files
 	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
-	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
-	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
+	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
-	// All the files in this group use the same parameters
-	foreach ($filenames as $filename)
+	// dejvu?
+	$cache_name = 'load_js_' . md5($settings['theme_dir'] . implode('_', $filenames));
+	if (($temp = cache_get_data($cache_name, 600)) !== null)
+		$context['javascript_files'] = $temp;
+	else
 	{
-		// account for shorthand like admin.js?alp21 filenames
-		$has_seed = strpos($filename, '.js?');
-		$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
-		$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
-
-		// Is this a local file?
-		if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+		// All the files in this group use the above parameters
+		foreach ($filenames as $filename)
 		{
-			$params['local'] = true;
-			$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
-
-			// Are we validating it exists on disk?
-			if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
+			// account for shorthand like admin.js?xyz11 filenames
+			$has_cache_staler = strpos($filename, '.js?');
+			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 3) : $filename;
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
+			
+			// Is this a local file?
+			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
 			{
-				// can't find it in this theme, how about the default?
-				if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
+				$params['local'] = true;
+				$params['dir'] = $settings['theme_dir'] . '/scripts/';
+				
+				// Fallback if we are not already in the default theme
+				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
 				{
-					$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['stale']);
-					$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+					// can't find it in this theme, how about the default?
+					if (file_exists($settings['default_theme_dir'] . '/scripts/' . $filename))
+					{
+						$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+						$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+					}
+					else
+						$filename = false;
 				}
 				else
-					$filename = false;
+					$filename = $settings['theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
 			}
-			else
-				$filename = $settings[$theme . '_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['stale']);
-		}
 
-		// Add it to the array for use in the template
-		if (!empty($filename))
-			$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+			// Add it to the array for use in the template
+			if (!empty($filename)) {
+				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+			}
+		}
+		
+		// Save it so we don't have to build this so often
+		cache_put_data($cache_name, $context['javascript_files'], 600);
 	}
 }
 
