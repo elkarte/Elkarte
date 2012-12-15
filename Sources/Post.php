@@ -1675,10 +1675,12 @@ function action_post2()
 	{
 		$attachIDs = array();
 		$attach_errors = array();
+		$error_count = 0;
+
 		if (!empty($context['we_are_history']))
 			$attach_errors[] = '<dd>' . $txt['error_temp_attachments_flushed'] . '<br /><br /></dd>';
 
-		foreach ($_SESSION['temp_attachments'] as  $attachID => $attachment)
+		foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 		{
 			if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 				continue;
@@ -1693,6 +1695,7 @@ function action_post2()
 				break;
 			}
 
+			// Load the attachmentOptions array with the data needed to create an attachement
 			$attachmentOptions = array(
 				'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
 				'poster' => $user_info['id'],
@@ -1700,11 +1703,12 @@ function action_post2()
 				'tmp_name' => $attachment['tmp_name'],
 				'size' => isset($attachment['size']) ? $attachment['size'] : 0,
 				'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-				'id_folder' => $attachment['id_folder'],
+				'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
 				'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
 				'errors' => $attachment['errors'],
 			);
 
+			// No errors, then try to create the attachment
 			if (empty($attachment['errors']))
 			{
 				if (createAttachment($attachmentOptions))
@@ -1714,14 +1718,13 @@ function action_post2()
 						$attachIDs[] = $attachmentOptions['thumb'];
 				}
 			}
+			// We have errors on this file, build out the issues for display to the user
 			else
-				$attach_errors[] = '<dt>&nbsp;</dt>';
-
-			if (!empty($attachmentOptions['errors']))
 			{
 				// Sort out the errors for display and delete any associated files.
 				$attach_errors[] = '<dt>' . vsprintf($txt['attach_warning'], $attachment['name']) . '</dt>';
 				$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
+
 				foreach ($attachmentOptions['errors'] as $error)
 				{
 					if (!is_array($error))
@@ -1733,6 +1736,12 @@ function action_post2()
 					else
 						$attach_errors[] = '<dd>' . vsprintf($txt[$error[0]], $error[1]) . '</dd>';
 				}
+
+				// a format spacer between file error blocks if needed.
+				if ($error_count > 0)
+					$attach_errors[] = '<dt>&nbsp;</dt>';
+				$error_count++;
+
 				if (file_exists($attachment['tmp_name']))
 					unlink($attachment['tmp_name']);
 			}
