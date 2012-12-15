@@ -44,7 +44,7 @@ function AdminMain()
 	// Some preferences.
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
-	// Define all the menu structure - see Subs-Menu.php for details!
+	// Define the menu structure - see Subs-Menu.php for details!
 	$admin_areas = array(
 		'forum' => array(
 			'title' => $txt['admin_main'],

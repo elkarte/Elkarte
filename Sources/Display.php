@@ -78,9 +78,7 @@ function Display()
 		{
 			$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
 			$includeStickies = !empty($modSettings['enableStickyTopics']);
-
 			$topic = $_REQUEST['prev_next'] === 'prev' ? getPreviousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : getNextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
-
 			$context['current_topic'] = $topic;
 		}
 
@@ -92,7 +90,6 @@ function Display()
 	if (!$user_info['possibly_robot'] && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
 	{
 		increaseViewCounter($topic);
-
 		$_SESSION['last_read_topic'] = $topic;
 	}
 
@@ -964,7 +961,6 @@ function Display()
 	$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 	$context['can_mark_unread'] = !$user_info['is_guest'] && $settings['show_mark_read'];
 	$context['can_disregard'] = !$user_info['is_guest'] && $modSettings['enable_disregard'];
-
 	$context['can_send_topic'] = (!$modSettings['postmod_active'] || $topicinfo['approved']) && allowedTo('send_topic');
 	$context['can_print'] = empty($modSettings['disable_print_topic']);
 

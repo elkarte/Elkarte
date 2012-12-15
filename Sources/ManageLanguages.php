@@ -94,7 +94,7 @@ function AddLanguage()
 				),
 				'description' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_desc'],
+						'value' => $txt['add_language_dialogo_desc'],
 					),
 					'data' => array(
 						'db' => 'description',
@@ -102,7 +102,7 @@ function AddLanguage()
 				),
 				'version' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_version'],
+						'value' => $txt['add_language_dialogo_version'],
 					),
 					'data' => array(
 						'db' => 'version',
@@ -110,7 +110,7 @@ function AddLanguage()
 				),
 				'utf8' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_utf8'],
+						'value' => $txt['add_language_dialogo_utf8'],
 					),
 					'data' => array(
 						'db' => 'utf8',
@@ -118,7 +118,7 @@ function AddLanguage()
 				),
 				'install_link' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_install'],
+						'value' => $txt['add_language_dialogo_install'],
 						'class' => 'centercol',
 					),
 					'data' => array(
@@ -178,7 +178,7 @@ function list_getLanguagesList()
 				'version' => $file->fetch('version'),
 				'utf8' => $file->fetch('utf8') ? $txt['yes'] : $txt['no'],
 				'description' => $file->fetch('description'),
-				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_smf_install'] . '</a>',
+				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_dialogo_install'] . '</a>',
 			);
 		}
 		if (empty($smf_languages))

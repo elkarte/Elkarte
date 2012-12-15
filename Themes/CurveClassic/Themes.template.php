@@ -17,7 +17,7 @@
 // The main sub template - for theme administration.
 function template_main()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -101,7 +101,7 @@ function template_main()
 			</div>
 		</form>';
 
-	// Link to simplemachines.org for latest themes and info!
+	// Link to github for latest themes and info!
 	echo '
 		<br />
 		<div class="cat_bar">
@@ -135,7 +135,6 @@ function template_main()
 					<dl class="settings">';
 
 	// Here's a little box for installing a new theme.
-	// @todo Should the value="theme_gz" be there?!
 	if ($context['can_create_new'])
 		echo '
 						<dt>

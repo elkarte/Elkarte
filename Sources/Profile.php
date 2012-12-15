@@ -78,7 +78,7 @@ function ModifyProfile($post_errors = array())
 				string $custom_url:	Optional href for area.
 				string $function:	Function to execute for this section.
 				bool $enabled:		Should area be shown?
-				string $sc:		Session check validation to do on save - note without this save will get unset - if set.
+				string $sc:			Session check validation to do on save - note without this save will get unset - if set.
 				bool $hidden:		Does this not actually appear on the menu?
 				bool $password:		Whether to require the user's password in order to save the data in the area.
 				array $subsections:	Array of subsections, in order of appearance.

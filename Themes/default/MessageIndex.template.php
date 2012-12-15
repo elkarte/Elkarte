@@ -201,7 +201,7 @@ function template_main()
 					<th scope="col" class="lefttext last_th" width="22%">', $context['topics_headers']['last_post'], '</th>';
 			else
 				echo '
-					<th scope="col" class="lefttext" width="22%">', $context['topics_headers']['last_post'], '</a></th>';
+					<th scope="col" class="lefttext" width="22%">', $context['topics_headers']['last_post'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)

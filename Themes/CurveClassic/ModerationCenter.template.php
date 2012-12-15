@@ -68,8 +68,7 @@ function template_latest_news()
 			</div>
 		</div>';
 
-	// This requires a lot of javascript...
-	// @todo Put this in it's own file!!
+	// This requires javascript...
 	echo '
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
