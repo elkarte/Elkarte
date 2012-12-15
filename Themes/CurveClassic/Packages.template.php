@@ -386,7 +386,7 @@ function template_view_package()
 	// ]]></script>';
 
 	// And a bit more for database changes.
-	if (!empty($context['database_changes']))
+	if ($context['uninstalling'] && !empty($context['database_changes']))
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var database_changes_area = document.getElementById(\'db_changes_div\');
