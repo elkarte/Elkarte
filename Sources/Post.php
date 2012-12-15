@@ -463,22 +463,30 @@ function action_post($post_errors = array())
 		// Only show the preview stuff if they hit Preview.
 		if (($really_previewing === true || isset($_REQUEST['xml'])) && !isset($_REQUEST['save_draft']))
 		{
-			// Set up the preview message and subject and censor them...
+			// Set up the preview message and subject
 			$context['preview_message'] = $form_message;
 			preparsecode($form_message, true);
-			preparsecode($context['preview_message']);
 
-			// Do all bulletin board code tags, with or without smileys.
+			// Do all bulletin board code thing on the message
+			preparsecode($context['preview_message']);
 			$context['preview_message'] = parse_bbc($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 			censorText($context['preview_message']);
 
-			if ($form_subject != '')
+			// Dont forget the subject
+			$context['preview_subject'] = $form_subject;
+			censorText($context['preview_subject']);
+
+			// Any errors we should tell them about?
+			if ($form_subject === '')
 			{
-				$context['preview_subject'] = $form_subject;
-				censorText($context['preview_subject']);
-			}
-			else
+				$post_errors[] = 'no_subject';
 				$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
+			}
+
+			if ($context['preview_message'] === '')
+				$post_errors[] = 'no_message';
+			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
+				$post_errors[] = 'long_message';
 
 			// Protect any CDATA blocks.
 			if (isset($_REQUEST['xml']))
@@ -970,7 +978,7 @@ function action_post($post_errors = array())
 		$post_errors[] = 'need_qr_verification';
 
 	/*
-	 * There are two error types: serious and miinor. Serious errors
+	 * There are two error types: serious and minor. Serious errors
 	 * actually tell the user that a real error has occurred, while minor
 	 * errors are like warnings that let them know that something with
 	 * their post isn't right.
