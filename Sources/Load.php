@@ -1695,11 +1695,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	);
 
 	// Queue our Javascript
-	loadJavascriptFile(
-		array('smf_jquery_plugins.js', 'script.js'),
-		array('default_theme' => true)
-	);
-	loadJavascriptFile('theme.js', array(), 'theme_scripts');
+	loadJavascriptFile(array('smf_jquery_plugins.js', 'script.js', 'theme.js'));
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -1769,15 +1765,18 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
 
-	// Do any style sheets first, cause we're easy with those.
-	$style_sheets += array('index');
-
 	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 	if (!empty($context['theme_variant']))
-		$style_sheets += array($context['theme_variant']);
+		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
+	else
+		$default_sheets = array('index.css');
+	loadCSSFile($default_sheets);
 
-	foreach ($style_sheets as $sheet)
-		loadCSSFile($sheet . '.css', array(), $sheet);
+	// Any specific template sheets we may have
+	if (!empty($style_sheets))
+		loadCSSFile(
+			array(implode('.css,', $style_sheets) . '.css')
+		);
 
 	// No template to load?
 	if ($template_name === false)

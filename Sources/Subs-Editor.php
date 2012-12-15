@@ -1481,10 +1481,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(
-			array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'),
-			array('default_theme' => true)
-		);
+		loadJavascriptFile(array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'));
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
@@ -1497,7 +1494,7 @@ function create_control_richedit($editorOptions)
 
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.js', array('default_theme' => true));
+			loadJavascriptFile('drafts.js');
 
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
 
@@ -1511,7 +1508,7 @@ function create_control_richedit($editorOptions)
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
 		</form>';
-			loadJavascriptFile('spellcheck.js', array('validate' => true, 'defer' => true));
+			loadJavascriptFile('spellcheck.js', array('defer' => true));
 		}
 	}
 
@@ -1964,7 +1961,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		// Some javascript ma'am?
 		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			loadJavascriptFile('captcha.js', array('validate' => true));
+			loadJavascriptFile('captcha.js');
 
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 

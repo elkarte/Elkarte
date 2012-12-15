@@ -2302,7 +2302,7 @@ function action_quotefast()
 	if (!isset($_REQUEST['xml']))
 	{
 		loadTemplate('Post');
-		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
+		loadJavascriptFile('post.js', array(), 'post_scripts');
 	}
 
 	include_once($sourcedir . '/Subs-Post.php');

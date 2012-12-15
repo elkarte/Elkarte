@@ -43,10 +43,8 @@ function action_pm()
 	require_once($sourcedir . '/Subs-PersonalMessage.php');
 
 	loadLanguage('PersonalMessage+Drafts');
-	loadJavascriptFile(
-		array('PersonalMessage.js', 'suggest.js'),
-		array('default_theme' => true)
-	);
+
+	loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('PersonalMessage');
