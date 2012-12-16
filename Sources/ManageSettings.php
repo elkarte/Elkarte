@@ -1388,7 +1388,8 @@ function ShowCustomProfiles()
 	$context['sub_template'] = 'show_custom_profile';
 
 	// What about standard fields they can tweak?
-	$standard_fields = array('icq', 'msn', 'aim', 'yim', 'location', 'gender', 'website', 'posts', 'warning_status');
+	$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
+	
 	// What fields can't you put on the registration page?
 	$context['fields_no_registration'] = array('posts', 'warning_status');
 
@@ -1621,7 +1622,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	if ($standardFields)
 	{
-		$standard_fields = array('icq', 'msn', 'aim', 'yim', 'location', 'gender', 'website', 'posts', 'warning_status');
+		$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
 		$fields_no_registration = array('posts', 'warning_status');
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
@@ -1710,7 +1711,7 @@ function EditCustomProfiles()
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['field_type'] == 'textarea')
-				@list ($rows, $cols) = @explode(',', $row['default_value']);
+				@list ($rows, $cols) = explode(',', $row['default_value']);
 			else
 			{
 				$rows = 3;
@@ -1823,6 +1824,7 @@ function EditCustomProfiles()
 
 				// Otherwise, save it boy.
 				$field_options .= $v . ',';
+				
 				// This is just for working out what happened with old options...
 				$newOptions[$k] = $v;
 
@@ -1833,7 +1835,7 @@ function EditCustomProfiles()
 			$field_options = substr($field_options, 0, -1);
 		}
 
-		// Text area has default has dimensions
+		// Text area by default has dimensions
 		if ($_POST['field_type'] == 'textarea')
 			$default = (int) $_POST['rows'] . ',' . (int) $_POST['cols'];
 
@@ -1843,11 +1845,11 @@ function EditCustomProfiles()
 			$colname = $smcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
 			preg_match('~([\w\d_-]+)~', $colname, $matches);
 
-			// If there is nothing to the name, then let's start out own - for foreign languages etc.
+			// If there is nothing to the name, then let's start our own - for foreign languages etc.
 			if (isset($matches[1]))
 				$colname = $initial_colname = 'cust_' . strtolower($matches[1]);
 			else
-				$colname = $initial_colname = 'cust_' . mt_rand(1, 999);
+				$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
 
 			// Make sure this is unique.
 			// @todo This may not be the most efficient way to do this.
@@ -1896,6 +1898,7 @@ function EditCustomProfiles()
 			{
 				$optionChanges = array();
 				$takenKeys = array();
+
 				// Work out what's changed!
 				foreach ($context['field']['options'] as $k => $option)
 				{
@@ -1933,7 +1936,7 @@ function EditCustomProfiles()
 			// @todo Maybe we should adjust based on new text length limits?
 		}
 
-		// Do the insertion/updates.
+		// Updating an existing field?
 		if ($context['fid'])
 		{
 			$smcFunc['db_query']('', '
@@ -1982,6 +1985,7 @@ function EditCustomProfiles()
 					)
 				);
 		}
+		// Otherwise creating a new one
 		else
 		{
 			$smcFunc['db_insert']('',
@@ -2066,8 +2070,8 @@ function EditCustomProfiles()
 				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
 				'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
 				'type' => $row['field_type'],
-				'bbc' => $row['bbc'] ? '1' : '0',
-				'placement' => !empty($row['placement']) ? $row['placement'] : '0',
+				'bbc' => $row['bbc'] ? 1 : 0,
+				'placement' => !empty($row['placement']) ? $row['placement'] : 0,
 				'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
 			);
 		}
