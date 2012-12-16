@@ -25,7 +25,7 @@ if (!defined('DIALOGO'))
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.
- * Used by VerificationCode() (Register.php).
+ * Used by action_verificationcode() (Register.php).
  *
  * @param string $word
  * @return boolean false on failure

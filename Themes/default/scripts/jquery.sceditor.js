@@ -279,8 +279,10 @@
 		initEditor = function () {
 			var $doc, $body;
 
-			$sourceEditor  = $('<textarea></textarea>').hide();
-			$wysiwygEditor = $('<iframe frameborder="0"></iframe>');
+			$sourceEditor	= $('<textarea></textarea>').attr('tabindex', $original.attr('tabindex')).hide();
+			$wysiwygEditor	= $('<iframe frameborder="0"></iframe>').attr('tabindex', $original.attr('tabindex'));
+			//$sourceEditor  = $('<textarea></textarea>').hide();
+			//$wysiwygEditor = $('<iframe frameborder="0"></iframe>');
 
 			if(window.location.protocol === "https:")
 				$wysiwygEditor.attr("src", "javascript:false");

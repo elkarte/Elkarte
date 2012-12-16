@@ -939,7 +939,7 @@ function ssi_boardStats($output_method = 'echo')
 		return $totals;
 
 	echo '
-		', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a><br />
+		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br />
 		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br />
 		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br />
 		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br />

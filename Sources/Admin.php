@@ -25,6 +25,7 @@ if (!defined('DIALOGO'))
  * It initialises all the basic context required for the admin center.
  * It passes execution onto the relevant admin section.
  * If the passed section is not found it shows the admin home page.
+ * Accessed by ?action=admin.
  */
 function AdminMain()
 {
@@ -33,7 +34,7 @@ function AdminMain()
 	// Load the language and templates....
 	loadLanguage('Admin');
 	loadTemplate('Admin', 'admin');
-	loadJavascriptFile('admin.js', array('default_theme' => true), 'admin.js');
+	loadJavascriptFile('admin.js', array(), 'admin_script');
 
 	// No indexing evil stuff.
 	$context['robot_no_index'] = true;
@@ -43,7 +44,7 @@ function AdminMain()
 	// Some preferences.
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
-	// Define all the menu structure - see Subs-Menu.php for details!
+	// Define the menu structure - see Subs-Menu.php for details!
 	$admin_areas = array(
 		'forum' => array(
 			'title' => $txt['admin_main'],
@@ -171,7 +172,7 @@ function AdminMain()
 				'current_theme' => array(
 					'label' => $txt['theme_current_settings'],
 					'file' => 'Themes.php',
-					'function' => 'ThemesMain',
+					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_current_theme',
@@ -179,7 +180,7 @@ function AdminMain()
 				'theme' => array(
 					'label' => $txt['theme_admin'],
 					'file' => 'Themes.php',
-					'function' => 'ThemesMain',
+					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_themes',
@@ -439,7 +440,7 @@ function AdminMain()
 				'mailqueue' => array(
 					'label' => $txt['mailqueue_title'],
 					'file' => 'ManageMail.php',
-					'function' => 'ManageMail',
+					'function' => 'action_managemail',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_mail',
 					'subsections' => array(
@@ -473,7 +474,7 @@ function AdminMain()
 				'repairboards' => array(
 					'label' => $txt['admin_repair'],
 					'file' => 'RepairBoards.php',
-					'function' => 'RepairBoards',
+					'function' => 'action_repairboards',
 					'select' => 'maintain',
 					'hidden' => true,
 				),
@@ -563,7 +564,7 @@ function AdminHome()
 
 	// Load the credits stuff.
 	require_once($sourcedir . '/Who.php');
-	Credits(true);
+	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.
 	$context['time_format'] = urlencode($user_info['time_format']);
@@ -655,8 +656,9 @@ function AdminHome()
 
 /**
  * Get admin information from the database.
+ * Accessed by ?action=viewadminfile.
  */
-function DisplayAdminFile()
+function action_viewadminfile()
 {
 	global $context, $modSettings, $smcFunc;
 
@@ -763,7 +765,8 @@ function AdminSearchInternal()
 		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
 	);
 
-	// This is a special array of functions that contain setting data - we query all these to simply pull all setting bits!
+	// This is a special array of functions that contain setting data
+	// - we query all these to simply pull all setting bits!
 	$settings_search = array(
 		array('ModifyCoreFeatures', 'area=corefeatures'),
 		array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
@@ -774,8 +777,8 @@ function AdminSearchInternal()
 		array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
 		array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
 		array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
-		array('ManageAttachmentSettings', 'area=manageattachments;sa=attachments'),
-		array('ManageAvatarSettings', 'area=manageattachments;sa=avatars'),
+		array('action_attachments', 'area=manageattachments;sa=attachments'),
+		array('action_avatars', 'area=manageattachments;sa=avatars'),
 		array('ModifyCalendarSettings', 'area=managecalendar;sa=settings'),
 		array('EditBoardSettings', 'area=manageboards;sa=settings'),
 		array('ModifyMailSettings', 'area=mailqueue;sa=settings'),
@@ -968,9 +971,9 @@ function AdminLogs()
 	// These are the logs they can load.
 	$log_functions = array(
 		'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
-		'adminlog' => array('Modlog.php', 'ViewModlog'),
-		'modlog' => array('Modlog.php', 'ViewModlog', 'disabled' => !in_array('ml', $context['admin_features'])),
-		'banlog' => array('ManageBans.php', 'BanLog'),
+		'adminlog' => array('Modlog.php', 'action_modlog'),
+		'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
+		'banlog' => array('ManageBans.php', 'action_log'),
 		'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 		'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
 		'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),

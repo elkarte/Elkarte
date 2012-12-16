@@ -28,7 +28,7 @@ if (!defined('DIALOGO'))
  * requires the view_stats permission.
  * accessed from ?action=stats.
  */
-function DisplayStats()
+function action_stats()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc;
 
@@ -638,7 +638,7 @@ function DisplayStats()
 
 /**
  * Loads the statistics on a daily basis in $context.
- * called by DisplayStats().
+ * called by action_stats().
  * @param string $condition_string
  * @param array $condition_parameters = array()
  */

@@ -646,8 +646,8 @@ function template_group_members()
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
+				sSessionId: smf_session_id,
+				sSessionVar: smf_session_var,
 				sSuggestId: \'to_suggest\',
 				sControlId: \'toAdd\',
 				sSearchType: \'member\',

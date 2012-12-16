@@ -26,7 +26,7 @@ if (!defined('DIALOGO'))
  * Redirects to the board when completed.
  * Called for ?action=removetopic2
  */
-function RemoveTopic2()
+function action_removetopic2()
 {
 	global $user_info, $topic, $board, $sourcedir, $smcFunc, $context, $modSettings;
 
@@ -84,7 +84,7 @@ function RemoveTopic2()
  * On completion redirect to the topic or to the board.
  * Called for ?action=deletemsg
  */
-function DeleteMessage()
+function action_deletemsg()
 {
 	global $user_info, $topic, $board, $modSettings, $smcFunc;
 
@@ -663,10 +663,11 @@ function removeMessage($message, $decreasePostCount = true)
 }
 
 /**
- * Move back a topic from the recycle board to its original board.
+ * Move back a topic or post from the recycle board to its original board.
+ * Merges back the posts to the original as necessary.
  * Called for ?action=restoretopic
  */
-function RestoreTopic()
+function action_restoretopic()
 {
 	global $context, $smcFunc, $modSettings, $sourcedir;
 

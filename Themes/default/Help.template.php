@@ -89,10 +89,8 @@ function template_find_members()
 					<span class="smalltext"><label for="buddies"><input type="checkbox" class="input_check" name="buddies" id="buddies"', !empty($context['buddy_search']) ? ' checked="checked"' : '', ' /> ', $txt['find_buddies'], '</label></span><br />';
 
 	echo '
-					<div class="padding righttext">
-						<input type="submit" value="', $txt['search'], '" class="button_submit" />
-						<input type="button" value="', $txt['find_close'], '" onclick="window.close();" class="button_submit" />
-					</div>
+					<input type="submit" value="', $txt['search'], '" class="button_submit" />
+					<input type="button" value="', $txt['find_close'], '" onclick="window.close();" class="button_submit" />
 				</div>
 			</div>
 			<br />
@@ -170,7 +168,7 @@ function template_manual()
 
 	echo '
 					</ul>
-					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=credits'), '</p>
+					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=who;sa=credits'), '</p>
 				</div>
 			</div>';
 }

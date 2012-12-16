@@ -18,6 +18,16 @@
  */
 
 /**
+ * The default action is to download an attachment.
+ * This allows ?action=attachment to be forwarded to action_dlattach()
+ */
+function action_attachment()
+{
+	// default action to execute
+	action_dlattach();
+}
+
+/**
  * Downloads an attachment or avatar, and increments the download count.
  * It requires the view_attachments permission. (not for avatars!)
  * It disables the session parser, and clears any previous output.
@@ -25,7 +35,7 @@
  * It is accessed via the query string ?action=dlattach.
  * Views to attachments and avatars do not increase hits and are not logged in the "Who's Online" log.
  */
-function Download()
+function action_dlattach()
 {
 	global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc;
 
@@ -206,4 +216,3 @@ function Download()
 
 	obExit(false);
 }
-

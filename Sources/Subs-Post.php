@@ -294,7 +294,7 @@ function un_preparsecode($message)
  */
 function fixTags(&$message)
 {
-	global $modSettings;
+	global $modSettings, $sourcedir;
 
 	// WARNING: Editing the below can cause large security holes in your forum.
 	// Edit only if you are sure you know what you are doing.
@@ -520,7 +520,7 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
  * It has problems with internationalization.
  * It is accessed via ?action=spellcheck.
  */
-function SpellCheck()
+function action_spellcheck()
 {
 	global $txt, $context, $smcFunc;
 

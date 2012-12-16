@@ -18,7 +18,7 @@ function template_print_above()
 {
 	global $context, $txt, $topic, $scripturl;
 
-	$url_text = $scripturl . '?action=printpage;topic=' . $topic . '.0';
+	$url_text = $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0';
 	$url_images = $url_text . ';images';
 
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -174,7 +174,7 @@ function template_print_below()
 {
 	global $topic, $txt, $scripturl;
 
-	$url_text = $scripturl . '?action=printpage;topic=' . $topic . '.0';
+	$url_text = $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0';
 	$url_images = $url_text . ';images';
 
 	echo '

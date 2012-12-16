@@ -421,63 +421,6 @@ function SelectMailingMembers()
 }
 
 /**
- * Prepare subject and message of an email for the preview box
- * Used in ComposeMailing and RetrievePreview (Xml.php)
- */
-function prepareMailingForPreview ()
-{
-	global $context, $smcFunc, $modSettings, $scripturl, $user_info, $txt;
-	loadLanguage('Errors');
-
-	$processing = array('preview_subject' => 'subject', 'preview_message' => 'message');
-
-	// Use the default time format.
-	$user_info['time_format'] = $modSettings['time_format'];
-
-	$variables = array(
-		'{$board_url}',
-		'{$current_time}',
-		'{$latest_member.link}',
-		'{$latest_member.id}',
-		'{$latest_member.name}'
-	);
-
-	$html = $context['send_html'];
-
-	// We might need this in a bit
-	$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
-
-	foreach ($processing as $key => $post)
-	{
-		$context[$key] = !empty($_REQUEST[$post]) ? $_REQUEST[$post] : '';
-
-		if (empty($context[$key]) && empty($_REQUEST['xml']))
-			$context['post_error']['messages'][] = $txt['error_no_' . $post];
-		elseif (!empty($_REQUEST['xml']))
-			continue;
-
-		preparsecode($context[$key]);
-		if ($html)
-		{
-			$enablePostHTML = $modSettings['enablePostHTML'];
-			$modSettings['enablePostHTML'] = $context['send_html'];
-			$context[$key] = parse_bbc($context[$key]);
-			$modSettings['enablePostHTML'] = $enablePostHTML;
-		}
-
-		// Replace in all the standard things.
-		$context[$key] = str_replace($variables,
-			array(
-				!empty($context['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
-				timeformat(forum_time(), false),
-				!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
-				$modSettings['latestMember'],
-				$cleanLatestMember
-			), $context[$key]);
-	}
-}
-
-/**
  * Shows a form to edit a forum mailing and its recipients.
  * Called by ?action=admin;area=news;sa=mailingcompose.
  * Requires the send_mail permission.
@@ -516,7 +459,7 @@ function ComposeMailing()
 
 	if (isset($context['preview']))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 		$context['recipients']['members'] = !empty($_POST['members']) ? explode(',', $_POST['members']) : array();
 		$context['recipients']['exclude_members'] = !empty($_POST['exclude_members']) ? explode(',', $_POST['exclude_members']) : array();
 		$context['recipients']['groups'] = !empty($_POST['groups']) ? explode(',', $_POST['groups']) : array();

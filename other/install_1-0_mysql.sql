@@ -1936,11 +1936,10 @@ VALUES (1, 'Google', 'googlebot', ''),
 	(21, 'Omgili', 'omgilibot', ''),
 	(22, 'EntireWeb', 'Speedy Spider', ''),
 	(23, 'Yandex', 'YandexBot', ''),
-	(24, 'Yandex', 'YandexImages', ''),
-	(25, 'Yandex', 'YandexVideo', ''),
-	(26, 'Yandex', 'YandexBlogs', ''),
-	(27, 'Yandex', 'YandexMedia', ''),
-	(28, 'Yandex', 'YandexBot', '');
+	(24, 'Yandex (Images)', 'YandexImages', ''),
+	(25, 'Yandex (Video)', 'YandexVideo', ''),
+	(26, 'Yandex (Blogs)', 'YandexBlogs', ''),
+	(27, 'Yandex (Media)', 'YandexMedia', '');
 
 #
 # Table structure for table `subscriptions`

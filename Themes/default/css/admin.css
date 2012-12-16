@@ -990,7 +990,7 @@ ul.theme_options li {
 	background: url(../images/admin/boards.png) no-repeat;
 }
 .edit_file {
-	width: 96%;
+	width: 100%;
 	font-family: monospace;
 	margin-top: 1ex;
 	white-space: pre;

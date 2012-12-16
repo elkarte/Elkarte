@@ -45,9 +45,11 @@ function MessageIndex()
 	}
 
 	loadTemplate('MessageIndex');
-
+	loadJavascriptFile('topic.js');
+	
 	$context['name'] = $board_info['name'];
 	$context['description'] = $board_info['description'];
+	
 	// How many topics do we have in total?
 	$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
@@ -670,7 +672,7 @@ function MessageIndex()
  * Allows for moderation from the message index.
  * @todo refactor this...
  */
-function QuickModeration()
+function action_quickmod()
 {
 	global $sourcedir, $board, $user_info, $modSettings, $smcFunc, $context;
 
@@ -715,10 +717,6 @@ function QuickModeration()
 	}
 	else
 	{
-		/**
-		 * @todo Ugly. There's no getting around this, is there?
-		 * @todo Maybe just do this on the actions people want to use?
-		 */
 		$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
 
 		$redirect_url = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');

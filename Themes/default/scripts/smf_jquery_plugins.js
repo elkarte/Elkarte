@@ -7,15 +7,6 @@
  *   prevent any default browser actions
  * - attempts to keep the tooltip on screen
  *
- * Simple Machines Forum (SMF)
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
- *
  */
  
 (function($) {
@@ -220,7 +211,6 @@
 
  /*
   * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING. KTHNX.
-  * SMF Dev copy - Antechinus - 20th October 2011.
   * Code has been tweaked to give responsive menus without compromising a11y.
   * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
   * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
@@ -237,9 +227,9 @@
 	$.fn.hoverIntent = function(f,g) {
 		// default configuration options
 		var cfg = {
-			sensitivity: 7,
-			interval: 100,
-			timeout: 0
+			sensitivity: 8,
+			interval: 50,
+			timeout: 1
 		};
 		// override configuration options with user supplied object
 		cfg = $.extend(cfg, g ? { over: f, out: g } : f );
@@ -375,7 +365,7 @@
 			var s = this.serial = sf.o.length;
 			var o = $.extend({},sf.defaults,op);
 			var h = $.extend({},sf.hoverdefaults,{over: over, out: out},op);
-			
+
 			o.$path = $('li.'+o.pathClass,this).slice(0,o.pathLevels).each(function(){
 				$(this).addClass([o.hoverClass,c.bcClass].join(' '))
 					.filter('li:has(ul)').removeClass(o.pathClass);
@@ -410,9 +400,9 @@
 		hoverClass	: 'sfhover',
 		pathClass	: 'current',
 		pathLevels	: 1,
-		delay		: 700,
+		delay		: 600,
 		animation	: {opacity:'show', height:'show'},
-		speed		: 300,
+		speed		: 200,
 		disableHI	: false,		// Leave as false. True disables hoverIntent detection (not good).
 		onInit		: function(){}, // callback functions
 		onBeforeShow: function(){},
@@ -420,8 +410,8 @@
 		onHide		: function(){}
 	};
 	sf.hoverdefaults = {
-		sensitivity : 10,
-		interval    : 40,
+		sensitivity : 8,
+		interval    : 50,
 		timeout     : 1
 	};
 	$.fn.extend({

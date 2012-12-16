@@ -25,15 +25,15 @@ if (!defined('DIALOGO'))
  * It allows moderators and users to access the group showing functions.
  * It handles permission checks, and puts the moderation bar on as required.
  */
-function Groups()
+function action_groups()
 {
 	global $context, $txt, $scripturl, $sourcedir, $user_info;
 
 	// The sub-actions that we can do. Format "Function Name, Mod Bar Index if appropriate".
 	$subActions = array(
-		'index' => array('GroupList', 'view_groups'),
-		'members' => array('MembergroupMembers', 'view_groups'),
-		'requests' => array('GroupRequests', 'group_requests'),
+		'index' => array('action_grouplist', 'view_groups'),
+		'members' => array('action_groupmembers', 'view_groups'),
+		'requests' => array('action_grouprequests', 'group_requests'),
 	);
 
 	// Default to sub action 'index' or 'settings' depending on permissions.
@@ -49,7 +49,7 @@ function Groups()
 	{
 		require_once($sourcedir . '/ModerationCenter.php');
 		$_GET['area'] = $_REQUEST['sa'] == 'requests' ? 'groups' : 'viewgroups';
-		ModerationMain(true);
+		action_modcenter(true);
 	}
 	// Otherwise add something to the link tree, for normal people.
 	else
@@ -69,7 +69,7 @@ function Groups()
 /**
  * This very simply lists the groups, nothing snazy.
  */
-function GroupList()
+function action_grouplist()
 {
 	global $txt, $context, $sourcedir;
 
@@ -296,7 +296,7 @@ function list_getGroupCount()
  * @uses ManageMembergroups template, group_members sub template.
  * @todo: use createList
  */
-function MembergroupMembers()
+function action_groupmembers()
 {
 	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $smcFunc;
 
@@ -544,7 +544,7 @@ function MembergroupMembers()
 /**
  * Show and manage all group requests.
  */
-function GroupRequests()
+function action_grouprequests()
 {
 	global $txt, $context, $scripturl, $user_info, $sourcedir, $smcFunc, $modSettings, $language;
 

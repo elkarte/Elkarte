@@ -44,18 +44,18 @@ function ManageAttachments()
 
 	// If they want to delete attachment(s), delete them. (otherwise fall through..)
 	$subActions = array(
-		'attachments' => 'ManageAttachmentSettings',
-		'attachpaths' => 'ManageAttachmentPaths',
-		'avatars' => 'ManageAvatarSettings',
-		'browse' => 'BrowseFiles',
-		'byAge' => 'RemoveAttachmentByAge',
-		'bySize' => 'RemoveAttachmentBySize',
-		'maintenance' => 'MaintainFiles',
-		'moveAvatars' => 'MoveAvatars',
-		'repair' => 'RepairAttachments',
-		'remove' => 'RemoveAttachment',
-		'removeall' => 'RemoveAllAttachments',
-		'transfer' => 'TransferAttachments',
+		'attachments' => 'action_attachments',
+		'attachpaths' => 'action_attachpaths',
+		'avatars' => 'action_avatars',
+		'browse' => 'action_browse',
+		'byAge' => 'action_byAge',
+		'bySize' => 'action_bySize',
+		'maintenance' => 'action_maintenance',
+		'moveAvatars' => 'action_moveAvatars',
+		'repair' => 'action_repair',
+		'remove' => 'action_remove',
+		'removeall' => 'action_removeall',
+		'transfer' => 'action_transfer',
 	);
 
 	call_integration_hook('integrate_manage_attachments', array($subActions));
@@ -89,7 +89,7 @@ function ManageAttachments()
  * @uses 'attachments' sub template.
  */
 
-function ManageAttachmentSettings($return_config = false)
+function action_attachments($return_config = false)
 {
 	global $txt, $modSettings, $scripturl, $context, $options, $sourcedir, $boarddir;
 
@@ -275,7 +275,7 @@ function ManageAttachmentSettings($return_config = false)
  * @param bool $return_config = false
  * @uses 'avatars' sub template.
  */
-function ManageAvatarSettings($return_config = false)
+function action_avatars($return_config = false)
 {
 	global $txt, $context, $modSettings, $sourcedir, $scripturl;
 
@@ -370,7 +370,7 @@ function ManageAvatarSettings($return_config = false)
  *
  *  @uses the 'browse' sub template
  */
-function BrowseFiles()
+function action_browse()
 {
 	global $context, $txt, $scripturl, $options, $modSettings;
 	global $smcFunc, $sourcedir;
@@ -665,7 +665,7 @@ function list_getNumFiles($browse_type)
  *
  * @uses the 'maintain' sub template.
  */
-function MaintainFiles()
+function action_maintenance()
 {
 	global $context, $modSettings, $txt, $smcFunc, $sourcedir;
 
@@ -735,9 +735,9 @@ function MaintainFiles()
 
 /**
  * Move avatars from their current location, to the custom_avatar_dir folder.
- * Called from the maintenance screen by ?action=admin;area=manageattachments;sa=moveAvatars.
+ * Called from the maintenance screen by ?action=admin;area=manageattachments;sa=action_moveAvatars.
  */
-function MoveAvatars()
+function action_moveAvatars()
 {
 	global $modSettings, $smcFunc;
 
@@ -794,7 +794,7 @@ function MoveAvatars()
  *  were removed from.
  *  @todo refactor this silly superglobals use...
  */
-function RemoveAttachmentByAge()
+function action_byAge()
 {
 	global $modSettings, $smcFunc, $sourcedir;
 
@@ -838,7 +838,7 @@ function RemoveAttachmentByAge()
  * Optionally adds a certain text to the messages the attachments were
  * 	removed from.
  */
-function RemoveAttachmentBySize()
+function action_bySize()
 {
 	global $modSettings, $smcFunc, $sourcedir;
 
@@ -870,7 +870,7 @@ function RemoveAttachmentBySize()
  * Called from the browse screen as submitted form by
  *  ?action=admin;area=manageattachments;sa=remove
  */
-function RemoveAttachment()
+function action_remove()
 {
 	global $txt, $smcFunc, $language, $sourcedir;
 
@@ -919,7 +919,7 @@ function RemoveAttachment()
  * Called from the maintenance screen by
  *  ?action=admin;area=manageattachments;sa=removeall.
  */
-function RemoveAllAttachments()
+function action_removeall()
 {
 	global $txt, $smcFunc, $sourcedir;
 
@@ -951,7 +951,7 @@ function RemoveAllAttachments()
 /**
  * This function should find attachments in the database that no longer exist and clear them, and fix filesize issues.
  */
-function RepairAttachments()
+function action_repair()
 {
 	global $modSettings, $context, $txt, $smcFunc;
 
@@ -1559,8 +1559,9 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 
 /**
  * Called from a mouse click, works out what we want to do with attachments and actions it.
+ * Accessed by ?action=attachapprove
  */
-function ApproveAttach()
+function action_attachapprove()
 {
 	global $smcFunc, $sourcedir;
 
@@ -1598,6 +1599,7 @@ function ApproveAttach()
 	if (empty($attachments))
 		fatal_lang_error('no_access', false);
 
+	// @todo nb: this requires permission to approve posts, not manage attachments
 	// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
 	$allowed_boards = boardsAllowedTo('approve_posts');
 
@@ -1649,7 +1651,7 @@ function ApproveAttach()
 /**
  * This function lists and allows updating of multiple attachments paths.
  */
-function ManageAttachmentPaths()
+function action_attachpaths()
 {
 	global $modSettings, $scripturl, $context, $txt, $sourcedir, $boarddir, $smcFunc;
 
@@ -2332,7 +2334,7 @@ function attachDirStatus($dir, $expected_files)
 /**
  * Maintance function to move attachments from one directory to another
  */
-function TransferAttachments()
+function action_transfer()
 {
 	global $modSettings, $context, $smcFunc, $sourcedir, $txt, $boarddir;
 

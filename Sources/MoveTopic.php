@@ -29,7 +29,7 @@ if (!defined('DIALOGO'))
  *
  * @uses the MoveTopic template, main sub-template.
  */
-function MoveTopic()
+function action_movetopic()
 {
 	global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $sourcedir, $modSettings;
 
@@ -136,7 +136,7 @@ function MoveTopic()
 
 /**
  * Execute the move of a topic.
- * It is called on the submit of MoveTopic.
+ * It is called on the submit of action_movetopic.
  * This function logs that topics have been moved in the moderation log.
  * If the member is the topic starter requires the move_own permission,
  * otherwise requires the move_any permission.
@@ -145,7 +145,7 @@ function MoveTopic()
  *
  * @uses Subs-Post.php.
  */
-function MoveTopic2()
+function action_movetopic2()
 {
 	global $txt, $board, $topic, $scripturl, $sourcedir, $modSettings, $context;
 	global $board, $language, $user_info, $smcFunc;

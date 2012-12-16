@@ -151,7 +151,7 @@ function template_main()
 	// If it is displaying the result of a search show a "search again" link to edit their criteria.
 	if (isset($context['old_search']))
 		echo '
-			<a class="button_link" href="', $scripturl, '?action=mlist;sa=search;search=', $context['old_search_value'], '">', $txt['mlist_search_again'], '</a>';
+			<a class="button_link" href="', $scripturl, '?action=memberlist;sa=search;search=', $context['old_search_value'], '">', $txt['mlist_search_again'], '</a>';
 	echo '
 		</div>
 	</div>';
@@ -165,7 +165,7 @@ function template_search()
 
 	// Start the submission form for the search!
 	echo '
-	<form action="', $scripturl, '?action=mlist;sa=search" method="post" accept-charset="', $context['character_set'], '">
+	<form action="', $scripturl, '?action=memberlist;sa=search" method="post" accept-charset="', $context['character_set'], '">
 		<div id="memberlist">
 			<div class="pagesection">
 				', template_button_strip($context['memberlist_buttons'], 'right'), '

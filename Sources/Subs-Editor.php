@@ -1193,7 +1193,6 @@ function legalise_bbc($text)
 						$inlineElements[$elementContent] = $tag;
 					}
 				}
-
 			}
 
 			// Closing tag.
@@ -1322,7 +1321,7 @@ function sort_array_length($a, $b)
 /**
  * Creates the javascript code for localization of the editor (SCEditor)
  */
-function loadLocale()
+function action_loadlocale()
 {
 	global $context, $txt, $editortxt, $modSettings;
 
@@ -1463,6 +1462,9 @@ function create_control_richedit($editorOptions)
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
 
+	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
+	loadLanguage('Drafts');
+
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
@@ -1479,10 +1481,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(
-			array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'),
-			array('default_theme' => true)
-		);
+		loadJavascriptFile(array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'));
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
@@ -1495,7 +1494,7 @@ function create_control_richedit($editorOptions)
 
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.js', array('default_theme' => true));
+			loadJavascriptFile('drafts.js');
 
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
 
@@ -1509,7 +1508,7 @@ function create_control_richedit($editorOptions)
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
 		</form>';
-	loadJavascriptFile('spellcheck.js', array('validate' => true, 'defer' => true));
+			loadJavascriptFile('spellcheck.js', array('defer' => true));
 		}
 	}
 
@@ -1962,7 +1961,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		// Some javascript ma'am?
 		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			loadJavascriptFile('captcha.js', array('validate' => true));
+			loadJavascriptFile('captcha.js');
 
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 
@@ -2165,144 +2164,4 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 	// Say that everything went well chaps.
 	return true;
-}
-
-/**
- * This keeps track of all registered handling functions for auto suggest functionality and passes execution to them.
- * @param bool $checkRegistered = null
- */
-function AutoSuggestHandler($checkRegistered = null)
-{
-	global $context;
-
-	// These are all registered types.
-	$searchTypes = array(
-		'member' => 'Member',
-		'versions' => 'SMFVersions',
-	);
-
-	call_integration_hook('integrate_autosuggest', array($searchTypes));
-
-	// If we're just checking the callback function is registered return true or false.
-	if ($checkRegistered != null)
-		return isset($searchTypes[$checkRegistered]) && function_exists('AutoSuggest_Search_' . $checkRegistered);
-
-	checkSession('get');
-	loadTemplate('Xml');
-
-	// Any parameters?
-	$context['search_param'] = isset($_REQUEST['search_param']) ? unserialize(base64_decode($_REQUEST['search_param'])) : array();
-
-	if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
-	{
-		$function = 'AutoSuggest_Search_' . $searchTypes[$_REQUEST['suggest_type']];
-		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = $function();
-	}
-}
-
-/**
- * Search for a member - by real_name or member_name by default.
- *
- * @return string
- */
-function AutoSuggest_Search_Member()
-{
-	global $user_info, $txt, $smcFunc, $context;
-
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
-	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-	// Find the member.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name
-		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (!empty($context['search_param']['buddies']) ? '
-			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
-		array(
-			'buddy_list' => $user_info['buddies'],
-			'search' => $_REQUEST['search'],
-		)
-	);
-	$xml_data = array(
-		'items' => array(
-			'identifier' => 'item',
-			'children' => array(),
-		),
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
-
-		$xml_data['items']['children'][] = array(
-			'attributes' => array(
-				'id' => $row['id_member'],
-			),
-			'value' => $row['real_name'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $xml_data;
-}
-
-/**
- * Provides a list of possible SMF versions to use in emulation
- *
- * @return string
- */
-function AutoSuggest_Search_SMFVersions()
-{
-
-	$xml_data = array(
-		'items' => array(
-			'identifier' => 'item',
-			'children' => array(),
-		),
-	);
-
-	$versions = array(
-		'SMF 1.1',
-		'SMF 1.1.1',
-		'SMF 1.1.2',
-		'SMF 1.1.3',
-		'SMF 1.1.4',
-		'SMF 1.1.5',
-		'SMF 1.1.6',
-		'SMF 1.1.7',
-		'SMF 1.1.8',
-		'SMF 1.1.9',
-		'SMF 1.1.10',
-		'SMF 1.1.11',
-		'SMF 1.1.12',
-		'SMF 1.1.13',
-		'SMF 1.1.14',
-		'SMF 1.1.15',
-		'SMF 1.1.16',
-		'SMF 2.0 beta 1',
-		'SMF 2.0 beta 1.2',
-		'SMF 2.0 beta 2',
-		'SMF 2.0 beta 3',
-		'SMF 2.0 RC 1',
-		'SMF 2.0 RC 1.2',
-		'SMF 2.0 RC 2',
-		'SMF 2.0 RC 3',
-		'SMF 2.0',
-		'SMF 2.0.1',
-		'SMF 2.0.2',
-		'DIALOGO 1.0',
-	);
-
-	foreach ($versions as $id => $version)
-		if (strpos($version, strtoupper($_REQUEST['search'])) !== false)
-			$xml_data['items']['children'][] = array(
-				'attributes' => array(
-					'id' => $id,
-				),
-				'value' => $version,
-			);
-
-	return $xml_data;
 }

@@ -974,7 +974,7 @@
 
 						for(attr in token.attrs)
 							if(token.attrs.hasOwnProperty(attr))
-								ret.push(' ' + attr + '="' + token.attrs[attr] + '"');
+								ret.push(' ' + attr + '=' + token.attrs[attr] + '');
 					}
 					ret.push(']');
 
