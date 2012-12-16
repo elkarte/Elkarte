@@ -293,3 +293,33 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 			)
 		);
 }
+
+/**
+ * Retrieve how many drafts the given user has.
+ * This function checks for expired lifetime on drafts (they would be removed
+ *  by a scheduled task), and doesn't count those.
+ *
+ * @param int $member_id
+ * @param int $draft_type
+ */
+function draftsCount($member_id, $draft_type)
+{
+	global $modSettings, $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(id_draft)
+		FROM {db_prefix}user_drafts
+		WHERE id_member = {int:id_member}
+			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
+			AND poster_time > {int:time}' : ''),
+		array(
+			'id_member' => $member_id,
+			'draft_type' => $draft_type,
+			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
+		)
+	);
+	list ($msgCount) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $msgCount;
+}
