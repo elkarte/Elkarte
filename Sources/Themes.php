@@ -1928,6 +1928,9 @@ function action_edittheme()
 			// You were able to submit it, so it's reasonable to assume you are allowed to save.
 			$context['allow_save'] = true;
 
+			// Re-create the token so that it can be used
+			createToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']));
+
 			return;
 		}
 	}
