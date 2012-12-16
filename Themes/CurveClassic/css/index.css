@@ -1951,7 +1951,7 @@ p#whoisviewing {
 .poster ul ul li {
 	display: inline;
 }
-.poster li.icons, .poster li.avatar, .poster li.blurb, li.postcount, li.im_icons ul {
+.poster li.icons, .poster li.avatar, .poster li.blurb, li.postcount, li.cf_icons ul {
 	margin-top: 6px;
 }
 .poster li.avatar {

@@ -2096,10 +2096,10 @@ div#pollmoderation {
 	background: none;
 	border: none;
 }
-.poster .dropmenu  li ul li.im_icons, .poster .dropmenu   ul ol li {
+.poster .dropmenu  li ul li.cf_icons, .poster .dropmenu	ul ol li {
 	padding: 3px;
 }
-.poster .dropmenu   ul ol li {
+.poster .dropmenu	ul ol li {
 	display: table-cell;
 }
 .poster .dropmenu  li.postgroup, .poster .dropmenu  li.postcount, .poster .dropmenu  li.karma,

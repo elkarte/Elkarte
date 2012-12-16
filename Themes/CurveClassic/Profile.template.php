@@ -268,7 +268,6 @@ function template_editBuddies()
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
-	$buddy_fields = array('icq', 'aim', 'yim', 'msn');
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
@@ -281,17 +280,10 @@ function template_editBuddies()
 			<tr class="catbg">
 				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
+	
 	if ($context['can_send_email'])
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
-
-	// don't show them if they are disabled
-	foreach ($buddy_fields as $key => $column)
-	{
-		if (!isset($disabled_fields[$column]))
-			echo '
-				<th scope="col">', $txt[$column], '</th>';
-	}
 
 	echo '
 				<th class="last_th" scope="col"></th>
@@ -315,14 +307,6 @@ function template_editBuddies()
 		if ($context['can_send_email'])
 			echo '
 				<td align="center">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
-
-		// If these are off, don't show them
-		foreach ($buddy_fields as $key => $column)
-		{
-			if (!isset($disabled_fields[$column]))
-				echo '
-					<td align="center">', $buddy[$column]['link'], '</td>';
-		}
 
 		echo '
 				<td align="center"><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['buddy_remove'], '" title="', $txt['buddy_remove'], '" /></a></td>
@@ -399,10 +383,6 @@ function template_editIgnoreList()
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
 	echo '
-				<th scope="col">', $txt['icq'], '</th>
-				<th scope="col">', $txt['aim'], '</th>
-				<th scope="col">', $txt['yim'], '</th>
-				<th scope="col">', $txt['msn'], '</th>
 				<th class="last_th" scope="col"></th>
 			</tr>';
 
@@ -424,11 +404,8 @@ function template_editIgnoreList()
 		if ($context['can_send_email'])
 			echo '
 				<td align="center">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
+		
 		echo '
-				<td align="center">', $member['icq']['link'], '</td>
-				<td align="center">', $member['aim']['link'], '</td>
-				<td align="center">', $member['yim']['link'], '</td>
-				<td align="center">', $member['msn']['link'], '</td>
 				<td align="center"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
 			</tr>';
 
@@ -3043,30 +3020,9 @@ function template_profile_block_contact()
 				echo '
 					</dl>';
 			}
-
-			// IM contact details
+			
 			echo '
 					<dl>';
-
-			if (!isset($context['disabled_fields']['icq']) && !empty($context['member']['icq']['link']))
-				echo '
-						<dt><img src="http://status.icq.com/online.png?img=5&amp;icq=', $context['member']['icq']['name'], '" alt="', $txt['icq'], '" /></dt>
-						<dd>', $context['member']['icq']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['aim']) && !empty($context['member']['aim']['link']))
-				echo '
-						<dt><img src="', $settings['images_url'] ,'/aim.png" alt="', $txt['aim'], '" /></dt>
-						<dd>', $context['member']['aim']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['msn']) && !empty($context['member']['msn']['link']))
-				echo '
-						<dt><img src="', $settings['images_url'] ,'/msntalk.png" alt="', $txt['msn'], '" /></dt>
-						<dd>', $context['member']['msn']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['yim']) && !empty($context['member']['yim']['link']))
-				echo '
-						<dt><img src="http://opi.yahoo.com/online?u=', urlencode($context['member']['yim']['link_text']), '&amp;m=g&amp;t=0" alt="', $txt['yim'], '" /></dt>
-						<dd>', $context['member']['yim']['link_text'], '</dd>';
 
 			// Show the email contact info?
 			if ($context['can_send_email'])
@@ -3079,7 +3035,6 @@ function template_profile_block_contact()
 				if ($context['member']['show_email'] == 'yes')
 					echo '
 							<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a>';
-
 				// ... Or if the one looking at the profile is an admin they can see it anyway.
 				elseif ($context['member']['show_email'] == 'yes_permission_override')
 					echo '
