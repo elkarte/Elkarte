@@ -368,22 +368,8 @@ function showProfileDrafts($memID, $draft_type = 0)
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
 		$_REQUEST['viewscount'] = 10;
 
-	// Get the count of applicable drafts on the boards they can (still) see ...
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(id_draft)
-		FROM {db_prefix}user_drafts AS ud
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)
-		WHERE id_member = {int:id_member}
-			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : ''),
-		array(
-			'id_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// Get the count of applicable drafts
+	$msgCount = draftsCount($memID, $draft_type);
 
 	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -513,20 +499,7 @@ function showPMDrafts($memID = -1)
 		$_REQUEST['viewscount'] = 10;
 
 	// Get the count of applicable drafts
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(id_draft)
-		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}
-			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : ''),
-		array(
-			'id_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$msgCount = draftsCount($memID, $draft_type);
 
 	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
