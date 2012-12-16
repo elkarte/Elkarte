@@ -639,18 +639,17 @@ function AdminHome()
 
 	// Lastly, fill in the blanks in the support resources paragraphs.
 	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-		'http://wiki.simplemachines.org/',
-		'http://wiki.simplemachines.org/smf/features2',
-		'http://wiki.simplemachines.org/smf/options2',
-		'http://wiki.simplemachines.org/smf/themes2',
-		'http://wiki.simplemachines.org/smf/packages2'
+		'https://github.com/Spuds/Dialogo/wiki',
+		'https://github.com/Spuds/Dialogo/wiki/features',
+		'https://github.com/Spuds/Dialogo/wiki/options',
+		'https://github.com/Spuds/Dialogo/wiki/themes',
+		'https://github.com/Spuds/Dialogo/wiki/packages'
 	);
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-		'http://www.simplemachines.org/community/',
-		'http://www.simplemachines.org/redirect/english_support',
-		'http://www.simplemachines.org/redirect/international_support_boards',
-		'http://www.simplemachines.org/redirect/smf_support',
-		'http://www.simplemachines.org/redirect/customize_support'
+		'http://www.spudsdesign.com/dialogo/',
+		'http://www.spudsdesign.com/dialogo/redirect/support',
+		'http://www.spudsdesign.com/dialogo/redirect/international_support_boards',
+		'http://www.spudsdesign.com/dialogo/redirect/customize_support'
 	);
 }
 
