@@ -1,5 +1,5 @@
 /**
- * SMFtooltip, Basic JQuery function to provide styled tooltips
+ * SiteTooltip, Basic JQuery function to provide styled tooltips
  *
  * - will use the hoverintent plugin if available
  * - shows the tooltip in a div with the class defined in tooltipClass
@@ -10,21 +10,21 @@
  */
  
 (function($) {
-	$.fn.SMFtooltip = function(oInstanceSettings) {
-		$.fn.SMFtooltip.oDefaultsSettings = {
+	$.fn.SiteTooltip = function(oInstanceSettings) {
+		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
 			hoverIntent: {sensitivity: 10, interval: 300, timeout: 50},
 			positionTop: 12,
 			positionLeft: 12,
-			tooltipID: 'smf_tooltip', // ID used on the outer div
-			tooltipTextID: 'smf_tooltipText', // as above but on the inner div holding the text
+			tooltipID: 'site_tooltip', // ID used on the outer div
+			tooltipTextID: 'site_tooltipText', // as above but on the inner div holding the text
 			tooltipClass: 'tooltip', // The class applied to the outer div (that displays on hover), use this in your css
-			tooltipSwapClass: 'smf_swaptip', // a class only used internally, change only if you have a conflict
+			tooltipSwapClass: 'site_swaptip', // a class only used internally, change only if you have a conflict
 			tooltipContent: 'html' // display captured title text as html or text
 		};
 
 		// account for any user options
-		var oSettings = $.extend({}, $.fn.SMFtooltip.oDefaultsSettings , oInstanceSettings || {});
+		var oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings , oInstanceSettings || {});
 
 		// move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		$(this).each(function()
@@ -113,19 +113,19 @@
 				$(this).hoverIntent({
 					sensitivity: oSettings.hoverIntent.sensitivity,
 					interval: oSettings.hoverIntent.interval,
-					over: smf_tooltip_on,
+					over: site_tooltip_on,
 					timeout: oSettings.hoverIntent.timeout,
-					out: smf_tooltip_off
+					out: site_tooltip_off
 				});
 			}
 			else
 			{
 				// plain old hover it is
-				$(this).hover(smf_tooltip_on, smf_tooltip_off);
+				$(this).hover(site_tooltip_on, site_tooltip_off);
 			}
 			
 			// create the on tip action
-			function smf_tooltip_on(event)
+			function site_tooltip_on(event)
 			{
 				// If we have text in the hidden span element we created on page load
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
@@ -154,7 +154,7 @@
 			};
 			
 			// create the Bye bye tip
-			function smf_tooltip_off(event)
+			function site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
