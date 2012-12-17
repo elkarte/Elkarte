@@ -258,7 +258,7 @@ if (@$modSettings['ourVersion'] < '1.0')
 				(id_group, id_profile, permission, add_deny)
 			VALUES
 				" . implode(',', $inserts));
-				
+
 	// Next we find people who can send PM's, and assume they can save pm_drafts as well
 	$request = upgrade_query("
 		SELECT id_group, add_deny, permission
@@ -280,4 +280,61 @@ if (@$modSettings['ourVersion'] < '1.0')
 				" . implode(',', $inserts));
 }
 ---}
+---#
+
+/******************************************************************************/
+--- Messenger fields
+/******************************************************************************/
+---# Insert new fields
+INSERT INTO `{$db_prefix}custom_fields` 
+	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`) 
+VALUES
+	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1),
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
+	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1),
+	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
+---#
+
+---# Move existing values...
+---{
+// We cannot do this twice
+// @todo this won't work when you upgrade from smf
+if (@$modSettings['ourVersion'] < '1.0')
+{
+	$request = upgrade_query("
+		SELECT id_member, aim, icq, msn, yim
+		FROM {$db_prefix}members");
+	$inserts = array();
+	while ($row = mysql_fetch_assoc($request))
+	{
+		if (!empty($row[aim]))
+			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
+
+		if (!empty($row[icq]))
+			$inserts[] = "($row[id_member], -1, 'cust_icq', $row[icq])";
+
+		if (!empty($row[msn]))
+			$inserts[] = "($row[id_member], -1, 'cust_msn', $row[msn])";
+
+		if (!empty($row[yim]))
+			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
+	}
+	mysql_free_result($request);
+
+	if (!empty($inserts))
+		upgrade_query("
+			INSERT INTO {$db_prefix}themes
+				(id_member, id_theme, variable, value)
+			VALUES
+				" . implode(',', $inserts));
+}
+---}
+---#
+
+---# Drop the old cols
+ALTER TABLE `{$db_prefix}members`
+	DROP `icq`,
+	DROP `aim`,
+	DROP `yim`,
+	DROP `msn`;
 ---#
