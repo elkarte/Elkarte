@@ -173,8 +173,8 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 	this.bInEditMode = false;
 
 	// redo tips if they are on since we just pulled the rug out on this one 
-	if ($.isFunction($.fn.SMFtooltip));
-		$('.preview').SMFtooltip().smf_tooltip_off;
+	if ($.isFunction($.fn.SiteTooltip));
+		$('.preview').SiteTooltip().smf_tooltip_off;
 	
 	return false;
 }
