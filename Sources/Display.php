@@ -130,7 +130,10 @@ function Display()
 
 	// Is this a moved topic that we are redirecting to?
 	if (!empty($topicinfo['id_redirect_topic']))
+	{
+		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg']), $topicinfo['new_from'] !== 0);
 		redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
+	}
 
 	$context['real_num_replies'] = $context['num_replies'] = $topicinfo['num_replies'];
 	$context['topic_first_message'] = $topicinfo['id_first_msg'];
