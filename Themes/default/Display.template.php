@@ -426,9 +426,9 @@ function template_main()
 			echo '
 								<li class="warning">', $context['can_issue_warning'] ? '<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '', '<img src="', $settings['images_url'], '/warning_', $message['member']['warning_status'], '.png" alt="', $txt['user_warn_' . $message['member']['warning_status']], '" />', $context['can_issue_warning'] ? '</a>' : '', '<span class="warn_', $message['member']['warning_status'], '">', $txt['warn_' . $message['member']['warning_status']], '</span></li>';
 
-			echo '
+		echo '
 							</ul>';
-			echo '
+		echo '
 						</div>
 						<div class="postarea">
 							<div class="keyinfo">
@@ -438,14 +438,13 @@ function template_main()
 								<h5 id="subject_', $message['id'], '">
 									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' - ', $message['subject'], '">', $message['time'], '</a>';
 
-		// Show "<< Last Edit: Time by Person >>" if this post was edited.
+		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'] && !empty($message['modified']['name']))
 			echo '
 									<span class="smalltext modified" id="modified_', $message['id'], '">
 										', $message['modified']['last_edit_text'], '
 									</span>';
-
-			echo '
+		echo '
 								</h5>
 								<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
 							</div>';
@@ -878,7 +877,7 @@ function template_main()
 								</div>'), ',
 							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 90%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
 							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
-							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a>'), ',
+							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
 							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
 							sFormRemoveAccessKeys: \'postmodify\'' : '', '
