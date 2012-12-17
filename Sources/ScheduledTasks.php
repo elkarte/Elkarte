@@ -917,7 +917,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 	// Now we know how many we're sending, let's send them.
 	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html
+		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
@@ -936,6 +936,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			'subject' => $row['subject'],
 			'headers' => $row['headers'],
 			'send_html' => $row['send_html'],
+			'time_sent' => $row['time_sent'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -999,7 +1000,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html']);
+			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['time_sent']);
 	}
 
 	// Any emails that didn't send?
@@ -1029,7 +1030,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		// Add our email back to the queue, manually.
 		$smcFunc['db_insert']('insert',
 			'{db_prefix}mail_queue',
-			array('recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'string'),
+			array('recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'string', 'time_sent' => 'string'),
 			$failed_emails,
 			array('id_mail')
 		);
