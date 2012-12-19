@@ -67,7 +67,6 @@ $txt['right_align'] = 'Right align';
 $txt['superscript'] = 'Superscript';
 $txt['subscript'] = 'Subscript';
 $txt['table_tr'] = 'Insert table row';
-$txt['post_too_long'] = 'Your message is too long. Please go back and shorten it, then try again.';
 $txt['horizontal_rule'] = 'Horizontal Rule';
 $txt['font_size'] = 'Font size';
 $txt['font_face'] = 'Font face';
