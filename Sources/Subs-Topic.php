@@ -1098,7 +1098,7 @@ function setTopicRegard($id_member, $topic, $on = false)
  */
 function getTopicInfo($topic_parameters, $full = false, $topic_selects = array(), $topic_tables = array())
 {
-	global $smcFunc, $user_info, $board;
+	global $smcFunc, $user_info, $modSettings, $board;
 
 	// Nothing to do
 	if (empty($topic_parameters))
@@ -1109,17 +1109,17 @@ function getTopicInfo($topic_parameters, $full = false, $topic_selects = array()
 		$topic_parameters = array(
 			'current_topic' => (int) $topic_parameters,
 			'current_member' => $user_info['id'],
-			'current_board' => $board,
+			'current_board' => (int) $board,
 		);
 
 	// Create the query, taking full and integration in to account
 	$request = $smcFunc['db_query']('', '
 		SELECT 
-			t.is_sticky, t.id_board, t.id_first_msg, t.id_member_started, t.id_member_updated, t.id_poll,
+			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg, t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.locked, t.redirect_expires, 
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($full ? ', ms.subject, 
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
-			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', id_previous_board, id_previous_topic' : '') . '
+			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!empty($topic_selects) ? implode(',', $topic_selects) : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') . '
 		FROM {db_prefix}topics AS t' . ($full ? '
@@ -1137,4 +1137,4 @@ function getTopicInfo($topic_parameters, $full = false, $topic_selects = array()
 	$smcFunc['db_free_result']($request);
 
 	return $topic_info;
-}	
+}
