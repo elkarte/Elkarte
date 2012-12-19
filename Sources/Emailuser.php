@@ -339,7 +339,31 @@ function action_reporttm()
 
 	// Show the inputs for the comment, etc.
 	loadLanguage('Post');
+	loadLanguage('Errors');
 	loadTemplate('Emailuser');
+
+	addInlineJavascript('
+	var error_box = $("#error_box");
+	$("#report_comment").keyup(function() {
+		var post_too_long = $("#error_post_too_long");
+		if ($(this).val().length > 254)
+		{
+			if (post_too_long.length == 0)
+			{
+				error_box.show();
+				if ($.trim(error_box.html()) == \'\')
+					error_box.append("<ul id=\'error_list\'></ul>");
+
+				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['error_post_too_long']) . ' + "</li>");
+			}
+		}
+		else
+		{
+			post_too_long.remove();
+			if ($("#error_list li").length == 0)
+				error_box.hide();
+		}
+	});', true);
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
 	$context['email_address'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
@@ -381,7 +405,10 @@ function action_reporttm2()
 	// Make sure we have a comment and it's clean.
 	if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
 		$post_errors[] = 'no_comment';
-	$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\n" => '', "\t" => ''));
+	$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
+
+	if ($smcFunc['strlen']($poster_comment) > 254)
+		$post_errors[] = 'post_too_long';
 
 	// Guests need to provide their address!
 	if ($user_info['is_guest'])
@@ -416,7 +443,7 @@ function action_reporttm2()
 
 		$context['post_errors'] = array();
 		foreach ($post_errors as $post_error)
-			$context['post_errors'][] = $txt['error_' . $post_error];
+			$context['post_errors'][$post_error] = $txt['error_' . $post_error];
 
 		return action_reporttm();
 	}
