@@ -339,6 +339,7 @@ function action_reporttm()
 
 	// Show the inputs for the comment, etc.
 	loadLanguage('Post');
+	loadLanguage('Errors');
 	loadTemplate('Emailuser');
 
 	addInlineJavascript('
@@ -353,7 +354,7 @@ function action_reporttm()
 				if ($.trim(error_box.html()) == \'\')
 					error_box.append("<ul id=\'error_list\'></ul>");
 
-				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['post_too_long']) . ' + "</li>");
+				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['error_post_too_long']) . ' + "</li>");
 			}
 		}
 		else
