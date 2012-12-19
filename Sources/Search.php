@@ -344,7 +344,6 @@ function action_plushsearch2()
 	// Load up the search API we are going to use.
 	$searchAPI = findSearchAPI();
 
-
 	// $search_params will carry all settings that differ from the default search parameters.
 	// That way, the URLs involved in a search page will be kept as short as possible.
 	$search_params = array();
@@ -456,6 +455,7 @@ function action_plushsearch2()
 				'match_possible_users' => 'real_name LIKE ' . implode(' OR real_name LIKE ', $realNameMatches),
 			)
 		);
+
 		// Simply do nothing if there're too many members matching the criteria.
 		if ($smcFunc['db_num_rows']($request) > $maxMembersToSearch)
 			$userQuery = '';
@@ -791,7 +791,6 @@ function action_plushsearch2()
 			$context['search_errors']['query_not_specific_enough'] = true;
 			break;
 		}
-
 		// Make sure we aren't searching for too many indexed words.
 		else
 		{
@@ -1844,9 +1843,6 @@ function action_plushsearch2()
 	$context['sub_template'] = 'results';
 	$context['page_title'] = $txt['search_results'];
 	$context['get_topics'] = 'prepareSearchContext';
-	$context['can_send_pm'] = allowedTo('pm_send');
-	$context['can_send_email'] = allowedTo('send_email_to_members');
-	$context['can_restore'] = allowedTo('move_any') && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board;
 
 	$context['jump_to'] = array(
 		'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
