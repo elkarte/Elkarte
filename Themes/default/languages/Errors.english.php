@@ -388,6 +388,7 @@ $txt['warning_notify_blank'] = 'You selected to notify the user but did not fill
 $txt['cannot_connect_doc_site'] = 'Could not connect to the Simple Machines Online Manual. Please check that your server configuration allows external internet connections and try again later.';
 
 $txt['movetopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection topic\'.';
+$txt['movetopic_no_board'] = 'You must choose a board to move the topic to.';
 
 // OpenID error strings
 $txt['openid_server_bad_response'] = 'The requested identifier did not return the proper information.';
