@@ -4046,7 +4046,7 @@ function sanitizeMSCutPaste($string)
 }
 
 /**
- * Decode numeric html entities to their ascii or UTF8 equivalent character.
+ * Decode numeric html entities to their UTF8 equivalent character.
  *
  * Callback function for preg_replace_callback in subs-members
  * Uses capture group 2 in the supplied array

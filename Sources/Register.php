@@ -135,7 +135,7 @@ function action_register($reg_errors = array())
 		// Try to find our selected language.
 		foreach ($context['languages'] as $key => $lang)
 		{
-			$context['languages'][$key]['name'] = strtr($lang['name'], array('-utf8' => ''));
+			$context['languages'][$key]['name'] = $lang['name'];
 
 			// Found it!
 			if ($selectedLanguage == $lang['filename'])

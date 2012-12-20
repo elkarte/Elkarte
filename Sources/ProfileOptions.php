@@ -453,7 +453,7 @@ function loadProfileFields($force_reload = false)
 			'input_validate' => create_function('&$value', '
 				global $context, $smcFunc, $sourcedir, $cur_profile;
 
-				$value = trim(preg_replace(\'~[\s]~\' . ($context[\'utf8\'] ? \'u\' : \'\'), \' \', $value));
+				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
 				if (trim($value) == \'\')
 					return \'no_name\';
@@ -2217,9 +2217,8 @@ function profileLoadLanguages()
 
 	// Setup our languages.
 	foreach ($context['languages'] as $lang)
-	{
-		$context['profile_languages'][$lang['filename']] = strtr($lang['name'], array('-utf8' => ''));
-	}
+		$context['profile_languages'][$lang['filename']] = $lang['name'];
+
 	ksort($context['profile_languages']);
 
 	// Return whether we should proceed with this.

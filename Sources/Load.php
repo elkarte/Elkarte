@@ -1148,7 +1148,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'image_href' => $settings['images_url'] . '/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' ', '-utf8' => ''))),
+			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -2201,7 +2201,7 @@ function getBoardParents($id_parent)
 
 /**
  * Attempt to reload our known languages.
- * It will try to choose only utf8 or non-utf8 languages.
+ * It will try to choose only utf8 languages.
  *
  * @param bool $use_cache = true
  * @param bool $favor_utf8 = true
@@ -2212,7 +2212,7 @@ function getLanguages($use_cache = true, $favor_utf8 = true)
 	global $context, $smcFunc, $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
-	if (!$use_cache || ($context['languages'] = cache_get_data('known_languages' . ($favor_utf8 ? '' : '_all'), !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
+	if (!$use_cache || ($context['languages'] = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
@@ -2250,17 +2250,8 @@ function getLanguages($use_cache = true, $favor_utf8 = true)
 					'filename' => $matches[1],
 					'location' => $language_dir . '/index.' . $matches[1] . '.php',
 				);
-
 			}
 			$dir->close();
-		}
-
-		// Favoring UTF8? Then prevent us from selecting non-UTF8 versions.
-		if ($favor_utf8)
-		{
-			foreach ($context['languages'] as $lang)
-				if (substr($lang['filename'], strlen($lang['filename']) - 5, 5) != '-utf8' && isset($context['languages'][$lang['filename'] . '-utf8']))
-					unset($context['languages'][$lang['filename']]);
 		}
 
 		// Lets cash in on this deal.

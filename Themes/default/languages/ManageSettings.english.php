@@ -350,7 +350,6 @@ $txt['add_language_dialogo_found'] = 'The following languages were found. Click 
 $txt['add_language_error_no_response'] = 'The Simple Machines site is not responding. Please try again later.';
 $txt['add_language_error_no_files'] = 'No files could be found.';
 $txt['add_language_dialogo_desc'] = 'Description';
-$txt['add_language_dialogo_utf8'] = 'UTF-8';
 $txt['add_language_dialogo_version'] = 'Version';
 
 $txt['edit_language_entries_primary'] = 'Below are the primary language settings for this language pack.';
