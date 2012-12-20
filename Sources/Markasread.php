@@ -55,12 +55,12 @@ function markasread()
  */
 function action_markboards()
 {
-	global $sourcedir;
+	global $sourcedir, $modSettings;
 
 	require_once($sourcedir . '/Subs-Boards.php');
 
 	// Find all the boards this user can see.
-	$boards[] = accessibleBoards();
+	$boards = accessibleBoards();
 
 	if (!empty($boards))
 		markBoardsRead($boards, isset($_REQUEST['unread']));
