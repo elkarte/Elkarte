@@ -699,7 +699,7 @@ function scheduled_daily_digest()
 	foreach ($members as $mid => $member)
 	{
 		// Right character set!
-		$context['character_set'] = empty($modSettings['global_character_set']) ? $langtxt[$lang]['char_set'] : $modSettings['global_character_set'];
+		$context['character_set'] = 'UTF-8';
 
 		// Do the start stuff!
 		$email = array(

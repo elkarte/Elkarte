@@ -40,7 +40,7 @@ function action_dlattach()
 	global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc;
 
 	// Some defaults that we need.
-	$context['character_set'] = empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set'];
+	$context['character_set'] = 'UTF-8';
 	$context['no_last_modified'] = true;
 
 	// Make sure some attachment was requested!
@@ -97,7 +97,7 @@ function action_dlattach()
 		loadLanguage('Errors');
 
 		header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
-		header('Content-Type: text/plain; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+		header('Content-Type: text/plain; charset=UTF-8');
 
 		// We need to die like this *before* we send any anti-caching headers as below.
 		die('404 - ' . $txt['attachment_not_found']);

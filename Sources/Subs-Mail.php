@@ -324,7 +324,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 {
 	global $context;
 
-	$charset = $custom_charset !== null ? $custom_charset : $context['character_set'];
+	$charset = $custom_charset !== null ? $custom_charset : 'UTF-8';
 
 	// This is the fun part....
 	if (preg_match_all('~&#(\d{3,8});~', $string, $matches) !== 0 && !$hotmail_fix)

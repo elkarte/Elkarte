@@ -1504,7 +1504,7 @@ function create_control_richedit($editorOptions)
 			// Some hidden information is needed in order to make spell check work.
 			if (!isset($_REQUEST['xml']))
 				$context['insert_after_template'] .= '
-		<form name="spell_form" id="spell_form" method="post" accept-charset="' . $context['character_set'] . '" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
+		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
 		</form>';

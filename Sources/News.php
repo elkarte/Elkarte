@@ -231,16 +231,16 @@ function action_showfeed()
 		ob_start();
 
 	if ($xml_format == 'smf' || isset($_REQUEST['debug']))
-		header('Content-Type: text/xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+		header('Content-Type: text/xml; charset=UTF-8');
 	elseif ($xml_format == 'rss' || $xml_format == 'rss2' || $xml_format == 'webslice')
-		header('Content-Type: application/rss+xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+		header('Content-Type: application/rss+xml; charset=UTF-8');
 	elseif ($xml_format == 'atom')
-		header('Content-Type: application/atom+xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+		header('Content-Type: application/atom+xml; charset=UTF-8');
 	elseif ($xml_format == 'rdf')
-		header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+		header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
 	// First, output the xml header.
-	echo '<?xml version="1.0" encoding="', $context['character_set'], '"?' . '>';
+	echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
 
 	// Are we outputting an rss feed or one with more information?
 	if ($xml_format == 'rss' || $xml_format == 'rss2')

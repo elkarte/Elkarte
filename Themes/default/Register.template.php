@@ -22,7 +22,7 @@ function template_registration_agreement()
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
 	echo '
-		<form action="', $scripturl, '?action=register" method="post" accept-charset="', $context['character_set'], '" id="registration">
+		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['registration_agreement'], '</h3>
 			</div>
@@ -95,7 +95,7 @@ function template_registration_form()
 	}
 
 	echo '
-		<form action="', $scripturl, '?action=register2" method="post" accept-charset="', $context['character_set'], '" name="registration" id="registration" onsubmit="return verifyAgree();">
+		<form action="', $scripturl, '?action=register2" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['registration_form'], '</h3>
 			</div>
@@ -482,7 +482,7 @@ function template_verification_sound()
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
@@ -522,7 +522,7 @@ function template_admin_register()
 	echo '
 	<div id="admincenter">
 		<div id="admin_form_wrapper">
-			<form id="postForm" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="', $context['character_set'], '" name="postForm">
+			<form id="postForm" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" name="postForm">
 				<div class="cat_bar">
 					<h3 class="catbg">', $txt['admin_browse_register_new'], '</h3>
 				</div>
@@ -613,7 +613,7 @@ function template_edit_agreement()
 
 	// Just a big box to edit the text file ;).
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="', $context['character_set'], '">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['registration_agreement'], '</h3>
 			</div>';
@@ -635,7 +635,7 @@ function template_edit_agreement()
 						<h3 class="catbg">', $txt['language_configuration'], '</h3>
 					</div>
 					<div class="information">
-						<form action="', $scripturl, '?action=admin;area=regcenter" id="change_reg" method="post" accept-charset="', $context['character_set'], '" style="display: inline;">
+						<form action="', $scripturl, '?action=admin;area=regcenter" id="change_reg" method="post" accept-charset="UTF-8" style="display: inline;">
 							<strong>', $txt['admin_agreement_select_language'], ':</strong>&nbsp;
 							<select name="agree_lang" onchange="document.getElementById(\'change_reg\').submit();" tabindex="', $context['tabindex']++, '">';
 
@@ -681,7 +681,7 @@ function template_edit_reserved_words()
 	global $context, $settings, $options, $scripturl, $txt;
 
 	echo '
-		<form id="admin_form_wrapper" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="', $context['character_set'], '">
+		<form id="admin_form_wrapper" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['admin_reserved_set'], '</h3>
 			</div>
@@ -734,7 +734,7 @@ function template_contact_form()
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['admin_contact_form'], '</h3>
 		</div>
-		<form id="contact_form" class="windowbg2" action="', $scripturl, '?action=contact" method="post" accept-charset="', $context['character_set'], '">
+		<form id="contact_form" class="windowbg2" action="', $scripturl, '?action=contact" method="post" accept-charset="UTF-8">
 			<div class="content">';
 			if (!empty($context['errors']))
 				echo '

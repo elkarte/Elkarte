@@ -77,7 +77,7 @@ function reloadSettings()
 		'entity_fix' => create_function('$string', '
 			$num = $string[0] === \'x\' ? hexdec(substr($string, 1)) : (int) $string;
 			return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? \'\' : \'&#\' . $num . \';\';'),
-		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'ISO-8859-1\'', '
+		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', '
 			global $smcFunc;
 			return ' . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, \'UTF-8\')' . $ent_check[1] . ';'),
 		'htmltrim' => create_function('$string', '
@@ -1620,7 +1620,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
 	// Set the character set from the template.
-	$context['character_set'] = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
+	$context['character_set'] = 'UTF-8';
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
 
 	$context['tabindex'] = 1;
@@ -1640,7 +1640,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'smf_scripturl' => '"' . $scripturl . '"',
 		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-		'smf_charset' => '"' . $context['character_set'] . '"',
+		'smf_charset' => '"UTF-8"',
 		'smf_session_id' => '"' . $context['session_id'] . '"',
 		'smf_session_var' => '"' . $context['session_var'] . '"',
 		'smf_member_id' => $context['user']['id'],
@@ -2293,7 +2293,7 @@ function censorText(&$text, $force = false)
 			for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
 			{
 				$censor_vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($censor_vulgar[$i], '/'));
-				$censor_vulgar[$i] = '/(?<=^|\W)' . $censor_vulgar[$i] . '(?=$|\W)/' . (empty($modSettings['censorIgnoreCase']) ? '' : 'i') . ((empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set']) === 'UTF-8' ? 'u' : '');
+				$censor_vulgar[$i] = '/(?<=^|\W)' . $censor_vulgar[$i] . '(?=$|\W)/u' . (empty($modSettings['censorIgnoreCase']) ? '' : 'i');
 
 				// @todo I'm thinking the old way is some kind of bug and this is actually fixing it.
 				//if (strpos($censor_vulgar[$i], '\'') !== false)
@@ -2363,7 +2363,7 @@ function template_include($filename, $once = false)
 			ob_start();
 
 		if (isset($_GET['debug']))
-			header('Content-Type: application/xhtml+xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
+			header('Content-Type: application/xhtml+xml; charset=UTF-8');
 
 		// Don't cache error pages!!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -2380,10 +2380,8 @@ function template_include($filename, $once = false)
 		// First, let's get the doctype and language information out of the way.
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', !empty($context['right_to_left']) ? ' dir="rtl"' : '', '>
-	<head>';
-		if (isset($context['character_set']))
-			echo '
-		<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />';
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
 
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 			echo '

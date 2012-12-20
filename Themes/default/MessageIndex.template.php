@@ -165,7 +165,7 @@ function template_main()
 		// If Quick Moderation is enabled start the form.
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))
 			echo '
-	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="', $context['character_set'], '" class="clear" name="quickModForm" id="quickModForm">';
+	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="UTF-8" class="clear" name="quickModForm" id="quickModForm">';
 
 		echo '
 		<div class="tborder topic_table" id="messageindex">';
@@ -195,6 +195,7 @@ function template_main()
 					<th scope="col" class="first_th" width="4%">&nbsp;</th>
 					<th scope="col" class="lefttext">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
 					<th scope="col" class="stats" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
+
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
 				echo '

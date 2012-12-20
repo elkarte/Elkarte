@@ -46,7 +46,7 @@ function template_main()
 
 	echo '
 	<div id="send_topic">
-		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<img src="', $settings['images_url'], '/email_sm.png" alt="" class="icon" />', $context['page_title'], '
@@ -109,7 +109,7 @@ function template_custom_email()
 
 	echo '
 	<div id="send_topic">
-		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<img src="', $settings['images_url'], '/email_sm.png" alt="" class="icon" />', $context['page_title'], '
@@ -202,7 +202,7 @@ function template_report()
 
 	echo '
 	<div id="report_topic">
-		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
 				<div class="cat_bar">
 					<h3 class="catbg">', $txt['report_to_mod'], '</h3>

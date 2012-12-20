@@ -145,7 +145,7 @@ function template_search()
 
 	// Start the submission form for the search!
 	echo '
-	<form action="', $scripturl, '?action=memberlist;sa=search" method="post" accept-charset="', $context['character_set'], '">
+	<form action="', $scripturl, '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<div id="memberlist">
 			<div class="pagesection">
 				', template_button_strip($context['memberlist_buttons'], 'right'), '
