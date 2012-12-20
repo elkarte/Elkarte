@@ -218,7 +218,7 @@ function action_attachments($return_config = false)
 
 		if (!empty($_POST['use_subdirectories_for_attachments']))
 		{
-			if(isset($_POST['use_subdirectories_for_attachments']) && empty($_POST['basedirectory_for_attachments']))
+			if (isset($_POST['use_subdirectories_for_attachments']) && empty($_POST['basedirectory_for_attachments']))
 				$_POST['basedirectory_for_attachments'] = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : $boarddir);
 
 			if (!empty($_POST['use_subdirectories_for_attachments']) && !empty($modSettings['attachment_basedirectories']))
@@ -1828,7 +1828,7 @@ function action_attachpaths()
 				$bid = -1;
 				$use_subdirectories_for_attachments = 0;
 				if (!empty($modSettings['attachment_basedirectories']))
-					foreach($modSettings['attachment_basedirectories'] as $bid => $base)
+					foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
 						if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !==false)
 						{
 							$use_subdirectories_for_attachments = 1;
@@ -1909,7 +1909,7 @@ function action_attachpaths()
 
 		If (isset($_POST['base_dir']))
 		{
-			foreach($_POST['base_dir'] as $id => $dir)
+			foreach ($_POST['base_dir'] as $id => $dir)
 			{
 				if (!empty($dir) && $dir != $modSettings['attachmentUploadDir'][$id])
 				{
@@ -1983,11 +1983,11 @@ function action_attachpaths()
 		{
 			$errors = array();
 			if (!empty($_SESSION['errors']['dir']))
-				foreach($_SESSION['errors']['dir'] as $error)
+				foreach ($_SESSION['errors']['dir'] as $error)
 					$errors['dir'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
 
 			if (!empty($_SESSION['errors']['base']))
-				foreach($_SESSION['errors']['base'] as $error)
+				foreach ($_SESSION['errors']['base'] as $error)
 					$errors['base'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
 		}
 		unset($_SESSION['errors']);
