@@ -761,7 +761,6 @@ function template_main()
 	// draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
-			<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/drafts.js?alp21"></script>
 			<script type="text/javascript"><!-- // --><![CDATA[
 				var oDraftAutoSave = new smf_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
@@ -784,7 +783,6 @@ function template_main()
 				<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
 	echo '
-				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/topic.js"></script>
 				<script type="text/javascript"><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_reply']))
@@ -898,5 +896,4 @@ function template_main()
 
 	echo '
 				// ]]></script>';
-
 }

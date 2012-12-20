@@ -979,6 +979,11 @@ function Display()
 	$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 	if (!empty($context['drafts_save']))
 		loadLanguage('Drafts');
+	if (!empty($context['drafts_autosave']))
+		loadJavascriptFile('drafts.js');
+
+	// Load up the Quick ModifyTopic and Quick Reply scripts
+	loadJavascriptFile('topic.js');
 
 	// Load up the "double post" sequencing magic.
 	if (!empty($options['display_quick_reply']))
@@ -1046,9 +1051,9 @@ function Display()
 		$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 	// Allow adding new mod buttons easily.
-	// Note: $context['normal_buttons'] and $context['mod_buttons'] are added for backward compatibility with 2.0, but are deprecated and should not be used
+	// Note: $context['normal_buttons'] and $context['mod_buttons'] are here for backward compatibility with 2.0, but are deprecated and should not be used
 	call_integration_hook('integrate_display_buttons', array($context['normal_buttons']));
-	// Note: integrate_mod_buttons is no more necessary and deprecated, but is kept for backward compatibility with 2.0
+	// Note: integrate_mod_buttons is no longer necessary and is now deprecated, it is kept for backward compatibility with 2.0
 	call_integration_hook('integrate_mod_buttons', array($context['mod_buttons']));
 }
 
