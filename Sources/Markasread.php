@@ -55,6 +55,8 @@ function markasread()
  */
 function action_markboards()
 {
+	global $sourcedir;
+
 	require_once($sourcedir . '/Subs-Boards.php');
 
 	// Find all the boards this user can see.
