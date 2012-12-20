@@ -1953,33 +1953,3 @@ function adminNotify($type, $memberID, $member_name = null)
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
 }
-
-/**
- * Callback function for loademaitemplate on subject and body
- * Uses capture group 1 in array
- *
- * @param type $matches
- * @return string
- */
-function user_info_callback($matches)
-{
-	global $user_info;
-	if (empty($matches[1]))
-		return '';
-
-	$use_ref = true;
-	$ref = &$user_info;
-
-	foreach (explode('.', $matches[1]) as $index)
-	{
-		if ($use_ref && isset($ref[$index]))
-			$ref = &$ref[$index];
-		else
-		{
-			$use_ref = false;
-			break;
-		}
-	}
-
-	return $use_ref ? $ref : $matches[0];
-}
