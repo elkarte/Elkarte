@@ -343,7 +343,7 @@ function action_login2()
 				$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
 
 			// Perhaps we converted to UTF-8 and have a valid password being hashed differently.
-			if ($context['character_set'] == 'utf8' && !empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
+			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
 			{
 				// Try iconv first, for no particular reason.
 				if (function_exists('iconv'))

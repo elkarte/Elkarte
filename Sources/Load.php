@@ -2201,7 +2201,6 @@ function getBoardParents($id_parent)
 
 /**
  * Attempt to reload our known languages.
- * It will try to choose only utf8 languages.
  *
  * @param bool $use_cache = true
  * @param bool $favor_utf8 = true
