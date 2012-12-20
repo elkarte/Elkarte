@@ -57,31 +57,36 @@ function action_movetopic()
 
 	loadTemplate('MoveTopic');
 
-	// Get the list of boards this moderator can move to.
-	require_once($sourcedir . '/Subs-Boards.php');
-	getBoardTree(false);
-
-	// Prepare it for the template
-	$context['categories'] = array();
-	foreach ($cat_tree as $catid => $tree)
+	// Get a list of boards this moderator can move to.
+	$request = $smcFunc['db_query']('order_by_board_order', '
+		SELECT b.id_board, b.name, b.child_level, c.name AS cat_name, c.id_cat
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
+		WHERE {query_see_board}
+			AND b.redirect = {string:blank_redirect}',
+		array(
+			'blank_redirect' => '',
+			'current_board' => $board,
+		)
+	);
+	$number_of_boards = $smcFunc['db_num_rows']($request);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$context['categories'][$catid] = array(
-			'name' => $tree['node']['name'],
-			'id' => $tree['node']['id'],
-			'boards' => array()
-		);
-		$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
-		foreach ($boardList[$catid] as $boardid)
-		{
-			$context['categories'][$catid]['boards'][$boardid] = array(
-				'id' => $boards[$boardid]['id'],
-				'name' => $boards[$boardid]['name'],
-				'description' => $boards[$boardid]['description'],
-				'child_level' => $boards[$boardid]['level'],
-				'selected' => !empty($_SESSION['move_to_topic']) && $_SESSION['move_to_topic'] == $boards[$boardid]['id'] && $boards[$boardid]['id'] != $board,
+		if (!isset($context['categories'][$row['id_cat']]))
+			$context['categories'][$row['id_cat']] = array (
+				'name' => strip_tags($row['cat_name']),
+				'boards' => array(),
 			);
-		}
+
+		$context['categories'][$row['id_cat']]['boards'][] = array(
+			'id' => $row['id_board'],
+			'name' => strip_tags($row['name']),
+			'category' => strip_tags($row['cat_name']),
+			'child_level' => $row['child_level'],
+			'selected' => !empty($_SESSION['move_to_topic']) && $_SESSION['move_to_topic'] == $row['id_board'] && $row['id_board'] != $board,
+		);
 	}
+	$smcFunc['db_free_result']($request);
 
 	// No boards?
 	if (empty($context['categories']) || (!empty($number_of_boards) && $number_of_boards == 1))

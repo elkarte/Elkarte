@@ -788,7 +788,7 @@ function fixChildren($parent, $newLevel, $newParent)
  *  $boardList	a list of boards grouped by category ID.
  *  $cat_tree	properties of each category.
  */
-function getBoardTree($full = true)
+function getBoardTree()
 {
 	global $cat_tree, $boards, $boardList, $txt, $modSettings, $smcFunc;
 
@@ -799,12 +799,9 @@ function getBoardTree($full = true)
 			b.board_order, b.count_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
 			b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse
 		FROM {db_prefix}categories AS c
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . ($full === true ? '' : '
-		WHERE {query_see_board}
-			AND b.redirect = {string:blank_redirect}') . '
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)
 		ORDER BY c.cat_order, b.child_level, b.board_order',
 		array(
-			'blank_redirect' => '',
 		)
 	);
 	$cat_tree = array();
