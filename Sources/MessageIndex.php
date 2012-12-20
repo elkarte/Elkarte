@@ -46,10 +46,10 @@ function MessageIndex()
 
 	loadTemplate('MessageIndex');
 	loadJavascriptFile('topic.js');
-	
+
 	$context['name'] = $board_info['name'];
 	$context['description'] = $board_info['description'];
-	
+
 	// How many topics do we have in total?
 	$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
@@ -678,7 +678,7 @@ function action_quickmod()
 
 	// Check the session = get or post.
 	checkSession('request');
-	
+
 	// Some help we may need
 	require_once($sourcedir . '/Subs-Topic.php');
 
@@ -1146,7 +1146,7 @@ function action_quickmod()
 
 	if (!empty($markCache))
 	{
-		$smcFunc['db_query']('', '
+		$request = $smcFunc['db_query']('', '
 			SELECT id_topic, disregarded
 			FROM {db_prefix}log_topics
 			WHERE id_topic IN ({array_int:selected_topics})
