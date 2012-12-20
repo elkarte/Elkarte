@@ -1002,3 +1002,26 @@ function setBoardNotification($id_member, $id_board, $on = false)
 		);
 	}
 }
+
+/**
+ * Returns all the boards accessible to the current user.
+ */
+function accessibleBoards()
+{
+	global $smcFunc;
+
+	// Find all the boards this user can see.
+	$result = $smcFunc['db_query']('', '
+		SELECT b.id_board
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}',
+		array(
+		)
+	);
+	$boards = array();
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$boards[] = $row['id_board'];
+	$smcFunc['db_free_result']($result);
+
+	return $boards;
+}
