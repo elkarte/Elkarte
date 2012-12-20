@@ -198,7 +198,7 @@ function action_marktopic()
  */
 function action_markasread()
 {
-	global $board, $topic, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir;
+	global $board, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir;
 
 	// no guests
 	is_not_guest();
