@@ -229,7 +229,7 @@ class sphinxql_search
 			);
 			
 			if (mysql_num_rows($request) != 0)
-				while($match = mysql_fetch_assoc($request))
+				while ($match = mysql_fetch_assoc($request))
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
