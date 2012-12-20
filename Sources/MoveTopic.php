@@ -32,41 +32,28 @@ if (!defined('DIALOGO'))
 function action_movetopic()
 {
 	global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $sourcedir, $modSettings;
-
+	global $cat_tree, $boards, $boardList;
+	
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT t.id_member_started, ms.subject, t.approved
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($id_member_started, $context['subject'], $context['is_approved']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// Retrieve the basic topic information for whats being moved
+	require_once($sourcedir . '/Subs-Topic.php');
+	$topic_info = getTopicInfo($topic, true);
+	
+	if ($topic_info === false)
+		fatal_lang_error('topic_gone', false);
+
+	$context['is_approved'] = $topic_info['approved'];
+	$context['subject'] = $topic_info['subject'];
 
 	// Can they see it - if not approved?
 	if ($modSettings['postmod_active'] && !$context['is_approved'])
 		isAllowedTo('approve_posts');
 
-	// Permission check!
-	// @todo
-	if (!allowedTo('move_any'))
-	{
-		if ($id_member_started == $user_info['id'])
-		{
-			isAllowedTo('move_own');
-			//$boards = array_merge(boardsAllowedTo('move_own'), boardsAllowedTo('move_any'));
-		}
-		else
-			isAllowedTo('move_any');
-	}
-	//else
-		//$boards = boardsAllowedTo('move_any');
+	// Are they allowed to actually move any topics or even their own?
+	if (!allowedTo('move_any') && ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('move_own')))
+		fatal_lang_error('cannot_move_any', false);
 
 	loadTemplate('MoveTopic');
 
@@ -101,6 +88,7 @@ function action_movetopic()
 	}
 	$smcFunc['db_free_result']($request);
 
+	// No boards?
 	if (empty($context['categories']) || (!empty($number_of_boards) && $number_of_boards == 1))
 		fatal_lang_error('moveto_noboards', false);
 
@@ -110,19 +98,19 @@ function action_movetopic()
 		'url' => $scripturl . '?topic=' . $topic . '.0',
 		'name' => $context['subject'],
 	);
-
 	$context['linktree'][] = array(
+		'url' => '#',
 		'name' => $txt['move_topic'],
 	);
 
 	$context['back_to_topic'] = isset($_REQUEST['goback']);
 
+	// Ugly !
 	if ($user_info['language'] != $language)
 	{
 		loadLanguage('index', $language);
 		$temp = $txt['movetopic_default'];
 		loadLanguage('index');
-
 		$txt['movetopic_default'] = $temp;
 	}
 
@@ -157,6 +145,10 @@ function action_movetopic2()
 	if (isset($_POST['postRedirect']) && (!isset($_POST['reason']) || trim($_POST['reason']) == ''))
 		fatal_lang_error('movetopic_no_reason', false);
 
+	// You have to tell us were you are moving to
+	if (!isset($_POST['toboard']))
+		fatal_lang_error('movetopic_no_board', false);
+
 	// We will need this
 	require_once($sourcedir . '/Subs-Topic.php');
 	moveTopicConcurrence();
@@ -164,17 +156,9 @@ function action_movetopic2()
 	// Make sure this form hasn't been submitted before.
 	checkSubmitOnce('check');
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member_started, id_first_msg, approved
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($id_member_started, $id_first_msg, $context['is_approved']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// Get the basic details on this topic
+	$topic_info = getTopicInfo($topic);
+	$context['is_approved'] = $topic_info['approved'];
 
 	// Can they see it?
 	if (!$context['is_approved'])
@@ -183,7 +167,7 @@ function action_movetopic2()
 	// Can they move topics on this board?
 	if (!allowedTo('move_any'))
 	{
-		if ($id_member_started == $user_info['id'])
+		if ($topic_info['id_member_started'] == $user_info['id'])
 		{
 			isAllowedTo('move_own');
 			$boards = array_merge(boardsAllowedTo('move_own'), boardsAllowedTo('move_any'));
@@ -206,7 +190,7 @@ function action_movetopic2()
 	require_once($sourcedir . '/Subs-Post.php');
 
 	// The destination board must be numeric.
-	$_POST['toboard'] = (int) $_POST['toboard'];
+	$toboard = (int) $_POST['toboard'];
 
 	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 	$request = $smcFunc['db_query']('', '
@@ -220,7 +204,7 @@ function action_movetopic2()
 		LIMIT 1',
 		array(
 			'current_topic' => $topic,
-			'to_board' => $_POST['toboard'],
+			'to_board' => $toboard,
 			'blank_redirect' => '',
 		)
 	);
@@ -230,18 +214,19 @@ function action_movetopic2()
 	$smcFunc['db_free_result']($request);
 
 	// Remember this for later.
-	$_SESSION['move_to_topic'] = $_POST['toboard'];
+	$_SESSION['move_to_topic'] = $toboard;
 
 	// Rename the topic...
 	if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
 	{
-		$_POST['custom_subject'] = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+		$custom_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+
 		// Keep checking the length.
-		if ($smcFunc['strlen']($_POST['custom_subject']) > 100)
-			$_POST['custom_subject'] = $smcFunc['substr']($_POST['custom_subject'], 0, 100);
+		if ($smcFunc['strlen']($custom_subject) > 100)
+			$custom_subject = $smcFunc['substr']($custom_subject, 0, 100);
 
 		// If it's still valid move onwards and upwards.
-		if ($_POST['custom_subject'] != '')
+		if ($custom_subject != '')
 		{
 			if (isset($_POST['enforce_subject']))
 			{
@@ -265,7 +250,7 @@ function action_movetopic2()
 					WHERE id_topic = {int:current_topic}',
 					array(
 						'current_topic' => $topic,
-						'subject' => $context['response_prefix'] . $_POST['custom_subject'],
+						'subject' => $context['response_prefix'] . $custom_subject,
 					)
 				);
 			}
@@ -275,13 +260,13 @@ function action_movetopic2()
 				SET subject = {string:custom_subject}
 				WHERE id_msg = {int:id_first_msg}',
 				array(
-					'id_first_msg' => $id_first_msg,
-					'custom_subject' => $_POST['custom_subject'],
+					'id_first_msg' => $topic_info['id_first_msg'],
+					'custom_subject' => $custom_subject,
 				)
 			);
 
 			// Fix the subject cache.
-			updateStats('subject', $topic, $_POST['custom_subject']);
+			updateStats('subject', $topic, $custom_subject);
 		}
 	}
 
@@ -293,12 +278,12 @@ function action_movetopic2()
 		if ($user_info['language'] != $language)
 			loadLanguage('index', $language);
 
-		$_POST['reason'] = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
-		preparsecode($_POST['reason']);
+		$reason = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
+		preparsecode($reason);
 
 		// Add a URL onto the message.
-		$_POST['reason'] = strtr($_POST['reason'], array(
-			$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $_POST['toboard'] . '.0]' . $board_name . '[/url]',
+		$reason = strtr($reason, array(
+			$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $toboard . '.0]' . $board_name . '[/url]',
 			$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $topic . '.0[/iurl]'
 		));
 
@@ -310,7 +295,7 @@ function action_movetopic2()
 
 		$msgOptions = array(
 			'subject' => $txt['moved'] . ': ' . $subject,
-			'body' => $_POST['reason'],
+			'body' => $reason,
 			'icon' => 'moved',
 			'smileys_enabled' => 1,
 		);
@@ -374,11 +359,12 @@ function action_movetopic2()
 	}
 
 	// Do the move (includes statistics update needed for the redirect topic).
-	moveTopics($topic, $_POST['toboard']);
+	moveTopics($topic, $toboard);
 
 	// Log that they moved this topic.
-	if (!allowedTo('move_own') || $id_member_started != $user_info['id'])
-		logAction('move', array('topic' => $topic, 'board_from' => $board, 'board_to' => $_POST['toboard']));
+	if (!allowedTo('move_own') || $topic_info['id_member_started'] != $user_info['id'])
+		logAction('move', array('topic' => $topic, 'board_from' => $board, 'board_to' => $toboard));
+	
 	// Notify people that this topic has been moved?
 	sendNotifications($topic, 'move');
 
