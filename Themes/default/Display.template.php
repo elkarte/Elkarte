@@ -428,6 +428,7 @@ function template_main()
 
 		echo '
 							</ul>';
+
 		echo '
 						</div>
 						<div class="postarea">
@@ -435,6 +436,7 @@ function template_main()
 								<div class="messageicon" ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="position: absolute; z-index: -1;"', '>
 									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 								</div>
+
 								<h5 id="subject_', $message['id'], '">
 									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' - ', $message['subject'], '">', $message['time'], '</a>';
 
@@ -788,7 +790,6 @@ function template_main()
 	// draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
-			<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/drafts.js?alp21"></script>
 			<script type="text/javascript"><!-- // --><![CDATA[
 				var oDraftAutoSave = new smf_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
@@ -811,7 +812,6 @@ function template_main()
 				<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
 	echo '
-				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/topic.js"></script>
 				<script type="text/javascript"><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_reply']))

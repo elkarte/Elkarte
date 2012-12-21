@@ -104,29 +104,10 @@ function Display()
 
 	// @todo Why isn't this cached?
 	// @todo if we get id_board in this query and cache it, we can save a query on posting
-	// Get all the important topic info.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			t.num_replies, t.num_views, t.locked, ms.subject, t.is_sticky, t.id_poll,
-			t.id_member_started, t.id_first_msg, t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic,
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
-			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', id_previous_board, id_previous_topic' : '') . '
-			' . (!empty($topic_selects) ? implode(',', $topic_selects) : '') . '
-			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') . '
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' . ($user_info['is_guest'] ? '' : '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:current_topic} AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') . '
-			' . (!empty($topic_tables) ? implode("\n\t", $topic_tables) : '') . '
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-			$topic_parameters
-	);
-
-	if ($smcFunc['db_num_rows']($request) == 0)
+	// Load the topic details
+	$topicinfo = getTopicInfo($topic_parameters, true, $topic_selects, $topic_tables);
+	if (empty($topicinfo))
 		fatal_lang_error('not_a_topic', false);
-	$topicinfo = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Is this a moved topic that we are redirecting to?
 	if (!empty($topicinfo['id_redirect_topic']))
@@ -979,6 +960,11 @@ function Display()
 	$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 	if (!empty($context['drafts_save']))
 		loadLanguage('Drafts');
+	if (!empty($context['drafts_autosave']))
+		loadJavascriptFile('drafts.js');
+
+	// Load up the Quick ModifyTopic and Quick Reply scripts
+	loadJavascriptFile('topic.js');
 
 	// Load up the "double post" sequencing magic.
 	if (!empty($options['display_quick_reply']))
@@ -1046,9 +1032,9 @@ function Display()
 		$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 	// Allow adding new mod buttons easily.
-	// Note: $context['normal_buttons'] and $context['mod_buttons'] are added for backward compatibility with 2.0, but are deprecated and should not be used
+	// Note: $context['normal_buttons'] and $context['mod_buttons'] are here for backward compatibility with 2.0, but are deprecated and should not be used
 	call_integration_hook('integrate_display_buttons', array($context['normal_buttons']));
-	// Note: integrate_mod_buttons is no more necessary and deprecated, but is kept for backward compatibility with 2.0
+	// Note: integrate_mod_buttons is no longer necessary and is now deprecated, it is kept for backward compatibility with 2.0
 	call_integration_hook('integrate_mod_buttons', array($context['mod_buttons']));
 }
 
