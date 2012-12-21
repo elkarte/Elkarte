@@ -222,7 +222,7 @@ function template_main()
 		// Show a link to the member's profile.
 		echo '
 										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-											<span style="padding: 6px; display: block;">', $message['member']['name'], '</span>';
+											<span class="name">', $message['member']['name'], '</span>';
 
 		// Show avatars, images, etc.?
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
@@ -343,7 +343,7 @@ function template_main()
 
 		// Stuff for the staff to wallop them with.
 		echo '
-										<li style="height: 2px; background: #ccc; box-shadow: 0 -1px 0 #fff inset;"></li>';
+										<li class="report_seperator"></li>';
 
 		// Maybe they want to report this post to the moderator(s)?
 		if ($context['can_report_moderator'])
@@ -569,7 +569,7 @@ function template_main()
 		// Can the user modify the contents of this post?  Show the modify inline image.
 		if ($message['can_modify'])
 			echo '
-							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" style="cursor: pointer; margin: 0;" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
 
 		// Can the user modify the contents of this post?
 		if ($message['can_modify'])
@@ -866,7 +866,7 @@ function template_main()
 							iTopicId: ', $context['current_topic'], ',
 							sTemplateBodyEdit: ', JavaScriptEscape('
 								<div id="quick_edit_body_container" style="width: 90%">
-									<div id="error_box" style="padding: 4px;" class="error"></div>
+									<div id="error_box" class="errorbox" style="display:none;"></div>
 									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 									<input type="hidden" name="\' + smf_session_var + \'" value="\' + smf_session_id + \'" />
 									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
