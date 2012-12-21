@@ -1077,44 +1077,29 @@ function action_post($post_errors = array())
 	$context['attached'] = '';
 	$context['make_poll'] = isset($_REQUEST['poll']);
 
-	// Message icons - customized icons are off?
+	// Message icons - customized or not, retrieve them...
 	$context['icons'] = getMessageIcons($board);
 
+	$context['icon_url'] = '';
+
 	if (!empty($context['icons']))
+	{
 		$context['icons'][count($context['icons']) - 1]['is_last'] = true;
+		$context['icons'][0]['selected'] = true;
+		$context['icon'] = $context['icons'][0]['value'];
+		$context['icon_url'] = $context['icons'][0]['url'];
+	}
 
 	// Are we starting a poll? if set the poll icon as selected if its available
 	if (isset($_REQUEST['poll']))
-	{
-	    foreach ($context['icons'] as $icons)
-		{
-			if (isset($icons['value']) && $icons['value'] == 'poll')
+		for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
+			if ($context['icons'][$i]['value'] == 'poll')
 			{
-				// if found we are done
+				$context['icons'][$i]['selected'] = true;
 				$context['icon'] = 'poll';
+				$context['icon_url'] = $context['icons'][$i]['url'];
 				break;
 			}
-		}
-	}
-
-	$context['icon_url'] = '';
-	for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
-	{
-		$context['icons'][$i]['selected'] = $context['icon'] == $context['icons'][$i]['value'];
-		if ($context['icons'][$i]['selected'])
-			$context['icon_url'] = $context['icons'][$i]['url'];
-	}
-	if (empty($context['icon_url']))
-	{
-		$context['icon_url'] = $settings[file_exists($settings['theme_dir'] . '/images/post/' . $context['icon'] . '.png') ? 'images_url' : 'default_images_url'] . '/post/' . $context['icon'] . '.png';
-		array_unshift($context['icons'], array(
-			'value' => $context['icon'],
-			'name' => $txt['current_icon'],
-			'url' => $context['icon_url'],
-			'is_last' => empty($context['icons']),
-			'selected' => true,
-		));
-	}
 
 	if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
 		getTopic();
