@@ -29,7 +29,6 @@ function template_main()
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
-
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
 
 	// Is this topic also a poll?
@@ -167,6 +166,7 @@ function template_main()
 						<span class="nextlinks floatright">', $context['previous_next'], '</span>
 					</h3>
 				</div>';
+
 	if (!empty($settings['display_who_viewing']))
 	{
 		echo '
@@ -863,6 +863,7 @@ function template_main()
 					if (\'XMLHttpRequest\' in window)
 					{
 						var oQuickModify = new QuickModify({
+							sIconHide: \'xx.png\',
 							sScriptUrl: smf_scripturl,
 							sClassName: \'quick_edit\',
 							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
@@ -878,8 +879,8 @@ function template_main()
 										<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
 									</div>
 								</div>'), ',
-							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 90%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
 							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
+							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
 							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
 							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',

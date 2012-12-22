@@ -304,6 +304,7 @@ function QuickModify(oOptions)
 	this.sCurMessageId = '';
 	this.oCurMessageDiv = null;
 	this.oCurSubjectDiv = null;
+	this.oMsgIcon = null
 	this.sMessageBuffer = '';
 	this.sSubjectBuffer = '';
 	this.bXmlHttpCapable = this.isXmlHttpCapable();
@@ -386,6 +387,14 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// Grab the message ID.
 	this.sCurMessageId = XMLDoc.getElementsByTagName('message')[0].getAttribute('id');
 
+	// Show the message icon if it was hidden and its set
+	if (this.opt.sIconHide !== null)
+	{
+		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace("msg_", ""));
+		if (this.oMsgIcon !== null && this.oMsgIcon.style.display === 'none')
+			this.oMsgIcon.style.display = '';
+	}
+
 	// If this is not valid then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
 		return this.modifyCancel();
@@ -420,6 +429,14 @@ QuickModify.prototype.modifyCancel = function ()
 	{
 		setInnerHTML(this.oCurMessageDiv, this.sMessageBuffer);
 		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);
+	}
+
+	// Hide the message icon if we are doign that
+	if (this.opt.sIconHide)
+	{
+		var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
+			this.oMsgIcon.style.display = 'none';
 	}
 
 	// No longer in edit mode, that's right.
@@ -532,6 +549,14 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
 			setInnerHTML(document.getElementById('modified_' + this.sCurMessageId.substr(4)), message.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
+		
+		// Hide the icon if we were told to
+		if (this.opt.sIconHide !== null)
+		{
+			var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
+				this.oMsgIcon.style.display = 'none';
+		}
 	}
 	else if (error)
 	{

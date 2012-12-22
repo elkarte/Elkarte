@@ -1276,8 +1276,9 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
 		if (oMessage.getElementsByTagName('error').length == 0)
 		{
-			if (this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0)
+			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
 				setInnerHTML(document.getElementById('modified_' + this.iCurMessageId), oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
+			
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		}
 	}
