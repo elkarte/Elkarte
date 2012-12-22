@@ -1026,6 +1026,9 @@ function action_post($post_errors = array())
 	else
 		$context['page_title'] = $txt['post_reply'];
 
+	if (isset($_REQUEST['xml']))
+		obexit();
+
 	// Build the link tree.
 	if (empty($topic))
 		$context['linktree'][] = array(
@@ -1073,7 +1076,6 @@ function action_post($post_errors = array())
 
 	// Store the ID.
 	$context['post_box_name'] = $editorOptions['id'];
-
 	$context['attached'] = '';
 	$context['make_poll'] = isset($_REQUEST['poll']);
 

@@ -471,7 +471,6 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-
 	var i, x = new Array();
 	x[x.length] = 'subject=' + escape(document.forms.quickModForm['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
 	x[x.length] = 'message=' + escape(document.forms.quickModForm['message'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
@@ -496,7 +495,11 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	{
 		// Mozilla will nicely tell us what's wrong.
 		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName == 'parsererror')
-			setInnerHTML(document.getElementById('error_box'), XMLDoc.firstChild.textContent);
+		{
+			var oErrordiv = document.getElementById('error_box');
+			setInnerHTML(oErrordiv, XMLDoc.firstChild.textContent);
+			oErrordiv.style.display = '';
+		}
 		else
 			this.modifyCancel();
 		return;
@@ -532,7 +535,9 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	}
 	else if (error)
 	{
-		setInnerHTML(document.getElementById('error_box'), error.childNodes[0].nodeValue);
+		var oErrordiv = document.getElementById('error_box'); 
+		setInnerHTML(oErrordiv, error.childNodes[0].nodeValue);
+		oErrordiv.style.display = '';
 		document.forms.quickModForm.message.style.border = error.getAttribute('in_body') == '1' ? this.opt.sErrorBorderStyle : '';
 		document.forms.quickModForm.subject.style.border = error.getAttribute('in_subject') == '1' ? this.opt.sErrorBorderStyle : '';
 	}

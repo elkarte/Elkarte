@@ -257,13 +257,13 @@ function template_main()
 			// Some columns require a different shade of the color class.
 			$alternate_class = $color_class . '2';
 
-			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
+			// [WIP] Markup can be cleaned up later.
 			echo '
 				<tr>
 					<td class="', $color_class, ' icon2">
-						<div style="position: relative; width: 40px; margin: auto;">
+						<div>
 							<img src="', $topic['first_post']['icon_url'], '" alt="" />
-							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" style="position: absolute; z-index: 5; right: 4px; bottom: -3px;" />' : '','
+							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" class="fred" />' : '','
 						</div>
 					</td>
 					<td class="', $alternate_class, ' subject">
