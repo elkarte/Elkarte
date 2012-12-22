@@ -4172,32 +4172,32 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 
 /* @todo tempo Colors for locked and sticky topics so we something to look at till this is done :P*/
 .table_grid tr td.stickybg {
-	background: #e8d8cf;
+	background: #f2e3d9; /*e8d8cf*/
 }
 .table_grid tr td.stickybg2 {
 	background: #f2e3d9;
 }
 .table_grid tr td.lockedbg {
-	background: #e7eaef;
+	background: #f0f4f7 /*e7eaef*/
 }
 .table_grid tr td.lockedbg2 {
 	background: #f0f4f7;
 }
 /* And now those precious little icons, boy are they cute ! */
 .table_grid tr td.stickybg.subject {
-	background:  #e8d8cf url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .table_grid tr td.stickybg2.subject {
 	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .table_grid tr td.locked_sticky.subject, .table_grid tr td.stickybglockedbg.subject {
-	background: #e8d8cf url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 .table_grid tr td.locked_sticky2.subject, .table_grid tr td.stickybglockedbg2.subject {
 	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 .table_grid tr td.lockedbg.subject{
-	background: #e7eaef url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }
 .table_grid tr td.lockedbg2.subject{
 	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
