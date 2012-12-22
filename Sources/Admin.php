@@ -648,7 +648,6 @@ function AdminHome()
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
 		'http://www.spudsdesign.com/dialogo/',
 		'http://www.spudsdesign.com/dialogo/redirect/support',
-		'http://www.spudsdesign.com/dialogo/redirect/international_support_boards',
 		'http://www.spudsdesign.com/dialogo/redirect/customize_support'
 	);
 }
