@@ -886,25 +886,7 @@ function initialize_inputs()
 	// This is really quite simple; if ?delete is on the URL, delete the upgrader...
 	if (isset($_GET['delete']))
 	{
-		@unlink(__FILE__);
-
-		// And the extra little files ;).
-		@unlink(dirname(__FILE__) . '/upgrade_1-0.sql');
-		@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
-		@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-		@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
-		@unlink(dirname(__FILE__) . '/webinstall.php');
-
-		$dh = opendir(dirname(__FILE__));
-		while ($file = readdir($dh))
-		{
-			if (preg_match('~upgrade_\d-\d_([A-Za-z])+\.sql~i', $file, $matches) && isset($matches[1]))
-				@unlink(dirname(__FILE__) . '/' . $file);
-		}
-		closedir($dh);
-
-		header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
-		exit;
+		deleteUpgrader();
 	}
 
 	// Are we calling the backup css file?
@@ -913,16 +895,6 @@ function initialize_inputs()
 		header('Content-Type: text/css');
 		template_css();
 		exit;
-	}
-
-	// Anybody home?
-	if (!isset($_GET['xml']))
-	{
-		$upcontext['remote_files_available'] = false;
-		$test = @fsockopen('www.simplemachines.org', 80, $errno, $errstr, 1);
-		if ($test)
-			$upcontext['remote_files_available'] = true;
-		@fclose($test);
 	}
 
 	// Something is causing this to happen, and it's annoying.  Stop it.
@@ -3267,6 +3239,29 @@ function makeFilesWritable(&$files)
 		return true;
 
 	return false;
+}
+
+function deleteUpgrader()
+{
+	@unlink(__FILE__);
+
+	// And the extra little files ;).
+	@unlink(dirname(__FILE__) . '/upgrade_1-0.sql');
+	@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
+	@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
+	@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
+	@unlink(dirname(__FILE__) . '/webinstall.php');
+
+	$dh = opendir(dirname(__FILE__));
+	while ($file = readdir($dh))
+	{
+		if (preg_match('~upgrade_\d-\d_([A-Za-z])+\.sql~i', $file, $matches) && isset($matches[1]))
+			@unlink(dirname(__FILE__) . '/' . $file);
+	}
+	closedir($dh);
+
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	exit;
 }
 
 /******************************************************************************
