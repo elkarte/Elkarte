@@ -151,12 +151,17 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 }
 a.button_link {
 	color: #000;
-	padding: 1px 5px;
+	padding: 2px 5px;
 	margin: 0 !important;
 	font-size: 0.9em;
+	line-height: 18px; 
 }
 .button_link:hover {
 	text-decoration: none;
+}
+/* FF rounding error on zoom? */
+#firefox a.button_link {
+	line-height: 17.25px;
 }
 
 /* the new "button" */
