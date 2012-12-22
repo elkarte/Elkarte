@@ -1027,7 +1027,7 @@ function action_post($post_errors = array())
 		$context['page_title'] = $txt['post_reply'];
 
 	if (isset($_REQUEST['xml']))
-		obexit();
+		obExit();
 
 	// Build the link tree.
 	if (empty($topic))
