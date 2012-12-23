@@ -552,10 +552,7 @@ function DownloadLanguage()
 
 	// Kill the cache, as it is now invalid..
 	if (!empty($modSettings['cache_enable']))
-	{
 		cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-		cache_put_data('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-	}
 
 	require_once($sourcedir . '/Subs-List.php');
 	createList($listOptions);
@@ -711,7 +708,7 @@ function list_getLanguages()
 
 	// Override these for now.
 	$settings['actual_theme_dir'] = $settings['base_theme_dir'] = $settings['default_theme_dir'];
-	getLanguages(true, false);
+	getLanguages(true);
 
 	// Put them back.
 	$settings['actual_theme_dir'] = $backup_actual_theme_dir;
@@ -795,8 +792,8 @@ function ModifyLanguageSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
-	// Get our languages. No cache and use utf8.
-	getLanguages(false, false);
+	// Get our languages. No cache.
+	getLanguages(false);
 	foreach ($context['languages'] as $lang)
 		$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
@@ -966,10 +963,7 @@ function ModifyLanguage()
 
 		// Fifth, update getLanguages() cache.
 		if (!empty($modSettings['cache_enable']))
-		{
 			cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-			cache_put_data('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-		}
 
 		// Sixth, if we deleted the default language, set us back to english?
 		if ($context['lang_id'] == $language)

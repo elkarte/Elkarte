@@ -1891,7 +1891,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 			if (!empty($filename))
 				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 		}
-		
+
 		// Save this build
 		cache_put_data($cache_name, $context['css_files'], 600);
 	}
@@ -1899,8 +1899,8 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 
 /**
  * Add a Javascript file for output later
- * 
- * Can be passed an array of filenames, all which will have the same parameters applied, if you 
+ *
+ * Can be passed an array of filenames, all which will have the same parameters applied, if you
  * need specific parameters on a per file basis, call it multiple times
  *
  * @param array $filenames
@@ -1941,13 +1941,13 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			$has_cache_staler = strpos($filename, '.js?');
 			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 3) : $filename;
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
-			
+
 			// Is this a local file?
 			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . '/scripts/';
-				
+
 				// Fallback if we are not already in the default theme
 				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
 				{
@@ -1969,7 +1969,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 			}
 		}
-		
+
 		// Save it so we don't have to build this so often
 		cache_put_data($cache_name, $context['javascript_files'], 600);
 	}
@@ -2206,7 +2206,7 @@ function getBoardParents($id_parent)
  * @param bool $favor_utf8 = true
  * @return array
  */
-function getLanguages($use_cache = true, $favor_utf8 = true)
+function getLanguages($use_cache = true)
 {
 	global $context, $smcFunc, $settings, $modSettings;
 
@@ -2255,7 +2255,7 @@ function getLanguages($use_cache = true, $favor_utf8 = true)
 
 		// Lets cash in on this deal.
 		if (!empty($modSettings['cache_enable']))
-			cache_put_data('known_languages' . ($favor_utf8 ? '' : '_all'), $context['languages'], !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+			cache_put_data('known_languages', $context['languages'], !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 	}
 
 	return $context['languages'];

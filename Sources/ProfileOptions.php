@@ -2213,7 +2213,7 @@ function profileLoadLanguages()
 	$context['profile_languages'] = array();
 
 	// Get our languages!
-	getLanguages(true, true);
+	getLanguages(true);
 
 	// Setup our languages.
 	foreach ($context['languages'] as $lang)
