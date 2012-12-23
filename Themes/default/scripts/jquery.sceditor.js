@@ -277,12 +277,10 @@
 		 * @private
 		 */
 		initEditor = function () {
-			var $doc, $body;
+			var $doc, $body, tabIndex;
 
-			$sourceEditor	= $('<textarea></textarea>').attr('tabindex', $original.attr('tabindex')).hide();
-			$wysiwygEditor	= $('<iframe frameborder="0"></iframe>').attr('tabindex', $original.attr('tabindex'));
-			//$sourceEditor  = $('<textarea></textarea>').hide();
-			//$wysiwygEditor = $('<iframe frameborder="0"></iframe>');
+			$sourceEditor  = $('<textarea></textarea>').hide();
+			$wysiwygEditor = $('<iframe frameborder="0"></iframe>');
 
 			if(window.location.protocol === "https:")
 				$wysiwygEditor.attr("src", "javascript:false");
@@ -347,6 +345,12 @@
 				$doc.bind("keyup", base.expandToContent);
 
 			rangeHelper = new $.sceditor.rangeHelper(wysiwygEditor.contentWindow);
+
+			if(typeof (tabIndex = $original.attr("tabindex")) !== "undefined")
+			{
+				$sourceEditor.attr('tabindex', tabIndex);
+				$wysiwygEditor.attr('tabindex', tabIndex);
+			}
 		};
 
 		/**
@@ -950,7 +954,7 @@
 				return str.replace(/&/g, "&amp;")
 					.replace(/</g, "&lt;")
 					.replace(/>/g, "&gt;")
-					.replace(/ /g, "&nbsp;")
+					.replace(/ {2}/g, " &nbsp;")
 					.replace(/\r\n|\r/g, "\n")
 					.replace(/\n/g, "<br />");
 			};

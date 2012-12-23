@@ -216,16 +216,6 @@ function initialize_inputs()
 		exit;
 	}
 
-	// Anybody home?
-	if (!isset($_GET['xml']))
-	{
-		$incontext['remote_files_available'] = false;
-		$test = @fsockopen('www.simplemachines.org', 80, $errno, $errstr, 1);
-		if ($test)
-			$incontext['remote_files_available'] = true;
-		@fclose($test);
-	}
-
 	// Add slashes, as long as they aren't already being added.
 	if (!function_exists('get_magic_quotes_gpc') || @get_magic_quotes_gpc() == 0)
 	{
@@ -236,35 +226,7 @@ function initialize_inputs()
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
-	{
-		if (isset($_SESSION['installer_temp_ftp']))
-		{
-			$ftp = new ftp_connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
-			$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
-
-			$ftp->unlink('install.php');
-			$ftp->unlink('webinstall.php');
-
-			foreach ($databases as $key => $dummy)
-				$ftp->unlink('install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
-
-			$ftp->close();
-
-			unset($_SESSION['installer_temp_ftp']);
-		}
-		else
-		{
-			@unlink(__FILE__);
-			@unlink(dirname(__FILE__) . '/webinstall.php');
-
-			foreach ($databases as $key => $dummy)
-				@unlink(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
-		}
-
-		// Now just redirect to a blank.png...
-		header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
-		exit;
-	}
+		deleteInstaller();
 
 	// PHP 5 might cry if we don't do this now.
 	if (function_exists('date_default_timezone_set'))
@@ -323,7 +285,7 @@ function load_lang_file()
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
 
-		<p>If you continue to get this error message, feel free to <a href="http://support.simplemachines.org/">look to us for support</a>.</p>
+		<p>If you continue to get this error message, feel free to <a href="http://www.spudsdesign.com/dialogo/">look to us for support</a>.</p>
 	</div>
 	</body>
 </html>';
@@ -2021,6 +1983,37 @@ function fixModSecurity()
 	}
 	else
 		return false;
+}
+
+function deleteInstaller()
+{
+	if (isset($_SESSION['installer_temp_ftp']))
+	{
+		$ftp = new ftp_connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
+
+		$ftp->unlink('install.php');
+		$ftp->unlink('webinstall.php');
+
+		foreach ($databases as $key => $dummy)
+			$ftp->unlink('install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+
+		$ftp->close();
+
+		unset($_SESSION['installer_temp_ftp']);
+	}
+	else
+	{
+		@unlink(__FILE__);
+		@unlink(dirname(__FILE__) . '/webinstall.php');
+
+		foreach ($databases as $key => $dummy)
+			@unlink(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+	}
+
+	// Now just redirect to a blank.png...
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	exit;
 }
 
 function template_install_above()

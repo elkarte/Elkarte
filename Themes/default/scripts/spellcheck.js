@@ -2,7 +2,7 @@
 var spell_formname, spell_fieldname, spell_full;
 
 // Spell check the specified field in the specified form.
-function spellCheck(formName, fieldName, bFull = true)
+function spellCheck(formName, fieldName, bFull)
 {
 	// Grab the (hidden) spell checking form.
 	var spellform = document.forms.spell_form;
@@ -10,7 +10,7 @@ function spellCheck(formName, fieldName, bFull = true)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = bFull;
+	spell_full = bFull || true;
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
