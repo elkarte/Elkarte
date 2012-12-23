@@ -86,7 +86,7 @@ function action_markreplies()
 	// Make sure all the topics are integers!
 	$topics = array_map('intval', explode('-', $_REQUEST['topics']));
 
-	$smcFunc['db_query']('', '
+	$request = $smcFunc['db_query']('', '
 		SELECT id_topic, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
