@@ -928,7 +928,6 @@ function ForumSettings()
 
 	// Check if the database sessions will even work.
 	$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
-	$incontext['utf8_required'] = true;
 	$incontext['continue'] = 1;
 
 	// Submitting?
