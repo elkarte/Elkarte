@@ -1026,6 +1026,11 @@ function action_post($post_errors = array())
 	else
 		$context['page_title'] = $txt['post_reply'];
 
+	// Update the topic summary, needed to show new posts in a preview
+	if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
+		getTopic();
+
+	// Just ajax previewing then lets stop now
 	if (isset($_REQUEST['xml']))
 		obExit();
 
@@ -1094,7 +1099,9 @@ function action_post($post_errors = array())
 
 	// Are we starting a poll? if set the poll icon as selected if its available
 	if (isset($_REQUEST['poll']))
+	{
 		for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
+		{
 			if ($context['icons'][$i]['value'] == 'poll')
 			{
 				$context['icons'][$i]['selected'] = true;
@@ -1102,9 +1109,8 @@ function action_post($post_errors = array())
 				$context['icon_url'] = $context['icons'][$i]['url'];
 				break;
 			}
-
-	if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
-		getTopic();
+		}
+	}
 
 	// If the user can post attachments prepare the warning labels.
 	if ($context['can_post_attachment'])

@@ -100,7 +100,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					echo '||';
 			}
 
-
 			echo '",';
 		}
 		else
@@ -128,7 +127,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				sEditHeight: ', JavaScriptEscape($editor_context['height']), ',
 				bRichEditOff: ', empty($modSettings['disable_wysiwyg']) ? 'false' : 'true', ',
 				oSmileyBox: null,
-				oBBCBox: null
+				oBBCBox: null,
+				resizeMaxHeight: \'100%\'
 			});
 			smf_editorArray[smf_editorArray.length] = oEditorHandle_', $editor_id, ';
 		// ]]></script>';

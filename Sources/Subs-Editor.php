@@ -1463,7 +1463,7 @@ function create_control_richedit($editorOptions)
 	loadLanguage('Post');
 
 	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
-	loadLanguage('Drafts');
+		loadLanguage('Drafts');
 
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));

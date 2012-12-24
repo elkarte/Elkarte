@@ -1870,6 +1870,9 @@ select.qaction, input.qaction {
 	border-radius: 3px;
 	padding: 8px 12px 0 12px;
 }
+#topic_icons.description.none {
+	margin-top: 0;
+}
 #topic_icons p {
 	line-height: 2em;
 }

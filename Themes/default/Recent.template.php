@@ -236,7 +236,7 @@ function template_unread()
 		</form>';
 
 	echo '
-		<div class="description " id="topic_icons">
+		<div class="description ', empty($context['topics']) ? 'none' : '', '" id="topic_icons">
 			<p class="smalltext floatleft">
 				', !empty($modSettings['enableParticipation']) ? '
 				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] . '<br />' : '', '
@@ -403,7 +403,7 @@ function template_replies()
 		</form>';
 
 	echo '
-		<div class="description flow_auto" id="topic_icons">
+		<div class="description ', empty($context['topics']) ? 'none' : '', '" id="topic_icons">
 			<p class="smalltext floatleft">
 				', !empty($modSettings['enableParticipation']) ? '
 				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] . '<br />' : '', '
