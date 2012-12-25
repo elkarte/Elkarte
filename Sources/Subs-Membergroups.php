@@ -668,7 +668,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
 
 	$groups = array();
 
-	$request = $smcFunc['db_query']('substring_membergroups', '
+	$request = $smcFunc['db_query']('', '
 		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color, mg.hidden,
 			mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
