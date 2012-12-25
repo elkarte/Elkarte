@@ -42,7 +42,7 @@ function ModifyDraftSettings($return_config = false)
 		return $config_vars;
 
 	// Get the settings template ready.
-	require_once($sourcedir . '/ManageServer.php');
+	loadAdminClass ('ManageServer.php');
 
 	// Setup the template.
 	$context['page_title'] = $txt['managedrafts_settings'];

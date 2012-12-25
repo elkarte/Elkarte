@@ -461,7 +461,7 @@ function ConvertUtf8()
 		db_extend('search');
 		if ($smcFunc['db_search_support']('fulltext'))
 		{
-			require_once($sourcedir . '/ManageSearch.php');
+			loadAdminClass ('ManageSearch.php');
 			detectFulltextIndex();
 		}
 		// Cannot do conversion if using a fulltext index

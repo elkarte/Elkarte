@@ -23,7 +23,7 @@ if (!file_exists(dirname(__FILE__) . '/SSI.php'))
 	die('Cannot find SSI.php');
 
 require_once(dirname(__FILE__) . '/SSI.php');
-require_once($sourcedir . '/ManagePaid.php');
+loadAdminClass ('ManagePaid.php');
 
 // For any admin emailing.
 require_once($sourcedir . '/Subs-Admin.php');

@@ -891,7 +891,7 @@ function AdminSearchMember()
 {
 	global $context, $sourcedir;
 
-	require_once($sourcedir . '/ManageMembers.php');
+	loadAdminClass ('ManageMembers.php');
 	$_REQUEST['sa'] = 'query';
 
 	$_POST['membername'] = un_htmlspecialchars($context['search_term']);

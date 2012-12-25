@@ -280,7 +280,7 @@ function ModifyRegistrationSettings($return_config = false)
 	global $txt, $context, $scripturl, $modSettings, $sourcedir;
 
 	// This is really quite wanting.
-	require_once($sourcedir . '/ManageServer.php');
+	loadAdminClass ('ManageServer.php');
 
 	$config_vars = array(
 			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
