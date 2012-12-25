@@ -3082,7 +3082,7 @@ function template_footer()
 function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $sourcedir;
-	
+
 	// First up, load jquery
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
@@ -3511,24 +3511,6 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
 		return '<img src="' . $settings['images_url'] . '/buttons/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />' . ($label != '' ? '&nbsp;<strong>' . $txt[$label] . '</strong>' : '');
 	else
 		return '<img src="' . $settings['lang_images_url'] . '/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />';
-}
-
-/**
- * Load classes that are both (E_STRICT) PHP 4 and PHP 5 compatible.
- * - removed php4 support
- * - left shell in place for mod compatablily
- *
- * @param string $filename
- * @todo remove this function since we are no longer supporting PHP < 5
- */
-function loadClassFile($filename)
-{
-	global $sourcedir;
-
-	if (!file_exists($sourcedir . '/' . $filename))
-		fatal_lang_error('error_bad_file', 'general', array($sourcedir . '/' . $filename));
-
-	require_once($sourcedir . '/' . $filename);
 }
 
 /**
