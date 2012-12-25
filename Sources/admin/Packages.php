@@ -30,7 +30,7 @@ function Packages()
 	// @todo Remove this!
 	if (isset($_GET['get']) || isset($_GET['pgdownload']))
 	{
-		require_once($sourcedir . '/PackageServers.php');
+		loadAdminClass('PackageServers.php');
 		return PackageServers();
 	}
 
