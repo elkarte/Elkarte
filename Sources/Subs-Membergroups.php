@@ -656,15 +656,17 @@ function cache_getMembergroupList()
 /**
  * Helper function to generate a list of membergroups for display
  *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
- * @param type $membergroup_type
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $membergroup_type
+ * @param int $user_id
+ * @param bool $can_moderate
  * @return type
  */
-function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
+function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $can_moderate, $can_view_all = false)
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $user_info;
+	global $scripturl, $smcFunc, $user_info;
 
 	$groups = array();
 
@@ -673,12 +675,12 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
 			mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
-		WHERE mg.min_posts {raw:min_posts}' . (allowedTo('admin_forum') ? '' : '
+		WHERE mg.min_posts {raw:min_posts}' . ($can_view_all ? '' : '
 			AND mg.id_group != {int:mod_group}
 			AND mg.group_type != {int:is_protected}') . '
 		ORDER BY {raw:sort}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => $user_id,
 			'min_posts' => ($membergroup_type === 'post_count' ? '!= ' : '= ') . -1,
 			'mod_group' => 3,
 			'is_protected' => 1,
@@ -689,11 +691,10 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
 	// Start collecting the data.
 	$groups = array();
 	$group_ids = array();
-	$context['can_moderate'] = allowedTo('manage_membergroups');
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// We only list the groups they can see.
-		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
+		if ($row['hidden'] && !$row['can_moderate'] && !$can_moderate)
 			continue;
 
 		$row['icons'] = explode('#', $row['icons']);
@@ -707,10 +708,10 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
 			'type' => $row['group_type'],
 			'num_members' => $row['num_members'],
 			'moderators' => array(),
-			'icons' => !empty($row['icons'][0]) && !empty($row['icons'][1]) ? str_repeat('<img src="' . $settings['images_url'] . '/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
+			'icons' => $row['icons'],
 		);
 
-		$context['can_moderate'] |= $row['can_moderate'];
+		$can_moderate |= $row['can_moderate'];
 		$group_ids[] = $row['id_group'];
 	}
 	$smcFunc['db_free_result']($request);
@@ -750,7 +751,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type)
 			$smcFunc['db_free_result']($query);
 
 			// Only do additional groups if we can moderate...
-			if ($context['can_moderate'])
+			if ($can_moderate)
 			{
 				$query = $smcFunc['db_query']('', '
 					SELECT mg.id_group, COUNT(*) AS num_members
