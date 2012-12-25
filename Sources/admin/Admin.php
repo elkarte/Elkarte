@@ -532,7 +532,7 @@ function AdminMain()
 
 	// Now - finally - call the right place!
 	if (isset($admin_include_data['file']))
-		require_once($sourcedir . '/' . $admin_include_data['file']);
+		loadAdminClass($admin_include_data['file']);
 
 	$admin_include_data['function']();
 }
