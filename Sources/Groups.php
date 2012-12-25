@@ -71,7 +71,7 @@ function action_groups()
  */
 function action_grouplist()
 {
-	global $txt, $context, $sourcedir, $scripturl;
+	global $txt, $context, $sourcedir, $scripturl, $user_info;
 
 	$context['page_title'] = $txt['viewing_groups'];
 
@@ -89,6 +89,9 @@ function action_grouplist()
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
+				$user_info['id'],
+				allowedTo('manage_membergroups'),
+				allowedTo('admin_forum'),
 			),
 		),
 		'columns' => array(
@@ -128,7 +131,14 @@ function action_grouplist()
 					'value' => $txt['membergroups_icons'],
 				),
 				'data' => array(
-					'db' => 'icons',
+					'function' => create_function('$rowData', '
+						global $settings;
+
+						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+						else
+							return \'\';
+					'),
 				),
 				'sort' => array(
 					'default' => 'mg.icons',

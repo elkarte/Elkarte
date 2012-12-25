@@ -82,7 +82,7 @@ function ModifyMembergroups()
  */
 function MembergroupIndex()
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $sourcedir;
+	global $txt, $scripturl, $context, $settings, $smcFunc, $sourcedir, $user_info;
 
 	$context['page_title'] = $txt['membergroups_title'];
 
@@ -97,6 +97,9 @@ function MembergroupIndex()
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
+				$user_info['id'],
+				allowedTo('manage_membergroups'),
+				allowedTo('admin_forum'),
 			),
 		),
 		'columns' => array(
@@ -136,7 +139,14 @@ function MembergroupIndex()
 					'value' => $txt['membergroups_icons'],
 				),
 				'data' => array(
-					'db' => 'icons',
+					'function' => create_function('$rowData', '
+						global $settings;
+
+						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+						else
+							return \'\';
+					'),
 				),
 				'sort' => array(
 					'default' => 'mg.icons',
@@ -204,6 +214,9 @@ function MembergroupIndex()
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'post_count',
+				$user_info['id'],
+				allowedTo('manage_membergroups'),
+				allowedTo('admin_forum'),
 			),
 		),
 		'columns' => array(
@@ -229,7 +242,14 @@ function MembergroupIndex()
 					'value' => $txt['membergroups_icons'],
 				),
 				'data' => array(
-					'db' => 'icons',
+					'function' => create_function('$rowData', '
+						global $settings;
+
+						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+						else
+							return \'\';
+					'),
 				),
 				'sort' => array(
 					'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, icons',
