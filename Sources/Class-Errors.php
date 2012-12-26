@@ -59,6 +59,9 @@ class error_context
 	 */
 	private static $_contexts = null;
 
+	const MINOR = 0;
+	const SERIOUS = 1;
+
 	/**
 	 * Initialize the class
 	 *
@@ -72,10 +75,10 @@ class error_context
 			$this->_name = $id;
 
 		// initialize severity levels... waiting for details!
-		$this->_severity_levels = array('minor', 'serious');
+		$this->_severity_levels = array(error_context::MINOR, error_context::SERIOUS);
 
 		// initialize default severity (not sure this is needed)
-		$this->_default_severity = 'minor';
+		$this->_default_severity = error_context::MINOR;
 	}
 
 	/**
