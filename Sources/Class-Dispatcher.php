@@ -114,7 +114,7 @@ class site_Dispatcher
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
 			// 'announce' => array('Announce.php', 'action_announce'),
-			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
+			'attachapprove' => array('ModerateAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Members.php', 'action_buddy'),
 			'calendar' => array('Calendar.php', 'action_calendar'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
