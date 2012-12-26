@@ -25,7 +25,7 @@ require_once(SUBSDIR . '/Drafts.subs.php');
  * Determines if this is a new or an existing draft
  * Returns any errors in $post_errors for display in the template
  *
- * @param string $post_errors
+ * @param object $post_errors
  * @return boolean
  */
 function saveDraft(&$post_errors)
@@ -98,14 +98,14 @@ function saveDraft(&$post_errors)
 			$context['id_draft'] = $id_draft;
 		}
 		else
-			$post_errors[] = 'draft_not_saved';
+			$post_errors->addError('draft_not_saved', 'serious');
 	}
 
 	// cleanup
 	unset($_POST['save_draft']);
 
 	// if we were called from the autosave function, send something back
-	if (!empty($id_draft) && isset($_REQUEST['xml']) && (!in_array('session_timeout', $post_errors)))
+	if (!empty($id_draft) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
 	{
 		loadTemplate('Xml');
 		$context['sub_template'] = 'xml_draft';
