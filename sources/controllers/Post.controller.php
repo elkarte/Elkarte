@@ -34,7 +34,7 @@ if (!defined('ELKARTE'))
  *
  *  @param array $post_errors holds any errors found tyring to post
  */
-function action_post($post_errors = null)
+function action_post()
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
@@ -1135,7 +1135,7 @@ function action_post2()
 		// If drafts are enabled, then pass this off
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1180,7 +1180,7 @@ function action_post2()
 		// Saving your new topic as a draft first?
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1263,7 +1263,7 @@ function action_post2()
 		// If drafts are enabled, then lets send this off to save
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1400,7 +1400,7 @@ function action_post2()
 		// Previewing.
 		$_REQUEST['preview'] = true;
 
-		return action_post($post_errors);
+		return action_post();
 	}
 
 	// Make sure the user isn't spamming the board.

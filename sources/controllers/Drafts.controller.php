@@ -28,7 +28,7 @@ require_once(SUBSDIR . '/Drafts.subs.php');
  * @param object $post_errors
  * @return boolean
  */
-function saveDraft(&$post_errors)
+function saveDraft()
 {
 	global $context, $user_info, $smcFunc, $modSettings, $board;
 
@@ -59,6 +59,9 @@ function saveDraft(&$post_errors)
 
 		return;
 	}
+
+	// be ready for surprises
+	$post_errors = error_context::context('post');
 
 	// prepare and clean the data, load the draft array
 	$draft['id_draft'] = $id_draft;
