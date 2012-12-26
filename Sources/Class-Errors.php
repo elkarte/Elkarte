@@ -14,7 +14,7 @@ if (!defined('DIALOGO'))
 /**
  *  This class is an experiment for the job of handling errors.
  */
-class error_handler
+class error_context
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
@@ -141,7 +141,9 @@ class error_handler
 	}
 
 	/**
-	 * Return the code of the highest error level encounterd
+	 * Return the code of the highest error level encountered
+	 *
+	 * @return int
 	 */
 	public function getErrorType()
 	{

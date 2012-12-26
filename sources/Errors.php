@@ -119,6 +119,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 /**
  * An irrecoverable error. This function stops execution and displays an error message.
  * It logs the error message if $log is specified.
+ *
  * @param string $error
  * @param string $log = 'general'
  */
@@ -186,6 +187,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 /**
  * Handler for standard error messages, standard PHP error handler replacement.
  * It dies with fatal_error() if the error_level matches with error_reporting.
+ *
  * @param int $error_level
  * @param string $error_string
  * @param string $file
@@ -238,7 +240,7 @@ function error_handler($error_level, $error_string, $file, $line)
 
 	$message = log_error($error_level . ': ' . $error_string, $error_type, $file, $line);
 
-	// Let's give integrations a chance to ouput a bit differently
+	// Let's give integrations a chance to output a bit differently
 	call_integration_hook('integrate_output_error', array($message, $error_type, $error_level, $file, $line));
 
 	// Dying on these errors only causes MORE problems (blank pages!)
