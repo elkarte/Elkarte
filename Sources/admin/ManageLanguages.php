@@ -774,7 +774,7 @@ function ModifyLanguageSettings($return_config = false)
 	global $scripturl, $context, $txt, $boarddir, $settings, $smcFunc, $sourcedir;
 
 	// We'll want to save them someday.
-	require_once $sourcedir . '/ManageServer.php';
+	loadAdminClass ('ManageServer.php');
 
 	// Warn the user if the backup of Settings.php failed.
 	$settings_not_writable = !is_writable($boarddir . '/Settings.php');

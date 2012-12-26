@@ -384,7 +384,7 @@ function EditBoard()
 
 	// For editing the profile we'll need this.
 	loadLanguage('ManagePermissions');
-	require_once($sourcedir . '/ManagePermissions.php');
+	loadAdminClass ('ManagePermissions.php');
 	loadPermissionProfiles();
 
 	// id_board must be a number....
@@ -773,7 +773,7 @@ function EditBoardSettings($return_config = false)
 		return $config_vars;
 
 	// Needed for the settings template.
-	require_once($sourcedir . '/ManageServer.php');
+	loadAdminClass ('ManageServer.php');
 
 	// Don't let guests have these permissions.
 	$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
