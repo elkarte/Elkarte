@@ -217,7 +217,7 @@ function deleteMembergroups($groups)
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
-	global $smcFunc, $user_info, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings, $sourcedir;
 
 	// You're getting nowhere without this permission, unless of course you are the group's moderator.
 	if (!$permissionCheckDone)
@@ -442,7 +442,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $smcFunc, $user_info, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings, $sourcedir;
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -654,7 +654,7 @@ function cache_getMembergroupList()
 }
 
 /**
- * Helper function to generate a list of membergroups for display
+ * Helper function to generate a list of membergroups for display.
  *
  * @param int $start
  * @param int $items_per_page
@@ -662,11 +662,11 @@ function cache_getMembergroupList()
  * @param string $membergroup_type
  * @param int $user_id
  * @param bool $can_moderate
- * @return type
+ * @param bool $can_view_all
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $can_moderate, $can_view_all = false)
 {
-	global $scripturl, $smcFunc, $user_info;
+	global $scripturl, $smcFunc;
 
 	$groups = array();
 
