@@ -52,16 +52,24 @@ class error_context
 	private $_language_files = array();
 
 	/**
+	 * Multipleton. This is an array of instances of error_context.
+	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
+	 *
+	 * @var array of error_context
+	 */
+	private static $_contexts = null;
+
+	/**
 	 * Initialize the class
 	 *
 	 * @param string error identifier
 	 * @param array/mixed a list of all severity code from the less important to the most serious
 	 * @param mixed the default error severity code
 	 */
-	public function __construct ($error_name, $severity_levels, $default_severity)
+	private function __construct ($id, $severity_levels, $default_severity)
 	{
-		if (!empty($error_name))
-			$this->_name = $error_name;
+		if (!empty($id))
+			$this->_name = $id;
 
 		if (!empty($severity_levels))
 			$this->_severity_levels = $severity_levels;
@@ -193,5 +201,15 @@ class error_context
 		}
 
 		return $returns;
+	}
+
+	public static function context($id = 'default')
+	{
+		if (self::$_contexts === null)
+			self::$_contexts = array();
+		if (!array_key_exists($id, self::$_contexts))
+			self::$_contexts[$id] = new error_context($id);
+
+		return self::$_contexts[$id];
 	}
 }

@@ -46,8 +46,8 @@ function action_post($post_errors = null)
 	if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 		unset($_REQUEST['poll']);
 
-	if ($post_errors === null)
-		$post_errors = new error_context('post', array('minor', 'serious'), 'minor');
+	$post_errors = error_context::context('post');
+	// array('minor', 'serious'), 'minor');
 
 	// Posting an event?
 	$context['make_event'] = isset($_REQUEST['calendar']);
@@ -989,7 +989,8 @@ function action_post2()
 	checkSubmitOnce('check');
 
 	// No errors as yet.
-	$post_errors = new error_context('post', array('minor', 'serious'), 'minor');
+	$post_errors = error_context::context('post');
+	// array('minor', 'serious'), 'minor');
 
 	// If the session has timed out, let the user re-submit their form.
 	if (checkSession('post', '', false) != '')
@@ -2098,7 +2099,8 @@ function action_jsmodify()
 		$moderationAction = $row['id_member'] != $user_info['id'];
 	}
 
-	$post_errors = new error_context('post', array('minor', 'serious'), 'minor');
+	$post_errors = error_context::context('post');
+	// array('minor', 'serious'), 'minor');
 	if (isset($_POST['subject']) && $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) !== '')
 	{
 		$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
