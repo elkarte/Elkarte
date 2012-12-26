@@ -66,18 +66,16 @@ class error_context
 	 * @param array/mixed a list of all severity code from the less important to the most serious
 	 * @param mixed the default error severity code
 	 */
-	private function __construct ($id, $severity_levels, $default_severity)
+	private function __construct ($id = 'default')
 	{
 		if (!empty($id))
 			$this->_name = $id;
 
-		if (!empty($severity_levels))
-			$this->_severity_levels = $severity_levels;
+		// initialize severity levels... waiting for details!
+		$this->_severity_levels = array('minor', 'serious');
 
-		if (!empty($default_severity))
-			$this->_default_severity = $default_severity;
-		else
-			$this->_default_severity = array_shift(array_values($this->_severity_levels));
+		// initialize default severity (not sure this is needed)
+		$this->_default_severity = 'minor';
 	}
 
 	/**
