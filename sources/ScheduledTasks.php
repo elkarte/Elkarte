@@ -1193,61 +1193,6 @@ function next_time($regularity, $unit, $offset)
 }
 
 /**
- * This loads the bare minimum data to allow us to load language files!
- */
-function loadEssentialThemeData()
-{
-	global $settings, $modSettings, $smcFunc, $mbname, $context;
-
-	// Get all the default theme variables.
-	$result = $smcFunc['db_query']('', '
-		SELECT id_theme, variable, value
-		FROM {db_prefix}themes
-		WHERE id_member = {int:no_member}
-			AND id_theme IN (1, {int:theme_guests})',
-		array(
-			'no_member' => 0,
-			'theme_guests' => $modSettings['theme_guests'],
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-	{
-		$settings[$row['variable']] = $row['value'];
-
-		// Is this the default theme?
-		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
-			$settings['default_' . $row['variable']] = $row['value'];
-	}
-	$smcFunc['db_free_result']($result);
-
-	// Check we have some directories setup.
-	if (empty($settings['template_dirs']))
-	{
-		$settings['template_dirs'] = array($settings['theme_dir']);
-
-		// Based on theme (if there is one).
-		if (!empty($settings['base_theme_dir']))
-			$settings['template_dirs'][] = $settings['base_theme_dir'];
-
-		// Lastly the default theme.
-		if ($settings['theme_dir'] != $settings['default_theme_dir'])
-			$settings['template_dirs'][] = $settings['default_theme_dir'];
-	}
-
-	// Assume we want this.
-	$context['forum_name'] = $mbname;
-
-	// Check loadLanguage actually exists!
-	if (!function_exists('loadLanguage'))
-	{
-		require_once(SOURCEDIR . '/Load.php');
-		require_once(SOURCEDIR . '/Subs.php');
-	}
-
-	loadLanguage('index+Modifications');
-}
-
-/**
  * This retieves data (e.g. last version of ELKARTE)
  */
 function scheduled_fetchFiles()

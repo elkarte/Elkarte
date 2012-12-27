@@ -1687,6 +1687,60 @@ function loadTheme($id_theme = 0, $initialize = true)
 }
 
 /**
+ * This loads the bare minimum data.
+ * Needed by scheduled tasks, and any other code that needs language files
+ * before the forum (the theme) is loaded.
+ */
+function loadEssentialThemeData()
+{
+	global $settings, $modSettings, $smcFunc, $mbname, $context, SOURCEDIR;
+
+	// Get all the default theme variables.
+	$result = $smcFunc['db_query']('', '
+		SELECT id_theme, variable, value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:no_member}
+			AND id_theme IN (1, {int:theme_guests})',
+		array(
+			'no_member' => 0,
+			'theme_guests' => $modSettings['theme_guests'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+	{
+		$settings[$row['variable']] = $row['value'];
+
+		// Is this the default theme?
+		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
+			$settings['default_' . $row['variable']] = $row['value'];
+	}
+	$smcFunc['db_free_result']($result);
+
+	// Check we have some directories setup.
+	if (empty($settings['template_dirs']))
+	{
+		$settings['template_dirs'] = array($settings['theme_dir']);
+
+		// Based on theme (if there is one).
+		if (!empty($settings['base_theme_dir']))
+			$settings['template_dirs'][] = $settings['base_theme_dir'];
+
+		// Lastly the default theme.
+		if ($settings['theme_dir'] != $settings['default_theme_dir'])
+			$settings['template_dirs'][] = $settings['default_theme_dir'];
+	}
+
+	// Assume we want this.
+	$context['forum_name'] = $mbname;
+
+	// Check loadLanguage actually exists!
+	if (!function_exists('loadLanguage'))
+		require_once(SOURCEDIR . '/Subs.php');
+
+	loadLanguage('index+Modifications');
+}
+
+/**
  * Load a template - if the theme doesn't include it, use the default.
  * What this function does:
  *  - loads a template file with the name template_name from the current, default, or base theme.
@@ -2035,10 +2089,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
-	{
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
-	}
 
 	// What theme are we in?
 	$theme_name = basename($settings['theme_url']);
