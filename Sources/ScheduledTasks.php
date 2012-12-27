@@ -433,7 +433,7 @@ function scheduled_daily_maintenance()
 	// Do any spider stuff.
 	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once($sourcedir . '/ManageSearchEngines.php');
+		loadAdminClass ('ManageSearchEngines.php');
 		consolidateSpiderStats();
 	}
 
@@ -1600,7 +1600,7 @@ function scheduled_paid_subscriptions()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		require_once($sourcedir . '/ManagePaid.php');
+		loadAdminClass ('ManagePaid.php');
 		removeSubscription($row['id_subscribe'], $row['id_member']);
 	}
 	$smcFunc['db_free_result']($request);
