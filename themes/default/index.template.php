@@ -599,3 +599,23 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 							</ul>
 						</div>';
 }
+
+function template_show_error($error_id)
+{
+	global $context;
+
+	if (empty($error_id))
+		return;
+
+	echo '
+					<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context[$error_id]) ? ' style="display: none"' : '', ' id="errors">
+						<dl>
+							<dt>
+								<strong id="error_serious">', $context['error_title'], '</strong>
+							</dt>
+							<dd class="error" id="error_list">
+								', empty($context[$error_id]) ? '' : implode('<br />', $context[$error_id]), '
+							</dd>
+						</dl>
+					</div>';
+}

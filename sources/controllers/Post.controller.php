@@ -810,6 +810,7 @@ function action_post()
 	{
 		$context['post_error'] = $post_errors->prepareErrors();
 		$context['error_type'] = $post_errors->getErrorType();
+		$context['error_title'] = $txt['error_while_submitting'];
 	}
 
 	// What are you doing? Posting a poll, modifying, previewing, new post, or reply...

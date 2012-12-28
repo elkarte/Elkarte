@@ -466,6 +466,7 @@ function action_editpoll()
 		{
 			$context['poll_error'] = $poll_errors->prepareErrors();
 			$context['error_type'] = $poll_errors->getErrorType();
+			$context['error_title'] = $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'];
 		}
 	}
 	else
