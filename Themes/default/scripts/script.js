@@ -1567,6 +1567,21 @@ function expandCollapseLabels()
 	document.getElementById("expandLabelsIcon").src = smf_images_url + (current ? "/expand.png" : "/collapse.png");
 }
 
+function expandCollapse(id, icon, speed)
+{
+	icon = icon || false;
+	speed = speed || 300;
+	var oId = $('#' + id);
+
+	// change the icon on the box as well?
+	if (icon)
+		$('#' + icon).attr("src", smf_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+	
+	// open or collaspe the content id
+	oId.slideToggle(speed);
+
+}
+
 function updateRuleDef(optNum)
 {
 	if (document.getElementById("ruletype" + optNum).value == "gid")
