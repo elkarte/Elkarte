@@ -114,9 +114,9 @@ function action_grouplist()
 
 						// Add a help option for moderator and administrator.
 						if ($rowData[\'id_group\'] == 1)
-							$group_name .= sprintf(\' (<a href="%1$s?action=helpadmin;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
 						elseif ($rowData[\'id_group\'] == 3)
-							$group_name .= sprintf(\' (<a href="%1$s?action=helpadmin;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
 
 						return $group_name;
 					'),

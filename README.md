@@ -21,3 +21,6 @@ How to contribute:
 * Branch your own repository, and commit the desired changes to that branch.
 * Sign-off on your commits, to acknowledge your submission under the license of the project.
 * Send in a pull request (PR).
+
+Recommended reading for github pull requests workflow:
+[About Github workflow](http://qsapp.com/wiki/Github#Github_Contributor_Workflow)

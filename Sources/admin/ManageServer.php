@@ -685,7 +685,7 @@ function prepareDBSettingContext(&$config_vars)
 	// If we have inline permissions we need to prep them.
 	if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 	{
-		require_once($sourcedir . '/ManagePermissions.php');
+		loadAdminClass ('ManagePermissions.php');
 		init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 	}
 
@@ -918,7 +918,7 @@ function saveDBSettings(&$config_vars)
 	// If we have inline permissions we need to save them.
 	if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 	{
-		require_once($sourcedir . '/ManagePermissions.php');
+		loadAdminClass ('ManagePermissions.php');
 		save_inline_permissions($inlinePermissions);
 	}
 }

@@ -37,7 +37,7 @@ function action_managemail()
 	loadLanguage('ManageMail');
 
 	// We'll need the utility functions from here.
-	require_once($sourcedir . '/ManageServer.php');
+	loadAdminClass ('ManageServer.php');
 
 	$context['page_title'] = $txt['mailqueue_title'];
 	$context['sub_template'] = 'show_settings';

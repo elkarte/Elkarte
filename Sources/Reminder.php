@@ -35,7 +35,14 @@ function pre_reminder()
 
 	$context['page_title'] = $txt['authentication_reminder'];
 	$context['robot_no_index'] = true;
+}
 
+/**
+ * Default action for reminder.
+ */
+function action_reminder()
+{
+	// nothing to do, the template will ask for an action to pick
 	createToken('remind');
 }
 

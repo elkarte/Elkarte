@@ -217,7 +217,7 @@ function deleteMembergroups($groups)
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
-	global $smcFunc, $user_info, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings, $sourcedir;
 
 	// You're getting nowhere without this permission, unless of course you are the group's moderator.
 	if (!$permissionCheckDone)
@@ -442,7 +442,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $smcFunc, $user_info, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings, $sourcedir;
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -654,19 +654,19 @@ function cache_getMembergroupList()
 }
 
 /**
- * Helper function to generate a list of membergroups for display
+ * Helper function to generate a list of membergroups for display.
  *
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
  * @param string $membergroup_type
  * @param int $user_id
- * @param bool $can_moderate
- * @return type
+ * @param bool $include_hidden
+ * @param bool $include_all
  */
-function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $can_moderate, $can_view_all = false)
+function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
 {
-	global $scripturl, $smcFunc, $user_info;
+	global $scripturl, $smcFunc;
 
 	$groups = array();
 
@@ -675,7 +675,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
-		WHERE mg.min_posts {raw:min_posts}' . ($can_view_all ? '' : '
+		WHERE mg.min_posts {raw:min_posts}' . ($include_all ? '' : '
 			AND mg.id_group != {int:mod_group}
 			AND mg.group_type != {int:is_protected}') . '
 		ORDER BY {raw:sort}',
@@ -694,7 +694,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// We only list the groups they can see.
-		if ($row['hidden'] && !$row['can_moderate'] && !$can_moderate)
+		if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
 			continue;
 
 		$row['icons'] = explode('#', $row['icons']);
@@ -711,7 +711,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			'icons' => $row['icons'],
 		);
 
-		$can_moderate |= $row['can_moderate'];
+		$include_hidden |= $row['can_moderate'];
 		$group_ids[] = $row['id_group'];
 	}
 	$smcFunc['db_free_result']($request);
@@ -751,7 +751,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			$smcFunc['db_free_result']($query);
 
 			// Only do additional groups if we can moderate...
-			if ($can_moderate)
+			if ($include_hidden)
 			{
 				$query = $smcFunc['db_query']('', '
 					SELECT mg.id_group, COUNT(*) AS num_members

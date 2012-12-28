@@ -114,7 +114,7 @@ class site_Dispatcher
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
 			// 'announce' => array('Announce.php', 'action_announce'),
-			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
+			'attachapprove' => array('ModerateAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Members.php', 'action_buddy'),
 			'calendar' => array('Calendar.php', 'action_calendar'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
@@ -188,16 +188,21 @@ class site_Dispatcher
 			'xmlhttp' => array('Xml.php', 'action_xmlhttp'),
 		);
 
+		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
+
 		// allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
+			// admin files have their own place
+			$path = $sourcedir . (in_array($_GET['action'], $adminActions) ? '/admin' : '');
+
 			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
 			{
-				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_controller_name = $actionArray[$_GET['action']][1];
 
 				// if the method is coded in, use it
@@ -212,7 +217,7 @@ class site_Dispatcher
 			// then it's one of our legacy functions
 			else
 			{
-				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_function_name = $actionArray[$_GET['action']][1];
 			}
 		}
