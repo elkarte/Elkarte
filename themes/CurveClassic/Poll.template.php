@@ -35,7 +35,7 @@ function template_poll_edit()
 				<h3 class="catbg">', $context['page_title'], '</h3>
 			</div>';
 
-	if (!empty($context['poll_error']['messages']))
+	if (!empty($context['poll_error']))
 		echo '
 			<div class="errorbox">
 				<dl class="poll_error">
@@ -43,7 +43,7 @@ function template_poll_edit()
 						', $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'], ':
 					</dt>
 					<dt>
-						', empty($context['poll_error']['messages']) ? '' : implode('<br />', $context['poll_error']['messages']), '
+						', implode('<br />', $context['poll_error']), '
 					</dt>
 				</dl>
 			</div>';
