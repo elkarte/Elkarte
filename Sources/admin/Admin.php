@@ -1021,7 +1021,7 @@ function AdminLogs()
 		),
 	);
 
-	require_once($sourcedir . '/' . $log_functions[$sub_action][0]);
+	loadAdminClass($log_functions[$sub_action][0]);
 	$log_functions[$sub_action][1]();
 }
 

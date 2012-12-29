@@ -372,7 +372,7 @@ function ModifyCoreFeatures($return_config = false)
 			'),
 			'on_save' => create_function('', '
 				global $sourcedir, $modSettings;
-				require_once($sourcedir . \'/ManageSearchEngines.php\');
+				loadAdminClass(\'ManageSearchEngines.php\');
 				recacheSpiderNames();
 			'),
 		),
@@ -1510,7 +1510,7 @@ function ShowCustomProfiles()
 
 	// What about standard fields they can tweak?
 	$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
-	
+
 	// What fields can't you put on the registration page?
 	$context['fields_no_registration'] = array('posts', 'warning_status');
 
@@ -1945,7 +1945,7 @@ function EditCustomProfiles()
 
 				// Otherwise, save it boy.
 				$field_options .= $v . ',';
-				
+
 				// This is just for working out what happened with old options...
 				$newOptions[$k] = $v;
 

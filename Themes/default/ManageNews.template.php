@@ -157,7 +157,8 @@ function template_email_members()
 				sOptionName: \'admin_preferences\',
 				sSessionVar: smf_session_var,
 				sSessionId: smf_session_id,
-				sThemeId: \'1\'
+				sThemeId: \'1\',
+				sAdditionalVars: \';admin_key=apn\'
 			}
 		});
 	// ]]></script>

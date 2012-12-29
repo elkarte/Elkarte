@@ -15,7 +15,7 @@ function previewControl()
 	// Lets make a background preview request
 	if (window.XMLHttpRequest)
 	{
-		var bPost = false;
+		bPost = false;
 
 		// call the needed preview function
 		switch(preview_area) 
