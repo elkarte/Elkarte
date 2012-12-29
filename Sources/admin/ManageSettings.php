@@ -368,7 +368,7 @@ function ModifyCoreFeatures($return_config = false)
 			'),
 			'on_save' => create_function('', '
 				global $sourcedir, $modSettings;
-				loadAdminClass(\'/ManageSearchEngines.php\');
+				loadAdminClass(\'ManageSearchEngines.php\');
 				recacheSpiderNames();
 			'),
 		),
