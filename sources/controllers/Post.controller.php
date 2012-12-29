@@ -1003,8 +1003,6 @@ function action_post2()
 			'id' => 'post',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
-		if (is_array($context['require_verification']))
-			$post_errors->addError(array_merge($post_errors, $context['require_verification']));
 	}
 
 	require_once(SUBSDIR . '/Post.subs.php');
