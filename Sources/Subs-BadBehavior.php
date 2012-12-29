@@ -55,6 +55,8 @@ function deleteBadBehavior($filter)
 			)
 		);
 
+		$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
+
 		// Go back to where we were.
 		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
 	}
