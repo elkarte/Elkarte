@@ -18,9 +18,13 @@ by signing off your contributions, you acknowledge that you can and do license y
 How to contribute:
 ===
 * Fork the repository. If you are not used to using Github, please check out [fork a repository](http://help.github.com/fork-a-repo).
-* Branch your own repository, and commit the desired changes to that branch.
+* Branch your own repository. Example:
+```
+git checkout -b new_enhancement_name
+```
+* commit the desired changes to that branch.
 * Sign-off on your commits, to acknowledge your submission under the license of the project.
-* Send in a pull request (PR).
+* Send in a pull request (PR) from your new_enhancement_name branch.
 
 Recommended reading for github pull requests workflow:
 [About Github workflow](http://qsapp.com/wiki/Github#Github_Contributor_Workflow)
