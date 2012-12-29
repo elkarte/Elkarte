@@ -4,15 +4,12 @@ var smf_editorArray = new Array();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
 var ua = navigator.userAgent.toLowerCase();
-
 var is_opera = ua.indexOf('opera') != -1;
 var is_ff = (ua.indexOf('firefox') != -1 || ua.indexOf('iceweasel') != -1 || ua.indexOf('icecat') != -1 || ua.indexOf('shiretoko') != -1 || ua.indexOf('minefield') != -1) && !is_opera;
 var is_gecko = ua.indexOf('gecko') != -1 && !is_opera;
-
 var is_chrome = ua.indexOf('chrome') != -1;
 var is_safari = ua.indexOf('applewebkit') != -1 && !is_chrome;
 var is_webkit = ua.indexOf('applewebkit') != -1;
-
 var is_ie = ua.indexOf('msie') != -1 && !is_opera;
 var is_iphone = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1;
 var is_android = ua.indexOf('android') != -1;
@@ -502,6 +499,7 @@ function submitonce(theform)
 	for (var i = 0; i < smf_editorArray.length; i++)
 		smf_editorArray[i].doSubmit();
 }
+
 function submitThisOnce(oControl)
 {
 	// oControl might also be a form.
@@ -665,7 +663,6 @@ function smf_avatarResize()
 	}
 }
 
-
 function hashLoginPassword(doForm, cur_session_id, token)
 {
 	// Compatibility.
@@ -753,7 +750,6 @@ function smc_preCacheImage(sSrc)
 	}
 }
 
-
 // *** smc_Cookie class.
 function smc_Cookie(oOptions)
 {
@@ -784,7 +780,6 @@ smc_Cookie.prototype.set = function(sKey, sValue)
 {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 }
-
 
 // *** smc_Toggle class.
 function smc_Toggle(oOptions)
@@ -948,7 +943,6 @@ smc_Toggle.prototype.toggle = function()
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
 }
-
 
 function ajax_indicator(turn_on)
 {
