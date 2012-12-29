@@ -743,13 +743,6 @@ function template_search()
 						msgCollapsed: ', JavaScriptEscape($txt['pm_search_choose_label']), '
 					}
 				],
-				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'admin_preferences\',
-					sSessionVar: smf_session_var,
-					sSessionId: smf_session_id,
-					sThemeId: \'1\'
-				}
 			});
 		// ]]></script>';
 		}
