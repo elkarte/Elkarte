@@ -1282,11 +1282,13 @@ function template_labels()
 						<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" class="button_submit" />
-			</div>
+				<div class="flow_auto">
+					<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" class="button_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</div>
+			</div>		
 		</div>
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-	</form><br />';
+	</form>';
 }
 
 // Template for reporting a personal message.
