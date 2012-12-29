@@ -140,14 +140,18 @@ class error_context
 	 *
 	 * @param string the error
 	 */
-	public function hasError($error)
+	public function hasError($errors)
 	{
 		if (empty($error))
 			return false;
 		else
-			foreach ($this->_errors as $errors)
-				if (isset($errors[$error]))
-					return true;
+		{
+			$errors = is_array($errors) ? $errors : array($errors);
+			foreach ($errors as $error)
+				foreach ($this->_errors as $current_errors)
+					if (isset($current_errors[$error]))
+						return true;
+		}
 		return false;
 	}
 
