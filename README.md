@@ -22,9 +22,9 @@ How to contribute:
 ```
 git checkout -b new_enhancement_name
 ```
-* commit the desired changes to that branch.
+* Commit the desired changes to that branch. As many commits on 'new_enhancement' as you want.
 * Sign-off on your commits, to acknowledge your submission under the license of the project.
-* Send in a pull request (PR) from your new_enhancement_name branch.
+* Send in a pull request (PR) from your _new_enhancement_name_ branch.
 
 Recommended reading for github pull requests workflow:
 [About Github workflow](http://qsapp.com/wiki/Github#Github_Contributor_Workflow)
