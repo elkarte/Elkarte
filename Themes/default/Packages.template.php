@@ -647,13 +647,6 @@ function template_browse()
 					msgCollapsed: ', JavaScriptEscape($txt['package_advanced_button']), '
 				}
 			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
-				sThemeId: \'1\'
-			}
 		});
 	// ]]></script>
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>

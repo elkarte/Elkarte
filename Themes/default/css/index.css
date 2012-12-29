@@ -110,7 +110,6 @@ select {
 select option  {
 	padding: 0 4px;
 }
-
 input:hover, textarea:hover, button:hover, select:hover {
 	outline: none !important;
 	border: 1px solid #999;
@@ -158,6 +157,9 @@ a.button_link {
 }
 .button_link:hover {
 	text-decoration: none;
+}
+.selectbox select {
+	margin: 0 !important;
 }
 /* FF rounding error on zoom? */
 #firefox a.button_link {
@@ -1614,7 +1616,7 @@ ul li.greeting {
 ------------------------------------------------------- */
 .table_list {
 	width: 100%;
-	border-collapse: collapse;
+	border-spacing: 0;
 }
 .table_list .header td {
 	padding: 0;
@@ -1623,7 +1625,7 @@ ul li.greeting {
 	padding: 7px;
 }
 .table_list .header .cat_bar {
-	margin: 0 0 0 -1px;
+	margin: 0;
 }
 .table_list .icon, .table_list .info, .table_list .stats, .table_list.lastpost {
 	border-top: 2px solid #fff;
@@ -1708,7 +1710,7 @@ ul li.greeting {
 
 /* the posting icons */
 #posting_icons {
-	padding: 0 12px 6px 12px;
+	padding: 0 6px 0 0;
 	margin: 0 0 12px 0;
 	line-height: 12px;
 	float: left;
