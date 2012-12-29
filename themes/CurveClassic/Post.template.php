@@ -76,17 +76,7 @@ function template_main()
 					<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '';
 
 	// If an error occurred, explain what happened.
-	echo '
-					<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']) ? ' style="display: none"' : '', ' id="errors">
-						<dl>
-							<dt>
-								<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
-							</dt>
-							<dd class="error" id="error_list">
-								', empty($context['post_error']) ? '' : implode('<br />', $context['post_error']), '
-							</dd>
-						</dl>
-					</div>';
+	template_show_error('post_error');
 
 	// If this won't be approved let them know!
 	if (!$context['becomes_approved'])

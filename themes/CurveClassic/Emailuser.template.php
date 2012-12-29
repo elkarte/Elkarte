@@ -211,25 +211,7 @@ function template_report()
 				<div class="windowbg">
 					<div class="content">';
 
-	if (!empty($context['post_errors']))
-	{
-	echo '
-				<div id="error_box" class="errorbox">
-					<ul id="error_list">';
-
-		foreach ($context['post_errors'] as $key => $error)
-			echo '
-						<li id="error_', $key, '" class="error">', $error, '</li>';
-
-		echo '
-					</ul>';
-	}
-	else
-		echo '
-				<div style="display:none" id="error_box" class="errorbox">';
-
-		echo '
-				</div>';
+	template_show_error('post_errors');
 
 	echo '
 						<p class="noticebox">', $txt['report_to_mod_func'], '</p>
