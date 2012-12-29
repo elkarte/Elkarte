@@ -66,10 +66,9 @@ class error_context
 	 * Initialize the class
 	 *
 	 * @param string error identifier
-	 * @param array/mixed a list of all severity code from the less important to the most serious
-	 * @param mixed the default error severity code
+	 * @param int the default error severity level
 	 */
-	private function __construct ($id = 'default')
+	private function __construct ($id = 'default', $default_severity = null)
 	{
 		if (!empty($id))
 			$this->_name = $id;
@@ -78,7 +77,10 @@ class error_context
 		$this->_severity_levels = array(error_context::MINOR, error_context::SERIOUS);
 
 		// initialize default severity (not sure this is needed)
-		$this->_default_severity = error_context::MINOR;
+		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
+			$this->_default_severity = error_context::MINOR;
+		else
+			$this->_default_severity = $default_severity;
 	}
 
 	/**
@@ -204,12 +206,12 @@ class error_context
 		return $returns;
 	}
 
-	public static function context($id = 'default')
+	public static function context($id = 'default', $default_severity = null)
 	{
 		if (self::$_contexts === null)
 			self::$_contexts = array();
 		if (!array_key_exists($id, self::$_contexts))
-			self::$_contexts[$id] = new error_context($id);
+			self::$_contexts[$id] = new error_context($id, $default_severity);
 
 		return self::$_contexts[$id];
 	}

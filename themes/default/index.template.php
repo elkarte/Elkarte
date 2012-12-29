@@ -608,14 +608,29 @@ function template_show_error($error_id)
 		return;
 
 	echo '
-					<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context[$error_id]) ? ' style="display: none"' : '', ' id="errors">
+					<div class="', (!isset($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($context[$error_id]) ? ' style="display: none"' : '', 'id="errors">';
+	if (!empty($context['error_title']))
+		echo '
 						<dl>
 							<dt>
 								<strong id="error_serious">', $context['error_title'], '</strong>
 							</dt>
-							<dd class="error" id="error_list">
-								', empty($context[$error_id]) ? '' : implode('<br />', $context[$error_id]), '
+							<dd>';
+	if (!empty($context[$error_id]))
+	{
+		echo '
+						<ul class="error" id="error_list">';
+
+		foreach ($context[$error_id] as $key => $error)
+			echo '
+							<li id="error_', $key, '">', $error, '</li>';
+		echo '
+						</ul>';
+	}
+	if (!empty($context['error_title']))
+		echo '
 							</dd>
-						</dl>
+						</dl>';
+	echo '
 					</div>';
 }

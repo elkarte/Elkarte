@@ -61,7 +61,7 @@ function saveDraft()
 	}
 
 	// be ready for surprises
-	$post_errors = error_context::context('post');
+	$post_errors = error_context::context('post', 1);
 
 	// prepare and clean the data, load the draft array
 	$draft['id_draft'] = $id_draft;
@@ -101,7 +101,7 @@ function saveDraft()
 			$context['id_draft'] = $id_draft;
 		}
 		else
-			$post_errors->addError('draft_not_saved', 'serious');
+			$post_errors->addError('draft_not_saved');
 	}
 
 	// cleanup

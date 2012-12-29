@@ -46,7 +46,7 @@ function action_post()
 	if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 		unset($_REQUEST['poll']);
 
-	$post_errors = error_context::context('post');
+	$post_errors = error_context::context('post', 1);
 
 	// Posting an event?
 	$context['make_event'] = isset($_REQUEST['calendar']);
@@ -143,7 +143,7 @@ function action_post()
 
 		// Check whether this is a really old post being bumped...
 		if (!empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
-			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])));
+			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 	}
 	else
 	{
@@ -350,7 +350,7 @@ function action_post()
 				else
 					$txt['error_new_replies'] = sprintf(isset($_GET['last_msg']) ? $txt['error_new_replies_reading'] : $txt['error_new_replies'], $context['new_replies']);
 
-				$post_errors->addError('new_replies');
+				$post_errors->addError('new_replies', 0);
 
 				$modSettings['topicSummaryPosts'] = $context['new_replies'] > $modSettings['topicSummaryPosts'] ? max($modSettings['topicSummaryPosts'], 5) : $modSettings['topicSummaryPosts'];
 			}
@@ -482,14 +482,14 @@ function action_post()
 			// Any errors we should tell them about?
 			if ($form_subject === '')
 			{
-				$post_errors->addError('no_subject');
+				$post_errors->addError('no_subject', 0);
 				$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
 			}
 
 			if ($context['preview_message'] === '')
-				$post_errors->addError('no_message', 'serious');
+				$post_errors->addError('no_message');
 			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
-				$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])), 'serious');
+				$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 			// Protect any CDATA blocks.
 			if (isset($_REQUEST['xml']))
@@ -673,7 +673,7 @@ function action_post()
 						if (file_exists($attachment['tmp_name']))
 							unlink($attachment['tmp_name']);
 				}
-				$post_errors->addError('temp_attachments_gone', 'serious');
+				$post_errors->addError('temp_attachments_gone');
 				$_SESSION['temp_attachments'] = array();
 			}
 			// Hmm, coming in fresh and there are files in session.
@@ -690,7 +690,7 @@ function action_post()
 
 						if (file_exists($attachment['tmp_name']))
 						{
-							$post_errors->addError('temp_attachments_new', 'serious');
+							$post_errors->addError('temp_attachments_new');
 							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 							unset($_SESSION['temp_attachments']['post']['files']);
 							break;
@@ -719,19 +719,19 @@ function action_post()
 						// We have a message id, so we can link back to the old topic they were trying to edit..
 						$goback_link = '<a href="' . $scripturl . '?action=post' .(!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
 
-						$post_errors->addError(array('temp_attachments_found', array($delete_link, $goback_link, $file_list)), 'serious');
+						$post_errors->addError(array('temp_attachments_found', array($delete_link, $goback_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 					else
 					{
-						$post_errors->addError(array('temp_attachments_lost', array($delete_link, $file_list)), 'serious');
+						$post_errors->addError(array('temp_attachments_lost', array($delete_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 				}
 			}
 
 			if (!empty($context['we_are_history']))
-				$post_errors->addError($context['we_are_history'], 'serious');
+				$post_errors->addError($context['we_are_history']);
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
@@ -744,7 +744,7 @@ function action_post()
 				if ($attachID == 'initial_error')
 				{
 					$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div style="padding: 0 1em;">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-					$post_errors->addError('attach_initial_error', 'serious');
+					$post_errors->addError('attach_initial_error');
 					unset($_SESSION['temp_attachments']);
 					break;
 				}
@@ -757,7 +757,7 @@ function action_post()
 					foreach ($attachment['errors'] as $error)
 						$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 					$txt['error_attach_errors'] .= '</div>';
-					$post_errors->addError('attach_errors', 'serious');
+					$post_errors->addError('attach_errors');
 
 					// Take out the trash.
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -803,13 +803,13 @@ function action_post()
 
 	// If they came from quick reply, and have to enter verification details, give them some notice.
 	if (!empty($_REQUEST['from_qr']) && !empty($context['require_verification']))
-		$post_errors->addError('need_qr_verification');
+		$post_errors->addError('need_qr_verification', 0);
 
 	// Any errors occurred?
 	if ($post_errors->hasErrors())
 	{
 		$context['post_error'] = $post_errors->prepareErrors();
-		$context['error_type'] = $post_errors->getErrorType();
+		$context['error_type'] = $post_errors->getErrorType() == 0 ? 'minor' : 'serious';
 		$context['error_title'] = $txt['error_while_submitting'];
 	}
 
@@ -989,11 +989,11 @@ function action_post2()
 	checkSubmitOnce('check');
 
 	// No errors as yet.
-	$post_errors = error_context::context('post');
+	$post_errors = error_context::context('post', 1);
 
 	// If the session has timed out, let the user re-submit their form.
 	if (checkSession('post', '', false) != '')
-		$post_errors->addError('session_timeout', 'serious');
+		$post_errors->addError('session_timeout');
 
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
@@ -1004,7 +1004,7 @@ function action_post2()
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
 		if (is_array($context['require_verification']))
-			$post_errors->addError(array_merge($post_errors, $context['require_verification']), 'serious');
+			$post_errors->addError(array_merge($post_errors, $context['require_verification']));
 	}
 
 	require_once(SUBSDIR . '/Post.subs.php');
@@ -1296,9 +1296,9 @@ function action_post2()
 		$_POST['email'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
 
 		if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
-			$post_errors->addError('no_name', 'serious');
+			$post_errors->addError('no_name');
 		if ($smcFunc['strlen']($_POST['guestname']) > 25)
-			$post_errors->addError('long_name', 'serious');
+			$post_errors->addError('long_name');
 
 		if (empty($modSettings['guest_post_no_email']))
 		{
@@ -1306,9 +1306,9 @@ function action_post2()
 			if (!isset($row) || $row['poster_email'] != $_POST['email'])
 			{
 				if (!allowedTo('moderate_forum') && (!isset($_POST['email']) || $_POST['email'] == ''))
-					$post_errors->addError('no_email', 'serious');
+					$post_errors->addError('no_email');
 				if (!allowedTo('moderate_forum') && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-					$post_errors->addError('bad_email', 'serious');
+					$post_errors->addError('bad_email');
 			}
 
 			// Now make sure this email address is not banned from posting.
@@ -1325,11 +1325,11 @@ function action_post2()
 
 	// Check the subject and message.
 	if (!isset($_POST['subject']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) === '')
-		$post_errors->addError('no_subject');
+		$post_errors->addError('no_subject', 0);
 	if (!isset($_POST['message']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message']), ENT_QUOTES) === '')
-		$post_errors->addError('no_message', 'serious');
+		$post_errors->addError('no_message');
 	elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
-		$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])), 'serious');
+		$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 	else
 	{
 		// Prepare the message a bit for some additional testing.
@@ -1342,11 +1342,11 @@ function action_post2()
 
 		// Let's see if there's still some content left without the tags.
 		if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
-			$post_errors->addError('no_message', 'serious');
+			$post_errors->addError('no_message');
 	}
 
 	if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
-		$post_errors->addError('no_event', 'serious');
+		$post_errors->addError('no_event');
 
 	// Validate the poll...
 	if (isset($_REQUEST['poll']) && $modSettings['pollMode'] == '1')
@@ -1365,7 +1365,7 @@ function action_post2()
 			isAllowedTo('poll_add_any');
 
 		if (!isset($_POST['question']) || trim($_POST['question']) == '')
-			$post_errors->addError('no_question', 'serious');
+			$post_errors->addError('no_question');
 
 		$_POST['options'] = empty($_POST['options']) ? array() : htmltrim__recursive($_POST['options']);
 
@@ -1376,9 +1376,9 @@ function action_post2()
 
 		// What are you going to vote between with one choice?!?
 		if (count($_POST['options']) < 2)
-			$post_errors->addError('poll_few', 'serious');
+			$post_errors->addError('poll_few');
 		elseif (count($_POST['options']) > 256)
-			$post_errors->addError('poll_many', 'serious');
+			$post_errors->addError('poll_many');
 	}
 
 	if ($posterIsGuest)
@@ -1386,7 +1386,7 @@ function action_post2()
 		// If user is a guest, make sure the chosen name isn't taken.
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($row['poster_name']) || $_POST['guestname'] != $row['poster_name']))
-			$post_errors->addError('bad_name', 'serious');
+			$post_errors->addError('bad_name');
 	}
 	// If the user isn't a guest, get his or her name and email.
 	elseif (!isset($_REQUEST['msg']))
@@ -2098,7 +2098,7 @@ function action_jsmodify()
 		$moderationAction = $row['id_member'] != $user_info['id'];
 	}
 
-	$post_errors = error_context::context('post');
+	$post_errors = error_context::context('post', 1);
 
 	if (isset($_POST['subject']) && $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) !== '')
 	{
@@ -2110,7 +2110,7 @@ function action_jsmodify()
 	}
 	elseif (isset($_POST['subject']))
 	{
-		$post_errors->addError('no_subject');
+		$post_errors->addError('no_subject', 0);
 		unset($_POST['subject']);
 	}
 
@@ -2118,12 +2118,12 @@ function action_jsmodify()
 	{
 		if ($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message'])) === '')
 		{
-			$post_errors->addError('no_message', 'serious');
+			$post_errors->addError('no_message');
 			unset($_POST['message']);
 		}
 		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
 		{
-			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])), 'serious');
+			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 			unset($_POST['message']);
 		}
 		else
@@ -2134,7 +2134,7 @@ function action_jsmodify()
 
 			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
 			{
-				$post_errors->addError('no_message', 'serious');
+				$post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
 		}
