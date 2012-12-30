@@ -1014,10 +1014,10 @@ function ModifyBadBehaviorSettings($return_config = false)
 	loadTemplate('BadBehavior');
 
 	// See if they supplied a valid looking http:BL API Key
-	$context['invlaid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
+	$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 	// Any errors to display?
-	if ($context['invlaid_badbehavior_httpbl_key'])
+	if ($context['invalid_badbehavior_httpbl_key'])
 	{
 		$context['settings_message'][] = $txt['setting_badbehavior_httpbl_key_invalid'];
 		$context['error_type'] = 'notice';
@@ -1057,7 +1057,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
 			array('text', 'badbehavior_reverse_proxy_addresses', 30),
 			'',
-			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invlaid_badbehavior_httpbl_key']),
+			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
 			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),	
 		array('title', 'badbehavior_whitelist_title'),

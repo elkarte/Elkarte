@@ -70,7 +70,7 @@ function action_badbehaviorlog()
 		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 	// Clean up start.
-	$start = (!isset($_GET['start']) || $_GET['start'] < 0) ? 0 : $_GET['start'];
+	$start = (!isset($_GET['start']) || $_GET['start'] < 0) ? 0 : (int) $_GET['start'];
 
 	// Do we want to reverse the listing?
 	$sort = isset($_REQUEST['desc']) ? 'up' : 'down';
