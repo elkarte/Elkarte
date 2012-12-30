@@ -158,7 +158,7 @@ function bb2_insert($settings, $package, $key)
 	$user_agent = bb2_db_escape($package['user_agent']);
 	$member_id = (int) !empty($user_info['id']) ? $user_info['id'] : 0;
 	$session = !empty($sc) ? (string) $sc : '';
-	
+
 	// Prepare the headers etc for db insertion
 	// We are passed ...  Host. User-Agent, Accept, Accept-Language, Accept-Encoding, DNT, Connection, Referer, Cookie, Authorization
 	$headers = '';
@@ -168,7 +168,7 @@ function bb2_insert($settings, $package, $key)
 		if (!in_array($h, $skip))
 			$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
 	}
-	
+
 	$request_entity = '';
 	if (!strcasecmp($request_method, "POST"))
 	{
@@ -216,7 +216,7 @@ function bb2_read_whitelist()
 }
 
 /**
- * Retrieve bad behavior settings from database and supply them to 
+ * Retrieve bad behavior settings from database and supply them to
  * bad behavior so it knows to not behave badly
  *
  * @return array
@@ -226,7 +226,7 @@ function bb2_read_settings()
 	global $modSettings;
 
 	$badbehavior_reverse_proxy = !empty($modSettings['badbehavior_reverse_proxy']);
-	
+
 	// Make sure that the proxy addresses are split into an array, and if it's empty - make sure reverse proxy is disabled
 	if (!empty($modSettings['badbehavior_reverse_proxy_addresses']))
 		$badbehavior_reverse_proxy_addresses = explode('|', trim($modSettings['badbehavior_reverse_proxy_addresses']));
@@ -242,7 +242,7 @@ function bb2_read_settings()
 	// Return the settings so BadBehavior can use them
 	return array(
 		'log_table' => '{db_prefix}log_badbehavior',
-		'display_stats' => true,
+		'display_stats' => !empty($modSettings['badbehavior_display_stats']),
 		'strict' => !empty($modSettings['badbehavior_strict']),
 		'verbose' => !empty($modSettings['badbehavior_verbose']),
 		'logging' => !empty($modSettings['badbehavior_logging']),
@@ -284,7 +284,7 @@ function bb2_insert_head()
  */
 function bb2_insert_stats($force = false)
 {
-	global $bb2_result, $txt, $db_show_debug;
+	global $txt;
 
 	$settings = bb2_read_settings();
 

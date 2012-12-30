@@ -82,13 +82,11 @@ function template_badbehavior_log()
 
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '" /></a>', $txt['badbehaviorlog_error_valid_log'], ': ', $entries['valid']['log'], '<br />
 
-							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=request_uri;value=', $entries['request_uri']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '" /></a><span style="display: table-cell;">', $entries['request_uri']['html'], '</span>';
-
+							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=request_uri;value=', $entries['request_uri']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '" /></a><a style="display: table-cell;" href="', $entries['request_uri']['html'], '">', $entries['request_uri']['html'], '</a>';
 		echo '
 						</div>
 						<div class="error_where">
-							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=url;value=', $entries['user_agent'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '" /></a>
-							<a style="display: table-cell;" href="', $entries['user_agent'], '">', $entries['user_agent'], '</a>
+							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=user_agent;value=', $entries['user_agent']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '" /></a><span style="display: table-cell;">', $entries['user_agent']['html'], '</span>
 						</div>
 						<div class="error_where">
 							<a onclick="expandCollapse(\'details', $i, '\', \'icon', $i, '\'); return false;">

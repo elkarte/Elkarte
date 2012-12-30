@@ -36,26 +36,32 @@ function action_badbehaviorlog()
 
 	// You can filter by any of the following columns:
 	$filters = array(
-		'ip' => $txt['badbehaviorlog_ip'],
 		'id_member' => $txt['badbehaviorlog_username'],
-		'url' => $txt['badbehaviorlog_uri'],
-		'headers' => $txt['badbehaviorlog_request'],
-		'browser' => $txt['badbehaviorlog_agent'],
-		'entity' => $txt['badbehaviorlog_entity'],
+		'ip' => $txt['badbehaviorlog_ip'],
+		'session' => $txt['badbehaviorlog_session'],
 		'valid' => $txt['badbehaviorlog_key'],
+		'request_uri' => $txt['badbehaviorlog_request'],
+		'user_agent' => $txt['badbehaviorlog_agent'],
 	);
 
 	// Set up the filtering...
+	$filter = array();
 	if (isset($_GET['value'], $_GET['filter']) && isset($filters[$_GET['filter']]))
 	{
 		$filter = array(
-			'variable' => $_GET['filter'],
+			'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],
 			'value' => array(
-				'sql' => in_array($_GET['filter'], array('url', 'headers', 'browser', 'entity')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+				'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
 			),
 			'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 			'entity' => $filters[$_GET['filter']]
 		);
+	}
+	elseif (isset($_GET['filter']) || isset($_GET['value']))
+	{
+		// Bad filter or something else goign on, back to the start you go
+		unset($_GET['filter'], $_GET['value']);
+		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 	}
 
 	// Deleting or doing a little weeding?
@@ -66,7 +72,7 @@ function action_badbehaviorlog()
 	$num_errors = getBadBehaviorLogEntryCount($filter);
 
 	// If this filter turns up empty, just return
-	if (empty($num_errors) && isset($filter))
+	if (empty($num_errors) && !empty($filter))
 		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 	// Clean up start.
@@ -76,7 +82,7 @@ function action_badbehaviorlog()
 	$sort = isset($_REQUEST['desc']) ? 'up' : 'down';
 
 	// Set the page listing up.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (isset($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
+	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
 
 	// Find and sort out the log entries.
 	getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $members, $filter);
@@ -117,7 +123,7 @@ function action_badbehaviorlog()
 	}
 
 	// Filtering?
-	if (isset($filter))
+	if (!empty($filter))
 	{
 		$context['filter'] = &$filter;
 
@@ -143,7 +149,7 @@ function action_badbehaviorlog()
 
 	// And the standard template goodies
 	$context['page_title'] = $txt['badbehaviorlog_log'];
-	$context['has_filter'] = isset($filter);
+	$context['has_filter'] = !empty($filter);
 	$context['sub_template'] = 'badbehavior_log';
 	$context['sort_direction'] = $sort;
 	$context['start'] = $start;

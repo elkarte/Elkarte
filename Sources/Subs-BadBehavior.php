@@ -58,7 +58,7 @@ function deleteBadBehavior($filter)
 		$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
 
 		// Go back to where we were.
-		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
+		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
 	}
 
 	// Back to the badbehavior log
@@ -126,7 +126,10 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 			'ip' => $row['ip'],
 			'request_method' => $row['request_method'],
 			'server_protocol' => $row['server_protocol'],
-			'user_agent' => $row['user_agent'],
+			'user_agent' => array(
+				'html' => $row['user_agent'],
+				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['user_agent']))
+			),
 			'request_entity' => $row['request_entity'],
 			'valid' => array(
 				'code' => $row['valid'],
