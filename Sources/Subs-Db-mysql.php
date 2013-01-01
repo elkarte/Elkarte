@@ -332,7 +332,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		}
 
 		// Don't overload it.
-		$st = microtime();
+		$st = microtime(true);
 		$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
 		$db_cache[$db_count]['f'] = $file;
 		$db_cache[$db_count]['l'] = $line;
@@ -402,7 +402,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 
 	// Debugging.
 	if (isset($db_show_debug) && $db_show_debug === true)
-		$db_cache[$db_count]['t'] = array_sum(explode(' ', microtime())) - array_sum(explode(' ', $st));
+		$db_cache[$db_count]['t'] = microtime(true) - $st;
 
 	return $ret;
 }
