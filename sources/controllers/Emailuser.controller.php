@@ -346,26 +346,21 @@ function action_reporttm()
 	loadTemplate('Emailuser');
 
 	addInlineJavascript('
-	var error_box = $("#errors");
-	$("#report_comment").keyup(function() {
-		var post_too_long = $("#error_post_too_long");
-		if ($(this).val().length > 254)
-		{
-			if (post_too_long.length == 0)
-			{
-				error_box.show().attr("class", "errorbox");
-				if ($.trim(error_box.html()) == \'\')
-					error_box.append("<ul id=\'error_list\'></ul>");
+	error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
 
-				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['error_post_too_long']) . ' + "</li>");
+	var report_errors = new errorbox_handler({
+		self: \'report_errors\',
+		error_box_id: \'report_error\',
+		error_checks: [{
+			code: \'post_too_long\',
+			function: function(box_value) {
+				if (box_value.length > 254)
+					return true;
+				else
+					return false;
 			}
-		}
-		else
-		{
-			post_too_long.remove();
-			if ($("#error_list li").length == 0)
-				error_box.hide();
-		}
+		}],
+		error_checking: "report_comment"
 	});', true);
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);

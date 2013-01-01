@@ -85,3 +85,62 @@ function smf_addButton(sButtonStripId, bUseImage, oOptions)
 
 	oButtonStripList.appendChild(oNewButton);
 }
+
+var error_txts = {};
+function errorbox_handler(oOptions)
+{
+	this.opt = oOptions;
+	this.error_box = null;
+	this.oErrorHandle = window;
+	this.init();
+}
+
+errorbox_handler.prototype.init = function ()
+{
+	this.checks_on = document.getElementById(this.opt.error_checking);
+	this.oErrorHandle.instanceRef = this;
+	this.error_box = $("#" + this.opt.error_box_id);
+
+	if (this.error_box == null)
+		this.error_box = $(this.opt.error_box_id);
+
+// 	this.checks_on.setAttribute('onblur', this.opt.self + '.checkErrors()');
+	this.checks_on.setAttribute('onkeyup', this.opt.self + '.checkErrors()');
+}
+
+errorbox_handler.prototype.checkErrors = function ()
+{
+	if (this.opt.error_checks.length != 0)
+	{
+		// Adds the error checking functions
+		for (var i = 0; i < this.opt.error_checks.length; i++)
+			if (this.opt.error_checks[i].function(this.checks_on.value))
+				this.addError(this.opt.error_checks[i].code);
+			else
+				this.removeError(this.opt.error_checks[i].code);
+
+		this.error_box.attr("class", "errorbox");
+	}
+	if (this.error_box.find("li").length == 0)
+		this.error_box.hide();
+	else
+		this.error_box.show();
+}
+
+errorbox_handler.prototype.addError = function (error_code)
+{
+	var error_elem = $("#" + this.opt.error_box_id + "_" + error_code);
+	if (error_elem.length == 0)
+	{
+		if ($.trim(this.error_box.html()) == '')
+			this.error_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
+		$("#" + this.opt.error_box_id + "_list").append("<li id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
+	}
+}
+
+errorbox_handler.prototype.removeError = function (error_code)
+{
+	var error_elem = $("#" + this.opt.error_box_id + "_" + error_code);
+	if (error_elem.length != 0)
+		error_elem.remove();
+}
