@@ -440,8 +440,8 @@ function action_reporttm2()
 	// Any errors?
 	if ($report_errors->hasErrors())
 	{
-		$context['report_error'] = $post_errors->prepareErrors();
-		$context['error_type'] = $post_errors->getErrorType() == 0 ? 'minor' : 'serious';
+		$context['report_error'] = $report_errors->prepareErrors();
+		$context['error_type'] = $report_errors->getErrorType() == 0 ? 'minor' : 'serious';
 
 		return action_reporttm();
 	}
