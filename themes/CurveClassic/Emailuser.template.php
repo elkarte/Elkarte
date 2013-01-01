@@ -211,7 +211,7 @@ function template_report()
 				<div class="windowbg">
 					<div class="content">';
 
-	template_show_error('post_errors');
+	template_show_error('post_error');
 
 	echo '
 						<p class="noticebox">', $txt['report_to_mod_func'], '</p>
