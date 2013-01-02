@@ -2657,7 +2657,7 @@ function prepareSearchContext($reset = false)
 		$context['can_merge'] |= in_array($output['board']['id'], $boards_can['merge_any']);
 		$context['can_markread'] = $context['user']['is_logged'];
 
-		$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'merge', 'restore', 'markread');
+		$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'markread');
 		call_integration_hook('integrate_quick_mod_actions_search');
 	}
 
