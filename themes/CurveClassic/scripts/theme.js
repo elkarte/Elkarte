@@ -99,12 +99,11 @@ errorbox_handler.prototype.init = function ()
 {
 	this.checks_on = document.getElementById(this.opt.error_checking);
 	this.oErrorHandle.instanceRef = this;
-	this.error_box = $("#" + this.opt.error_box_id);
 
 	if (this.error_box == null)
-		this.error_box = $(this.opt.error_box_id);
+		this.error_box = $(document.getElementById(this.opt.error_box_id));
 
-// 	this.checks_on.setAttribute('onblur', this.opt.self + '.checkErrors()');
+	this.checks_on.setAttribute('onblur', this.opt.self + '.checkErrors()');
 	this.checks_on.setAttribute('onkeyup', this.opt.self + '.checkErrors()');
 }
 
@@ -114,10 +113,13 @@ errorbox_handler.prototype.checkErrors = function ()
 	{
 		// Adds the error checking functions
 		for (var i = 0; i < this.opt.error_checks.length; i++)
+		{
+			var $elem = $(document.getElementById(this.opt.error_box_id + "_" + this.opt.error_checks[i].code));
 			if (this.opt.error_checks[i].function(this.checks_on.value))
-				this.addError(this.opt.error_checks[i].code);
+				this.addError($elem, this.opt.error_checks[i].code);
 			else
-				this.removeError(this.opt.error_checks[i].code);
+				this.removeError($elem, this.opt.error_checks[i].code);
+		}
 
 		this.error_box.attr("class", "errorbox");
 	}
@@ -127,20 +129,18 @@ errorbox_handler.prototype.checkErrors = function ()
 		this.error_box.show();
 }
 
-errorbox_handler.prototype.addError = function (error_code)
+errorbox_handler.prototype.addError = function (error_elem, error_code)
 {
-	var error_elem = $("#" + this.opt.error_box_id + "_" + error_code);
 	if (error_elem.length == 0)
 	{
 		if ($.trim(this.error_box.html()) == '')
 			this.error_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
-		$("#" + this.opt.error_box_id + "_list").append("<li id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
+		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
 	}
 }
 
-errorbox_handler.prototype.removeError = function (error_code)
+errorbox_handler.prototype.removeError = function (error_elem, error_code)
 {
-	var error_elem = $("#" + this.opt.error_box_id + "_" + error_code);
 	if (error_elem.length != 0)
 		error_elem.remove();
 }
