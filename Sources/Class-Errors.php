@@ -187,6 +187,9 @@ class error_context
 			foreach ($this->_language_files as $language)
 				loadLanguage($language);
 
+		if (empty($this->_errors))
+			return array();
+
 		call_integration_hook('integrate_' . $this->_name . 'errors', array($this->_errors, $this->_severity_levels));
 
 		$errors = array();
@@ -201,6 +204,7 @@ class error_context
 
 		foreach ($errors as $error_val)
 		{
+			// @todo: take in consideration also $txt[$error_val]?
 			if (is_array($error_val))
 				$returns[$error_val[0]] = vsprintf(isset($txt['error_' . $error_val[0]]) ? $txt['error_' . $error_val[0]] : $error_val[0], $error_val[1]);
 			else
@@ -219,4 +223,102 @@ class error_context
 
 		return self::$_contexts[$id];
 	}
+}
+
+class attachment_error_context
+{
+	private static $_context = null;
+	private $_attachs = null;
+	private $_generic_error = null;
+
+	public function addAttach($id, $name)
+	{
+		if (empty($id) || empty($name))
+			return false;
+
+		if (!isset($this->_attachs[$id]))
+			$this->_attachs[$id] = array(
+				'name' => $name,
+				'error' => error_context::context($id, 1),
+			);
+		return true;
+		
+	}
+
+	public function addError($error, $attachID = 'generic', $lang_file = null)
+	{
+		if (empty($error))
+			return;
+
+		if ($attachID == 'generic')
+		{
+			if (!isset($this->_attachs[$attachID]))
+				$this->_generic_error = error_context::context('attach_generic_error', 1);
+			$this->_generic_error->addError($error, null, $lang_file);
+			return;
+		}
+
+		$this->_attachs[$attachID]['error']->addError($error, null, $lang_file);
+	}
+
+	public function hasErrors($attachID = null, $severity = null)
+	{
+		if ($this->_generic_error !== null)
+			if ($this->_generic_error->hasErrors($severity))
+				return true;
+
+		if (!empty($this->_attachs))
+		{
+			if ($attachID !== null)
+			{
+				if (isset($this->_attachs[$attachID]))
+					return $this->_attachs[$attachID]['error']->hasErrors($severity)
+			}
+			else
+			{
+				foreach ($this->_attachs as $attach)
+					if ($attach['error']->hasErrors($severity))
+						return true;
+			}
+		}
+		return false;
+	}
+
+	public function prepareErrors($severity = null)
+	{
+		global $txt;
+
+		$returns = array();
+
+		if ($this->_generic_error !== null)
+			$returns['attach_generic'] = array(
+				'errors' => $this->_generic_error->prepareErrors($severity),
+				'type' => $this->getErrorType(),
+				'title' => $txt['attach_error_title'],
+			);
+
+		if (!empty($this->_attachs))
+			foreach ($this->_attachs as $attachID => $error)
+				$returns[$attachID] = array(
+					'errors' => $error['error']->prepareErrors($severity),
+					'type' => $this->getErrorType(),
+					'title' => sprintf($txt['attach_warning'], $error['name']),
+				);
+
+		return $returns;
+	}
+
+	public function getErrorType()
+	{
+		return 1;
+	}
+
+	public static function context()
+	{
+		if (self::$_context === null)
+			self::$_context = new attachment_error_context();
+
+		return self::$_context;
+	}
+	
 }

@@ -47,6 +47,7 @@ function action_post()
 		unset($_REQUEST['poll']);
 
 	$post_errors = error_context::context('post', 1);
+	$attach_errors = error_context::context('attachment', 1);
 
 	// Posting an event?
 	$context['make_event'] = isset($_REQUEST['calendar']);
@@ -673,7 +674,7 @@ function action_post()
 						if (file_exists($attachment['tmp_name']))
 							unlink($attachment['tmp_name']);
 				}
-				$post_errors->addError('temp_attachments_gone');
+				$attach_errors->addError('temp_attachments_gone');
 				$_SESSION['temp_attachments'] = array();
 			}
 			// Hmm, coming in fresh and there are files in session.
@@ -690,7 +691,7 @@ function action_post()
 
 						if (file_exists($attachment['tmp_name']))
 						{
-							$post_errors->addError('temp_attachments_new');
+							$attach_errors->addError('temp_attachments_new');
 							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 							unset($_SESSION['temp_attachments']['post']['files']);
 							break;
@@ -719,19 +720,19 @@ function action_post()
 						// We have a message id, so we can link back to the old topic they were trying to edit..
 						$goback_link = '<a href="' . $scripturl . '?action=post' .(!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
 
-						$post_errors->addError(array('temp_attachments_found', array($delete_link, $goback_link, $file_list)));
+						$attach_errors->addError(array('temp_attachments_found', array($delete_link, $goback_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 					else
 					{
-						$post_errors->addError(array('temp_attachments_lost', array($delete_link, $file_list)));
+						$attach_errors->addError(array('temp_attachments_lost', array($delete_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 				}
 			}
 
 			if (!empty($context['we_are_history']))
-				$post_errors->addError($context['we_are_history']);
+				$attach_errors->addError($context['we_are_history']);
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
@@ -744,7 +745,7 @@ function action_post()
 				if ($attachID == 'initial_error')
 				{
 					$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div style="padding: 0 1em;">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-					$post_errors->addError('attach_initial_error');
+					$attach_errors->addError('attach_initial_error');
 					unset($_SESSION['temp_attachments']);
 					break;
 				}
@@ -757,7 +758,7 @@ function action_post()
 					foreach ($attachment['errors'] as $error)
 						$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 					$txt['error_attach_errors'] .= '</div>';
-					$post_errors->addError('attach_errors');
+					$attach_errors->addError('attach_errors');
 
 					// Take out the trash.
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -806,12 +807,16 @@ function action_post()
 		$post_errors->addError('need_qr_verification', 0);
 
 	// Any errors occurred?
-	if ($post_errors->hasErrors())
-	{
-		$context['post_error'] = $post_errors->prepareErrors();
-		$context['error_type'] = $post_errors->getErrorType() == 0 ? 'minor' : 'serious';
-		$context['error_title'] = $txt['error_while_submitting'];
-	}
+	$context['post_error'] = array(
+		'errors' => $post_errors->prepareErrors(),
+		'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['error_while_submitting'],
+	);
+	$context['attachment_error'] = array(
+		'errors' => $attach_errors->prepareErrors(),
+		'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['error_while_submitting'],
+	);
 
 	// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
 	if (isset($_REQUEST['poll']))
@@ -965,7 +970,7 @@ function action_post()
 function action_post2()
 {
 	global $board, $topic, $txt, $modSettings, $context;
-	global $user_info, $board_info, $options, $smcFunc;
+	global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
 
 	// Sneaking off, are we?
 	if (empty($_POST) && empty($topic))
@@ -990,6 +995,7 @@ function action_post2()
 
 	// No errors as yet.
 	$post_errors = error_context::context('post', 1);
+	$attach_errors = attachment_error_context::context();
 
 	// If the session has timed out, let the user re-submit their form.
 	if (checkSession('post', '', false) != '')
@@ -1468,11 +1474,9 @@ function action_post2()
 	if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 	{
 		$attachIDs = array();
-		$attach_errors = array();
-		$error_count = 0;
 
 		if (!empty($context['we_are_history']))
-			$attach_errors[] = '<dd>' . $txt['error_temp_attachments_flushed'] . '<br /><br /></dd>';
+			$attach_errors->addError('temp_attachments_flushed');
 
 		foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 		{
@@ -1482,29 +1486,29 @@ function action_post2()
 			// If there was an initial error just show that message.
 			if ($attachID == 'initial_error')
 			{
-				$attach_errors[] = '<dt>' . $txt['attach_no_upload'] . '</dt>';
-				$attach_errors[] = '<dd>' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</dd>';
+				$attach_errors->addError($txt['attach_no_upload']);
+				$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
 
 				unset($_SESSION['temp_attachments']);
 				break;
 			}
 
-			// Load the attachmentOptions array with the data needed to create an attachement
-			$attachmentOptions = array(
-				'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
-				'poster' => $user_info['id'],
-				'name' => $attachment['name'],
-				'tmp_name' => $attachment['tmp_name'],
-				'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-				'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-				'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-				'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-				'errors' => $attachment['errors'],
-			);
-
 			// No errors, then try to create the attachment
 			if (empty($attachment['errors']))
 			{
+				// Load the attachmentOptions array with the data needed to create an attachement
+				$attachmentOptions = array(
+					'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+					'poster' => $user_info['id'],
+					'name' => $attachment['name'],
+					'tmp_name' => $attachment['tmp_name'],
+					'size' => isset($attachment['size']) ? $attachment['size'] : 0,
+					'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+					'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
+					'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
+					'errors' => $attachment['errors'],
+				);
+
 				if (createAttachment($attachmentOptions))
 				{
 					$attachIDs[] = $attachmentOptions['id'];
@@ -1516,25 +1520,20 @@ function action_post2()
 			else
 			{
 				// Sort out the errors for display and delete any associated files.
-				$attach_errors[] = '<dt>' . vsprintf($txt['attach_warning'], $attachment['name']) . '</dt>';
+				$attach_errors->addAttach($attachID, $attachment['name']);
 				$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
 
-				foreach ($attachmentOptions['errors'] as $error)
+				foreach ($attachment['errors'] as $error)
 				{
 					if (!is_array($error))
 					{
-						$attach_errors[] = '<dd>' . $txt[$error] . '</dd>';
+						$attach_errors->addError($txt[$error], $attachID);
 						if (in_array($error, $log_these))
 							log_error($attachment['name'] . ': ' . $txt[$error], 'critical');
 					}
 					else
-						$attach_errors[] = '<dd>' . vsprintf($txt[$error[0]], $error[1]) . '</dd>';
+						$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]), $attachID);
 				}
-
-				// a format spacer between file error blocks if needed.
-				if ($error_count > 0)
-					$attach_errors[] = '<dt>&nbsp;</dt>';
-				$error_count++;
 
 				if (file_exists($attachment['tmp_name']))
 					unlink($attachment['tmp_name']);
@@ -1823,18 +1822,19 @@ function action_post2()
 		redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
 
 	// If there are attachment errors. Let's show a list to the user.
-	if (!empty($attach_errors))
+	if ($attach_errors->hasErrors())
 	{
-		global $settings, $scripturl;
-
 		loadTemplate('Errors');
 		$context['sub_template'] = 'attachment_errors';
 		$context['page_title'] = $txt['error_occured'];
 
-		$context['error_message'] = '<dl>';
-		$context['error_message'] .= implode("\n", $attach_errors);
-		$context['error_message'] .= '</dl>';
-		$context['error_title'] = $txt['attach_error_title'];
+		$errors = $attach_errors->prepareErrors();
+
+		foreach ($errors as $key => $error)
+		{
+			$context['attachment_error_keys'][] = $key . '_error';
+			$context[$key . '_error'] = $error;
+		}
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
@@ -1843,11 +1843,11 @@ function action_post2()
 		);
 
 		if (isset($_REQUEST['msg']))
-			$context['redirect_link'] = '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
+			$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
 		else
-			$context['redirect_link'] = '?topic=' . $topic . '.new#new';
+			$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.new#new';
 
-		$context['back_link'] = '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
+		$context['back_link'] =  $scripturl . '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
 
 		obExit(null, true);
 	}

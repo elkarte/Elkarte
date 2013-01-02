@@ -151,7 +151,7 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 a.button_link {
 	color: #000;
 	padding: 2px 5px;
-	margin: 0 !important;
+	margin: 0 0 0 12px !important;
 	font-size: 0.9em;
 	line-height: 18px;
 }
