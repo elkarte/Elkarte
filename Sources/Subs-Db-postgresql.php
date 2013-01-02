@@ -410,7 +410,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 			$_SESSION['debug_redirect'] = array();
 		}
 
-		$st = microtime();
+		$st = microtime(true);
 		// Don't overload it.
 		$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
 		$db_cache[$db_count]['f'] = $file;
@@ -478,7 +478,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 
 	// Debugging.
 	if (isset($db_show_debug) && $db_show_debug === true)
-		$db_cache[$db_count]['t'] = array_sum(explode(' ', microtime())) - array_sum(explode(' ', $st));
+		$db_cache[$db_count]['t'] = microtime(true) - $st;
 
 	return $db_last_result;
 }
