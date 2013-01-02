@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -351,5 +352,3 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			);
 	}
 }
-
-?>

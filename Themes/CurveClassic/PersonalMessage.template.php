@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -167,7 +168,7 @@ function template_folder()
 				if ($message['member']['karma']['allow'])
 					echo '
 				<li class="karma_allow">
-					<a href="', $scripturl, '?action=modifykarma;sa=applaud;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaApplaudLabel'], '</a> <a href="', $scripturl, '?action=modifykarma;sa=smite;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaSmiteLabel'], '</a>
+					<a href="', $scripturl, '?action=karma;sa=applaud;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaApplaudLabel'], '</a> <a href="', $scripturl, '?action=karma;sa=smite;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaSmiteLabel'], '</a>
 				</li>';
 
 				// Show the member's gender icon?
@@ -192,7 +193,7 @@ function template_folder()
 						{
 							$shown = true;
 							echo '
-				<li class="im_icons">
+				<li class="cf_icons">
 					<ul>';
 						}
 						echo '
@@ -203,18 +204,6 @@ function template_folder()
 					</ul>
 				</li>';
 				}
-
-				// This shows the popular messaging icons.
-				if ($message['member']['has_messenger'] && $message['member']['can_view_profile'])
-					echo '
-				<li class="im_icons">
-					<ul>', !isset($context['disabled_fields']['icq']) && !empty($message['member']['icq']['link']) ? '
-						<li>' . $message['member']['icq']['link'] . '</li>' : '', !isset($context['disabled_fields']['msn']) && !empty($message['member']['msn']['link']) ? '
-						<li>' . $message['member']['msn']['link'] . '</li>' : '', !isset($context['disabled_fields']['aim']) && !empty($message['member']['aim']['link']) ? '
-						<li>' . $message['member']['aim']['link'] . '</li>' : '', !isset($context['disabled_fields']['yim']) && !empty($message['member']['yim']['link']) ? '
-						<li>' . $message['member']['yim']['link'] . '</li>' : '', '
-					</ul>
-				</li>';
 
 				// Show the profile, website, email address, and personal message buttons.
 				if ($message['member']['show_profile_buttons'])
@@ -483,7 +472,7 @@ function template_subject_list()
 		</tr>
 	</thead>
 	<tbody>';
-	
+
 	if (!$context['show_delete'])
 		echo '
 		<tr class="windowbg2">
@@ -1125,7 +1114,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=helpadmin;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
 				), '
 			});
 		';
@@ -1201,7 +1190,7 @@ function template_labels()
 			</tr>
 		</thead>
 		<tbody>';
-	
+
 	if (count($context['labels']) < 2)
 		echo '
 			<tr class="windowbg2">
@@ -1226,7 +1215,7 @@ function template_labels()
 			$alternate = !$alternate;
 		}
 	}
-	
+
 	echo '
 		</tbody>
 		</table>';
@@ -1421,7 +1410,7 @@ function template_add_rule()
 		var actionNum = 0;
 		var groups = new Array()
 		var labels = new Array()
-		
+
 		var txt_pm_readable_and = "', $txt['pm_readable_and'], '";
 		var txt_pm_readable_or = "', $txt['pm_readable_or'], '";
 		var txt_pm_readable_member = "', $txt['pm_readable_member'], '";
@@ -1434,7 +1423,7 @@ function template_add_rule()
 		var txt_pm_readable_start = "', $txt['pm_readable_start'], '";
 		var txt_pm_readable_end = "', $txt['pm_readable_end'], '";
 		var txt_pm_readable_then = "', $txt['pm_readable_then'], '";
-		
+
 		var txt_pm_rule_not_defined = "', $txt['pm_rule_not_defined'], '";
 		var txt_pm_rule_bud = "', $txt['pm_rule_bud'], '";
 		var txt_pm_rule_sub = "', $txt['pm_rule_sub'], '";
@@ -1443,7 +1432,7 @@ function template_add_rule()
 		var txt_pm_rule_mid = "', $txt['pm_rule_mid'], '";
 		var txt_pm_rule_gid = "', $txt['pm_rule_gid'], '";
 		var txt_pm_rule_sel_group = "', $txt['pm_rule_sel_group'], '";
-		
+
 		var txt_pm_rule_sel_action = "', $txt['pm_rule_sel_action'], '";
 		var txt_pm_rule_label = "', $txt['pm_rule_label'], '";
 		var txt_pm_rule_delete = "', $txt['pm_rule_delete'], '";
@@ -1454,7 +1443,7 @@ function template_add_rule()
 	foreach ($context['groups'] as $id => $title)
 		echo '
 		groups[', $id, '] = "', addslashes($title), '";';
-	
+
 	// And any existing labels
 	foreach ($context['labels'] as $label)
 		if ($label['id'] != -1)
@@ -1581,7 +1570,7 @@ function template_add_rule()
 				</fieldset>
 			</div>
 		</div>
-		
+
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_rule_description'], '</h3>
 		</div>
@@ -1687,4 +1676,3 @@ function template_showPMDrafts()
 			<span>', $txt['pages'], ': ', $context['page_index'], '</span>
 		</div>';
 }
-?>

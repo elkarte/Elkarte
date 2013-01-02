@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -30,7 +31,7 @@ if (!defined('DIALOGO'))
  * @uses Who template, main sub-template
  * @uses Who language file.
  */
-function Who()
+function action_who()
 {
 	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext, $smcFunc;
 
@@ -285,7 +286,7 @@ function determineActions($urls, $preferred_prefix = false)
 		'maintain' => array('admin_forum'),
 		'manageattachments' => array('manage_attachments'),
 		'manageboards' => array('manage_boards'),
-		'mlist' => array('view_mlist'),
+		'memberlist' => array('view_mlist'),
 		'moderate' => array('access_mod_center', 'moderate_forum', 'manage_membergroups'),
 		'optimizetables' => array('admin_forum'),
 		'repairboards' => array('admin_forum'),
@@ -519,11 +520,13 @@ function determineActions($urls, $preferred_prefix = false)
 }
 
 /**
- * It prepares credit and copyright information for the credits page or the admin page
+ * It prepares credit and copyright information for the credits page or the admin page.
+ * @todo two functions: split the data from loading templates and stuff, and remove the parameter.
+ *  - a function for action=who;sa=credits, and another for the data needed for this and admin.
  *
  * @param bool $in_admin = false, if parameter is true the it will not load the sub-template nor the template file
  */
-function Credits($in_admin = false)
+function action_credits($in_admin = false)
 {
 	global $context, $smcFunc, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info;
 
@@ -597,7 +600,7 @@ function Credits($in_admin = false)
 	$context['credits_modifications'] = $mods;
 
 	$context['copyrights'] = array(
-		'dialogo' => sprintf($forum_copyright, $forum_version),
+		'dialogo' => sprintf($forum_copyright, ucfirst(strtolower($forum_version))),
 		/* Modification Authors:  You may add a copyright statement to this array for your mods.
 			Copyright statements should be in the form of a value only without a array key.  I.E.:
 				'Some Mod by Thantos &copy; 2010',
@@ -619,5 +622,3 @@ function Credits($in_admin = false)
 		$context['page_title'] = $txt['credits'];
 	}
 }
-
-?>

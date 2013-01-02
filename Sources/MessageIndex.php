@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -13,7 +14,7 @@
  * @version 1.0 Alpha
  *
  * This file is what shows the listing of topics in a board.
- * It's just one or two functions, but don't under estimate it ;).
+ * It's just one or two functions, but don't underestimate it ;).
  *
  */
 
@@ -44,9 +45,11 @@ function MessageIndex()
 	}
 
 	loadTemplate('MessageIndex');
+	loadJavascriptFile('topic.js');
 
 	$context['name'] = $board_info['name'];
 	$context['description'] = $board_info['description'];
+
 	// How many topics do we have in total?
 	$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
@@ -79,7 +82,7 @@ function MessageIndex()
 	// We only know these.
 	if (isset($_REQUEST['sort']) && !in_array($_REQUEST['sort'], array('subject', 'starter', 'last_poster', 'replies', 'views', 'first_post', 'last_post')))
 		$_REQUEST['sort'] = 'last_post';
-		
+
 	// Make sure the starting place makes sense and construct the page index.
 	if (isset($_REQUEST['sort']))
 		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
@@ -486,7 +489,7 @@ function MessageIndex()
 			if (!empty($settings['avatars_on_indexes']))
 			{
 				// Allow themers to show the latest poster's avatar along with the topic
-				if(!empty($row['avatar']))
+				if (!empty($row['avatar']))
 				{
 					if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 					{
@@ -635,21 +638,6 @@ function MessageIndex()
 			$context['can_remove'] |= ($started && allowedTo('remove_own'));
 		}
 
-		// Find the boards/cateogories they can move their topic to.
-		if ($options['display_quick_mod'] == 1 && $context['can_move'] && !empty($context['topics']))
-		{
-			require_once($sourcedir . '/Subs-MessageIndex.php');
-			$boardListOptions = array(
-				'excluded_boards' => array($board),
-				'not_redirection' => true,
-				'use_permissions' => true,
-				'selected_board' => empty($_SESSION['move_to_topic']) ? null : $_SESSION['move_to_topic'],
-			);
-
-			// With no other boards to see, it's useless to move.
-			if (empty($context['move_to_boards']))
-				$context['can_move'] = false;
-		}
 		// Can we use quick moderation checkboxes?
 		if ($options['display_quick_mod'] == 1)
 			$context['can_quick_mod'] = $context['user']['is_logged'] || $context['can_approve'] || $context['can_remove'] || $context['can_lock'] || $context['can_sticky'] || $context['can_move'] || $context['can_merge'] || $context['can_restore'];
@@ -684,12 +672,15 @@ function MessageIndex()
  * Allows for moderation from the message index.
  * @todo refactor this...
  */
-function QuickModeration()
+function action_quickmod()
 {
 	global $sourcedir, $board, $user_info, $modSettings, $smcFunc, $context;
 
 	// Check the session = get or post.
 	checkSession('request');
+
+	// Some help we may need
+	require_once($sourcedir . '/Subs-Topic.php');
 
 	// Lets go straight to the restore area.
 	if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
@@ -726,10 +717,6 @@ function QuickModeration()
 	}
 	else
 	{
-		/**
-		 * @todo Ugly. There's no getting around this, is there?
-		 * @todo Maybe just do this on the actions people want to use?
-		 */
 		$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
 
 		$redirect_url = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
@@ -847,7 +834,6 @@ function QuickModeration()
 			$stickyCache[] = $topic;
 		elseif ($action == 'move')
 		{
-			require_once($sourcedir . '/MoveTopic.php');
 			moveTopicConcurrence();
 
 			// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
@@ -944,8 +930,6 @@ function QuickModeration()
 		$smcFunc['db_free_result']($request);
 
 		$moveCache = $moveCache2;
-
-		require_once($sourcedir . '/MoveTopic.php');
 
 		// Do the actual moves...
 		foreach ($moveTos as $to => $topics)
@@ -1053,7 +1037,6 @@ function QuickModeration()
 				sendNotifications($topic, 'remove');
 			}
 
-			require_once($sourcedir . '/RemoveTopic.php');
 			removeTopics($removeCache);
 		}
 	}
@@ -1163,16 +1146,26 @@ function QuickModeration()
 
 	if (!empty($markCache))
 	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_topic, disregarded
+			FROM {db_prefix}log_topics
+			WHERE id_topic IN ({array_int:selected_topics})
+				AND id_member = {int:current_user}',
+			array(
+				'selected_topics' => $markCache,
+				'current_user' => $user_info['id'],
+			)
+		);
+		$logged_topics = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$logged_topics[$row['id_topic']] = $row['disregarded'];
+		$smcFunc['db_free_result']($request);
+
 		$markArray = array();
 		foreach ($markCache as $topic)
-			$markArray[] = array($modSettings['maxMsgID'], $user_info['id'], $topic);
+			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			$markArray,
-			array('id_member', 'id_topic')
-		);
+		markTopicsRead($markArray, true);
 	}
 
 	foreach ($moveCache as $topic)
@@ -1206,5 +1199,3 @@ function QuickModeration()
 
 	redirectexit($redirect_url);
 }
-
-?>

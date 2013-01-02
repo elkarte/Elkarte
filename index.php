@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -23,7 +24,7 @@
  *
  */
 
-$forum_version = 'Dialogo 1.0 Alpha 1';
+$forum_version = 'DIALOGO 1.0 Alpha';
 
 // Get everything started up...
 define('DIALOGO', 1);
@@ -111,8 +112,8 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 	unset($_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]);
 }
 
-// What function shall we execute? (done like this for memory's sake.)
-call_user_func(smf_main());
+// Pre-dispatch
+smf_main();
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -155,7 +156,7 @@ function smf_main()
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
 		fatal_lang_error('not_a_topic', false);
 
-	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', 'smstats', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewsmfile');
+	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array($no_stat_actions));
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions))
@@ -169,159 +170,8 @@ function smf_main()
 	}
 	unset($no_stat_actions);
 
-	// Is the forum in maintenance mode? (doesn't apply to administrators.)
-	if (!empty($maintenance) && !allowedTo('admin_forum'))
-	{
-		// You can only login.... otherwise, you're getting the "maintenance mode" display.
-		if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'login2' || $_REQUEST['action'] == 'logout'))
-		{
-			require_once($sourcedir . '/LogInOut.php');
-			return $_REQUEST['action'] == 'login2' ? 'Login2' : 'Logout';
-		}
-		// Don't even try it, sonny.
-		else
-		{
-			require_once($sourcedir . '/Subs-Auth.php');
-			return 'InMaintenance';
-		}
-	}
-	// If guest access is off, a guest can only do one of the very few following actions.
-	elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'smstats', 'mailq', 'verificationcode', 'openidreturn'))))
-	{
-		require_once($sourcedir . '/Subs-Auth.php');
-		return 'KickGuest';
-	}
-	elseif (empty($_REQUEST['action']))
-	{
-		// Action and board are both empty... BoardIndex! Unless someone else wants to do something different.
-		if (empty($board) && empty($topic))
-		{
-			$defaultActions = call_integration_hook('integrate_default_action');
-			foreach ($defaultActions as $defaultAction)
-			{
-				$call = strpos($defaultAction, '::') !== false ? explode('::', $defaultAction) : $defaultAction;
-				if (!empty($call) && is_callable($call))
-					return $call;
-			}
-
-			require_once($sourcedir . '/BoardIndex.php');
-
-			return 'BoardIndex';
-		}
-		// Topic is empty, and action is empty.... MessageIndex!
-		elseif (empty($topic))
-		{
-			require_once($sourcedir . '/MessageIndex.php');
-			return 'MessageIndex';
-		}
-		// Board is not empty... topic is not empty... action is empty.. Display!
-		else
-		{
-			require_once($sourcedir . '/Display.php');
-			return 'Display';
-		}
-	}
-
-	// Here's the monstrous $_REQUEST['action'] array - $_REQUEST['action'] => array($file, $function).
-	$actionArray = array(
-		'activate' => array('Register.php', 'Activate'),
-		'admin' => array('Admin.php', 'AdminMain'),
-		'announce' => array('Post.php', 'AnnounceTopic'),
-		'attachapprove' => array('ManageAttachments.php', 'ApproveAttach'),
-		'buddy' => array('Subs-Members.php', 'BuddyListToggle'),
-		'calendar' => array('Calendar.php', 'CalendarMain'),
-		'collapse' => array('BoardIndex.php', 'CollapseCategory'),
-		'contact' => array('Register.php', 'ContactForm'),
-		'coppa' => array('Register.php', 'CoppaForm'),
-		'credits' => array('Who.php', 'Credits'),
-		'deletemsg' => array('RemoveTopic.php', 'DeleteMessage'),
-		'dlattach' => array('Display.php', 'Download'),
-		'editpoll' => array('Poll.php', 'EditPoll'),
-		'editpoll2' => array('Poll.php', 'EditPoll2'),
-		'emailuser' => array('SendTopic.php', 'EmailUser'),
-		'findmember' => array('Subs-Auth.php', 'JSMembers'),
-		'groups' => array('Groups.php', 'Groups'),
-		'help' => array('Help.php', 'ShowHelp'),
-		'helpadmin' => array('Help.php', 'ShowAdminHelp'),
-		'jsmodify' => array('Post.php', 'JavaScriptModify'),
-		'jsoption' => array('Themes.php', 'SetJavaScript'),
-		'loadeditorlocale' => array('Subs-Editor.php', 'loadLocale'),
-		'lock' => array('Topic.php', 'LockTopic'),
-		'lockvoting' => array('Poll.php', 'LockVoting'),
-		'login' => array('LogInOut.php', 'Login'),
-		'login2' => array('LogInOut.php', 'Login2'),
-		'logout' => array('LogInOut.php', 'Logout'),
-		'markasread' => array('Subs-Boards.php', 'MarkRead'),
-		'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
-		'mlist' => array('Memberlist.php', 'Memberlist'),
-		'moderate' => array('ModerationCenter.php', 'ModerationMain'),
-		'modifykarma' => array('Karma.php', 'ModifyKarma'),
-		'movetopic' => array('MoveTopic.php', 'MoveTopic'),
-		'movetopic2' => array('MoveTopic.php', 'MoveTopic2'),
-		'notify' => array('Notify.php', 'Notify'),
-		'notifyboard' => array('Notify.php', 'BoardNotify'),
-		'openidreturn' => array('Subs-OpenID.php', 'smf_openID_return'),
-		'pm' => array('PersonalMessage.php', 'MessageMain'),
-		'post' => array('Post.php', 'Post'),
-		'post2' => array('Post.php', 'Post2'),
-		'printpage' => array('Printpage.php', 'PrintTopic'),
-		'profile' => array('Profile.php', 'ModifyProfile'),
-		'quotefast' => array('Post.php', 'QuoteFast'),
-		'quickmod' => array('MessageIndex.php', 'QuickModeration'),
-		'quickmod2' => array('Display.php', 'QuickInTopicModeration'),
-		'recent' => array('Recent.php', 'RecentPosts'),
-		'register' => array('Register.php', 'Register'),
-		'register2' => array('Register.php', 'Register2'),
-		'reminder' => array('Reminder.php', 'RemindMe'),
-		'removepoll' => array('Poll.php', 'RemovePoll'),
-		'removetopic2' => array('RemoveTopic.php', 'RemoveTopic2'),
-		'reporttm' => array('SendTopic.php', 'ReportToModerator'),
-		'requestmembers' => array('Subs-Auth.php', 'RequestMembers'),
-		'restoretopic' => array('RemoveTopic.php', 'RestoreTopic'),
-		'search' => array('Search.php', 'PlushSearch1'),
-		'search2' => array('Search.php', 'PlushSearch2'),
-		'sendtopic' => array('SendTopic.php', 'EmailUser'),
-		'smstats' => array('Stats.php', 'SMStats'),
-		'suggest' => array('Subs-Editor.php', 'AutoSuggestHandler'),
-		'spellcheck' => array('Subs-Post.php', 'SpellCheck'),
-		'splittopics' => array('SplitTopics.php', 'SplitTopics'),
-		'stats' => array('Stats.php', 'DisplayStats'),
-		'sticky' => array('Topic.php', 'Sticky'),
-		'theme' => array('Themes.php', 'ThemesMain'),
-		'trackip' => array('Profile-View.php', 'trackIP'),
-		'unread' => array('Recent.php', 'UnreadTopics'),
-		'unreadreplies' => array('Recent.php', 'UnreadTopics'),
-		'verificationcode' => array('Register.php', 'VerificationCode'),
-		'viewprofile' => array('Profile.php', 'ModifyProfile'),
-		'vote' => array('Poll.php', 'Vote'),
-		'viewquery' => array('ViewQuery.php', 'ViewQuery'),
-		'viewsmfile' => array('Admin.php', 'DisplayAdminFile'),
-		'who' => array('Who.php', 'Who'),
-		'.xml' => array('News.php', 'ShowXmlFeed'),
-		'xmlhttp' => array('Xml.php', 'XMLhttpMain'),
-	);
-
-	// Allow modifying $actionArray easily.
-	call_integration_hook('integrate_actions', array(&$actionArray));
-
-	// Get the function and file to include - if it's not there, do the board index.
-	if (!isset($_REQUEST['action']) || !isset($actionArray[$_REQUEST['action']]))
-	{
-		// Catch the action with the theme?
-		if (!empty($settings['catch_action']))
-		{
-			require_once($sourcedir . '/Themes.php');
-			return 'WrapAction';
-		}
-
-		// Fall through to the board index then...
-		require_once($sourcedir . '/BoardIndex.php');
-		return 'BoardIndex';
-	}
-
-	// Otherwise, it was set - so let's go to that action.
-	require_once($sourcedir . '/' . $actionArray[$_REQUEST['action']][0]);
-	return $actionArray[$_REQUEST['action']][1];
+	// What shall we do?
+	require_once $sourcedir . '/Class-Dispatcher.php';
+	$dispatcher = new site_Dispatcher();
+	$dispatcher->dispatch();
 }
-
-?>

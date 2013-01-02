@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -75,8 +76,9 @@ function getLastPost()
 
 /**
  * Find the ten most recent posts.
+ * Accessed by action=recent.
  */
-function RecentPosts()
+function action_recent()
 {
 	global $txt, $scripturl, $user_info, $context, $modSettings, $sourcedir, $board, $smcFunc;
 
@@ -419,8 +421,9 @@ function RecentPosts()
 
 /**
  * Find unread topics and replies.
+ * Accessed by action=unread and action=unreadreplies
  */
-function UnreadTopics()
+function action_unread()
 {
 	global $board, $txt, $scripturl, $sourcedir;
 	global $user_info, $context, $settings, $modSettings, $smcFunc, $options;
@@ -756,7 +759,8 @@ function UnreadTopics()
 			WHERE lt.id_member = {int:current_member}
 				AND t.' . $query_this_board . (empty($earliest_msg) ? '' : '
 				AND t.id_last_msg > {int:earliest_msg}') . ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : ''),
+				AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_disregard'] ? '
+				AND lt.disregarded != 1' : ''),
 			array_merge($query_parameters, array(
 				'current_member' => $user_info['id'],
 				'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -777,8 +781,9 @@ function UnreadTopics()
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.' . $query_this_board . (!empty($earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : '') . '
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : ''),
+				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+				 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 			array_merge($query_parameters, array(
 				'current_member' => $user_info['id'],
 				'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -832,8 +837,9 @@ function UnreadTopics()
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE b.' . $query_this_board . '
 				AND t.id_last_msg >= {int:min_message}
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
-				AND ms.approved = {int:is_approved}' : '') . '
+				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+				 ($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
+				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 			ORDER BY {raw:sort}
 			LIMIT {int:offset}, {int:limit}',
 			array_merge($query_parameters, array(
@@ -857,8 +863,9 @@ function UnreadTopics()
 			WHERE t.' . $query_this_board . ($context['showing_all_topics'] && !empty($earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : (!$context['showing_all_topics'] && empty($_SESSION['first_login']) ? '
 				AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : ''),
+				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+				 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 			array_merge($query_parameters, array(
 				'current_member' => $user_info['id'],
 				'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -918,8 +925,9 @@ function UnreadTopics()
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.' . $query_this_board . '
 				AND t.id_last_msg >= {int:min_message}
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' . ($modSettings['postmod_active'] ? '
-				AND ms.approved = {int:is_approved}' : '') . '
+				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
+				 ($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
+				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 			ORDER BY {raw:order}
 			LIMIT {int:offset}, {int:limit}',
 			array_merge($query_parameters, array(
@@ -970,8 +978,9 @@ function UnreadTopics()
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$_REQUEST['sort']]) ? $sortKey_joins[$_REQUEST['sort']] : '') . '
 				WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
-					AND t.id_board = {int:current_board}' : '') . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved}' : '') . '
+					AND t.id_board = {int:current_board}' : '') .
+					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 				GROUP BY m.id_topic',
 				array(
 					'current_board' => $board,
@@ -1023,8 +1032,9 @@ function UnreadTopics()
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.' . $query_this_board . '
 					AND m.id_member = {int:current_member}
-					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved}' : ''),
+					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'is_approved' => 1,
@@ -1086,8 +1096,9 @@ function UnreadTopics()
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.' . $query_this_board . '
 					AND t.id_last_msg >= {int:min_message}
-					AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg
-					AND t.approved = {int:is_approved}
+					AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
+					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(
@@ -1359,5 +1370,3 @@ function UnreadTopics()
 	// Allow helpdesks and bug trackers and what not to add their own unread data (just add a template_layer to show custom stuff in the template!)
  	call_integration_hook('integrate_unread_list');
 }
-
-?>

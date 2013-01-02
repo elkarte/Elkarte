@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManagePermissions
+// Version: 1.0; ManagePermissions
 
 $txt['permissions_title'] = 'Manage Permissions';
 $txt['permissions_modify'] = 'Modify';
@@ -363,5 +363,3 @@ $txt['permissions_post_moderation_group'] = 'Group';
 $txt['auto_approve_topics'] = 'Post new topics, without requiring approval';
 $txt['auto_approve_replies'] = 'Post replies to topics, without requiring approval';
 $txt['auto_approve_attachments'] = 'Post attachments, without requiring approval';
-
-?>

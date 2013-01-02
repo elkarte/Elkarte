@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageMembers
+// Version: 1.0; ManageMembers
 
 global $context;
 
@@ -13,6 +13,7 @@ $txt['membergroups_modify'] = 'Modify';
 $txt['membergroups_add_group'] = 'Add group';
 $txt['membergroups_regular'] = 'Regular groups';
 $txt['membergroups_post'] = 'Post count based groups';
+$txt['membergroups_guests_na'] = 'n/a';
 
 $txt['membergroups_group_name'] = 'Membergroup name';
 $txt['membergroups_new_board'] = 'Visible Boards';
@@ -126,4 +127,3 @@ $txt['dont_check_for_duplicate'] = 'Don\'t check for duplicates';
 $txt['duplicates'] = 'Duplicates';
 
 $txt['not_activated'] = 'Not activated';
-?>

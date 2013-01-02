@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -162,7 +163,7 @@ function template_main()
 					<th scope="col" class="first_th" width="6%" colspan="1">&nbsp;</th>
 					<th scope="col" class="lefttext">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
 					<th scope="col" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
-			
+
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
 				echo '
@@ -421,7 +422,6 @@ function template_main()
 
 	// Javascript for inline editing.
 	echo '
-<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/topic.js"></script>
 <script type="text/javascript"><!-- // --><![CDATA[
 	var oQuickModifyTopic = new QuickModifyTopic({
 		aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
@@ -429,5 +429,3 @@ function template_main()
 	});
 // ]]></script>';
 }
-
-?>

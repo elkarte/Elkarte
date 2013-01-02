@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Editor
+// Version: 1.0; Editor
 global $editortxt;
 
 $editortxt['Bold'] = 'Bold';
@@ -52,5 +52,8 @@ $editortxt['Insert current time'] = 'Insert current time';
 $editortxt['Print'] = 'Print';
 $editortxt['Preformatted Text'] = 'Preformatted Text';
 $editortxt['View source'] = 'View source';
-
-?>
+$editortxt['Glow'] = 'Glow';
+$editortxt['Insert FTP Link'] = 'Insert FTP Link';
+$editortxt['Shadow'] = 'Shadow';
+$editortxt['Teletype'] = 'Teletype';
+$editortxt['Move'] = 'Move';

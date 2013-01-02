@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Profile
+// Version: 1.0; Drafts
 
 global $scripturl, $context;
 
@@ -37,5 +37,3 @@ $txt['drafts_pm_enabled'] = 'Enable the saving of PM drafts';
 $txt['drafts_post_enabled'] = 'Enable the saving of Post drafts';
 $txt['drafts_none'] = 'No Subject';
 $txt['drafts_saved'] = 'Draft was sucessfuly saved';
-
-?>

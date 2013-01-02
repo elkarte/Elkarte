@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -23,10 +24,11 @@ if (!defined('DIALOGO'))
 
 /**
  * Begin the registration process.
+ * Accessed by ?action=register
  *
  * @param array $reg_errors = array()
  */
-function Register($reg_errors = array())
+function action_register($reg_errors = array())
 {
 	global $txt, $boarddir, $context, $settings, $modSettings, $user_info;
 	global $language, $scripturl, $smcFunc, $sourcedir, $smcFunc, $cur_profile;
@@ -148,7 +150,7 @@ function Register($reg_errors = array())
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($sourcedir . '/Profile-Modify.php');
+		require_once($sourcedir . '/ProfileOptions.php');
 
 		// Setup some important context.
 		loadLanguage('Profile');
@@ -212,10 +214,13 @@ function Register($reg_errors = array())
 
 /**
  * Actually register the member.
+ * @todo split this function in two functions:
+ *  - a function that handles action=register2, which needs no parameter;
+ *  - a function that processes the case of OpenID verification.
  *
  * @param bool $verifiedOpenID = false
  */
-function Register2($verifiedOpenID = false)
+function action_register2($verifiedOpenID = false)
 {
 	global $scripturl, $txt, $modSettings, $context, $sourcedir;
 	global $user_info, $options, $settings, $smcFunc;
@@ -286,7 +291,6 @@ function Register2($verifiedOpenID = false)
 	// Collect all extra registration fields someone might have filled in.
 	$possible_strings = array(
 		'website_url', 'website_title',
-		'aim', 'yim',
 		'location', 'birthdate',
 		'time_format',
 		'buddy_list',
@@ -299,7 +303,6 @@ function Register2($verifiedOpenID = false)
 	$possible_ints = array(
 		'pm_email_notify',
 		'notify_types',
-		'icq',
 		'gender',
 		'id_theme',
 	);
@@ -324,9 +327,6 @@ function Register2($verifiedOpenID = false)
 		if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && $smcFunc['strlen']($_POST['real_name']) < 60)
 			$possible_strings[] = 'real_name';
 	}
-
-	if (isset($_POST['msn']) && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['msn']) != 0)
-		$profile_strings[] = 'msn';
 
 	// Handle a string as a birthdate...
 	if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')
@@ -467,7 +467,7 @@ function Register2($verifiedOpenID = false)
 				$save_variables[$k] = $v;
 
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_validate($_POST['openid_identifier'], false, $save_variables);
+		openID_validate($_POST['openid_identifier'], false, $save_variables);
 	}
 	// If we've come from OpenID set up some default stuff.
 	elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))
@@ -495,7 +495,7 @@ function Register2($verifiedOpenID = false)
 	if (!empty($_POST['customfield']))
 	{
 		require_once($sourcedir . '/Profile.php');
-		require_once($sourcedir . '/Profile-Modify.php');
+		require_once($sourcedir . '/ProfileOptions.php');
 		makeCustomFieldChanges($memberID, 'register');
 	}
 
@@ -525,9 +525,10 @@ function Register2($verifiedOpenID = false)
 }
 
 /**
- * @todo needs description
+ * Verify the activation code, and activate the user if correct.
+ * Accessed by ?action=activate
  */
-function Activate()
+function action_activate()
 {
 	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $language, $user_info;
 
@@ -615,7 +616,7 @@ function Activate()
 	// Resend the password, but only if the account wasn't activated yet.
 	if (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'resend' && ($row['is_activated'] == 0 || $row['is_activated'] == 2) && (!isset($_REQUEST['code']) || $_REQUEST['code'] == ''))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 
 		$replacements = array(
 			'REALNAME' => $row['real_name'],
@@ -684,8 +685,9 @@ function Activate()
 
 /**
  * This function will display the contact information for the forum, as well a form to fill in.
+ * Accessed by action=coppa
  */
-function CoppaForm()
+function action_coppa()
 {
 	global $context, $modSettings, $txt, $smcFunc;
 
@@ -767,8 +769,9 @@ function CoppaForm()
 
 /**
  * Show the verification code or let it hear.
+ * Accessed by ?action=verificationcode
  */
-function VerificationCode()
+function action_verificationcode()
 {
 	global $sourcedir, $modSettings, $context, $scripturl;
 
@@ -859,7 +862,7 @@ function RegisterCheckUsername()
  * Shows the contact form for the user to fill out
  * Needs to be enabled to be used
  */
-function ContactForm()
+function action_contact()
 {
 	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
 
@@ -951,4 +954,3 @@ function ContactForm()
 
 	createToken('contact');
 }
-?>

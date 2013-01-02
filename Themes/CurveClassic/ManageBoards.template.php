@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -56,7 +57,7 @@ function template_main()
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=newboard;cat=', $category['id'], '" method="post" accept-charset="', $context['character_set'], '">
 			<div class="windowbg">
 				<div class="content">';
-				
+
 		if (count($category['boards']) !== 0)
 		{
 				echo '
@@ -94,7 +95,7 @@ function template_main()
 				}
 				$alternate = !$alternate;
 			}
-			
+
 			echo '
 						</ul>';
 		}
@@ -685,5 +686,3 @@ function template_confirm_board_delete()
 		</form>
 	</div>';
 }
-
-?>

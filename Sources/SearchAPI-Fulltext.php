@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -26,13 +27,13 @@ class fulltext_search
 	 * This is the last version of DIALOGO that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
+	public $version_compatible = 'DIALOGO 1.0 Alpha';
 
 	/**
 	 * This won't work with versions of DIALOGO less than this.
 	 * @var string
 	 */
-	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
+	public $min_smf_version = 'DIALOGO 1.0 Alpha';
 
 	/**
 	 * Is it supported?
@@ -290,5 +291,3 @@ class fulltext_search
 		return $ignoreRequest;
 	}
 }
-
-?>

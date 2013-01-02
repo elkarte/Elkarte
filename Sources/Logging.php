@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -45,7 +46,7 @@ function writeLog($force = false)
 	// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
 	if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once($sourcedir . '/ManageSearchEngines.php');
+		loadAdminClass ('ManageSearchEngines.php');
 		logSpider();
 	}
 
@@ -178,7 +179,7 @@ function logLastDatabaseError()
 	if (filemtime($boarddir . '/db_last_error.php') === $last_db_error_change)
 	{
 		// Write the change
-		$write_db_change =  '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';' . "\n" . '?' . '>';
+		$write_db_change =  '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
 		$written_bytes = file_put_contents($boarddir . '/db_last_error.php', $write_db_change, LOCK_EX);
 
 		// survey says ...
@@ -530,5 +531,3 @@ function logActions($logs)
 
 	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
 }
-
-?>

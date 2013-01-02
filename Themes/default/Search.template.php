@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -59,7 +60,6 @@ function template_main()
 			</div>
 		</fieldset>';
 	}
-
 	// Advanced search!
 	else
 	{
@@ -125,11 +125,6 @@ function template_main()
 						$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 					</dd>
 				</dl>
-				
-				<script type="text/javascript"><!-- // --><![CDATA[
-					createEventListener(window);
-					window.addEventListener("load", initSearch, false);
-				// ]]></script>
 				<input type="hidden" name="advanced" value="1" />';
 
 		// Require an image to be typed to save spamming?
@@ -160,53 +155,48 @@ function template_main()
 			<div class="roundframe">
 				<div class="title_bar">
 					<h4 class="titlebg">
-						<span class="floatright">
-							<a href="javascript:void(0);" onclick="expandCollapseBoards(); return false;"><img src="', $settings['images_url'], '/expand.png" id="expandBoardsIcon" alt=""  class="icon"/></a>
-						</span>
-						<span>
-							<a href="javascript:void(0);" onclick="expandCollapseBoards(); return false;"><strong>', $txt['choose_board'], '</strong></a>
-						</span>
+						<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['show_advanced_options']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 					</h4>
 				</div>
-				<div class="flow_auto" id="searchBoardsExpand"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>
+				<div class="flow_auto" id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>
 					<ul class="ignoreboards floatleft">';
 
-	$i = 0;
-	$limit = ceil($context['num_boards'] / 2);
-	foreach ($context['categories'] as $category)
-	{
-		echo '
+			$i = 0;
+			$limit = ceil($context['num_boards'] / 2);
+			foreach ($context['categories'] as $category)
+			{
+				echo '
 						<li class="category">
 							<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'searchform\'); return false;">', $category['name'], '</a>
 							<ul>';
 
-		foreach ($category['boards'] as $board)
-		{
-			if ($i == $limit)
-				echo '
+				foreach ($category['boards'] as $board)
+				{
+					if ($i == $limit)
+						echo '
+									</ul>
+								</li>
 							</ul>
-						</li>
-					</ul>
-					<ul class="ignoreboards floatright">
-						<li class="category">
-							<ul>';
+							<ul class="ignoreboards floatright">
+								<li class="category">
+									<ul>';
+
+					echo '
+										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
+											<label for="brd', $board['id'], '">
+												<input type="checkbox" id="brd', $board['id'], '" name="brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
+											</label>
+										</li>';
+
+					$i ++;
+				}
+
+				echo '
+									</ul>
+								</li>';
+			}
 
 			echo '
-								<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-									<label for="brd', $board['id'], '">
-										<input type="checkbox" id="brd', $board['id'], '" name="brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
-									</label>
-								</li>';
-
-			$i ++;
-		}
-
-		echo '
-							</ul>
-						</li>';
-	}
-
-	echo '
 					</ul>
 				</div>
 				<br class="clear" />';
@@ -220,9 +210,13 @@ function template_main()
 			</div>
 		</fieldset>';
 		}
-	echo '
+
+		echo '
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
+			createEventListener(window);
+			window.addEventListener("load", initSearch, false);
+
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: smf_session_id,
@@ -230,6 +224,31 @@ function template_main()
 				sControlId: \'userspec\',
 				sSearchType: \'member\',
 				bItemList: false
+			});
+
+			// Some javascript for the advanced toggling
+			var oAdvancedPanelToggle = new smc_Toggle({
+				bToggleEnabled: true,
+				bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
+				aSwappableContainers: [
+					\'advanced_panel_div\'
+				],
+				aSwapImages: [
+					{
+						sId: \'advanced_panel_toggle\',
+						srcExpanded: smf_images_url + \'/collapse.png\',
+						altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+						srcCollapsed: smf_images_url + \'/expand.png\',
+						altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+					}
+				],
+				aSwapLinks: [
+					{
+						sId: \'advanced_panel_link\',
+						msgExpanded: ', JavaScriptEscape($txt['choose_board']), ',
+						msgCollapsed: ', JavaScriptEscape($txt['choose_board']), '
+					}
+				],
 			});
 		// ]]></script>';
 	}
@@ -540,5 +559,3 @@ function template_results()
 		// ]]></script>';
 
 }
-
-?>

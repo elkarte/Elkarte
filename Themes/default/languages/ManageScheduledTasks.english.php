@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageScheduledTasks
+// Version: 1.0; ManageScheduledTasks
 
 $txt['scheduled_tasks_title'] = 'Scheduled Tasks';
 $txt['scheduled_tasks_header'] = 'All Scheduled Tasks';
@@ -23,8 +23,8 @@ $txt['scheduled_task_daily_digest'] = 'Daily Notification Summary';
 $txt['scheduled_task_desc_daily_digest'] = 'Emails out the daily digest for notification subscribers.';
 $txt['scheduled_task_weekly_digest'] = 'Weekly Notification Summary';
 $txt['scheduled_task_desc_weekly_digest'] = 'Emails out the weekly digest for notification subscribers.';
-$txt['scheduled_task_fetchSMfiles'] = 'Fetch Simple Machines Files';
-$txt['scheduled_task_desc_fetchSMfiles'] = 'Retrieves javascript files containing notifications of updates and other information.';
+$txt['scheduled_task_fetchFiles'] = 'Fetch Dialogo Version Information';
+$txt['scheduled_task_desc_fetchFiles'] = 'Retrieves javascript files containing current revision levels, notifications of updates and other information.';
 $txt['scheduled_task_birthdayemails'] = 'Send Birthday Emails';
 $txt['scheduled_task_desc_birthdayemails'] = 'Sends out emails wishing members a happy birthday.';
 $txt['scheduled_task_weekly_maintenance'] = 'Weekly Maintenance';
@@ -61,5 +61,3 @@ $txt['scheduled_log_empty_log_confirm'] = 'Are you sure you want to completely c
 
 $txt['scheduled_task_remove_old_drafts'] = 'Remove old drafts';
 $txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the admin panel.';
-
-?>

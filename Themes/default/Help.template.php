@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -88,10 +89,8 @@ function template_find_members()
 					<span class="smalltext"><label for="buddies"><input type="checkbox" class="input_check" name="buddies" id="buddies"', !empty($context['buddy_search']) ? ' checked="checked"' : '', ' /> ', $txt['find_buddies'], '</label></span><br />';
 
 	echo '
-					<div class="padding righttext">
-						<input type="submit" value="', $txt['search'], '" class="button_submit" />
-						<input type="button" value="', $txt['find_close'], '" onclick="window.close();" class="button_submit" />
-					</div>
+					<input type="submit" value="', $txt['search'], '" class="button_submit" />
+					<input type="button" value="', $txt['find_close'], '" onclick="window.close();" class="button_submit" />
 				</div>
 			</div>
 			<br />
@@ -153,7 +152,7 @@ function template_manual()
 
 	echo '
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_smf_user_help'], '</h3>
+				<h3 class="catbg">', $txt['manual_dialogo_user_help'], '</h3>
 			</div>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">
@@ -169,9 +168,7 @@ function template_manual()
 
 	echo '
 					</ul>
-					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=credits'), '</p>
+					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=who;sa=credits'), '</p>
 				</div>
 			</div>';
 }
-
-?>

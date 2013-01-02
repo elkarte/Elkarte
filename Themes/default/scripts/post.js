@@ -15,8 +15,8 @@ function previewControl()
 	// Lets make a background preview request
 	if (window.XMLHttpRequest)
 	{
-		var bPost = false;
-		
+		bPost = false;
+
 		// call the needed preview function
 		switch(preview_area) 
 		{
@@ -91,7 +91,7 @@ function previewPM()
 	document.getElementById('preview_section').style.display = '';
 	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
 	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
-	
+
 	return false;
 }
 
@@ -120,7 +120,7 @@ function previewNews()
 	document.getElementById('preview_section').style.display = '';
 	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
 	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
-	
+
 	return false;
 }
 
@@ -128,10 +128,10 @@ function previewNews()
 function getFields(textFields, numericFields, checkboxFields, form_name)
 {
 	var fields = new Array();
-	
+
 	// Get all of the text fields
 	for (var i = 0, n = textFields.length; i < n; i++)
-	{	
+	{
 		if (textFields[i] in document.forms[form_name])
 		{
 			// Handle the editor.
@@ -144,7 +144,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
 		}
 	}
-	
+
 	// All of the numeric fields
 	for (var i = 0, n = numericFields.length; i < n; i++)
 	{
@@ -159,17 +159,17 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 			}
 		}
 	}
-	
+
 	// And the checkboxes
 	for (var i = 0, n = checkboxFields.length; i < n; i++)
 	{
 		if (checkboxFields[i] in document.forms[form_name] && document.forms[form_name].elements[checkboxFields[i]].checked)
 			fields[fields.length] = checkboxFields[i] + '=' + document.forms[form_name].elements[checkboxFields[i]].value;
 	}
-	
+
 	// And some security
 	fields[fields.length] = smf_session_var + '=' + smf_session_id;
-	
+
 	return fields;
 }
 
@@ -197,10 +197,10 @@ function onDocSent(XMLDoc)
 	// Show a list of errors (if any).
 	var errors = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('errors')[0];
 	var errorList = new Array();
-	
+
 	for (var i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 		errorList[errorList.length] = errors.getElementsByTagName('error')[i].firstChild.nodeValue;
-		
+
 	document.getElementById('errors').style.display = numErrors == 0 ? 'none' : '';
 	document.getElementById('errors').className = errors.getAttribute('serious') == 1 ? 'errorbox' : 'noticebox';
 	document.getElementById('error_serious').style.display = numErrors == 0 ? 'none' : '';
@@ -243,7 +243,7 @@ function onDocSent(XMLDoc)
 		var ignored_replies = new Array(), ignoring;
 		var newPosts = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
 		var numNewPosts = newPosts.length;
-		
+
 		if (numNewPosts != 0)
 		{
 			var newPostsHTML = '<span id="new_replies"><' + '/span>';
@@ -349,9 +349,9 @@ function onDocReceived(XMLDoc)
 
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
 		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
-	
+
 	$('#' + post_box_name).data("sceditor").InsertText(text);
-	
+
 	ajax_indicator(false);
 }
 

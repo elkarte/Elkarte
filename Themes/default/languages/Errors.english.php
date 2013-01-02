@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Errors
+// Version: 1.0; Errors
 
 global $scripturl, $modSettings;
 
@@ -240,6 +240,7 @@ $txt['error_no_question'] = 'No question was filled in for this poll.';
 $txt['error_no_message'] = 'The message body was left empty.';
 $txt['error_long_message'] = 'The message exceeds the maximum allowed length (%1$d characters).';
 $txt['error_no_comment'] = 'The comment field was left empty.';
+$txt['error_post_too_long'] = 'Your message is too long. Please enter a maximum of 255 characters.';
 $txt['error_session_timeout'] = 'Your session timed out while posting. Please try to re-submit your message.';
 $txt['error_no_to'] = 'No recipients specified.';
 $txt['error_bad_to'] = 'One or more \'to\'-recipients could not be found.';
@@ -301,8 +302,8 @@ $txt['error_functionality_not_windows'] = 'Sorry, this functionality is currentl
 $txt['attachment_not_found'] = 'Attachment Not Found';
 
 $txt['error_no_boards_selected'] = 'No valid boards were selected.';
-$txt['error_invalid_search_string'] = 'Did you forget to put something to search for?';
-$txt['error_invalid_search_string_blacklist'] = 'Your search query contained too trivial words. Please try again with a different query.';
+$txt['error_invalid_search_string'] = 'Did you forget to enter something to search for?';
+$txt['error_invalid_search_string_blacklist'] = 'Your search query contained trivial words. Please try again with a different query.';
 $txt['error_search_string_small_words'] = 'Each word must be at least two characters long.';
 $txt['error_query_not_specific_enough'] = 'Your search query didn\'t return any matches.';
 $txt['error_no_messages_in_time_frame'] = 'No messages found in selected time frame.';
@@ -328,7 +329,6 @@ $txt['profile_error_password_chars'] = 'Your password must contain a mix of uppe
 $txt['profile_error_already_requested_group'] = 'You already have an outstanding request for this group!';
 $txt['profile_error_openid_in_use'] = 'Another user is already using that OpenID authentication URL';
 $txt['profile_error_signature_not_yet_saved'] = 'The signature has not been saved.';
-$txt['profile_error_aim_too_long'] = 'The AIM nickname is too long.';
 $txt['profile_error_personal_text_too_long'] = 'The personal text is too long.';
 $txt['profile_error_user_title_too_long'] = 'The custom title is too long.';
 
@@ -385,9 +385,10 @@ $txt['custom_option_regex_error'] = 'The regex you entered is not valid';
 $txt['warning_no_reason'] = 'You must enter a reason for altering the warning state of a member';
 $txt['warning_notify_blank'] = 'You selected to notify the user but did not fill in the subject/message fields';
 
-$txt['cannot_connect_doc_site'] = 'Could not connect to the Simple Machines Online Manual. Please check that your server configuration allows external internet connections and try again later.';
+$txt['cannot_connect_doc_site'] = 'Could not connect to the documentation site. Please check that your server configuration allows external internet connections and try again later.';
 
 $txt['movetopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection topic\'.';
+$txt['movetopic_no_board'] = 'You must choose a board to move the topic to.';
 
 // OpenID error strings
 $txt['openid_server_bad_response'] = 'The requested identifier did not return the proper information.';
@@ -418,4 +419,3 @@ $txt['restore_not_found'] = 'The following messages could not be restored; the o
 $txt['error_invalid_dir'] = 'The directory you entered is invalid.';
 
 $txt['error_sqlite_optimizing'] = 'Sqlite is optimizing the database, the forum can not be accessed until it has finished.  Please try refreshing this page momentarily.';
-?>

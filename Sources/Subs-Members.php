@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -318,7 +319,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete personal messages.
-	require_once($sourcedir . '/PersonalMessage.php');
+	require_once($sourcedir . '/Subs-PersonalMessage.php');
 	deleteMessages(null, null, $users);
 
 	$smcFunc['db_query']('', '
@@ -341,7 +342,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete avatar.
-	require_once($sourcedir . '/ManageAttachments.php');
+	require_once($sourcedir . '/Subs-Attachments.php');
 	removeAttachments(array('id_member' => $users));
 
 	// It's over, no more moderation for you.
@@ -440,7 +441,7 @@ function registerMember(&$regOptions, $return_errors = false)
 
 	// We'll need some external functions.
 	require_once($sourcedir . '/Subs-Auth.php');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Put any errors in here.
 	$reg_errors = array();
@@ -617,10 +618,6 @@ function registerMember(&$regOptions, $return_errors = false)
 		'website_title' => '',
 		'website_url' => '',
 		'location' => '',
-		'icq' => '',
-		'aim' => '',
-		'yim' => '',
-		'msn' => '',
 		'time_format' => '',
 		'signature' => '',
 		'avatar' => '',
@@ -674,10 +671,6 @@ function registerMember(&$regOptions, $return_errors = false)
 		if (in_array($regOptions['register_vars']['id_group'], $unassignableGroups))
 			$regOptions['register_vars']['id_group'] = 0;
 	}
-
-	// ICQ cannot be zero.
-	if (isset($regOptions['extra_register_vars']['icq']) && empty($regOptions['extra_register_vars']['icq']))
-		$regOptions['extra_register_vars']['icq'] = '';
 
 	// Integrate optional member settings to be set.
 	if (!empty($regOptions['extra_register_vars']))
@@ -798,6 +791,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		}
 
 		// Send admin their notification.
+		require_once($sourcedir . '/Subs-Post.php');
 		adminNotify('standard', $memberID, $regOptions['username']);
 	}
 	// Need to activate their account - or fall under COPPA.
@@ -842,6 +836,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 		// Admin gets informed here...
+		require_once($sourcedir . '/Subs-Post.php');
 		adminNotify('approval', $memberID, $regOptions['username']);
 	}
 
@@ -1179,39 +1174,6 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 }
 
 /**
- * This simple function adds/removes the passed user from the current users buddy list.
- * Requires profile_identity_own permission.
- * Called by ?action=buddy;u=x;session_id=y.
- * Redirects to ?action=profile;u=x.
- */
-function BuddyListToggle()
-{
-	global $user_info;
-
-	checkSession('get');
-
-	isAllowedTo('profile_identity_own');
-	is_not_guest();
-
-	if (empty($_REQUEST['u']))
-		fatal_lang_error('no_access', false);
-	$_REQUEST['u'] = (int) $_REQUEST['u'];
-
-	// Remove if it's already there...
-	if (in_array($_REQUEST['u'], $user_info['buddies']))
-		$user_info['buddies'] = array_diff($user_info['buddies'], array($_REQUEST['u']));
-	// ...or add if it's not and if it's not you.
-	elseif ($user_info['id'] != $_REQUEST['u'])
-		$user_info['buddies'][] = (int) $_REQUEST['u'];
-
-	// Update the settings.
-	updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
-
-	// Redirect back to the profile
-	redirectexit('action=profile;u=' . $_REQUEST['u']);
-}
-
-/**
  * Callback for createList().
  *
  * @param $start
@@ -1227,7 +1189,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.icq, mem.aim, mem.yim, mem.msn, mem.member_ip, mem.member_ip2, mem.last_login,
+			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.member_ip, mem.member_ip2, mem.last_login,
 			mem.posts, mem.is_activated, mem.date_registered, mem.id_group, mem.additional_groups, mg.group_name
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
@@ -1424,5 +1386,3 @@ function generateValidationCode()
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
 }
-
-?>

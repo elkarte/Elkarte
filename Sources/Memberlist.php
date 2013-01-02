@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -14,6 +15,8 @@
  *
  * This file contains the functions for displaying and searching in the
  * members list.
+ * Accessed by ?action_memberlist.
+ * The default action is to list all registered members.
  *
  */
 
@@ -21,16 +24,12 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * Shows a listing of registered members.
- * - If a subaction is not specified, lists all registered members.
- * - It allows searching for members with the 'search' sub action.
- * - It calls MLAll or MLSearch depending on the sub action.
- * - Requires the view_mlist permission.
- * - Accessed via ?action=mlist.
+ * Sets up the context for showing a listing of registered members.
+ * For the handlers in this file, it requires the view_mlist permission.
  *
  * @uses Memberlist template, main sub template.
  */
-function Memberlist()
+function pre_memberlist()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings, $modSettings;
 
@@ -44,8 +43,8 @@ function Memberlist()
 	// $subActions array format:
 	// 'subaction' => array('label', 'function', 'is_selected')
 	$subActions = array(
-		'all' => array($txt['view_all_members'], 'MLAll', $context['listing_by'] == 'all'),
-		'search' => array($txt['mlist_search'], 'MLSearch', $context['listing_by'] == 'search'),
+		'all' => array($txt['view_all_members'], 'action_mlall', $context['listing_by'] == 'all'),
+		'search' => array($txt['mlist_search'], 'action_mlsearch', $context['listing_by'] == 'search'),
 	);
 
 	// Set up the sort links.
@@ -96,38 +95,6 @@ function Memberlist()
 				'up' => 'LENGTH(mem.website_url) > 0 DESC, IFNULL(mem.website_url, 1=1) ASC, mem.website_url ASC'
 			),
 		),
-		'icq' => array(
-			'label' => $txt['icq'],
-			'width' => 30,
-			'sort' => array(
-				'down' => 'LENGTH(mem.icq) > 0 ASC, mem.icq = 0 DESC, mem.icq DESC',
-				'up' => 'LENGTH(mem.icq) > 0 DESC, mem.icq = 0 ASC, mem.icq ASC'
-			),
-		),
-		'aim' => array(
-			'label' => $txt['aim'],
-			'width' => 30,
-			'sort' => array(
-				'down' => 'LENGTH(mem.aim) > 0 ASC, IFNULL(mem.aim, 1=1) DESC, mem.aim DESC',
-				'up' => 'LENGTH(mem.aim) > 0 DESC, IFNULL(mem.aim, 1=1) ASC, mem.aim ASC'
-			),
-		),
-		'yim' => array(
-			'label' => $txt['yim'],
-			'width' => 30,
-			'sort' => array(
-				'down' => 'LENGTH(mem.yim) > 0 ASC, IFNULL(mem.yim, 1=1) DESC, mem.yim DESC',
-				'up' => 'LENGTH(mem.yim) > 0 DESC, IFNULL(mem.yim, 1=1) ASC, mem.yim ASC'
-			),
-		),
-		'msn' => array(
-			'label' => $txt['msn'],
-			'width' => 30,
-			'sort' => array(
-				'down' => 'LENGTH(mem.msn) > 0 ASC, IFNULL(mem.msn, 1=1) DESC, mem.msn DESC',
-				'up' => 'LENGTH(mem.msn) > 0 DESC, IFNULL(mem.msn, 1=1) ASC, mem.msn ASC'
-			),
-		),
 		'id_group' => array(
 			'label' => $txt['position'],
 			'sort' => array(
@@ -172,7 +139,7 @@ function Memberlist()
 	$context['columns'][key($context['columns'])]['class'] = 'last_th';
 
 	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=mlist',
+		'url' => $scripturl . '?action=memberlist',
 		'name' => $txt['members_list']
 	);
 
@@ -181,8 +148,8 @@ function Memberlist()
 
 	// Build the memberlist button array.
 	$context['memberlist_buttons'] = array(
-		'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=mlist' . ';sa=all', 'active'=> true),
-		'mlist_search' => array('text' => 'mlist_search', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=mlist' . ';sa=search'),
+		'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=all', 'active'=> true),
+		'mlist_search' => array('text' => 'mlist_search', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=search'),
 	);
 
 	// Allow mods to add additional buttons here
@@ -201,7 +168,7 @@ function Memberlist()
  * Can be passed a sort parameter, to order the display of members.
  * Calls printMemberListRows to retrieve the results of the query.
  */
-function MLAll()
+function action_mlall()
 {
 	global $txt, $scripturl, $user_info;
 	global $modSettings, $context, $smcFunc;
@@ -301,12 +268,12 @@ function MLAll()
 
 	$context['letter_links'] = '';
 	for ($i = 97; $i < 123; $i++)
-		$context['letter_links'] .= '<a href="' . $scripturl . '?action=mlist;sa=all;start=' . chr($i) . '#letter' . chr($i) . '">' . strtoupper(chr($i)) . '</a> ';
+		$context['letter_links'] .= '<a href="' . $scripturl . '?action=memberlist;sa=all;start=' . chr($i) . '#letter' . chr($i) . '">' . strtoupper(chr($i)) . '</a> ';
 
 	// Sort out the column information.
 	foreach ($context['columns'] as $col => $column_details)
 	{
-		$context['columns'][$col]['href'] = $scripturl . '?action=mlist;sort=' . $col . ';start=0';
+		$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sort=' . $col . ';start=0';
 
 		if ((!isset($_REQUEST['desc']) && $col == $_REQUEST['sort']) || ($col != $_REQUEST['sort'] && !empty($column_details['default_sort_rev'])))
 			$context['columns'][$col]['href'] .= ';desc';
@@ -320,7 +287,7 @@ function MLAll()
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'up' : 'down';
 
 	// Construct the page index.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=mlist;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['num_members'], $modSettings['defaultMaxMembers']);
+	$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['num_members'], $modSettings['defaultMaxMembers']);
 
 	// Send the data to the template.
 	$context['start'] = $_REQUEST['start'] + 1;
@@ -329,7 +296,7 @@ function MLAll()
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 	$context['page_title'] = sprintf($txt['viewing_members'], $context['start'], $context['end']);
 	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=mlist;sort=' . $_REQUEST['sort'] . ';start=' . $_REQUEST['start'],
+		'url' => $scripturl . '?action=memberlist;sort=' . $_REQUEST['sort'] . ';start=' . $_REQUEST['start'],
 		'name' => &$context['page_title'],
 		'extra_after' => ' (' . sprintf($txt['of_total_members'], $context['num_members']) . ')'
 	);
@@ -401,11 +368,10 @@ function MLAll()
 
 /**
  * Search for members, or display search results.
- * - Called by MemberList().
  * - If variable 'search' is empty displays search dialog box, using the search sub template.
  * - Calls printMemberListRows to retrieve the results of the query.
  */
-function MLSearch()
+function action_mlsearch()
 {
 	global $txt, $scripturl, $context, $user_info, $modSettings, $smcFunc;
 
@@ -457,7 +423,7 @@ function MLSearch()
 		// Build the column link / sort information.
 		foreach ($context['columns'] as $col => $column_details)
 		{
-			$context['columns'][$col]['href'] = $scripturl . '?action=mlist;sa=search;start=0;sort=' . $col;
+			$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sa=search;start=0;sort=' . $col;
 
 			if ((!isset($_REQUEST['desc']) && $col == $_REQUEST['sort']) || ($col != $_REQUEST['sort'] && !empty($column_details['default_sort_rev'])))
 				$context['columns'][$col]['href'] .= ';desc';
@@ -486,9 +452,6 @@ function MLSearch()
 			$fields = allowedTo('moderate_forum') ? array('member_name', 'real_name') : array('real_name');
 		else
 			$fields = array();
-		// Search for messengers...
-		if (in_array('messenger', $_POST['fields']) && (!$user_info['is_guest'] || empty($modSettings['guest_hideContacts'])))
-			$fields += array(3 => 'msn', 'aim', 'icq', 'yim');
 		// Search for websites.
 		if (in_array('website', $_POST['fields']))
 			$fields += array(7 => 'website_title', 'website_url');
@@ -538,7 +501,7 @@ function MLSearch()
 		list ($numResults) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
 
-		$context['page_index'] = constructPageIndex($scripturl . '?action=mlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 
 		// Find the members from the database.
 		$request = $smcFunc['db_query']('', '
@@ -563,7 +526,6 @@ function MLSearch()
 		$context['search_fields'] = array(
 			'name' => $txt['mlist_search_name'],
 			'email' => $txt['mlist_search_email'],
-			'messenger' => $txt['mlist_search_messenger'],
 			'website' => $txt['mlist_search_website'],
 			'group' => $txt['mlist_search_group'],
 		);
@@ -579,7 +541,7 @@ function MLSearch()
 	}
 
 	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=mlist;sa=search',
+		'url' => $scripturl . '?action=memberlist;sa=search',
 		'name' => &$context['page_title']
 	);
 
@@ -631,5 +593,3 @@ function printMemberListRows($request)
 		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
 	}
 }
-
-?>

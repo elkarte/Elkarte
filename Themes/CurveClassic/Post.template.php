@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -51,7 +52,7 @@ function template_main()
 	// End of the javascript
 	echo '
 		// ]]></script>';
-	
+
 	// Start the form and display the link tree.
 	echo '
 		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
@@ -466,7 +467,7 @@ function template_main()
 							</dd>
 						</dl>';
 	}
-	
+
 	echo '
 					</div>';
 	// If the admin enabled the drafts feature, show a draft selection box
@@ -552,7 +553,7 @@ function template_main()
 			var txt_new = "', $txt['new'], '";
 			var txt_posted_by = "', $txt['posted_by'], '";
 			var txt_on = "', $txt['on'], '";';
-			
+
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
@@ -615,7 +616,7 @@ function template_main()
 
 	echo '
 		// ]]></script>';
-		
+
 	// If the user is replying to a topic show the previous posts.
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
@@ -742,7 +743,7 @@ function template_spellcheck()
 			var spell_formname = window.opener.spell_formname;
 			var spell_fieldname = window.opener.spell_fieldname;
 			var spell_full = window.opener.spell_full;
-		// ]]></script>	
+		// ]]></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
@@ -908,5 +909,3 @@ function template_announcement_send()
 		doAutoSubmit();
 	// ]]></script>';
 }
-
-?>

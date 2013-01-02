@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -42,7 +43,7 @@ function template_show_list($list_id = null)
 					', $cur_list['title'], '
 				</h3>
 			</div>';
-	
+
 	// This is for the old style menu with the arrows "> Test | Test 1"
 	if (empty($settings['use_tabs']) && isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'top'))
 		template_create_list_menu($cur_list['list_menu'], 'top');
@@ -51,9 +52,9 @@ function template_show_list($list_id = null)
 	{
 		echo '
 			<div class="information flow_hidden">';
-			
+
 		template_additional_rows('after_title', $cur_list);
-		
+
 		echo '
 			</div>';
 	}
@@ -346,5 +347,3 @@ function template_create_list_menu($list_menu, $direction = 'top')
 		</table>';
 	}
 }
-
-?>

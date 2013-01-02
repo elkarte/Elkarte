@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -82,11 +83,12 @@ function validateSession($type = 'admin')
 			return;
 		}
 	}
+
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_revalidate();
+		openID_revalidate();
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
@@ -118,7 +120,7 @@ function is_not_guest($message = '')
 	global $user_info, $txt, $context, $scripturl;
 
 	// Luckily, this person isn't a guest.
-	if (!$user_info['is_guest'])
+	if (isset($user_info['is_guest']) && !$user_info['is_guest'])
 		return;
 
 	// People always worry when they see people doing things they aren't actually doing...
@@ -274,7 +276,7 @@ function is_not_banned($forceCheck = false)
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			require_once($sourcedir . '/ManageBans.php');
+			loadAdminClass ('ManageBans.php');
 			updateBanMembers();
 		}
 	}
@@ -657,7 +659,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$referrer = $_SESSION['request_referer'];
 	else
 		$referrer = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
-	
+
 	if (!empty($referrer['host']))
 	{
 		if (strpos($_SERVER['HTTP_HOST'], ':') !== false)
@@ -761,7 +763,7 @@ function createToken($action, $type = 'post')
 	$context[$action . '_token'] = $token;
 	$context[$action . '_token_var'] = $token_var;
 
-	return array($token_var, $token);
+	return array($action . '_token_var' => $token_var, $action . '_token' => $token);
 }
 
 /**
@@ -1046,7 +1048,8 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	global $user_info, $modSettings, $smcFunc;
 
 	// Arrays are nice, most of the time.
-	$permissions = (array) $permissions;
+	if (!is_array($permissions))
+		$permissions = array($permissions);
 
 	/*
 	 * Set $simple to true to use this function in compatability mode
@@ -1062,11 +1065,11 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			return array(0);
 		else
 		{
-			$result = array();
+			$boards = array();
 			foreach ($permissions as $permission)
-				$result[$permission] = array(0);
+				$boards[$permission] = array(0);
 
-			return $result;
+			return $boards;
 		}
 	}
 
@@ -1089,7 +1092,8 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			'permissions' => $permissions,
 		)
 	);
-	$boards = $deny_boards = $result = array();
+	$boards = array();
+	$deny_boards = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		if ($simple)
@@ -1110,12 +1114,24 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	$smcFunc['db_free_result']($request);
 
 	if ($simple)
-		$result = array_unique(array_values(array_diff($boards, $deny_boards)));
+		$boards = array_unique(array_values(array_diff($boards, $deny_boards)));
 	else
+	{
 		foreach ($permissions as $permission)
-			$result[$permission] = array_unique(array_values(array_diff($boards[$permission], $deny_boards[$permission])));
+		{
+			// never had it to start with
+			if (empty($boards[$permission]))
+				$boards[$permission] = array();
+			else
+			{
+				// Or it may have been removed
+				$deny_boards[$permission] = isset($deny_boards[$permission]) ? $deny_boards[$permission] : array();
+				$boards[$permission] = array_unique(array_values(array_diff($boards[$permission], $deny_boards[$permission])));
+			}
+		}
+	}
 
-	return $result;
+	return $boards;
 }
 
 /**
@@ -1264,7 +1280,9 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 		if ($fh) {
 			fwrite($fh, '<?php
 
-// This file is here solely to protect your ' . $directoryname . ' directory.
+/**
+ * This file is here solely to protect your ' . $directoryname . ' directory.
+ */
 
 // Look for Settings.php....
 if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
@@ -1276,8 +1294,7 @@ if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
 // Can\'t find it... just forget it.
 else
 	exit;
-
-?>');
+');
 			fclose($fh);
 		}
 		$errors[] = 'index-php_cannot_create_file';
@@ -1327,5 +1344,3 @@ function constructBanQueryIP($fullip)
 
 	return $ban_query;
 }
-
-?>

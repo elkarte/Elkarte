@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -12,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file provides compatibility functions such as the sha1() function, 
+ * This file provides compatibility functions such as the sha1() function,
  * missing extensions, etc
  * It is only included for when the respective extension or function cannot be found.
  *
@@ -186,5 +187,3 @@ function loadOldClassFile($filename)
 		'$1function ',
 	), rtrim(file_get_contents($sourcedir . '/' . $filename))));
 }
-
-?>

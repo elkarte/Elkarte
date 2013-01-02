@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -51,7 +52,7 @@ function template_main()
 	// End of the javascript
 	echo '
 		// ]]></script>';
-	
+
 	// Start the form and display the link tree.
 	echo '
 		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
@@ -400,7 +401,7 @@ function template_main()
 
 		echo '
 						</dl>';
-		
+
 		if (!empty($context['files_in_session_warning']))
 			echo '
 						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
@@ -552,7 +553,7 @@ function template_main()
 			var txt_new = "', $txt['new'], '";
 			var txt_posted_by = "', $txt['posted_by'], '";
 			var txt_on = "', $txt['on'], '";';
-			
+
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
@@ -615,7 +616,7 @@ function template_main()
 
 	echo '
 		// ]]></script>';
-		
+
 	// If the user is replying to a topic show the previous posts.
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
@@ -741,12 +742,12 @@ function template_spellcheck()
 			var spell_formname = window.opener.spell_formname;
 			var spell_fieldname = window.opener.spell_fieldname;
 			var spell_full = window.opener.spell_full;
-		// ]]></script>	
+		// ]]></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			', $context['spell_js'], '
-		// ]]></script>	
+		// ]]></script>
 	</head>
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="', $context['character_set'], '" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
@@ -823,89 +824,3 @@ function template_quotefast()
 	</body>
 </html>';
 }
-
-function template_announce()
-{
-	global $context, $settings, $options, $txt, $scripturl;
-
-	echo '
-	<div id="announcement">
-		<form action="', $scripturl, '?action=announce;sa=send" method="post" accept-charset="', $context['character_set'], '">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['announce_title'], '</h3>
-			</div>
-			<div class="information">
-				', $txt['announce_desc'], '
-			</div>
-			<div class="windowbg2">
-				<div class="content">
-					<p>
-						', $txt['announce_this_topic'], ' <a href="', $scripturl, '?topic=', $context['current_topic'], '.0">', $context['topic_subject'], '</a>
-					</p>
-					<ul class="reset">';
-
-	foreach ($context['groups'] as $group)
-		echo '
-						<li>
-							<label for="who_', $group['id'], '"><input type="checkbox" name="who[', $group['id'], ']" id="who_', $group['id'], '" value="', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
-						</li>';
-
-	echo '
-						<li>
-							<label for="checkall"><input type="checkbox" id="checkall" class="input_check" onclick="invertAll(this, this.form);" checked="checked" /> <em>', $txt['check_all'], '</em></label>
-						</li>
-					</ul>
-					<hr class="hrcolor" />
-					<div id="confirm_buttons">
-						<input type="submit" value="', $txt['post'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-						<input type="hidden" name="move" value="', $context['move'], '" />
-						<input type="hidden" name="goback" value="', $context['go_back'], '" />
-					</div>
-				</div>
-				<br class="clear_right" />
-			</div>
-		</form>
-	</div>
-	<br />';
-}
-
-function template_announcement_send()
-{
-	global $context, $settings, $options, $txt, $scripturl;
-
-	echo '
-	<div id="announcement">
-		<form action="' . $scripturl . '?action=announce;sa=send" method="post" accept-charset="', $context['character_set'], '" name="autoSubmit" id="autoSubmit">
-			<div class="windowbg2">
-				<div class="content">
-					<p>', $txt['announce_sending'], ' <a href="', $scripturl, '?topic=', $context['current_topic'], '.0" target="_blank" class="new_win">', $context['topic_subject'], '</a></p>
-					<div class="progress_bar">
-						<div class="full_bar">', $context['percentage_done'], '% ', $txt['announce_done'], '</div>
-						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
-					</div>
-					<hr class="hrcolor" />
-					<div id="confirm_buttons">
-						<input type="submit" name="b" value="', $txt['announce_continue'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-						<input type="hidden" name="move" value="', $context['move'], '" />
-						<input type="hidden" name="goback" value="', $context['go_back'], '" />
-						<input type="hidden" name="start" value="', $context['start'], '" />
-						<input type="hidden" name="membergroups" value="', $context['membergroups'], '" />
-					</div>
-				</div>
-				<br class="clear_right" />
-			</div>
-		</form>
-	</div>
-	<br />
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var countdown = 2;
-		var txt_message = "', $txt['announce_continue'], '";
-		doAutoSubmit();
-	// ]]></script>';
-}
-
-?>

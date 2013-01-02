@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageBoards
+// Version: 1.0; ManageBoards
 
 $txt['boards_and_cats'] = 'Manage Boards and Categories';
 $txt['order'] = 'Order';
@@ -96,5 +96,3 @@ $txt['mboards_cancel_moving'] = 'Cancel moving';
 $txt['mboards_move'] = 'move';
 
 $txt['mboards_no_cats'] = 'There are currently no categories or boards configured.';
-
-?>

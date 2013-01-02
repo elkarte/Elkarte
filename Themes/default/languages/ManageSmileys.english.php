@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageSmileys
+// Version: 1.0; ManageSmileys
 
 $txt['smiley_sets_save'] = 'Save Changes';
 $txt['smiley_sets_add'] = 'New smiley Set';
@@ -94,4 +94,3 @@ $txt['icons_location_after'] = 'After';
 $txt['icons_filename_all_gif'] = 'All files must be &quot;gif&quot; files';
 $txt['icons_filename_all_png'] = 'All files must be &quot;png&quot; files';
 $txt['icons_no_entries'] = 'There are currently no message icons configured.';
-?>

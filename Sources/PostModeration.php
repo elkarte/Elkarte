@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -22,7 +23,7 @@ if (!defined('DIALOGO'))
 /**
  * This is a handling function for all things post moderation.
  */
-function PostModerationMain()
+function action_postmoderation()
 {
 	global $sourcedir;
 
@@ -35,10 +36,10 @@ function PostModerationMain()
 
 	// Allowed sub-actions, you know the drill by now!
 	$subactions = array(
-		'approve' => 'ApproveMessage',
-		'attachments' => 'UnapprovedAttachments',
-		'replies' => 'UnapprovedPosts',
-		'topics' => 'UnapprovedPosts',
+		'approve' => 'action_approve',
+		'attachments' => 'action_unapproved_attachments',
+		'replies' => 'action_unapproved',
+		'topics' => 'action_unapproved',
 	);
 
 	// Pick something valid...
@@ -51,7 +52,7 @@ function PostModerationMain()
 /**
  * View all unapproved posts.
  */
-function UnapprovedPosts()
+function action_unapproved()
 {
 	global $txt, $scripturl, $context, $user_info, $smcFunc;
 
@@ -311,7 +312,7 @@ function UnapprovedPosts()
 /**
  * View all unapproved attachments.
  */
-function UnapprovedAttachments()
+function action_unapproved_attachments()
 {
 	global $txt, $scripturl, $context, $user_info, $sourcedir, $smcFunc, $modSettings;
 
@@ -349,7 +350,7 @@ function UnapprovedAttachments()
 		checkSession('request');
 
 		// This will be handy.
-		require_once($sourcedir . '/ManageAttachments.php');
+		require_once($sourcedir . '/Subs-Attachments.php');
 
 		// Confirm the attachments are eligible for changing!
 		$request = $smcFunc['db_query']('', '
@@ -377,7 +378,7 @@ function UnapprovedAttachments()
 		if (!empty($attachments))
 		{
 			if ($curAction == 'approve')
-				ApproveAttachments($attachments);
+				approveAttachments($attachments);
 			else
 				removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 		}
@@ -524,7 +525,7 @@ function UnapprovedAttachments()
 }
 
 /**
- * Callback function for UnapprovedAttachments
+ * Callback function for action_unapproved_attachments
  * retrieve all the attachments waiting for approval the approver can approve
  *
  * @param int $start
@@ -604,7 +605,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 }
 
 /**
- * Callback function for UnapprovedAttachments
+ * Callback function for action_unapproved_attachments
  * count all the attachments waiting for approval that this approver can approve
  *
  * @param string $approve_query additional restrictions based on the boards the approver can see
@@ -638,7 +639,7 @@ function list_getNumUnapprovedAttachments($approve_query)
 /**
  * Approve a post, just the one.
  */
-function ApproveMessage()
+function action_approve()
 {
 	global $user_info, $topic, $board, $sourcedir, $smcFunc;
 
@@ -759,8 +760,8 @@ function approveAllData()
 
 	if (!empty($attaches))
 	{
-		require_once($sourcedir . '/ManageAttachments.php');
-		ApproveAttachments($attaches);
+		require_once($sourcedir . '/Subs-Attachments.php');
+		approveAttachments($attaches);
 	}
 }
 
@@ -777,7 +778,7 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/Subs-Topic.php');
 	if ($current_view == 'topics')
 	{
 		removeTopics($messages);
@@ -797,4 +798,3 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 		}
 	}
 }
-?>

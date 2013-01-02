@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -33,7 +34,7 @@ function template_main()
 					<div class="content top_row">
 						<dl class="stats">
 							<dt>', $txt['total_members'], ':</dt>
-							<dd>', $context['show_member_list'] ? '<a href="' . $scripturl . '?action=mlist">' . $context['num_members'] . '</a>' : $context['num_members'], '</dd>
+							<dd>', $context['show_member_list'] ? '<a href="' . $scripturl . '?action=memberlist">' . $context['num_members'] . '</a>' : $context['num_members'], '</dd>
 							<dt>', $txt['total_posts'], ':</dt>
 							<dd>', $context['num_posts'], '</dd>
 							<dt>', $txt['total_topics'], ':</dt>
@@ -432,5 +433,3 @@ function template_main()
 	// ]]></script>';
 	}
 }
-
-?>

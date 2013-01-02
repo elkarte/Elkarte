@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; index
+// Version: 1.0; index
 
 global $forum_copyright, $forum_version, $webmaster_email, $scripturl, $context, $boardurl;
 
@@ -331,17 +331,6 @@ $txt['newest_member'] = ', our newest member.'; //Deprecated
 $txt['search_for'] = 'Search for';
 $txt['search_match'] = 'Match';
 
-$txt['aim'] = 'AIM';
-// In this string, please use +'s for spaces.
-$txt['aim_default_message'] = 'Hi.+Are+you+there?';
-$txt['aim_title'] = 'AOL Instant Messenger';
-$txt['icq'] = 'ICQ';
-$txt['icq_title'] = 'ICQ Messenger';
-$txt['msn'] = 'MSN';
-$txt['msn_title'] = 'MSN Messenger';
-$txt['yim'] = 'YIM';
-$txt['yim_title'] = 'Yahoo Instant Messenger';
-
 $txt['maintain_mode_on'] = 'Remember, this forum is in \'Maintenance Mode\'.';
 
 $txt['read'] = 'Read'; //Deprecated
@@ -366,13 +355,15 @@ $txt['total_boards'] = 'Total Boards';
 
 $txt['print_page'] = 'Print Page';
 $txt['print_page_text'] = 'Text only';
-$txt['print_page_images'] = 'Test with Images';
+$txt['print_page_images'] = 'Text with Images';
 
 $txt['valid_email'] = 'This must be a valid email address.';
 
 $txt['info_center_title'] = '%1$s - Info Center';
 
 $txt['send_topic'] = 'Send this topic';
+$txt['disregard'] = 'Disregard';
+$txt['undisregard'] = 'Stop disregarding';
 
 $txt['sendtopic_title'] = 'Send the topic &quot;%1$s&quot; to a friend.';
 $txt['sendtopic_sender_name'] = 'Your name';
@@ -498,8 +489,8 @@ $txt['status'] = 'Status';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=credits" title="Dialogo Forum" target="_blank" class="new_win">%1$s</a> |
- <a href="http://www.dialogoforum.org/about/smf/license.php" title="License" target="_blank" class="new_win">Dialogo &copy; 2012</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="Dialogo Forum" target="_blank" class="new_win">%1$s</a> |
+ <a href="https://github.com/Spuds/SMF21se/blob/master/license.md" title="License" target="_blank" class="new_win">Dialogo &copy; 2012</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -556,7 +547,6 @@ $txt['mlist_search'] = 'Search For Members';
 $txt['mlist_search_again'] = 'Search again';
 $txt['mlist_search_filter'] = 'Search Options';
 $txt['mlist_search_email'] = 'Search by email address';
-$txt['mlist_search_messenger'] = 'Search by messenger nickname';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';
 $txt['mlist_search_website'] = 'Search by website';
@@ -827,5 +817,3 @@ $txt['debug_hide_queries'] = '[Hide Queries]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser ID: ';
 $txt['debug_hooks'] = 'Hooks called: ';
-
-?>

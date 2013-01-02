@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -34,7 +35,7 @@ class standard_search
 	 *
 	 * @var type
 	 */
-	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
+	public $min_smf_version = 'DIALOGO 1.0 Alpha';
 
 	/**
 	 * Standard search is supported by default.
@@ -55,5 +56,3 @@ class standard_search
 		return false;
 	}
 }
-
-?>

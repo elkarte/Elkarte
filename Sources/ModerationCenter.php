@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -24,7 +25,7 @@ if (!defined('DIALOGO'))
  *
  * @param bool $dont_call = false
  */
-function ModerationMain($dont_call = false)
+function action_modcenter($dont_call = false)
 {
 	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $options, $smcFunc;
 
@@ -82,7 +83,7 @@ function ModerationMain($dont_call = false)
 					'label' => $txt['modlog_view'],
 					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
 					'file' => 'Modlog.php',
-					'function' => 'ViewModlog',
+					'function' => 'action_modlog',
 				),
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],
@@ -103,7 +104,7 @@ function ModerationMain($dont_call = false)
 					'label' => $txt['mc_unapproved_posts'],
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'PostModeration.php',
-					'function' => 'PostModerationMain',
+					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=postmod',
 					'subsections' => array(
 						'posts' => array($txt['mc_unapproved_replies']),
@@ -114,7 +115,7 @@ function ModerationMain($dont_call = false)
 					'label' => $txt['mc_unapproved_attachments'],
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'PostModeration.php',
-					'function' => 'PostModerationMain',
+					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 				),
 				'reports' => array(
@@ -145,13 +146,13 @@ function ModerationMain($dont_call = false)
 				'groups' => array(
 					'label' => $txt['mc_group_requests'],
 					'file' => 'Groups.php',
-					'function' => 'Groups',
+					'function' => 'action_groups',
 					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				),
 				'viewgroups' => array(
 					'label' => $txt['mc_view_groups'],
 					'file' => 'Groups.php',
-					'function' => 'Groups',
+					'function' => 'action_groups',
 				),
 			),
 		),
@@ -213,7 +214,7 @@ function ModerationHome()
 	global $txt, $context, $scripturl, $modSettings, $user_info, $user_settings;
 
 	loadTemplate('ModerationCenter');
-	loadJavascriptFile('admin.js', array('default_theme' => true), 'admin.js');
+	loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
 	$context['page_title'] = $txt['moderation_center'];
 	$context['sub_template'] = 'moderation_center';
@@ -498,6 +499,7 @@ function ModBlockReportedPosts()
 
 /**
  * Show a list of all the group requests they can see.
+ * Checks permissions for group moderation.
  */
 function ModBlockGroupRequests()
 {
@@ -735,7 +737,7 @@ function ModerateGroups()
 
 	// Setup the subactions...
 	$subactions = array(
-		'requests' => 'GroupRequests',
+		'requests' => 'action_grouprequests',
 		'view' => 'ViewGroups',
 	);
 
@@ -883,7 +885,7 @@ function ModReport()
 	{
 		$context['report']['comments'][] = array(
 			'id' => $row['id_comment'],
-			'message' => $row['comment'],
+			'message' => strtr($row['comment'], array("\n" => '<br />')),
 			'time' => timeformat($row['time_sent']),
 			'member' => array(
 				'id' => $row['id_member'],
@@ -2152,5 +2154,3 @@ function ModEndSession()
 
 	redirectexit('action=moderate');
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -30,9 +31,9 @@ if (!defined('DIALOGO'))
  *
  * @uses Notify template, main sub-template
  */
-function Notify()
+function action_notify()
 {
-	global $scripturl, $txt, $topic, $user_info, $context, $smcFunc;
+	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $smcFunc;
 
 	// Make sure they aren't a guest or something - guests can't really receive notifications!
 	is_not_guest();
@@ -42,6 +43,9 @@ function Notify()
 	if (empty($topic))
 		fatal_lang_error('not_a_topic', false);
 
+	// Our topic functions are here
+	require_once($sourcedir . '/Subs-Topic.php');
+
 	// What do we do?  Better ask if they didn't say..
 	if (empty($_GET['sa']))
 	{
@@ -49,19 +53,7 @@ function Notify()
 		loadTemplate('Notify');
 
 		// Find out if they have notification set for this topic already.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member
-			FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-			)
-		);
-		$context['notification_set'] = $smcFunc['db_num_rows']($request) != 0;
-		$smcFunc['db_free_result']($request);
+		$context['notification_set'] = hasTopicNotification($user_info['id'], $topic);
 
 		// Set the template variables...
 		$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'];
@@ -75,27 +67,14 @@ function Notify()
 		checkSession('get');
 
 		// Attempt to turn notifications on.
-		$smcFunc['db_insert']('ignore',
-			'{db_prefix}log_notify',
-			array('id_member' => 'int', 'id_topic' => 'int'),
-			array($user_info['id'], $topic),
-			array('id_member', 'id_topic')
-		);
+		setTopicNotification($user_info['id'], $topic, true);
 	}
 	else
 	{
 		checkSession('get');
 
 		// Just turn notifications off.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_topic = {int:current_topic}',
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-			)
-		);
+		setTopicNotification($user_info['id'], $topic, false);
 	}
 
 	// Send them back to the topic.
@@ -112,13 +91,16 @@ function Notify()
  *
  * @uses Notify template, notify_board sub-template.
  */
-function BoardNotify()
+function action_notifyboard()
 {
-	global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
+	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $smcFunc;
 
 	// Permissions are an important part of anything ;).
 	is_not_guest();
 	isAllowedTo('mark_notify');
+
+	// our board functions are here
+	require_once($sourcedir . '/Subs-Boards.php');
 
 	// You have to specify a board to turn notifications on!
 	if (empty($board))
@@ -131,19 +113,7 @@ function BoardNotify()
 		loadTemplate('Notify');
 
 		// Find out if they have notification set for this board already.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member
-			FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_board = {int:current_board}
-			LIMIT 1',
-			array(
-				'current_board' => $board,
-				'current_member' => $user_info['id'],
-			)
-		);
-		$context['notification_set'] = $smcFunc['db_num_rows']($request) != 0;
-		$smcFunc['db_free_result']($request);
+		$context['notification_set'] = hasBoardNotification($user_info['id'], $board);
 
 		// Set the template variables...
 		$context['board_href'] = $scripturl . '?board=' . $board . '.' . $_REQUEST['start'];
@@ -159,12 +129,7 @@ function BoardNotify()
 		checkSession('get');
 
 		// Turn notification on.  (note this just blows smoke if it's already on.)
-		$smcFunc['db_insert']('ignore',
-			'{db_prefix}log_notify',
-			array('id_member' => 'int', 'id_board' => 'int'),
-			array($user_info['id'], $board),
-			array('id_member', 'id_board')
-		);
+		setBoardNotification($user_info['id'], $board, true);
 	}
 	// ...or off?
 	else
@@ -172,19 +137,39 @@ function BoardNotify()
 		checkSession('get');
 
 		// Turn notification off for this board.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_board = {int:current_board}',
-			array(
-				'current_board' => $board,
-				'current_member' => $user_info['id'],
-			)
-		);
+		setBoardNotification($user_info['id'], $board, false);
 	}
 
 	// Back to the board!
 	redirectexit('board=' . $board . '.' . $_REQUEST['start']);
 }
 
-?>
+/**
+ * Turn off/on unread replies subscription for a topic
+ * Must be called with a topic specified in the URL.
+ * The sub-action can be 'on', 'off', or nothing for what to do.
+ * Requires the mark_any_notify permission.
+ * Upon successful completion of action will direct user back to topic.
+ * Accessed via ?action=disregardtopic.
+ */
+function action_disregardtopic()
+{
+	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
+
+	// our topic functions are here
+	require_once($sourcedir . '/Subs-Topic.php');
+
+	// Let's do something only if the function is enabled
+	if (!$user_info['is_guest'] && !empty($modSettings['enable_disregard']))
+	{
+		checkSession('get');
+
+		if ($_GET['sa'] === 'on')
+			setTopicRegard($user_info['id'], $topic, true);
+		elseif ($_GET['sa'] === 'off')
+			setTopicRegard($user_info['id'], $topic, false);
+	}
+
+	// Back to the topic.
+	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+}

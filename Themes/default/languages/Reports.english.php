@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Reports
+// Version: 1.0; Reports
 
 $txt['generate_reports_desc'] = 'From this section you can generate a variety of reports to assist in the administration of your forum. Simply follow the steps below to select the option of your choice.';
 $txt['generate_reports_continue'] = 'Continue';
@@ -137,5 +137,3 @@ $txt['report_staff_posts'] = 'Posts';
 $txt['report_staff_last_login'] = 'Last Login';
 $txt['report_staff_all_boards'] = 'All boards';
 $txt['report_staff_no_boards'] = 'No boards';
-
-?>

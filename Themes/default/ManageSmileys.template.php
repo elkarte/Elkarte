@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -34,7 +35,7 @@ function template_editsets()
 			</div>
 		</div>
 	</div>
-	
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		window.smfForum_scripturl = smf_scripturl;
 		window.smfForum_sessionid = smf_session_id;
@@ -43,7 +44,7 @@ function template_editsets()
 
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-	<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-smileys.js"></script>';
+	<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
@@ -240,7 +241,7 @@ function template_modifysmiley()
 			<input type="hidden" name="smiley" value="', $context['current_smiley']['id'], '" />
 		</form>
 	</div>
-	
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function updatePreview()
 		{
@@ -342,7 +343,7 @@ function template_addsmiley()
 					</dl>
 				</div>
 			</div>
-			
+
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['smiley_new'], '</h3>
 			</div>
@@ -434,7 +435,7 @@ function template_setorder()
 		<input type="hidden" name="reorder" value="1" />
 	</form>';
 	}
-	
+
 	echo '
 	</div>';
 }
@@ -476,7 +477,7 @@ function template_editicon()
 							<strong><label for="icon_filename">', $txt['smileys_filename'], '</label>: </strong><br /><span class="smalltext">', $txt['icons_filename_all_png'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="icon_filename" id="icon_filename" value="', !empty($context['icon']['filename']) ? $context['icon']['filename'] . '.gif' : '', '" class="input_text" />
+							<input type="text" name="icon_filename" id="icon_filename" value="', !empty($context['icon']['filename']) ? $context['icon']['filename'] . '.png' : '', '" class="input_text" />
 						</dd>
 						<dt>
 							<strong><label for="icon_description">', $txt['smileys_description'], '</label>: </strong>
@@ -535,5 +536,3 @@ function template_editicon()
 		</form>
 	</div>';
 }
-
-?>

@@ -78,7 +78,7 @@ body.action_admin .navigate_section ul li a {
 	border: 1px solid #ddd;
 	border-top: none;
 	border-radius: 0 0 7px 7px;
-	margin: -1px 0 12px 0;
+	margin: 0;
 	padding: 12px 9px 8px 9px;
 }
 .action_admin p.description a {
@@ -324,14 +324,15 @@ h3.catbg #quick_search form .button_submit:hover {
 
 /* Browser tweaks. */
 body#chrome #quick_search form input {
-	padding: 4px 3px;
+	padding: 2px 3px;
 }
 body#chrome #quick_search .button_submit, body#ie #quick_search .button_submit, body#opera #quick_search .button_submit {
 	margin: 0 5px;
 	padding: 5px 9px 4px 9px;
 }
 body#chrome  #quick_search .button_submit {
-	margin: -26px 5px 0 5px;
+	margin: -24px 5px 0 5px;
+	padding: 2px 5px;
 }
 
 /* The welcome thingy. */
@@ -411,7 +412,7 @@ body#chrome  #quick_search .button_submit {
 	overflow: auto;
 }
 #live_news div.content, #supportVersionsTable  div.content {
-	padding: 0;
+	padding: 0 4px;
 	font-size: 0.9em;
 }
 #supportVersionsTable  div.content {
@@ -879,6 +880,13 @@ dl.settings dd.small_caption {
 }
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
+#permissionForm .table_grid {
+	width: 100%;
+}
+#permissionForm .table_grid img.icon {
+	vertical-align: top;
+	width: 16px;
+}
 dl.admin_permissions dt {
 	width: 35%;
 }
@@ -983,7 +991,7 @@ ul.theme_options li {
 	background: url(../images/admin/boards.png) no-repeat;
 }
 .edit_file {
-	width: 96%;
+	width: 100%;
 	font-family: monospace;
 	margin-top: 1ex;
 	white-space: pre;
@@ -1064,6 +1072,26 @@ h3.grid_header {
 }
 #error_log td div {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+#error_log .error_who, #error_log .error_type {
+	float: left;
+	width: 50%;
+	line-height: 1.8em;
+	padding: 0 4px 4px 4px;
+	vertical-align: bottom;
+}
+#error_log .error_where {
+	float: left;
+	width: 100%;
+	padding: 4px 0;
+	line-height: 1.6em;
+	border-top: 1px solid #e3e3e3;
+}
+.error_where a.scope {
+	display: table-cell;
+	padding: 4px;
+	width: 20px;
+	vertical-align: top;
 }
 #error_log td.checkbox_column {
 	width: 15px;

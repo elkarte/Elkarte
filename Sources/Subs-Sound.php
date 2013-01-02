@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -24,7 +25,7 @@ if (!defined('DIALOGO'))
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.
- * Used by VerificationCode() (Register.php).
+ * Used by action_verificationcode() (Register.php).
  *
  * @param string $word
  * @return boolean false on failure
@@ -115,5 +116,3 @@ function createWaveFile($word)
 	// Noting more to add.
 	die();
 }
-
-?>

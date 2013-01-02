@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageMaintenance
+// Version: 1.0; ManageMaintenance
 
 $txt['repair_zero_ids'] = 'Found topics and/or messages with topic or message IDs of 0.';
 $txt['repair_missing_topics'] = 'Message #%1$d is in non-existent topic #%2$d.';
@@ -234,5 +234,3 @@ $txt['zipped_file'] = 'If you want you can create a compressed (zipped) backup.'
 $txt['plain_text'] = 'The best method to backup your database is to create a plain text file, a compressed package may not be completely reliable.';
 $txt['enable_maintenance1'] = 'Due to the size of your forum, it is recommended to place your forum in "maintenance mode" before you start the backup.';
 $txt['enable_maintenance2'] = 'To proceed, due to the size of your forum, please place your forum in "maintenance mode".';
-
-?>

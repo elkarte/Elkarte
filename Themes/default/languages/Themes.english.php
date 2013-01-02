@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Themes
+// Version: 1.0; Themes
 
 $txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum.  These settings affect the selection of themes, and which themes guests and other members use.';
 
@@ -145,5 +145,3 @@ $txt['themeadmin_edit_on_line'] = 'Beginning on line';
 $txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes that the user is able to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of themes';
-
-?>

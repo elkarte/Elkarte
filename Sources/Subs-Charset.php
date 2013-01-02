@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -19,10 +20,10 @@
 if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
-/** 
+/**
  * Converts the given UTF-8 string into lowercase.
  * equivalent to mb_strtolower($string, 'UTF-8')
- * 
+ *
  * @param string $string
  * @return string
  */
@@ -291,7 +292,7 @@ function utf8_strtolower($string)
 /**
  * Convert the given UTF-8 string to uppercase.
  * equivalent to mb_strtoupper($string, 'UTF-8')
- * 
+ *
  * @param string $string
  * @return string
  */

@@ -1132,22 +1132,10 @@ img.sort {
 
 /* The ^ pointer at the top of the pulldowns */
 .dropmenu li ul:before {
-	content: "";
+	content: url(../images/theme/pointer.png);
 	display: block;
-	height: 10px;
-	width: 10px;
-	background: #dbdfeb;
-	-webkit-transform: rotate(45deg);
-	-moz-transform: rotate(45deg);
-	-ms-transform: rotate(45deg);
-	-o-transform: rotate(45deg);
-	transform: rotate(45deg);
-	border: 1px solid #c9c9c9;
-	border-width: 1px 0 0 1px;
-	box-shadow: inset 1px 1px 0 rgba(255,255,255, 0.8);
-	margin-top: -10px;
-	margin-left: 10px;
-	margin-bottom: -4px;
+	margin-top: -13px;
+	margin-left: 0px;
 }
 
 /* Level 2 link background. */
@@ -1398,7 +1386,7 @@ h1.forumtitle {
 }
 
 /* float these items to the right */
-#siteslogan, img#smflogo {
+#siteslogan, img#logo {
 	margin: 0;
 	padding: 0;
 	float: right;
@@ -1413,7 +1401,7 @@ img#upshrink {
 }
 
 /* ..so does the SMF logo */
-img#smflogo {
+img#logo {
 	margin: 6px 0;
 }
 
@@ -1963,7 +1951,7 @@ p#whoisviewing {
 .poster ul ul li {
 	display: inline;
 }
-.poster li.icons, .poster li.avatar, .poster li.blurb, li.postcount, li.im_icons ul {
+.poster li.icons, .poster li.avatar, .poster li.blurb, li.postcount, li.cf_icons ul {
 	margin-top: 6px;
 }
 .poster li.avatar {

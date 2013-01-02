@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -27,7 +28,7 @@ if (!defined('DIALOGO'))
  * requires the split_any permission.
  * is accessed with ?action=splittopics.
  */
-function SplitTopics()
+function action_splittopics()
 {
 	global $topic, $sourcedir;
 
@@ -485,8 +486,7 @@ function SplitSelectionExecute()
 }
 
 /**
-	int splitTopic(int topicID, array messagesToBeSplit, string newSubject)
- * general function to split off a topic.
+ * General function to split off a topic.
  * creates a new topic and moves the messages with the IDs in
  * array messagesToBeSplit to the new topic.
  * the subject of the newly created topic is set to 'newSubject'.
@@ -755,7 +755,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	// Copy log topic entries.
 	// @todo This should really be chunked.
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, id_msg
+		SELECT id_member, id_msg, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic = {int:id_topic}',
 		array(
@@ -766,14 +766,10 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	{
 		$replaceEntries = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg']);
+			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
-		$smcFunc['db_insert']('ignore',
-			'{db_prefix}log_topics',
-			array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int'),
-			$replaceEntries,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
 	$smcFunc['db_free_result']($request);
@@ -970,7 +966,7 @@ function MergeIndex()
  *
  * the merge options screen:
  * * shows topics to be merged and allows to set some merge options.
- * * is accessed by ?action=mergetopics;sa=options.and can also internally be called by QuickModeration() (Subs-Boards.php).
+ * * is accessed by ?action=mergetopics;sa=options.and can also internally be called by action_quickmod().
  * * uses 'merge_extra_options' sub template of the SplitTopics template.
  *
  * the actual merge:
@@ -1434,8 +1430,9 @@ function MergeExecute($topics = array())
 	);
 
 	// Merge log topic entries.
+	// The disregard setting comes from the oldest topic
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, MIN(id_msg) AS new_id_msg
+		SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})
 		GROUP BY id_member',
@@ -1447,14 +1444,10 @@ function MergeExecute($topics = array())
 	{
 		$replaceEntries = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg']);
+			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
 
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int'),
-			$replaceEntries,
-			array('id_member', 'id_topic')
-		);
+		require_once($sourcedir . '/Subs-Topic.php');
+		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);
 
 		// Get rid of the old log entries.
@@ -1603,5 +1596,3 @@ function MergeDone()
 	$context['page_title'] = $txt['merge'];
 	$context['sub_template'] = 'merge_done';
 }
-
-?>

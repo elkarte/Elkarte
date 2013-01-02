@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ModerationCenter
+// Version: 1.0; ModerationCenter
 
 global $scripturl;
 
@@ -17,12 +17,12 @@ $txt['mc_unapproved_posts'] = 'Unapproved Posts';
 $txt['mc_watched_users'] = 'Recent Watched Members';
 $txt['mc_watched_topics'] = 'Watched Topics';
 $txt['mc_scratch_board'] = 'Moderator Scratch Board';
-$txt['mc_latest_news'] = 'Simple Machines Latest News';
+$txt['mc_latest_news'] = 'Latest News';
 $txt['mc_recent_reports'] = 'Recent Topic Reports';
 $txt['mc_warnings'] = 'Warnings';
 $txt['mc_notes'] = 'Moderator Notes';
 
-$txt['mc_cannot_connect_sm'] = 'You are unable to connect to simplemachines.org\'s latest news file.';
+$txt['mc_cannot_connect_sm'] = 'You are unable to connect to dialogo\'s latest news file.';
 
 $txt['mc_recent_reports_none'] = 'There are no outstanding reports';
 $txt['mc_watched_users_none'] = 'There are not currently any watches in place.';
@@ -144,5 +144,3 @@ $txt['mc_logoff'] = 'Moderator End Session';
 // Use entities in the below string.
 $txt['mc_click_add_note'] = 'Add a new note';
 $txt['mc_add_note'] = 'Add';
-
-?>

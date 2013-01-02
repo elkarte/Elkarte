@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; ManageSettings
+// Version: 1.0; ManageSettings
 
 global $scripturl;
 
@@ -20,6 +20,7 @@ $txt['allow_hideOnline'] = 'Allow non-administrators to hide their online status
 $txt['guest_hideContacts'] = 'Do not reveal contact details of members to guests';
 $txt['titlesEnable'] = 'Enable custom titles';
 $txt['enable_buddylist'] = 'Enable buddy/ignore lists';
+$txt['enable_disregard'] = 'Enable disregard topics';
 $txt['default_personal_text'] = 'Default personal text';
 $txt['default_personal_text_note'] = 'Personal text to assign to newly registered members.';
 $txt['time_format'] = 'Default time format';
@@ -342,15 +343,15 @@ $txt['lang_entries_not_writable'] = '<strong>Warning:</strong> The language file
 $txt['languages_ltr'] = 'Right to Left';
 
 $txt['add_language'] = 'Add Language';
-$txt['add_language_smf'] = 'Download from Simple Machines';
-$txt['add_language_smf_browse'] = 'Type name of language to search for or leave blank to search for all.';
-$txt['add_language_smf_install'] = 'Install';
-$txt['add_language_smf_found'] = 'The following languages were found. Click the install link next to the language you wish to install, you will then be taken to the package manager to install.';
+$txt['add_language_dialogo'] = 'Download from Dialogo\'s GitHub Repository';
+$txt['add_language_dialogo_browse'] = 'Type name of language to search for or leave blank to search for all.';
+$txt['add_language_dialogo_install'] = 'Install';
+$txt['add_language_dialogo_found'] = 'The following languages were found. Click the install link next to the language you wish to install, you will then be taken to the package manager to install.';
 $txt['add_language_error_no_response'] = 'The Simple Machines site is not responding. Please try again later.';
 $txt['add_language_error_no_files'] = 'No files could be found.';
-$txt['add_language_smf_desc'] = 'Description';
-$txt['add_language_smf_utf8'] = 'UTF-8';
-$txt['add_language_smf_version'] = 'Version';
+$txt['add_language_dialogo_desc'] = 'Description';
+$txt['add_language_dialogo_utf8'] = 'UTF-8';
+$txt['add_language_dialogo_version'] = 'Version';
 
 $txt['edit_language_entries_primary'] = 'Below are the primary language settings for this language pack.';
 $txt['edit_language_entries'] = 'Edit Language Entries';
@@ -388,5 +389,3 @@ $txt['languages_download_illegal_paths'] = 'Package contains illegal paths - ple
 $txt['languages_download_complete'] = 'Installation Complete';
 $txt['languages_download_complete_desc'] = 'Language pack installed successfully. Please click <a href="%1$s">here</a> to return to the languages page';
 $txt['languages_delete_confirm'] = 'Are you sure you want to delete this language?';
-
-?>

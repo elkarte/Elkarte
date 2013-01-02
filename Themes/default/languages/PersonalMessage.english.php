@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; PersonalMessage
+// Version: 1.0; PersonalMessage
 
 global $context;
 
@@ -185,5 +185,3 @@ $txt['pm_readable_buddy'] = 'sender is a buddy';
 $txt['pm_readable_label'] = 'apply label &quot;{LABEL}&quot;';
 $txt['pm_readable_delete'] = 'delete the message';
 $txt['pm_readable_then'] = '<strong>then</strong>';
-
-?>

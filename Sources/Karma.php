@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -24,11 +25,11 @@ if (!defined('DIALOGO'))
  * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
  * Requires the karma_edit permission, and that the user isn't a guest.
  * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
- * It is accessed via ?action=modifykarma.
+ * It is accessed via ?action=karma, sa=smite or sa=applaud.
  */
-function ModifyKarma()
+function action_karma()
 {
-	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context;
+	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir;
 
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))
@@ -39,6 +40,9 @@ function ModifyKarma()
 	isAllowedTo('karma_edit');
 
 	checkSession('get');
+
+	// we hold karma here.
+	require_once($sourcedir . '/Subs-Karma.php');
 
 	// If you don't have enough posts, tough luck.
 	// @todo Should this be dropped in favor of post group permissions?
@@ -56,15 +60,7 @@ function ModifyKarma()
 	// Applauding or smiting?
 	$dir = $_REQUEST['sa'] != 'applaud' ? -1 : 1;
 
-	// Delete any older items from the log. (karmaWaitTime is by hour.)
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_karma
-		WHERE {int:current_time} - log_time > {int:wait_time}',
-		array(
-			'wait_time' => (int) ($modSettings['karmaWaitTime'] * 3600),
-			'current_time' => time(),
-		)
-	);
+	clearKarma($modSettings['karmaWaitTime']);
 
 	// Start off with no change in karma.
 	$action = 0;
@@ -73,61 +69,19 @@ function ModifyKarma()
 	if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
 	{
 		// Find out if this user has done this recently...
-		$request = $smcFunc['db_query']('', '
-			SELECT action
-			FROM {db_prefix}log_karma
-			WHERE id_target = {int:id_target}
-				AND id_executor = {int:current_member}
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'id_target' => $_REQUEST['uid'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) > 0)
-			list ($action) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$action = lastActionOn($user_info['id'], $_REQUEST['uid']);
 	}
 
 	// They haven't, not before now, anyhow.
 	if (empty($action) || empty($modSettings['karmaWaitTime']))
-	{
-		// Put it in the log.
-		$smcFunc['db_insert']('replace',
-				'{db_prefix}log_karma',
-				array('action' => 'int', 'id_target' => 'int', 'id_executor' => 'int', 'log_time' => 'int'),
-				array($dir, $_REQUEST['uid'], $user_info['id'], time()),
-				array('id_target', 'id_executor')
-			);
-
-		// Change by one.
-		updateMemberData($_REQUEST['uid'], array($dir == 1 ? 'karma_good' : 'karma_bad' => '+'));
-	}
+		addKarma($user_info['id'], $_REQUEST['uid'], $dir);
 	else
 	{
 		// If you are gonna try to repeat.... don't allow it.
 		if ($action == $dir)
 			fatal_lang_error('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
 
-		// You decided to go back on your previous choice?
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}log_karma
-			SET action = {int:action}, log_time = {int:current_time}
-			WHERE id_target = {int:id_target}
-				AND id_executor = {int:current_member}',
-			array(
-				'current_member' => $user_info['id'],
-				'action' => $dir,
-				'current_time' => time(),
-				'id_target' => $_REQUEST['uid'],
-			)
-		);
-
-		// It was recently changed the OTHER way... so... reverse it!
-		if ($dir == 1)
-			updateMemberData($_REQUEST['uid'], array('karma_good' => '+', 'karma_bad' => '-'));
-		else
-			updateMemberData($_REQUEST['uid'], array('karma_bad' => '+', 'karma_good' => '-'));
+		updateKarma($user_info['id'], $_REQUEST['uid'], $dir);
 	}
 
 	// Figure out where to go back to.... the topic?
@@ -153,5 +107,3 @@ function ModifyKarma()
 		obExit(false);
 	}
 }
-
-?>

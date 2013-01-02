@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Profile
+// Version: 1.0; Profile
 
 global $scripturl, $context;
 
@@ -48,9 +48,6 @@ $txt['dob_year'] = 'Year (YYYY)';
 $txt['password_strength'] = 'For best security, you should use eight or more characters with a combination of letters, numbers, and symbols.';
 $txt['include_website_url'] = 'This must be included if you specify a URL below.';
 $txt['complete_url'] = 'This must be a complete URL.';
-$txt['your_icq'] = 'This is your ICQ number.';
-$txt['your_aim'] = 'This is your AOL Instant Messenger nickname.';
-$txt['your_yim'] = 'This is your Yahoo! Instant Messenger nickname.';
 $txt['sig_info'] = 'Signatures are displayed at the bottom of each post or personal message. BBCode and smileys may be used in your signature.';
 $txt['max_sig_characters'] = 'Max characters: %1$d; characters remaining: ';
 $txt['send_member_pm'] = 'Send this member a personal message';
@@ -60,7 +57,6 @@ $txt['current_time'] = 'Current forum time';
 $txt['language'] = 'Language';
 $txt['avatar_too_big'] = 'Avatar image is too big, please resize it and try again (max';
 $txt['invalid_registration'] = 'Invalid Date Registered value, valid example:';
-$txt['msn_email_address'] = 'Your MSN messenger email address';
 $txt['current_password'] = 'Current Password';
 // Don't use entities in the below string, except the main ones. (lt, gt, quot.)
 $txt['required_security_reasons'] = 'For security reasons, your current password is required to make changes to your account.';
@@ -163,6 +159,7 @@ $txt['showPosts'] = 'Show Posts';
 $txt['showPosts_help'] = 'This section allows you to view all posts made by this member. Note that you can only see posts made in areas you currently have access to.';
 $txt['showMessages'] = 'Messages';
 $txt['showTopics'] = 'Topics';
+$txt['showDisregarded'] = 'Disregarded topics';
 $txt['showAttachments'] = 'Attachments';
 $txt['viewWarning_help'] = 'This section allows you to view all warnings issued to this member.';
 $txt['statPanel'] = 'Show Stats';
@@ -321,6 +318,7 @@ $txt['show_member_topics'] = 'View Member Topics';
 $txt['show_member_attachments'] = 'View Member Attachments';
 $txt['show_posts_none'] = 'No posts have been posted yet.';
 $txt['show_topics_none'] = 'No topics have been posted yet.';
+$txt['disregarded_topics_none'] = 'You don\'t have any topic in the disregarded list.';
 $txt['show_attachments_none'] = 'No attachments have been posted yet.';
 $txt['show_attach_filename'] = 'Filename';
 $txt['show_attach_downloads'] = 'Downloads';
@@ -466,8 +464,8 @@ $txt['pm_display_mode_linked'] = 'As a conversation';
 // Use entities in the below string.
 $txt['pm_recommend_enable_outbox'] = 'To make the most of this setting we suggest you enable &quot;Save a copy of each Personal Message in my sent items by default&quot;\\n\\nThis will help ensure that the conversations flow better as you can see both sides of the conversation.';
 
-$txt['tracking'] = 'Tracking';
-$txt['tracking_description'] = 'This section allows you to review certain profile actions performed on this member\'s profile as well as track their IP address and login history.';
+$txt['history'] = 'History';
+$txt['history_description'] = 'This section allows you to review certain profile actions performed on this member\'s profile as well as track their IP address and login history.';
 
 $txt['trackEdits'] = 'Profile Edits';
 $txt['trackEdit_deleted_member'] = 'Deleted Member';
@@ -483,5 +481,3 @@ $txt['trackEdit_action_member_name'] = 'Username';
 $txt['trackEdit_action_email_address'] = 'Email Address';
 $txt['trackEdit_action_id_group'] = 'Primary Membergroup';
 $txt['trackEdit_action_additional_groups'] = 'Additional Membergroups';
-
-?>

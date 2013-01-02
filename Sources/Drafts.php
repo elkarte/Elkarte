@@ -3,12 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
- *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
  *
@@ -92,9 +87,6 @@ function saveDraft(&$post_errors)
 		// some items to return to the form
 		$context['draft_saved'] = true;
 		$context['id_draft'] = $id_draft;
-
-		// cleanup
-		unset($_POST['save_draft']);
 	}
 	// otherwise creating a new draft
 	else
@@ -109,10 +101,10 @@ function saveDraft(&$post_errors)
 		}
 		else
 			$post_errors[] = 'draft_not_saved';
-
-		// cleanup
-		unset($_POST['save_draft']);
 	}
+
+	// cleanup
+	unset($_POST['save_draft']);
 
 	// if we were called from the autosave function, send something back
 	if (!empty($id_draft) && isset($_REQUEST['xml']) && (!in_array('session_timeout', $post_errors)))
@@ -143,7 +135,7 @@ function savePMDraft(&$post_errors, $recipientList)
 	// ajax calling
 	if (!isset($context['drafts_pm_save']))
 		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
-	
+
 	// PM survey says ... can you stay or must you go
 	if (empty($context['drafts_pm_save']) || !isset($_POST['save_draft']) || !isset($_POST['id_pm_draft']))
 		return false;
@@ -162,6 +154,7 @@ function savePMDraft(&$post_errors, $recipientList)
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_pm_draft;
 			$context['draft_saved_on'] = $draft_info['poster_time'];
+			obExit();
 		}
 
 		return true;
@@ -223,6 +216,7 @@ function savePMDraft(&$post_errors, $recipientList)
 		$context['sub_template'] = 'xml_draft';
 		$context['id_draft'] = $id_pm_draft;
 		$context['draft_saved_on'] = time();
+		obExit();
 	}
 
 	return;
@@ -296,38 +290,6 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 }
 
 /**
- * Deletes one or many drafts from the DB
- * Validates the drafts are from the user
- * If supplied an array of drafts will attempt to remove all of them
- *
- * @param int $id_draft
- * @param bool $check
- * @return boolean
- */
-function deleteDrafts($id_draft, $check = true)
-{
-	global $user_info, $smcFunc;
-
-	// Only a single draft.
-	if (is_numeric($id_draft))
-		$id_draft = array($id_draft);
-
-	// can't delete nothing
-	if (empty($id_draft) || ($check && empty($user_info['id'])))
-		return false;
-
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}user_drafts
-		WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
-			AND  id_member = {int:id_member}' : ''),
-		array (
-			'id_draft' => $id_draft,
-			'id_member' => empty($user_info['id']) ? -1 : $user_info['id'],
-		)
-	);
-}
-
-/**
  * Loads in a group of drafts for the user of a given type (0/posts, 1/pm's)
  * loads a specific draft for forum use if selected.
  * Used in the posting screens to allow draft selection
@@ -352,7 +314,7 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
 	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 		loadDraft((int) $_REQUEST['id_draft'], $draft_type, true, true);
 
-	// load all the drafts for this user that meet the criteria 
+	// load all the drafts for this user that meet the criteria
 	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$user_drafts = load_user_drafts($member_id, $topic, $draft_type, $drafts_keep_days);
 
@@ -362,14 +324,14 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
 		// Post drafts
 		if ($draft_type === 0)
 			$context['drafts'][] = array(
-				'subject' => censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
 				'poster_time' => timeformat($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . $draft['subject'] . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		// PM drafts
 		elseif ($draft_type === 1)
 			$context['drafts'][] = array(
-				'subject' => censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
 				'poster_time' => timeformat($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
@@ -398,17 +360,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 		checkSession('get');
 		$id_delete = (int) $_REQUEST['delete'];
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}user_drafts
-			WHERE id_draft = {int:id_draft}
-				AND id_member = {int:id_member}
-			LIMIT 1',
-			array(
-				'id_draft' => $id_delete,
-				'id_member' => $memID,
-			)
-		);
-
+		deleteDrafts($id_delete, $memID);
 		redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 	}
 
@@ -416,22 +368,8 @@ function showProfileDrafts($memID, $draft_type = 0)
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
 		$_REQUEST['viewscount'] = 10;
 
-	// Get the count of applicable drafts on the boards they can (still) see ...
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(id_draft)
-		FROM {db_prefix}user_drafts AS ud
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)
-		WHERE id_member = {int:id_member}
-			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : ''),
-		array(
-			'id_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// Get the count of applicable drafts
+	$msgCount = draftsCount($memID, $draft_type);
 
 	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -441,7 +379,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 
 	// Reverse the query if we're past 50% of the pages for better performance.
 	$start = $context['start'];
-	$reverse = $_REQUEST['start'] > $msgCount / 2;
+	$reverse = $start > $msgCount / 2;
 	if ($reverse)
 	{
 		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
@@ -478,7 +416,7 @@ function showProfileDrafts($memID, $draft_type = 0)
 
 		$row['subject'] = $smcFunc['htmltrim']($row['subject']);
 		if (empty($row['subject']))
-			$row['subject'] = $txt['no_subject'];
+			$row['subject'] = $txt['drafts_none'];
 
 		censorText($row['body']);
 		censorText($row['subject']);
@@ -493,11 +431,11 @@ function showProfileDrafts($memID, $draft_type = 0)
 			'alternate' => $counter % 2,
 			'board' => array(
 				'name' => $row['bname'],
-				'id' => $row['id_board']
+				'id' => $row['id_board'],
 			),
 			'topic' => array(
 				'id' => $row['id_topic'],
-				'link' => empty($row['id']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+				'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			),
 			'subject' => $row['subject'],
 			'time' => timeformat($row['poster_time']),
@@ -530,31 +468,19 @@ function showPMDrafts($memID = -1)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
 
-	// init
-	$draft_type = 1;
+	// set up what we will need
+	$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 	// If just deleting a draft, do it and then redirect back.
 	if (!empty($_REQUEST['delete']))
 	{
 		checkSession('get');
 		$id_delete = (int) $_REQUEST['delete'];
-		$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}user_drafts
-			WHERE id_draft = {int:id_draft}
-				AND id_member = {int:id_member}
-				AND type = {int:draft_type}
-			LIMIT 1',
-			array(
-				'id_draft' => $id_delete,
-				'id_member' => $memID,
-				'draft_type' => $draft_type,
-			)
-		);
+		deleteDrafts($id_delete, $memID);
 
 		// now redirect back to the list
-		redirectexit('action=pm;sa=showpmdrafts;start=' . $start);
+		redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
 	}
 
 	// perhaps a draft was selected for editing? if so pass this off
@@ -565,25 +491,15 @@ function showPMDrafts($memID = -1)
 		redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
 	}
 
+	// init
+	$draft_type = 1;
+
 	// Default to 10.
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
 		$_REQUEST['viewscount'] = 10;
 
 	// Get the count of applicable drafts
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(id_draft)
-		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}
-			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : ''),
-		array(
-			'id_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$msgCount = draftsCount($memID, $draft_type);
 
 	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -593,7 +509,7 @@ function showPMDrafts($memID = -1)
 
 	// Reverse the query if we're past 50% of the total for better performance.
 	$start = $context['start'];
-	$reverse = $_REQUEST['start'] > $msgCount / 2;
+	$reverse = $start > $msgCount / 2;
 	if ($reverse)
 	{
 		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
@@ -695,5 +611,3 @@ function showPMDrafts($memID = -1)
 		'name' => $txt['drafts'],
 	);
 }
-
-?>

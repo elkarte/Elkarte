@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -1192,7 +1193,6 @@ function legalise_bbc($text)
 						$inlineElements[$elementContent] = $tag;
 					}
 				}
-
 			}
 
 			// Closing tag.
@@ -1321,13 +1321,14 @@ function sort_array_length($a, $b)
 /**
  * Creates the javascript code for localization of the editor (SCEditor)
  */
-function loadLocale()
+function action_loadlocale()
 {
 	global $context, $txt, $editortxt, $modSettings;
 
 	loadLanguage('Editor');
 
 	$context['template_layers'] = array();
+
 	// Lets make sure we aren't going to output anything nasty.
 	@ob_end_clean();
 	if (!empty($modSettings['enableCompressedOutput']))
@@ -1461,6 +1462,9 @@ function create_control_richedit($editorOptions)
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
 
+	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
+		loadLanguage('Drafts');
+
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
@@ -1477,25 +1481,23 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile('editor.js', array('default_theme' => true), 'smf_editor');
-		loadJavascriptFile('jquery.sceditor.js', array('default_theme' => true));
-		loadJavascriptFile('jquery.sceditor.bbcode.js', array('default_theme' => true));
-		loadJavascriptFile('post.js', array('default_theme' => true), 'post.js');
+		loadJavascriptFile(array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'));
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
 		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
 		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
+
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
 			loadJavascriptFile($scripturl . '?action=loadeditorlocale', array(), 'sceditor_language');
-		
+
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.js', array('default_theme' => true));
+			loadJavascriptFile('drafts.js');
 
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
-		
+
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
 		{
@@ -1505,8 +1507,8 @@ function create_control_richedit($editorOptions)
 		<form name="spell_form" id="spell_form" method="post" accept-charset="' . $context['character_set'] . '" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
-		</form>
-		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+		</form>';
+			loadJavascriptFile('spellcheck.js', array('defer' => true));
 		}
 	}
 
@@ -1665,7 +1667,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Allow mods to modify BBC buttons.
-		// Note: pass the array here is not necessary and is deprecated, but it is ketp for backward compatibility with 2.0
+		// Note: pass the array here is not necessary and is deprecated, but it is kept for backward compatibility with 2.0
 		call_integration_hook('integrate_bbc_buttons', array(&$context['bbc_tags']));
 
 		// Show the toggle?
@@ -1725,11 +1727,12 @@ function create_control_richedit($editorOptions)
 		{
 			if (!isset($context['bbc_toolbar'][$row]))
 				$context['bbc_toolbar'][$row] = array();
+
 			$tagsRow = array();
 			foreach ($tagRow as $tag)
 			{
-			 if (!empty($tag))
-			 {
+				if (!empty($tag))
+				{
 					if (empty($context['disabled_tags'][$tag['code']]))
 					{
 						$tagsRow[] = $tag['code'];
@@ -1741,14 +1744,14 @@ function create_control_richedit($editorOptions)
 						if (isset($tag['before']))
 						{
 							$context['bbcodes_handlers'] = '
-				$.sceditor.setCommand(
-					' . javaScriptEscape($tag['code']) . ',
-					function () {
+				$.sceditor.command.set(
+					' . javaScriptEscape($tag['code']) . ', {
+					exec: function () {
 						this.wysiwygEditorInsertHtml(' . javaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . javaScriptEscape($tag['after']) : '') . ');
 					},
-					' . javaScriptEscape($tag['description']) . ',
-					null,
-					[' . javaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . javaScriptEscape($tag['after']) : '') . ']
+					tooltip:' . javaScriptEscape($tag['description']) . ',
+					txtExec: [' . javaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . javaScriptEscape($tag['after']) : '') . '],
+					}
 				);';
 						}
 					}
@@ -1760,14 +1763,17 @@ function create_control_richedit($editorOptions)
 				}
 			}
 
-			if ($row == 0)
+			if ($row === 0)
 			{
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
 				$tagsRow = array();
+
 				if (!isset($context['disabled_tags']['font']))
 					$tagsRow[] = 'font';
+
 				if (!isset($context['disabled_tags']['size']))
 					$tagsRow[] = 'size';
+
 				if (!isset($context['disabled_tags']['color']))
 					$tagsRow[] = 'color';
 			}
@@ -1785,6 +1791,7 @@ function create_control_richedit($editorOptions)
 			if (!empty($tagsRow))
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
 		}
+
 		if (!empty($bbcodes_styles))
 			$context['html_headers'] .= '
 		<style type="text/css">' . $bbcodes_styles . '
@@ -1954,8 +1961,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		// Some javascript ma'am?
 		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			$context['html_headers'] .= '
-		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/captcha.js"></script>';
+			loadJavascriptFile('captcha.js');
 
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 
@@ -1982,10 +1988,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 	// Add javascript for the object.
 	if ($context['controls']['verification'][$verificationOptions['id']]['show_visual'])
-		$context['insert_after_template'] .= '
-			<script type="text/javascript"><!-- // --><![CDATA[
-				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');
-			// ]]></script>';
+		addInlineJavascript('
+				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');', true);
 
 	// Is there actually going to be anything?
 	if (empty($thisVerification['show_visual']) && empty($thisVerification['number_questions']))
@@ -2161,144 +2165,3 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	// Say that everything went well chaps.
 	return true;
 }
-
-/**
- * This keeps track of all registered handling functions for auto suggest functionality and passes execution to them.
- * @param bool $checkRegistered = null
- */
-function AutoSuggestHandler($checkRegistered = null)
-{
-	global $context;
-
-	// These are all registered types.
-	$searchTypes = array(
-		'member' => 'Member',
-		'versions' => 'SMFVersions',
-	);
-
-	call_integration_hook('integrate_autosuggest', array($searchTypes));
-
-	// If we're just checking the callback function is registered return true or false.
-	if ($checkRegistered != null)
-		return isset($searchTypes[$checkRegistered]) && function_exists('AutoSuggest_Search_' . $checkRegistered);
-
-	checkSession('get');
-	loadTemplate('Xml');
-
-	// Any parameters?
-	$context['search_param'] = isset($_REQUEST['search_param']) ? unserialize(base64_decode($_REQUEST['search_param'])) : array();
-
-	if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
-	{
-		$function = 'AutoSuggest_Search_' . $searchTypes[$_REQUEST['suggest_type']];
-		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = $function();
-	}
-}
-
-/**
- * Search for a member - by real_name or member_name by default.
- *
- * @return string
- */
-function AutoSuggest_Search_Member()
-{
-	global $user_info, $txt, $smcFunc, $context;
-
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
-	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-	// Find the member.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name
-		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (!empty($context['search_param']['buddies']) ? '
-			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
-		array(
-			'buddy_list' => $user_info['buddies'],
-			'search' => $_REQUEST['search'],
-		)
-	);
-	$xml_data = array(
-		'items' => array(
-			'identifier' => 'item',
-			'children' => array(),
-		),
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
-
-		$xml_data['items']['children'][] = array(
-			'attributes' => array(
-				'id' => $row['id_member'],
-			),
-			'value' => $row['real_name'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $xml_data;
-}
-
-/**
- * Provides a list of possible SMF versions to use in emulation
- * 
- * @return string
- */
-function AutoSuggest_Search_SMFVersions()
-{
-
-	$xml_data = array(
-		'items' => array(
-			'identifier' => 'item',
-			'children' => array(),
-		),
-	);
-
-	$versions = array(
-		'SMF 1.1',
-		'SMF 1.1.1',
-		'SMF 1.1.2',
-		'SMF 1.1.3',
-		'SMF 1.1.4',
-		'SMF 1.1.5',
-		'SMF 1.1.6',
-		'SMF 1.1.7',
-		'SMF 1.1.8',
-		'SMF 1.1.9',
-		'SMF 1.1.10',
-		'SMF 1.1.11',
-		'SMF 1.1.12',
-		'SMF 1.1.13',
-		'SMF 1.1.14',
-		'SMF 1.1.15',
-		'SMF 1.1.16',
-		'SMF 2.0 beta 1',
-		'SMF 2.0 beta 1.2',
-		'SMF 2.0 beta 2',
-		'SMF 2.0 beta 3',
-		'SMF 2.0 RC 1',
-		'SMF 2.0 RC 1.2',
-		'SMF 2.0 RC 2',
-		'SMF 2.0 RC 3',
-		'SMF 2.0',
-		'SMF 2.0.1',
-		'SMF 2.0.2',
-		'DIALOGO 1.0',
-	);
-
-	foreach ($versions as $id => $version)
-		if (strpos($version, strtoupper($_REQUEST['search'])) !== false)
-			$xml_data['items']['children'][] = array(
-				'attributes' => array(
-					'id' => $id,
-				),
-				'value' => $version,
-			);
-
-	return $xml_data;
-}
-?>

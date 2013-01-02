@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -262,7 +263,7 @@ function error_handler($error_level, $error_string, $file, $line)
 /**
  * It is called by fatal_error() and fatal_lang_error().
  * @uses Errors template, fatal_error sub template, or Wireless template, error sub template.
- * 
+ *
  * @param string $error_message
  * @param type $error_code
  */
@@ -363,7 +364,7 @@ function display_db_error()
 	set_fatal_error_headers();
 
 	// For our purposes, we're gonna want this on if at all possible.
-	$modSettings['cache_enable'] = '1';
+	$modSettings['cache_enable'] = 1;
 
 	if (($temp = cache_get_data('db_last_error', 600)) !== null)
 		$db_last_error = max($db_last_error, $temp);
@@ -440,5 +441,3 @@ function set_fatal_error_headers()
 	header('Status: 503 Service Temporarily Unavailable');
 	header('Retry-After: 3600');
 }
-
-?>

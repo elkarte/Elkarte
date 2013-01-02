@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -12,8 +13,8 @@
  *
  * @version 1.0 Alpha
  *
- * Handle sending out reminders, and checking the secret answer and question.  
- * It uses just a few functions to do this, which are:
+ * Handle sending out reminders, and checking the secret answer and question.
+ * It uses just a few functions to do this.
  *
  */
 
@@ -21,10 +22,11 @@ if (!defined('DIALOGO'))
 	die('Hacking attempt...');
 
 /**
- * This is the controlling delegator
+ * This is the pre-dispatch function
+ *
  * @uses Profile language files and Reminder template
  */
-function RemindMe()
+function pre_reminder()
 {
 	global $txt, $context;
 
@@ -33,25 +35,22 @@ function RemindMe()
 
 	$context['page_title'] = $txt['authentication_reminder'];
 	$context['robot_no_index'] = true;
-
-	// Delegation can be useful sometimes.
-	$subActions = array(
-		'picktype' => 'RemindPick',
-		'secret2' => 'SecretAnswer2',
-		'setpassword' =>'setPassword',
-		'setpassword2' =>'setPassword2'
-	);
-
-	// Any subaction?  If none, fall through to the main template, which will ask for one.
-	if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-		$subActions[$_REQUEST['sa']]();
-	// Creating a one time token.
-	else
-		createToken('remind');
 }
 
-// Pick a reminder type.
-function RemindPick()
+/**
+ * Default action for reminder.
+ */
+function action_reminder()
+{
+	// nothing to do, the template will ask for an action to pick
+	createToken('remind');
+}
+
+/**
+ * Pick a reminder type.
+ * sa=picktype
+ */
+function action_picktype()
 {
 	global $context, $txt, $scripturl, $sourcedir, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
 
@@ -132,7 +131,7 @@ function RemindPick()
 		require_once($sourcedir . '/Subs-Members.php');
 		$password = generateValidationCode();
 
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/Subs-Mail.php');
 		$replacements = array(
 			'REALNAME' => $row['real_name'],
 			'REMINDLINK' => $scripturl . '?action=reminder;sa=setpassword;u=' . $row['id_member'] . ';code=' . $password,
@@ -146,6 +145,7 @@ function RemindPick()
 
 		// If they were using OpenID simply email them their OpenID identity.
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+
 		if (empty($row['openid_uri']))
 			// Set the password in the database.
 			updateMemberData($row['id_member'], array('validation_code' => substr(md5($password), 0, 10)));
@@ -170,8 +170,11 @@ function RemindPick()
 	);
 }
 
-// Set your new password
-function setPassword()
+/**
+ * Set your new password
+ * sa=setpassword
+ */
+function action_setpassword()
 {
 	global $txt, $context;
 
@@ -193,7 +196,11 @@ function setPassword()
 	createToken('remind-sp');
 }
 
-function setPassword2()
+/**
+ * Handle the password change.
+ * sa=setpassword2
+ */
+function action_setpassword2()
 {
 	global $context, $txt, $modSettings, $smcFunc, $sourcedir;
 
@@ -274,7 +281,9 @@ function setPassword2()
 	createToken('login');
 }
 
-// Get the secret answer.
+/**
+ * Get the secret answer.
+ */
 function SecretAnswerInput()
 {
 	global $txt, $context, $smcFunc;
@@ -319,7 +328,11 @@ function SecretAnswerInput()
 	createToken('remind-sai');
 }
 
-function SecretAnswer2()
+/**
+ * Verify the answer to the secret question.
+ * sa=secret2
+ */
+function action_secret2()
 {
 	global $txt, $context, $modSettings, $smcFunc, $sourcedir;
 
@@ -397,5 +410,3 @@ function SecretAnswer2()
 
 	createToken('login');
 }
-
-?>

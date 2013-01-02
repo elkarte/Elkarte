@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -161,7 +162,7 @@ function smf_db_optimize_table($table)
 /**
  * This function lists all tables in the database.
  * The listing could be filtered according to $filter.
- * 
+ *
  * @param mixed $db string holding the table name, or false, default false
  * @param mixed $filter string to filter by, or false, default false
  * @return array an array of table names. (strings)
@@ -367,5 +368,3 @@ function smf_db_get_backup()
 
 	obExit(false);
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -54,7 +55,7 @@ function template_summary()
 	template_profile_block_buddies();
 	echo '
 		</div>';
-		
+
 	// left and right blocks, entered as left, right, left, right
 	$templates = array(
 		'summary',
@@ -65,10 +66,10 @@ function template_summary()
 		'moderation',
 	);
 	$left = true;
-	
+
 	echo '
 		<div id="profile_summary_container">';
-	
+
 	foreach ($templates as $template)
 	{
 		echo '
@@ -87,12 +88,12 @@ function template_summary()
 
 		$left = !$left;
 	}
-	
+
 	// clear up odd number of blocks
 	if (!$left)
 		echo '
 			<br class="clear" />';
-			
+
 	// end of the sidexside container
 	echo'
 		</div>';
@@ -118,12 +119,6 @@ function template_showPosts()
 				', (!isset($context['attachments']) && empty($context['is_topics']) ? $txt['showMessages'] : (!empty($context['is_topics']) ? $txt['showTopics'] : $txt['showAttachments'])), ' - ', $context['member']['name'], '
 			</h3>
 		</div>';
-
-	// Button shortcuts
-	$quote_button = create_button('quote.png', 'reply_quote', 'quote', 'class="centericon"');
-	$reply_button = create_button('reply_sm.png', 'reply', 'reply', 'class="centericon"');
-	$remove_button = create_button('delete.png', 'remove_message', 'remove', 'class="centericon"');
-	$notify_button = create_button('notify_sm.png', 'notify_replies', 'notify', 'class="centericon"');
 
 	// Are we displaying posts or attachments?
 	if (!isset($context['attachments']))
@@ -153,33 +148,31 @@ function template_showPosts()
 
 			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 				echo '
-				<div class="floatright">
-					<ul class="reset smalltext quickbuttons">';
+				<ul class="quickbuttons">';
 
 			// If they *can* reply?
 			if ($post['can_reply'])
 				echo '
-						<li><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="reply_button"><span>', $txt['reply'], '</span></a></li>';
+					<li><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="reply_button"><span>', $txt['reply'], '</span></a></li>';
 
 			// If they *can* quote?
 			if ($post['can_quote'])
 				echo '
-						<li><a href="', $scripturl . '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="quote_button"><span>', $txt['quote'], '</span></a></li>';
+					<li><a href="', $scripturl . '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="quote_button"><span>', $txt['quote'], '</span></a></li>';
 
 			// Can we request notification of topics?
 			if ($post['can_mark_notify'])
 				echo '
-						<li><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="notify_button"><span>', $txt['notify'], '</span></a></li>';
+					<li><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="notify_button"><span>', $txt['notify'], '</span></a></li>';
 
 			// How about... even... remove it entirely?!
 			if ($post['can_delete'])
 				echo '
-						<li><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button"><span>', $txt['remove'], '</span></a></li>';
+					<li><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button"><span>', $txt['remove'], '</span></a></li>';
 
 			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 				echo '
-					</ul>
-				</div>';
+				</ul>';
 
 			echo '
 				</div>
@@ -216,10 +209,6 @@ function template_showDrafts()
 			</div>
 		</div>';
 
-	// Button shortcuts
-	$edit_button = create_button('modify_inline.png', 'draft_edit', 'draft_edit', 'class="centericon"');
-	$remove_button = create_button('delete.png', 'draft_delete', 'draft_delete', 'class="centericon"');
-
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
 		echo '
@@ -251,12 +240,14 @@ function template_showDrafts()
 					<div class="list_posts">
 						', $draft['body'], '
 					</div>
-					<div class="floatright">
-						<ul class="reset smalltext quickbuttons">
-							<li><a href="', $scripturl, '?action=post;', (empty($draft['topic']['id']) ? 'board=' . $draft['board']['id'] : 'topic=' . $draft['topic']['id']), '.0;id_draft=', $draft['id_draft'], '" class="reply_button"><span>', $txt['draft_edit'], '</span></a></li>
-							<li><a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=showdrafts;delete=', $draft['id_draft'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a></li>
-						</ul>
-					</div>
+					<ul class="quickbuttons">
+						<li>
+							<a href="', $scripturl, '?action=post;', (empty($draft['topic']['id']) ? 'board=' . $draft['board']['id'] : 'topic=' . $draft['topic']['id']), '.0;id_draft=', $draft['id_draft'], '" class="reply_button"><span>', $txt['draft_edit'], '</span></a>
+						</li>
+						<li>
+							<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=showdrafts;delete=', $draft['id_draft'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a>
+						</li>
+					</ul>
 				</div>
 			</div>';
 		}
@@ -277,7 +268,6 @@ function template_editBuddies()
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
-	$buddy_fields = array('icq', 'aim', 'yim', 'msn');
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
@@ -290,17 +280,10 @@ function template_editBuddies()
 			<tr class="catbg">
 				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
+	
 	if ($context['can_send_email'])
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
-
-	// don't show them if they are disabled
-	foreach ($buddy_fields as $key => $column)
-	{
-		if (!isset($disabled_fields[$column]))
-			echo '
-				<th scope="col">', $txt[$column], '</th>';
-	}
 
 	echo '
 				<th class="last_th" scope="col"></th>
@@ -324,14 +307,6 @@ function template_editBuddies()
 		if ($context['can_send_email'])
 			echo '
 				<td align="center">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
-
-		// If these are off, don't show them
-		foreach ($buddy_fields as $key => $column)
-		{
-			if (!isset($disabled_fields[$column]))
-				echo '
-					<td align="center">', $buddy[$column]['link'], '</td>';
-		}
 
 		echo '
 				<td align="center"><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['buddy_remove'], '" title="', $txt['buddy_remove'], '" /></a></td>
@@ -403,15 +378,11 @@ function template_editIgnoreList()
 			<tr class="catbg">
 				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
-	
+
 	if ($context['can_send_email'])
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
 	echo '
-				<th scope="col">', $txt['icq'], '</th>
-				<th scope="col">', $txt['aim'], '</th>
-				<th scope="col">', $txt['yim'], '</th>
-				<th scope="col">', $txt['msn'], '</th>
 				<th class="last_th" scope="col"></th>
 			</tr>';
 
@@ -433,11 +404,8 @@ function template_editIgnoreList()
 		if ($context['can_send_email'])
 			echo '
 				<td align="center">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
+		
 		echo '
-				<td align="center">', $member['icq']['link'], '</td>
-				<td align="center">', $member['aim']['link'], '</td>
-				<td align="center">', $member['yim']['link'], '</td>
-				<td align="center">', $member['msn']['link'], '</td>
 				<td align="center"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
 			</tr>';
 
@@ -480,8 +448,8 @@ function template_editIgnoreList()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
+			sSessionId: smf_session_id,
+			sSessionVar: smf_session_var,
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
@@ -510,15 +478,15 @@ function template_trackActivity()
 					<dl class="noborder">
 						<dt>', $txt['most_recent_ip'], ':
 							', (empty($context['last_ip2']) ? '' : '<br />
-							<span class="smalltext">(<a href="' . $scripturl . '?action=helpadmin;help=whytwoip" onclick="return reqOverlayDiv(this.href);">' . $txt['why_two_ip_address'] . '</a>)</span>'), '
+							<span class="smalltext">(<a href="' . $scripturl . '?action=quickhelp;help=whytwoip" onclick="return reqOverlayDiv(this.href);">' . $txt['why_two_ip_address'] . '</a>)</span>'), '
 						</dt>
 						<dd>
-							<a href="', $scripturl, '?action=profile;area=tracking;sa=ip;searchip=', $context['last_ip'], ';u=', $context['member']['id'], '">', $context['last_ip'], '</a>';
+							<a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['last_ip'], ';u=', $context['member']['id'], '">', $context['last_ip'], '</a>';
 
 	// Second address detected?
 	if (!empty($context['last_ip2']))
 		echo '
-							, <a href="', $scripturl, '?action=profile;area=tracking;sa=ip;searchip=', $context['last_ip2'], ';u=', $context['member']['id'], '">', $context['last_ip2'], '</a>';
+							, <a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['last_ip2'], ';u=', $context['member']['id'], '">', $context['last_ip2'], '</a>';
 
 	echo '
 						</dd>';
@@ -2360,7 +2328,7 @@ function template_profile_group_manage()
 	echo '
 							<dt>
 								<strong>', $txt['primary_membergroup'], ': </strong><br />
-								<span class="smalltext">[<a href="', $scripturl, '?action=helpadmin;help=moderator_why_missing" onclick="return reqOverlayDiv(this.href);">', $txt['moderator_why_missing'], '</a>]</span>
+								<span class="smalltext">[<a href="', $scripturl, '?action=quickhelp;help=moderator_why_missing" onclick="return reqOverlayDiv(this.href);">', $txt['moderator_why_missing'], '</a>]</span>
 							</dt>
 							<dd>
 								<select name="id_group" ', ($context['user']['is_owner'] && $context['member']['group_id'] == 1 ? 'onchange="if (this.value != 1 &amp;&amp; !confirm(\'' . $txt['deadmin_confirm'] . '\')) this.value = 1;"' : ''), '>';
@@ -2457,7 +2425,7 @@ function template_profile_signature_modify()
 	if (!empty($context['show_preview_button']))
 		echo '
 								<input type="submit" name="preview_signature" id="preview_button" value="', $txt['preview_signature'], '"  tabindex="', $context['tabindex']++, '" class="button_submit" />';
-	
+
 	if ($context['signature_warning'])
 		echo '
 								<span class="smalltext">', $context['signature_warning'], '</span>';
@@ -2609,7 +2577,7 @@ function template_profile_timeformat_modify()
 	echo '
 							<dt>
 								<strong><label for="easyformat">', $txt['time_format'], ':</label></strong><br />
-								<a href="', $scripturl, '?action=helpadmin;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="floatleft" /></a>
+								<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="floatleft" /></a>
 								<span class="smalltext">&nbsp;<label for="time_format">', $txt['date_format'], '</label></span>
 							</dt>
 							<dd>
@@ -2691,7 +2659,7 @@ function template_authentication_method()
 				<div class="content">
 					<dl>
 						<dt>
-							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_openid"><strong>', $txt['authenticate_openid'], '</strong></label>&nbsp;<em><a href="', $scripturl, '?action=helpadmin;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></em><br />
+							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_openid"><strong>', $txt['authenticate_openid'], '</strong></label>&nbsp;<em><a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></em><br />
 							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_pass"><strong>', $txt['authenticate_password'], '</strong></label>
 						</dt>
 						<dd>
@@ -2835,7 +2803,7 @@ function template_profile_block_summary()
 						<dd>
 							<a href="', $scripturl, '?action=profile;area=showposts;u=', $context['id_member'], '">', $txt['showPosts'], '</a>
 							<br />';
-		
+
 		if (!empty($modSettings['drafts_enabled']))
 			echo '
 							<a href="', $scripturl, '?action=profile;area=showdrafts;u=', $context['id_member'], '">', $txt['drafts_show'], '</a>
@@ -2910,7 +2878,7 @@ function template_profile_block_user_info()
 				if (!empty($context['member']['ip']))
 					echo '
 						<dt><strong>', $txt['ip'], ': </strong></dt>
-						<dd><a href="', $scripturl, '?action=profile;area=tracking;sa=ip;searchip=', $context['member']['ip'], ';u=', $context['member']['id'], '">', $context['member']['ip'], '</a></dd>';
+						<dd><a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['member']['ip'], ';u=', $context['member']['id'], '">', $context['member']['ip'], '</a></dd>';
 
 				if (empty($modSettings['disableHostnameLookup']) && !empty($context['member']['ip']))
 					echo '
@@ -3052,30 +3020,9 @@ function template_profile_block_contact()
 				echo '
 					</dl>';
 			}
-
-			// IM contact details
+			
 			echo '
 					<dl>';
-
-			if (!isset($context['disabled_fields']['icq']) && !empty($context['member']['icq']['link']))
-				echo '
-						<dt><img src="http://status.icq.com/online.png?img=5&amp;icq=', $context['member']['icq']['name'], '" alt="', $txt['icq'], '" /></dt>
-						<dd>', $context['member']['icq']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['aim']) && !empty($context['member']['aim']['link']))
-				echo '
-						<dt><img src="', $settings['images_url'] ,'/aim.png" alt="', $txt['aim'], '" /></dt>
-						<dd>', $context['member']['aim']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['msn']) && !empty($context['member']['msn']['link']))
-				echo '
-						<dt><img src="', $settings['images_url'] ,'/msntalk.png" alt="', $txt['msn'], '" /></dt>
-						<dd>', $context['member']['msn']['link_text'], '</dd>';
-
-			if (!isset($context['disabled_fields']['yim']) && !empty($context['member']['yim']['link']))
-				echo '
-						<dt><img src="http://opi.yahoo.com/online?u=', urlencode($context['member']['yim']['link_text']), '&amp;m=g&amp;t=0" alt="', $txt['yim'], '" /></dt>
-						<dd>', $context['member']['yim']['link_text'], '</dd>';
 
 			// Show the email contact info?
 			if ($context['can_send_email'])
@@ -3088,7 +3035,6 @@ function template_profile_block_contact()
 				if ($context['member']['show_email'] == 'yes')
 					echo '
 							<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a>';
-
 				// ... Or if the one looking at the profile is an admin they can see it anyway.
 				elseif ($context['member']['show_email'] == 'yes_permission_override')
 					echo '
@@ -3297,7 +3243,7 @@ function template_profile_block_moderation()
 function template_profile_block_buddies()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
-	
+
 	// init
 	$i = 0;
 	$per_line = 4;
@@ -3305,7 +3251,7 @@ function template_profile_block_buddies()
 	// set the height to about 2 lines of buddies w/avatars
 	if (isset($context['buddies']))
 		$div_height = 120 + (2 * max(empty($modSettings['avatar_max_height_external']) ? 0 : $modSettings['avatar_max_height_external'], empty($modSettings['avatar_max_height_upload']) ? 0 : $modSettings['avatar_max_height_upload'], 65));
-		
+
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
 		echo '
@@ -3386,7 +3332,7 @@ function template_profile_block_buddies()
 function template_profile_block_attachments()
 {
 	global $settings, $txt, $context, $scripturl;
-	
+
 	// init
 	$i = 0;
 	$per_line = 4;
@@ -3444,5 +3390,3 @@ function template_profile_block_attachments()
 		</div>
 	</div>';
 }
-
-?>

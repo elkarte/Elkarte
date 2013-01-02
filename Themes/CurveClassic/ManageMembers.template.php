@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -130,12 +131,6 @@ function template_search_members()
 								</dt>
 								<dd>
 									<input type="text" name="ip" id="ip" value="" class="input_text" />
-								</dd>
-								<dt class="righttext">
-									<strong><label for="messenger">', $txt['messenger_address'], ':</label></strong>
-								</dt>
-								<dd>
-									<input type="text" name="messenger" id="messenger" value="" class="input_text" />
 								</dd>
 							</dl>
 						</div>
@@ -322,5 +317,3 @@ function template_admin_browse()
 	echo '
 	</div>';
 }
-
-?>

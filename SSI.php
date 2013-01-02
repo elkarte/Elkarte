@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -938,7 +939,7 @@ function ssi_boardStats($output_method = 'echo')
 		return $totals;
 
 	echo '
-		', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a><br />
+		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br />
 		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br />
 		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br />
 		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br />
@@ -1282,10 +1283,10 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 
 	$return = array(
 		'id' => $row['id_poll'],
-		'image' => empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll',
+		'image' => empty($row['voting_locked']) ? 'poll' : 'locked_poll',
 		'question' => $row['question'],
 		'total_votes' => $total,
-		'is_locked' => !empty($pollinfo['voting_locked']),
+		'is_locked' => !empty($row['voting_locked']),
 		'allow_vote' => $allow_vote,
 		'allow_view_results' => $allow_view_results,
 		'topic' => $topic
@@ -2013,5 +2014,3 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	echo '
 		</table>';
 }
-
-?>

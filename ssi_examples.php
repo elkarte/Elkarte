@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -36,7 +37,7 @@ template_ssi_above();
 ?>
 
 			<h2>SSI.php Functions</h2>
-			<p><strong>Current Version:</strong> 1.0 Alpha 1</p>
+			<p><strong>Current Version:</strong> 1.0 Alpha</p>
 			<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
 			<h2>Include Code</h2>
@@ -524,7 +525,7 @@ function template_ssi_above()
 			<div id="header"><div class="frame">
 				<div id="top_section">
 					<h1 class="forumtitle">SSI.php Examples</h1>
-					<img id="smflogo" src="Themes/default/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />
+					<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
 				</div>
 				<div id="upper_section" class="middletext" style="overflow: hidden;">
 					<div class="user"></div>
@@ -549,7 +550,7 @@ function template_ssi_below()
 				</div>
 			</div></div>
 			<div id="footer_section"><div class="frame">
-				<div class="smalltext"><a href="http://www.simplemachines.org">Simple Machines Forum</a></div>
+				<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/">Dialogo Community</a></div>
 			</div></div>
 		</div>
 	</body>

@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Help
+// Version: 1.0; Help
 
 global $helptxt;
 
@@ -136,7 +136,7 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
-	This box shows recently updated announcements from <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.
+	This box shows recently updated announcements from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.
 	You should check here every now and then for updates, new releases, and important information from Simple Machines.';
 
 $helptxt['registrations'] = '<strong>Registration Management</strong><br />
@@ -246,6 +246,7 @@ $helptxt['userLanguage'] = 'Turning this option on will allow users to select wh
 $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest posts and the most popular topics on your forum.
 		It will also show several statistics, like the most members online, new members and new topics.<hr />
 		Page views:<br />Adds another column to the stats page with the number of pageviews on your forum.';
+$helptxt['enable_disregard'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves.
 		This will be shown underneath the name.<br /><em>For example:</em><br />Jeff<br />Cool Guy';
 $helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that member can go to the top and bottom of a page
@@ -277,7 +278,7 @@ $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';
 $helptxt['cache_enable'] = 'The software performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
 $helptxt['cache_memcached'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in the example below:<br /><br/>	&quot;server1,server2,server3:port,server4&quot;<br /><br />Note that if no port is specified the software will use port 11211. The system will also attempt to perform rough/random load balancing across the specified servers.';
-$helptxt['cache_cachedir'] = 'This setting is only for the smf file based cache system. It specifies the path to the cache directory.  It is recommended that you place this in /tmp/ if you are going to use this, although it will work in any directory';
+$helptxt['cache_cachedir'] = 'This setting is only for the filesystem based cache system. It specifies the path to the cache directory.  It is recommended that you place this in /tmp/ if you are going to use this, although it will work in any directory';
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
 $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to the database in the error log.  Requires error logging to be turned on.<br /><br /><strong>Note:  This will affect the ability to filter the error log by the error message.</strong>';
 $helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;announce topic&quot; checkbox when posting.';
@@ -361,9 +362,9 @@ $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml
 $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the state of a &quot;hot&quot; or
 	&quot;very hot&quot; topic.';
 $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
-	Your site is at http://www.simplemachines.org/,<br />
-	And your forum is at http://forum.simplemachines.org/,<br />
-	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.simplemachines.org) not controlled by you.';
+	Your site is at http://www.sitename.org/,<br />
+	And your forum is at http://forum.sitename.org/,<br />
+	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.spudsdesign.com) not controlled by you.';
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';
@@ -385,7 +386,7 @@ $helptxt['attachmentEncryptFilenames'] = 'Encrypting attachment filenames allows
 	difficult to rebuild your database if something drastic happened.';
 
 $helptxt['failed_login_threshold'] = 'Set the number of failed login attempts before directing the user to the password reminder screen.';
-$helptxt['loginHistoryDays'] = 'The number of days to keep login history under user profile tracking. Default is 30 days.';
+$helptxt['loginHistoryDays'] = 'The number of days to keep login history under user profile history. Default is 30 days.';
 $helptxt['oldTopicDays'] = 'If this option is enabled a warning will be displayed to the user when attempting to reply to a topic which has not had any new replies for the amount of time, in days, specified by this setting. Set this setting to 0 to disable the feature.';
 $helptxt['edit_wait_time'] = 'Number of seconds allowed for a post to be edited before logging the last edit date.';
 $helptxt['edit_disable_time'] = 'Number of minutes allowed to pass before a user can no longer edit a post they have made. Set to 0 disable. <br /><br /><em>Note: This will not affect any user who has permission to edit other people\'s posts.</em>';
@@ -428,7 +429,7 @@ $helptxt['default_personal_text'] = 'Sets the default text a new user will have 
 
 $helptxt['modlog_enabled'] = 'Logs all moderation actions.';
 
-$helptxt['guest_hideContacts'] = 'If selected this option will hide the email addresses and messenger contact details
+$helptxt['guest_hideContacts'] = 'If selected this option will hide the email addresses and other contact details
 	of all members from any guests on your forum';
 
 $helptxt['registration_method'] = 'This option determines what method of registration is used for people wishing to join your forum. You can select from:<br /><br />
@@ -484,9 +485,9 @@ $helptxt['allow_hideOnline'] = 'With this option enabled all members will be abl
 $helptxt['make_email_viewable'] = 'If this option is enabled instead of users email addresses being hidden to normal members and guests they will be publicly viewable on the forum. Enabling this will put your users at greater risk of being victims of spam as a result of email harvesters visiting your forum. Note this setting does not override the user setting for hiding their email address from users. Enabling this setting is <strong>not</strong> recommended.';
 $helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate to search engines (etc) the key content of your site. They should be a comma separated list of words, and should not use HTML.';
 
-$helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.';
-$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.';
-$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.  It may not show up properly if your computer can\'t find <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>, though.';
+$helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
+$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.';
+$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>, though.';
 
 $helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that the software will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="javascript:window.open(\'%1$s?action=admin;area=manageboards\'); self.close();">board management interface</a>.';
@@ -616,5 +617,3 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		\ - Escapes the next character.<br />
 	</div><br /><br />
 	More information and advanced techniques may be found on the internet.';
-
-?>

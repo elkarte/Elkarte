@@ -10,15 +10,15 @@ h1.forumtitle {
 	font-size: 2em;
 	font-family: tahoma;
 	margin: 0;
-	padding: 32px 12px 16px 12px;
+	padding: 50px 12px 2px 12px;
 	float: left;
 	font-weight: normal;
 	color: #a85400;
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
 }
-/* Tweak the SMF logo */
-img#smflogo {
-	margin: 26px 0 0 0;
+/* Tweak the logo */
+img#logo {
+	margin: 2px 0 0 0;
 }
 #inner_wrap {
 	min-height: 80px;
@@ -134,12 +134,12 @@ img#smflogo {
 	padding: 1em 0 0 0;
 	overflow: auto;
 }
-/* [WIP] Warning: this next bit may cause trouble. */
-/* It's just to hide an empty div when the submits are not shown. */
-.panel .clear:nth-child(3) {
+/* [WIP] Warning: this next bit may cause trouble. .. confirmed, it does :P */
+/* It's just to hide an empty div when the submits are not shown. 
+.panel .clear:nth-child(4) {
 	border: 1px solid green;
 	display: none;
-}
+}*/
 /* End [WIP] */
 #time_elapsed {
 	clear: both;

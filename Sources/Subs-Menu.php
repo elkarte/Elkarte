@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -120,14 +121,14 @@ function createMenu($menuData, $menuOptions = array())
 							$menu_context['sections'][$section_id]['title'] = $section['title'];
 
 						$menu_context['sections'][$section_id]['areas'][$area_id] = array('label' => isset($area['label']) ? $area['label'] : $txt[$area_id]);
-						
+
 						// We'll need the ID as well...
 						$menu_context['sections'][$section_id]['id'] = $section_id;
-						
+
 						// Does it have a custom URL?
 						if (isset($area['custom_url']))
 							$menu_context['sections'][$section_id]['areas'][$area_id]['url'] = $area['custom_url'];
-							
+
 						// Does this area have its own icon?
 						if (isset($area['icon']))
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : '') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
@@ -297,4 +298,34 @@ function destroyMenu($menu_id = 'last')
 	unset($context[$menu_name]);
 }
 
-?>
+/**
+ * Call the function or method for the selected menu item.
+ * $selectedMenu is the array of menu information,
+ *  with the format as retrieved from createMenu()
+ *
+ * $selectedMenu['function'] can be an array or a string:
+ *  an array, array('controller_name', 'method_name')
+ *  a string, 'function_name'
+ *
+ * @param array $selectedMenu
+ */
+function callMenu($selectedMenu)
+{
+	// We use only $selectedMenu['function']
+	// which can be, for example for object oriented controllers:
+	// function'     an array, array('ManageAttachments_Controller', 'action_attachments')
+	// or, for procedural controllers
+	// 'function'     a string, 'action_managemail'
+
+	if (is_array($selectedMenu['function']))
+	{
+		// 'function' => array ('controller_name', 'method_name')
+		$controller = new $selectedMenu['function'][0]();
+		$controller->{$selectedMenu['function'][1]}();
+	}
+	else
+	{
+		// a single function name... call it over!
+		$selectedMenu['function']();
+	}
+}

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -1479,6 +1480,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
 {
+	global $forum_version;
 	static $near_version = 0;
 
 	if ($reset)
@@ -1486,6 +1488,11 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 
 	// Normalize the $versions while we remove our previous Doh!
 	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+
+	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
+	list($the_brand,) = explode(' ', $forum_version, 2);
+	if ($the_brand = 'DIALOGO')
+		$the_version = '1' . $the_version;
 
 	// Loop through each version, save the highest we can find
 	foreach ($versions as $for)
@@ -1518,6 +1525,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  */
 function matchPackageVersion($version, $versions)
 {
+
 	// Make sure everything is lowercase and clean of spaces and unpleasant history.
 	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
 	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
@@ -3191,26 +3199,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 
 if (!function_exists('smf_crc32'))
 {
-	/**
-	 * crc32 doesn't work as expected on 64-bit functions - make our own.
-	 * http://www.php.net/crc32#79567
-	 * 
-	 * @param type $number
-	 * @return type
-	 */
-	function smf_crc32($number)
-	{
-		$crc = crc32($number);
-
-		if ($crc & 0x80000000)
-		{
-			$crc ^= 0xffffffff;
-			$crc += 1;
-			$crc = -$crc;
-		}
-
-		return $crc;
-	}
+	global $sourcedir;
+	require_once $sourcedir . '/Subs-Compat.php';
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -95,7 +96,7 @@ function template_maintenance()
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['attachment_pruning'], '</h3>
 		</div>
@@ -131,7 +132,7 @@ function template_maintenance()
 			</div>
 		</div>
 	</div>';
-	
+
 	echo '
 			<div id="transfer" class="cat_bar">
 				<h3 class="catbg">', $txt['attachment_transfer'], '</h3>
@@ -176,7 +177,7 @@ function template_maintenance()
 							<dd><select name="to">
 								<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
-	foreach($context['attach_dirs'] as $id => $dir)
+	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
 								<option value="', $id, '">', $dir, '</option>';
 	echo '
@@ -297,5 +298,3 @@ function template_attachment_paths()
 
 	template_show_list('attach_paths');
 }
-
-?>

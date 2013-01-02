@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -44,7 +45,7 @@ function template_maintain_database()
 
 		<div class="cat_bar">
 			<h3 class="catbg">
-			<a href="', $scripturl, '?action=helpadmin;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
+			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
 			</h3>
 		</div>
 
@@ -349,7 +350,7 @@ function template_maintain_members()
 		</div>
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<a href="', $scripturl, '?action=helpadmin;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
+				<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
 			</h3>
 		</div>
 		<div class="windowbg2">
@@ -690,7 +691,7 @@ function template_convert_msgbody()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';
-	
+
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
@@ -719,4 +720,3 @@ function template_convert_msgbody()
 		</div>
 	</div>';
 }
-?>

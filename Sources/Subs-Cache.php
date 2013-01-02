@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -179,7 +180,7 @@ function cache_put_data($key, $value, $ttl = 120)
 				@unlink($cachedir . '/data_' . $key . '.php');
 			else
 			{
-				$cache_data = '<' . '?' . 'php if (!defined(\'DIALOGO\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}' . '?' . '>';
+				$cache_data = '<' . '?' . 'php if (!defined(\'DIALOGO\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
@@ -406,9 +407,10 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
+				// @todo interface !!!
 				//$_SERVER["PHP_AUTH_USER"] = 'userid';
 				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
-				
+
 				// Get the counts so we clear each instance
 				$pcnt = xcache_count(XC_TYPE_PHP);
 				$vcnt = xcache_count(XC_TYPE_VAR);
@@ -418,7 +420,7 @@ function clean_cache($type = '')
 					for ($i = 0; $i < $vcnt; $i++)
 						xcache_clear_cache(XC_TYPE_VAR, $i);
 				}
-				
+
 				if ($type === '' || $type === 'data')
 				{
 					for ($i = 0; $i < $pcnt; $i++)
@@ -457,6 +459,11 @@ function clean_cache($type = '')
 function cache_get_key($key)
 {
 	global $boardurl, $sourcedir, $cache_accelerator;
+	static $key_prefix;
 
-	return md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-DIALOGO-' . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
+	// no need to do this every time, slows us down :P
+	if (empty($key_prefix))
+		$key_prefix = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-DIALOGO-';
+
+	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }

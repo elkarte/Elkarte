@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -173,9 +174,9 @@ function template_body_above()
 	// the upshrink image, right-floated
 	echo '
 				<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />';
-	
+
 	echo empty($settings['site_slogan']) ? '
-				<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '
+				<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '
 				<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
 			</div>
 			<div id="upper_wrap">
@@ -188,7 +189,7 @@ function template_body_above()
 		if (!empty($context['user']['avatar']))
 			echo '
 						<p class="avatar"><a href="', $scripturl, '?action=profile">', $context['user']['avatar']['image'], '</a></p>';
-			
+
 			echo '
 						<ul class="reset">
 							<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>
@@ -292,7 +293,7 @@ function template_body_above()
 	}
 
 	// Show a random news item? (or you could pick one from news_lines...)
-	if (!empty($settings['enable_news']))
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
 		echo '
 						<h2>', $txt['news'], ': </h2>
 						<p>', $context['random_news_line'], '</p>';
@@ -373,7 +374,7 @@ function template_body_below()
 		<div class="frame" ', !empty($settings['forum_width']) ? 'style="width: ' . $settings['forum_width'] . '"' : '', '>';
 
 	// There is now a global "Go to top" link above the copyright.
-		echo '
+	echo '
 			<a href="#top" id="footer_uplink"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
 			<ul class="reset">
 				<li class="copyright">', theme_copyright(), '</li>
@@ -563,5 +564,3 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 			</ul>
 		</div>';
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -40,7 +41,7 @@ function template_permission_index()
 			</div>';
 
 		echo '
-			<table width="100%" class="table_grid">
+			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th">', $txt['membergroups_name'], '</th>
@@ -70,7 +71,7 @@ function template_permission_index()
 		echo '
 					<tr class="windowbg', $alternate ? '2' : '', '">
 						<td>
-							', $group['id'] == -1 ? ' <a class="help" href="' . $scripturl . '?action=helpadmin;help=membergroup_guests" onclick="return reqOverlayDiv(this.href);"><img class="icon" style="vertical-align: top" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : ($group['id'] == 0 ? ' <a class="help" href="' . $scripturl . '?action=helpadmin;help=membergroup_regular_members" onclick="return reqOverlayDiv(this.href);"><img class="icon" style="vertical-align: top" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : ($group['id'] == 1 ? ' <a class="help" href="' . $scripturl . '?action=helpadmin;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);"><img class="icon" style="vertical-align: top" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : ($group['id'] == 3 ? ' <a class="help" href="' . $scripturl . '?action=helpadmin;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);"><img class="icon" style="vertical-align: top" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '<img class="icon" style="vertical-align: top" src="' . $settings['images_url'] . '/blank.png" width="16px" alt="' . $txt['help'] . '" />'))), '&nbsp;<span>', $group['name'], '</span>';
+							', !empty($group['help']) ? ' <a class="help" href="' . $scripturl . '?action=quickhelp;help=' . $group['help'] . '" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '<img class="icon" src="' . $settings['images_url'] . '/blank.png" alt="' . $txt['help'] . '" />', '&nbsp;<span>', $group['name'], '</span>';
 
 		if (!empty($group['children']))
 			echo '
@@ -116,7 +117,7 @@ function template_permission_index()
 						<legend>', $txt['permissions_with_selection'], '</legend>
 						<dl class="settings admin_permissions">
 							<dt>
-								<a class="help" href="', $scripturl, '?action=helpadmin;help=permissions_quickgroups" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>', $txt['permissions_apply_pre_defined'], ':
+								<a class="help" href="', $scripturl, '?action=quickhelp;help=permissions_quickgroups" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>', $txt['permissions_apply_pre_defined'], ':
 							</dt>
 							<dd>
 								<select name="predefined">
@@ -281,7 +282,7 @@ function template_by_board()
 			<div class="information">
 				', $txt['permissions_boards_desc'], '
 			</div>
-			
+
 			<div class="title_bar">
 				<h3 id="board_permissions" class="titlebg flow_hidden">
 					<span class="perm_name floatleft">', $txt['board_name'], '</span>
@@ -321,7 +322,7 @@ function template_by_board()
 								<a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], ';rid=permissions;', $context['session_var'], '=', $context['session_id'], '">', str_repeat('-', $board['child_level']), ' ', $board['name'], '</a>
 							</span>
 							<span class="perm_boardprofile floatleft">';
-			
+
 			if ($context['edit_all'])
 			{
 				echo '
@@ -359,7 +360,7 @@ function template_by_board()
 	else
 		echo '
 				<a class="button_link" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
-	
+
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-mpb_token_var'], '" value="', $context['admin-mpb_token'], '" />
@@ -668,7 +669,7 @@ function template_modify_group_simple($type)
 				echo '
 					<tr id="perm_div_', $id_group, '_', $permission['id'], '" class="', $alternate ? 'windowbg' : 'windowbg2', '">
 						<td valign="top" width="10" style="padding-right: 1ex;">
-							', $permission['help_index'] ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $permission['help_index'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
+							', $permission['help_index'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $permission['help_index'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
 						</td>
 						<td valign="top" width="100%" align="left" style="padding-bottom: 2px;">', $permission['name'], '</td>';
 
@@ -916,7 +917,7 @@ function template_modify_group_classic($type)
 					echo '
 							<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
 								<td width="10">
-									', $permission['show_help'] ? '<a href="' . $scripturl . '?action=helpadmin;help=permissionhelp_' . $permission['id'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
+									', $permission['show_help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=permissionhelp_' . $permission['id'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
 								</td>';
 
 					if ($permission['has_own_any'])
@@ -1177,5 +1178,3 @@ function template_postmod_permissions()
 		</p>
 	</div>';
 }
-
-?>

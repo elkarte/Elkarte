@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -25,7 +26,7 @@ if (!defined('DIALOGO'))
  * It is accessed by ?action=help.
  * @uses Help template and Manual language file.
  */
-function ShowHelp()
+function action_help()
 {
 	global $scripturl, $context, $txt;
 
@@ -33,7 +34,7 @@ function ShowHelp()
 	loadLanguage('Manual');
 
 	// We need to know where our wiki is.
-	$context['wiki_url'] = 'http://wiki.simplemachines.org/smf';
+	$context['wiki_url'] = 'https://github.com/Spuds/dialogo/wiki';
 
 	// Sections were are going to link...
 	$context['manual_sections'] = array(
@@ -56,7 +57,7 @@ function ShowHelp()
 	);
 
 	// Lastly, some minor template stuff.
-	$context['page_title'] = $txt['manual_smf_user_help'];
+	$context['page_title'] = $txt['manual_dialogo_user_help'];
 	$context['sub_template'] = 'manual';
 }
 
@@ -65,11 +66,11 @@ function ShowHelp()
  * It shows a popup for administrative or user help.
  * It uses the help parameter to decide what string to display and where to get
  * the string from. ($helptxt or $txt?)
- * It is accessed via ?action=helpadmin;help=?.
+ * It is accessed via ?action=quickhelp;help=?.
  * @uses ManagePermissions language file, if the help starts with permissionhelp.
  * @uses Help template, popup sub template, no layers.
  */
-function ShowAdminHelp()
+function action_quickhelp()
 {
 	global $txt, $helptxt, $context, $scripturl;
 
@@ -89,7 +90,7 @@ function ShowAdminHelp()
 	loadTemplate('Help');
 
 	// Allow mods to load their own language file here
- 	call_integration_hook('integrate_helpadmin');
+ 	call_integration_hook('integrate_quickhelp');
 
 	// Set the page title to something relevant.
 	$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
@@ -110,5 +111,3 @@ function ShowAdminHelp()
 	if (preg_match('~%([0-9]+\$)?s\?~', $context['help_text'], $match))
 		$context['help_text'] = sprintf($context['help_text'], $scripturl, $context['session_id'], $context['session_var']);
 }
-
-?>

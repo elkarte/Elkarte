@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -121,7 +122,6 @@ function template_find_members()
 		}
 
 		echo '
-
 				</ul>
 				<div class="pagesection">
 					', $txt['pages'], ': ', $context['page_index'], '
@@ -154,7 +154,7 @@ function template_manual()
 
 	echo '
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_smf_user_help'], '</h3>
+				<h3 class="catbg">', $txt['manual_dialogo_user_help'], '</h3>
 			</div>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">
@@ -170,9 +170,7 @@ function template_manual()
 
 	echo '
 					</ul>
-					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=credits'), '</p>
+					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=who;sa=credits'), '</p>
 				</div>
 			</div>';
 }
-
-?>

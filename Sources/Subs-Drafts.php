@@ -1,14 +1,11 @@
 <?php
 
 /**
- * Simple Machines Forum (SMF)
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2012 Simple Machines Forum contributors
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
 /**
@@ -265,4 +262,64 @@ function load_user_drafts($member_id, $topic = false, $draft_type = 0, $drafts_k
 	return $user_drafts;
 }
 
-?>
+/**
+ * Deletes one or many drafts from the DB
+ * Validates the drafts are from the user
+ * If supplied an array of drafts will attempt to remove all of them
+ *
+ * @param int $id_draft
+ * @param bool $check
+ * @return boolean
+ */
+function deleteDrafts($id_draft, $member_id = -1, $check = true)
+{
+	global $smcFunc;
+
+	// Only a single draft.
+	if (is_numeric($id_draft))
+		$id_draft = array($id_draft);
+
+	// can't delete nothing
+	if (empty($id_draft))
+		return false;
+
+	$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}user_drafts
+			WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
+				AND  id_member = {int:id_member}' : ''),
+			array (
+				'id_draft' => $id_draft,
+				'id_member' => $member_id ,
+			)
+		);
+}
+
+/**
+ * Retrieve how many drafts the given user has.
+ * This function checks for expired lifetime on drafts (they would be removed
+ *  by a scheduled task), and doesn't count those.
+ *
+ * @param int $member_id
+ * @param int $draft_type
+ */
+function draftsCount($member_id, $draft_type)
+{
+	global $modSettings, $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(id_draft)
+		FROM {db_prefix}user_drafts
+		WHERE id_member = {int:id_member}
+			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
+			AND poster_time > {int:time}' : ''),
+		array(
+			'id_member' => $member_id,
+			'draft_type' => $draft_type,
+			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
+		)
+	);
+	list ($msgCount) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $msgCount;
+}

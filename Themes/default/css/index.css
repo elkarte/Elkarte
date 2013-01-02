@@ -110,7 +110,6 @@ select {
 select option  {
 	padding: 0 4px;
 }
-
 input:hover, textarea:hover, button:hover, select:hover {
 	outline: none !important;
 	border: 1px solid #999;
@@ -151,12 +150,20 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 }
 a.button_link {
 	color: #000;
-	padding: 1px 5px;
+	padding: 2px 5px;
 	margin: 0 !important;
 	font-size: 0.9em;
+	line-height: 18px; 
 }
 .button_link:hover {
 	text-decoration: none;
+}
+.selectbox select {
+	margin: 0 !important;
+}
+/* FF rounding error on zoom? */
+#firefox a.button_link {
+	line-height: 17.25px;
 }
 
 /* the new "button" */
@@ -430,7 +437,8 @@ a img {
 }
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: red;
+	font-style: italic;
+	color: blue;
 }
 
 /* Highlighted text - such as search results. */
@@ -565,25 +573,6 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 	border-left: 1px solid #bbb;
 	border-top: 1px solid #aaa;
 	box-shadow: -1px -1px 2px rgba(0,0,0,0.07), -1px -2px 4px rgba(255,255,255,0.33) inset;
-}
-
-
-
-/* Sticky topics get a different background */
-.stickybg {
-	background: #e8d8cf;
-}
-.stickybg2 {
-	background: #f2e3d9;
-}
-
-/* Plain locked topics just get the icon. */
-/* Nobody wants them to stand out much. */
-.lockedbg {
-	background: #e7eaef;
-}
-.lockedbg2 {
-	background: #f0f4f7;
 }
 
 /* Posts and personal messages displayed throughout the forum. */
@@ -1378,16 +1367,21 @@ img.sort {
 #search_form select {
 	padding: 1px;
 }
+#chrome #search_form select {
+	padding: 2px;
+}
 #search_form .button_submit {
-	padding: 1px 2px;
-	margin: 1px 5px;
+	padding: 1px 3px 0;
+	margin: 2px 5px 0;
 	background: #fff url(../images/theme/lower_section.png) 0 45% repeat-x;
 	color: #333;
 }
-/* @todo In practice it may be better to set a different value for Firefox and Opera only, */
-/*	just to save a little bit of code. Will wait for Opera detection on body tag. */
-#ie #search_form .button_submit, #chrome #search_form .button_submit {
-	padding: 3px 5px;
+#ie9 #search_form .button_submit {
+	padding: 1px 3px 2px;
+	margin: 1px 5px;
+}
+#chrome #search_form .button_submit {
+	margin: 1px 5px;
 }
 #search_form .button_submit:hover {
 	background: #fff url(../images/theme/upper_section.png) 0 45% repeat-x;
@@ -1417,15 +1411,15 @@ h1.forumtitle a {
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
 }
 /* Float these items to the right */
-#siteslogan, img#smflogo {
+#siteslogan, img#logo {
 	margin: 0;
 	padding: 0;
 	float: right;
 	line-height: 50px;
 	font-size: 1.8em;
 }
-/* Tweak the SMF logo */
-img#smflogo {
+/* Tweak the logo */
+img#logo {
 	margin: 16px 0 0 0;
 }
 /*
@@ -1622,7 +1616,7 @@ ul li.greeting {
 ------------------------------------------------------- */
 .table_list {
 	width: 100%;
-	border-collapse: collapse;
+	border-spacing: 0;
 }
 .table_list .header td {
 	padding: 0;
@@ -1631,7 +1625,7 @@ ul li.greeting {
 	padding: 7px;
 }
 .table_list .header .cat_bar {
-	margin: 0 0 0 -1px;
+	margin: 0;
 }
 .table_list .icon, .table_list .info, .table_list .stats, .table_list.lastpost {
 	border-top: 2px solid #fff;
@@ -1716,7 +1710,7 @@ ul li.greeting {
 
 /* the posting icons */
 #posting_icons {
-	padding: 0 12px 6px 12px;
+	padding: 0 6px 0 0;
 	margin: 0 0 12px 0;
 	line-height: 12px;
 	float: left;
@@ -1863,6 +1857,7 @@ p.whoisviewing {
 }
 select.qaction, input.qaction {
 	padding: 0;
+	margin: 2px 0 0;
 }
 .qaction_cell .button_submit {
 	margin: 2px 4px 0 4px;
@@ -1876,6 +1871,9 @@ select.qaction, input.qaction {
 	border: 1px solid #ddd;
 	border-radius: 3px;
 	padding: 8px 12px 0 12px;
+}
+#topic_icons.description.none {
+	margin-top: 0;
 }
 #topic_icons p {
 	line-height: 2em;
@@ -2045,6 +2043,10 @@ div#pollmoderation {
 	color: #c06002;
 	display: block;
 }
+.poster h4 span{
+	padding: 6px;
+	display: block;
+}
 /* Nifty new flyout menu for the poster info. */
 /* @todo Can probably clean up the CSS here a bit. */
 /* Check inheritance with font size in the dropdown. */
@@ -2070,7 +2072,7 @@ div#pollmoderation {
 	border: none;
 }
 .poster .dropmenu>li.sfhover>ul, .poster .dropmenu>li:hover>ul  {
-	top: 3em;
+	top: 100%;
 	float: none;
 	left: 0;
 	padding: 6px 0.5em 4px  0.5em;
@@ -2096,10 +2098,10 @@ div#pollmoderation {
 	background: none;
 	border: none;
 }
-.poster .dropmenu  li ul li.im_icons, .poster .dropmenu   ul ol li {
+.poster .dropmenu  li ul li.cf_icons, .poster .dropmenu	ul ol li {
 	padding: 3px;
 }
-.poster .dropmenu   ul ol li {
+.poster .dropmenu	ul ol li {
 	display: table-cell;
 }
 .poster .dropmenu  li.postgroup, .poster .dropmenu  li.postcount, .poster .dropmenu  li.karma,
@@ -2113,6 +2115,11 @@ div#pollmoderation {
 	width: 100%;
 	font-size: 1.1em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+.poster .dropmenu  li ul li.report_seperator {
+	height: 2px;
+	background: #ccc;
+	box-shadow: 0 -1px 0 #fff inset;
 }
 .poster .dropmenu  li ul li hr {
 	margin: 4px 3px;
@@ -2324,6 +2331,8 @@ ul.quickbuttons li.inline_mod_check {
 	position: absolute;
 	left: 0;
 	top: 0;
+	cursor: pointer;
+	margin: 0;
 }
 .quickbuttons li.quick_edit {
 	display: none;
@@ -2453,6 +2462,9 @@ ul.quickbuttons li.inline_mod_check {
 form#postmodify .roundframe {
 	padding: 12px 12%;
 }
+form#postmodify {
+	margin: 0;
+}
 #post_header, .postbox {
 	padding: 6px;
 	overflow: hidden;
@@ -2495,6 +2507,9 @@ ul.post_options li {
 	border-top: 1px solid #ccc;
 	margin: -1px 0 0 0;
 	padding: 10px;
+}
+#postAttachment, #postAttachment2 {
+	overflow: hidden;
 }
 #postAttachment dd, #postAttachment2 dd {
 	margin: 4px 0 4px 12px;
@@ -2883,35 +2898,6 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 	padding: 4px;
 }
 
-/* Sticky topics get a different background */
-.topic_table td.stickybg {
-	background:  #e8d8cf url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.topic_table td.stickybg2 {
-	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.topic_table td.locked_sticky, .topic_table td.stickybglockedbg {
-	background: #e8d8cf url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-.topic_table td.locked_sticky2, .topic_table td.stickybglockedbg2 {
-	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-
-/* Plain locked topics just get the icon. */
-/* Nobody wants them to stand out much. */
-.topic_table td.lockedbg {
-	background: #e7eaef url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-.topic_table td.lockedbg2 {
-	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-
-/* Stop those damned icons popping up in every table cell! */
-.topic_table td.icon1, .topic_table td.icon2, .topic_table td.stats,
-.topic_table td.lastpost, .topic_table td.moderation {
-	background-image: none;
-}
-
 .errorfile_table {
 	background: #f0f4f7;
 	border-spacing: 3;
@@ -3033,9 +3019,10 @@ dl {
 	margin-right: 5px;
 	height: 20px;
 }
-#basicinfo#userstatus {
+#basicinfo #userstatus {
 	display: block;
 	clear: both;
+	margin-top: 6px;
 }
 #basicinfo #userstatus img {
 	vertical-align: middle;
@@ -3798,6 +3785,7 @@ span.hidelink {
 	width: 100%;
 	height: 100%;
 	background: rgba(40,64,80,0.5);
+	z-index: 100;
 }
 .popup_window
 {
@@ -4163,6 +4151,17 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid  tr td:first-child, .table_grid td.icon2 {
 	border-left: 1px solid #ccc;
 }
+.table_grid  img.fred {
+	position: absolute;
+	z-index: 5;
+	right: 4px;
+	bottom: -3px;
+}
+.table_grid td.icon2 div {
+	position: relative;
+	width: 40px;
+	margin: auto;
+}
 .table_grid td.lastpost, .table_grid td.whos_viewing, .table_grid td.moderation, .table_grid td.qaction_cell {
 	border-right: 1px solid #ccc;
 }
@@ -4180,6 +4179,40 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid td.whos_viewing {
 	font-size: 0.9em;
 }
+
+/* @todo tempo Colors for locked and sticky topics so we something to look at till this is done :P*/
+.table_grid tr td.stickybg {
+	background: #f2e3d9; /*e8d8cf*/
+}
+.table_grid tr td.stickybg2 {
+	background: #f2e3d9;
+}
+.table_grid tr td.lockedbg {
+	background: #f0f4f7 /*e7eaef*/
+}
+.table_grid tr td.lockedbg2 {
+	background: #f0f4f7;
+}
+/* And now those precious little icons, boy are they cute ! */
+.table_grid tr td.stickybg.subject {
+	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+.table_grid tr td.stickybg2.subject {
+	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+.table_grid tr td.locked_sticky.subject, .table_grid tr td.stickybglockedbg.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.locked_sticky2.subject, .table_grid tr td.stickybglockedbg2.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.lockedbg.subject{
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.lockedbg2.subject{
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+
 /* Colors for background of posts requiring approval */
 #forumposts .approvebg {
 	color: #222;

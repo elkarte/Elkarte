@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -403,7 +404,7 @@ function template_results()
 			<div class="titlebg2" style="padding: 4px;">
 				<div class="flow_auto">
 					<div class="floatright">';
-			
+
 			echo '
 						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 							<option value="">--------</option>';
@@ -415,7 +416,7 @@ function template_results()
 
 			echo '
 						</select>';
-						
+
 			if ($context['can_move'])
 				echo '
 						<span id="quick_mod_jump_to">&nbsp;</span>';
@@ -524,7 +525,7 @@ function template_results()
 					bDisabled: true,
 					sCustomName: "move_to"
 				});';
-	
+
 	echo '
 			if (typeof(window.XMLHttpRequest) != "undefined")
 				aJumpTo[aJumpTo.length] = new JumpTo({
@@ -542,5 +543,3 @@ function template_results()
 		// ]]></script>';
 
 }
-
-?>

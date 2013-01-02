@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -16,7 +17,7 @@
 // The main sub template - for theme administration.
 function template_main()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -24,7 +25,7 @@ function template_main()
 			<input type="hidden" value="0" name="options[theme_allow]" />
 			<div class="cat_bar">
 				<h3 class="catbg">
-					<a href="', $scripturl, '?action=helpadmin;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+					<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
 					', $txt['themeadmin_title'], '
 				</h3>
 			</div>
@@ -96,16 +97,16 @@ function template_main()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
 				</div>
-				
+
 			</div>
 		</form>';
 
-	// Link to simplemachines.org for latest themes and info!
+	// Link to github for latest themes and info!
 	echo '
 		<br />
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<a href="', $scripturl, '?action=helpadmin;help=latest_themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_latest'], '
+				<a href="', $scripturl, '?action=quickhelp;help=latest_themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_latest'], '
 			</h3>
 		</div>
 		<div class="windowbg">
@@ -126,7 +127,7 @@ function template_main()
 		<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="', $context['character_set'], '" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 			<div class="cat_bar">
 				<h3 class="catbg">
-					<a href="', $scripturl, '?action=helpadmin;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
+					<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
 				</h3>
 			</div>
 			<div class="windowbg">
@@ -134,7 +135,6 @@ function template_main()
 					<dl class="settings">';
 
 	// Here's a little box for installing a new theme.
-	// @todo Should the value="theme_gz" be there?!
 	if ($context['can_create_new'])
 		echo '
 						<dt>
@@ -181,7 +181,7 @@ function template_main()
 
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-themes.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-themes.js"></script>';
 
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
@@ -404,6 +404,7 @@ function template_set_options()
 					<hr class="hrcolor" />
 					<input type="submit" name="submit" value="', $txt['save'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-sto_token_var'], '" value="', $context['admin-sto_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -419,7 +420,7 @@ function template_set_settings()
 		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="', $context['character_set'], '">
 			<div class="title_bar">
 				<h3 class="titlebg">
-					<a href="', $scripturl, '?action=helpadmin;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+					<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 				</h3>
 			</div>';
 
@@ -1027,7 +1028,14 @@ function template_edit_style()
 				</div>
 			</div>
 			<input type="hidden" name="filename" value="', $context['edit_filename'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
+
+	// Hopefully our token exists.
+	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
+		echo '
+			<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+
+	echo '
 		</form>
 	</div>';
 }
@@ -1075,7 +1083,14 @@ function template_edit_template()
 					<div class="padding righttext">
 						<input type="submit" name="save" value="', $txt['theme_edit_save'], '"', $context['allow_save'] ? '' : ' disabled="disabled"', ' class="button_submit" />
 						<input type="hidden" name="filename" value="', $context['edit_filename'], '" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
+
+	// You better have one of these to do that
+	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
+		echo '
+					<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+
+	echo '
 					</div>
 				</div>
 			</div>
@@ -1117,7 +1132,7 @@ function template_edit_file()
 	// Hopefully it exists.
 	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
 		echo '
-					<input type="text" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+					<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
 
 	echo '
 				</div>
@@ -1126,5 +1141,3 @@ function template_edit_file()
 		</form>
 	</div>';
 }
-
-?>

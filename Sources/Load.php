@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -99,7 +100,7 @@ function reloadSettings()
 			}
 			else
 			{
-				$needle_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~' . ($utf8 ? 'u' : '') . '\',  ' . implode('$needle', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+				$needle_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~' . ($utf8 ? 'u' : '') . '\', ' . implode('$needle', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 				$needle_size = count($needle_arr);
 
 				$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
@@ -129,10 +130,10 @@ function reloadSettings()
 		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
 			global $smcFunc;
 			$string = ' . implode('$string', $ent_check) . ';' : '') . '
-			preg_match(\'~^(' . $ent_list . '|.){\' . $smcFunc[\'strlen\'](substr($string, 0, $length)) . \'}~'.  ($utf8 ? 'u' : '') . '\', $string, $matches);
+			preg_match(\'~^(' . $ent_list . '|.){\' . $smcFunc[\'strlen\'](substr($string, 0, $length)) . \'}~'. ($utf8 ? 'u' : '') . '\', $string, $matches);
 			$string = $matches[0];
 			while (strlen($string) > $length)
-				$string = preg_replace(\'~(?:' . $ent_list . '|.)$~'.  ($utf8 ? 'u' : '') . '\', \'\', $string);
+				$string = preg_replace(\'~(?:' . $ent_list . '|.)$~'. ($utf8 ? 'u' : '') . '\', \'\', $string);
 			return $string;'),
 		'ucfirst' => $utf8 ? create_function('$string', '
 			global $smcFunc;
@@ -395,7 +396,7 @@ function loadUserSettings()
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
 		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
 		{
-			require_once($sourcedir . '/ManageSearchEngines.php');
+			loadAdminClass ('ManageSearchEngines.php');
 			$user_info['possibly_robot'] = SpiderCheck();
 		}
 		elseif (!empty($modSettings['spider_mode']))
@@ -442,7 +443,7 @@ function loadUserSettings()
 		'permissions' => array(),
 	);
 	$user_info['groups'] = array_unique($user_info['groups']);
-	
+
 	// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
 	if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		unset($user_info['ignoreboards'][$tmp]);
@@ -906,56 +907,47 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		}
 	}
 
-	if ($set == 'normal')
-	{
-		$select_columns = '
+	// Used by default
+	$select_columns = '
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login,
+			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
-			mem.buddy_list, mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
-			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group, mem.is_activated, mem.warning,
-			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons' . (!empty($modSettings['titlesEnable']) ? ',
-			mem.usertitle' : '');
-		$select_tables = '
+			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
+			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
+			mem.is_activated, mem.warning' . (!empty($modSettings['titlesEnable']) ? ', mem.usertitle, ' : '') . '
+			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
+	$select_tables = '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
-	}
-	elseif ($set == 'profile')
+
+	// We add or replace according to the set
+	switch ($set)
 	{
-		$select_columns = '
-			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
-			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good,
-			mem.karma_bad, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group, mem.id_theme, mem.buddy_list,
-			mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from, mem.time_offset' . (!empty($modSettings['titlesEnable']) ? ', mem.usertitle' : '') . ',
-			mem.time_format, mem.secret_question, mem.is_activated, mem.additional_groups, mem.smiley_set, mem.show_online,
-			mem.total_time_logged_in, mem.id_post_group, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-			mem.notify_types, lo.url, mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
-			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group, mem.ignore_boards, mem.warning,
-			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons, mem.password_salt, mem.pm_prefs';
-		$select_tables = '
-			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
-	}
-	elseif ($set == 'minimal')
-	{
-		$select_columns = '
+		case 'normal':
+			$select_columns .= ', mem.buddy_list';
+			break;
+		case 'profile':
+			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from,
+			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
+			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs';
+			break;
+		case 'minimal':
+			$select_columns = '
 			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.hide_email, mem.date_registered,
 			mem.posts, mem.last_login, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group';
-		$select_tables = '';
+			$select_tables = '';
+			break;
+		default:
+			trigger_error('loadMemberData(): Invalid member data set \'' . $set . '\'', E_USER_WARNING);
 	}
-	else
-		trigger_error('loadMemberData(): Invalid member data set \'' . $set . '\'', E_USER_WARNING);
 
 	// Allow mods to easily add to the selected member data
-	call_integration_hook('integrate_load_member_data', array($select_columns, $select_tables));
+	call_integration_hook('integrate_load_member_data', array($select_columns, $select_tables, $set));
 
 	if (!empty($users))
 	{
@@ -1113,6 +1105,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// If the set isn't minimal then load the monstrous array.
 	if ($context['loadMemberContext_set'] !== 'minimal')
 		$memberContext[$user] += array(
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
@@ -1129,30 +1124,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'birth_date' => empty($profile['birthdate']) || $profile['birthdate'] === '0001-01-01' ? '0000-00-00' : (substr($profile['birthdate'], 0, 4) === '0004' ? '0000' . substr($profile['birthdate'], 4) : $profile['birthdate']),
 			'signature' => $profile['signature'],
 			'location' => $profile['location'],
-			'icq' => $profile['icq'] != '' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
-				'name' => $profile['icq'],
-				'href' => 'http://www.icq.com/whitepages/about_me.php?uin=' . $profile['icq'],
-				'link' => '<a class="icq new_win" href="http://www.icq.com/whitepages/about_me.php?uin=' . $profile['icq'] . '" target="_blank" title="' . $txt['icq_title'] . ' - ' . $profile['icq'] . '"><img src="http://status.icq.com/online.png?img=5&amp;icq=' . $profile['icq'] . '" alt="' . $txt['icq_title'] . ' - ' . $profile['icq'] . '" width="18" height="18" /></a>',
-				'link_text' => '<a class="icq extern" href="http://www.icq.com/whitepages/about_me.php?uin=' . $profile['icq'] . '" title="' . $txt['icq_title'] . ' - ' . $profile['icq'] . '">' . $profile['icq'] . '</a>',
-			) : array('name' => '', 'add' => '', 'href' => '', 'link' => '', 'link_text' => ''),
-			'aim' => $profile['aim'] != '' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
-				'name' => $profile['aim'],
-				'href' => 'aim:goim?screenname=' . urlencode(strtr($profile['aim'], array(' ' => '%20'))) . '&amp;message=' . $txt['aim_default_message'],
-				'link' => '<a class="aim" href="aim:goim?screenname=' . urlencode(strtr($profile['aim'], array(' ' => '%20'))) . '&amp;message=' . $txt['aim_default_message'] . '" title="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '"><img src="' . $settings['images_url'] . '/aim.png" alt="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '" /></a>',
-				'link_text' => '<a class="aim" href="aim:goim?screenname=' . urlencode(strtr($profile['aim'], array(' ' => '%20'))) . '&amp;message=' . $txt['aim_default_message'] . '" title="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '">' . $profile['aim'] . '</a>'
-			) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
-			'yim' => $profile['yim'] != '' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
-				'name' => $profile['yim'],
-				'href' => 'http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($profile['yim']),
-				'link' => '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($profile['yim']) . '" title="' . $txt['yim_title'] . ' - ' . $profile['yim'] . '"><img src="http://opi.yahoo.com/online?u=' . urlencode($profile['yim']) . '&amp;m=g&amp;t=0" alt="' . $txt['yim_title'] . ' - ' . $profile['yim'] . '" /></a>',
-				'link_text' => '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($profile['yim']) . '" title="' . $txt['yim_title'] . ' - ' . $profile['yim'] . '">' . $profile['yim'] . '</a>'
-			) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
-			'msn' => $profile['msn'] !='' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
-				'name' => $profile['msn'],
-				'href' => 'http://members.msn.com/' . $profile['msn'],
-				'link' => '<a class="msn new_win" href="http://members.msn.com/' . $profile['msn'] . '" title="' . $txt['msn_title'] . ' - ' . $profile['msn'] . '"><img src="' . $settings['images_url'] . '/msntalk.png" alt="' . $txt['msn_title'] . ' - ' . $profile['msn'] . '" /></a>',
-				'link_text' => '<a class="msn new_win" href="http://members.msn.com/' . $profile['msn'] . '" title="' . $txt['msn_title'] . ' - ' . $profile['msn'] . '">' . $profile['msn'] . '</a>'
-			) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
 			'avatar' => array(
@@ -1195,17 +1166,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
-	
-	// First do a quick run through to make sure there is something to be shown.
-	$memberContext[$user]['has_messenger'] = false;
-	foreach (array('icq', 'msn', 'aim', 'yim') as $messenger)
-	{
-		if (!isset($context['disabled_fields'][$messenger]) && !empty($memberContext[$user][$messenger]['link']))
-		{
-			$memberContext[$user]['has_messenger'] = true;
-			break;
-		}
-	}
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
@@ -1271,29 +1231,6 @@ function detectBrowser()
 function isBrowser($browser)
 {
 	global $context;
-
-	// @todo REMOVE THIS BEFORE BETA 1 RELEASE.
-	if (in_array($browser, array('ie7', 'ie6', 'ie5.5', 'ie5', 'ie5', 'ie4', 'mac_ie', 'firefox1')))
-	{
-		$line = $file = null;
-		foreach (debug_backtrace() as $step)
-		{
-			// Found it?
-			if (strpos($step['function'], 'query') === false && !in_array(substr($step['function'], 0, 7), array('smf_db_', 'preg_re', 'db_erro', 'call_us')) && strpos($step['function'], '__') !== 0)
-			{
-				$function = '<br />Function: ' . $step['function'];
-				break;
-			}
-
-			if (isset($step['line']))
-			{
-				$file = $step['file'];
-				$line = $step['line'];
-			}
-		}
-
-		log_error('Old browser support' . $function, 'debug', $file, $line);
-	}
 
 	// Don't know any browser!
 	if (empty($context['browser']))
@@ -1397,11 +1334,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$smcFunc['db_free_result']($result);
 
 		if (!empty($themeData[-1]))
+		{
 			foreach ($themeData[-1] as $k => $v)
 			{
 				if (!isset($themeData[$member][$k]))
 					$themeData[$member][$k] = $v;
 			}
+		}
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
@@ -1593,7 +1532,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$txt = array();
 	$simpleActions = array(
 		'findmember',
-		'helpadmin',
+		'quickhelp',
 		'printpage',
 		'quotefast',
 		'spellcheck',
@@ -1714,21 +1653,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
 	);
 
-	// Add the JQuery library to the list of files to load.
-	if (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'cdn')
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', array(), 'jquery');
-	elseif (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'local')
-		loadJavascriptFile('jquery-1.7.2.min.js', array('default_theme' => true, 'seed' => false), 'jquery');
-	// Auto loading? template_javascript() will take care of the local half of this.
-	else
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', array(), 'jquery');
-
-	// Queue our JQuery plugins!
-	loadJavascriptFile('smf_jquery_plugins.js', array('default_theme' => true));
-
-	// script.js and theme.js, always required, so always add them! Makes index.template.php cleaner and all.
-	loadJavascriptFile('script.js', array('default_theme' => true), 'smf_scripts');
-	loadJavascriptFile('theme.js', array(), 'theme_scripts');
+	// Queue our Javascript
+	loadJavascriptFile(array('smf_jquery_plugins.js', 'script.js', 'theme.js'));
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -1797,16 +1723,19 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
-	
-	// Do any style sheets first, cause we're easy with those.
-	$style_sheets += array('index');
-	
+
 	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 	if (!empty($context['theme_variant']))
-		$style_sheets += array($context['theme_variant']);
+		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
+	else
+		$default_sheets = array('index.css');
+	loadCSSFile($default_sheets);
 
-	foreach ($style_sheets as $sheet)
-		loadCSSFile($sheet . '.css', array(), $sheet);
+	// Any specific template sheets we may have
+	if (!empty($style_sheets))
+		loadCSSFile(
+			array(implode('.css,', $style_sheets) . '.css')
+		);
 
 	// No template to load?
 	if ($template_name === false)
@@ -1905,110 +1834,161 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * @param array $params
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
- * 	- ['default_theme'] (true/false): force use of default theme url
- * 	- ['force_current'] (true/false): if this is false, we will attempt to load the file from the default theme if not found in the current theme
- *  - ['validate'] (true/false): if true script will validate the local file exists
- *  - ['seed'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * 	- ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
+ *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *
  * @param string $id
  */
-function loadCSSFile($filename, $params = array(), $id = '')
+function loadCSSFile($filenames, $params = array(), $id = '')
 {
 	global $settings, $context;
 
-	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
-	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
-	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-	
-	// account for shorthand like admin.css?alp21 filenames
-	$has_seed = strpos($filename, '.css?');
-	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 4) : $filename;
-	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
+	if (empty($filenames))
+		return;
 
-	// Is this a local file?
-	if (strpos($filename, 'http') === false || !empty($params['local']))
+	if (!is_array($filenames))
+		$filenames = array($filenames);
+
+	// static values for all these settings
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
+
+	// Whoa ... we've done this before yes?
+	$cache_name = 'load_css_' . md5($settings['theme_dir'] . implode('_', $filenames));
+	if (($temp = cache_get_data($cache_name, 600)) !== null)
+		$context['css_files'] = $temp;
+	else
 	{
-		$params['local'] = true;
-		$params['dir'] = $settings[$theme . '_dir'] . '/css/';
-		
-		// Are we validating the the file exists?
-		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/css/' . $filename))
+		// All the files in this group use the parameters as defined above
+		foreach ($filenames as $filename)
 		{
-			// Maybe the default theme has it?
-			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
-			{
-				$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
-				$params['dir'] = $settings['default_theme_dir'] . '/css/';
-			}
-			else
-				$filename = false;
-		}
-		else
-			$filename = $settings[$theme . '_url'] . '/css/' . $filename . ($has_seed ? '' : $params['seed']);
-	}
+			// account for shorthand like admin.css?xyz11 filenames
+			$has_cache_staler = strpos($filename, '.css?');
+			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 4) : $filename;
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
-	// Add it to the array for use in the template
-	if (!empty($filename))
-		$context['css_files'][$id] = array('filename' => $filename, 'options' => $params);
+			// Is this a local file?
+			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+			{
+				$params['local'] = true;
+				$params['dir'] = $settings['theme_dir'] . '/css/';
+				$params['url'] = $settings['theme_url'];
+
+				// Fallback if needed?
+				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/css/' . $filename))
+				{
+					// Fallback if we are not already in the default theme
+					if (file_exists($settings['default_theme_dir'] . '/css/' . $filename))
+					{
+						$filename = $settings['default_theme_url'] . '/css/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+						$params['dir'] = $settings['default_theme_dir'] . '/css/';
+						$params['url'] = $settings['default_theme_url'];
+					}
+					else
+						$filename = false;
+				}
+				else
+					$filename = $settings['theme_url'] . '/css/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+			}
+
+			// Add it to the array for use in the template
+			if (!empty($filename))
+				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+		}
+
+		// Save this build
+		cache_put_data($cache_name, $context['css_files'], 600);
+	}
 }
 
 /**
  * Add a Javascript file for output later
- 
- * @param string $filename
+ *
+ * Can be passed an array of filenames, all which will have the same parameters applied, if you
+ * need specific parameters on a per file basis, call it multiple times
+ *
+ * @param array $filenames
  * @param array $params
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
- * 	- ['default_theme'] (true/false): force use of default theme url
  * 	- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- * 	- ['force_current'] (true/false): if this is false, we will attempt to load the file from the
- *    default theme if not found in the current theme
+ * 	- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
  *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- *  - ['validate'] (true/false): if true script will validate the local file exists
- *  - ['seed'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
  * @param string $id
  */
-function loadJavascriptFile($filename, $params = array(), $id = '')
+function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
 	global $settings, $context;
-	
-	if (empty($filename))
+
+	if (empty($filenames))
 		return;
 
-	$params['seed'] = (!isset($params['seed']) || $params['seed'] === true) ? '?alph21' : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
-	$params['force_current'] = !empty($params['force_current']) ? $params['force_current'] : false;
-	$theme = !empty($params['default_theme']) ? 'default_theme' : 'theme';
-	
-	// account for shorthand like admin.js?alp21 filenames
-	$has_seed = strpos($filename, '.js?');
-	$params['basename'] = $has_seed ? substr($filename, 0, $has_seed + 3) : $filename;
-	$id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
+	if (!is_array($filenames))
+		$filenames = array($filenames);
 
-	// Is this a local file?
-	if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+	// static values for all these files
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
+
+	// dejvu?
+	$cache_name = 'load_js_' . md5($settings['theme_dir'] . implode('_', $filenames));
+	if (($temp = cache_get_data($cache_name, 600)) !== null)
+		$context['javascript_files'] = $temp;
+	else
 	{
-		$params['local'] = true;
-		$params['dir'] = $settings[$theme . '_dir'] . '/scripts/';
-		
-		// Are we validating it exists on disk?
-		if (!empty($params['validate']) && !file_exists($settings[$theme . '_dir'] . '/scripts/' . $filename))
+		// All the files in this group use the above parameters
+		foreach ($filenames as $filename)
 		{
-			// can't find it in this theme, how about the default?
-			if ($theme === 'theme' && !$params['force_current'] && file_exists($settings['default_theme_dir'] . '/' . $filename))
-			{
-				$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['seed']);
-				$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
-			}
-			else
-				$filename = false;
-		}
-		else
-			$filename = $settings[$theme . '_url'] . '/scripts/' . $filename . ($has_seed ? '' : $params['seed']);
-	}
+			// account for shorthand like admin.js?xyz11 filenames
+			$has_cache_staler = strpos($filename, '.js?');
+			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 3) : $filename;
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
-	// Add it to the array for use in the template
-	if (!empty($filename))
-		$context['javascript_files'][$id] = array('filename' => $filename, 'options' => $params);
+			// Is this a local file?
+			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+			{
+				$params['local'] = true;
+				$params['dir'] = $settings['theme_dir'] . '/scripts/';
+
+				// Fallback if we are not already in the default theme
+				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
+				{
+					// can't find it in this theme, how about the default?
+					if (file_exists($settings['default_theme_dir'] . '/scripts/' . $filename))
+					{
+						$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+						$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+					}
+					else
+						$filename = false;
+				}
+				else
+					$filename = $settings['theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
+			}
+
+			// Add it to the array for use in the template
+			if (!empty($filename)) {
+				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+			}
+		}
+
+		// Save it so we don't have to build this so often
+		cache_put_data($cache_name, $context['javascript_files'], 600);
+	}
+}
+
+/**
+ * Load an admin controller from the admin area.
+ *
+ * @param string $filename
+ */
+function loadAdminClass($filename)
+{
+	global $sourcedir;
+
+	require_once($sourcedir . '/admin/' . $filename);
 }
 
 /**
@@ -2588,5 +2568,3 @@ function loadDatabase()
 	if (DIALOGO == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
-
-?>

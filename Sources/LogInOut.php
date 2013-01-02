@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -29,7 +30,7 @@ if (!defined('DIALOGO'))
  *  @uses the protocol_login sub-template in the Wireless template,
  *   if you are using a wireless device
  */
-function Login()
+function action_login()
 {
 	global $txt, $context, $scripturl, $user_info;
 
@@ -75,7 +76,7 @@ function Login()
  * - accessed from ?action=login2, by forms.
  * On error, uses the same templates Login() uses.
  */
-function Login2()
+function action_login2()
 {
 	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
 	global $cookiename, $maintenance, $modSettings, $context, $sc, $sourcedir;
@@ -155,7 +156,7 @@ function Login2()
 		$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 
 	loadLanguage('Login');
-	
+
 	// Load the template stuff
 	loadTemplate('Login');
 	$context['sub_template'] = 'login';
@@ -176,7 +177,7 @@ function Login2()
 	if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 	{
 		require_once($sourcedir . '/Subs-OpenID.php');
-		if (($open_id = smf_openID_validate($_POST['openid_identifier'])) !== 'no_data')
+		if (($open_id = openID_validate($_POST['openid_identifier'])) !== 'no_data')
 			return $open_id;
 	}
 
@@ -567,7 +568,7 @@ function DoLogin()
  * @param bool $internal if true, it doesn't check the session
  * @param $redirect
  */
-function Logout($internal = false, $redirect = true)
+function action_logout($internal = false, $redirect = true)
 {
 	global $sourcedir, $user_info, $user_settings, $context, $modSettings, $smcFunc;
 
@@ -750,5 +751,3 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
 
 }
-
-?>

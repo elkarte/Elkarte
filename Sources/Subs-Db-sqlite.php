@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -350,10 +351,6 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		$db_string = str_replace($matches[0], $replace, $db_string);
 	}
 
-	// We need to replace the SUBSTRING in the sort identifier.
-	if ($identifier == 'substring_membergroups' && isset($db_values['sort']))
-		$db_values['sort'] = preg_replace('~SUBSTRING~', 'SUBSTR', $db_values['sort']);
-
 	// SQLite doesn't support TO_DAYS but has the julianday function which can be used in the same manner.  But make sure it is being used to calculate a span.
 	$db_string = preg_replace('~\(TO_DAYS\(([^)]+)\) - TO_DAYS\(([^)]+)\)\) AS span~', '(julianday($1) - julianday($2)) AS span', $db_string);
 
@@ -549,8 +546,8 @@ function smf_db_error($db_string, $connection = null)
 		$context['error_message'] = $txt['try_again'];
 
 	// A database error is often the sign of a database in need of updgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
-	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['smfVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
-		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['smfVersion']);
+	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['ourVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
+		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['ourVersion']);
 
 	if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
 	{
@@ -872,4 +869,3 @@ function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false
 
 	return strtr($string, $replacements);
 }
-?>

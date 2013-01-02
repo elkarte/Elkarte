@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -329,8 +330,6 @@ function updateSettingsFile($config_vars)
 		// Add in any newly defined vars that were passed
 		foreach ($config_vars as $var => $val)
 			$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
-
-		$settingsArray[$end] = '?' . '>';
 	}
 	else
 		$settingsArray[$end] = trim($settingsArray[$end]);
@@ -401,9 +400,10 @@ function updateDbLastError($time)
 	global $boarddir;
 
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';' . "\n" . '?' . '>', LOCK_EX);
+	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
 	@touch($boarddir . '/' . 'Settings.php');
 }
+
 /**
  * Saves the admins current preferences to the database.
  */
@@ -456,7 +456,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	global $smcFunc, $sourcedir, $language, $modSettings;
 
 	// We certainly want this.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	// Load all groups which are effectively admins.
 	$request = $smcFunc['db_query']('', '
@@ -525,5 +525,3 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
 }
-
-?>

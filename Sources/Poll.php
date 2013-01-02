@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -30,7 +31,7 @@ if (!defined('DIALOGO'))
  *
  * @uses Post language file.
  */
-function Vote()
+function action_vote()
 {
 	global $topic, $txt, $user_info, $smcFunc, $sourcedir, $modSettings;
 
@@ -233,7 +234,7 @@ function Vote()
  * Upon successful completion of action will direct user back to topic.
  * Accessed via ?action=lockvoting.
  */
-function LockVoting()
+function action_lockvoting()
 {
 	global $topic, $user_info, $smcFunc;
 
@@ -299,7 +300,7 @@ function LockVoting()
  * @uses Post language file.
  * @uses Poll template, main sub-template.
  */
-function EditPoll()
+function action_editpoll()
 {
 	global $txt, $user_info, $context, $topic, $board, $smcFunc, $sourcedir, $scripturl;
 
@@ -587,11 +588,11 @@ function EditPoll()
  * with poll_edit_own permission for editing, or be topic starter
  * with poll_add_any permission for adding.
  * In the case of an error, this function will redirect back to
- * EditPoll and display the relevant error message.
+ * action_editpoll and display the relevant error message.
  * Upon successful completion of action will direct user back to topic.
  * Accessed via ?action=editpoll2.
  */
-function EditPoll2()
+function action_editpoll2()
 {
 	global $txt, $topic, $board, $context;
 	global $modSettings, $user_info, $smcFunc, $sourcedir;
@@ -604,7 +605,7 @@ function EditPoll2()
 		$poll_errors[] = 'session_timeout';
 
 	if (isset($_POST['preview']))
-		return EditPoll();
+		return action_editpoll();
 
 	// HACKERS (!!) can't edit :P.
 	if (empty($topic))
@@ -676,7 +677,7 @@ function EditPoll2()
 			$context['poll_error']['messages'][] = $txt['error_' . $poll_error];
 		}
 
-		return EditPoll();
+		return action_editpoll();
 	}
 
 	// Prevent double submission of this form.
@@ -900,7 +901,7 @@ function EditPoll2()
  * Upon successful completion of action will direct user back to topic.
  * Accessed via ?action=removepoll.
  */
-function RemovePoll()
+function action_removepoll()
 {
 	global $topic, $user_info, $smcFunc;
 
@@ -986,5 +987,3 @@ function RemovePoll()
 	// Take the moderator back to the topic.
 	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 }
-
-?>

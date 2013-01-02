@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -26,7 +27,7 @@ if (!defined('DIALOGO'))
  * It updates the most online statistics.
  * It is accessed by ?action=boardindex.
  */
-function BoardIndex()
+function action_boardindex()
 {
 	global $txt, $user_info, $sourcedir, $modSettings, $context, $settings, $scripturl;
 
@@ -118,8 +119,9 @@ function BoardIndex()
 
 /**
  * Collapse or expand a category
+ * ?action=collapse
  */
-function CollapseCategory()
+function action_collapse()
 {
 	global $user_info, $sourcedir, $context;
 
@@ -140,7 +142,5 @@ function CollapseCategory()
 	}
 
 	// And go back to the board index.
-	BoardIndex();
+	action_boardindex();
 }
-
-?>

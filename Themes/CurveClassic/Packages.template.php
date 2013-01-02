@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -385,7 +386,7 @@ function template_view_package()
 	// ]]></script>';
 
 	// And a bit more for database changes.
-	if (!empty($context['database_changes']))
+	if ($context['uninstalling'] && !empty($context['database_changes']))
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var database_changes_area = document.getElementById(\'db_changes_div\');
@@ -535,7 +536,7 @@ function template_browse()
 		echo '
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<a href="', $scripturl, '?action=helpadmin;help=latest_packages" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a> ', $txt['packages_latest'], '
+				<a href="', $scripturl, '?action=quickhelp;help=latest_packages" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a> ', $txt['packages_latest'], '
 			</h3>
 		</div>
 		<div class="windowbg2">
@@ -552,12 +553,12 @@ function template_browse()
 		// Make a list of already installed mods so nothing is listed twice ;).
 		echo '
 			window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
-			window.smfVersion = "', $context['forum_version'], '";
+			window.ourVersion = "', $context['forum_version'], '";
 		// ]]></script>';
 
 		if (empty($modSettings['disable_smf_js']))
 			echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-packages.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-packages.js"></script>';
 
 		echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
@@ -1578,7 +1579,7 @@ function template_file_permissions()
 							<label for="method_individual"><strong>', $txt['package_file_perms_apply'], '</strong></label>
 						</dt>
 						<dd>
-							<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=helpadmin;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></em>
+							<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></em>
 						</dd>
 						<dt>
 							<input type="radio" name="method" value="predefined" id="method_predefined" class="input_radio" />
@@ -1710,10 +1711,10 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 function template_pause_action_permissions()
 {
 	global $txt, $scripturl, $context;
-	
+
 	// How many have we done?
 	$countDown = 5;
-	
+
 	echo '
 	<div id="admincenter">
 		<div class="cat_bar">
@@ -1751,8 +1752,8 @@ function template_pause_action_permissions()
 					</div>
 				</div>';
 	}
-	
-	echo '		
+
+	echo '
 				<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="', $context['character_set'], '">';
 
 	// Put out the right hidden data.
@@ -1799,5 +1800,3 @@ function template_pause_action_permissions()
 	// ]]></script>';
 
 }
-
-?>

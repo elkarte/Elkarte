@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -63,12 +64,12 @@ function template_admin()
 			<div id="live_news" class="floatleft">
 				<div class="cat_bar">
 					<h3 class="catbg">
-						<a href="', $scripturl, '?action=helpadmin;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+						<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
 					</h3>
 				</div>
 				<div class="windowbg nopadding">
 					<div class="content">
-						<div id="smfAnnouncements">', $txt['lfyi'], '</div>
+						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
 					</div>
 				</div>
 			</div>';
@@ -88,7 +89,7 @@ function template_admin()
 							', $txt['support_versions_forum'], ':
 							<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
 							', $txt['support_versions_current'], ':
-							<em id="smfVersion" style="white-space: nowrap;">??</em><br />
+							<em id="ourVersion" style="white-space: nowrap;">??</em><br />
 							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
@@ -96,6 +97,7 @@ function template_admin()
 							<br />
 							<strong>', $txt['administrators'], ':</strong>
 							', implode(', ', $context['administrators']);
+	
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
@@ -130,8 +132,8 @@ function template_admin()
 	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-news.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
@@ -152,10 +154,10 @@ function template_admin()
 						%message%
 					</dd>
 				'), ',
-				sAnnouncementContainerId: \'smfAnnouncements\',
+				sAnnouncementContainerId: \'ourAnnouncements\',
 
 				bLoadVersions: true,
-				sSmfVersionContainerId: \'smfVersion\',
+				sOurVersionContainerId: \'ourVersion\',
 				sYourVersionContainerId: \'yourVersion\',
 				sVersionOutdatedTemplate: ', JavaScriptEscape('
 					<span class="alert">%currentVersion%</span>
@@ -172,7 +174,6 @@ function template_admin()
 						</h3>
 					</div>
 					<div class="windowbg">
-						<span class="topslice"><span></span></span>
 						<div class="content">
 							<div id="update_message" class="smalltext">
 								%message%
@@ -205,7 +206,7 @@ function template_credits()
 		<div id="support_credits">
 			<div class="cat_bar">
 				<h3 class="catbg">
-					', $txt['support_title'], ' <img src="', $settings['images_url'], '/smflogo.png" id="credits_logo" alt="" />
+					', $txt['support_title'], ' <img src="', $settings['images_url'], '/logo.png" id="credits_logo" alt="" />
 				</h3>
 			</div>
 			<div class="windowbg">
@@ -214,7 +215,7 @@ function template_credits()
 						', $txt['support_versions_forum'], ':
 					<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 						', $txt['support_versions_current'], ':
-					<em id="smfVersion" style="white-space: nowrap;">??</em><br />';
+					<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -253,7 +254,7 @@ function template_credits()
 	echo '
 			<div class="cat_bar">
 				<h3 class="catbg">
-					<a href="', $scripturl, '?action=helpadmin;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+					<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
 				</h3>
 			</div>
 			<div class="windowbg">
@@ -311,42 +312,42 @@ function template_credits()
 	// This makes all the support information available to the support script...
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var smfSupportVersions = {};
+			var ourSupportVersions = {};
 
-			smfSupportVersions.forum = "', $context['forum_version'], '";';
+			ourSupportVersions.forum = "', $context['forum_version'], '";';
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
 		echo '
-			smfSupportVersions.', $variable, ' = "', $version['version'], '";';
+			ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 
 	// Now we just have to include the script and wait ;).
 	echo '
 		// ]]></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-news.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=latest-support.js"></script>';
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
-			function smfCurrentVersion()
+			function ourCurrentVersion()
 			{
-				var smfVer, yourVer;
-
-				if (!window.smfVersion)
+				var ourVer, yourVer;
+console.log("here");
+				if (!window.ourVersion)
 					return;
 
-				smfVer = document.getElementById("smfVersion");
+				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");
 
-				setInnerHTML(smfVer, window.smfVersion);
+				setInnerHTML(ourVer, window.ourVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion != window.smfVersion)
+				if (currentVersion != window.ourVersion)
 					setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
 			}
-			addLoadEvent(smfCurrentVersion)
+			addLoadEvent(ourCurrentVersion)
 		// ]]></script>';
 }
 
@@ -388,10 +389,10 @@ function template_view_versions()
 							', $txt['admin_smfpackage'], '
 						</td>
 						<td class="windowbg">
-							<em id="yourDIALOGO">', $context['forum_version'], '</em>
+							<em id="yourVersion">', $context['forum_version'], '</em>
 						</td>
 						<td class="windowbg">
-							<em id="currentDIALOGO">??</em>
+							<em id="ourVersion">??</em>
 						</td>
 					</tr>';
 
@@ -405,7 +406,7 @@ function template_view_versions()
 							<em id="yourSources">??</em>
 						</td>
 						<td class="windowbg">
-							<em id="currentSources">??</em>
+							<em id="ourSources">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -425,7 +426,7 @@ function template_view_versions()
 						<em id="yourSources', $filename, '">', $version, '</em>
 					</td>
 					<td class="windowbg2" width="25%">
-						<em id="currentSources', $filename, '">??</em>
+						<em id="ourSources', $filename, '">??</em>
 					</td>
 				</tr>';
 
@@ -444,7 +445,7 @@ function template_view_versions()
 							<em id="yourDefault">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentDefault">??</em>
+							<em id="ourDefault">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -463,7 +464,7 @@ function template_view_versions()
 							<em id="yourDefault', $filename, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="currentDefault', $filename, '">??</em>
+							<em id="ourDefault', $filename, '">??</em>
 						</td>
 					</tr>';
 
@@ -482,7 +483,7 @@ function template_view_versions()
 							<em id="yourLanguages">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentLanguages">??</em>
+							<em id="ourLanguages">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -503,7 +504,7 @@ function template_view_versions()
 							<em id="your', $filename, '.', $language, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="current', $filename, '.', $language, '">??</em>
+							<em id="our', $filename, '.', $language, '">??</em>
 						</td>
 					</tr>';
 	}
@@ -526,7 +527,7 @@ function template_view_versions()
 							<em id="yourTemplates">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="currentTemplates">??</em>
+							<em id="ourTemplates">??</em>
 						</td>
 					</tr>
 				</tbody>
@@ -545,7 +546,7 @@ function template_view_versions()
 							<em id="yourTemplates', $filename, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="currentTemplates', $filename, '">??</em>
+							<em id="ourTemplates', $filename, '">??</em>
 						</td>
 					</tr>';
 
@@ -562,7 +563,7 @@ function template_view_versions()
 	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	   file categories. (sources, languages, and templates.) */
 	echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewsmfile;filename=detailed-version.js"></script>
+		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oViewVersions = new smf_ViewVersions({
 				aKnownLanguages: [
@@ -577,7 +578,6 @@ function template_view_versions()
 				}
 			});
 		// ]]></script>';
-
 }
 
 // Form for stopping people using naughty words, etc.
@@ -756,7 +756,7 @@ function template_show_settings()
 				echo '
 					<div class="cat_bar">
 						<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'catbg', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-							', ($config_var['help'] ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
+							', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
 							', $config_var['label'], '
 						</h3>
 					</div>';
@@ -816,7 +816,7 @@ function template_show_settings()
 				// Show the [?] button.
 				if ($config_var['help'])
 					echo '
-							<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=helpadmin;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' style="color: #777777;"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, ($config_var['type'] == 'password' ? '<br /><em>' . $txt['admin_confirm_password'] . '</em>' : ''), '</span>
+							<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' style="color: #777777;"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, ($config_var['type'] == 'password' ? '<br /><em>' . $txt['admin_confirm_password'] . '</em>' : ''), '</span>
 						</dt>';
 				else
 					echo '
@@ -867,7 +867,7 @@ function template_show_settings()
 						foreach ($bbcColumn as $bbcTag)
 							echo '
 										<li class="list_bbc floatleft">
-											<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=helpadmin;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+											<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
 										</li>';
 					}
 					echo '			</ul>
@@ -1055,7 +1055,7 @@ function template_edit_profile_field()
 								</select>
 							</dd>
 							<dt>
-								<a id="field_show_enclosed" href="', $scripturl, '?action=helpadmin;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
 								<strong><label for="enclose">', $txt['custom_edit_enclose'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
 							</dt>
@@ -1100,7 +1100,7 @@ function template_edit_profile_field()
 								<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt id="options_dt">
-								<a href="', $scripturl, '?action=helpadmin;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
 								<strong><label for="options_dd">', $txt['custom_edit_options'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
 							</dt>
@@ -1129,7 +1129,7 @@ function template_edit_profile_field()
 						<legend>', $txt['custom_edit_advanced'], '</legend>
 						<dl class="settings">
 							<dt id="mask_dt">
-								<a id="custom_mask" href="', $scripturl, '?action=helpadmin;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
 								<strong><label for="mask">', $txt['custom_edit_mask'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
 							</dt>
@@ -1371,7 +1371,7 @@ function template_core_features()
 				<h3 class="catbg">
 					', $txt['core_settings_title'], '
 				</h3>
-				
+
 			</div>
 			<p class="description">', $txt['core_settings_desc'], '</p>
 			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="', $context['character_set'], '">
@@ -1555,7 +1555,7 @@ function template_php_info()
 			</h3>
 		</div>
 		<br />';
-	
+
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
 	{
@@ -1648,5 +1648,3 @@ function template_clean_cache_button_below()
 		</div>
 	</div>';
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -194,13 +195,14 @@ function template_main()
 					<th scope="col" class="first_th" width="4%">&nbsp;</th>
 					<th scope="col" class="lefttext">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
 					<th scope="col" class="stats" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
+
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
 				echo '
 					<th scope="col" class="lefttext last_th" width="22%">', $context['topics_headers']['last_post'], '</th>';
 			else
 				echo '
-					<th scope="col" class="lefttext" width="22%">', $context['topics_headers']['last_post'], '</a></th>';
+					<th scope="col" class="lefttext" width="22%">', $context['topics_headers']['last_post'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -256,13 +258,13 @@ function template_main()
 			// Some columns require a different shade of the color class.
 			$alternate_class = $color_class . '2';
 
-			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
+			// [WIP] Markup can be cleaned up later.
 			echo '
 				<tr>
 					<td class="', $color_class, ' icon2">
-						<div style="position: relative; width: 40px; margin: auto;">
+						<div>
 							<img src="', $topic['first_post']['icon_url'], '" alt="" />
-							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" style="position: absolute; z-index: 5; right: 4px; bottom: -3px;" />' : '','
+							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" class="fred" />' : '','
 						</div>
 					</td>
 					<td class="', $alternate_class, ' subject">
@@ -434,7 +436,6 @@ function template_main()
 
 	// Javascript for inline editing.
 	echo '
-<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/topic.js"></script>
 <script type="text/javascript"><!-- // --><![CDATA[
 	var oQuickModifyTopic = new QuickModifyTopic({
 		aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
@@ -442,5 +443,3 @@ function template_main()
 	});
 // ]]></script>';
 }
-
-?>

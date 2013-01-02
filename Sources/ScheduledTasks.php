@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -283,7 +284,8 @@ function scheduled_approval_notification()
 	$smcFunc['db_free_result']($request);
 
 	// Get the mailing stuff.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
+
 	// Need the below for loadLanguage to work!
 	loadEssentialThemeData();
 
@@ -431,7 +433,7 @@ function scheduled_daily_maintenance()
 	// Do any spider stuff.
 	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once($sourcedir . '/ManageSearchEngines.php');
+		loadAdminClass ('ManageSearchEngines.php');
 		consolidateSpiderStats();
 	}
 
@@ -452,7 +454,7 @@ function scheduled_daily_maintenance()
 	if (!empty($modSettings['enableOpenID']))
 	{
 		require_once($sourcedir . '/Subs-OpenID.php');
-		smf_openID_setup_DH(true);
+		openID_setup_DH(true);
 	}
 	elseif (!empty($modSettings['dh_keys']))
 		$smcFunc['db_query']('', '
@@ -533,7 +535,7 @@ function scheduled_daily_digest()
 	global $is_weekly, $txt, $mbname, $scripturl, $sourcedir, $smcFunc, $context, $modSettings;
 
 	// We'll want this...
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 	loadEssentialThemeData();
 
 	$is_weekly = !empty($is_weekly) ? 1 : 0;
@@ -915,7 +917,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 	// Now we know how many we're sending, let's send them.
 	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html
+		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
@@ -934,6 +936,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			'subject' => $row['subject'],
 			'headers' => $row['headers'],
 			'send_html' => $row['send_html'],
+			'time_sent' => $row['time_sent'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -997,7 +1000,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html']);
+			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['time_sent']);
 	}
 
 	// Any emails that didn't send?
@@ -1027,7 +1030,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		// Add our email back to the queue, manually.
 		$smcFunc['db_insert']('insert',
 			'{db_prefix}mail_queue',
-			array('recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'string'),
+			array('recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'string', 'time_sent' => 'string'),
 			$failed_emails,
 			array('id_mail')
 		);
@@ -1246,7 +1249,7 @@ function loadEssentialThemeData()
 /**
  * This retieves data (e.g. last version of DIALOGO)
  */
-function scheduled_fetchSMfiles()
+function scheduled_fetchFiles()
 {
 	global $sourcedir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
 
@@ -1259,6 +1262,7 @@ function scheduled_fetchSMfiles()
 	);
 
 	$js_files = array();
+	$errors = 0;
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1268,7 +1272,6 @@ function scheduled_fetchSMfiles()
 			'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
 		);
 	}
-
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
@@ -1281,29 +1284,31 @@ function scheduled_fetchSMfiles()
 	foreach ($js_files as $ID_FILE => $file)
 	{
 		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.simplemachines.org' : '';
+		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.spudsdesign.com' : '';
 		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
 
 		// Get the file
 		$file_data = fetch_web_data($url);
 
-		// If we got an error - give up - the site might be down.
-		if ($file_data === false)
+		// If we are tossing errors - give up - the site might be down.
+		if ($file_data === false && $errors++ > 2)
 		{
 			log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
 			return false;
 		}
-
-		// Save the file to the database.
-		$smcFunc['db_query']('substring', '
-			UPDATE {db_prefix}admin_info_files
-			SET data = SUBSTRING({string:file_data}, 1, 65534)
-			WHERE id_file = {int:id_file}',
-			array(
-				'id_file' => $ID_FILE,
-				'file_data' => $file_data,
-			)
-		);
+		elseif ($file_data !== false)
+		{
+			// Save the update to the database
+			$smcFunc['db_query']('substring', '
+				UPDATE {db_prefix}admin_info_files
+				SET data = SUBSTRING({string:file_data}, 1, 65534)
+				WHERE id_file = {int:id_file}',
+				array(
+					'id_file' => $ID_FILE,
+					'file_data' => $file_data,
+				)
+			);
+		}
 	}
 	return true;
 }
@@ -1319,7 +1324,7 @@ function scheduled_birthdayemails()
 	loadEssentialThemeData();
 
 	// Going to need this to send the emails.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/Subs-Mail.php');
 
 	$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
 
@@ -1595,7 +1600,7 @@ function scheduled_paid_subscriptions()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		require_once($sourcedir . '/ManagePaid.php');
+		loadAdminClass ('ManagePaid.php');
 		removeSubscription($row['id_subscribe'], $row['id_member']);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1623,7 +1628,7 @@ function scheduled_paid_subscriptions()
 		// If this is the first one load the important bits.
 		if (empty($subs_reminded))
 		{
-			require_once($sourcedir . '/Subs-Post.php');
+			require_once($sourcedir . '/Subs-Mail.php');
 			// Need the below for loadLanguage to work!
 			loadEssentialThemeData();
 		}
@@ -1731,7 +1736,7 @@ function scheduled_remove_topic_redirect()
 	// Zap, your gone
 	if (count($topics) > 0)
 	{
-		require_once($sourcedir . '/RemoveTopic.php');
+		require_once($sourcedir . '/Subs-Topic.php');
 		removeTopics($topics, false, true);
 	}
 
@@ -1751,7 +1756,7 @@ function scheduled_remove_old_drafts()
 	// init
 	$drafts= array();
 
-	// We need this for lanaguage items
+	// We need this for language items
 	loadEssentialThemeData();
 
 	// Find all of the old drafts
@@ -1771,11 +1776,9 @@ function scheduled_remove_old_drafts()
 	// If we have old one, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($sourcedir . '/Drafts.php');
-		deleteDrafts($drafts, false);
+		require_once($sourcedir . '/Subs-Drafts.php');
+		deleteDrafts($drafts, -1, false);
 	}
 
 	return true;
 }
-
-?>

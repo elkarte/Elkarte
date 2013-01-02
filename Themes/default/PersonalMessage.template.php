@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -12,7 +13,6 @@
  *
  * @version 1.0 Alpha
  */
-
 
 // This is the main sidebar for the personal messages section.
 function template_pm_above()
@@ -158,7 +158,7 @@ function template_folder()
 				if ($message['member']['karma']['allow'])
 					echo '
 						<li class="karma_allow">
-							<a href="', $scripturl, '?action=modifykarma;sa=applaud;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaApplaudLabel'], '</a> <a href="', $scripturl, '?action=modifykarma;sa=smite;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaSmiteLabel'], '</a>
+							<a href="', $scripturl, '?action=karma;sa=applaud;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaApplaudLabel'], '</a> <a href="', $scripturl, '?action=karma;sa=smite;uid=', $message['member']['id'], ';f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pm=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $modSettings['karmaSmiteLabel'], '</a>
 						</li>';
 
 				// Show the member's gender icon?
@@ -183,7 +183,7 @@ function template_folder()
 						{
 							$shown = true;
 							echo '
-						<li class="im_icons">
+						<li class="cf_icons">
 							<ul>';
 						}
 						echo '
@@ -194,18 +194,6 @@ function template_folder()
 							</ul>
 						</li>';
 				}
-
-				// This shows the popular messaging icons.
-				if ($message['member']['has_messenger'] && $message['member']['can_view_profile'])
-					echo '
-						<li class="im_icons">
-							<ul>', !isset($context['disabled_fields']['icq']) && !empty($message['member']['icq']['link']) ? '
-								<li>' . $message['member']['icq']['link'] . '</li>' : '', !isset($context['disabled_fields']['msn']) && !empty($message['member']['msn']['link']) ? '
-								<li>' . $message['member']['msn']['link'] . '</li>' : '', !isset($context['disabled_fields']['aim']) && !empty($message['member']['aim']['link']) ? '
-								<li>' . $message['member']['aim']['link'] . '</li>' : '', !isset($context['disabled_fields']['yim']) && !empty($message['member']['yim']['link']) ? '
-								<li>' . $message['member']['yim']['link'] . '</li>' : '', '
-							</ul>
-						</li>';
 
 				// Stuff for the staff to wallop them with.
 				echo '
@@ -223,17 +211,17 @@ function template_folder()
 		// Show the IP to this user for this post - because you can moderate?
 		if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
 			echo '
-										<li class="poster_ip"><a href="', $scripturl, '?action=', !empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=tracking;sa=ip;u=' . $message['member']['id'], ';searchip=', $message['member']['ip'], '">', $message['member']['ip'], '</a> <a href="', $scripturl, '?action=helpadmin;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></li>';
+										<li class="poster_ip"><a href="', $scripturl, '?action=', !empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'], ';searchip=', $message['member']['ip'], '">', $message['member']['ip'], '</a> <a href="', $scripturl, '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></li>';
 
 		// Or, should we show it because this is you?
 		elseif ($message['can_see_ip'])
 			echo '
-										<li class="poster_ip"><a href="', $scripturl, '?action=helpadmin;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help">', $message['member']['ip'], '</a></li>';
+										<li class="poster_ip"><a href="', $scripturl, '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help">', $message['member']['ip'], '</a></li>';
 
 		// Okay, you are logged in, then we can show something about why IPs are logged...
 		else
 			echo '
-										<li class="poster_ip"><a href="', $scripturl, '?action=helpadmin;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help">', $txt['logged'], '</a></li>';
+										<li class="poster_ip"><a href="', $scripturl, '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help">', $txt['logged'], '</a></li>';
 
 				// Show the profile, website, email address, and personal message buttons.
 				if ($message['member']['show_profile_buttons'])
@@ -285,6 +273,7 @@ function template_folder()
 					</ul>
 				</li>
 				<li class="icons">', $message['member']['group_icons'], '</li>';
+
 			// Show the member's primary group (like 'Administrator') if they have one.
 			if (isset($message['member']['group']) && $message['member']['group'] != '')
 				echo '
@@ -301,7 +290,7 @@ function template_folder()
 		}
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
-			if(!empty($modSettings['onlineEnable']))
+			if (!empty($modSettings['onlineEnable']))
 				echo '
 				<li class="poster_online"><a href="', $scripturl,'?action=pm;sa=send;u=', $message['member']['id'], '" title="', $message['member']['online']['member_online_text'], '">', $txt['send_message'], ' <img src="'. $message['member']['online']['image_href']. '" alt="" /></a></li>';
 			else
@@ -359,7 +348,7 @@ function template_folder()
 				if (!$message['member']['is_guest'])
 				{
 					// Is there than more than one recipient you can reply to?
-					if ($message['number_recipients'] > 1 && $context['display_mode'] != 2)
+					if ($message['number_recipients'] > 1)
 						echo '
 					<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="reply_all_button">', $txt['reply_to_all'], '</a></li>';
 
@@ -754,13 +743,6 @@ function template_search()
 						msgCollapsed: ', JavaScriptEscape($txt['pm_search_choose_label']), '
 					}
 				],
-				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'admin_preferences\',
-					sSessionVar: smf_session_var,
-					sSessionId: smf_session_id,
-					sThemeId: \'1\'
-				}
 			});
 		// ]]></script>';
 		}
@@ -832,7 +814,7 @@ function template_search_results()
 				{
 					$quote_button = create_button('quote.png', 'reply_quote', 'reply_quote', 'class="centericon"');
 					$reply_button = create_button('im_reply.png', 'reply', 'reply', 'class="centericon"');
-					
+
 					// You can only reply if they are not a guest...
 					if (!$message['member']['is_guest'])
 						echo '
@@ -1169,7 +1151,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=helpadmin;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
 				), '
 			});
 		';
@@ -1245,7 +1227,7 @@ function template_labels()
 			</tr>
 		</thead>
 		<tbody>';
-	
+
 	if (count($context['labels']) < 2)
 		echo '
 			<tr class="windowbg2">
@@ -1270,7 +1252,7 @@ function template_labels()
 			$alternate = !$alternate;
 		}
 	}
-	
+
 	echo '
 		</tbody>
 		</table>';
@@ -1300,11 +1282,13 @@ function template_labels()
 						<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" class="button_submit" />
-			</div>
+				<div class="flow_auto">
+					<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" class="button_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</div>
+			</div>		
 		</div>
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-	</form><br />';
+	</form>';
 }
 
 // Template for reporting a personal message.
@@ -1464,7 +1448,7 @@ function template_add_rule()
 		var actionNum = 0;
 		var groups = new Array()
 		var labels = new Array()
-		
+
 		var txt_pm_readable_and = "', $txt['pm_readable_and'], '";
 		var txt_pm_readable_or = "', $txt['pm_readable_or'], '";
 		var txt_pm_readable_member = "', $txt['pm_readable_member'], '";
@@ -1477,7 +1461,7 @@ function template_add_rule()
 		var txt_pm_readable_start = "', $txt['pm_readable_start'], '";
 		var txt_pm_readable_end = "', $txt['pm_readable_end'], '";
 		var txt_pm_readable_then = "', $txt['pm_readable_then'], '";
-		
+
 		var txt_pm_rule_not_defined = "', $txt['pm_rule_not_defined'], '";
 		var txt_pm_rule_bud = "', $txt['pm_rule_bud'], '";
 		var txt_pm_rule_sub = "', $txt['pm_rule_sub'], '";
@@ -1486,7 +1470,7 @@ function template_add_rule()
 		var txt_pm_rule_mid = "', $txt['pm_rule_mid'], '";
 		var txt_pm_rule_gid = "', $txt['pm_rule_gid'], '";
 		var txt_pm_rule_sel_group = "', $txt['pm_rule_sel_group'], '";
-		
+
 		var txt_pm_rule_sel_action = "', $txt['pm_rule_sel_action'], '";
 		var txt_pm_rule_label = "', $txt['pm_rule_label'], '";
 		var txt_pm_rule_delete = "', $txt['pm_rule_delete'], '";
@@ -1497,7 +1481,7 @@ function template_add_rule()
 	foreach ($context['groups'] as $id => $title)
 		echo '
 		groups[', $id, '] = "', addslashes($title), '";';
-	
+
 	// And any existing labels
 	foreach ($context['labels'] as $label)
 		if ($label['id'] != -1)
@@ -1623,7 +1607,7 @@ function template_add_rule()
 					<a href="#" onclick="addActionOption(); return false;" id="addonjs2" style="display: none;">(', $txt['pm_rule_add_action'], ')</a>
 				</fieldset>
 			</div>
-		
+
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['pm_rule_description'], '</h3>
 			</div>
@@ -1731,4 +1715,3 @@ function template_showPMDrafts()
 			<span>', $context['page_index'], '</span>
 		</div>';
 }
-?>

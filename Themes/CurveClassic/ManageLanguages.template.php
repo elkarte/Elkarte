@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -191,7 +192,7 @@ function template_download_language()
 			<div class="righttext padding">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
-				<input type="submit" name="do_install" value="', $txt['add_language_smf_install'], '" class="button_submit" />
+				<input type="submit" name="do_install" value="', $txt['add_language_dialogo_install'], '" class="button_submit" />
 			</div>
 		</form>
 	</div>';
@@ -308,7 +309,7 @@ function template_modify_language_entries()
 	{
 		// English can't be deleted though.
 		echo '
-						<input type="submit" name="delete_main" value="', $txt['delete'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' onclick="confirm(\'', $txt['languages_delete_confirm'], '\');" class="button_submit" />';
+						<input type="submit" name="delete_main" value="', $txt['delete'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' onclick="return confirm(\'', $txt['languages_delete_confirm'], '\');" class="button_submit" />';
 	}
 
 	echo '
@@ -394,7 +395,6 @@ function template_modify_language_entries()
 		{
 			// Alternative time
 			echo '
-
 						<dt>
 							<span class="smalltext">', $cached['key'], '</span>
 						</dt>
@@ -441,18 +441,18 @@ function template_add_language()
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>
-						<legend>', $txt['add_language_smf'], '</legend>
-						<label class="smalltext">', $txt['add_language_smf_browse'], '</label>
+						<legend>', $txt['add_language_dialogo'], '</legend>
+						<label class="smalltext">', $txt['add_language_dialogo_browse'], '</label>
 						<input type="text" name="smf_add" size="40" value="', !empty($context['smf_search_term']) ? $context['smf_search_term'] : '', '" class="input_text" />';
 
 	// Do we have some errors? Too bad.
-	if (!empty($context['smf_error']))
+	if (!empty($context['langfile_error']))
 	{
 		// Display a little error box.
 		echo '
 						<div>
 							<br />
-							<p class="errorbox">', $txt['add_language_error_' . $context['smf_error']], '</p>
+							<p class="errorbox">', $txt['add_language_error_' . $context['langfile_error']], '</p>
 						</div>';
 	}
 
@@ -469,7 +469,7 @@ function template_add_language()
 	if (!empty($context['smf_languages']))
 	{
 		echo '
-			<div class="information">', $txt['add_language_smf_found'], '</div>';
+			<div class="information">', $txt['add_language_dialogo_found'], '</div>';
 
 		template_show_list('smf_languages');
 	}
@@ -478,5 +478,3 @@ function template_add_language()
 		</form>
 	</div>';
 }
-
-?>

@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1; Post
+// Version: 1.0; Post
 
 global $context;
 
@@ -67,7 +67,6 @@ $txt['right_align'] = 'Right align';
 $txt['superscript'] = 'Superscript';
 $txt['subscript'] = 'Subscript';
 $txt['table_tr'] = 'Insert table row';
-$txt['post_too_long'] = 'Your message is too long. Please go back and shorten it, then try again.';
 $txt['horizontal_rule'] = 'Horizontal Rule';
 $txt['font_size'] = 'Font size';
 $txt['font_face'] = 'Font face';
@@ -231,5 +230,3 @@ $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an admi
 $txt['attachments_no_write'] = 'The attachments upload directory is not writable.  Your attachment or avatar cannot be saved.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory.  Your attachment or avatar cannot be saved.';
 $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachments per post';
-
-?>

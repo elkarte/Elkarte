@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -112,7 +113,8 @@ function markBoardsRead($boards, $unread = false)
 			INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
 				AND t.id_board IN ({array_int:board_list}))
 		WHERE lt.id_member = {int:current_member}
-			AND lt.id_topic >= {int:lowest_topic}',
+			AND lt.id_topic >= {int:lowest_topic}
+			AND lt.disregarded != 1',
 		array(
 			'current_member' => $user_info['id'],
 			'board_list' => $boards,
@@ -134,266 +136,6 @@ function markBoardsRead($boards, $unread = false)
 				'topic_list' => $topics,
 			)
 		);
-}
-
-/**
- * Mark one or more boards as read.
- */
-function MarkRead()
-{
-	global $board, $topic, $user_info, $board_info, $modSettings, $smcFunc;
-
-	// No Guests allowed!
-	is_not_guest();
-
-	checkSession('get');
-
-	if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
-	{
-		// Find all the boards this user can see.
-		$result = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}',
-			array(
-			)
-		);
-		$boards = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$boards[] = $row['id_board'];
-		$smcFunc['db_free_result']($result);
-
-		if (!empty($boards))
-			markBoardsRead($boards, isset($_REQUEST['unread']));
-
-		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
-		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
-			redirectexit('action=unread');
-
-		if (isset($_SESSION['topicseen_cache']))
-			$_SESSION['topicseen_cache'] = array();
-
-		redirectexit();
-	}
-	elseif (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'unreadreplies')
-	{
-		// Make sure all the boards are integers!
-		$topics = explode('-', $_REQUEST['topics']);
-
-		$markRead = array();
-		foreach ($topics as $id_topic)
-			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], (int) $id_topic);
-
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			$markRead,
-			array('id_member', 'id_topic')
-		);
-
-		if (isset($_SESSION['topicseen_cache']))
-			$_SESSION['topicseen_cache'] = array();
-
-		redirectexit('action=unreadreplies');
-	}
-
-	// Special case: mark a topic unread!
-	elseif (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'topic')
-	{
-		// First, let's figure out what the latest message is.
-		$result = $smcFunc['db_query']('', '
-			SELECT id_first_msg, id_last_msg
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		$topicinfo = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
-
-		if (!empty($_GET['t']))
-		{
-			// If they read the whole topic, go back to the beginning.
-			if ($_GET['t'] >= $topicinfo['id_last_msg'])
-				$earlyMsg = 0;
-			// If they want to mark the whole thing read, same.
-			elseif ($_GET['t'] <= $topicinfo['id_first_msg'])
-				$earlyMsg = 0;
-			// Otherwise, get the latest message before the named one.
-			else
-			{
-				$result = $smcFunc['db_query']('', '
-					SELECT MAX(id_msg)
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg >= {int:id_first_msg}
-						AND id_msg < {int:topic_msg_id}',
-					array(
-						'current_topic' => $topic,
-						'topic_msg_id' => (int) $_GET['t'],
-						'id_first_msg' => $topicinfo['id_first_msg'],
-					)
-				);
-				list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
-			}
-		}
-		// Marking read from first page?  That's the whole topic.
-		elseif ($_REQUEST['start'] == 0)
-			$earlyMsg = 0;
-		else
-		{
-			$result = $smcFunc['db_query']('', '
-				SELECT id_msg
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-				ORDER BY id_msg
-				LIMIT ' . (int) $_REQUEST['start'] . ', 1',
-				array(
-					'current_topic' => $topic,
-				)
-			);
-			list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
-
-			$earlyMsg--;
-		}
-
-		// Blam, unread!
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}log_topics',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_topic' => 'int'),
-			array($earlyMsg, $user_info['id'], $topic),
-			array('id_member', 'id_topic')
-		);
-
-		redirectexit('board=' . $board . '.0');
-	}
-	else
-	{
-		$categories = array();
-		$boards = array();
-
-		if (isset($_REQUEST['c']))
-		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $c)
-				$categories[] = (int) $c;
-		}
-		if (isset($_REQUEST['boards']))
-		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $b)
-				$boards[] = (int) $b;
-		}
-		if (!empty($board))
-			$boards[] = (int) $board;
-
-		if (isset($_REQUEST['children']) && !empty($boards))
-		{
-			// They want to mark the entire tree starting with the boards specified
-			// The easist thing is to just get all the boards they can see, but since we've specified the top of tree we ignore some of them
-
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.id_parent
-				FROM {db_prefix}boards AS b
-				WHERE {query_see_board}
-					AND b.child_level > {int:no_parents}
-					AND b.id_board NOT IN ({array_int:board_list})
-				ORDER BY child_level ASC
-				',
-				array(
-					'no_parents' => 0,
-					'board_list' => $boards,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				if (in_array($row['id_parent'], $boards))
-					$boards[] = $row['id_board'];
-			$smcFunc['db_free_result']($request);
-		}
-
-		$clauses = array();
-		$clauseParameters = array();
-		if (!empty($categories))
-		{
-			$clauses[] = 'id_cat IN ({array_int:category_list})';
-			$clauseParameters['category_list'] = $categories;
-		}
-		if (!empty($boards))
-		{
-			$clauses[] = 'id_board IN ({array_int:board_list})';
-			$clauseParameters['board_list'] = $boards;
-		}
-
-		if (empty($clauses))
-			redirectexit();
-
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}
-				AND b.' . implode(' OR b.', $clauses),
-			array_merge($clauseParameters, array(
-			))
-		);
-		$boards = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$boards[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
-
-		if (empty($boards))
-			redirectexit();
-
-		markBoardsRead($boards, isset($_REQUEST['unread']));
-
-		foreach ($boards as $b)
-		{
-			if (isset($_SESSION['topicseen_cache'][$b]))
-				$_SESSION['topicseen_cache'][$b] = array();
-		}
-
-		if (!isset($_REQUEST['unread']))
-		{
-			// Find all the boards this user can see.
-			$result = $smcFunc['db_query']('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE b.id_parent IN ({array_int:parent_list})
-					AND {query_see_board}',
-				array(
-					'parent_list' => $boards,
-				)
-			);
-			if ($smcFunc['db_num_rows']($result) > 0)
-			{
-				$logBoardInserts = '';
-				while ($row = $smcFunc['db_fetch_assoc']($result))
-					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $row['id_board']);
-
-				$smcFunc['db_insert']('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					$logBoardInserts,
-					array('id_member', 'id_board')
-				);
-			}
-			$smcFunc['db_free_result']($result);
-
-			if (empty($board))
-				redirectexit();
-			else
-				redirectexit('board=' . $board . '.0');
-		}
-		else
-		{
-			if (empty($board_info['parent']))
-				redirectexit();
-			else
-				redirectexit('board=' . $board_info['parent'] . '.0');
-		}
-	}
 }
 
 /**
@@ -720,7 +462,7 @@ function modifyBoard($board_id, &$boardOptions)
  * Allows (almost) the same options as the modifyBoard() function.
  * With the option inherit_permissions set, the parent board permissions
  * will be inherited.
- * 
+ *
  * @param array $boardOptions
  * @return int The new board id
  */
@@ -877,7 +619,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		$topics[] = $row['id_topic'];
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/Subs-Topic.php');
 	removeTopics($topics, false);
 
 	// Delete the board's logs.
@@ -1160,7 +902,7 @@ function getBoardTree()
 
 /**
  * Recursively get a list of boards.
- * Used by getBoardTree 
+ * Used by getBoardTree
  *
  * @param array &$_boardList
  * @param array &$_tree
@@ -1196,4 +938,90 @@ function isChildOf($child, $parent)
 	return isChildOf($boards[$child]['parent'], $parent);
 }
 
-?>
+/**
+ * Returns whether this member has notification turned on for the specified board.
+ *
+ * @param int $id_member
+ * @param int $id_board
+ * @return bool
+ */
+function hasBoardNotification($id_member, $id_board)
+{
+	global $smcFunc, $user_info, $board;
+
+	// Find out if they have notification set for this board already.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member
+		FROM {db_prefix}log_notify
+		WHERE id_member = {int:current_member}
+			AND id_board = {int:current_board}
+		LIMIT 1',
+		array(
+			'current_board' => $board,
+			'current_member' => $user_info['id'],
+		)
+	);
+	$hasNotification = $smcFunc['db_num_rows']($request) != 0;
+	$smcFunc['db_free_result']($request);
+
+	return hasNotification;
+}
+
+/**
+ * Set board notification on or off for the given member.
+ *
+ * @param int $id_member
+ * @param int $id_board
+ * @param bool $on = false
+ */
+function setBoardNotification($id_member, $id_board, $on = false)
+{
+	global $smcFunc;
+
+	if ($on)
+	{
+		// Turn notification on.  (note this just blows smoke if it's already on.)
+		$smcFunc['db_insert']('ignore',
+			'{db_prefix}log_notify',
+			array('id_member' => 'int', 'id_board' => 'int'),
+			array($id_member, $id_board),
+			array('id_member', 'id_board')
+		);
+	}
+	else
+	{
+		// Turn notification off for this board.
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}log_notify
+			WHERE id_member = {int:current_member}
+				AND id_board = {int:current_board}',
+			array(
+				'current_board' => $id_board,
+				'current_member' => $id_member,
+			)
+		);
+	}
+}
+
+/**
+ * Returns all the boards accessible to the current user.
+ */
+function accessibleBoards()
+{
+	global $smcFunc;
+
+	// Find all the boards this user can see.
+	$result = $smcFunc['db_query']('', '
+		SELECT b.id_board
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}',
+		array(
+		)
+	);
+	$boards = array();
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$boards[] = $row['id_board'];
+	$smcFunc['db_free_result']($result);
+
+	return $boards;
+}

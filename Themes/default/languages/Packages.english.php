@@ -77,7 +77,7 @@ $txt['package_installed_redirect_go_now'] = 'Redirect Now';
 $txt['package_installed_redirect_cancel'] = 'Return to Package Manager';
 
 $txt['packages_latest'] = 'Latest Packages';
-$txt['packages_latest_fetch'] = 'Attempting to fetch the most popular and recent packages from www.simplemachines.org...';
+$txt['packages_latest_fetch'] = 'Attempting to fetch the most popular and recent packages ...';
 
 $txt['package_upgrade'] = 'Upgrade';
 $txt['package_uninstall_readme'] = 'Uninstallation Readme';
@@ -277,5 +277,3 @@ $txt['package_readme_default'] = 'Default';
 $txt['package_available_readme_language'] = 'Available Readme Languages:';
 $txt['package_license_default'] = 'Default';
 $txt['package_available_license_language'] = 'Available License Languages:';
-
-?>

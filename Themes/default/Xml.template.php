@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -55,7 +56,7 @@ function template_modifydone()
 	if (empty($context['message']['errors']))
 	{
 		echo '
-		<modified><![CDATA[', empty($context['message']['modified']['time']) ? '' : cleanXml('&#171; <em>' . sprintf($txt['last_edit_by'], $context['message']['modified']['time'], $context['message']['modified']['name']) . '</em> &#187;'), ']]></modified>
+		<modified><![CDATA[', empty($context['message']['modified']['time']) ? '' : cleanXml(sprintf($txt['last_edit_by'], $context['message']['modified']['time'], $context['message']['modified']['name'])), ']]></modified>
 		<subject is_first="', $context['message']['first_in_topic'] ? '1' : '0', '"><![CDATA[', cleanXml($context['message']['subject']), ']]></subject>
 		<body><![CDATA[', $context['message']['body'], ']]></body>';
 	}
@@ -431,5 +432,3 @@ function template_xml_draft()
 	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', timeformat($context['draft_saved_on']), ']]></draft>
 </drafts>';
 }
-
-?>

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -42,6 +43,9 @@ function Display()
 	// Load the template
 	loadTemplate('Display');
 
+	// And the topic functions
+	require_once($sourcedir . '/Subs-Topic.php');
+
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 	{
@@ -55,11 +59,13 @@ function Display()
 
 	// Let's do some work on what to search index.
 	if (count($_GET) > 2)
+	{
 		foreach ($_GET as $k => $v)
 		{
 			if (!in_array($k, array('topic', 'board', 'start', session_name())))
 				$context['robot_no_index'] = true;
 		}
+	}
 
 	if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
 		$context['robot_no_index'] = true;
@@ -70,56 +76,9 @@ function Display()
 		// No use in calculating the next topic if there's only one.
 		if ($board_info['num_topics'] > 1)
 		{
-			// Just prepare some variables that are used in the query.
-			$gt_lt = $_REQUEST['prev_next'] == 'prev' ? '>' : '<';
-			$order = $_REQUEST['prev_next'] == 'prev' ? '' : ' DESC';
-
-			$request = $smcFunc['db_query']('', '
-				SELECT t2.id_topic
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}topics AS t2 ON (' . (empty($modSettings['enableStickyTopics']) ? '
-					t2.id_last_msg ' . $gt_lt . ' t.id_last_msg' : '
-					(t2.id_last_msg ' . $gt_lt . ' t.id_last_msg AND t2.is_sticky ' . $gt_lt . '= t.is_sticky) OR t2.is_sticky ' . $gt_lt . ' t.is_sticky') . ')
-				WHERE t.id_topic = {int:current_topic}
-					AND t2.id_board = {int:current_board}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-					AND (t2.approved = {int:is_approved} OR (t2.id_member_started != {int:id_member_started} AND t2.id_member_started = {int:current_member}))') . '
-				ORDER BY' . (empty($modSettings['enableStickyTopics']) ? '' : ' t2.is_sticky' . $order . ',') . ' t2.id_last_msg' . $order . '
-				LIMIT 1',
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-					'is_approved' => 1,
-					'id_member_started' => 0,
-				)
-			);
-
-			// No more left.
-			if ($smcFunc['db_num_rows']($request) == 0)
-			{
-				$smcFunc['db_free_result']($request);
-
-				// Roll over - if we're going prev, get the last - otherwise the first.
-				$request = $smcFunc['db_query']('', '
-					SELECT id_topic
-					FROM {db_prefix}topics
-					WHERE id_board = {int:current_board}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
-					ORDER BY' . (empty($modSettings['enableStickyTopics']) ? '' : ' is_sticky' . $order . ',') . ' id_last_msg' . $order . '
-					LIMIT 1',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-						'is_approved' => 1,
-						'id_member_started' => 0,
-					)
-				);
-			}
-
-			// Now you can be sure $topic is the id_topic to view.
-			list ($topic) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
+			$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
+			$includeStickies = !empty($modSettings['enableStickyTopics']);
+			$topic = $_REQUEST['prev_next'] === 'prev' ? getPreviousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : getNextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
 			$context['current_topic'] = $topic;
 		}
 
@@ -130,15 +89,7 @@ function Display()
 	// Add 1 to the number of views of this topic (except for robots).
 	if (!$user_info['possibly_robot'] && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET num_views = num_views + 1
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-
+		increaseViewCounter($topic);
 		$_SESSION['last_read_topic'] = $topic;
 	}
 
@@ -153,35 +104,22 @@ function Display()
 
 	// @todo Why isn't this cached?
 	// @todo if we get id_board in this query and cache it, we can save a query on posting
-	// Get all the important topic info.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			t.num_replies, t.num_views, t.locked, ms.subject, t.is_sticky, t.id_poll,
-			t.id_member_started, t.id_first_msg, t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic,
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
-			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', id_previous_board, id_previous_topic' : '') . '
-			' . (!empty($topic_selects) ? implode(',', $topic_selects) : '') . '
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' . ($user_info['is_guest'] ? '' : '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:current_topic} AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') . '
-			' . (!empty($topic_tables) ? implode("\n\t", $topic_tables) : '') . '
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-			$topic_parameters
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	// Load the topic details
+	$topicinfo = getTopicInfo($topic_parameters, true, $topic_selects, $topic_tables);
+	if (empty($topicinfo))
 		fatal_lang_error('not_a_topic', false);
-	$topicinfo = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Is this a moved topic that we are redirecting to?
 	if (!empty($topicinfo['id_redirect_topic']))
+	{
+		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg']), $topicinfo['new_from'] !== 0);
 		redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
+	}
 
 	$context['real_num_replies'] = $context['num_replies'] = $topicinfo['num_replies'];
 	$context['topic_first_message'] = $topicinfo['id_first_msg'];
 	$context['topic_last_message'] = $topicinfo['id_last_msg'];
+	$context['topic_disregarded'] = isset($topicinfo['disregarded']) ? $topicinfo['disregarded'] : 0;
 
 	// Add up unapproved replies to get real number of replies...
 	if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
@@ -827,57 +765,9 @@ function Display()
 		if ($mark_at_msg >= $topicinfo['id_last_msg'])
 			$mark_at_msg = $modSettings['maxMsgID'];
 		if ($mark_at_msg >= $topicinfo['new_from'])
-		{
-			$smcFunc['db_insert']($topicinfo['new_from'] == 0 ? 'ignore' : 'replace',
-				'{db_prefix}log_topics',
-				array(
-					'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int',
-				),
-				array(
-					$user_info['id'], $topic, $mark_at_msg,
-				),
-				array('id_member', 'id_topic')
-			);
-		}
+			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg), $topicinfo['new_from'] !== 0);
 
-		// Check for notifications on this topic OR board.
-		$request = $smcFunc['db_query']('', '
-			SELECT sent, id_topic
-			FROM {db_prefix}log_notify
-			WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
-				AND id_member = {int:current_member}
-			LIMIT 2',
-			array(
-				'current_board' => $board,
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-			)
-		);
-		$do_once = true;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// Find if this topic is marked for notification...
-			if (!empty($row['id_topic']))
-				$context['is_marked_notify'] = true;
-
-			// Only do this once, but mark the notifications as "not sent yet" for next time.
-			if (!empty($row['sent']) && $do_once)
-			{
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}log_notify
-					SET sent = {int:is_not_sent}
-					WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
-						AND id_member = {int:current_member}',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-						'current_topic' => $topic,
-						'is_not_sent' => 0,
-					)
-				);
-				$do_once = false;
-			}
-		}
+		updateReadNotificationsFor($topic, $board);
 
 		// Have we recently cached the number of new topics in this board, and it's still a lot?
 		if (isset($_REQUEST['topicseen']) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
@@ -886,23 +776,7 @@ function Display()
 		elseif (isset($_REQUEST['topicseen']))
 		{
 			// Use the mark read tables... and the last visit to figure out if this should be read or not.
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}topics AS t
-					LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = {int:current_board} AND lb.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				WHERE t.id_board = {int:current_board}
-					AND t.id_last_msg > IFNULL(lb.id_msg, 0)
-					AND t.id_last_msg > IFNULL(lt.id_msg, 0)' . (empty($_SESSION['id_msg_last_visit']) ? '' : '
-					AND t.id_last_msg > {int:id_msg_last_visit}'),
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'id_msg_last_visit' => (int) $_SESSION['id_msg_last_visit'],
-				)
-			);
-			list ($numNewTopics) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 			// If there're no real new topics in this board, mark the board as seen.
 			if (empty($numNewTopics))
@@ -1064,13 +938,13 @@ function Display()
 	$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 	$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 	$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1;
-	
+
 	// Handle approval flags...
 	$context['can_reply_approved'] = $context['can_reply'];
 	$context['can_reply'] |= $context['can_reply_unapproved'];
 	$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 	$context['can_mark_unread'] = !$user_info['is_guest'] && $settings['show_mark_read'];
-
+	$context['can_disregard'] = !$user_info['is_guest'] && $modSettings['enable_disregard'];
 	$context['can_send_topic'] = (!$modSettings['postmod_active'] || $topicinfo['approved']) && allowedTo('send_topic');
 	$context['can_print'] = empty($modSettings['disable_print_topic']);
 
@@ -1086,6 +960,11 @@ function Display()
 	$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 	if (!empty($context['drafts_save']))
 		loadLanguage('Drafts');
+	if (!empty($context['drafts_autosave']))
+		loadJavascriptFile('drafts.js');
+
+	// Load up the Quick ModifyTopic and Quick Reply scripts
+	loadJavascriptFile('topic.js');
 
 	// Load up the "double post" sequencing magic.
 	if (!empty($options['display_quick_reply']))
@@ -1133,16 +1012,17 @@ function Display()
 		'add_poll' => array('test' => 'can_add_poll', 'text' => 'add_poll', 'image' => 'add_poll.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;add;topic=' . $context['current_topic'] . '.' . $context['start']),
 		'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . ($context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']) . '\');"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 		'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+		'disregard' => array('test' => 'can_disregard', 'text' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard', 'image' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard.png', 'lang' => true, 'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_disregarded'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
 		'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0'),
-		'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="new_win nofollow"', 'url' => $scripturl . '?action=printpage;topic=' . $context['current_topic'] . '.0'),
+		'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="new_win nofollow"', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
 	);
 
 	// Build the mod button array
 	$context['mod_buttons'] = array(
 		'move' => array('test' => 'can_move', 'text' => 'move_topic', 'image' => 'admin_move.png', 'lang' => true, 'url' => $scripturl . '?action=movetopic;current_board=' . $context['current_board'] . ';topic=' . $context['current_topic'] . '.0'),
 		'delete' => array('test' => 'can_delete', 'text' => 'remove_topic', 'image' => 'admin_rem.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"', 'url' => $scripturl . '?action=removetopic2;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id']),
-		'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-		'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+		'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+		'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 		'merge' => array('test' => 'can_merge', 'text' => 'merge', 'image' => 'merge.png', 'lang' => true, 'url' => $scripturl . '?action=mergetopics;board=' . $context['current_board'] . '.0;from=' . $context['current_topic']),
 		'calendar' => array('test' => 'calendar_post', 'text' => 'calendar_link', 'image' => 'linktocal.png', 'lang' => true, 'url' => $scripturl . '?action=post;calendar;msg=' . $context['topic_first_message'] . ';topic=' . $context['current_topic'] . '.0'),
 	);
@@ -1152,9 +1032,9 @@ function Display()
 		$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 	// Allow adding new mod buttons easily.
-	// Note: $context['normal_buttons'] and $context['mod_buttons'] are added for backward compatibility with 2.0, but are deprecated and should not be used
+	// Note: $context['normal_buttons'] and $context['mod_buttons'] are here for backward compatibility with 2.0, but are deprecated and should not be used
 	call_integration_hook('integrate_display_buttons', array($context['normal_buttons']));
-	// Note: integrate_mod_buttons is no more necessary and deprecated, but is kept for backward compatibility with 2.0
+	// Note: integrate_mod_buttons is no longer necessary and is now deprecated, it is kept for backward compatibility with 2.0
 	call_integration_hook('integrate_mod_buttons', array($context['mod_buttons']));
 }
 
@@ -1294,222 +1174,6 @@ function prepareDisplayContext($reset = false)
 }
 
 /**
- * Downloads an attachment or avatar, and increments the download count.
- * It requires the view_attachments permission. (not for avatars!)
- * It disables the session parser, and clears any previous output.
- * It depends on the attachmentUploadDir setting being correct.
- * It is accessed via the query string ?action=dlattach.
- * Views to attachments and avatars do not increase hits and are not logged in the "Who's Online" log.
- */
-function Download()
-{
-	global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc;
-
-	// Some defaults that we need.
-	$context['character_set'] = empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set'];
-	$context['utf8'] = $context['character_set'] === 'UTF-8';
-	$context['no_last_modified'] = true;
-
-	// Make sure some attachment was requested!
-	if (!isset($_REQUEST['attach']) && !isset($_REQUEST['id']))
-		fatal_lang_error('no_access', false);
-
-	$_REQUEST['attach'] = isset($_REQUEST['attach']) ? (int) $_REQUEST['attach'] : (int) $_REQUEST['id'];
-
-	if (isset($_REQUEST['type']) && $_REQUEST['type'] == 'avatar')
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
-			FROM {db_prefix}attachments
-			WHERE id_attach = {int:id_attach}
-				AND id_member > {int:blank_id_member}
-			LIMIT 1',
-			array(
-				'id_attach' => $_REQUEST['attach'],
-				'blank_id_member' => 0,
-			)
-		);
-		$_REQUEST['image'] = true;
-	}
-	// This is just a regular attachment...
-	else
-	{
-		// This checks only the current board for $board/$topic's permissions.
-		isAllowedTo('view_attachments');
-
-		// Make sure this attachment is on this board.
-		// @todo: We must verify that $topic is the attachment's topic, or else the permission check above is broken.
-		$request = $smcFunc['db_query']('', '
-			SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
-			FROM {db_prefix}attachments AS a
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-			WHERE a.id_attach = {int:attach}
-			LIMIT 1',
-			array(
-				'attach' => $_REQUEST['attach'],
-				'current_topic' => $topic,
-			)
-		);
-	}
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('no_access', false);
-	list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	// If it isn't yet approved, do they have permission to view it?
-	if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
-		isAllowedTo('approve_posts');
-
-	// Update the download counter (unless it's a thumbnail).
-	if ($attachment_type != 3)
-		$smcFunc['db_query']('attach_download_increase', '
-			UPDATE LOW_PRIORITY {db_prefix}attachments
-			SET downloads = downloads + 1
-			WHERE id_attach = {int:id_attach}',
-			array(
-				'id_attach' => $id_attach,
-			)
-		);
-
-	$filename = getAttachmentFilename($real_filename, $_REQUEST['attach'], $id_folder, false, $file_hash);
-
-	// This is done to clear any output that was made before now.
-	ob_end_clean();
-	if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
-		@ob_start('ob_gzhandler');
-	else
-	{
-		ob_start();
-		header('Content-Encoding: none');
-	}
-
-	// No point in a nicer message, because this is supposed to be an attachment anyway...
-	if (!file_exists($filename))
-	{
-		loadLanguage('Errors');
-
-		header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
-		header('Content-Type: text/plain; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
-
-		// We need to die like this *before* we send any anti-caching headers as below.
-		die('404 - ' . $txt['attachment_not_found']);
-	}
-
-	// If it hasn't been modified since the last time this attachement was retrieved, there's no need to display it again.
-	if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
-	{
-		list($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
-		if (strtotime($modified_since) >= filemtime($filename))
-		{
-			ob_end_clean();
-
-			// Answer the question - no, it hasn't been modified ;).
-			header('HTTP/1.1 304 Not Modified');
-			exit;
-		}
-	}
-
-	// Check whether the ETag was sent back, and cache based on that...
-	$eTag = '"' . substr($_REQUEST['attach'] . $real_filename . filemtime($filename), 0, 64) . '"';
-	if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
-	{
-		ob_end_clean();
-
-		header('HTTP/1.1 304 Not Modified');
-		exit;
-	}
-
-	// Send the attachment headers.
-	header('Pragma: ');
-	if (!isBrowser('gecko'))
-		header('Content-Transfer-Encoding: binary');
-	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-	header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
-	header('Accept-Ranges: bytes');
-	header('Connection: close');
-	header('ETag: ' . $eTag);
-
-	// Make sure the mime type warrants an inline display.
-	if (isset($_REQUEST['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
-		unset($_REQUEST['image']);
-
-	// Does this have a mime type?
-	elseif (!empty($mime_type) && (isset($_REQUEST['image']) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
-		header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
-
-	else
-	{
-		header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-		if (isset($_REQUEST['image']))
-			unset($_REQUEST['image']);
-	}
-
-	// Convert the file to UTF-8, cuz most browsers dig that.
-	$utf8name = !$context['utf8'] && function_exists('iconv') ? iconv($context['character_set'], 'UTF-8', $real_filename) : (!$context['utf8'] && function_exists('mb_convert_encoding') ? mb_convert_encoding($real_filename, 'UTF-8', $context['character_set']) : $real_filename);
-	$disposition = !isset($_REQUEST['image']) ? 'attachment' : 'inline';
-
-	// Different browsers like different standards...
-	if (isBrowser('firefox'))
-		header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $utf8name)));
-
-	elseif (isBrowser('opera'))
-		header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $utf8name) . '"');
-
-	elseif (isBrowser('ie'))
-		header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $utf8name)) . '"');
-
-	else
-		header('Content-Disposition: ' . $disposition . '; filename="' . $utf8name . '"');
-
-	// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-	if (!isset($_REQUEST['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
-		header('Cache-Control: no-cache');
-	else
-		header('Cache-Control: max-age=' . (525600 * 60) . ', private');
-
-	header('Content-Length: ' . filesize($filename));
-
-	// Try to buy some time...
-	@set_time_limit(600);
-
-	// Recode line endings for text files, if enabled.
-	if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($_REQUEST['image']) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
-	{
-		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Windows') !== false)
-			$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r\n", $buffer);');
-		elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Mac') !== false)
-			$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r", $buffer);');
-		else
-			$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\n", $buffer);');
-	}
-
-	// Since we don't do output compression for files this large...
-	if (filesize($filename) > 4194304)
-	{
-		// Forcibly end any output buffering going on.
-		while (@ob_get_level() > 0)
-			@ob_end_clean();
-
-		$fp = fopen($filename, 'rb');
-		while (!feof($fp))
-		{
-			if (isset($callback))
-				echo $callback(fread($fp, 8192));
-			else
-				echo fread($fp, 8192);
-			flush();
-		}
-		fclose($fp);
-	}
-	// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-	elseif (isset($callback) || @readfile($filename) === null)
-		echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
-
-	obExit(false);
-}
-
-/**
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
  * Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
  * (@todo change this pre-condition, too fragile and error-prone.)
@@ -1518,7 +1182,7 @@ function Download()
  * the max_image_width and max_image_height settings.
  *
  * @param type $id_msg message number to load attachments for
- * @return array of attachemnts
+ * @return array of attachments
  */
 function loadAttachmentContext($id_msg)
 {
@@ -1567,18 +1231,8 @@ function loadAttachmentContext($id_msg)
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 					{
 						// So what folder are we putting this image in?
-						if (!empty($modSettings['currentAttachmentUploadDir']))
-						{
-							if (!is_array($modSettings['attachmentUploadDir']))
-								$modSettings['attachmentUploadDir'] = @unserialize($modSettings['attachmentUploadDir']);
-							$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-							$id_folder_thumb = $modSettings['currentAttachmentUploadDir'];
-						}
-						else
-						{
-							$path = $modSettings['attachmentUploadDir'];
-							$id_folder_thumb = 1;
-						}
+						$path = getAttachmentPath();
+						$id_folder_thumb = getAttachmentPathID();
 
 						// Calculate the size of the created thumbnail.
 						$size = @getimagesize($filename . '_thumb');
@@ -1627,7 +1281,7 @@ function loadAttachmentContext($id_msg)
 							// Do we need to remove an old thumbnail?
 							if (!empty($old_id_thumb))
 							{
-								require_once($sourcedir . '/ManageAttachments.php');
+								require_once($sourcedir . '/Subs-Attachments.php');
 								removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 							}
 						}
@@ -1700,8 +1354,9 @@ function approved_attach_sort($a, $b)
 
 /**
  * In-topic quick moderation.
+ * Accessed by ?action=quickmod2
  */
-function QuickInTopicModeration()
+function action_quickmod2()
 {
 	global $sourcedir, $topic, $board, $user_info, $smcFunc, $modSettings, $context;
 
@@ -1820,5 +1475,3 @@ function QuickInTopicModeration()
 
 	redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . $_REQUEST['start']);
 }
-
-?>

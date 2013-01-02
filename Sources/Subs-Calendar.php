@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -845,12 +846,10 @@ function insertEvent(&$eventOptions)
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
 
 	// Make sure the start date is in ISO order.
-	// @todo $year, $month, and $day are not set
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
 
 	// Set the end date (if not yet given)
-	// @todo $year, $month, and $day are not set
 	if (!isset($eventOptions['end_date']))
 		$eventOptions['end_date'] = strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
 
@@ -1105,5 +1104,3 @@ function removeHolidays($holiday_ids)
 		'calendar_updated' => time(),
 	));
 }
-
-?>

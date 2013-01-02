@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -196,7 +197,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			return;
 
 		$postgroups = cache_get_data('updateStats:postgroups', 360);
-		if ($postgroups == null || $parameter1 == null)
+		if ($postgroups === null || $parameter1 === null)
 		{
 			// Fetch the postgroups!
 			$request = $smcFunc['db_query']('', '
@@ -600,7 +601,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 }
 
 /**
- * - Formats a number.
+ * Formats a number.
  * - uses the format of number_format to decide how to format the number.
  *   for example, it might display "1 234,50".
  * - caches the formatting data from the setting for optimization.
@@ -1693,6 +1694,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						// Check if the image is larger than allowed.
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
+							// For images, we'll want this.
+							require_once($sourcedir . '/Subs-Attachments.php');
 							list ($width, $height) = url_image_size($imgtag);
 
 							if (!empty($modSettings['max_image_width']) && $width > $modSettings['max_image_width'])
@@ -1793,12 +1796,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos2 = strpos($message, ']', $pos + 1);
 			if ($pos2 == $pos + 2)
 				continue;
-			
+
 			$look_for = strtolower(substr($message, $pos + 2, $pos2 - $pos - 2));
 
 			$to_close = array();
 			$block_level = null;
-			
+
 			do
 			{
 				$tag = array_pop($open_tags);
@@ -1895,12 +1898,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		foreach ($bbc_codes[$tags] as $possible)
 		{
 			$pt_strlen = strlen($possible['tag']);
-			
+
 			// Not a match?
 			if (strtolower(substr($message, $pos + 1, $pt_strlen)) != $possible['tag'])
 				continue;
 
-			$next_c = $message[$pos + 1 + $pt_strlen];
+			$next_c = isset($message[$pos + 1 + $pt_strlen]) ? $message[$pos + 1 + $pt_strlen] : '';
 
 			// A test validation?
 			if (isset($possible['test']) && preg_match('~^' . $possible['test'] . '~', substr($message, $pos + 1 + $pt_strlen + 1)) === 0)
@@ -2017,7 +2020,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		{
 			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", '>')))
 				continue;
-			
+
 			$tag = $itemcodes[$message[$pos + 1]];
 
 			// First let's set up the tree: it needs to be in a list, or after an li.
@@ -2110,7 +2113,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			else
 				$tag['content'] = $tag['disabled_content'];
 		}
-		
+
 		// we use this alot
 		$tag_strlen = strlen($tag['tag']);
 
@@ -2188,7 +2191,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos2 = strpos($message, $quoted == false ? ']' : '&quot;]', $pos1);
 			if ($pos2 === false)
 				continue;
-			
+
 			$pos3 = stripos($message, '[/' . substr($message, $pos + 1, $tag_strlen) . ']', $pos2);
 			if ($pos3 === false)
 				continue;
@@ -2222,7 +2225,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos2 = strpos($message, ']', $pos1);
 			if ($pos2 === false)
 				continue;
-				
+
 			$pos3 = stripos($message, '[/' . substr($message, $pos + 1, $tag_strlen) . ']', $pos2);
 			if ($pos3 === false)
 				continue;
@@ -2424,7 +2427,7 @@ function parsesmileys(&$message)
 		$smileyPregReplacements = array();
 		$searchParts = array();
 		$smileys_path = htmlspecialchars($modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/');
-		
+
 		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
 		{
 			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
@@ -2459,8 +2462,6 @@ function parsesmileys(&$message)
  */
 function highlight_php_code($code)
 {
-	global $context;
-
 	// Remove special characters.
 	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'DIALOGO_TAB();', '&#91;' => '[')));
 
@@ -2616,7 +2617,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewsmfile') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
@@ -2639,89 +2640,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
 		exit;
-}
-
-/**
- * Get the size of a specified image with better error handling.
- * @todo see if it's better in Subs-Graphics, but one step at the time.
- * Uses getimagesize() to determine the size of a file.
- * Attempts to connect to the server first so it won't time out.
- *
- * @param string $url
- * @return array or false, the image size as array (width, height), or false on failure
- */
-function url_image_size($url)
-{
-	global $sourcedir;
-
-	// Make sure it is a proper URL.
-	$url = str_replace(' ', '%20', $url);
-
-	// Can we pull this from the cache... please please?
-	if (($temp = cache_get_data('url_image_size-' . md5($url), 240)) !== null)
-		return $temp;
-	$t = microtime();
-
-	// Get the host to pester...
-	preg_match('~^\w+://(.+?)/(.*)$~', $url, $match);
-
-	// Can't figure it out, just try the image size.
-	if ($url == '' || $url == 'http://' || $url == 'https://')
-	{
-		return false;
-	}
-	elseif (!isset($match[1]))
-	{
-		$size = @getimagesize($url);
-	}
-	else
-	{
-		// Try to connect to the server... give it half a second.
-		$temp = 0;
-		$fp = @fsockopen($match[1], 80, $temp, $temp, 0.5);
-
-		// Successful?  Continue...
-		if ($fp != false)
-		{
-			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/DIALOGO' . "\r\n" . 'Connection: close' . "\r\n\r\n");
-
-			// Read in the HTTP/1.1 or whatever.
-			$test = substr(fgets($fp, 11), -1);
-			fclose($fp);
-
-			// See if it returned a 404/403 or something.
-			if ($test < 4)
-			{
-				$size = @getimagesize($url);
-
-				// This probably means allow_url_fopen is off, let's try GD.
-				if ($size === false && function_exists('imagecreatefromstring'))
-				{
-					include_once($sourcedir . '/Subs-Package.php');
-
-					// It's going to hate us for doing this, but another request...
-					$image = @imagecreatefromstring(fetch_web_data($url));
-					if ($image !== false)
-					{
-						$size = array(imagesx($image), imagesy($image));
-						imagedestroy($image);
-					}
-				}
-			}
-		}
-	}
-
-	// If we didn't get it, we failed.
-	if (!isset($size))
-		$size = false;
-
-	// If this took a long time, we may never have to do it again, but then again we might...
-	if (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $t)) > 0.8)
-		cache_put_data('url_image_size-' . md5($url), $size, 240);
-
-	// Didn't work.
-	return $size;
 }
 
 /**
@@ -2774,8 +2692,7 @@ function setupThemeContext($forceload = false)
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 
 	// Get some news...
-	$context['news_lines'] = explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news']))));
-	$context['fader_news_lines'] = array();
+	$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
 	for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
 	{
 		if (trim($context['news_lines'][$i]) == '')
@@ -2783,11 +2700,9 @@ function setupThemeContext($forceload = false)
 
 		// Clean it up for presentation ;).
 		$context['news_lines'][$i] = parse_bbc(stripslashes(trim($context['news_lines'][$i])), true, 'news' . $i);
-
-		// Gotta be special for the javascript.
-		$context['fader_news_lines'][$i] = strtr(addslashes($context['news_lines'][$i]), array('/' => '\/', '<a href=' => '<a hre" + "f='));
 	}
-	$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
+	if (!empty($context['news_lines']))
+		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
 
 	if (!$user_info['is_guest'])
 	{
@@ -2869,7 +2784,7 @@ function setupThemeContext($forceload = false)
 	$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'pm');
 
 	// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
-	if($context['show_pm_popup'])
+	if ($context['show_pm_popup'])
 		addInlineJavascript('
 		$(document).ready(function(){
 			new smc_Popup({
@@ -2883,21 +2798,12 @@ function setupThemeContext($forceload = false)
 	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
 	{
 		// @todo Move this over to script.js?
-		$context['html_headers'] .= '
-	<script type="text/javascript"><!-- // --><![CDATA[
+		addInlineJavascript('
 		var smf_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';';
-
-		if (!isBrowser('ie'))
-			$context['html_headers'] .= '
-	window.addEventListener("load", smf_avatarResize, false);';
-		else
-			$context['html_headers'] .= '
-	var window_oldAvatarOnload = window.onload;
-	window.onload = smf_avatarResize;';
-
-		$context['html_headers'] .= '
-	// ]]></script>';
+		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		window.addEventListener("load", smf_avatarResize, false);' : '
+		var window_oldAvatarOnload = window.onload;
+		window.onload = smf_avatarResize;'));
 	}
 
 	// This looks weird, but it's because BoardIndex.php references the variable.
@@ -2916,10 +2822,7 @@ function setupThemeContext($forceload = false)
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		$context['html_headers'] .= '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var smf_scripturl = "' . $scripturl . '";
-	// ]]></script>';
+		addJavascriptVar('smf_scripturl', $scripturl);
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';
@@ -3137,7 +3040,7 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
-	$forum_copyright = sprintf($forum_copyright, $forum_version);
+	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
 
 	echo '
 			<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">' . $forum_copyright . '
@@ -3179,8 +3082,29 @@ function template_footer()
 function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $sourcedir;
-	
-	$loadjquery = false;
+
+	// First up, load jquery
+	if (isset($modSettings['jquery_source']) && !$do_defered)
+	{
+		switch ($modSettings['jquery_source'])
+		{
+			case 'cdn':
+				echo '
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" id="jquery"></script>';
+				break;
+			case 'local':
+				echo '
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.7.2.min.js" id="jquery"></script>';
+				break;
+			case 'auto':
+				echo '
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" id="jquery"></script>
+	<script type="text/javascript"><!-- // --><![CDATA[
+		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.7.2.min.js"><\/script>\');
+	// ]]></script>';
+				break;
+		}
+	}
 
 	// Use this hook to work with Javascript files and vars pre output
 	call_integration_hook('pre_javascript_output');
@@ -3191,12 +3115,12 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Class-Combine.php');
-			$combiner = new smf_Combiner;
-			$combine_name = $combiner->smf_js_combine($context['javascript_files'], $do_defered, $loadjquery);
-			
+			$combiner = new site_Combiner;
+			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
+
 			if (!empty($combine_name))
 				echo '
-	<script type="text/javascript" src="', $combine_name, '" id="jscombined' . ($do_defered ? 'top' : 'bottom') .'"></script>';
+	<script type="text/javascript" src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
 		else
 		{
@@ -3205,22 +3129,15 @@ function template_javascript($do_defered = false)
 			{
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id,'"' , !empty($js_file['options']['async']) ? ' async="async"' : '' ,'></script>';
-				
+	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+
 				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
 				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
 					$loadjquery = true;
 			}
 		}
 	}
-	
-	// load JQuery if needed
-	if (!empty($loadjquery))
-		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		window.jQuery || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-1.7.2.min.js"><\/script>\');
-	// ]]></script>';
-	
+
 	// Output the declared Javascript variables.
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
@@ -3234,9 +3151,6 @@ function template_javascript($do_defered = false)
 		echo '
 	// ]]></script>';
 	}
-
-
-
 
 	// Inline JavaScript - Actually useful some times!
 	if (!empty($context['javascript_inline']))
@@ -3284,8 +3198,8 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Class-Combine.php');
-			$combiner = new smf_Combiner;
-			$combine_name = $combiner->smf_css_combine($context['css_files']);
+			$combiner = new site_Combiner;
+			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '
 	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
@@ -3600,24 +3514,6 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
 }
 
 /**
- * Load classes that are both (E_STRICT) PHP 4 and PHP 5 compatible.
- * - removed php4 support
- * - left shell in place for mod compatablily
- *
- * @param string $filename
- * @todo remove this function since we are no longer supporting PHP < 5
- */
-function loadClassFile($filename)
-{
-	global $sourcedir;
-
-	if (!file_exists($sourcedir . '/' . $filename))
-		fatal_lang_error('error_bad_file', 'general', array($sourcedir . '/' . $filename));
-
-	require_once($sourcedir . '/' . $filename);
-}
-
-/**
  * Sets up all of the top menu buttons
  * Saves them in the cache if it is available and on
  * Places the results in $context
@@ -3779,19 +3675,19 @@ function setupMenuContext()
 					),
 				),
 			),
-			'mlist' => array(
+			'memberlist' => array(
 				'title' => $txt['members_title'],
-				'href' => $scripturl . '?action=mlist',
+				'href' => $scripturl . '?action=memberlist',
 				'show' => $context['allow_memberlist'],
 				'sub_buttons' => array(
 					'mlist_view' => array(
 						'title' => $txt['mlist_menu_view'],
-						'href' => $scripturl . '?action=mlist',
+						'href' => $scripturl . '?action=memberlist',
 						'show' => true,
 					),
 					'mlist_search' => array(
 						'title' => $txt['mlist_search'],
-						'href' => $scripturl . '?action=mlist;sa=search',
+						'href' => $scripturl . '?action=memberlist;sa=search',
 						'show' => true,
 						'is_last' => true,
 					),
@@ -3976,7 +3872,7 @@ function call_integration_hook($hook, $parameters = array())
 					$absPath = strtr(trim($file), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
 				if (file_exists($absPath))
 					require_once($absPath);
-				$call = $function;
+				$call = $func;
 			}
 		}
 
@@ -4106,9 +4002,9 @@ function sanitizeMSCutPaste($string)
 
 	// UTF-8 occurences of MS special characters
 	$findchars_utf8 = array(
-		"\xe2\80\x9a",	// single low-9 quotation mark
-		"\xe2\80\x9e",	// double low-9 quotation mark
-		"\xe2\80\xa6",	// horizontal ellipsis
+		"\xe2\x80\x9a",	// single low-9 quotation mark
+		"\xe2\x80\x9e",	// double low-9 quotation mark
+		"\xe2\x80\xa6",	// horizontal ellipsis
 		"\xe2\x80\x98",	// left single curly quote
 		"\xe2\x80\x99",	// right single curly quote
 		"\xe2\x80\x9c",	// left double curly quote
@@ -4164,16 +4060,16 @@ function sanitizeMSCutPaste($string)
 function replaceEntities__callback($matches)
 {
 	global $context;
-	
+
 	if (!isset($matches[2]))
 		return '';
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
-	
+
 	// remove left to right / right to left overrides
 	if ($num === 0x202D || $num === 0x202E)
 		return '';
-	
+
 	// Quote, Ampersand, Apostrophe, Less/Greater Than get html replaced
 	if (in_array($num, array(0x22, 0x26, 0x27, 0x3C, 0x3E)))
 		return '&#' . $num . ';';
@@ -4225,7 +4121,7 @@ function fixchar__callback($matches)
 {
 	if (!isset($matches[1]))
 		return '';
-	
+
 	$num = $matches[1][0] === 'x' ? hexdec(substr($matches[1], 1)) : (int) $matches[1];
 
 	// <0x20 are control characters, > 0x10FFFF is past the end of the utf8 character set
@@ -4259,14 +4155,12 @@ function entity_fix__callback($matches)
 {
 	if (!isset($matches[2]))
 		return '';
-	
+
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
-	
+
 	// we don't allow control characters, characters out of range, byte markers, etc
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
 		return '';
 	else
 		return '&#' . $num . ';';
 }
-
-?>

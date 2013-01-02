@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -26,28 +27,28 @@ class sphinxql_search
 	/**
 	 * This is the last version of DIALOGO that this was tested on, to protect against API changes.
 	 * @var string
-	 */	
-	public $version_compatible = 'DIALOGO 1.0 Alpha 1';
-	
+	 */
+	public $version_compatible = 'DIALOGO 1.0 Alpha';
+
 	/**
 	 * This won't work with versions of DIALOGO less than this.
 	 * @var string
 	 */
-	public $min_smf_version = 'DIALOGO 1.0 Alpha 1';
-	
+	public $min_smf_version = 'DIALOGO 1.0 Alpha';
+
 	/**
 	 * Is it supported?
 	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
-	
+
 	/**
 	 * What words are banned?
 	 * @var array
 	 */
 	protected $bannedWords = array();
-	
+
 	/**
 	 * What is the minimum word length?
 	 * @var int
@@ -73,7 +74,7 @@ class sphinxql_search
 			$this->is_supported = false;
 			return;
 		}
-		
+
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 	}
 
@@ -112,8 +113,8 @@ class sphinxql_search
 	public function isValid()
 	{
 		global $modSettings;
-		
-		return !(empty($modSettings['sphinxql_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+
+		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
 	}
 
 	/**
@@ -158,23 +159,23 @@ class sphinxql_search
 
 	/*
 	 * This has it's own custom search.
-	 */	
+	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
+		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
-			$query = 'SELECT * FROM smf_index';
+			$query = 'SELECT * FROM dialogo_index';
 
 			// Construct the (binary mode) query.
 			$where_match = $this->_constructQuery($search_params['search']);
-			
+
 			// Nothing to search, return zero results
 			if (trim($where_match) == '')
 				return 0;
@@ -198,10 +199,10 @@ class sphinxql_search
 			if (!empty($extra_where))
 				$query .= ' AND ' . implode(' AND ', $extra_where);
 
-			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary 
+			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary
 			// sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time DESC';
-			
+
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
 				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . $sphinx_sort;
@@ -223,10 +224,12 @@ class sphinxql_search
 
 			// Get the relevant information from the search results.
 			$cached_results = array(
+				'num_results' => 0,
 				'matches' => array(),
 			);
+			
 			if (mysql_num_rows($request) != 0)
-				while($match = mysql_fetch_assoc($request))
+				while ($match = mysql_fetch_assoc($request))
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
@@ -236,10 +239,10 @@ class sphinxql_search
 			mysql_free_result($request);
 			mysql_close($mySphinx);
 
-			$cached_results['total'] = count($cached_results['matches']);
-			
+			$cached_results['num_results'] = count($cached_results['matches']);
+
 			// Store the search results in the cache.
-			cache_put_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			cache_put_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}
 
 		$participants = array();
@@ -254,7 +257,7 @@ class sphinxql_search
 		foreach ($search_words as $orIndex => $words)
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
 
-		return $cached_results['total'];
+		return $cached_results['num_results'];
 	}
 
 	/**

@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -821,5 +822,3 @@ function smf_db_alter_table($table_name, $columns)
 	// We got here so we're good.  The temp table should be deleted, if not it will be gone later on >:D.
 	return true;
 }
-
-?>

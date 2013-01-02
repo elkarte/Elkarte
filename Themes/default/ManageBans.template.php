@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -25,11 +26,11 @@ function template_ban_edit()
 					', $context['ban']['is_new'] ? $txt['ban_add_new'] : $txt['ban_edit'] . ' \'' . $context['ban']['name'] . '\'', '
 				</h3>
 			</div>';
-			
+
 	if ($context['ban']['is_new'])
 		echo '
 			<div class="information">', $txt['ban_add_notes'], '</div>';
-		
+
 	echo '
 			<div class="content">
 				<dl class="settings">
@@ -68,7 +69,7 @@ function template_ban_edit()
 					</legend>
 					<input type="radio" name="full_ban" id="full_ban" value="1" onclick="fUpdateStatus();"', $context['ban']['cannot']['access'] ? ' checked="checked"' : '', ' class="input_radio" /> <label for="full_ban">', $txt['ban_full_ban'], '</label><br />
 					<input type="radio" name="full_ban" id="partial_ban" value="0" onclick="fUpdateStatus();"', !$context['ban']['cannot']['access'] ? ' checked="checked"' : '', ' class="input_radio" /> <label for="partial_ban">', $txt['ban_partial_ban'], '</label><br />
-					<input type="checkbox" name="cannot_post" id="cannot_post" value="1"', $context['ban']['cannot']['post'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_post">', $txt['ban_cannot_post'], '</label> (<a href="', $scripturl, '?action=helpadmin;help=ban_cannot_post" onclick="return reqOverlayDiv(this.href);">?</a>)<br />
+					<input type="checkbox" name="cannot_post" id="cannot_post" value="1"', $context['ban']['cannot']['post'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_post">', $txt['ban_cannot_post'], '</label> (<a href="', $scripturl, '?action=quickhelp;help=ban_cannot_post" onclick="return reqOverlayDiv(this.href);">?</a>)<br />
 					<input type="checkbox" name="cannot_register" id="cannot_register" value="1"', $context['ban']['cannot']['register'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_register">', $txt['ban_cannot_register'], '</label><br />
 					<input type="checkbox" name="cannot_login" id="cannot_login" value="1"', $context['ban']['cannot']['login'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_login">', $txt['ban_cannot_login'], '</label><br />
 				</fieldset>
@@ -187,7 +188,7 @@ function template_ban_edit()
 						</tr>
 					</thead>
 					<tbody>';
-		
+
 		if (empty($context['ban_items']))
 			echo '
 						<tr class="windowbg2">
@@ -222,7 +223,7 @@ function template_ban_edit()
 		echo '
 					</tbody>
 				</table>
-				
+
 				<div class="flow_auto">
 					<br />
 					<input type="submit" name="remove_selection" value="', $txt['ban_remove_selected_triggers'], '" class="button_submit" />
@@ -355,5 +356,3 @@ function template_ban_edit_trigger()
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	// ]]></script>';
 }
-
-?>

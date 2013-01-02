@@ -3,6 +3,7 @@
 /**
  * @name      Dialogo Forum
  * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
@@ -91,9 +92,9 @@ function template_html_above()
 
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
-	
+
 	// Save some database hits, if a width for multiple wrappers is set in admin.
-	if(!empty($settings['forum_width']))
+	if (!empty($settings['forum_width']))
 		echo '
 	<style type="text/css">#wrapper, .frame {width: ', $settings['forum_width'], ';}</style>';
 
@@ -101,17 +102,14 @@ function template_html_above()
 	//echo '
 	//<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
-	// load in any javascript files from mods and themes
-	template_javascript();
-
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
 	{
 		echo '
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
-	if (!empty($context['theme_variant']))
-		echo '
+		if (!empty($context['theme_variant']))
+			echo '
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl', $context['theme_variant'], '.css?alp21" />';
 	}
 
@@ -148,6 +146,7 @@ function template_html_above()
 		echo '<link rel="next" href="', $context['links']['next'], '" />';
 	else if (!empty($context['current_topic']))
 		echo '<link rel="next" href="', $scripturl, '?topic=', $context['current_topic'], '.0;prev_next=next" />';
+
 	if (!empty($context['links']['prev']))
 		echo '<link rel="prev" href="', $context['links']['prev'], '" />';
 	else if (!empty($context['current_topic']))
@@ -157,6 +156,9 @@ function template_html_above()
 	if (!empty($context['current_board']))
 		echo '
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
+
+	// load in any javascript files from mods and themes
+	template_javascript();
 
 	// Output any remaining HTML headers. (from mods, maybe?)
 	echo $context['html_headers'];
@@ -216,9 +218,9 @@ function template_body_above()
 				echo '
 					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
 
-		// Can't limit it to a specific board if we are not in one
-		if (!empty($context['current_board']))
-			echo '
+			// Can't limit it to a specific board if we are not in one
+			if (!empty($context['current_board']))
+				echo '
 					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
 			echo '
 					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
@@ -252,7 +254,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
@@ -298,7 +300,7 @@ function template_body_above()
 		if (!empty($context['user']['avatar']))
 			echo '
 						<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
-			echo '
+		echo '
 						<ul>
 							<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
 
@@ -318,7 +320,7 @@ function template_body_above()
 	echo'
 					</div>';
 	// Show a random news item? (or you could pick one from news_lines...)
-	if (!empty($settings['enable_news']))
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
 		echo '
 					<div class="news">
 						<h2>', $txt['news'], ': </h2>
@@ -331,7 +333,6 @@ function template_body_above()
 
 	// Show the menu here, according to the menu sub template, followed by the navigation tree.
 	template_menu();
-
 	theme_linktree();
 
 	echo '
@@ -360,7 +361,7 @@ function template_body_below()
 		<div class="frame">';
 
 	// There is now a global "Go to top" link at the right.
-		echo '
+	echo '
 			<a href="#top" id="bot"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
 			<ul class="reset">
 				<li class="copyright">', theme_copyright(), '</li>
@@ -408,7 +409,7 @@ function theme_linktree($force_show = false)
 		<ul>';
 
 	if ($context['user']['is_logged'])
-	echo '
+		echo '
 			<li class="unread_links">
 				<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
 				<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
@@ -502,9 +503,11 @@ function template_menu()
 				echo '
 						</li>';
 			}
-				echo '
+
+			echo '
 					</ul>';
 		}
+
 		echo '
 				</li>';
 	}
@@ -552,7 +555,6 @@ function template_menu()
 				}
 			});
 		// ]]></script>';
-
 }
 
 /**
@@ -594,5 +596,3 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 			</ul>
 		</div>';
 }
-
-?>
