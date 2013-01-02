@@ -3043,8 +3043,8 @@ function theme_copyright()
 	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
 
 	echo '
-			<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">' . $forum_copyright . '
-			</span>';
+					<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">', $forum_copyright, '
+					</span>';
 }
 
 /**
