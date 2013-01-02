@@ -1824,7 +1824,7 @@ div.table_frame .table_list {
 	border-collapse: collapse;
 	margin: 2px 0;
 }
-#messageindex {
+#messageindex, #unread {
 	clear: both;
 }
 /* the page navigation area */
@@ -3688,10 +3688,10 @@ span.hidelink {
 	float: left;
 	padding: 2px;
 	text-align: right;
-	width: 20%;
+	width: 15%;
 }
 #advanced_search dd {
-	width: 75%;
+	width: 80%;
 	float: left;
 	padding: 2px;
 	margin: 0 0 0 6px;
@@ -3941,7 +3941,7 @@ span.hidelink {
 /* The generic wrapper thingy for teh awesome cool looks innit. */
 /* This lot will be simplified once I get all the styling hooks in place. */
 .generic_list_wrapper, .action_profile  #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
-#notify_options .windowbg2, #info_center, #profileview, #messageindex, #mlist,
+#notify_options .windowbg2, #info_center, #profileview, #messageindex, #unread, #mlist,
 #main_grid table, .core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
 	background: #f0f4f7;
 	margin: 12px 0 0 0;
@@ -4006,7 +4006,7 @@ span.hidelink {
 	border: none;
 	box-shadow: none;
 }
-/* Some caution required here, as Post.template.php topic summary shares #recent with recent posts. */
+/* Post.template topic summary uses #recent */
 #recent .core_posts {
 	padding: 8px 0;
 }
@@ -4147,7 +4147,9 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 
 /* Subtle zebra striping to make tables easier to follow. Will make a solution for IE8. */
 /* CSS for locked, sticky, etc has not been applied yet. Don't panic. She'll be right, mate. :P */
-.table_grid td.statsbar div{display: none;}
+.table_grid td.statsbar div {
+	display: none;
+}
 .table_grid  tr td:first-child, .table_grid td.icon2 {
 	border-left: 1px solid #ccc;
 }
@@ -4195,10 +4197,10 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 /* And now those precious little icons, boy are they cute ! */
 .table_grid tr td.stickybg.subject {
-	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .table_grid tr td.stickybg2.subject {
-	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .table_grid tr td.locked_sticky.subject, .table_grid tr td.stickybglockedbg.subject {
 	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
@@ -4206,11 +4208,21 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid tr td.locked_sticky2.subject, .table_grid tr td.stickybglockedbg2.subject {
 	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
-.table_grid tr td.lockedbg.subject{
+.table_grid tr td.lockedbg.subject {
 	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }
 .table_grid tr td.lockedbg2.subject{
 	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+/* Search results need some help as well */
+.search_results_posts .lockedbg {
+	background:  #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+}
+.search_results_posts .stickybg {
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 95% 15px;
+}
+.search_results_posts .locked_stickybg {
+	background:  #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }
 
 /* Colors for background of posts requiring approval */
