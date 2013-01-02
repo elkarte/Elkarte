@@ -1040,7 +1040,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div>' . (isBrowser('gecko') || isBrowser('opera') ? '<pre style="margin: 0; padding: 0;">' : '') . '<code class="bbc_code">$1</code>' . (isBrowser('gecko') || isBrowser('opera') ? '</pre>' : ''),
+				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1077,7 +1077,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div>' . (isBrowser('gecko') || isBrowser('opera') ? '<pre style="margin: 0; padding: 0;">' : '') . '<code class="bbc_code">$1</code>' . (isBrowser('gecko') || isBrowser('opera') ? '</pre>' : ''),
+				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1331,6 +1331,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = highlight_php_code($add_begin ? \'&lt;?php \' . $data . \'?&gt;\' : $data);
 						if ($add_begin)
 							$data = preg_replace(array(\'~^(.+?)&lt;\?.{0,40}?php(?:&nbsp;|\s)~\', \'~\?&gt;((?:</(font|span)>)*)$~\'), \'$1\', $data, 2);
+						
+						// Fix the PHP code stuff...
+						$data = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", $data);
+						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
 					}'),
 				'block_level' => false,
 				'disabled_content' => '$1',
@@ -2463,16 +2467,12 @@ function parsesmileys(&$message)
 function highlight_php_code($code)
 {
 	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'DIALOGO_TAB();', '&#91;' => '[')));
-
-	$oldlevel = error_reporting(0);
+	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
 
 	$buffer = str_replace(array("\n", "\r"), '', @highlight_string($code, true));
 
-	error_reporting($oldlevel);
-
 	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
-	$buffer = preg_replace('~DIALOGO_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
+	$buffer = preg_replace('~___TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
 
 	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
