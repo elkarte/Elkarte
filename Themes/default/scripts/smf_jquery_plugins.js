@@ -8,8 +8,8 @@
  * - attempts to keep the tooltip on screen
  *
  */
- 
-(function($) {
+ (function($) {
+
 	$.fn.SiteTooltip = function(oInstanceSettings) {
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
@@ -36,11 +36,11 @@
 		// determine where we are going to place the tooltip, while trying to keep it on screen
 		var positionTooltip = function(event)
 		{
-			var iPosx = 0;
-			var iPosy = 0;
+			var iPosx = 0,
+				iPosy = 0;
 			
 			if (!event)
-				var event = window.event;
+				event = window.event;
 				
 			if (event.pageX || event.pageY)
 			{
@@ -59,7 +59,7 @@
 				y: iPosy + oSettings.positionTop,
 				w: $('#' + oSettings.tooltipID).width(),
 				h: $('#' + oSettings.tooltipID).height()
-			}
+			};
 
 			// Display limits and window scroll postion
 			var oLimits = {
@@ -86,17 +86,17 @@
 			
 			// finally set the position we determined
 			$('#' + oSettings.tooltipID).css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
-		}
+		};
 		
 		// used to show a tooltip
 		var showTooltip = function(){
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).show();
-		}
+		};
 		
 		// used to hide a tooltip
-		var hideTooltip = function(valueOfThis){
+		var hideTooltip = function(){
 			$('#' + oSettings.tooltipID).fadeOut('slow').trigger("unload").remove();
-		}
+		};
 		
 		// used to keep html encoded
 		function htmlspecialchars(string)
@@ -105,7 +105,7 @@
 		}
 		
 		// for all of the elements that match the selector on the page, lets set up some actions
-		return this.each(function(index)
+		return this.each(function()
 		{
 			// if we find hoverIntent use it
 			if ($.fn.hoverIntent)
@@ -137,12 +137,10 @@
 					var tt = $('#' + oSettings.tooltipID);
 					var ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
 					
-					if (oSettings.tooltipContent == 'html')
+					if (oSettings.tooltipContent === 'html')
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
 					else
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
-					
-					oSettings.tooltipContent
 					
 					// show then position or it may postion off screen
 					tt.show();
@@ -151,14 +149,14 @@
 				}
 			
 				return false;
-			};
+			}
 			
 			// create the Bye bye tip
 			function site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
-			};
+			}
 			
 			// create the tip move with the cursor
 			if (oSettings.followMouse)
@@ -170,14 +168,13 @@
 			}
 			
 			// clear the tip on a click
-			$(this).bind("click", function(event){
+			$(this).bind("click", function(){
 				hideTooltip(this);
 				return true;
 			});
 
 		});
 	};
-	
 })(jQuery);
 
 /**
@@ -348,7 +345,7 @@
 				},o.delay);
 			},
 			getMenu = function($menu){
-				var menu = $menu.parents(['ul.', c.menuClass, ':first'].join(''))[0];
+				var menu = $menu.closest(['ul.', c.menuClass].join(''))[0];
 
 				sf.op = sf.o[menu.serial];
 				return menu;
@@ -374,6 +371,7 @@
 				lis['hover'](h).hideSuperfishUl();
 			}
 
+			// add focus/blur events to the links
 			var $a = $(this).find('a').parent('li');
 			$a.each(function(i){
 				var $li = $a.eq(i);
