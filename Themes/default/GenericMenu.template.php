@@ -50,7 +50,7 @@ function template_generic_menu_sidebar_above()
 				continue;
 
 			echo '
-					<li ', !empty($area['subsections']) ?'class="subsections"':'', ' ', ($i == $menu_context['current_area']) ?'id="menu_current_area"':'', '>';
+					<li ', !empty($area['subsections']) ? 'class="subsections"' : '', ' ', ($i == $menu_context['current_area']) ? 'id="menu_current_area"' : '', '>';
 
 			// Is this the current area, or just some area?
 			if ($i == $menu_context['current_area'])
@@ -127,17 +127,18 @@ function template_generic_menu_dropdown_above()
 	$menu_context = &$context['menu_data_' . $context['cur_menu_id']];
 
 	echo '
-<div id="admin_menu">';
+				<div id="admin_menu">';
 
 	echo '
-	<ul class="dropmenu" id="dropdown_menu_', $context['cur_menu_id'], '">';
+					<ul class="dropmenu" id="dropdown_menu_', $context['cur_menu_id'], '">';
 
 	// Main areas first.
 	foreach ($menu_context['sections'] as $section)
 	{
 		echo '
-			<li ', !empty($section['areas']) ? 'class="subsections"' : '', '><a class="', !empty($section['selected']) ? 'active ' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['title'] , '</a>
-				<ul>';
+						<li ', !empty($section['areas']) ? 'class="subsections"' : '', '>
+							<a class="', !empty($section['selected']) ? 'active ' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['title'] , '</a>
+							<ul>';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
 		// @todo Code for additional_items class was deprecated and has been removed. Suggest following up in Sources if required.
@@ -148,10 +149,10 @@ function template_generic_menu_dropdown_above()
 				continue;
 
 			echo '
-					<li', !empty($area['subsections']) ? ' class="subsections"' : '', '>';
+								<li', !empty($area['subsections']) ? ' class="subsections"' : '', '>';
 
 			echo '
-						<a ', !empty($area['selected']) ? 'class="chosen" ' : '', 'href="', (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i), $menu_context['extra_parameters'], '">', $area['icon'], $area['label'], '</a>';
+									<a ', !empty($area['selected']) ? 'class="chosen" ' : '', 'href="', (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i), $menu_context['extra_parameters'], '">', $area['icon'], $area['label'], '</a>';
 
 			// Is this the current area, or just some area?
 			if (!empty($area['selected']) && empty($context['tabs']))
@@ -161,7 +162,7 @@ function template_generic_menu_dropdown_above()
 			if (!empty($area['subsections']))
 			{
 				echo '
-						<ul>';
+									<ul>';
 
 				foreach ($area['subsections'] as $sa => $sub)
 				{
@@ -171,30 +172,30 @@ function template_generic_menu_dropdown_above()
 					$url = isset($sub['url']) ? $sub['url'] : (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i) . ';sa=' . $sa;
 
 					echo '
-							<li ', !empty($area['subsections']) ? ' class="subsections"' : '', '>
-								<a ', !empty($sub['selected']) ? 'class="chosen" ' : '', ' href="', $url, $menu_context['extra_parameters'], '">', $sub['label'], '</a>
-							</li>';
+										<li ', !empty($area['subsections']) ? ' class="subsections"' : '', '>
+											<a ', !empty($sub['selected']) ? 'class="chosen" ' : '', ' href="', $url, $menu_context['extra_parameters'], '">', $sub['label'], '</a>
+										</li>';
 				}
 
 				echo '
-						</ul>';
+									</ul>';
 			}
 
 			echo '
-					</li>';
+								</li>';
 		}
 		echo '
-				</ul>
-			</li>';
+							</ul>
+						</li>';
 	}
 
 	echo '
-	</ul>
-</div>';
+				</ul>
+			</div>';
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '
-<div id="admin_content">';
+				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
 	if (!empty($context['tabs']))
@@ -207,7 +208,7 @@ function template_generic_menu_dropdown_below()
 	global $context, $settings, $options;
 
 	echo '
-</div>';
+					</div>';
 }
 
 // Some code for showing a tabbed view.
