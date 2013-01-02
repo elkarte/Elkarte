@@ -489,8 +489,7 @@ $txt['status'] = 'Status';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="Dialogo Forum" target="_blank" class="new_win">%1$s</a> |
- <a href="https://github.com/Spuds/SMF21se/blob/master/license.md" title="License" target="_blank" class="new_win">Dialogo &copy; 2012</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="Dialogo Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/Spuds/SMF21se/blob/master/license.md" title="License" target="_blank" class="new_win">Dialogo &copy; 2012</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
