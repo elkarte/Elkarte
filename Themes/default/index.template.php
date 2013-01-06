@@ -116,7 +116,14 @@ function template_html_above()
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
-	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '', '
+	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
+
+	// Tell IE to render the page in standards not compatabilty mode. really for ie >= 8
+	if (isBrowser('ie'))
+		echo '
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
+
+	echo '
 	<title>', $context['page_title_html_safe'], '</title>';
 
 	// Please don't index these Mr Robot.
