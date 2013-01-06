@@ -1,16 +1,18 @@
 <?php
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines
- * @copyright 2011 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
- */
+ * @version 1.0 Alpha
 
-/*	This template is, perhaps, the most important template in the theme. It
+	This template is, perhaps, the most important template in the theme. It
 	contains the main template layer that displays the header and footer of
 	the forum, namely with main_above and main_below. It also contains the
 	menu sub template, which appropriately displays the menu; the init sub
@@ -82,15 +84,15 @@ function template_html_above()
 	// Jquery Librarys
 	if (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'cdn')
 		echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>';
 	elseif (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'local')
 		echo '
-	<script src="', $settings['theme_url'], '/scripts/jquery-1.7.1.min.js"></script>
+	<script src="', $settings['theme_url'], '/scripts/jquery-1.7.2.min.js"></script>
 	<script src="', $settings['theme_url'], '/scripts/jquery.mobile-1.2.0.min.js"></script>';
 	else
 		echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>';
 	
 	// Here comes the JavaScript bits!
@@ -163,6 +165,7 @@ function template_body_above()
 	echo '
 	<div data-role="page" id="the-page">
 		<div data-role="header" class="ui-bar ui-bar-b">
+			<a data-iconpos="notext" data-mini="true" data-role="button" data-icon="search" href="', $scripturl, '?action=search">', $txt['search'], '</a>
 			<h1><a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : $context['page_title'], '</a></h1>
 		</div>';
 		
@@ -189,9 +192,10 @@ function template_body_below()
 					', str_replace(array('[', ']'), '', !empty($context['page_index']) ? $context['page_index'] : ''), '
 				</div>
 			</div>';
-	// Show the copyright.	
+	// Show the copyright.
 	echo '
-		<div data-role="footer" class="ui-bar">
+		<div data-role="footer" data-theme="b" data-position="fixed" id="footer">
+			<a data-iconpos="notext" data-mini="true" data-role="button" data-rel="back" data-icon="back" href="">Back</a>
 			<p>', theme_copyright(), '</p>
 		</div>	
 	</div>';
@@ -258,10 +262,10 @@ function template_menu()
 {
 	global $context, $txt;
 	
-	$allowedItems = array('home', 'pm', 'search', 'register', 'login', 'logout');
+	$allowedItems = array('home', 'pm', 'profile', 'register', 'login', 'logout');
 
 	echo '
-	<div data-role="header" data-id="foo1" data-position="fixed">
+	<div data-role="header" data-position="fixed">
 		<div data-role="navbar">
 			<ul>';
 			
@@ -272,7 +276,7 @@ function template_menu()
 			
 		if (in_array($id, $allowedItems))
 			echo '
-				<li data-wrapperels="div"><a href="', $item['href'], '"', $item['active_button'] ? ' class="ui-btn-active"' : '', '>', $item['title'], '</a></li>';
+				<li data-wrapperels="div"><a data-theme="d" href="', $item['href'], '"', $item['active_button'] ? ' class="ui-btn-active"' : '', '>', $item['title'], '</a></li>';
 	}
 	echo '
 			</ul>

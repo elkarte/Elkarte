@@ -1,27 +1,34 @@
 <?php
 /**
+ * @name      Dialogo Forum
+ * @copyright Dialogo Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
  * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @package SMF
- * @author Simple Machines
- * @copyright 2011 Simple Machines
- * @license http://www.simplemachines.org/about/smf/license.php BSD
- *
- * @version 2.1 Alpha 1
+ * @version 1.0 Alpha
  */
 
 // Template for the profile side bar - goes before any other profile template.
 function template_profile_above()
 {
-	global $context, $scripturl, $txt;
-
+	global $context, $scripturl, $txt, $settings;
+	
+	echo '
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
+	
 	// If an error occurred while trying to save previously, give the user a clue!
 	echo template_error_message();
 
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
 		echo '
-		<div class="infobox">
+		<div class="ui-body ui-body-e">
 			', $context['profile_updated'], '
 		</div>';
 
@@ -29,7 +36,7 @@ function template_profile_above()
 	if (allowedTo('profile_identity_any'))
 	{
 		echo '
-		<div data-role="controlgroup" data-type="horizontal">
+		<div data-role="controlgroup">
 			<a data-role="button" href="', $scripturl, '?action=profile;area=summary;u=', $context['member']['id'], '">', $txt['profileInfo'], '</a>';
 
 		if (allowedTo('profile_identity_own'))
@@ -829,7 +836,7 @@ function template_profile_signature_modify()
 					<script>
 						var maxLength = ', $context['signature_limits']['max_length'], ';
 
-						$(document).ready(function() {
+						$(document).on("pageinit", function () {
 							calcCharLeft();
 							$("#preview_button").click(function() {
 								return ajax_getSignaturePreview(true);
@@ -852,13 +859,13 @@ function template_profile_avatar_select()
 					', !empty($context['member']['avatar']['allow_external']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_external" value="external"' . ($context['member']['avatar']['choice'] == 'external' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_external"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['my_own_pic'] . '</label><br />' : '', '
 					', !empty($context['member']['avatar']['allow_upload']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_upload" value="upload"' . ($context['member']['avatar']['choice'] == 'upload' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_upload"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['avatar_will_upload'] . '</label>' : '';
 
-/*	// If users are allowed to choose avatars stored on the server show selection boxes to choice them from.
+	// If users are allowed to choose avatars stored on the server show selection boxes to choice them from.
 	if (!empty($context['member']['avatar']['allow_server_stored']))
 	{
 		echo '
 					<div id="avatar_server_stored">
 						<div>
-							<select name="cat" id="cat" size="10" onchange="changeSel(\'\');" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'server_stored\');">';
+							<select name="cat" id="cat" onchange="changeSel(\'\');" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'server_stored\');">';
 		// This lists all the file categories.
 		foreach ($context['avatars'] as $avatar)
 			echo '
@@ -867,17 +874,17 @@ function template_profile_avatar_select()
 							</select>
 						</div>
 						<div>
-							<select name="file" id="file" size="10" style="display: none;" onchange="showAvatar()" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'server_stored\');" disabled="disabled"><option></option></select>
+							<select name="file" id="file" style="display: none;" onchange="showAvatar()" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'server_stored\');" disabled="disabled"><option></option></select>
 						</div>
 						<div><img id="avatar" src="', !empty($context['member']['avatar']['allow_external']) && $context['member']['avatar']['choice'] == 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="Do Nothing" /></div>
 						<script>
 							var files = ["' . implode('", "', $context['avatar_list']) . '"];
-							var avatar = $("#avatar");
-							var cat = $("cat");
+							var avatar = document.getElementById("avatar");
+							var cat = document.getElementById("cat");
 							var selavatar = "' . $context['avatar_selected'] . '";
 							var avatardir = "' . $modSettings['avatar_url'] . '/";
 							var size = avatar.alt.substr(3, 2) + " " + avatar.alt.substr(0, 2) + String.fromCharCode(117, 98, 116);
-							var file = $("#file");
+							var file = document.getElementById("file");
 							var maxHeight = ', !empty($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 0, ';
 							var maxWidth = ', !empty($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 0, ';
 
@@ -888,9 +895,8 @@ function template_profile_avatar_select()
 
 						</script>
 					</div>';
-	}*/
-
-
+	}
+	
 	// If the user can link to an off server avatar, show them a box to input the address.
 	if (!empty($context['member']['avatar']['allow_external']))
 	{
@@ -913,33 +919,33 @@ function template_profile_avatar_select()
 
 	echo '
 					<script>
-						', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "' . ($context['member']['avatar']['choice'] == 'server_stored' ? '' : 'none') . '";' : '', '
-						', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "' . ($context['member']['avatar']['choice'] == 'external' ? '' : 'none') . '";' : '', '
-						', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "' . ($context['member']['avatar']['choice'] == 'upload' ? '' : 'none') . '";' : '', '
+						', !empty($context['member']['avatar']['allow_server_stored']) ? '$("#avatar_server_stored").' . ($context['member']['avatar']['choice'] == 'server_stored' ? 'show()' : 'hide()') . ';' : '', '
+						', !empty($context['member']['avatar']['allow_external']) ? '$("#avatar_external").' . ($context['member']['avatar']['choice'] == 'external' ? 'show()' : 'hide()') . ';' : '', '
+						', !empty($context['member']['avatar']['allow_upload']) ? '$("#avatar_upload").' . ($context['member']['avatar']['choice'] == 'upload' ? 'show()' : 'hide()') . ';' : '', '
 
 						function swap_avatar(type)
 						{
 							switch(type.id)
 							{
 								case "avatar_choice_server_stored":
-									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "";' : '', '
-									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+									', !empty($context['member']['avatar']['allow_server_stored']) ? '$("#avatar_server_stored").show();' : '', '
+									', !empty($context['member']['avatar']['allow_external']) ? '$("#avatar_external").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_upload']) ? '$("#avatar_upload").hide();' : '', '
 									break;
 								case "avatar_choice_external":
-									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "";' : '', '
-									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+									', !empty($context['member']['avatar']['allow_server_stored']) ? '$("#avatar_server_stored").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_external']) ? '$("#avatar_external").show();' : '', '
+									', !empty($context['member']['avatar']['allow_upload']) ? '$("#avatar_upload").hide();' : '', '
 									break;
 								case "avatar_choice_upload":
-									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "";' : '', '
+									', !empty($context['member']['avatar']['allow_server_stored']) ? '$("#avatar_server_stored").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_external']) ? '$("#avatar_external").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_upload']) ? '$("#avatar_upload").show();' : '', '
 									break;
 								case "avatar_choice_none":
-									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
-									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+									', !empty($context['member']['avatar']['allow_server_stored']) ? '$("#avatar_server_stored").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_external']) ? '$("#avatar_external").hide();' : '', '
+									', !empty($context['member']['avatar']['allow_upload']) ? '$("#avatar_upload").hide();' : '', '
 									break;
 							}
 						}
