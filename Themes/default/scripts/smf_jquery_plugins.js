@@ -9,7 +9,7 @@
  *
  */
  (function($) {
-
+	'use strict';
 	$.fn.SiteTooltip = function(oInstanceSettings) {
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
@@ -206,7 +206,7 @@
  * @author    Brian Cherne brian(at)cherne(dot)net
  */
 ;(function($) {
-
+	'use strict';
 	$.fn.hoverIntent = function (f, g) {
 		// default configuration options
 		var cfg = {
@@ -323,25 +323,24 @@
  */
 ;(function($){
 	'use strict';
-
 	$.fn.superfish = function(op){
 		var sf = $.fn.superfish,
 			c = sf.c,
 			over = function(){
-				var $$ = $(this),
-					menu = getMenu($$);
+				var $this = $(this),
+					menu = getMenu($this);
 
 				clearTimeout(menu.sfTimer);
-				$$.showSuperfishUl().siblings().hideSuperfishUl();
+				$this.showSuperfishUl().siblings().hideSuperfishUl();
 			},
 			out = function(){
-				var $$ = $(this),
-					menu = getMenu($$),
+				var $this = $(this),
+					menu = getMenu($this),
 					o = sf.op;
 
 				clearTimeout(menu.sfTimer);
 				menu.sfTimer = setTimeout(function(){
-					$$.hideSuperfishUl();
+					$this.hideSuperfishUl();
 				},o.delay);
 			},
 			getMenu = function($menu){
@@ -355,27 +354,28 @@
 			var s = this.serial = sf.o.length,
 				o = $.extend({}, sf.defaults, op),
 				h = $.extend({}, sf.hoverdefaults, {over: over, out: out}, op),
-				lis = $(this).find("li ul").parent();
+				$this = $(this),
+				lis = $this.find("li ul").parent(),
+				a_li = $this.find('a').parent('li');
 
-			//make sure passed in element actually has submenus
-			if (lis.length === 0)
-				return this;
-
-			sf.o[s] = sf.op = o;
-			if($.fn.hoverIntent && !o.disableHI)
+			// make sure passed in element actually has submenus
+			if (lis.length !== 0)
 			{
-				lis['hoverIntent'](over, out).hideSuperfishUl();
-			}
-			else
-			{
-				lis['hover'](h).hideSuperfishUl();
+				sf.o[s] = sf.op = o;
+				if($.fn.hoverIntent && !o.disableHI)
+				{
+					lis['hoverIntent'](over, out).hideSuperfishUl();
+				}
+				else
+				{
+					lis['hover'](h).hideSuperfishUl();
+				}
 			}
 
 			// add focus/blur events to the links
-			var $a = $(this).find('a').parent('li');
-			$a.each(function(i){
-				var $li = $a.eq(i);
-				$li.focus(function(){over.call($li);}).blur(function(){out.call($li);});
+			a_li.each(function() {
+				var li = $(this);
+				li.focus(function(){over.call(li);}).blur(function(){out.call(li);});
 			});
 			o.onInit.call(this);
 		}).each(function() {
