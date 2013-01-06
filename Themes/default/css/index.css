@@ -1313,6 +1313,7 @@ img.sort {
 #wrapper, .frame {
 	margin: 0 auto;
 	min-width: 760px;
+	width: 95%;
 	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
 	max-width: 100em;
 }
