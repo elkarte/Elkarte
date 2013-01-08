@@ -208,7 +208,7 @@ function template_generic_menu_dropdown_below()
 	global $context, $settings, $options;
 
 	echo '
-					</div>';
+				</div>';
 }
 
 // Some code for showing a tabbed view.
@@ -220,8 +220,8 @@ function template_generic_menu_tabs(&$menu_context)
 	$tab_context = &$menu_context['tab_data'];
 
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">';
+					<div class="cat_bar">
+						<h3 class="catbg">';
 
 	// Exactly how many tabs do we have?
 	foreach ($context['tabs'] as $id => $tab)
@@ -274,35 +274,38 @@ function template_generic_menu_tabs(&$menu_context)
 	if (!empty($selected_tab['icon']) || !empty($tab_context['icon']) || !empty($selected_tab['help']) || !empty($tab_context['help']))
 	{
 		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']))
-			echo '<img src="', $settings['images_url'], '/icons/', !empty($selected_tab['icon']) ? $selected_tab['icon'] : $tab_context['icon'], '" alt="" class="icon" />';
+			echo '
+						<img src="', $settings['images_url'], '/icons/', !empty($selected_tab['icon']) ? $selected_tab['icon'] : $tab_context['icon'], '" alt="" class="icon" />';
 
 		if (!empty($selected_tab['help']) || !empty($tab_context['help']))
-			echo '<a href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a>';
+			echo '
+						<a href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a>';
 
-		echo $tab_context['title'];
+		echo '
+						', $tab_context['title'];
 	}
 	else
 	{
 		echo '
-			', $tab_context['title'];
+						', $tab_context['title'];
 	}
 
 	echo '
-		</h3>
-	</div>';
+						</h3>
+					</div>';
 
 	// Shall we use the tabs?
 	if (!empty($settings['use_tabs']))
 	{
 		echo '
-	<p class="description">
-		', !empty($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
-	</p>';
+					<p class="description">
+						', !empty($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
+					</p>';
 
 		// The admin tabs.
 		echo '
-	<div id="adm_submenus">
-		<ul class="dropmenu">';
+					<div id="adm_submenus">
+						<ul class="dropmenu">';
 
 		// Print out all the items in this tab.
 		foreach ($tab_context['tabs'] as $sa => $tab)
@@ -313,28 +316,28 @@ function template_generic_menu_tabs(&$menu_context)
 			if (!empty($tab['is_selected']))
 			{
 				echo '
-			<li>
-				<a class="active" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
-			</li>';
+							<li>
+								<a class="active" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
+							</li>';
 			}
 			else
 				echo '
-			<li>
-				<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
-			</li>';
+							<li>
+								<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
+							</li>';
 		}
 
 		// the end of tabs
 		echo '
-		</ul>
-	</div>
-	<br class="clear" />';
+						</ul>
+					</div>
+					<br class="clear" />';
 	}
 	// ...if not use the old style
 	else
 	{
 		echo '
-	<p class="tabs">';
+					<p class="tabs">';
 
 		// Print out all the items in this tab.
 		foreach ($tab_context['tabs'] as $sa => $tab)
@@ -345,18 +348,18 @@ function template_generic_menu_tabs(&$menu_context)
 			if (!empty($tab['is_selected']))
 			{
 				echo '
-		<img src="', $settings['images_url'], '/selected.png" alt="*" /> <strong><a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a></strong>';
+						<img src="', $settings['images_url'], '/selected.png" alt="*" /> <strong><a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a></strong>';
 			}
 			else
 				echo '
-		<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a>';
+						<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a>';
 
 			if (empty($tab['is_last']))
 				echo ' | ';
 		}
 
 		echo '
-	</p>
-	<p class="description">', isset($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '</p>';
+					</p>
+					<p class="description">', isset($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '</p>';
 	}
 }
