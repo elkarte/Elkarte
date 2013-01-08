@@ -30,13 +30,16 @@ function deleteBadBehavior($filter)
 
 	// Delete all or just some?
 	if (isset($_POST['delall']) && empty($filter))
+	{
 		$smcFunc['db_query']('truncate_table', '
 			TRUNCATE {db_prefix}log_badbehavior',
 			array(
 			)
 		);
+	}
 	// Deleting all with a filter?
 	elseif (isset($_POST['delall']) && !empty($filter))
+	{
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_badbehavior
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
@@ -44,6 +47,7 @@ function deleteBadBehavior($filter)
 				'filter' => $filter['value']['sql'],
 			)
 		);
+	}
 	// Just specific entries?
 	elseif (!empty($_POST['delete']))
 	{
@@ -145,7 +149,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 			'date' => timeformat($row['date']),
 			'timestamp' => $row['date'],
 			'request_uri' => array(
-				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) == '?' ? $scripturl : '') . $row['request_uri']),
+				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri']),
 				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['request_uri']))
 			),
 			'http_headers' => array(

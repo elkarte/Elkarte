@@ -59,12 +59,12 @@ function action_badbehaviorlog()
 	}
 	elseif (isset($_GET['filter']) || isset($_GET['value']))
 	{
-		// Bad filter or something else goign on, back to the start you go
+		// Bad filter or something else going on, back to the start you go
 		unset($_GET['filter'], $_GET['value']);
 		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 	}
 
-	// Deleting or doing a little weeding?
+	// Deleting or just doing a little weeding?
 	if (isset($_POST['delall']) || isset($_POST['delete']))
 		deleteBadBehavior($filter);
 
@@ -111,7 +111,7 @@ function action_badbehaviorlog()
 			'real_name' => $txt['guest_title']
 		);
 
-		// Go through each entry and add the member data on.
+		// Go through each entry and add the member data.
 		foreach ($context['bb_entries'] as $id => $dummy)
 		{
 			$memID = $context['bb_entries'][$id]['member']['id'];
@@ -125,7 +125,7 @@ function action_badbehaviorlog()
 	// Filtering?
 	if (!empty($filter))
 	{
-		$context['filter'] = &$filter;
+		$context['filter'] = $filter;
 
 		// Set the filtering context.
 		if ($filter['variable'] === 'id_member')
@@ -136,7 +136,7 @@ function action_badbehaviorlog()
 		}
 		elseif ($filter['variable'] === 'url')
 		{
-			$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql']), array('\_' => '_')) . '\'';
+			$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql']), array('\_' => '_')) . '\'';
 		}
 		elseif ($filter['variable'] === 'headers')
 		{
@@ -144,7 +144,7 @@ function action_badbehaviorlog()
 			$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
 		}
 		else
-			$context['filter']['value']['html'] = &$filter['value']['sql'];
+			$context['filter']['value']['html'] = $filter['value']['sql'];
 	}
 
 	// And the standard template goodies
