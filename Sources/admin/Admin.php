@@ -270,6 +270,7 @@ function AdminMain()
 					'subsections' => array(
 						'weights' => array($txt['search_weights']),
 						'method' => array($txt['search_method']),
+						'managesphinx' => array($txt['search_sphinx']),
 						'settings' => array($txt['settings']),
 					),
 				),
