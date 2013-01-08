@@ -190,8 +190,8 @@ function template_generic_menu_dropdown_above()
 	}
 
 	echo '
-				</ul>
-			</div>';
+					</ul>
+				</div>';
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '

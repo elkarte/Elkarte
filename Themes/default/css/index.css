@@ -2018,8 +2018,7 @@ div#pollmoderation {
 	margin: 4px 0 0 0;
 }
 /* poster and postarea + moderation area underneath */
-#forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg,
-#forumposts .approvebg2, #personal_messages div.windowbg, #personal_messages div.windowbg2 {
+#forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg, #forumposts .approvebg2 {
 	overflow: visible;
 }
 .post_wrapper:after {
@@ -3463,7 +3462,7 @@ tr.windowbg2 td.stats_day {
 	margin: 0 0 0 9em;
 }
 #personal_messages div.labels {
-	padding: 0 12px 0 0;
+	margin: 11px 0 0;
 }
 #personal_messages .capacity_bar {
 	background: #f0f4f7;

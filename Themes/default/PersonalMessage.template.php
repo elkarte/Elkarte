@@ -58,15 +58,15 @@ function template_folder()
 
 	// The every helpful javascript!
 	echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
-						var allLabels = {};
-						var currentLabels = {};
-						var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
-						var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-					// ]]></script>';
+						<script type="text/javascript"><!-- // --><![CDATA[
+							var allLabels = {};
+							var currentLabels = {};
+							var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
+							var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+						// ]]></script>';
 
 	echo '
-					<form class="flow_hidden" action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="', $context['character_set'], '" name="pmFolder">';
+						<form class="flow_hidden" action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
 
 	// If we are not in single display mode show the subjects on the top!
 	if ($context['display_mode'] != 1)
@@ -274,7 +274,7 @@ function template_folder()
 				echo '
 									<li class="avatar">
 										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-											', $message['member']['avatar']['image'], '
+												', $message['member']['avatar']['image'], '
 										</a>
 									</li>';
 
@@ -332,7 +332,7 @@ function template_folder()
 			elseif ($context['folder'] != 'sent')
 				echo '(', $txt['pm_undisclosed_recipients'], ')';
 
-			echo '
+				echo '
 											<strong> ', $txt['on'], ':</strong> ', $message['time'], ' &#187;
 										</span>';
 
@@ -347,7 +347,15 @@ function template_folder()
 
 			echo '
 									</div>
-									<ul class="reset smalltext quickbuttons">';
+								</div>
+								<div class="post">
+									<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '
+									</div>';
+			
+			// Show our quick buttons like quote and reply
+			echo '
+									<div class="floatright">
+										<ul class="reset smalltext quickbuttons">';
 
 			// Show reply buttons if you have the permission to send PMs.
 			if ($context['can_send_pm'])
@@ -358,30 +366,76 @@ function template_folder()
 					// Is there than more than one recipient you can reply to?
 					if ($message['number_recipients'] > 1)
 						echo '
-										<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="reply_all_button">', $txt['reply_to_all'], '</a></li>';
+											<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="reply_all_button">', $txt['reply_to_all'], '</a></li>';
 
 					echo '
-										<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="reply_button">', $txt['reply'], '</a></li>
-										<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="quote_button">', $txt['quote'], '</a></li>';
+											<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="reply_button">', $txt['reply'], '</a></li>
+											<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="quote_button">', $txt['quote'], '</a></li>';
 				}
 				// This is for "forwarding" - even if the member is gone.
 				else
 					echo '
-										<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="quote_button">', $txt['reply_quote'], '</a></li>';
+											<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="quote_button">', $txt['reply_quote'], '</a></li>';
 			}
 
 			echo '
-										<li><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions[', $message['id'], ']=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="remove_button">', $txt['delete'], '</a></li>';
+											<li><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions[', $message['id'], ']=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="remove_button">', $txt['delete'], '</a></li>';
 
+			// Showing all then give a remove item checkbox
 			if (empty($context['display_mode']))
 				echo '
-										<li class="inline_mod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
+											<li class="inline_mod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
 
 			echo '
-									</ul>
-								</div>
-								<div class="post">
-									<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '</div>';
+										</ul>
+									</div>';
+
+			// Add a selection box if we have labels enabled.
+			if ($context['folder'] != 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
+			{
+				echo '
+									<div class="labels floatright">';
+
+				// Add the label drop down box.
+				if (!empty($context['currently_using_labels']))
+				{
+					echo '
+										<select name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
+												<option value="">', $txt['pm_msg_label_title'], ':</option>
+												<option value="" disabled="disabled">---------------</option>';
+
+					// Are there any labels which can be added to this?
+					if (!$message['fully_labeled'])
+					{
+						echo '
+											<option value="" disabled="disabled">', $txt['pm_msg_label_apply'], ':</option>';
+
+						foreach ($context['labels'] as $label)
+							if (!isset($message['labels'][$label['id']]))
+								echo '
+											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+					}
+
+					// ... and are there any that can be removed?
+					if (!empty($message['labels']) && (count($message['labels']) > 1 || !isset($message['labels'][-1])))
+					{
+						echo '
+											<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], 	':</option>';
+
+						foreach ($message['labels'] as $label)
+							echo '
+											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+					}
+
+					echo '
+										</select>
+										<noscript>
+											<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" style="float: none" />
+										</noscript>';
+				}
+				echo '
+									</div>';
+			}
 
 			// Are there any custom profile fields for above the signature?
 			if (!empty($message['member']['custom_fields']))
@@ -412,53 +466,6 @@ function template_folder()
 			if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 				echo '
 									<div class="signature">', $message['member']['signature'], '</div>';
-
-			// Add an extra line at the bottom if we have labels enabled.
-			if ($context['folder'] != 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
-			{
-				echo '
-									<div class="labels righttext flow_auto">';
-
-				// Add the label drop down box.
-				if (!empty($context['currently_using_labels']))
-				{
-					echo '
-										<select name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
-											<option value="">', $txt['pm_msg_label_title'], ':</option>
-											<option value="" disabled="disabled">---------------</option>';
-
-					// Are there any labels which can be added to this?
-					if (!$message['fully_labeled'])
-					{
-						echo '
-											<option value="" disabled="disabled">', $txt['pm_msg_label_apply'], ':</option>';
-
-						foreach ($context['labels'] as $label)
-							if (!isset($message['labels'][$label['id']]))
-								echo '
-											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
-					}
-
-					// ... and are there any that can be removed?
-					if (!empty($message['labels']) && (count($message['labels']) > 1 || !isset($message['labels'][-1])))
-					{
-						echo '
-											<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
-
-						foreach ($message['labels'] as $label)
-							echo '
-											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
-					}
-
-					echo '
-										</select>
-										<noscript>
-											<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" style="float: none" />
-										</noscript>';
-				}
-				echo '
-									</div>';
-			}
 
 			echo '
 								</div>
@@ -501,7 +508,7 @@ function template_folder()
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</form>';
+						</form>';
 }
 
 // Just list all the personal message subjects - to make templates easier.
@@ -626,7 +633,7 @@ function template_search()
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="', $context['character_set'], '" name="searchform" id="searchform">
+	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_search_title'], '</h3>
 		</div>';
@@ -934,7 +941,7 @@ function template_send()
 		</div>';
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
+	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
 		<div>
 			<div class="roundframe">
 				<br class="clear" />';
@@ -1198,7 +1205,7 @@ function template_prune()
 	global $context, $settings, $options, $scripturl, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
+	<form action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_prune'], '</h3>
 		</div>
@@ -1218,7 +1225,7 @@ function template_labels()
 	global $context, $settings, $options, $scripturl, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="', $context['character_set'], '">
+	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_manage_labels'], '</h3>
 		</div>
@@ -1283,7 +1290,7 @@ function template_labels()
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>
 	<br class="clear" />
-	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="', $context['character_set'], '" style="margin-top: 1ex;">
+	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8" style="margin-top: 1ex;">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_label_add_new'], '</h3>
 		</div>
@@ -1312,7 +1319,7 @@ function template_report_message()
 	global $context, $settings, $options, $txt, $scripturl;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], '" method="post" accept-charset="', $context['character_set'], '">
+	<form action="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], '" method="post" accept-charset="UTF-8">
 		<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_report_title'], '</h3>
@@ -1383,7 +1390,7 @@ function template_rules()
 	global $context, $settings, $options, $txt, $scripturl;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=manrules" method="post" accept-charset="', $context['character_set'], '" name="manRules" id="manrules">
+	<form action="', $scripturl, '?action=pm;sa=manrules" method="post" accept-charset="UTF-8" name="manRules" id="manrules">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_manage_rules'], '</h3>
 		</div>
@@ -1507,7 +1514,7 @@ function template_add_rule()
 	// ]]></script>';
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="', $context['character_set'], '" name="addrule" id="addrule" class="flow_hidden">
+	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8" name="addrule" id="addrule" class="flow_hidden">
 		<div class="cat_bar">
 			<h3 class="catbg">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h3>
 		</div>
@@ -1678,13 +1685,8 @@ function template_showPMDrafts()
 			</h3>
 		</div>
 		<div class="pagesection">
-			<span>', $context['page_index'], '</span>
+			<div>', $context['page_index'], '</div>
 		</div>';
-
-	// Button shortcuts
-	$edit_button = create_button('modify_inline.png', 'draft_edit', 'draft_edit', 'class="centericon"');
-	$remove_button = create_button('delete.png', 'draft_delete', 'draft_delete', 'class="centericon"');
-
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -1698,35 +1700,40 @@ function template_showPMDrafts()
 		foreach ($context['drafts'] as $draft)
 		{
 			echo '
-			<div class="topic">
-				<div class="', $draft['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
-					<div class="content">
-						<div class="counter">', $draft['counter'], '</div>
-						<div class="topic_details">
-							<h5><strong>', $draft['subject'], '</strong>&nbsp;';
-
-			echo '
-							</h5>
-							<span class="smalltext">&#171;&nbsp;<strong>', $txt['draft_saved_on'], ':</strong> ', sprintf($txt['draft_days_ago'], $draft['age']), (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : ''), '&#187;</span><br />
-							<span class="smalltext">&#171;&nbsp;<strong>', $txt['to'], ':</strong> ', implode(', ', $draft['recipients']['to']), '&nbsp;&#187;</span><br />
-							<span class="smalltext">&#171;&nbsp;<strong>', $txt['pm_bcc'], ':</strong> ', implode(', ', $draft['recipients']['bcc']), '&nbsp;&#187;</span>
-						</div>
-						<div class="list_posts">
-							', $draft['body'], '
-						</div>
-						<ul class="reset smalltext quickbuttons">
-							<li><a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '"  class="reply_button"><span>', $txt['draft_edit'], '</span></a></li>
-							<li><a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a></li>
-						</ul>
-					</div>
+		<div class="', $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+			<div class="content">
+				<div class="counter">', $draft['counter'], '</div>
+				<div class="topic_details">
+					<h5><strong>',
+						$draft['subject'], '</strong>&nbsp;
+					</h5>
+					<span class="smalltext">&#171;&nbsp;<strong>', $txt['draft_saved_on'], ':</strong> ', sprintf($txt['draft_days_ago'], $draft['age']), (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : ''), '&#187;</span>
+					<br />
+					<span class="smalltext">&#171;&nbsp;<strong>', $txt['to'], ':</strong> ', implode(', ', $draft['recipients']['to']), '&nbsp;&#187;</span>
+					<br />
+					<span class="smalltext">&#171;&nbsp;<strong>', $txt['pm_bcc'], ':</strong> ', implode(', ', $draft['recipients']['bcc']), '&nbsp;&#187;</span>
 				</div>
-			</div>';
+				<div class="list_posts">
+					', $draft['body'], '
+				</div>
+				<div class="floatright">
+					<ul class="quickbuttons">
+						<li>
+							<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="reply_button"><span>', $txt['draft_edit'], '</span></a>
+						</li>
+						<li>
+							<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>';
 		}
 	}
 
 	// Show page numbers.
 	echo '
 		<div class="pagesection" style="margin-bottom: 0;">
-			<span>', $context['page_index'], '</span>
+			<div class="pagelinks">', $context['page_index'], '</div>
 		</div>';
 }
