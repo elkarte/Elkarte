@@ -114,6 +114,7 @@ function ModifySecuritySettings()
 	$subActions = array(
 		'general' => 'ModifyGeneralSecuritySettings',
 		'spam' => 'ModifySpamSettings',
+		'badbehavior' => 'ModifyBadBehaviorSettings',
 		'moderation' => 'ModifyModerationSettings',
 	);
 
@@ -135,6 +136,9 @@ function ModifySecuritySettings()
 			),
 			'spam' => array(
 				'description' => $txt['antispam_Settings_desc'] ,
+			),
+			'badbehavior' => array(
+				'description' => $txt['badbehavior_desc'] ,
 			),
 			'moderation' => array(
 			),
@@ -993,6 +997,123 @@ function ModifySpamSettings($return_config = false)
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 	$context['settings_title'] = $txt['antispam_Settings'];
+
+	prepareDBSettingContext($config_vars);
+}
+
+/**
+ * Change the way bad behavior ... well behaves
+ *
+ * @param $return_config
+ */
+function ModifyBadBehaviorSettings($return_config = false)
+{
+	global $txt, $scripturl, $context, $modSettings;
+
+	// Our callback templates are here
+	loadTemplate('BadBehavior');
+
+	// See if they supplied a valid looking http:BL API Key
+	$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
+
+	// Any errors to display?
+	if ($context['invalid_badbehavior_httpbl_key'])
+	{
+		$context['settings_message'][] = $txt['setting_badbehavior_httpbl_key_invalid'];
+		$context['error_type'] = 'notice';
+	}
+
+	// Have we blocked anything in the last 7 days?
+	if (!empty($modSettings['badbehavior_enabled']))
+		$context['settings_message'][] = bb2_insert_stats(true);
+
+	// Current whitelist data
+	$whitelist = array('badbehavior_ip_wl', 'badbehavior_useragent_wl', 'badbehavior_url_wl');
+	foreach ($whitelist as $list)
+	{
+		$context[$list] = array();
+		$context[$list . '_desc'] = array();
+
+		if (!empty($modSettings[$list]))
+			$context[$list] = unserialize($modSettings[$list]);
+
+		if (!empty($modSettings[$list . '_desc']))
+			$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);	
+	}
+
+	// Build up our options array
+	$config_vars = array(
+		array('title', 'badbehavior_title'),
+			array('desc', 'badbehavior_desc'),
+			array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
+			array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
+			array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
+			array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
+			array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
+			array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
+			array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
+			'',
+			array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
+			array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
+			array('text', 'badbehavior_reverse_proxy_addresses', 30),
+			'',
+			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
+			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
+			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),	
+		array('title', 'badbehavior_whitelist_title'),
+			array('desc', 'badbehavior_wl_desc'),
+			array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
+			array('callback', 'badbehavior_add_ip'),
+			array('callback', 'badbehavior_add_url'),
+			array('callback', 'badbehavior_add_useragent'),
+	);
+
+	if ($return_config)
+		return $config_vars;
+
+	// Saving?
+	if (isset($_GET['save']))
+	{
+		checkSession();
+
+		// Make sure Bad Behavior defaults are set if nothing was specified
+		$_POST['badbehavior_httpbl_threat'] = empty($_POST['badbehavior_httpbl_threat']) ? 25 : $_POST['badbehavior_httpbl_threat'];
+		$_POST['badbehavior_httpbl_maxage'] = empty($_POST['badbehavior_httpbl_maxage']) ? 30 : $_POST['badbehavior_httpbl_maxage'];
+		$_POST['badbehavior_reverse_proxy_header'] = empty($_POST['badbehavior_reverse_proxy_header']) ? 'X-Forwarded-For' : $_POST['badbehavior_reverse_proxy_header'];
+
+		// Build up the whitelist options
+		foreach ($whitelist as $list)
+		{
+			$this_list = array();
+			$this_desc = array();
+
+			if (isset($_POST[$list]))
+			{
+				// clear blanks from the data field, only grab the comments that don't have blank data value
+				$this_list = array_map('trim', array_filter($_POST[$list]));
+				$this_desc = array_intersect_key($_POST[$list . '_desc'], $this_list);
+			}
+			updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
+		}
+
+		saveDBSettings($config_vars);
+		redirectexit('action=admin;area=securitysettings;sa=badbehavior');
+	}
+
+	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
+	
+	// javascript vars for the "add more xyz" buttons in the callback forms
+	addInlineJavascript('
+	var sUrlParent = \'add_more_url_placeholder\';
+	var oUrlOptionsdt = {name: \'badbehavior_url_wl_desc[]\', class: \'input_text\'};
+	var oUrlOptionsdd = {name: \'badbehavior_url_wl[]\', class: \'input_text\'};
+	var sUseragentParent = \'add_more_useragent_placeholder\';
+	var oUseragentOptionsdt = {name: \'badbehavior_useragent_wl_desc[]\', class: \'input_text\'};
+	var oUseragentOptionsdd = {name: \'badbehavior_useragent_wl[]\', class: \'input_text\'};
+	var sIpParent = \'add_more_ip_placeholder\';
+	var oIpOptionsdt = {name: \'badbehavior_ip_wl_desc[]\', class: \'input_text\'};
+	var oIpOptionsdd = {name: \'badbehavior_ip_wl[]\', class: \'input_text\'};'
+	);
 
 	prepareDBSettingContext($config_vars);
 }
@@ -2108,6 +2229,7 @@ function ModifyPruningSettings($return_config = false)
 			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
 			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
 			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
+			array('int', 'pruneBadbehaviorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Bad Behavior log.
 			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
 			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
 			// Mod Developers: Do NOT use the pruningOptions master variable for this as the Core may overwrite your setting in the future!
@@ -2155,9 +2277,9 @@ function ModifyPruningSettings($return_config = false)
 
 	// Get the actual values
 	if (!empty($modSettings['pruningOptions']))
-		@list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
+		@list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
 	else
-		$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneSpiderHitLog'] = 0;
+		$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
 	prepareDBSettingContext($config_vars);
 }

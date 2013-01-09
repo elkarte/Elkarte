@@ -139,6 +139,7 @@ function AdminMain()
 					'subsections' => array(
 						'general' => array($txt['mods_cat_security_general']),
 						'spam' => array($txt['antispam_title']),
+						'badbehavior' => array($txt['badbehavior_title']),
 						'moderation' => array($txt['moderation_settings_short'], 'enabled' => substr($modSettings['warning_settings'], 0, 1) == 1),
 					),
 				),
@@ -468,6 +469,7 @@ function AdminMain()
 						'banlog' => array($txt['ban_log'], 'manage_bans'),
 						'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
 						'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
+						'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled'])),
 						'pruning' => array($txt['pruning_title'], 'admin_forum'),
 					),
 				),
@@ -964,13 +966,14 @@ function AdminSearchOM()
  */
 function AdminLogs()
 {
-	global $sourcedir, $context, $txt, $scripturl;
+	global $sourcedir, $context, $txt, $scripturl, $modSettings;
 
 	// These are the logs they can load.
 	$log_functions = array(
 		'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
 		'adminlog' => array('Modlog.php', 'action_modlog'),
 		'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
+		'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled'])),
 		'banlog' => array('ManageBans.php', 'action_log'),
 		'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 		'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
@@ -1008,6 +1011,9 @@ function AdminLogs()
 			),
 			'tasklog' => array(
 				'description' => $txt['scheduled_log_desc'],
+			),
+			'badbehaviorlog' => array(
+				'description' => $txt['badbehavior_log_desc'],
 			),
 			'pruning' => array(
 				'description' => $txt['pruning_log_desc'],
