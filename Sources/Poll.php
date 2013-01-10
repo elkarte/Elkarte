@@ -309,6 +309,7 @@ function action_editpoll()
 
 	loadLanguage('Post');
 	loadTemplate('Poll');
+	loadJavascriptFile('post.js', array(), 'post_scripts');
 
 	$context['start'] = (int) $_REQUEST['start'];
 	$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
