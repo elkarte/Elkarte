@@ -195,6 +195,7 @@ function template_main()
 					<th scope="col" class="first_th" width="4%">&nbsp;</th>
 					<th scope="col" class="lefttext">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
 					<th scope="col" class="stats" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
+
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
 				echo '

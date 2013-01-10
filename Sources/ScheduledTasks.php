@@ -95,7 +95,7 @@ function AutoTask()
 				// Log that we did it ;)
 				if ($completed)
 				{
-					$total_time = round(array_sum(explode(' ', microtime())) - array_sum(explode(' ', $time_start)), 3);
+					$total_time = round(microtime(true) - $time_start, 3);
 					$smcFunc['db_insert']('',
 						'{db_prefix}log_scheduled_tasks',
 						array(
@@ -1475,6 +1475,20 @@ function scheduled_weekly_maintenance()
 
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}log_banned
+				WHERE log_time < {int:log_time}',
+				array(
+					'log_time' => $t,
+				)
+			);
+		}
+
+		if (!empty($modSettings['pruneBadbehaviorLog']))
+		{
+			// Figure out when our cutoff time is.  1 day = 86400 seconds.
+			$t = time() - $modSettings['pruneBadbehaviorLog'] * 86400;
+
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}log_badbehavior
 				WHERE log_time < {int:log_time}',
 				array(
 					'log_time' => $t,

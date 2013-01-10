@@ -31,7 +31,7 @@ define('DIALOGO', 1);
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
 error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
-$time_start = microtime();
+$time_start = microtime(true);
 
 // This makes it so headers can be sent!
 ob_start();
@@ -71,6 +71,7 @@ loadDatabase();
 
 // Load the settings from the settings table, and perform operations like optimizing.
 reloadSettings();
+
 // Clean the request variables, add slashes, etc.
 cleanRequest();
 $context = array();
@@ -141,6 +142,9 @@ function smf_main()
 
 	// Load the current user's permissions.
 	loadPermissions();
+
+	// Load BadBehavior before we go much further
+	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))

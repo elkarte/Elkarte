@@ -239,6 +239,8 @@ $txt['admin_log'] = 'Administration Log';
 $txt['admin_log_desc'] = 'Lists administrative tasks that have been performed by admins of your forum.';
 $txt['moderation_log'] = 'Moderation Log';
 $txt['moderation_log_desc'] = 'Lists moderation activities that have been performed by moderators on your forum.';
+$txt['badbehavior_log'] = 'Bad Behavior Log';
+$txt['badbehavior_log_desc'] = 'Lists requests that were blocked or marked suspicious by bad behavior.  If verbose logging is on all HTTP requests are listed.';
 $txt['spider_log_desc'] = 'Review the entries related to search engine spider activity on your forum.';
 $txt['pruning_log_desc'] = 'Use these tools to prune older entries in the various logs.';
 
@@ -656,6 +658,7 @@ $txt['core_settings_desc'] = 'This page allows you to turn on or off optional fe
 $txt['mods_cat_features'] = 'General';
 $txt['mods_cat_security_general'] = 'General';
 $txt['antispam_title'] = 'Anti-Spam';
+$txt['badbehavior_title'] = 'Bad-Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
@@ -666,7 +669,7 @@ $txt['pruning_title'] = 'Log Pruning';
 
 $txt['core_settings_activation_message'] = 'The feature {core_feature} has been activated, click on the title to configure it';
 $txt['core_settings_deactivation_message'] = 'The feature {core_feature} has been deactivated';
-$txt['core_settings_generic_error'] = 'An unforeseen error occurred, please relod the page and try again';
+$txt['core_settings_generic_error'] = 'An unforeseen error occurred, please reload the page and try again';
 
 $txt['boardsEdit'] = 'Modify Boards';
 $txt['mboards_new_cat'] = 'Create new category';
