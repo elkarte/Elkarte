@@ -553,6 +553,48 @@ $.sceditorBBCodePlugin.bbcode.set(
 );
 
 $.sceditorBBCodePlugin.bbcode.set(
+	'img', {
+		tags: {
+			img: {
+				src: null
+			}
+		},
+		allowsEmpty: true,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function(element, content) {
+			var	attribs = '',
+				style = function(name) {
+					return element.style ? element.style[name] : null;
+				};
+
+			// check if this is an emoticon image
+			if(typeof element.attr('data-sceditor-emoticon') !== "undefined")
+				return content;
+
+			// only add width and height if one is specified
+			if(element.attr('width') || style('width'))
+				attribs += " width=" + $(element).width();
+			if(element.attr('height') || style('height'))
+				attribs += " height=" + $(element).height();
+
+			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
+		},
+		html: function(token, attrs, content) {
+			var	parts,
+				attribs = '';
+
+			// handle [img width=340 height=240]url[/img]
+			if(typeof attrs.width !== "undefined")
+				attribs += ' width="' + attrs.width + '"';
+			if(typeof attrs.height !== "undefined")
+				attribs += ' height="' + attrs.height + '"';
+
+			return '<img' + attribs + ' src="' + content + '" />';
+		}
+	}
+);
+
+$.sceditorBBCodePlugin.bbcode.set(
 	'list', {
 		breakStart: true,
 		isInline: false,
