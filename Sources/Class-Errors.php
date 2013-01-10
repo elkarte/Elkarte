@@ -272,7 +272,7 @@ class attachment_error_context
 			if ($attachID !== null)
 			{
 				if (isset($this->_attachs[$attachID]))
-					return $this->_attachs[$attachID]['error']->hasErrors($severity)
+					return $this->_attachs[$attachID]['error']->hasErrors($severity);
 			}
 			else
 			{
