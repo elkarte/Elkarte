@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_main()
+function template_poll_edit()
 {
 	global $context, $settings, $options, $txt, $scripturl;
 

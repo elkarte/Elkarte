@@ -310,6 +310,7 @@ function action_editpoll()
 	loadLanguage('Post');
 	loadTemplate('Poll');
 	loadJavascriptFile('post.js', array(), 'post_scripts');
+	$context['sub_template'] = 'poll_edit';
 
 	$context['start'] = (int) $_REQUEST['start'];
 	$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
@@ -465,22 +466,22 @@ function action_editpoll()
 			$context['poll']['expiration'] = $_POST['poll_expire'];
 
 		// Check the question/option count for errors.
-		if (trim($_POST['question']) == '' && empty($context['poll_error']))
+		if (trim($_POST['question']) == '' && empty($context['post_error']))
 			$poll_errors[] = 'no_question';
 
 		// No check is needed, since nothing is really posted.
 		checkSubmitOnce('free');
 
 		// Take a check for any errors... assuming we haven't already done so!
-		if (!empty($poll_errors) && empty($context['poll_error']))
+		if (!empty($poll_errors) && empty($context['post_error']))
 		{
 			loadLanguage('Errors');
 
-			$context['poll_error'] = array('messages' => array());
+			$context['post_error'] = array('messages' => array());
 			foreach ($poll_errors as $poll_error)
 			{
-				$context['poll_error'][$poll_error] = true;
-				$context['poll_error']['messages'][] = $txt['error_' . $poll_error];
+				$context['post_error'][$poll_error] = true;
+				$context['post_error']['messages'][] = $txt['error_' . $poll_error];
 			}
 		}
 	}
@@ -566,6 +567,7 @@ function action_editpoll()
 		}
 	}
 	$context['page_title'] = $context['is_edit'] ? $txt['poll_edit'] : $txt['add_poll'];
+	$context['form_url'] = $scripturl . '?action=editpoll2' . ($context['is_edit'] ? '' : ';add') . ';topic=' . $context['current_topic'] . '.' . $context['start'];
 
 	// Build the link tree.
 	censorText($pollinfo['subject']);
@@ -671,11 +673,11 @@ function action_editpoll2()
 		// Previewing.
 		$_POST['preview'] = true;
 
-		$context['poll_error'] = array('messages' => array());
+		$context['post_error'] = array('messages' => array());
 		foreach ($poll_errors as $poll_error)
 		{
-			$context['poll_error'][$poll_error] = true;
-			$context['poll_error']['messages'][] = $txt['error_' . $poll_error];
+			$context['post_error'][$poll_error] = true;
+			$context['post_error']['messages'][] = $txt['error_' . $poll_error];
 		}
 
 		return action_editpoll();
