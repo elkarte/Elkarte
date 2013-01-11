@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_main()
+function template_poll_edit()
 {
 	global $context, $settings, $options, $txt, $scripturl;
 
@@ -23,20 +23,8 @@ function template_main()
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var pollOptionNum = 0;
 			var pollOptionId = ', $context['last_choice_id'], ';
-
-			function addPollOption()
-			{
-				if (pollOptionNum == 0)
-				{
-					for (var i = 0; i < document.forms.postmodify.elements.length; i++)
-						if (document.forms.postmodify.elements[i].id.substr(0, 8) == "options-")
-							pollOptionNum++;
-				}
-				pollOptionNum++
-				pollOptionId++
-
-				setOuterHTML(document.getElementById("pollMoreOptions"), \'<li><label for="options-\' + pollOptionId + \'" ', (isset($context['poll_error']['no_question']) ? ' class="error"' : ''), '>', $txt['option'], ' \' + pollOptionNum + \'</label>: <input type="text" name="options[\' + (pollOptionId) + \']" id="options-\' + (pollOptionId) + \'" value="" size="80" maxlength="255" class="input_text" /></li><li id="pollMoreOptions"></li\');
-			}
+			var form_name = \'postmodify\';
+			var txt_option = "', $txt['option'], '";
 		// ]]></script>';
 
 	// Start the main poll form.

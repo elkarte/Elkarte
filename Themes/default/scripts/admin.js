@@ -430,6 +430,40 @@ function addAnotherQuestion()
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
 
+// Add a new dt/dd pair above a parent selector
+function addAnotherOption(parent, oDtName, oDdName)
+{
+	// Some defaults to use if none are passed
+	oDtName['type'] = oDtName['type'] || 'text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
+	oDtName['size'] = oDtName['size'] || '20';
+
+	oDdName['type'] = oDdName['type'] || 'text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
+	oDdName['size'] = oDdName['size'] || '20';
+
+	// our new <dt> element
+	var newDT = document.createElement('dt');
+	var newInput = createNamedElement('input', oDtName['name']);
+	newInput.type = oDtName['type'];
+	newInput.setAttribute('class', oDtName['class']);
+	newInput.size = oDtName['size'];
+	newDT.appendChild(newInput);
+
+	// and its matching <dd>
+	var newDD = document.createElement('dd');
+	newInput = createNamedElement('input', oDdName['name']);
+	newInput.type = oDdName['type'];
+	newInput.size = oDdName['size'];
+	newInput.setAttribute('class', oDdName['class']);
+	newDD.appendChild(newInput);
+
+	// place the new dt/dd pair before our parent
+	var placeHolder = document.getElementById(parent);
+	placeHolder.parentNode.insertBefore(newDT, placeHolder);
+	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}
+
 function smfSetLatestThemes()
 {
 	if (typeof(window.ourLatestThemes) != "undefined")

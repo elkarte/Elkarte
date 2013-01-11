@@ -1344,3 +1344,41 @@ function constructBanQueryIP($fullip)
 
 	return $ban_query;
 }
+
+/**
+ * Decide if we are going to enable bad behavior scanning for this user
+ * - Admins and Moderators get a free pass
+ * - Optionally existing users with post counts over a limit are bypassed
+ * - Others get a humane frisking
+ */
+function loadBadBehavior()
+{
+	global $modSettings, $user_info, $context, $sourcedir, $bb2_results;
+
+	$bb_run = false;
+
+	// Bad Behavior Enabled?
+	if (!empty($modSettings['badbehavior_enabled']))
+	{
+		require_once($sourcedir . '/lib/bad-behavior/badbehavior-plugin.php');
+		$bb_run = true;
+
+		// We may want to give some folks a hallway pass
+		if (!$user_info['is_guest'])
+		{
+			if ($user_info['is_mod'] || $user_info['is_admin'])
+				$bb_run = false;
+			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] < 0)
+				$bb_run = false;
+			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] > 0 && ($user_info['posts'] > $modSettings['badbehavior_postcount_wl']))
+				$bb_run = false;
+		}
+
+		// Put on the sanitary gloves, its time for a patdown !
+		if ($bb_run === true)
+		{
+			$bb2_results = bb2_start(bb2_read_settings());
+			addInlineJavascript(bb2_insert_head());
+		}
+	}
+}

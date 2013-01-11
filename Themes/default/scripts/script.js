@@ -1489,12 +1489,12 @@ function pollOptions()
 
 	if (isEmptyText(expire_time) || expire_time.value == 0)
 	{
-		document.forms.postmodify.poll_hide[2].disabled = true;
-		if (document.forms.postmodify.poll_hide[2].checked)
-			document.forms.postmodify.poll_hide[1].checked = true;
+		document.forms[form_name].poll_hide[2].disabled = true;
+		if (document.forms[form_name].poll_hide[2].checked)
+			document.forms[form_name].poll_hide[1].checked = true;
 	}
 	else
-		document.forms.postmodify.poll_hide[2].disabled = false;
+		document.forms[form_name].poll_hide[2].disabled = false;
 }
 
 function generateDays(offset)
@@ -1543,6 +1543,21 @@ function selectBoards(ids, aFormID)
 
 	for (i = 0; i < ids.length; i++)
 		aForm["brd" + ids[i]].checked = !toggle;
+}
+
+function expandCollapse(id, icon, speed)
+{
+	icon = icon || false;
+	speed = speed || 300;
+	var oId = $('#' + id);
+
+	// change the icon on the box as well?
+	if (icon)
+		$('#' + icon).attr("src", smf_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+	
+	// open or collaspe the content id
+	oId.slideToggle(speed);
+
 }
 
 function updateRuleDef(optNum)

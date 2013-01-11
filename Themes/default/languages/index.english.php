@@ -553,9 +553,8 @@ $txt['mlist_search_results'] = 'Search results for';
 $txt['mlist_search_by'] = 'Search by %1$s';
 $txt['mlist_menu_view'] = 'View the memberlist';
 
-$txt['attach_downloaded'] = 'downloaded';
-$txt['attach_viewed'] = 'viewed';
-$txt['attach_times'] = 'times';
+$txt['attach_downloaded'] = 'downloaded %1$d times';
+$txt['attach_viewed'] = 'viewed %1$d times';
 
 $txt['settings'] = 'Settings';
 $txt['never'] = 'Never';
@@ -794,6 +793,9 @@ $txt['prompt_text_img'] = 'Enter image location';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['autosuggest_delete_item'] = 'Delete Item';
+
+// Bad Behavior
+$txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> has blocked %1$s access attempts in the last 7 days.';
 
 // Debug related - when $db_show_debug is true.
 $txt['debug_templates'] = 'Templates: ';

@@ -31,7 +31,7 @@ global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd, $cachedir
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
-$time_start = microtime();
+$time_start = microtime(true);
 
 // Just being safe...
 foreach (array('db_character_set', 'cachedir') as $variable)
@@ -139,6 +139,9 @@ loadUserSettings();
 
 // Load the current user's permissions....
 loadPermissions();
+
+// Load BadBehavior functions
+loadBadBehavior();
 
 // Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);

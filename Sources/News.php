@@ -207,7 +207,7 @@ function action_showfeed()
 		if (isset($_REQUEST[$var]))
 			$cachekey[] = $_REQUEST[$var];
 	$cachekey = md5(serialize($cachekey) . (!empty($query_this_board) ? $query_this_board : ''));
-	$cache_t = microtime();
+	$cache_t = microtime(true);
 
 	// Get the associative array representing the xml.
 	if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
@@ -217,7 +217,7 @@ function action_showfeed()
 		$xml = $subActions[$_GET['sa']][0]($xml_format);
 
 		if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
-		|| (!$user_info['is_guest'] && (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.2))))
+		|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
 			cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 	}
 
