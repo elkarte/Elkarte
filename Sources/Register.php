@@ -455,7 +455,7 @@ function action_register2($verifiedOpenID = false)
 	if (!empty($reg_errors))
 	{
 		$_REQUEST['step'] = 2;
-		return Register($reg_errors);
+		return action_register($reg_errors);
 	}
 	// If they're wanting to use OpenID we need to validate them first.
 	if (empty($_SESSION['openid']['verified']) && !empty($_POST['authenticate']) && $_POST['authenticate'] == 'openid')
@@ -485,7 +485,7 @@ function action_register2($verifiedOpenID = false)
 	{
 		$reg_errors = array_merge($reg_errors, $memberID);
 		$_REQUEST['step'] = 2;
-		return Register($reg_errors);
+		return action_register($reg_errors);
 	}
 
 	// Do our spam protection now.
