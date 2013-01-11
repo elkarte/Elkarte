@@ -310,7 +310,7 @@
 	};
 })(jQuery);
 
-/*
+/**
  * Superfish v1.4.8 - jQuery menu widget
  * Copyright (c) 2008 Joel Birch
  *
@@ -319,7 +319,17 @@
  *
  * CHANGELOG: http://users.tpg.com.au/j_birch/plugins/superfish/changelog.txt
  *
- * This is Derivative code for use in Elkarte
+ * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING
+ * This is Derivative code for use in Elkarte, code has been tweaked to give responsive menus without compromising a11y.
+ * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
+ * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
+ * If you do not understand the a11y advantages of this system, please ask before making changes.
+ *
+ * Full functionality means:
+ * 1/ hoverIntent plugin functions so that drop menus do NOT open or close instantly when cursor touches first level anchor.
+ * 2/ The drop menus should only open when the cursor actually stops on the first level anchor, or is moving very slowly.
+ * 3/ There should be a delay before the drop menus close on mouseout, for people with less than perfect tracking ability.
+ * 4/ The drop menus must remain fully accessible via keyboard navigation (eg: the Tab key).
  */
 ;(function($){
 	'use strict';
