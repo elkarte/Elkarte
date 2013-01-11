@@ -1489,12 +1489,12 @@ function pollOptions()
 
 	if (isEmptyText(expire_time) || expire_time.value == 0)
 	{
-		document.forms.postmodify.poll_hide[2].disabled = true;
-		if (document.forms.postmodify.poll_hide[2].checked)
-			document.forms.postmodify.poll_hide[1].checked = true;
+		document.forms[form_name].poll_hide[2].disabled = true;
+		if (document.forms[form_name].poll_hide[2].checked)
+			document.forms[form_name].poll_hide[1].checked = true;
 	}
 	else
-		document.forms.postmodify.poll_hide[2].disabled = false;
+		document.forms[form_name].poll_hide[2].disabled = false;
 }
 
 function generateDays(offset)
