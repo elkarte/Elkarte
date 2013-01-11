@@ -1,4 +1,15 @@
 /**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
  * Extension functions to provide Dialogo compatibility with sceditor
  */
 (function($) {
@@ -33,14 +44,15 @@
 					.attr({
 						src: emoticon.url || emoticon,
 						alt: code,
-						title: emoticon.tooltip || emoticon,
+						title: emoticon.tooltip || emoticon
 					})
 					.click(function (e) {
-						var	start = '', end = '';
+						var	start = '',
+							end = '';
 
 						if(base.opts.emoticonsCompat)
 						{
-							start = '<span> ';
+							start = '<span>';
 							end   = ' </span>';
 						}
 
@@ -66,12 +78,12 @@
 				this.toggleSourceMode();
 		},
 		createPermanentDropDown: function() {
-			var	emoticons	= $.extend({}, this.opts.emoticons.dropdown);
-			var popup_exists = false;
+			var	emoticons	= $.extend({}, this.opts.emoticons.dropdown),
+				popup_exists = false;
+			
 			base = this;
-
-			content = $('<div class="sceditor-insertemoticon" />');
-			line = $('<div />');
+			content = $('<div class="sceditor-insertemoticon" />'),
+			line = $('<div id="sceditor-smileycontainer" />');
 
 			for(smiley_popup in this.opts.emoticons.popup)
 			{
@@ -79,34 +91,35 @@
 				break;
 			}
 
+			// For any smileys that go in the more popup
 			if(popup_exists)
 			{
 				this.opts.emoticons.more = this.opts.emoticons.popup;
-				moreButton = $('<div class="sceditor-more-button" />').attr({'class': "sceditor-more"}).text('[' + this._('More') + ']').click(function () {
-					if($(".sceditor-smileyPopup").length > 0)
-					{
-						$(".sceditor-smileyPopup").fadeIn('fast');
-					}
+				moreButton = $('<div class="sceditor-more" />').text(this._('More')).click(function () {
+					var popup_box = $('.sceditor-smileyPopup');
+
+					if(popup_box.length > 0)
+						popup_box.fadeIn('fast');
 					else
 					{
-						var emoticons = $.extend({}, base.opts.emoticons.popup);
-						var popup_position;
-						var titlebar = $('<div class="catbg sceditor-popup-grip"/>');
-
+						var emoticons = $.extend({}, base.opts.emoticons.popup),
+							popup_position,
+							adjheight = 0,
+							titlebar = $('<div class="catbg sceditor-popup-grip"/>');
+							
 						popupContent = $('<div id="sceditor-popup"/>');
-						allowHide = true;
 						line = $('<div id="sceditor-popup-smiley"/>');
-						adjheight = 0;
 
+						// create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
+
+						$.each(emoticons, base.appendEmoticon);
+						if(line.children().length > 0)
+							popupContent.append(line);
+
 						closeButton = $('<span />').text('[' + base._('Close') + ']').click(function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
-
-						$.each(emoticons, base.appendEmoticon);
-
-						if(line.children().length > 0)
-							popupContent.append(line);
 						if(typeof closeButton !== "undefined")
 							popupContent.append(closeButton);
 
@@ -121,20 +134,25 @@
 						$dropdown.appendTo($('body'));
 						dropdownIgnoreLastClick = true;
 						adjheight = closeButton.height() + titlebar.height();
+
+						// make the window fits the contents we just put in it
 						$dropdown.css({
 							position: "fixed",
 							top: $(window).height() * 0.2,
 							left: $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2),
 							"max-width": "50%",
-							"max-height": "50%",
+							"max-height": "50%"
 						}).find('#sceditor-popup-smiley').css({
 							height: $dropdown.height() - adjheight,
 							"overflow": "auto"
 						});
 
-						$('.sceditor-smileyPopup').animaDrag({ 
-							speed: 150, 
-							interval: 120, 
+						// Allow the smiley window to be moved about
+						$('.sceditor-smileyPopup').animaDrag({
+							speed: 100,
+							interval: 120,
+							easing: null, 
+							cursor: 'move', 
 							during: function(e) {
 								$(this).height(this.startheight);
 								$(this).width(this.startwidth);
@@ -143,7 +161,7 @@
 								this.startheight = $(this).innerHeight();
 								this.startwidth = $(this).innerWidth();
 							},
-							grip: '.sceditor-popup-grip' 
+							grip: '.sceditor-popup-grip'
 						});
 
 						// stop clicks within the dropdown from being handled
@@ -153,7 +171,11 @@
 					}
 				});
 			}
+
+			// show the standard placement icons
 			$.each(emoticons, base.appendEmoticon);
+
+			// Show the more button on the editor if we have more
 			if(typeof moreButton !== "undefined")
 				content.append(moreButton);
 		}
@@ -207,7 +229,7 @@ $.sceditor.command.set(
 			editor.createDropDown(caller, "insertlink", content);
 		},
 		txtExec: ["[ftp]", "[/ftp]"],
-		tooltip: 'Insert FTP Link',
+		tooltip: 'Insert FTP Link'
 	}
 );
 
@@ -217,7 +239,7 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('[glow=red,2,300]', '[/glow]');
 		},
 		txtExec: ["[glow=red,2,300]", "[/glow]"],
-		tooltip: 'Glow',
+		tooltip: 'Glow'
 	}
 );
 
@@ -227,7 +249,7 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('[shadow=red,left]', '[/shadow]');
 		},
 		txtExec: ["[shadow=red,left]", "[/shadow]"],
-		tooltip: 'Shadow',
+		tooltip: 'Shadow'
 	}
 );
 
@@ -237,7 +259,7 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('<tt>', '</tt>');
 		},
 		txtExec: ["[tt]", "[/tt]"],
-		tooltip: 'Teletype',
+		tooltip: 'Teletype'
 	}
 );
 
@@ -247,7 +269,7 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('<pre>', '</pre>');
 		},
 		txtExec: ["[pre]", "[/pre]"],
-		tooltip: 'Preformatted Text',
+		tooltip: 'Preformatted Text'
 	}
 );
 
@@ -257,7 +279,7 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('<marquee>', '</marquee>');
 		},
 		txtExec: ["[move]", "[/move]"],
-		tooltip: 'Move',
+		tooltip: 'Move'
 	}
 );
 
@@ -268,19 +290,19 @@ $.sceditor.command.set(
  */
 $.sceditor.command.set(
 	'bulletlist', {
-		txtExec: ["[list]\n[li]", "[/li]\n[li][/li]\n[/list]"],
+		txtExec: ["[list]\n[li]", "[/li]\n[li][/li]\n[/list]"]
 	}
 );
 
 $.sceditor.command.set(
 	'orderedlist', {
-		txtExec:  ["[list type=decimal]\n[li]", "[/li]\n[li][/li]\n[/list]"],
+		txtExec:  ["[list type=decimal]\n[li]", "[/li]\n[li][/li]\n[/list]"]
 	}
 );
 
 $.sceditor.command.set(
 	'table', {
-		txtExec: ["[table]\n[tr]\n[td]", "[/td]\n[/tr]\n[/table]"],
+		txtExec: ["[table]\n[tr]\n[td]", "[/td]\n[/tr]\n[/table]"]
 	}
 );
 
@@ -341,7 +363,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 		html: function(element, attrs, content) {
 			if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
 				return content;
-			if(attrs.defaultattr != 'rtl' && attrs.defaultattr != 'ltr')
+			if(attrs.defaultattr !== 'rtl' && attrs.defaultattr !== 'ltr')
 				return '[bdo=' + attrs.defaultattr + ']' + content + '[/bdo]';
 
 			return '<bdo dir="' + attrs.defaultattr + '">' + content + '</bdo>';
@@ -431,7 +453,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 /**
  * Dialogo modified tags, modified so they support the existing paradigm
  *
- * Changes the way existing editor tags work 
+ * Changes the way existing editor tags work
  * Modifies code, quote, list, ul, ol, li
  */
 $.sceditorBBCodePlugin.bbcode.set(
@@ -471,7 +493,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 			if(typeof attrs.defaultattr !== "undefined")
 				from = '<cite>' + attrs.defaultattr + '</cite>';
 
-			return '<code>' + from + content.replace('[', '&#91;') + '</code>'
+			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
 		}
 	}
 );
@@ -506,7 +528,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 			return ['author', 'date', 'link'];
 		},
 		html: function(element, attrs, content) {
-			var attr_author = '', 
+			var attr_author = '',
 				sAuthor = '',
 				attr_date = '',
 				sDate = '',
@@ -571,7 +593,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 $.sceditorBBCodePlugin.bbcode.set(
 	'li', {
-		breakAfter: true,
+		breakAfter: true
 	}
 );
 

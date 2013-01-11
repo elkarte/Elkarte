@@ -23,168 +23,169 @@ function template_admin()
 
 	// Welcome message for the admin.
 	echo '
-	<div id="admincenter">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">';
+					<div id="admincenter">
+						<div id="section_header" class="cat_bar">
+							<h3 class="catbg">';
 
 	if ($context['user']['is_admin'])
 		echo '
-			<object id="quick_search">
-				<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" class="floatright">
-					<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
-					<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
-					<select name="search_type">
-						<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
-						<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
-						<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
-					</select>
-					<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
-				</form>
-			</object>';
+								<object id="quick_search">
+									<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
+										<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
+										<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
+										<select name="search_type">
+											<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
+											<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
+											<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
+										</select>
+										<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
+									</form>
+								</object>';
 
-	echo $txt['admin_center'], '
-			</h3>
-		</div>
-		<div class="roundframe">
-			<div id="welcome">
-				<strong>', $txt['hello_guest'], ' ', $context['user']['name'], '!</strong>
-				', sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']), '
-			</div>
-		</div>';
+	echo 
+								$txt['admin_center'], '
+							</h3>
+						</div>
+						<div class="roundframe">
+							<div id="welcome">
+								<strong>', $txt['hello_guest'], ' ', $context['user']['name'], '!</strong>
+								', sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']), '
+							</div>
+						</div>';
 
 	// Is there an update available?
 	echo '
-		<div id="update_section"></div>';
+						<div id="update_section"></div>';
 
 	echo '
-		<div id="admin_main_section">';
+						<div id="admin_main_section">';
 
 	// Display the "live news" from simplemachines.org.
 	echo '
-			<div id="live_news" class="floatleft">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
-					</h3>
-				</div>
-				<div class="windowbg nopadding">
-					<div class="content">
-						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
-					</div>
-				</div>
-			</div>';
+							<div id="live_news" class="floatleft">
+								<div class="cat_bar">
+									<h3 class="catbg">
+										<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+									</h3>
+								</div>
+								<div class="windowbg nopadding">
+									<div class="content">
+										<div id="ourAnnouncements">', $txt['lfyi'], '</div>
+									</div>
+								</div>
+							</div>';
 
 	// Show the user version information from their server.
 	echo '
-			<div id="supportVersionsTable" class="floatright">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
-					</h3>
-				</div>
-				<div class="windowbg nopadding">
-					<div class="content">
-						<div id="version_details">
-							<strong>', $txt['support_versions'], ':</strong><br />
-							', $txt['support_versions_forum'], ':
-							<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
-							', $txt['support_versions_current'], ':
-							<em id="ourVersion" style="white-space: nowrap;">??</em><br />
-							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
+							<div id="supportVersionsTable" class="floatright">
+								<div class="cat_bar">
+									<h3 class="catbg">
+										<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+									</h3>
+								</div>
+								<div class="windowbg nopadding">
+									<div class="content">
+										<div id="version_details">
+											<strong>', $txt['support_versions'], ':</strong><br />
+											', $txt['support_versions_forum'], ':
+											<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
+											', $txt['support_versions_current'], ':
+											<em id="ourVersion" style="white-space: nowrap;">??</em><br />
+											', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
 	echo '
-							<br />
-							<strong>', $txt['administrators'], ':</strong>
-							', implode(', ', $context['administrators']);
+											<br />
+											<strong>', $txt['administrators'], ':</strong>
+											', implode(', ', $context['administrators']);
 	
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
-							(', $context['more_admins_link'], ')';
+											(', $context['more_admins_link'], ')';
 
 	echo '
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>';
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>';
 
 	echo '
-		<div class="windowbg2 quick_tasks">
-			<div class="content">
-				<ul id="quick_tasks" class="flow_hidden">';
+						<div class="windowbg2 quick_tasks">
+							<div class="content">
+								<ul id="quick_tasks" class="flow_hidden">';
 
 	foreach ($context['quick_admin_tasks'] as $task)
 		echo '
-					<li>
-						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
-						<h5>', $task['link'], '</h5>
-						<span class="task">', $task['description'],'</span>
-					</li>';
+									<li>
+										', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
+										<h5>', $task['link'], '</h5>
+										<span class="task">', $task['description'],'</span>
+									</li>';
 
 	echo '
-				</ul>
-			</div>
-		</div>
-	</div>';
+								</ul>
+							</div>
+						</div>
+					</div>';
 
 	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_smf_js']))
 		echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
+					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAdminIndex = new smf_AdminIndex({
-				sSelf: \'oAdminCenter\',
+					<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
+					<script type="text/javascript"><!-- // --><![CDATA[
+						var oAdminIndex = new smf_AdminIndex({
+							sSelf: \'oAdminCenter\',
 
-				bLoadAnnouncements: true,
-				sAnnouncementTemplate: ', JavaScriptEscape('
-					<dl>
-						%content%
-					</dl>
-				'), ',
-				sAnnouncementMessageTemplate: ', JavaScriptEscape('
-					<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
-					<dd>
-						%message%
-					</dd>
-				'), ',
-				sAnnouncementContainerId: \'ourAnnouncements\',
+							bLoadAnnouncements: true,
+							sAnnouncementTemplate: ', JavaScriptEscape('
+								<dl>
+									%content%
+								</dl>
+							'), ',
+							sAnnouncementMessageTemplate: ', JavaScriptEscape('
+								<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
+								<dd>
+									%message%
+								</dd>
+							'), ',
+							sAnnouncementContainerId: \'ourAnnouncements\',
 
-				bLoadVersions: true,
-				sOurVersionContainerId: \'ourVersion\',
-				sYourVersionContainerId: \'yourVersion\',
-				sVersionOutdatedTemplate: ', JavaScriptEscape('
-					<span class="alert">%currentVersion%</span>
-				'), ',
+							bLoadVersions: true,
+							sOurVersionContainerId: \'ourVersion\',
+							sYourVersionContainerId: \'yourVersion\',
+							sVersionOutdatedTemplate: ', JavaScriptEscape('
+								<span class="alert">%currentVersion%</span>
+							'), ',
 
-				bLoadUpdateNotification: true,
-				sUpdateNotificationContainerId: \'update_section\',
-				sUpdateNotificationDefaultTitle: ', JavaScriptEscape($txt['update_available']), ',
-				sUpdateNotificationDefaultMessage: ', JavaScriptEscape($txt['update_message']), ',
-				sUpdateNotificationTemplate: ', JavaScriptEscape('
-					<div class="cat_bar">
-						<h3 id="update_title" class="catbg">
-							%title%
-						</h3>
-					</div>
-					<div class="windowbg">
-						<div class="content">
-							<div id="update_message" class="smalltext">
-								%message%
-							</div>
-						</div>
-					</div>
-				'), ',
-				sUpdateNotificationLink: smf_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+							bLoadUpdateNotification: true,
+							sUpdateNotificationContainerId: \'update_section\',
+							sUpdateNotificationDefaultTitle: ', JavaScriptEscape($txt['update_available']), ',
+							sUpdateNotificationDefaultMessage: ', JavaScriptEscape($txt['update_message']), ',
+							sUpdateNotificationTemplate: ', JavaScriptEscape('
+								<div class="cat_bar">
+									<h3 id="update_title" class="catbg">
+										%title%
+									</h3>
+								</div>
+								<div class="windowbg">
+									<div class="content">
+										<div id="update_message" class="smalltext">
+											%message%
+										</div>
+									</div>
+								</div>
+							'), ',
+							sUpdateNotificationLink: smf_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
-			});
-		// ]]></script>';
+						});
+					// ]]></script>';
 }
 
 /**
@@ -196,159 +197,158 @@ function template_credits()
 
 	// Show the user version information from their server.
 	echo '
-
-	<div id="admincenter">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">
-				', $txt['support_credits_title'], '
-			</h3>
-		</div>
-		<div id="support_credits">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['support_title'], ' <img src="', $settings['images_url'], '/logo.png" id="credits_logo" alt="" />
-				</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<strong>', $txt['support_versions'], ':</strong><br />
-						', $txt['support_versions_forum'], ':
-					<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
-						', $txt['support_versions_current'], ':
-					<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
+					<div id="admincenter">
+						<div id="section_header" class="cat_bar">
+							<h3 class="catbg">
+								', $txt['support_credits_title'], '
+							</h3>
+						</div>
+						<div id="support_credits">
+							<div class="cat_bar">
+								<h3 class="catbg">
+									', $txt['support_title'], ' <img src="', $settings['images_url'], '/logo.png" id="credits_logo" alt="" />
+								</h3>
+							</div>
+							<div class="windowbg">
+								<div class="content">
+									<strong>', $txt['support_versions'], ':</strong><br />
+										', $txt['support_versions_forum'], ':
+									<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+										', $txt['support_versions_current'], ':
+									<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
 	{
 		echo '
-						', $version['title'], ':
-					<em>', $version['version'], '</em>';
+										', $version['title'], ':
+									<em>', $version['version'], '</em>';
 
 		// more details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
 			echo
-					' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+									' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
 		echo '
-					<br />';
+									<br />';
 	}
 
 	echo '
-				</div>
-			</div>';
+								</div>
+							</div>';
 
 	// Point the admin to common support resources.
 	echo '
-			<div id="support_resources" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['support_resources'], '
-				</h3>
-			</div>
-			<div class="windowbg2">
-				<div class="content">
-					<p>', $txt['support_resources_p1'], '</p>
-					<p>', $txt['support_resources_p2'], '</p>
-				</div>
-			</div>';
+							<div id="support_resources" class="cat_bar">
+								<h3 class="catbg">
+									', $txt['support_resources'], '
+								</h3>
+							</div>
+							<div class="windowbg2">
+								<div class="content">
+									<p>', $txt['support_resources_p1'], '</p>
+									<p>', $txt['support_resources_p2'], '</p>
+								</div>
+							</div>';
 
 	// Display latest support questions from simplemachines.org.
 	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
-				</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
-				</div>
-			</div>';
+							<div class="cat_bar">
+								<h3 class="catbg">
+									<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+								</h3>
+							</div>
+							<div class="windowbg">
+								<div class="content">
+									<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
+								</div>
+							</div>';
 
 	// The most important part - the credits :P.
 	echo '
-			<div id="credits_sections" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['admin_credits'], '
-				</h3>
-			</div>
-			<div class="windowbg2">
-				<div class="content">';
+							<div id="credits_sections" class="cat_bar">
+								<h3 class="catbg">
+									', $txt['admin_credits'], '
+								</h3>
+							</div>
+							<div class="windowbg2">
+								<div class="content">';
 
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
 			echo '
-					<p>', $section['pretext'], '</p><hr />';
+									<p>', $section['pretext'], '</p><hr />';
 
 		echo '
-					<dl>';
+									<dl>';
 
 		foreach ($section['groups'] as $group)
 		{
 			if (isset($group['title']))
 				echo '
-						<dt>
-							<strong>', $group['title'], ':</strong>
-						</dt>';
+										<dt>
+											<strong>', $group['title'], ':</strong>
+										</dt>';
 
 			echo '
-						<dd>', implode(', ', $group['members']), '</dd>';
+										<dd>', implode(', ', $group['members']), '</dd>';
 		}
 
 		echo '
-					</dl>';
+									</dl>';
 
 		if (isset($section['posttext']))
 			echo '
-					<hr />
-					<p>', $section['posttext'], '</p>';
+									<hr />
+									<p>', $section['posttext'], '</p>';
 	}
 
 	echo '
-				</div>
-			</div>
-		</div>
-	</div>';
+								</div>
+							</div>
+						</div>
+					</div>';
 
 	// This makes all the support information available to the support script...
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var ourSupportVersions = {};
+					<script type="text/javascript"><!-- // --><![CDATA[
+						var ourSupportVersions = {};
 
-			ourSupportVersions.forum = "', $context['forum_version'], '";';
+						ourSupportVersions.forum = "', $context['forum_version'], '";';
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
 		echo '
-			ourSupportVersions.', $variable, ' = "', $version['version'], '";';
+						ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 
 	// Now we just have to include the script and wait ;).
 	echo '
-		// ]]></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
+					// ]]></script>
+					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
-			function ourCurrentVersion()
-			{
-				var ourVer, yourVer;
-console.log("here");
-				if (!window.ourVersion)
-					return;
+					<script type="text/javascript"><!-- // --><![CDATA[
+						function ourCurrentVersion()
+						{
+							var ourVer, yourVer;
 
-				ourVer = document.getElementById("ourVersion");
-				yourVer = document.getElementById("yourVersion");
+							if (!window.ourVersion)
+								return;
 
-				setInnerHTML(ourVer, window.ourVersion);
+							ourVer = document.getElementById("ourVersion");
+							yourVer = document.getElementById("yourVersion");
 
-				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion != window.ourVersion)
-					setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
-			}
-			addLoadEvent(ourCurrentVersion)
-		// ]]></script>';
+							setInnerHTML(ourVer, window.ourVersion);
+
+							var currentVersion = getInnerHTML(yourVer);
+							if (currentVersion != window.ourVersion)
+								setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
+						}
+						addLoadEvent(ourCurrentVersion)
+					// ]]></script>';
 }
 
 /**
@@ -359,225 +359,225 @@ function template_view_versions()
 	global $context, $settings, $options, $scripturl, $txt;
 
 	echo '
-	<div id="admincenter">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">
-				', $txt['admin_version_check'], '
-			</h3>
-		</div>
-		<div class="information">', $txt['version_check_desc'], '</div>
-			<table width="100%" class="table_grid">
-				<thead>
-					<tr class="catbg" align="left">
-						<th class="first_th" scope="col" width="50%">
-							<strong>', $txt['admin_smffile'], '</strong>
-						</th>
-						<th scope="col" width="25%">
-							<strong>', $txt['dvc_your'], '</strong>
-						</th>
-						<th class="last_th" scope="col" width="25%">
-							<strong>', $txt['dvc_current'], '</strong>
-						</th>
-					</tr>
-				</thead>
-				<tbody>';
+					<div id="admincenter">
+						<div id="section_header" class="cat_bar">
+							<h3 class="catbg">
+								', $txt['admin_version_check'], '
+							</h3>
+						</div>
+						<div class="information">', $txt['version_check_desc'], '</div>
+							<table width="100%" class="table_grid">
+								<thead>
+									<tr class="catbg" align="left">
+										<th class="first_th" scope="col" width="50%">
+											<strong>', $txt['admin_smffile'], '</strong>
+										</th>
+										<th scope="col" width="25%">
+											<strong>', $txt['dvc_your'], '</strong>
+										</th>
+										<th class="last_th" scope="col" width="25%">
+											<strong>', $txt['dvc_current'], '</strong>
+										</th>
+									</tr>
+								</thead>
+								<tbody>';
 
 	// The current version of the core package.
 	echo '
-					<tr>
-						<td class="windowbg">
-							', $txt['admin_smfpackage'], '
-						</td>
-						<td class="windowbg">
-							<em id="yourVersion">', $context['forum_version'], '</em>
-						</td>
-						<td class="windowbg">
-							<em id="ourVersion">??</em>
-						</td>
-					</tr>';
+									<tr>
+										<td class="windowbg">
+											', $txt['admin_smfpackage'], '
+										</td>
+										<td class="windowbg">
+											<em id="yourVersion">', $context['forum_version'], '</em>
+										</td>
+										<td class="windowbg">
+											<em id="ourVersion">??</em>
+										</td>
+									</tr>';
 
 	// Now list all the source file versions, starting with the overall version (if all match!).
 	echo '
-					<tr>
-						<td class="windowbg">
-							<a href="#" id="Sources-link">', $txt['dvc_sources'], '</a>
-						</td>
-						<td class="windowbg">
-							<em id="yourSources">??</em>
-						</td>
-						<td class="windowbg">
-							<em id="ourSources">??</em>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+									<tr>
+										<td class="windowbg">
+											<a href="#" id="Sources-link">', $txt['dvc_sources'], '</a>
+										</td>
+										<td class="windowbg">
+											<em id="yourSources">??</em>
+										</td>
+										<td class="windowbg">
+											<em id="ourSources">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
-			<table id="Sources" width="100%" class="table_grid">
-			<tbody>';
+							<table id="Sources" width="100%" class="table_grid">
+							<tbody>';
 
 	// Loop through every source file displaying its version - using javascript.
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
-				<tr>
-					<td class="windowbg2" width="50%" style="padding-left: 3ex;">
-						', $filename, '
-					</td>
-					<td class="windowbg2" width="25%">
-						<em id="yourSources', $filename, '">', $version, '</em>
-					</td>
-					<td class="windowbg2" width="25%">
-						<em id="ourSources', $filename, '">??</em>
-					</td>
-				</tr>';
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="yourSources', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="ourSources', $filename, '">??</em>
+									</td>
+								</tr>';
 
 	// Default template files.
 	echo '
-			</tbody>
-			</table>
+							</tbody>
+							</table>
 
-			<table width="100%" class="table_grid">
-				<tbody>
-					<tr>
-						<td class="windowbg" width="50%">
-							<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="yourDefault">??</em>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="ourDefault">??</em>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yourDefault">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ourDefault">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
-			<table id="Default" width="100%" class="table_grid">
-				<tbody>';
+							<table id="Default" width="100%" class="table_grid">
+								<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
 		echo '
-					<tr>
-						<td class="windowbg2" width="50%" style="padding-left: 3ex;">
-							', $filename, '
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="yourDefault', $filename, '">', $version, '</em>
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="ourDefault', $filename, '">??</em>
-						</td>
-					</tr>';
+									<tr>
+										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+											', $filename, '
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="yourDefault', $filename, '">', $version, '</em>
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="ourDefault', $filename, '">??</em>
+										</td>
+									</tr>';
 
 	// Now the language files...
 	echo '
-				</tbody>
-			</table>
+								</tbody>
+							</table>
 
-			<table width="100%" class="table_grid">
-				<tbody>
-					<tr>
-						<td class="windowbg" width="50%">
-							<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="yourLanguages">??</em>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="ourLanguages">??</em>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yourLanguages">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ourLanguages">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
-			<table id="Languages" width="100%" class="table_grid">
-				<tbody>';
+							<table id="Languages" width="100%" class="table_grid">
+								<tbody>';
 
 	foreach ($context['default_language_versions'] as $language => $files)
 	{
 		foreach ($files as $filename => $version)
 			echo '
-					<tr>
-						<td class="windowbg2" width="50%" style="padding-left: 3ex;">
-							', $filename, '.<em>', $language, '</em>.php
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="your', $filename, '.', $language, '">', $version, '</em>
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="our', $filename, '.', $language, '">??</em>
-						</td>
-					</tr>';
+									<tr>
+										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+											', $filename, '.<em>', $language, '</em>.php
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="your', $filename, '.', $language, '">', $version, '</em>
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="our', $filename, '.', $language, '">??</em>
+										</td>
+									</tr>';
 	}
 
 	echo '
-				</tbody>
-			</table>';
+								</tbody>
+							</table>';
 
 	// Finally, display the version information for the currently selected theme - if it is not the default one.
 	if (!empty($context['template_versions']))
 	{
 		echo '
-			<table width="100%" class="table_grid">
-				<tbody>
-					<tr>
-						<td class="windowbg" width="50%">
-							<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="yourTemplates">??</em>
-						</td>
-						<td class="windowbg" width="25%">
-							<em id="ourTemplates">??</em>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yourTemplates">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ourTemplates">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
-			<table id="Templates" width="100%" class="table_grid">
-				<tbody>';
+							<table id="Templates" width="100%" class="table_grid">
+								<tbody>';
 
 		foreach ($context['template_versions'] as $filename => $version)
 			echo '
-					<tr>
-						<td class="windowbg2" width="50%" style="padding-left: 3ex;">
-							', $filename, '
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="yourTemplates', $filename, '">', $version, '</em>
-						</td>
-						<td class="windowbg2" width="25%">
-							<em id="ourTemplates', $filename, '">??</em>
-						</td>
-					</tr>';
+									<tr>
+										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+											', $filename, '
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="yourTemplates', $filename, '">', $version, '</em>
+										</td>
+										<td class="windowbg2" width="25%">
+											<em id="ourTemplates', $filename, '">??</em>
+										</td>
+									</tr>';
 
 		echo '
-				</tbody>
-			</table>';
+								</tbody>
+							</table>';
 	}
 
 	echo '
-		</div>';
+						</div>';
 
 	/* Below is the hefty javascript for this. Upon opening the page it checks the current file versions with ones
 	   held at simplemachines.org and works out if they are up to date.  If they aren't it colors that files number
 	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	   file categories. (sources, languages, and templates.) */
 	echo '
-		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oViewVersions = new smf_ViewVersions({
-				aKnownLanguages: [
-					\'.', implode('\',
-					\'.', $context['default_known_languages']), '\'
-				],
-				oSectionContainerIds: {
-					Sources: \'Sources\',
-					Default: \'Default\',
-					Languages: \'Languages\',
-					Templates: \'Templates\'
-				}
-			});
-		// ]]></script>';
+						<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
+						<script type="text/javascript"><!-- // --><![CDATA[
+							var oViewVersions = new smf_ViewVersions({
+								aKnownLanguages: [
+									\'.', implode('\',
+									\'.', $context['default_known_languages']), '\'
+								],
+								oSectionContainerIds: {
+									Sources: \'Sources\',
+									Default: \'Default\',
+									Languages: \'Languages\',
+									Templates: \'Templates\'
+								}
+							});
+						// ]]></script>';
 }
 
 // Form for stopping people using naughty words, etc.
@@ -588,7 +588,7 @@ function template_edit_censored()
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="', $context['character_set'], '">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
 			<div id="section_header" class="cat_bar">
 				<h3 class="catbg">
 					', $txt['admin_censored_words'], '
@@ -689,7 +689,7 @@ function template_not_done()
 				</div>';
 
 	echo '
-				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="', $context['character_set'], '" style="margin: 0;" name="autoSubmit" id="autoSubmit">
+				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" style="margin: 0;" name="autoSubmit" id="autoSubmit">
 					<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
 					', $context['continue_post_data'], '
 				</form>
@@ -717,7 +717,7 @@ function template_show_settings()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
+		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	// Is there a custom title?
 	if (isset($context['settings_title']))
@@ -879,6 +879,7 @@ function template_show_settings()
 											<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
 										</li>';
 					}
+
 					echo '			</ul>
 								<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
 							</fieldset>';
@@ -900,7 +901,6 @@ function template_show_settings()
 						'</dd>';
 			}
 		}
-
 		else
 		{
 			// Just show a separator.
@@ -930,22 +930,21 @@ function template_show_settings()
 				</div>
 			</div>';
 
-
 	// At least one token has to be used!
 	if (isset($context['admin-ssc_token']))
 		echo '
-		<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
+			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
 
 	if (isset($context['admin-dbsc_token']))
 		echo '
-		<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
+			<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
 
 	if (isset($context['admin-mp_token']))
 		echo '
-		<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />';
+			<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />';
 
 	echo '
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>';
 
@@ -986,9 +985,9 @@ function template_edit_profile_field()
 
 	// All the javascript for this page - quite a bit in script.js!
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var startOptID = ', count($context['field']['options']), ';
-	// ]]></script>';
+					<script type="text/javascript"><!-- // --><![CDATA[
+						var startOptID = ', count($context['field']['options']), ';
+					// ]]></script>';
 
 	// any errors messages to show?
 	if (isset($_GET['msg']))
@@ -996,214 +995,214 @@ function template_edit_profile_field()
 		loadLanguage('Errors');
 		if (isset($txt['custom_option_' . $_GET['msg']]))
 			echo '
-	<div class="errorbox">',
-		$txt['custom_option_' . $_GET['msg']], '
-	</div>';
+					<div class="errorbox">',
+						$txt['custom_option_' . $_GET['msg']], '
+					</div>';
 	}
 
 	echo '
-	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<fieldset>
-						<legend>', $txt['custom_edit_general'], '</legend>
+					<div id="admincenter">
+						<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+							<div id="section_header" class="cat_bar">
+								<h3 class="catbg">
+									', $context['page_title'], '
+								</h3>
+							</div>
+							<div class="windowbg">
+								<div class="content">
+									<fieldset>
+										<legend>', $txt['custom_edit_general'], '</legend>
+										<dl class="settings">
+											<dt>
+												<strong><label for="field_name">', $txt['custom_edit_name'], ':</label></strong>
+											</dt>
+											<dd>
+												<input type="text" name="field_name" id="field_name" value="', $context['field']['name'], '" size="20" maxlength="40" class="input_text" />
+											</dd>
+											<dt>
+												<strong><label for="field_desc">', $txt['custom_edit_desc'], ':</label></strong>
+											</dt>
+											<dd>
+												<textarea name="field_desc" id="field_desc" rows="3" cols="40">', $context['field']['desc'], '</textarea>
+											</dd>
+											<dt>
+												<strong><label for="profile_area">', $txt['custom_edit_profile'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_profile_desc'], '</span>
+											</dt>
+											<dd>
+												<select name="profile_area" id="profile_area">
+													<option value="none"', $context['field']['profile_area'] == 'none' ? ' selected="selected"' : '', '>', $txt['custom_edit_profile_none'], '</option>
+													<option value="account"', $context['field']['profile_area'] == 'account' ? ' selected="selected"' : '', '>', $txt['account'], '</option>
+													<option value="forumprofile"', $context['field']['profile_area'] == 'forumprofile' ? ' selected="selected"' : '', '>', $txt['forumprofile'], '</option>
+													<option value="theme"', $context['field']['profile_area'] == 'theme' ? ' selected="selected"' : '', '>', $txt['theme'], '</option>
+												</select>
+											</dd>
+											<dt>
+												<strong><label for="reg">', $txt['custom_edit_registration'], ':</label></strong>
+											</dt>
+											<dd>
+												<select name="reg" id="reg">
+													<option value="0"', $context['field']['reg'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_disable'], '</option>
+													<option value="1"', $context['field']['reg'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_allow'], '</option>
+													<option value="2"', $context['field']['reg'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_require'], '</option>
+												</select>
+											</dd>
+											<dt>
+												<strong><label for="display">', $txt['custom_edit_display'], ':</label></strong>
+											</dt>
+											<dd>
+												<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
+											</dd>
 
-						<dl class="settings">
-							<dt>
-								<strong><label for="field_name">', $txt['custom_edit_name'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="text" name="field_name" id="field_name" value="', $context['field']['name'], '" size="20" maxlength="40" class="input_text" />
-							</dd>
-							<dt>
-								<strong><label for="field_desc">', $txt['custom_edit_desc'], ':</label></strong>
-							</dt>
-							<dd>
-								<textarea name="field_desc" id="field_desc" rows="3" cols="40">', $context['field']['desc'], '</textarea>
-							</dd>
-							<dt>
-								<strong><label for="profile_area">', $txt['custom_edit_profile'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_profile_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="profile_area" id="profile_area">
-									<option value="none"', $context['field']['profile_area'] == 'none' ? ' selected="selected"' : '', '>', $txt['custom_edit_profile_none'], '</option>
-									<option value="account"', $context['field']['profile_area'] == 'account' ? ' selected="selected"' : '', '>', $txt['account'], '</option>
-									<option value="forumprofile"', $context['field']['profile_area'] == 'forumprofile' ? ' selected="selected"' : '', '>', $txt['forumprofile'], '</option>
-									<option value="theme"', $context['field']['profile_area'] == 'theme' ? ' selected="selected"' : '', '>', $txt['theme'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<strong><label for="reg">', $txt['custom_edit_registration'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="reg" id="reg">
-									<option value="0"', $context['field']['reg'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_disable'], '</option>
-									<option value="1"', $context['field']['reg'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_allow'], '</option>
-									<option value="2"', $context['field']['reg'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_require'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<strong><label for="display">', $txt['custom_edit_display'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-
-							<dt>
-								<strong><label for="placement">', $txt['custom_edit_placement'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="placement" id="placement">
-									<option value="0"', $context['field']['placement'] == '0' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_standard'], '</option>
-									<option value="1"', $context['field']['placement'] == '1' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_withicons'], '</option>
-									<option value="2"', $context['field']['placement'] == '2' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_abovesignature'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="enclose">', $txt['custom_edit_enclose'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
-							</dt>
-							<dd>
-								<textarea name="enclose" id="enclose" rows="10" cols="50">', @$context['field']['enclose'], '</textarea>
-							</dd>
-						</dl>
-					</fieldset>
-					<fieldset>
-						<legend>', $txt['custom_edit_input'], '</legend>
-						<dl class="settings">
-							<dt>
-								<strong><label for="field_type">', $txt['custom_edit_picktype'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="field_type" id="field_type" onchange="updateInputBoxes();">
-									<option value="text"', $context['field']['type'] == 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
-									<option value="textarea"', $context['field']['type'] == 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
-									<option value="select"', $context['field']['type'] == 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
-									<option value="radio"', $context['field']['type'] == 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>
-									<option value="check"', $context['field']['type'] == 'check' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_check'], '</option>
-								</select>
-							</dd>
-							<dt id="max_length_dt">
-								<strong><label for="max_length_dd">', $txt['custom_edit_max_length'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_max_length_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="text" name="max_length" id="max_length_dd" value="', $context['field']['max_length'], '" size="7" maxlength="6" class="input_text" />
-							</dd>
-							<dt id="dimension_dt">
-								<strong><label for="dimension_dd">', $txt['custom_edit_dimension'], ':</label></strong>
-							</dt>
-							<dd id="dimension_dd">
-								<strong>', $txt['custom_edit_dimension_row'], ':</strong> <input type="text" name="rows" value="', $context['field']['rows'], '" size="5" maxlength="3" class="input_text" />
-								<strong>', $txt['custom_edit_dimension_col'], ':</strong> <input type="text" name="cols" value="', $context['field']['cols'], '" size="5" maxlength="3" class="input_text" />
-							</dd>
-							<dt id="bbc_dt">
-								<strong><label for="bbc_dd">', $txt['custom_edit_bbc'], '</label></strong>
-							</dt>
-							<dd >
-								<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt id="options_dt">
-								<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="options_dd">', $txt['custom_edit_options'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
-							</dt>
-							<dd id="options_dd">
-								<div>';
+											<dt>
+												<strong><label for="placement">', $txt['custom_edit_placement'], ':</label></strong>
+											</dt>
+											<dd>
+												<select name="placement" id="placement">
+													<option value="0"', $context['field']['placement'] == '0' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_standard'], '</option>
+													<option value="1"', $context['field']['placement'] == '1' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_withicons'], '</option>
+													<option value="2"', $context['field']['placement'] == '2' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_abovesignature'], '</option>
+												</select>
+											</dd>
+											<dt>
+												<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+												<strong><label for="enclose">', $txt['custom_edit_enclose'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
+											</dt>
+											<dd>
+												<textarea name="enclose" id="enclose" rows="10" cols="50">' . (isset($context['field']['enclose']) ? $context['field']['enclose'] : '') . '</textarea>
+											</dd>
+										</dl>
+									</fieldset>
+									<fieldset>
+										<legend>', $txt['custom_edit_input'], '</legend>
+										<dl class="settings">
+											<dt>
+												<strong><label for="field_type">', $txt['custom_edit_picktype'], ':</label></strong>
+											</dt>
+											<dd>
+												<select name="field_type" id="field_type" onchange="updateInputBoxes();">
+													<option value="text"', $context['field']['type'] == 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
+													<option value="textarea"', $context['field']['type'] == 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
+													<option value="select"', $context['field']['type'] == 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
+													<option value="radio"', $context['field']['type'] == 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>
+													<option value="check"', $context['field']['type'] == 'check' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_check'], '</option>
+												</select>
+											</dd>
+											<dt id="max_length_dt">
+												<strong><label for="max_length_dd">', $txt['custom_edit_max_length'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_max_length_desc'], '</span>
+											</dt>
+											<dd>
+												<input type="text" name="max_length" id="max_length_dd" value="', $context['field']['max_length'], '" size="7" maxlength="6" class="input_text" />
+											</dd>
+											<dt id="dimension_dt">
+												<strong><label for="dimension_dd">', $txt['custom_edit_dimension'], ':</label></strong>
+											</dt>
+											<dd id="dimension_dd">
+												<strong>', $txt['custom_edit_dimension_row'], ':</strong> <input type="text" name="rows" value="', $context['field']['rows'], '" size="5" maxlength="3" class="input_text" />
+												<strong>', $txt['custom_edit_dimension_col'], ':</strong> <input type="text" name="cols" value="', $context['field']['cols'], '" size="5" maxlength="3" class="input_text" />
+											</dd>
+											<dt id="bbc_dt">
+												<strong><label for="bbc_dd">', $txt['custom_edit_bbc'], '</label></strong>
+											</dt>
+											<dd >
+												<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
+											</dd>
+											<dt id="options_dt">
+												<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+												<strong><label for="options_dd">', $txt['custom_edit_options'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
+											</dt>
+											<dd id="options_dd">
+												<div>';
 
 	foreach ($context['field']['options'] as $k => $option)
 	{
 		echo '
-								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
+												', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
 	}
+
 	echo '
-								<span id="addopt"></span>
-								[<a href="" onclick="addOption(); return false;">', $txt['custom_edit_options_more'], '</a>]
-								</div>
-							</dd>
-							<dt id="default_dt">
-								<strong><label for="default_dd">', $txt['custom_edit_default'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="checkbox" name="default_check" id="default_dd"', $context['field']['default_check'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-						</dl>
-					</fieldset>
-					<fieldset>
-						<legend>', $txt['custom_edit_advanced'], '</legend>
-						<dl class="settings">
-							<dt id="mask_dt">
-								<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="mask">', $txt['custom_edit_mask'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="mask" id="mask" onchange="updateInputBoxes();">
-									<option value="nohtml"', $context['field']['mask'] == 'nohtml' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_nohtml'], '</option>
-									<option value="email"', $context['field']['mask'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_email'], '</option>
-									<option value="number"', $context['field']['mask'] == 'number' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_number'], '</option>
-									<option value="regex"', strpos($context['field']['mask'], 'regex') === 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_regex'], '</option>
-								</select>
-								<br />
-								<span id="regex_div">
-									<input type="text" name="regex" value="', $context['field']['regex'], '" size="30" class="input_text" />
-								</span>
-							</dd>
-							<dt>
-								<strong><label for="private">', $txt['custom_edit_privacy'], ':</label></strong>
-								<span class="smalltext">', $txt['custom_edit_privacy_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="private" id="private" onchange="updateInputBoxes();" style="width: 100%">
-									<option value="0"', $context['field']['private'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_all'], '</option>
-									<option value="1"', $context['field']['private'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_see'], '</option>
-									<option value="2"', $context['field']['private'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_owner'], '</option>
-									<option value="3"', $context['field']['private'] == 3 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_none'], '</option>
-								</select>
-							</dd>
-							<dt id="can_search_dt">
-								<strong><label for="can_search_dd">', $txt['custom_edit_can_search'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_can_search_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="checkbox" name="can_search" id="can_search_dd"', $context['field']['can_search'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
-								<strong><label for="can_search_check">', $txt['custom_edit_active'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_active_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="checkbox" name="active" id="can_search_check"', $context['field']['active'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-						</dl>
-					</fieldset>
-						<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />';
+												<span id="addopt"></span>
+												[<a href="" onclick="addOption(); return false;">', $txt['custom_edit_options_more'], '</a>]
+												</div>
+											</dd>
+											<dt id="default_dt">
+												<strong><label for="default_dd">', $txt['custom_edit_default'], ':</label></strong>
+											</dt>
+											<dd>
+												<input type="checkbox" name="default_check" id="default_dd"', $context['field']['default_check'] ? ' checked="checked"' : '', ' class="input_check" />
+											</dd>
+										</dl>
+									</fieldset>
+									<fieldset>
+										<legend>', $txt['custom_edit_advanced'], '</legend>
+										<dl class="settings">
+											<dt id="mask_dt">
+												<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+												<strong><label for="mask">', $txt['custom_edit_mask'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
+											</dt>
+											<dd>
+												<select name="mask" id="mask" onchange="updateInputBoxes();">
+													<option value="nohtml"', $context['field']['mask'] == 'nohtml' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_nohtml'], '</option>
+													<option value="email"', $context['field']['mask'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_email'], '</option>
+													<option value="number"', $context['field']['mask'] == 'number' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_number'], '</option>
+													<option value="regex"', strpos($context['field']['mask'], 'regex') === 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_regex'], '</option>
+												</select>
+												<br />
+												<span id="regex_div">
+													<input type="text" name="regex" value="', $context['field']['regex'], '" size="30" class="input_text" />
+												</span>
+											</dd>
+											<dt>
+												<strong><label for="private">', $txt['custom_edit_privacy'], ':</label></strong>
+												<span class="smalltext">', $txt['custom_edit_privacy_desc'], '</span>
+											</dt>
+											<dd>
+												<select name="private" id="private" onchange="updateInputBoxes();" style="width: 100%">
+													<option value="0"', $context['field']['private'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_all'], '</option>
+													<option value="1"', $context['field']['private'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_see'], '</option>
+													<option value="2"', $context['field']['private'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_owner'], '</option>
+													<option value="3"', $context['field']['private'] == 3 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_none'], '</option>
+												</select>
+											</dd>
+											<dt id="can_search_dt">
+												<strong><label for="can_search_dd">', $txt['custom_edit_can_search'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_can_search_desc'], '</span>
+											</dt>
+											<dd>
+												<input type="checkbox" name="can_search" id="can_search_dd"', $context['field']['can_search'] ? ' checked="checked"' : '', ' class="input_check" />
+											</dd>
+											<dt>
+												<strong><label for="can_search_check">', $txt['custom_edit_active'], ':</label></strong><br />
+												<span class="smalltext">', $txt['custom_edit_active_desc'], '</span>
+											</dt>
+											<dd>
+												<input type="checkbox" name="active" id="can_search_check"', $context['field']['active'] ? ' checked="checked"' : '', ' class="input_check" />
+											</dd>
+										</dl>
+									</fieldset>
+									<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />';
 
 	if ($context['fid'])
 		echo '
-						<input type="submit" name="delete" value="', $txt['delete'], '" onclick="return confirm(\'', $txt['custom_edit_delete_sure'], '\');" class="button_submit" />';
+									<input type="submit" name="delete" value="', $txt['delete'], '" onclick="return confirm(\'', $txt['custom_edit_delete_sure'], '\');" class="button_submit" />';
 
 	echo '
-				</div>
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-ecp_token_var'], '" value="', $context['admin-ecp_token'], '" />
-		</form>
-	</div>';
+								</div>
+							</div>
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+							<input type="hidden" name="', $context['admin-ecp_token_var'], '" value="', $context['admin-ecp_token'], '" />
+						</form>
+					</div>';
 
 	// Get the javascript bits right!
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		updateInputBoxes();
-	// ]]></script>';
+					<script type="text/javascript"><!-- // --><![CDATA[
+						updateInputBoxes();
+					// ]]></script>';
 }
 
 // Results page for an admin search.
@@ -1212,67 +1211,67 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $options, $scripturl;
 
 	echo '
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">
-				<object id="quick_search">
-					<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" class="floatright">
-						<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
-						<input type="hidden" name="search_type" value="', $context['search_type'], '" />
-						<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
-					</form>
-				</object>
-				<img class="icon" src="' . $settings['images_url'] . '/buttons/search.png" alt="" />&nbsp;', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
-			</h3>
-		</div>
-	<div class="windowbg2 generic_list_wrapper">
-		<div class="content">';
+					<div id="section_header" class="cat_bar">
+						<h3 class="catbg">
+							<object id="quick_search">
+								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
+									<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
+									<input type="hidden" name="search_type" value="', $context['search_type'], '" />
+									<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
+								</form>
+							</object>
+							<img class="icon" src="' . $settings['images_url'] . '/buttons/search.png" alt="" />&nbsp;', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
+						</h3>
+					</div>
+					<div class="windowbg2 generic_list_wrapper">
+						<div class="content">';
 
 	if (empty($context['search_results']))
 	{
 		echo '
-			<p class="centertext"><strong>', $txt['admin_search_results_none'], '</strong></p>';
+							<p class="centertext"><strong>', $txt['admin_search_results_none'], '</strong></p>';
 	}
 	else
 	{
 		echo '
-			<ol class="search_results">';
+							<ol class="search_results">';
 		foreach ($context['search_results'] as $result)
 		{
 			// Is it a result from the online manual?
 			if ($context['search_type'] == 'online')
 			{
 				echo '
-				<li>
-					<p>
-						<a href="', $context['doc_scripturl'], str_replace(' ', '_', $result['title']), '" target="_blank" class="new_win"><strong>', $result['title'], '</strong></a>
-					</p>
-					<p class="double_height">
-						', $result['snippet'], '
-					</p>
-				</li>';
+								<li>
+									<p>
+										<a href="', $context['doc_scripturl'], str_replace(' ', '_', $result['title']), '" target="_blank" class="new_win"><strong>', $result['title'], '</strong></a>
+									</p>
+									<p class="double_height">
+										', $result['snippet'], '
+									</p>
+								</li>';
 			}
 			// Otherwise it's... not!
 			else
 			{
 				echo '
-				<li class="windowbg2">
-					<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'] , ']';
+								<li class="windowbg2">
+									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'] , ']';
 
 				if ($result['help'])
 					echo '
-					<p class="double_height">', $result['help'], '</p>';
+									<p class="double_height">', $result['help'], '</p>';
 
 				echo '
-				</li>';
+								</li>';
 			}
 		}
 		echo '
-			</ol>';
+							</ol>';
 	}
 
 	echo '
-		</div>
-	</div>';
+						</div>
+					</div>';
 }
 
 // Turn on and off certain key features.
@@ -1386,7 +1385,7 @@ function template_core_features()
 
 			</div>
 			<p class="description">', $txt['core_settings_desc'], '</p>
-			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="', $context['character_set'], '">
+			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
 	$alternate = true;
@@ -1419,7 +1418,6 @@ function template_core_features()
 		</form>
 	</div>';
 }
-
 
 // This little beauty shows questions and answer from the captcha type feature.
 function template_callback_question_answer_list()
@@ -1651,7 +1649,7 @@ function template_clean_cache_button_below()
 	</div>
 	<div class="windowbg">
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="', $context['character_set'], '">
+			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
 				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" /></span>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

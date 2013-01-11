@@ -1,7 +1,18 @@
 $(document).ready(function() {
 	// menu drop downs
-	$('ul.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
-	
+	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
+
+	// Smooth scroll navigation
+	$('.topbottom').bind('click', function(event) {		
+		event.preventDefault();
+
+		// Position to the id pagetop or pagebot
+		var link = $('#page' + this.hash.substring(1)),
+			link_y = link.height() + 15;
+
+		$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
+	});
+
 	// tooltips
 	$('.preview').SiteTooltip();
 
