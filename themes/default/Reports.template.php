@@ -21,13 +21,17 @@ function template_report_type()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['generate_reports'], '</h3>
-			</div>
-			<div class="information">
-				', $txt['generate_reports_desc'], '
-			</div>
+		<div class="cat_bar">
+			<h3 class="catbg">';
+
+	template_admin_quick_search();
+
+	echo $txt['generate_reports'], '</h3>
+		</div>
+		<div class="information">
+			', $txt['generate_reports_desc'], '
+		</div>
+		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="', $context['character_set'], '">
 			<div id="generate_reports_type">
 				<div class="cat_bar">
 					<h3 class="catbg">', $txt['generate_reports_type'], '</h3>
