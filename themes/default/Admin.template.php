@@ -23,22 +23,7 @@ function template_admin()
 
 	// Welcome message for the admin.
 	echo '
-					<div id="admincenter">
-						<div id="section_header" class="cat_bar">
-							<h3 class="catbg">';
-
-	template_admin_quick_search();
-
-	echo 
-								$txt['admin_center'], '
-							</h3>
-						</div>
-						<div class="roundframe rfix">
-							<div id="welcome">
-								<strong>', $txt['hello_guest'], ' ', $context['user']['name'], '!</strong>
-								', sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']), '
-							</div>
-						</div>';
+					<div id="admincenter">';
 
 	// Is there an update available?
 	echo '
@@ -184,16 +169,7 @@ function template_credits()
 
 	// Show the user version information from their server.
 	echo '
-
 					<div id="admincenter">
-						<div id="section_header" class="cat_bar">
-							<h3 class="catbg">';
-
-	template_admin_quick_search();
-
-	echo $txt['support_credits_title'], '
-							</h3>
-						</div>
 						<div id="support_credits">
 							<div class="cat_bar">
 								<h3 class="catbg">
