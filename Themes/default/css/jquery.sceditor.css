@@ -99,6 +99,9 @@ div.sceditor-dropdown .button {
 div.sceditor-inserttable, div.sceditor-insertimage, div.sceditor-pastetext, div.sceditor-insertlink, div.sceditor-insertemail {
 	padding: 5px;
 }
+#sceditor-smileycontainer {
+	float:left;
+}
 div.sceditor-smileyPopup {
 	margin: 0;
 }
@@ -106,14 +109,32 @@ div.sceditor-smileyPopup {
 	cursor: pointer;
 	margin: 6px 4px 4px 4px;
 }
-.sceditor-more, .sceditor-smileyPopup {
+.sceditor-more {
+	float: left;
+	cursor: pointer;
+	padding: 0px 3px !important;
+	margin: 2px 0 0 !important;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.05) inset;
+	background: #fff;
+	border-top: 1px solid #ccc;
+	border-left: none;
+	border-right: 1px solid #bbb;
+	border-bottom: 1px solid #aaa;
+	color: #222;
+}
+.sceditor-more:hover { 
+	background: #fafafa;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
+	border: 1px solid #ccc;
+	border-left: none;
+	border-top: 1px solid #aaa;
+}
+.sceditor-smileyPopup {
 	display: inline;
 	text-align: center;
 	cursor: pointer;
 	padding: 2px 0;
-}
-.sceditor-more:hover { 
-	background: #eee; 
 }
 .sceditor-fontsize-option, .sceditor-font-option {
 	display: block;

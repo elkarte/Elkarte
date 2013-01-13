@@ -23,56 +23,62 @@ code:before {
 	content: 'Code:';
 	top: -1.35em;
 	left: 0;
+	font-size: 1em;
 }
 code {
 	margin-top: 1.5em;
 	position: relative;
-	background: #eee;
-	border: 1px solid #aaa;
+	background: #f3f3f3;
+	border: 1px solid #dfdfdf;
 	white-space: pre;
 	padding: .25em;
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	font-size: 0.7em;
+	border-top: 2px solid #bbb;
+	border-bottom: 3px solid #aaa;
 }
 code:before, code {
 	display: block;
 	text-align: left;
+}
+code cite {
+	position: relative;
+	top: -1.6em;
+	padding-left: 3em;
 }
 
 blockquote {
 	position: relative;
 	background: #ebf4f8;
 	margin: .25em 0;
+	padding: 6px 10px;
+	text-indent: 12px;
+	background: url(../images/theme/quote.png) 2px 3px no-repeat;
 	border: 1px solid #d6dfe2;
 	border-left: 2px solid #aaa;
 	border-right: 2px solid #aaa;
-	padding: 4px 8px;
-	font: 75%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
 }
 blockquote blockquote {
-	font-size: 1em;
+	font-size: .9em;
+}
+blockquote cite, code cite {
+	font-style: normal;
+	display: block;
+	font-size: .9em;
+	border-bottom: 1px solid #fff;
+	box-shadow: 0 -1px 0 #ccc inset;
+	margin: 0 -4px;
+	padding: 0 0 4px 0;
 }
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
 body>blockquote>blockquote, body>blockquote>blockquote>blockquote>blockquote,
 body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote {
 	background: #e0e6f6;
 }
-blockquote cite, code cite {
-	font-style: normal;
-	display: block;
-	font-size: 1em;
-	border-bottom: 1px solid #fff;
-	box-shadow: 0 -1px 0 #ccc inset;
-	margin: 0 -4px;
-	padding: 0 0 4px 0;
-}
 body>blockquote>blockquote>cite, body>blockquote>blockquote>blockquote>blockquote>cite,
 body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote>cite {
 	border-bottom: 1px solid #f0f0f0;
 	box-shadow: 0 -1px 0 #c0c0c0 inset;
-}
-code cite {
-	position: relative;
-	top: -1.6em;
-	padding-left: 3em;
 }
 blockquote cite a:link, blockquote cite a:visited {
 	text-decoration: none;

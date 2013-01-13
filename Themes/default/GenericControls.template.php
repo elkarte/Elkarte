@@ -70,13 +70,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						echo '
 							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 					}
+
 					if (empty($smileyRow['isLast']) && $numRows != 1)
 						echo ',
 						\'-', $emptyPlaceholder++, '\': \'\',';
 				}
+
 				echo '
 						}', $countLocations != 0 ? ',' : '';
 			}
+
 			echo '
 					}';
 		}
