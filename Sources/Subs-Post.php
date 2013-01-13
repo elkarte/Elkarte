@@ -1121,7 +1121,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once($sourcedir . '/Subs-Topic.php');
-			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id']), false);
+			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
 
@@ -1280,7 +1280,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once($sourcedir . '/Subs-Topic.php');
-			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID']), false);
+			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
 

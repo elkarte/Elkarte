@@ -1163,7 +1163,7 @@ function action_quickmod()
 
 		$markArray = array();
 		foreach ($markCache as $topic)
-			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID']);
+			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], $logged_topics[$topic]);
 
 		markTopicsRead($markArray, true);
 	}
