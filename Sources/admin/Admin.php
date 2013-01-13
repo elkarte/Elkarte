@@ -805,7 +805,7 @@ function AdminSearchInternal()
 	loadLanguage(implode('+', $language_files));
 
 	foreach ($include_files as $file)
-		require_once($sourcedir . '/' . $file . '.php');
+		loadAdminClass($file . '.php');
 
 	/* This is the huge array that defines everything... it's a huge array of items formatted as follows:
 		0 = Language index (Can be array of indexes) to search through for this setting.
