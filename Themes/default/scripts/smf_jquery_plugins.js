@@ -390,7 +390,7 @@
 			o.onInit.call(this);
 		}).each(function() {
 			var menuClasses = [c.menuClass];
-			this.classList.add(menuClasses.join(' '));
+			$(this).addClass(menuClasses.join(' '));
 		});
 	};
 
