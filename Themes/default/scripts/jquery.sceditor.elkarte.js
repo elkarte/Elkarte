@@ -108,8 +108,8 @@
 							adjheight = 0,
 							titlebar = $('<div class="catbg sceditor-popup-grip"/>');
 							
-						popupContent = $('<div id="sceditor-popup"/>');
-						line = $('<div id="sceditor-popup-smiley"/>');
+						popupContent = $('<div id="sceditor-popup" />');
+						line = $('<div id="sceditor-popup-smiley" />');
 
 						// create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
@@ -131,20 +131,21 @@
 							content.find(':not(input,textarea)').filter(function() {return this.nodeType === 1;}).attr('unselectable', 'on');
 						}
 
-						$dropdown = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
-						$dropdown.appendTo($('body'));
+						popupContent = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
+						$dropdown = popupContent.appendTo('body');
 						dropdownIgnoreLastClick = true;
-						adjheight = closeButton.height() + titlebar.height();
 
-						// make the window fits the contents we just put in it
+						// position it on the screen
 						$dropdown.css({
-							position: "fixed",
-							top: $(window).height() * 0.2,
-							left: $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2),
+							"position": "fixed",
+							"top": $(window).height() * 0.2,
+							"left": $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2),
 							"max-width": "50%",
 							"max-height": "50%"
-						}).find('#sceditor-popup-smiley').css({
-							height: $dropdown.height() - adjheight,
+						});
+
+						// make the window fit the content
+						$('#sceditor-popup-smiley').css({
 							"overflow": "auto"
 						});
 
