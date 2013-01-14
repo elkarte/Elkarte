@@ -12,6 +12,7 @@
  * @version 1.0 Alpha
  * Extension functions to provide Elkarte compatibility with sceditor
  */
+
 (function($) {
 	var extensionMethods = {
 		InsertText: function(text, bClear) {
