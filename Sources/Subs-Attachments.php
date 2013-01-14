@@ -867,22 +867,30 @@ function getAvatar($id_attach)
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
-		FROM {db_prefix}attachments
-		WHERE id_attach = {int:id_attach}
-			AND id_member > {int:blank_id_member}
-		LIMIT 1',
-		array(
-			'id_attach' => $id_attach,
-			'blank_id_member' => 0,
-		)
-	);
+	// Use our cache when possible
+	if (($cache = cache_get_data('getAvatar_id-' . $id_attach)) !== null)
+		$avatarData = $cache;
+	else
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}
+				AND id_member > {int:blank_id_member}
+			LIMIT 1',
+			array(
+				'id_attach' => $id_attach,
+				'blank_id_member' => 0,
+			)
+		);
 
-	$avatarData = array();
-	if ($smcFunc['db_num_rows']($request) != 0)
-		$avatarData = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+		$avatarData = array();
+		if ($smcFunc['db_num_rows']($request) != 0)
+			$avatarData = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		cache_put_data('getAvatar_id-' . $id_attach, $avatarData, 900);
+	}
 
 	return $avatarData;
 }

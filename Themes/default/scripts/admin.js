@@ -409,7 +409,6 @@ function createNamedElement(type, name, customFields)
 function addAnotherQuestion()
 {
 	var newDT = document.createElement("dt");
-
 	var newInput = createNamedElement("input", "question[]");
 	newInput.type = "text";
 	newInput.className = "input_text";
@@ -417,8 +416,7 @@ function addAnotherQuestion()
 	newInput.setAttribute("class", "verification_question");
 	newDT.appendChild(newInput);
 
-	newDD = document.createElement("dd");
-
+	var newDD = document.createElement("dd");
 	newInput = createNamedElement("input", "answer[]");
 	newInput.type = "text";
 	newInput.className = "input_text";
@@ -666,8 +664,8 @@ function toggleCache ()
 }
 
 /*
-* Attachments Settings
-*/
+ * Attachments Settings
+ */
 function toggleSubDir ()
 {
 	var auto_attach = document.getElementById('automanage_attachments');
@@ -691,6 +689,7 @@ function toggleSubDir ()
 	}
 		toggleBaseDir();
 }
+
 function toggleBaseDir ()
 {
 	var auto_attach = document.getElementById('automanage_attachments');

@@ -1366,7 +1366,7 @@ function loadBadBehavior()
 		// We may want to give some folks a hallway pass
 		if (!$user_info['is_guest'])
 		{
-			if ($user_info['is_mod'] || $user_info['is_admin'])
+			if (!empty($user_info['is_mod']) || !empty($user_info['is_admin']))
 				$bb_run = false;
 			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] < 0)
 				$bb_run = false;

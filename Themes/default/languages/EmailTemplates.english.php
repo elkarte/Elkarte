@@ -968,7 +968,7 @@ Reply to this Personal Message here: {REPLYLINK}';
 	@description: A notification email sent to the receivers of a personal message
 */
 $txt['new_pm_tolist_subject'] = 'New Personal Message: {SUBJECT}';
-$txt['new_pm_tolist_body'] = 'You and {TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
+$txt['new_pm_tolist_body'] = '{TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
 
 IMPORTANT: Remember, this is just a notification. Please do not reply to this email.
 
@@ -986,7 +986,7 @@ Reply to this Personal Message (to the sender only) here: {REPLYLINK}';
 	@description: A notification email sent to the receivers of a personal message
 */
 $txt['new_pm_body_tolist_subject'] = 'New Personal Message: {SUBJECT}';
-$txt['new_pm_body_tolist_body'] = 'You and {TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
+$txt['new_pm_body_tolist_body'] = '{TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
 
 IMPORTANT: Remember, this is just a notification. Please do not reply to this email.
 
