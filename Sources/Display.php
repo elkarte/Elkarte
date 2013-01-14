@@ -112,7 +112,7 @@ function Display()
 	// Is this a moved topic that we are redirecting to?
 	if (!empty($topicinfo['id_redirect_topic']))
 	{
-		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg']), $topicinfo['new_from'] !== 0);
+		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 		redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
 	}
 
@@ -765,7 +765,7 @@ function Display()
 		if ($mark_at_msg >= $topicinfo['id_last_msg'])
 			$mark_at_msg = $modSettings['maxMsgID'];
 		if ($mark_at_msg >= $topicinfo['new_from'])
-			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg), $topicinfo['new_from'] !== 0);
+			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['disregarded']), $topicinfo['new_from'] !== 0);
 
 		updateReadNotificationsFor($topic, $board);
 
