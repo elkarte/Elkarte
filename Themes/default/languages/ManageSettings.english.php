@@ -80,6 +80,7 @@ $txt['contact_form_menu'] = 'Show in the menu';
 $txt['queryless_urls'] = 'Search engine friendly URLs';
 $txt['queryless_urls_note'] = 'Apache/Lighttpd only';
 $txt['enableReportPM'] = 'Enable reporting of personal messages';
+$txt['antispam_PM'] = 'Personal Message Limits';
 $txt['max_pm_recipients'] = 'Maximum number of recipients allowed in a personal message';
 $txt['max_pm_recipients_note'] = '(0 for no limit, admins are exempt)';
 $txt['pm_posts_verification'] = 'Post count under which users must pass verification when sending personal messages';
