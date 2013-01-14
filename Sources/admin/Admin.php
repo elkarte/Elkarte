@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -641,16 +641,16 @@ function AdminHome()
 
 	// Lastly, fill in the blanks in the support resources paragraphs.
 	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-		'https://github.com/Spuds/Dialogo/wiki',
-		'https://github.com/Spuds/Dialogo/wiki/features',
-		'https://github.com/Spuds/Dialogo/wiki/options',
-		'https://github.com/Spuds/Dialogo/wiki/themes',
-		'https://github.com/Spuds/Dialogo/wiki/packages'
+		'https://github.com/elkarte/Elkarte/wiki',
+		'https://github.com/elkarte/Elkarte/wiki/features',
+		'https://github.com/elkarte/Elkarte/wiki/options',
+		'https://github.com/elkarte/Elkarte/wiki/themes',
+		'https://github.com/elkarte/Elkarte/wiki/packages'
 	);
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-		'http://www.spudsdesign.com/dialogo/',
-		'http://www.spudsdesign.com/dialogo/redirect/support',
-		'http://www.spudsdesign.com/dialogo/redirect/customize_support'
+		'http://www.elkarte.net/',
+		'http://www.elkarte.net/redirect/support',
+		'http://www.elkarte.net/redirect/customize_support'
 	);
 }
 
@@ -910,8 +910,8 @@ function AdminSearchOM()
 {
 	global $context, $sourcedir;
 
-	$context['doc_apiurl'] = 'https://github.com/Spuds/Dialogo/wiki//api.php';
-	$context['doc_scripturl'] = 'https://github.com/Spuds/Dialogo/wiki/';
+	$context['doc_apiurl'] = 'https://github.com/elkarte/Elkarte/wiki/api.php';
+	$context['doc_scripturl'] = 'https://github.com/elkarte/Elkarte/wiki/';
 
 	// Set all the parameters search might expect.
 	$postVars = explode(' ', $context['search_term']);
@@ -926,7 +926,7 @@ function AdminSearchOM()
 	// Get the results from the doc site.
 	require_once($sourcedir . '/Subs-Package.php');
 	// Demo URL:
-	// https://github.com/Spuds/Dialogo/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
+	// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 	// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
