@@ -4,17 +4,17 @@
  *
  * Copyright (C) 2011-2012, Sam Clarke (samclarke.com)
  *
- * SCEditor is dual licensed under the MIT and GPL licenses:
+ * SCEditor is licensed under the MIT license:
  *	http://www.opensource.org/licenses/mit-license.php
- *	http://www.gnu.org/licenses/gpl.html
  *
+ * @fileoverview SCEditor BBCode Plugin
  * @author Sam Clarke
- * @version 1.4.0
+ * @version 1.4.1
  * @requires jQuery
  */
 
 // ==ClosureCompiler==
-// @output_file_name jquery.sceditor.min.js
+// @output_file_name bbcode.min.js
 // @compilation_level SIMPLE_OPTIMIZATIONS
 // ==/ClosureCompiler==
 
@@ -52,6 +52,7 @@
 			convertToHTML,
 			convertToBBCode,
 			hasTag,
+			quote,
 			lower,
 			last;
 
@@ -157,7 +158,7 @@
 		/**
 		 * Takes a BBCode string and splits it into open, content and close tags.
 		 *
-		 * It dose no checking to verify a tag has a matching open or closing tag
+		 * It does no checking to verify a tag has a matching open or closing tag
 		 * or if the tag is valid child of any tag before it. For that the tokens
 		 * should be passed to the parse function.
 		 *
@@ -254,7 +255,6 @@
 			else
 				name = '#';
 
-
 			return new TokenizeToken(type, name, val, attrs);
 		};
 
@@ -267,9 +267,34 @@
 		 * @private
 		 */
 		tokenizeAttrs = function(attrs) {
-			var	matches,
-				atribsRegex = /(\S+)=(?:(?:(["'])((?:\\\2|[^\2])*?)\2)|([^'"\s]+))/g,
+			var	matches, unquote,
+				/*
+				([^\s=]+)					Anything that's not a space or equals
+				=						Equals =
+				(?:
+					(?:
+						(["'])				The opening quote
+						(
+							(?:\\\2|[^\2])*?	Anything that isn't the unescaped opening quote
+						)
+						\2				The opening quote again which will now close the string
+					)
+						|				If not a quoted string then match
+					(
+						(?:.(?!\s\S+=))*.?		Anything that isn't part of [space][non-space][=] which would be a new attribute
+					)
+				)
+				 */
+				atribsRegex = /([^\s=]+)=(?:(?:(["'])((?:\\\2|[^\2])*?)\2)|((?:.(?!\s\S+=))*.))/g,
 				ret         = {};
+
+			//
+			unquote = function(str, quote) {
+				if(quote)
+					str = str.replace('\\\\', '\\').replace('\\' + quote, quote);
+
+				return str;
+			};
 
 			// if only one attribute then remove the = from the start and strip any quotes
 			if(attrs.charAt(0) === "=" && attrs.split("=").length <= 2)
@@ -281,7 +306,7 @@
 
 				// No need to strip quotes here, the regex will do that.
 				while((matches = atribsRegex.exec(attrs)))
-					ret[lower(matches[1])] = matches[3] || matches[4];
+					ret[lower(matches[1])] = unquote(matches[3], matches[2]) || matches[4];
 			}
 
 			return ret;
@@ -429,10 +454,10 @@
 
 					case tokenType.close:
 						// check if this closes the current tag, e.g. [/list] would close an open [*]
-						if(currentOpenTag() && token.name !== currentOpenTag().name && closesCurrentTag(token.name))
+						if(currentOpenTag() && token.name !== currentOpenTag().name && closesCurrentTag('/' + token.name))
 							openTags.pop();
 
-						// If this is closing the currently open tag just pop the
+						// If this is closing the currently open tag just pop thfcloe
 						// tage off the open tags array
 						if(currentOpenTag() && token.name === currentOpenTag().name)
 						{
@@ -492,7 +517,7 @@
 						//     [*]list\nitem[/*]\n[*]list1[/*]
 						// instead of
 						//     [*]list\nitem\n[/*][*]list1[/*]
-						if(currentOpenTag() && next && closesCurrentTag(next.name))
+						if(currentOpenTag() && next && closesCurrentTag((next.type === tokenType.close ? '/' : '') + next.name))
 						{
 							// skip if the next tag is the closing tag for the option tag, i.e. [/*]
 							if(!(next.type === tokenType.close && next.name === currentOpenTag().name))
@@ -854,9 +879,7 @@
 
 					ret.push('<div>');
 
-					// Putting BR in a div in IE9 causes it to do a double line break,
-					// as much as I hate browser UA sniffing, to do feature detection would
-					// be more code than it's worth for this specific bug.
+					// Putting BR in a div in IE9 causes it to do a double line break.
 					if(!$.sceditor.ie)
 						ret.push('<br />');
 
@@ -878,9 +901,7 @@
 				else // content
 				{
 					needsBlockWrap = isRoot;
-					html           = token.val.replace(/&/g, "&amp;")
-								.replace(/>/g, "&gt;")
-								.replace(/</g, "&lt;");
+					html           = $.sceditor.escapeEntities(token.val);
 				}
 
 				if(needsBlockWrap && !blockWrapOpen)
@@ -927,7 +948,7 @@
 		 * @private
 		 */
 		convertToBBCode = function(toks) {
-			var	token, attr, bbcode, isBlock, isSelfClosing,
+			var	token, attr, bbcode, isBlock, isSelfClosing, quoteType,
 				breakBefore, breakStart, breakEnd, breakAfter,
 				// Create an array of strings which are joined together
 				// before being returned as this is faster in slow browsers.
@@ -946,6 +967,7 @@
 				breakStart    = ((isBlock && !isSelfClosing && base.opts.breakStartBlock && bbcode.breakStart !== false) || (bbcode && bbcode.breakStart));
 				breakEnd      = ((isBlock && base.opts.breakEndBlock && bbcode.breakEnd !== false) || (bbcode && bbcode.breakEnd));
 				breakAfter    = ((isBlock && base.opts.breakAfterBlock && bbcode.breakAfter !== false) || (bbcode && bbcode.breakAfter));
+				quoteType     = (bbcode ? bbcode.quoteType : null) || base.opts.quoteType || $.sceditor.BBCodeParser.QuoteType.auto;
 
 				if(!bbcode && token.type === tokenType.open)
 				{
@@ -968,13 +990,13 @@
 					{
 						if(token.attrs.defaultattr)
 						{
-							ret.push('=' + token.attrs.defaultattr);
+							ret.push('=' + quote(token.attrs.defaultattr, quoteType));
 							delete token.attrs.defaultattr;
 						}
 
 						for(attr in token.attrs)
 							if(token.attrs.hasOwnProperty(attr))
-								ret.push(' ' + attr + '=' + token.attrs[attr] + '');
+								ret.push(' ' + attr + '=' + quote(token.attrs[attr], quoteType));
 					}
 					ret.push(']');
 
@@ -1010,6 +1032,27 @@
 		};
 
 		/**
+		 * Quotes an attribute
+		 *
+		 * @param {String} str
+		 * @param {$.sceditor.BBCodeParser.QuoteType} quoteType
+		 * @return {String}
+		 * @private
+		 */
+		quote = function(str, quoteType) {
+			var	QuoteTypes  = $.sceditor.BBCodeParser.QuoteType,
+				needsQuotes = /\s|=/.test(str);
+// TODO:Add name to quoteType callback
+			if($.isFunction(quoteType))
+				return quoteType(str);
+
+			if(quoteType === QuoteTypes.never || (quoteType === QuoteTypes.auto && !needsQuotes))
+				return str;
+
+			return '"' + str.replace('\\', '\\\\').replace('"', '\\"') + '"';
+		};
+
+		/**
 		 * Returns the last element of an array or null
 		 *
 		 * @param {Array} arr
@@ -1036,6 +1079,37 @@
 
 		init();
 	};
+
+	/**
+	 * Quote type
+	 * @type {Object}
+	 * @class QuoteType
+	 * @name jQuery.sceditor.BBCodeParser.QuoteType
+	 * @since v1.4.0
+	 */
+	$.sceditor.BBCodeParser.QuoteType = {
+		/**
+		 * Always quote the attribute value
+		 * @type {Number}
+		 */
+		always: 1,
+
+		/**
+		 * Never quote the attributes value
+		 * @type {Number}
+		 */
+		never: 2,
+
+		/**
+		 * Only quote the attributes value when it contains spaces ot equals
+		 * @type {Number}
+		 */
+		auto: 3
+	};
+
+	// Make AttributeQuoteType enum read-only in browsers that support it.
+	if(Object.freeze)
+		Object.freeze($.sceditor.BBCodeParser.QuoteType);
 
 	/**
 	 * Default BBCode parser options
@@ -1082,7 +1156,14 @@
 		 * If to fix invalid children. i.e. A tag which is inside a parent that doesn't allow that type of tag.
 		 * @type {Boolean}
 		 */
-		fixInvalidChildren: true
+		fixInvalidChildren: true,
+
+		/**
+		 * Attribute quote type
+		 * @type {$.sceditor.BBCodeParser.QuoteType}
+		 * @since 1.4.1
+		 */
+		quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 	};
 
 	/**
@@ -1091,23 +1172,23 @@
 	 * @param {Element} $element The textarea to be converted
 	 * @return {Object} options
 	 * @class sceditorBBCodePlugin
-	 * @name jQuery.sceditorBBCodePlugin
+	 * @name jQuery.sceditor.plugins.bbcode
 	 */
-	$.sceditorBBCodePlugin = function($element, options) {
+	$.sceditorBBCodePlugin =
+	$.sceditor.plugins.bbcode = function() {
 		var base = this;
 
 		/**
 		 * Private methods
 		 * @private
 		 */
-		var	init,
-			buildBbcodeCache,
+		var	buildBbcodeCache,
 			handleStyles,
 			handleTags,
 			formatString,
 			getStyle,
 			isEmpty,
-			mergeTextModeCommands,
+			mergeSourceModeCommands,
 			removeFirstLastDiv;
 
 		formatString     = $.sceditorBBCodePlugin.formatString;
@@ -1133,8 +1214,8 @@
 		 * @private
 		 */
 		var validChildren = {
-			ul: ['li'],
-			ol: ['li'],
+			ul: ['li', 'ol', 'ul'],
+			ol: ['li', 'ol', 'ul'],
 			table: ['tr'],
 			tr: ['td', 'th'],
 			code: ['br', 'p', 'div']
@@ -1151,24 +1232,15 @@
 		 * Initializer
 		 * @private
 		 */
-		init = function() {
-			$element.data("sceditorbbcode", base);
-
-			base.opts = $.extend({}, $.sceditor.defaultOptions, options);
+		base.init = function() {
+			base.opts = this.opts;
 
 			// build the BBCode cache
 			buildBbcodeCache();
-
-			(new $.sceditor($element,
-				$.extend({}, base.opts, {
-					getHtmlHandler: base.getHtmlHandler,
-					getTextHandler: base.getTextHandler,
-					commands: mergeTextModeCommands()
-				})
-			));
+			mergeSourceModeCommands(this);
 		};
 
-		mergeTextModeCommands = function() {
+		mergeSourceModeCommands = function(editor) {
 			var merge = {
 				bold: { txtExec: ["[b]", "[/b]"] },
 				italic: { txtExec: ["[i]", "[/i]"] },
@@ -1256,7 +1328,7 @@
 				ltr: { txtExec: ["[ltr]", "[/ltr]"] }
 			};
 
-			return $.extend(true, {}, merge, $.sceditor.commands);
+			editor.commands = $.extend(true, {}, merge, editor.commands);
 		};
 
 		/**
@@ -1316,7 +1388,7 @@
 
 			return style[name];
 		};
-
+// TODO: remove duplicated by parser empty removal
 		isEmpty = function(element) {
 			var	childNodes = element.childNodes,
 				i          = childNodes.length;
@@ -1357,7 +1429,7 @@
 				// so you don't end up with [i]parent[i]child[/i][/i]
 				if(!elementPropVal || getStyle(element.parent()[0], property) === elementPropVal)
 					return;
-
+// TODO: remove allows empty handling here
 				$.each(bbcodes, function(bbcode, values) {
 					if(!/\S|\u00A0/.test(content) && !base.bbcodes[bbcode].allowsEmpty && isEmpty(element[0]))
 						return;
@@ -1395,7 +1467,7 @@
 				$.each(tagsToBbcodes[tag][blockLevel], function(bbcode, bbcodeAttribs) {
 					if(!/\S|\u00A0/.test(content) && !base.bbcodes[bbcode].allowsEmpty && isEmpty(element[0]))
 						return;
-
+// TODO: remove, duplicated by parser empty removal
 					// if the bbcode requires any attributes then check this has
 					// all needed
 					if(bbcodeAttribs) {
@@ -1454,7 +1526,7 @@
 		 * @return string BBCode which has been converted from HTML
 		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
 		 */
-		base.getHtmlHandler = function(html, domBody) {
+		base.signalToSource = function(html, domBody) {
 			var parser = new $.sceditor.BBCodeParser(base.opts.parserOptions);
 
 			$.sceditor.dom.removeWhiteSpace(domBody[0]);
@@ -1468,7 +1540,7 @@
 		 *
 		 * @private
 		 * @param HtmlElement	element		The element to convert to BBCode
-		 * @param array			vChildren	Valid child tags allowed
+		 * @param array		vChildren	Valid child tags allowed
 		 * @return string BBCode
 		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
 		 */
@@ -1525,7 +1597,7 @@
 					}
 					else if(node.wholeText && (!node.previousSibling || node.previousSibling.nodeType !== 3))
 					{
-// TODO:This should check for CSS white-space
+// TODO:This should check for CSS white-space, should pass it int the function to reduce css lookups which are SLOW!
 						if($node.parents('code').length === 0)
 							ret += node.wholeText.replace(/ +/g, " ");
 						else
@@ -1547,7 +1619,7 @@
 		 * @return {String} HTML
 		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
 		 */
-		base.getTextHandler = function(text, asFragment) {
+		base.signalToWysiwyg = function(text, asFragment) {
 			var	parser = new $.sceditor.BBCodeParser(base.opts.parserOptions),
 				html   = parser.toHTML(text);
 
@@ -1564,14 +1636,11 @@
 		 */
 		removeFirstLastDiv = function(html)
 		{
-			var	node, next, ret,
+			var	node, next,
 				$output = $('<div />').hide().appendTo(document.body),
 				output  = $output[0];
 
-			output.innerHTML = html;
-			node             = output.firstChild;
-			if(node && node.nodeName.toLowerCase() === "div")
-			{
+			var removeDiv = function(node) {
 				while((next = node.firstChild))
 					output.insertBefore(next, node);
 
@@ -1579,27 +1648,23 @@
 					output.insertBefore(document.createElement('br'), node);
 
 				output.removeChild(node);
-			}
+			};
+
+			output.innerHTML = html.replace(/<\/div>\n/g, '</div>');
+
+			node = output.firstChild;
+			if(node && node.nodeName.toLowerCase() === "div")
+				removeDiv(node);
 
 			node = output.lastChild;
 			if(node && node.nodeName.toLowerCase() === "div")
-			{
-				while((next = node.firstChild))
-					output.insertBefore(next, node);
+				removeDiv(node);
 
-				if($.sceditor.ie >= 9)
-					output.insertBefore(document.createElement('br'), node);
-
-				output.removeChild(node);
-			}
-
-			ret = output.innerHTML;
+			output = output.innerHTML;
 			$output.remove();
 
-			return ret;
+			return output;
 		};
-
-		init();
 	};
 
 	/**
@@ -1749,6 +1814,7 @@
 			styles: {
 				"font-family": null
 			},
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			format: function(element, content) {
 				var font;
 
@@ -1819,6 +1885,7 @@
 			styles: {
 				color: null
 			},
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			format: function($element, content) {
 				var	color,
 					element = $element[0];
@@ -1866,13 +1933,13 @@
 				li: null
 			},
 			isInline: false,
-			closedBy: ['ul', 'ol', 'list', '*', 'li'],
+			closedBy: ['/ul', '/ol', '/list', '*', 'li'],
 			format: "[li]{0}[/li]",
 			html: '<li>{0}</li>'
 		},
 		"*": {
 			isInline: false,
-			closedBy: ['ul', 'ol', 'list', '*', 'li'],
+			closedBy: ['/ul', '/ol', '/list', '*', 'li'],
 			html: '<li>{0}</li>'
 		},
 		// END_COMMAND
@@ -1934,11 +2001,13 @@
 		// END_COMMAND
 
 		// START_COMMAND: Horizontal Rule
-		horizontalrule: {
-			allowsEmpty: true,
+		hr: {
 			tags: {
 				hr: null
 			},
+			allowsEmpty: true,
+			isSelfClosing: true,
+			isInline: false,
 			format: "[hr]{0}",
 			html: "<hr />"
 		},
@@ -1952,6 +2021,7 @@
 					src: null
 				}
 			},
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			format: function(element, content) {
 				var	attribs = '',
 					style = function(name) {
@@ -1999,12 +2069,13 @@
 					href: null
 				}
 			},
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			format: function(element, content) {
 				var url = element.attr('href');
 
 				// make sure this link is not an e-mail, if it is return e-mail BBCode
 				if(url.substr(0, 7) === 'mailto:')
-					return '[email=' + url.substr(7) + ']' + content + '[/email]';
+					return '[email="' + url.substr(7) + '"]' + content + '[/email]';
 
 				return '[url=' + decodeURI(url) + ']' + content + '[/url]';
 			},
@@ -2019,6 +2090,7 @@
 
 		// START_COMMAND: E-mail
 		email: {
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			html: function(token, attrs, content) {
 				if(typeof attrs.defaultattr === "undefined")
 					attrs.defaultattr = content;
@@ -2034,6 +2106,7 @@
 				blockquote: null
 			},
 			isInline: false,
+			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 			format: function(element, content) {
 				var	author = '',
 					$elm  = $(element),
@@ -2161,19 +2234,6 @@
 		},
 		// END_COMMAND
 
-		// START_COMMAND: Hr
-		hr: {
-			tags: {
-				hr: null
-			},
-			isSelfClosing: true,
-			isInline: false,
-			format: "[hr]",
-			html: '<hr />'
-		},
-		// END_COMMAND
-
-
 		// this is here so that commands above can be removed
 		// without having to remove the , after the last one.
 		// Needed for IE.
@@ -2260,36 +2320,11 @@
 	};
 
 	$.fn.sceditorBBCodePlugin = function (options) {
-		var	$this,
-			ret = [];
-
 		options = options || {};
 
-		if(!options.runWithoutWysiwygSupport && !$.sceditor.isWysiwygSupported)
-			return;
+		if($.isPlainObject(options))
+			options.plugins = (options.plugins ? options.plugins : '') + 'bbcode' ;
 
-		this.each(function () {
-
-			$this = this.jquery ? this : $(this);
-
-			// Don't allow the editor to be initilised on it's own source editor
-			if($this.parents('.sceditor-container').length > 0)
-				return;
-
-			// Add state of instance to ret if that is what options is set to
-			if(options === "state")
-				ret.push(!!$this.data('sceditor'));
-			else if(options === "instance")
-				ret.push($this.data('sceditorbbcode'));
-			else if(!$this.data('sceditor'))
-				(new $.sceditorBBCodePlugin($this, options));
-
-		});
-
-		// If nothing in the ret array then must be init so return this
-		if(!ret.length)
-			return this;
-
-		return ret.length === 1 ? ret[0] : $(ret);
+		return this.sceditor(options);
 	};
 })(jQuery, window, document);
