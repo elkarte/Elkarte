@@ -1720,6 +1720,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	global $context, $settings, $txt, $scripturl, $boarddir, $db_show_debug;
+	static $default_loaded;
 
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
@@ -1729,13 +1730,17 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
 	else
 		$default_sheets = array('index.css');
-	loadCSSFile($default_sheets);
 
-	// Any specific template sheets we may have
+	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 		loadCSSFile(
 			array(implode('.css,', $style_sheets) . '.css')
 		);
+	elseif (empty($default_loaded))
+	{
+		loadCSSFile($default_sheets);
+		$default_loaded = true;
+	}
 
 	// No template to load?
 	if ($template_name === false)
@@ -1856,7 +1861,11 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	// Whoa ... we've done this before yes?
 	$cache_name = 'load_css_' . md5($settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
-		$context['css_files'] = $temp;
+	{
+		if (empty($context['css_files']))
+			$context['css_files'] = array();
+		$context['css_files'] += $temp;
+	}
 	else
 	{
 		// All the files in this group use the parameters as defined above
@@ -1935,7 +1944,11 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	// dejvu?
 	$cache_name = 'load_js_' . md5($settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
-		$context['javascript_files'] = $temp;
+	{
+		if (empty($context['javascript_files']))
+			$context['javascript_files'] = array();
+		$context['javascript_files'] += $temp;
+	}
 	else
 	{
 		// All the files in this group use the above parameters
