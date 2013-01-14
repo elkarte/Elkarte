@@ -529,7 +529,7 @@ function removeMessage($message, $decreasePostCount = true)
 			if (!$user_info['is_guest'])
 			{
 				require_once($sourcedir . '/Subs-Topic.php');
-				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID']), true);
+				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 			}
 
 			// Mark recycle board as seen, if it was marked as seen before.
