@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -243,7 +243,7 @@ function template_credits()
 		</div>';
 	}
 
-	// Dialogo itself
+	// Elkarte itself
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
@@ -252,7 +252,7 @@ function template_credits()
 			<div class="content">
 				<dl>
 					<dt><strong>', $txt['credits_forum'], '</strong></dt>', '
-					<dd>', $context['copyrights']['dialogo'];
+					<dd>', $context['copyrights']['elkarte'];
 
 	echo '
 					</dd>

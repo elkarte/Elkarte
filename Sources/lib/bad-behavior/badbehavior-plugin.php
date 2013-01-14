@@ -13,7 +13,7 @@
  * License: LGPLv3
  *
  */
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 define('BB2_CWD', dirname(__FILE__));

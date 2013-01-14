@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -149,7 +149,7 @@ function action_suggest_versions()
 		'SMF 2.0',
 		'SMF 2.0.1',
 		'SMF 2.0.2',
-		'DIALOGO 1.0',
+		'ELKARTE 1.0',
 	);
 
 	foreach ($versions as $id => $version)

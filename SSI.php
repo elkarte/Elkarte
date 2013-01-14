@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -14,11 +14,11 @@
  * @version 1.0 Alpha
  */
 
-// Don't do anything if DIALOGO is already loaded.
-if (defined('DIALOGO'))
+// Don't do anything if ELKARTE is already loaded.
+if (defined('ELKARTE'))
 	return true;
 
-define('DIALOGO', 'SSI');
+define('ELKARTE', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;

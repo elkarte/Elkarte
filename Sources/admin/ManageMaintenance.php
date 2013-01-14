@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1128,7 +1128,7 @@ function OptimizeTables()
 	// If there aren't any tables then I believe that would mean the world has exploded...
 	$context['num_tables'] = count($tables);
 	if ($context['num_tables'] == 0)
-		fatal_error('You appear to be running DIALOGO in a flat file mode... fantastic!', false);
+		fatal_error('You appear to be running ELKARTE in a flat file mode... fantastic!', false);
 
 	// For each table....
 	$context['optimized_tables'] = array();

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -134,7 +134,7 @@ function is_not_guest($message = '')
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
-	if (DIALOGO != 'SSI' && empty($context['theme_loaded']))
+	if (ELKARTE != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Never redirect to an attachment

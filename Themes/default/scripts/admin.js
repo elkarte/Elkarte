@@ -1,3 +1,19 @@
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * Handle the JavaScript surrounding the admin and moderation center.
+ */
+
 /*
 	smf_AdminIndex(oOptions)
 	{
@@ -7,18 +23,7 @@
 		public showCurrentVersion()
 		public checkUpdateAvailable()
 	}
-
-	smf_ViewVersions(oOptions)
-	{
-		public init()
-		public loadViewVersions
-		public swapOption(oSendingElement, sName)
-		public compareVersions(sCurrent, sTarget)
-		public determineVersions()
-	}
 */
-
-// Handle the JavaScript surrounding the admin and moderation center.
 function smf_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
@@ -103,6 +108,16 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 	}
 }
 
+/*
+	smf_ViewVersions(oOptions)
+	{
+		public init()
+		public loadViewVersions
+		public swapOption(oSendingElement, sName)
+		public compareVersions(sCurrent, sTarget)
+		public determineVersions()
+	}
+*/
 function smf_ViewVersions (oOptions)
 {
 	this.opt = oOptions;

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -94,7 +94,7 @@ function AddLanguage()
 				),
 				'description' => array(
 					'header' => array(
-						'value' => $txt['add_language_dialogo_desc'],
+						'value' => $txt['add_language_elkarte_desc'],
 					),
 					'data' => array(
 						'db' => 'description',
@@ -102,7 +102,7 @@ function AddLanguage()
 				),
 				'version' => array(
 					'header' => array(
-						'value' => $txt['add_language_dialogo_version'],
+						'value' => $txt['add_language_elkarte_version'],
 					),
 					'data' => array(
 						'db' => 'version',
@@ -110,7 +110,7 @@ function AddLanguage()
 				),
 				'utf8' => array(
 					'header' => array(
-						'value' => $txt['add_language_dialogo_utf8'],
+						'value' => $txt['add_language_elkarte_utf8'],
 					),
 					'data' => array(
 						'db' => 'utf8',
@@ -118,7 +118,7 @@ function AddLanguage()
 				),
 				'install_link' => array(
 					'header' => array(
-						'value' => $txt['add_language_dialogo_install'],
+						'value' => $txt['add_language_elkarte_install'],
 						'class' => 'centercol',
 					),
 					'data' => array(
@@ -150,7 +150,7 @@ function list_getLanguagesList()
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
 
 	// Load the class file and stick it into an array.
 	require_once($sourcedir . '/Class-Package.php');
@@ -178,7 +178,7 @@ function list_getLanguagesList()
 				'version' => $file->fetch('version'),
 				'utf8' => $file->fetch('utf8') ? $txt['yes'] : $txt['no'],
 				'description' => $file->fetch('description'),
-				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_dialogo_install'] . '</a>',
+				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elkarte_install'] . '</a>',
 			);
 		}
 		if (empty($smf_languages))
@@ -245,7 +245,7 @@ function DownloadLanguage()
 		elseif (!empty($install_files))
 		{
 			// @todo retrieve the language pack per naming pattern from our sites
-			$archive_content = read_tgz_file('http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
+			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
 			// Make sure the files aren't stuck in the cache.
 			package_flush_cache();
 			$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -256,7 +256,7 @@ function DownloadLanguage()
 
 	// @todo Open up the old china.
 	if (!isset($archive_content))
-		$archive_content = read_tgz_file('http://download.spudsdesign.com/fetch_language.php?version=' . urlencode(strtr($forum_version, array('DIALOGO ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
+		$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 
 	if (empty($archive_content))
 		fatal_error($txt['add_language_error_no_response']);
