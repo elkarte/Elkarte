@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -546,7 +546,7 @@ function smf_db_error($db_string, $connection = null)
 		$context['error_message'] = $txt['try_again'];
 
 	// A database error is often the sign of a database in need of updgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
-	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['ourVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
+	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'ELKARTE ' . @$modSettings['ourVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
 		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['ourVersion']);
 
 	if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)

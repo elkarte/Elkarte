@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -853,7 +853,7 @@ function EditSphinxSettings()
 				$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 				$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
 
-				$request = $mySphinx->Query('test', 'dialogo_index');
+				$request = $mySphinx->Query('test', 'elkarte_index');
 				if ($request === false)
 				{
 					$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
@@ -953,7 +953,7 @@ function CreateSphinxConfig()
 
 	// output our minimal configuration file to get them started
 	echo '#
-# Sphinx configuration file (sphinx.conf), configured for Dialogo
+# Sphinx configuration file (sphinx.conf), configured for Elkarte
 #
 # This is the minimum needed clean, simple, functional
 #
@@ -961,7 +961,7 @@ function CreateSphinxConfig()
 # /usr/local/etc/sphinx.conf
 #
 
-source dialogo_source
+source elkarte_source
 {
 	type				= mysql
 	sql_host 			= ', $db_server, '
@@ -1004,7 +1004,7 @@ source dialogo_source
 		WHERE id_msg = $id
 }
 
-source dialogo_delta_source : dialogo_source
+source elkarte_delta_source : elkarte_source
 {
 	sql_query_pre	= ', isset($db_character_set) ? 'SET NAMES ' . $db_character_set : '', '
 	sql_query_range	= \
@@ -1014,28 +1014,28 @@ source dialogo_delta_source : dialogo_source
 			AND s2.variable = \'maxMsgID\'
 }
 
-index dialogo_base_index
+index elkarte_base_index
 {
 	html_strip 		= 1
-	source 			= dialogo_source
-	path 			= ', $modSettings['sphinx_data_path'], '/dialogo_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	source 			= elkarte_source
+	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
 	stopwords 		= ' . $modSettings['sphinx_stopword_path'], '
 	min_word_len 	= 2
 	charset_type 	= ', isset($db_character_set) && $db_character_set === 'utf8' ? 'utf-8' : 'sbcs', '
 	charset_table 	= 0..9, A..Z->a..z, _, a..z
 }
 
-index dialogo_delta_index : dialogo_base_index
+index elkarte_delta_index : elkarte_base_index
 {
-	source 			= dialogo_delta_source
-	path 			= ', $modSettings['sphinx_data_path'], '/dialogo_sphinx_delta.index
+	source 			= elkarte_delta_source
+	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
 }
 
-index dialogo_index
+index elkarte_index
 {
 	type			= distributed
-	local			= dialogo_base_index
-	local			= dialogo_delta_index
+	local			= elkarte_base_index
+	local			= elkarte_delta_index
 }
 
 indexer

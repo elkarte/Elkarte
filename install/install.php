@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -326,8 +326,8 @@ function load_database()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('DIALOGO'))
-		define('DIALOGO', 1);
+	if (!defined('ELKARTE'))
+		define('ELKARTE', 1);
 	if (empty($smcFunc))
 		$smcFunc = array();
 
@@ -759,7 +759,7 @@ function DatabaseSettings()
 			'db_server' => $_POST['db_server'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'DIALOGOCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
+			'cookiename' => 'ELKARTECookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 		);
 
 		// God I hope it saved!
@@ -783,7 +783,7 @@ function DatabaseSettings()
 		}
 
 		// Now include it for database functions!
-		define('DIALOGO', 1);
+		define('ELKARTE', 1);
 		$modSettings['disableQueryCheck'] = true;
 		if (empty($smcFunc))
 			$smcFunc = array();
@@ -1934,7 +1934,7 @@ function updateDbLastError()
 }
 
 /**
- * Create an .htaccess file to prevent mod_security. Dialogo has filtering built-in.
+ * Create an .htaccess file to prevent mod_security. Elkarte has filtering built-in.
  */
 function fixModSecurity()
 {
@@ -2034,7 +2034,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
+				<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 			</div>
 		</div>
 		<div id="wrapper">
@@ -2123,7 +2123,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul class="reset">
-					<li class="copyright"><a href="http://www.spudsdesign.com/dialogo/" title="Dialogo Community" target="_blank" class="new_win">Dialogo &copy; 2012, Dialogo Community</a></li>
+					<li class="copyright"><a href="http://www.spudsdesign.com/dialogo/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
 				</ul>
 			</div>
 		</div>
@@ -2132,7 +2132,7 @@ function template_install_below()
 }
 
 /**
- * Welcome them to the wonderful world of Dialogo!
+ * Welcome them to the wonderful world of Elkarte!
  */
 function template_welcome_message()
 {
@@ -2170,7 +2170,7 @@ function template_welcome_message()
 				if (!(\'ourVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/DIALOGO\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/ELKARTE\s?/g, \'\');
 
 				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");

@@ -136,7 +136,7 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
-	This box shows recently updated announcements from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.
+	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
 	You should check here every now and then for updates, new releases, and important information from Simple Machines.';
 
 $helptxt['registrations'] = '<strong>Registration Management</strong><br />
@@ -366,7 +366,7 @@ $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the
 $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
 	Your site is at http://www.sitename.org/,<br />
 	And your forum is at http://forum.sitename.org/,<br />
-	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.spudsdesign.com) not controlled by you.';
+	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.';
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';
@@ -488,8 +488,8 @@ $helptxt['make_email_viewable'] = 'If this option is enabled instead of users em
 $helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate to search engines (etc) the key content of your site. They should be a comma separated list of words, and should not use HTML.';
 
 $helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
-$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.';
-$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>, though.';
+$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
+$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
 $helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that the software will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="javascript:window.open(\'%1$s?action=admin;area=manageboards\'); self.close();">board management interface</a>.';

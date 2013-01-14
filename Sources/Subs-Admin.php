@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -89,7 +89,7 @@ function getServerVersions($checkFor)
 
 /**
  * Search through source, theme and language files to determine their version.
- * Get detailed version information about the physical DIALOGO files on the server.
+ * Get detailed version information about the physical ELKARTE files on the server.
  *
  * - the input parameter allows to set whether to include SSI.php and whether
  *   the results should be sorted.

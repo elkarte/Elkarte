@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -749,7 +749,7 @@ function template_servers()
 								<strong>' . $txt['server_name'] . ':</strong>
 							</dt>
 							<dd>
-								<input type="text" name="servername" size="44" value="DIALOGO" class="input_text" />
+								<input type="text" name="servername" size="44" value="ELKARTE" class="input_text" />
 							</dd>
 							<dt>
 								<strong>' . $txt['serverurl'] . ':</strong>

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -304,7 +304,7 @@ function action_browseserver()
 			$default_title = $smcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
 	}
 
-	$the_version = strtr($forum_version, array('DIALOGO ' => ''));
+	$the_version = strtr($forum_version, array('ELKARTE ' => ''));
 	if (!empty($_SESSION['version_emulate']))
 		$the_version = $_SESSION['version_emulate'];
 

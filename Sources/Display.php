@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -14,11 +14,11 @@
  * @version 1.0 Alpha
  *
  * This is perhaps the most important and probably most accessed file in all
- * of DIALOGO.  This file controls topic, message, and attachment display.
+ * of ELKARTE.  This file controls topic, message, and attachment display.
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**

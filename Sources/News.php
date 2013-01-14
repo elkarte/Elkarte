@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -252,7 +252,7 @@ function action_showfeed()
 		<title>', $feed_title, '</title>
 		<link>', $scripturl, '</link>
 		<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-		<generator>Dialogo</generator>
+		<generator>Elkarte</generator>
 		<ttl>30</ttl>
 		<image>
 			<url>', $settings['default_theme_dir'], '/images/logo.png</url>
@@ -308,7 +308,7 @@ function action_showfeed()
 
 	<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 	<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-	<generator uri="http://www.dialogocommunity.org" version="', strtr($forum_version, array('DIALOGO' => '')), '">DIALOGO</generator>
+	<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ELKARTE' => '')), '">ELKARTE</generator>
 	<author>
 		<name>', strip_tags($context['forum_name']), '</name>
 	</author>';

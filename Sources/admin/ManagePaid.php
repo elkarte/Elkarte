@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1788,7 +1788,7 @@ function loadPaymentGateways()
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// DIALOGO Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, '// ELKARTE Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
 					require_once($sourcedir . '/' . $file);
 

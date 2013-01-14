@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -70,7 +70,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
 
 	// Don't log the session hash in the url twice, it's a waste.
-	$query_string = htmlspecialchars((DIALOGO == 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
+	$query_string = htmlspecialchars((ELKARTE == 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
 
 	// Just so we know what board error messages are from.
 	if (isset($_POST['board']) && !isset($_GET['board']))
@@ -278,7 +278,7 @@ function setup_fatal_error_context($error_message, $error_code)
 		return false;
 
 	// Maybe they came from dlattach or similar?
-	if (DIALOGO != 'SSI' && empty($context['theme_loaded']))
+	if (ELKARTE != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Don't bother indexing errors mate...
@@ -298,7 +298,7 @@ function setup_fatal_error_context($error_message, $error_code)
 	$context['sub_template'] = 'fatal_error';
 
 	// If this is SSI, what do they want us to do?
-	if (DIALOGO == 'SSI')
+	if (ELKARTE == 'SSI')
 	{
 		if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 			$ssi_on_error_method();

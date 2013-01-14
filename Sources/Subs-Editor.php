@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1481,7 +1481,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.dialogo.js', 'post.js'));
+		loadJavascriptFile(array('editor.js', 'jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
 		addInlineJavascript('
 		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
