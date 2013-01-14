@@ -90,6 +90,12 @@ function template_html_above()
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>';
 
+	// Tell IE to render the page in standards not compatabilty mode. really for ie >= 8
+	// Note if this is not in the first 4k, its ignored, thats why its here
+	if (isBrowser('ie'))
+		echo '
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
+
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
 
@@ -117,11 +123,6 @@ function template_html_above()
 	<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
-
-	// Tell IE to render the page in standards not compatabilty mode. really for ie >= 8
-	if (isBrowser('ie'))
-		echo '
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
 	echo '
 	<title>', $context['page_title_html_safe'], '</title>';

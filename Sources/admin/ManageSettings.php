@@ -818,27 +818,29 @@ function ModifySpamSettings($return_config = false)
 	$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 	$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
 
+	// Build up our options array
 	$config_vars = array(
-				array('check', 'reg_verification'),
-				array('check', 'search_enable_captcha'),
-				// This, my friend, is a cheat :p
-				'guest_verify' => array('check', 'guests_require_captcha', 'subtext' => $txt['setting_guests_require_captcha_desc']),
-				array('int', 'posts_require_captcha', 'subtext' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
-				array('check', 'guests_report_require_captcha'),
-			'',
-			// PM Settings
-				'pm1' => array('int', 'max_pm_recipients', 'subtext' => $txt['max_pm_recipients_note']),
-				'pm2' => array('int', 'pm_posts_verification', 'subtext' => $txt['pm_posts_verification_note']),
-				'pm3' => array('int', 'pm_posts_per_hour', 'subtext' => $txt['pm_posts_per_hour_note']),
-			// Visual verification.
-			array('title', 'configure_verification_means'),
+		array('title', 'antispam_Settings'),
+			array('check', 'reg_verification'),
+			array('check', 'search_enable_captcha'),
+			// This, my friend, is a cheat :p
+			'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
+			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+			array('check', 'guests_report_require_captcha'),
+		// PM Settings
+		array('title', 'antispam_PM'),
+			'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+			'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+			'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+		// Visual verification.
+		array('title', 'configure_verification_means'),
 			array('desc', 'configure_verification_means_desc'),
-				'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
-			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
-			array('title', 'setup_verification_questions'),
+			'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
+		// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
+		array('title', 'setup_verification_questions'),
 			array('desc', 'setup_verification_questions_desc'),
-				array('int', 'qa_verification_number', 'subtext' => $txt['setting_qa_verification_number_desc']),
-				array('callback', 'question_answer_list'),
+			array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
+			array('callback', 'question_answer_list'),
 	);
 
 	call_integration_hook('integrate_spam_settings', array($config_vars));
@@ -956,9 +958,7 @@ function ModifySpamSettings($return_config = false)
 
 		// Now save.
 		saveDBSettings($save_vars);
-
 		cache_put_data('verificationQuestionIds', null, 300);
-
 		redirectexit('action=admin;area=securitysettings;sa=spam');
 	}
 
@@ -997,7 +997,6 @@ function ModifySpamSettings($return_config = false)
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 	$context['settings_title'] = $txt['antispam_Settings'];
-
 	prepareDBSettingContext($config_vars);
 }
 
