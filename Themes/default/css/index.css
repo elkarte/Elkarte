@@ -1519,7 +1519,7 @@ ul li.greeting {
 	border: 1px solid #ccc;
 	border-radius: 2px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .navigate_section ul li {
 	float: left;
@@ -3978,7 +3978,7 @@ span.hidelink {
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .generic_list_wrapper {
 	margin-top: -5px;
@@ -4167,7 +4167,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 #postmodify #message{
 	width: 100%;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #postmodify .lastedit{
 	font-weight: bold;
