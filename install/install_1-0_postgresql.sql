@@ -1820,7 +1820,7 @@ CREATE INDEX {$db_prefix}messages_related_ip ON {$db_prefix}messages (id_member,
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Dialogo', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Elkarte', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -2307,7 +2307,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('warning_moderate', '
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('warning_mute', '60');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('admin_features', '');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('last_mod_report_action', '0');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pruningOptions', '30,180,180,180,30,0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pruningOptions', '30,180,180,180,30,7,0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cache_enable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reg_verification', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('visual_verification_type', '3');
@@ -2322,6 +2322,12 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachment_thumb_png
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_reencode', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_paranoid', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enable_disregard', '0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_enabled', '0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #
@@ -2605,3 +2611,31 @@ CREATE TABLE {$db_prefix}user_drafts (
 #
 
 CREATE UNIQUE INDEX {$db_prefix}id_member ON {$db_prefix}user_drafts (id_member, id_draft, type);
+# --------------------------------------------------------
+
+#
+# Table structure for table `log_badbehavior`
+#
+
+CREATE TABLE {$db_prefix}log_badbehavior (
+	id int default nextval('{$db_prefix}log_badbehavior'),
+	ip char NOT NULL,
+	date int NOT NULL default '0',
+	request_method varchar(255) NOT NULL,
+	request_uri varchar(255) NOT NULL,
+	server_protocol varchar(255) NOT NULL,
+	http_headers text NOT NULL,
+	user_agent varchar(255) NOT NULL,
+	request_entity varchar(255) NOT NULL,
+	valid varchar(255) NOT NULL,
+	id_member int unsigned NOT NULL,
+	session char(64) NOT NULL default '',
+	PRIMARY KEY (id)
+)
+
+#
+# Indexes for table `log_badbehavior`
+#
+
+CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
+CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);

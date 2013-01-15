@@ -136,7 +136,7 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
-	This box shows recently updated announcements from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.
+	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
 	You should check here every now and then for updates, new releases, and important information from Simple Machines.';
 
 $helptxt['registrations'] = '<strong>Registration Management</strong><br />
@@ -172,6 +172,8 @@ $helptxt['modlog'] = '<strong>Moderation Log</strong><br />
 $helptxt['adminlog'] = '<strong>Administration Log</strong><br />
 	This section allows members of the admin team to track some of the administrative actions that have occurred on the forum. To ensure that
 	admins cannot remove references to the actions they have performed, entries may not be deleted until 24 hours after the action was taken.';
+$helptxt['badbehaviorlog'] = '<strong>Bad Behavior Log</strong><br />
+	This section allows members of the admin team to view some of the bad behavior actions that have occurred on the forum. This log is automatically pruned by the bad behavior funciton so it will only contain the last week of activity.';
 $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
 	This feature enables members of the admin and moderation team to issue warnings to members - and to use a members warning level to determine the
 	actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define
@@ -364,7 +366,7 @@ $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the
 $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
 	Your site is at http://www.sitename.org/,<br />
 	And your forum is at http://forum.sitename.org/,<br />
-	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.spudsdesign.com) not controlled by you.';
+	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.';
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';
@@ -486,8 +488,8 @@ $helptxt['make_email_viewable'] = 'If this option is enabled instead of users em
 $helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate to search engines (etc) the key content of your site. They should be a comma separated list of words, and should not use HTML.';
 
 $helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
-$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.';
-$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.spudsdesign.com/dialogo/" target="_blank" class="new_win">www.spudsdesign.com/dialogo/</a>, though.';
+$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
+$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
 $helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that the software will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="javascript:window.open(\'%1$s?action=admin;area=manageboards\'); self.close();">board management interface</a>.';
@@ -617,3 +619,20 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		\ - Escapes the next character.<br />
 	</div><br /><br />
 	More information and advanced techniques may be found on the internet.';
+
+$helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case, you should add all of the internal IP addresses for your reverse proxy/load balancer servers, as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
+$helptxt['badbehavior_reverse_proxy_header'] = 'When a reverse proxy is in use, Bad Behavior looks at this HTTP header to determine the actual source IP address for each web request. Your reverse proxy or load balancer must add an HTTP header containing the remote IP address where the connection originated. Most do this by default; check the configuration for your reverse proxy or load balancer to ensure that this header is sent.<br /><br />If you use the CloudFlare service, you should change this option to CF-Connecting-IP.';
+$helptxt['badbehavior_reverse_proxy'] = 'When enabled, Bad Behavior will assume it is receiving a connection from a reverse proxy, when a specific HTTP header is received.';
+$helptxt['badbehavior_eucookie'] = 'Set this option on if you believe Bad Behavior\'s site security cookie is not exempt from the 2012 EU cookie regulation.</a>';
+$helptxt['badbehavior_httpbl_maxage'] = 'This is the number of days since suspicious activity was last observed from an IP address by Project Honey Pot. Bad Behavior will block requests with a maximum age equal to or less than this setting.';
+$helptxt['badbehavior_httpbl_threat'] = 'This number provides a measure of how suspicious an IP address is, based on activity observed at Project Honey Pot. Bad Behavior will block requests with a threat level equal or higher to this setting. Project Honey Pot has <a href="http://www.projecthoneypot.org/threat_info.php" target="_blank">more information on this parameter</a>.';
+$helptxt['badbehavior_httpbl_key']= 'Bad Behavior is capable of using data from the <a href="http://www.projecthoneypot.org/faq.php#g" target="_blank">http:BL</a> service provided by <a href="http://www.projecthoneypot.org/" target="_blank">Project Honey Pot</a> to screen requests.<br /><br />This is purely optional; however if you wish to use it, you must <a href="http://www.projecthoneypot.org/httpbl_configure.php" target="_blank">sign up for the service</a> and obtain an API key. To disable http:BL use, remove the API key from your settings.';
+$helptxt['badbehavior_verbose'] = 'Enabling verbose mode causes all HTTP requests to be logged. When verbose mode is off, only blocked requests and suspicious requests are logged.<br /><br />Verbose mode is off by default. Using verbose mode is not recommended as it can significantly slow down your site; it exists to capture data from live spammers which are not being blocked.';
+$helptxt['badbehavior_logging'] = 'Should Bad Behavior keep a log of requests? On by default, and it is not recommended to disable it, since it will cause additional spam to get through.';
+$helptxt['badbehavior_strict'] = 'Bad Behavior operates in two blocking modes: normal and strict.<br />When strict mode is enabled, additional checks for (old) software which have been spam sources are enabled, but occasional legitimate users using the same software may be blocked as well.';
+$helptxt['badbehavior_offsite_forms'] = 'Bad Behavior normally prevents your site from receiving data posted from forms on other web sites. This prevents spammers from, e.g., using a Google cached version of your web site to send you spam. However, some web applications such as OpenID require that your site be able to receive form data in this way. If you are running OpenID, enable this option.';
+$helptxt['badbehavior_display_stats'] = 'Enabling this option will add a blurb to your web site footer (theme dependant) advertising Bad Behavior’s presence and the number of recently blocked requests. This option is not available or has no effect when logging is not in use.';
+$helptxt['badbehavior_postcount_wl'] = 'This allows you to bypass bad behavior checks for users over a certain post count.<br />-1 will bypass all registered users, including those with no posts<br />0 will disable bypassing and scan everyone regardless of post count<br />A post count number greater than zero under which users will be checked.';
+$helptxt['badbehavior_ip_wl'] = 'IP address ranges use the CIDR format.  To remove an address just leave it blank and then save';
+$helptxt['badbehavior_useragent_wl'] = 'User agents are matched by exact match only.';
+$helptxt['badbehavior_url_wl'] = 'URLs are matched from the first / after the server name up to, but not including, the ? (if any). The URL to be whitelisted is a URL on YOUR site. A partial URL match is permitted, so URL whitelist entries should be as specific as possible, but no more specific than necessary.<br />For instance, /example would match /example.php and /example/address';

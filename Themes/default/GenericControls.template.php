@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -70,13 +70,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						echo '
 							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 					}
+
 					if (empty($smileyRow['isLast']) && $numRows != 1)
 						echo ',
 						\'-', $emptyPlaceholder++, '\': \'\',';
 				}
+
 				echo '
 						}', $countLocations != 0 ? ',' : '';
 			}
+
 			echo '
 					}';
 		}

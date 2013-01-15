@@ -1,4 +1,14 @@
 /**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript plugins for use with jquery
+ */
+
+/**
  * SiteTooltip, Basic JQuery function to provide styled tooltips
  *
  * - will use the hoverintent plugin if available
@@ -8,8 +18,8 @@
  * - attempts to keep the tooltip on screen
  *
  */
- 
-(function($) {
+ (function($) {
+	'use strict';
 	$.fn.SiteTooltip = function(oInstanceSettings) {
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
@@ -36,11 +46,11 @@
 		// determine where we are going to place the tooltip, while trying to keep it on screen
 		var positionTooltip = function(event)
 		{
-			var iPosx = 0;
-			var iPosy = 0;
+			var iPosx = 0,
+				iPosy = 0;
 			
 			if (!event)
-				var event = window.event;
+				event = window.event;
 				
 			if (event.pageX || event.pageY)
 			{
@@ -59,7 +69,7 @@
 				y: iPosy + oSettings.positionTop,
 				w: $('#' + oSettings.tooltipID).width(),
 				h: $('#' + oSettings.tooltipID).height()
-			}
+			};
 
 			// Display limits and window scroll postion
 			var oLimits = {
@@ -86,17 +96,17 @@
 			
 			// finally set the position we determined
 			$('#' + oSettings.tooltipID).css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
-		}
+		};
 		
 		// used to show a tooltip
 		var showTooltip = function(){
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).show();
-		}
+		};
 		
 		// used to hide a tooltip
-		var hideTooltip = function(valueOfThis){
+		var hideTooltip = function(){
 			$('#' + oSettings.tooltipID).fadeOut('slow').trigger("unload").remove();
-		}
+		};
 		
 		// used to keep html encoded
 		function htmlspecialchars(string)
@@ -105,7 +115,7 @@
 		}
 		
 		// for all of the elements that match the selector on the page, lets set up some actions
-		return this.each(function(index)
+		return this.each(function()
 		{
 			// if we find hoverIntent use it
 			if ($.fn.hoverIntent)
@@ -137,12 +147,10 @@
 					var tt = $('#' + oSettings.tooltipID);
 					var ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
 					
-					if (oSettings.tooltipContent == 'html')
+					if (oSettings.tooltipContent === 'html')
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
 					else
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
-					
-					oSettings.tooltipContent
 					
 					// show then position or it may postion off screen
 					tt.show();
@@ -151,14 +159,14 @@
 				}
 			
 				return false;
-			};
+			}
 			
 			// create the Bye bye tip
 			function site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
-			};
+			}
 			
 			// create the tip move with the cursor
 			if (oSettings.followMouse)
@@ -170,14 +178,13 @@
 			}
 			
 			// clear the tip on a click
-			$(this).bind("click", function(event){
+			$(this).bind("click", function(){
 				hideTooltip(this);
 				return true;
 			});
 
 		});
 	};
-	
 })(jQuery);
 
 /**
@@ -208,55 +215,50 @@
  * @param  g  onMouseOut function  || Nothing (use configuration options object)
  * @author    Brian Cherne brian(at)cherne(dot)net
  */
-
- /*
-  * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING. KTHNX.
-  * Code has been tweaked to give responsive menus without compromising a11y.
-  * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
-  * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
-  * If you do not understand the a11y advantages of this system, please ask before making changes.
-  *
-  * Full functionality means:
-  * 1/ hoverIntent plugin functions so that drop menus do NOT open or close instantly when cursor touches first level anchor.
-  * 2/ The drop menus should only open when the cursor actually stops on the first level anchor, or is moving very slowly.
-  * 3/ There should be a delay before the drop menus close on mouseout, for people with less than perfect tracking ability.
-  * 4/ Settings for custom tooltips will be done separately in another file.
-  */
- 
-(function($) {
-	$.fn.hoverIntent = function(f,g) {
+;(function($) {
+	'use strict';
+	$.fn.hoverIntent = function (f, g) {
 		// default configuration options
 		var cfg = {
 			sensitivity: 8,
 			interval: 50,
 			timeout: 1
 		};
+
 		// override configuration options with user supplied object
-		cfg = $.extend(cfg, g ? { over: f, out: g } : f );
+		cfg = $.extend(cfg, g ? {over: f, out: g} : f);
 
 		// instantiate variables
 		// cX, cY = current X and Y position of mouse, updated by mousemove event
 		// pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
-		var cX, cY, pX, pY;
+		var cX, cY,
+			pX, pY;
 
 		// A private function for getting mouse position
-		var track = function(ev) {
+		var track = function (ev) {
 			cX = ev.pageX;
 			cY = ev.pageY;
 		};
 
 		// A private function for comparing current and previous mouse position
-		var compare = function(ev,ob) {
+		var compare = function (ev, ob) {
 			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+			
 			// compare mouse positions to see if they've crossed the threshold
-			if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
-				$(ob).unbind("mousemove",track);
+			if((Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity)
+			{
+				$(ob).unbind("mousemove", track);
+
 				// set hoverIntent state to true (so mouseOut can be called)
 				ob.hoverIntent_s = 1;
 				return cfg.over.apply(ob,[ev]);
-			} else {
+			}
+			else
+			{
 				// set previous coordinates for next time
-				pX = cX; pY = cY;
+				pX = cX;
+				pY = cY;
+
 				// use self-calling timeout, guarantees intervals are spaced out properly (avoids JavaScript timer bugs)
 				ob.hoverIntent_t = setTimeout( function(){compare(ev, ob);} , cfg.interval );
 			}
@@ -266,122 +268,136 @@
 		var delay = function(ev,ob) {
 			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
 			ob.hoverIntent_s = 0;
+
 			return cfg.out.apply(ob,[ev]);
 		};
 
 		// A private function for handling mouse 'hovering'
-		var handleHover = function(e) {
-
-			// next three lines copied from jQuery.hover, ignore children onMouseOver/onMouseOut
-			var p = (e.type == "mouseenter" ? e.fromElement : e.toElement) || e.relatedTarget;
-			while ( p && p != this ) { try { p = p.parentNode; } catch(e) { p = this; } }
-			if ( p == this ) { return false; }
-
+		var handleHover = function(e)
+		{
 			// copy objects to be passed into t (required for event object to be passed in IE)
 			var ev = jQuery.extend({},e);
 			var ob = this;
 
 			// cancel hoverIntent timer if it exists
-			if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
+			if(ob.hoverIntent_t)
+			{
+				ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+			}
 
 			// if e.type == "mouseenter"
-			if (e.type == "mouseenter") {
+			if(e.type === "mouseenter")
+			{
 				// set "previous" X and Y position based on initial entry point
-				pX = ev.pageX; pY = ev.pageY;
+				pX = ev.pageX;
+				pY = ev.pageY;
+
 				// update "current" X and Y position based on mousemove
 				$(ob).bind("mousemove",track);
-				// start polling interval (self-calling timeout) to compare mouse coordinates over time
-				if (ob.hoverIntent_s != 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
 
+				// start polling interval (self-calling timeout) to compare mouse coordinates over time
+				if (ob.hoverIntent_s !== 1)
+				{
+					ob.hoverIntent_t = setTimeout(function(){compare(ev,ob);}, cfg.interval);
+				}
 			// else e.type == "mouseleave"
-			} else {
+			}
+			else
+			{
 				// unbind expensive mousemove event
-				$(ob).unbind("mousemove",track);
+				$(ob).unbind("mousemove", track);
+
 				// if hoverIntent state is true, then call the mouseOut function after the specified delay
-				if (ob.hoverIntent_s == 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
+				if(ob.hoverIntent_s === 1)
+				{
+					ob.hoverIntent_t = setTimeout(function(){delay(ev,ob);}, cfg.timeout);
+				}
 			}
 		};
 
 		// bind the function to the two event listeners
-		return this.bind('mouseenter',handleHover).bind('mouseleave',handleHover);
+		return this.bind('mouseenter', handleHover).bind('mouseleave', handleHover);
 	};
 })(jQuery);
 
-/*
+/**
  * Superfish v1.4.8 - jQuery menu widget
  * Copyright (c) 2008 Joel Birch
  *
  * Licensed under the MIT license:
- * 	http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/mit-license.php
  *
  * CHANGELOG: http://users.tpg.com.au/j_birch/plugins/superfish/changelog.txt
+ *
+ * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING
+ * This is Derivative code for use in Elkarte, code has been tweaked to give responsive menus without compromising a11y.
+ * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
+ * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
+ * If you do not understand the a11y advantages of this system, please ask before making changes.
+ *
+ * Full functionality means:
+ * 1/ hoverIntent plugin functions so that drop menus do NOT open or close instantly when cursor touches first level anchor.
+ * 2/ The drop menus should only open when the cursor actually stops on the first level anchor, or is moving very slowly.
+ * 3/ There should be a delay before the drop menus close on mouseout, for people with less than perfect tracking ability.
+ * 4/ The drop menus must remain fully accessible via keyboard navigation (eg: the Tab key).
  */
- 
- /*
-  * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING. KTHNX.
-  * Dev copy. Antechinus - 20th October 2011.
-  * Code has been tweaked to remove stuff we do not need (IE7 fix, etc).
-  * Remaining code appears to be essential for full functionality.
-  * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
-  * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
-  * If you do not understand the a11y advantages of this system, please ask before making changes.
-  *
-  * Full functionality means:
-  * 1/ hoverIntent plugin functions so that drop menus do NOT open or close instantly when cursor touches first level anchor.
-  * 2/ The drop menus should only open when the cursor actually stops on the first level anchor, or is moving very slowly.
-  * 3/ There should be a delay before the drop menus close on mouseout, for people with less than perfect tracking ability.
-  * 4/ The drop menus must remain fully accessible via keyboard navigation (eg: the Tab key).
-  */
-
 ;(function($){
+	'use strict';
 	$.fn.superfish = function(op){
-
 		var sf = $.fn.superfish,
 			c = sf.c,
 			over = function(){
-				var $$ = $(this), menu = getMenu($$);
+				var $this = $(this),
+					menu = getMenu($this);
+
 				clearTimeout(menu.sfTimer);
-				$$.showSuperfishUl().siblings().hideSuperfishUl();
+				$this.showSuperfishUl().siblings().hideSuperfishUl();
 			},
 			out = function(){
-				var $$ = $(this), menu = getMenu($$), o = sf.op;
+				var $this = $(this),
+					menu = getMenu($this),
+					o = sf.op;
+
 				clearTimeout(menu.sfTimer);
-				menu.sfTimer=setTimeout(function(){
-					o.retainPath=($.inArray($$[0],o.$path)>-1);
-					$$.hideSuperfishUl();
-					if (o.$path.length && $$.parents(['li.',o.hoverClass].join('')).length<1){over.call(o.$path);}
-				},o.delay);	
+				menu.sfTimer = setTimeout(function(){
+					$this.hideSuperfishUl();
+				},o.delay);
 			},
 			getMenu = function($menu){
-				var menu = $menu.parents(['ul.',c.menuClass,':first'].join(''))[0];
+				var menu = $menu.closest(['ul.', c.menuClass].join(''))[0];
+
 				sf.op = sf.o[menu.serial];
 				return menu;
-			},
-			// This next line is essential, despite the other code for arrows being removed.
-			// Changing the next line WILL break hoverIntent functionality. Very bad.
-			addArrow = function($a){$a.addClass(c.anchorClass)};
+			};
 
 		return this.each(function() {
-			var s = this.serial = sf.o.length;
-			var o = $.extend({},sf.defaults,op);
-			var h = $.extend({},sf.hoverdefaults,{over: over, out: out},op);
+			var s = this.serial = sf.o.length,
+				o = $.extend({}, sf.defaults, op),
+				h = $.extend({}, sf.hoverdefaults, {over: over, out: out}, op),
+				$this = $(this),
+				lis = $this.find("li ul").parent(),
+				a_li = $this.find('a').parent('li');
 
-			o.$path = $('li.'+o.pathClass,this).slice(0,o.pathLevels).each(function(){
-				$(this).addClass([o.hoverClass,c.bcClass].join(' '))
-					.filter('li:has(ul)').removeClass(o.pathClass);
-			});
-			sf.o[s] = sf.op = o;
-			$('li:has(ul)',this)[($.fn.hoverIntent && !o.disableHI) ? 'hoverIntent' : 'hover'](($.fn.hoverIntent && !o.disableHI) ? (h) : (over,out)).each(function() {})
-			.not('.'+c.bcClass)
-				.hideSuperfishUl();
+			// make sure passed in element actually has submenus
+			if (lis.length !== 0)
+			{
+				sf.o[s] = sf.op = o;
+				if($.fn.hoverIntent && !o.disableHI)
+				{
+					lis['hoverIntent'](over, out).hideSuperfishUl();
+				}
+				else
+				{
+					lis['hover'](h).hideSuperfishUl();
+				}
+			}
 
-			var $a = $('a',this);
-			$a.each(function(i){
-				var $li = $a.eq(i).parents('li');
-				$a.eq(i).focus(function(){over.call($li);}).blur(function(){out.call($li);});
+			// add focus/blur events to the links
+			a_li.each(function() {
+				var li = $(this);
+				li.focus(function(){over.call(li);}).blur(function(){out.call(li);});
 			});
 			o.onInit.call(this);
-			
 		}).each(function() {
 			var menuClasses = [c.menuClass];
 			$(this).addClass(menuClasses.join(' '));
@@ -392,49 +408,38 @@
 	sf.o = [];
 	sf.op = {};
 	sf.c = {
-		bcClass     : 'sf-breadcrumb',
-		menuClass   : 'sf-js-enabled',
-		anchorClass : 'sf-with-ul',
+		bcClass		: 'sf-breadcrumb',
+		menuClass	: 'sf-js-enabled',
+		anchorClass	: 'sf-with-ul'
 	};
 	sf.defaults = {
 		hoverClass	: 'sfhover',
-		pathClass	: 'current',
-		pathLevels	: 1,
 		delay		: 600,
-		animation	: {opacity:'show', height:'show'},
-		speed		: 200,
-		disableHI	: false,		// Leave as false. True disables hoverIntent detection (not good).
-		onInit		: function(){}, // callback functions
-		onBeforeShow: function(){},
-		onShow		: function(){},
-		onHide		: function(){}
+		animation	: {opacity:'show', height:'show', width:'show'},
+		speed		: 150,
+		disableHI	: false, // Leave as false. true disables hoverIntent detection (not good).
+		onInit		: function(){}
 	};
 	sf.hoverdefaults = {
-		sensitivity : 8,
-		interval    : 50,
-		timeout     : 1
+		sensitivity	: 8,
+		interval	: 50,
+		timeout		: 1
 	};
 	$.fn.extend({
 		hideSuperfishUl : function(){
-			var o = sf.op,
-				not = (o.retainPath===true) ? o.$path : '';
-			o.retainPath = false;
-			var $ul = $(['li.',o.hoverClass].join(''),this).add(this).not(not).removeClass(o.hoverClass)
-					.find('>ul').hide().css('opacity','0');
-			o.onHide.call($ul);
+			var o = sf.op;
+
+			$(['li.', o.hoverClass].join(''), this).add(this).removeClass(o.hoverClass).find('>ul').hide();
 			return this;
 		},
 		showSuperfishUl : function(){
 			var o = sf.op,
-				sh = sf.c,
-				$ul = this.addClass(o.hoverClass)
-					.find('>ul:hidden').css('opacity','1');
-			o.onBeforeShow.call($ul);
-			$ul.animate(o.animation,o.speed,function(){o.onShow.call($ul);});
+				$ul = this.addClass(o.hoverClass).find('>ul:hidden').css('opacity', 1);
+			
+			$ul.animate(o.animation, o.speed);
 			return this;
 		}
 	});
-
 })(jQuery);
 
 /**

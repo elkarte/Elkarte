@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -20,7 +20,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -432,7 +432,7 @@ function moveTopics($topics, $toBoard)
 	// Move over the mark_read data. (because it may be read and now not by some!)
 	$SaveAServer = max(0, $modSettings['maxMsgID'] - 50000);
 	$request = $smcFunc['db_query']('', '
-		SELECT lmr.id_member, lmr.id_msg, t.id_topic
+		SELECT lmr.id_member, lmr.id_msg, t.id_topic, lt.disregarded
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board
 				AND lmr.id_msg > t.id_first_msg AND lmr.id_msg > {int:protect_lmr_msg})
@@ -447,7 +447,7 @@ function moveTopics($topics, $toBoard)
 	$log_topics = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg']);
+		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg'], $row['disregarded']);
 
 		// Prevent queries from getting too big. Taking some steam off.
 		if (count($log_topics) > 500)
@@ -748,7 +748,7 @@ function markTopicsRead($mark_topics, $was_set = false)
 	$smcFunc['db_insert']($was_set ? 'replace' : 'ignore',
 		'{db_prefix}log_topics',
 		array(
-			'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int',
+			'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int',
 		),
 		$mark_topics,
 		array('id_member', 'id_topic')

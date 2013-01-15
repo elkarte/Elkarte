@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -24,10 +24,10 @@
  *
  */
 
-$forum_version = 'DIALOGO 1.0 Alpha';
+$forum_version = 'ELKARTE 1.0 Alpha';
 
 // Get everything started up...
-define('DIALOGO', 1);
+define('ELKARTE', 1);
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
 error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
@@ -71,6 +71,7 @@ loadDatabase();
 
 // Load the settings from the settings table, and perform operations like optimizing.
 reloadSettings();
+
 // Clean the request variables, add slashes, etc.
 cleanRequest();
 $context = array();
@@ -142,6 +143,9 @@ function smf_main()
 	// Load the current user's permissions.
 	loadPermissions();
 
+	// Load BadBehavior before we go much further
+	loadBadBehavior();
+
 	// Attachments don't require the entire theme to be loaded.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
 		detectBrowser();
@@ -158,6 +162,7 @@ function smf_main()
 
 	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array($no_stat_actions));
+
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions))
 	{

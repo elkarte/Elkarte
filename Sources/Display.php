@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -14,11 +14,11 @@
  * @version 1.0 Alpha
  *
  * This is perhaps the most important and probably most accessed file in all
- * of DIALOGO.  This file controls topic, message, and attachment display.
+ * of ELKARTE.  This file controls topic, message, and attachment display.
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -112,7 +112,7 @@ function Display()
 	// Is this a moved topic that we are redirecting to?
 	if (!empty($topicinfo['id_redirect_topic']))
 	{
-		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg']), $topicinfo['new_from'] !== 0);
+		markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 		redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
 	}
 
@@ -765,7 +765,7 @@ function Display()
 		if ($mark_at_msg >= $topicinfo['id_last_msg'])
 			$mark_at_msg = $modSettings['maxMsgID'];
 		if ($mark_at_msg >= $topicinfo['new_from'])
-			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg), $topicinfo['new_from'] !== 0);
+			markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['disregarded']), $topicinfo['new_from'] !== 0);
 
 		updateReadNotificationsFor($topic, $board);
 

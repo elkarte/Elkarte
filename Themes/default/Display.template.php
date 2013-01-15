@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -150,7 +150,7 @@ function template_main()
 	echo '
 			<div class="pagesection">
 				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -224,11 +224,6 @@ function template_main()
 										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
 											<span class="name">', $message['member']['name'], '</span>';
 
-		// Show avatars, images, etc.?
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
-			echo '
-
-											', $message['member']['avatar']['image'], '';
 
 			echo '
 										</a>
@@ -241,7 +236,6 @@ function template_main()
 		// Don't show these things for guests.
 		if (!$message['member']['is_guest'])
 		{
-
 			// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
 			if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
 				echo '
@@ -383,6 +377,15 @@ function template_main()
 		// Done with the information about the poster... on to the post itself.
 			echo '
 									</ul>
+								</li>';
+
+		// Show avatars, images, etc.?
+		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
+			echo '
+								<li class="avatar">
+									<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
+										', $message['member']['avatar']['image'], '
+									</a>
 								</li>';
 
 		// Show the post group icons, but not for guests.
@@ -530,7 +533,7 @@ function template_main()
 					echo '
 											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
 				echo '
-											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . $txt['attach_viewed'] : '<br />' . $txt['attach_downloaded']) . ' ' . $attachment['downloads'] . ' ' . $txt['attach_times'] . '
+											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
 										</div>';
 
 				echo '
@@ -675,7 +678,7 @@ function template_main()
 	echo '
 			<div class="pagesection">
 				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -709,7 +712,7 @@ function template_main()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" onsubmit="submitonce(this);" style="margin: 0;">
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" onsubmit="submitonce(this);" >
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />

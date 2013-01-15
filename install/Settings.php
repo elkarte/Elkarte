@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -62,7 +62,7 @@ $webmaster_email = 'noreply@myserver.com';
  * Name of the cookie to set for authentication.
  * @var string
  */
-$cookiename = 'DIALOGOCookie11';
+$cookiename = 'ELKARTECookie11';
 
 ########## Database Info ##########
 /**

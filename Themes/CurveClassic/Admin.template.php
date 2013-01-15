@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -725,10 +725,19 @@ function template_show_settings()
 				</h3>
 			</div>';
 
-	// Have we got a message to display?
+	// any messages or errors to show?
 	if (!empty($context['settings_message']))
+	{
+		if (!is_array($context['settings_message']))
+			$context['settings_message'] = array($context['settings_message']);
+		
 		echo '
-			<div class="information">', $context['settings_message'], '</div>';
+			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
+				<ul>
+					<li>', implode('</li><li>', $context['settings_message']), '</li>
+				</ul>
+			</div>';
+	}
 
 	// Now actually loop through all the variables.
 	$is_open = false;
@@ -879,6 +888,9 @@ function template_show_settings()
 				else
 					echo '
 							<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+
+				echo ($config_var['invalid']) ? '
+							<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
 
 				echo isset($config_var['postinput']) ? '
 							' . $config_var['postinput'] : '',

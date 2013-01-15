@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -104,7 +104,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	if ($message_id !== null && empty($modSettings['mail_no_message_id']))
 		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
-	$headers .= 'X-Mailer: DIALOGO' . $line_break;
+	$headers .= 'X-Mailer: ELKARTE' . $line_break;
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
@@ -114,7 +114,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$orig_message = $message;
 
 	// The mime boundary separates the different alternative versions.
-	$mime_boundary = 'DIALOGO-' . md5($message . time());
+	$mime_boundary = 'ELKARTE-' . md5($message . time());
 
 	// Using mime, as it allows to send a plain unencoded alternative.
 	$headers .= 'Mime-Version: 1.0' . $line_break;
@@ -300,7 +300,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	}
 
 	// If they are using SSI there is a good chance obExit will never be called.  So lets be nice and flush it for them.
-	if (DIALOGO === 'SSI')
+	if (ELKARTE === 'SSI')
 		return AddMailQueue(true);
 
 	return true;

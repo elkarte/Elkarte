@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -195,18 +195,19 @@ function action_post($post_errors = array())
 		// If you're not the owner, can you add to any poll?
 		else
 			isAllowedTo('poll_add_any');
+		$context['can_moderate_poll'] = true;
 
 		require_once($sourcedir . '/Subs-Members.php');
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.
-		$context['poll_options'] = array(
+		$context['poll'] = array(
 			'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
-			'hide' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
-			'expire' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
+			'hide_results' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
+			'expiration' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
 			'change_vote' => isset($_POST['poll_change_vote']),
 			'guest_vote' => isset($_POST['poll_guest_vote']),
-			'guest_vote_enabled' => in_array(-1, $allowedVoteGroups['allowed']),
+			'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
 		);
 
 		// Make all five poll choices empty.
@@ -406,7 +407,7 @@ function action_post($post_errors = array())
 
 		if (isset($_REQUEST['poll']))
 		{
-			$context['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
+			$context['poll']['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
 
 			$context['choices'] = array();
 			$choice_id = 0;
@@ -1083,6 +1084,8 @@ function action_post($post_errors = array())
 	$context['post_box_name'] = $editorOptions['id'];
 	$context['attached'] = '';
 	$context['make_poll'] = isset($_REQUEST['poll']);
+	if ($context['make_poll'])
+		loadTemplate('Poll');
 
 	// Message icons - customized or not, retrieve them...
 	$context['icons'] = getMessageIcons($board);

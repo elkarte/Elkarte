@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -66,6 +66,8 @@ function ViewErrorLog()
 			'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 			'entity' => $filters[$_GET['filter']]
 		);
+	elseif (isset($_GET['filter']) || isset($_GET['value']))
+		unset($_GET['filter'], $_GET['value']);
 
 	// Deleting, are we?
 	if (isset($_POST['delall']) || isset($_POST['delete']))
@@ -336,16 +338,25 @@ function deleteErrors()
  */
 function ViewFile()
 {
-	global $context, $txt, $boarddir, $sourcedir;
+	global $context, $txt, $boarddir, $sourcedir, $cachedir;
+
 	// Check for the administrative permission to do this.
 	isAllowedTo('admin_forum');
 
-	// decode the file and get the line
-	$file = base64_decode($_REQUEST['file']);
+	// Decode the file and get the line
+	$file = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, base64_decode($_REQUEST['file']));
 	$line = isset($_REQUEST['line']) ? (int) $_REQUEST['line'] : 0;
 
-	// Make sure the file we are looking for is one they are allowed to look at
-	if (!is_readable($file) || (strpos($file, '../') !== false && ( strpos($file, $boarddir) === false || strpos($file, $sourcedir) === false)))
+	// Make sure things are normalized
+	$real_board = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $boarddir);
+	$real_source = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $sourcedir);
+	$real_cache = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $cachedir);
+
+	// Make sure the file requested is one they are allowed to look at
+	$excluded = array('settings.php', 'settings_bak.php');
+	$basename = strtolower(basename($file));
+	$ext = strrchr($basename, '.');
+	if ($ext !== '.php' || (strpos($file, $real_board) === false || strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
 		fatal_lang_error('error_bad_file', true, array(htmlspecialchars($file)));
 
 	// get the min and max lines

@@ -27,7 +27,7 @@ $txt['admin_title'] = 'Forum Title';
 $txt['admin_url'] = 'Forum URL';
 $txt['cookie_name'] = 'Cookie name';
 $txt['admin_webmaster_email'] = 'Webmaster email address';
-$txt['boarddir'] = 'DIALOGO Directory';
+$txt['boarddir'] = 'ELKARTE Directory';
 $txt['sourcesdir'] = 'Sources Directory';
 $txt['cachedir'] = 'Cache Directory';
 $txt['admin_news'] = 'Enable News';
@@ -36,8 +36,8 @@ $txt['admin_manage_members'] = 'Members';
 $txt['admin_main'] = 'Main';
 $txt['admin_config'] = 'Configuration';
 $txt['admin_version_check'] = 'Detailed version check';
-$txt['admin_smffile'] = 'DIALOGO File';
-$txt['admin_smfpackage'] = 'DIALOGO Package';
+$txt['admin_smffile'] = 'ELKARTE File';
+$txt['admin_smfpackage'] = 'ELKARTE Package';
 $txt['admin_logoff'] = 'Admin End Session';
 $txt['admin_maintenance'] = 'Maintenance';
 $txt['admin_image_text'] = 'Show buttons as images instead of text';
@@ -110,10 +110,10 @@ $txt['remove_all'] = 'Clear Log';
 $txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 
-$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/Spuds/SMF21se/archive/master.zip" target="_blank" class="new_win">Github Dialogo Respository</a>.';
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte//wiki/downloads" target="_blank" class="new_win">Github Elkarte Respository</a>.';
 $txt['version_check_more'] = '(more detailed)';
 
-$txt['lfyi'] = 'You are unable to connect to dialogo\'s latest news file.';
+$txt['lfyi'] = 'You are unable to connect to elkarte\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
@@ -239,6 +239,8 @@ $txt['admin_log'] = 'Administration Log';
 $txt['admin_log_desc'] = 'Lists administrative tasks that have been performed by admins of your forum.';
 $txt['moderation_log'] = 'Moderation Log';
 $txt['moderation_log_desc'] = 'Lists moderation activities that have been performed by moderators on your forum.';
+$txt['badbehavior_log'] = 'Bad Behavior Log';
+$txt['badbehavior_log_desc'] = 'Lists requests that were blocked or marked suspicious by bad behavior.  If verbose logging is on all HTTP requests are listed.';
 $txt['spider_log_desc'] = 'Review the entries related to search engine spider activity on your forum.';
 $txt['pruning_log_desc'] = 'Use these tools to prune older entries in the various logs.';
 
@@ -305,8 +307,8 @@ $txt['support_versions_gd'] = 'GD version';
 $txt['support_versions_imagick'] = 'Imagick version';
 $txt['support_versions'] = 'Version Information';
 $txt['support_resources'] = 'Support Resources';
-$txt['support_resources_p1'] = 'Our <a href="%1$s">Documentation Wiki</a> provides the main documentation for DIALOGO. The DIALOGO Online Manual has many documents to help answer support questions and explain <a href="%2$s">Features</a>, <a href="%3$s">Settings</a>, <a href="%4$s">Themes</a>, <a href="%5$s">Packages</a>, etc. The Online Manual documents each area of DIALOGO thoroughly and should answer most questions quickly.';
-$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s">Support Community</a> or ask for assistance in our support boards. The DIALOGO Support Community can be used for <a href="%2$s">support</a>, <a href="%3$s">customization</a>, and many other things such as discussing DIALOGO, finding a host, and discussing administrative issues with other forum administrators.';
+$txt['support_resources_p1'] = 'Our <a href="%1$s">Documentation Wiki</a> provides the main documentation for ELKARTE. The ELKARTE Online Manual has many documents to help answer support questions and explain <a href="%2$s">Features</a>, <a href="%3$s">Settings</a>, <a href="%4$s">Themes</a>, <a href="%5$s">Packages</a>, etc. The Online Manual documents each area of ELKARTE thoroughly and should answer most questions quickly.';
+$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s">Support Community</a> or ask for assistance in our support boards. The ELKARTE Support Community can be used for <a href="%2$s">support</a>, <a href="%3$s">customization</a>, and many other things such as discussing ELKARTE, finding a host, and discussing administrative issues with other forum administrators.';
 
 $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
@@ -418,7 +420,7 @@ $txt['max_image_width'] = 'Max display width of posted or attached images';
 $txt['max_image_height'] = 'Max display height of posted or attached images';
 
 $txt['automanage_attachments'] = 'Choose the method for the management of the attachment directories';
-$txt['attachments_normal'] = '(Manual) DIALOGO default behaviour';
+$txt['attachments_normal'] = '(Manual) ELKARTE default behaviour';
 $txt['attachments_auto_years'] = '(Auto) Subdivide by years';
 $txt['attachments_auto_months'] = '(Auto) Subdivide by years and months';
 $txt['attachments_auto_days'] = '(Auto) Subdivide by years, months and days';
@@ -525,7 +527,7 @@ $txt['logs'] = 'Logs';
 $txt['generate_reports'] = 'Reports';
 
 $txt['update_available'] = 'Update Available';
-$txt['update_message'] = 'You\'re using an outdated version of DIALOGO, which contains some bugs which have since been fixed.
+$txt['update_message'] = 'You\'re using an outdated version of ELKARTE, which contains some bugs which have since been fixed.
 	It is recommended that you <a href="#" id="update-link">update your forum</a> to the latest version as soon as possible. It only takes a minute!';
 
 $txt['manageposts'] = 'Posts and Topics';
@@ -656,6 +658,7 @@ $txt['core_settings_desc'] = 'This page allows you to turn on or off optional fe
 $txt['mods_cat_features'] = 'General';
 $txt['mods_cat_security_general'] = 'General';
 $txt['antispam_title'] = 'Anti-Spam';
+$txt['badbehavior_title'] = 'Bad-Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
@@ -693,7 +696,7 @@ $txt['browse_packages'] = 'Browse Packages';
 $txt['download_packages'] = 'Download Packages';
 $txt['installed_packages'] = 'Installed Packages';
 $txt['package_file_perms'] = 'File Permissions';
-$txt['package_settings'] = 'Options';
+$txt['package_settings'] = 'Settings';
 $txt['themeadmin_admin_title'] = 'Manage and Install';
 $txt['themeadmin_list_title'] = 'Theme Settings';
 $txt['themeadmin_reset_title'] = 'Member Options';

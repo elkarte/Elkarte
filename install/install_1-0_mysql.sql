@@ -1386,7 +1386,7 @@ CREATE TABLE {$db_prefix}messages (
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'Dialogo', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'Elkarte', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -1818,7 +1818,7 @@ VALUES ('ourVersion', '{$current_version}'),
 	('warning_mute', '60'),
 	('admin_features', ''),
 	('last_mod_report_action', '0'),
-	('pruningOptions', '30,180,180,180,30,0'),
+	('pruningOptions', '30,180,180,180,30,7,0'),
 	('cache_enable', '1'),
 	('reg_verification', '1'),
 	('visual_verification_type', '3'),
@@ -1833,6 +1833,12 @@ VALUES ('ourVersion', '{$current_version}'),
 	('avatar_reencode', '1'),
 	('avatar_paranoid', '0'),
 	('enable_disregard', '0');
+	('badbehavior_enabled', '0');
+	('badbehavior_logging', '0');
+	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
+	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
+	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
+	('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #
@@ -2071,4 +2077,26 @@ CREATE TABLE {$db_prefix}user_drafts (
   outbox tinyint(4) NOT NULL default '0',
   PRIMARY KEY (id_draft),
   UNIQUE id_member (id_member, id_draft, type)
+) ENGINE=MyISAM;
+# --------------------------------------------------------
+
+#
+# Table structure for table `log_badbehavior`
+#
+CREATE TABLE {$db_prefix}log_badbehavior (
+	id int(10) NOT NULL auto_increment,
+	ip char(19) NOT NULL,
+	date int(10) NOT NULL default '0',
+	request_method varchar(255) NOT NULL,
+	request_uri varchar(255) NOT NULL,
+	server_protocol varchar(255) NOT NULL,
+	http_headers text NOT NULL,
+	user_agent varchar(255) NOT NULL,
+	request_entity varchar(255) NOT NULL,
+	valid varchar(255) NOT NULL,
+	id_member mediumint(8) unsigned NOT NULL,
+	session char(64) NOT NULL default '',
+	PRIMARY KEY (id),
+	INDEX ip (ip),
+	INDEX user_agent (user_agent)
 ) ENGINE=MyISAM;

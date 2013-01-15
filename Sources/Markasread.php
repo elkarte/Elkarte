@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -103,7 +103,7 @@ function action_markreplies()
 
 	$markRead = array();
 	foreach ($topics as $id_topic)
-		$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID']);
+		$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], $logged_topics[$id_topic]);
 
 	require_once($sourcedir . '/Subs-Topic.php');
 	markTopicsRead($markRead, true);
@@ -188,7 +188,7 @@ function action_marktopic()
 
 	// Blam, unread!
 	require_once($sourcedir . '/Subs-Topic.php');
-	markTopicsRead(array($user_info['id'], $topic, $earlyMsg), true);
+	markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
 
 	redirectexit('board=' . $board . '.0');
 }

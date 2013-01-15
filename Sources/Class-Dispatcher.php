@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -17,7 +17,7 @@ if (!defined('DIALOGO'))
  * Try first the critical functionality (maintenance, no guest access)
  * Then, in order:
  *   forum's main actions: board index, message index, display topic
- *   the current/legacy file/functions registered by Dialogo core
+ *   the current/legacy file/functions registered by Elkarte core
  * Fall back to naming patterns:
  *   filename=[action].php function=[sa]
  *   filename=[action].controller.php method=action_[sa]

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -20,7 +20,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 function automanage_attachments_check_directory()
@@ -867,22 +867,30 @@ function getAvatar($id_attach)
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
-		FROM {db_prefix}attachments
-		WHERE id_attach = {int:id_attach}
-			AND id_member > {int:blank_id_member}
-		LIMIT 1',
-		array(
-			'id_attach' => $id_attach,
-			'blank_id_member' => 0,
-		)
-	);
+	// Use our cache when possible
+	if (($cache = cache_get_data('getAvatar_id-' . $id_attach)) !== null)
+		$avatarData = $cache;
+	else
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}
+				AND id_member > {int:blank_id_member}
+			LIMIT 1',
+			array(
+				'id_attach' => $id_attach,
+				'blank_id_member' => 0,
+			)
+		);
 
-	$avatarData = array();
-	if ($smcFunc['db_num_rows']($request) != 0)
-		$avatarData = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+		$avatarData = array();
+		if ($smcFunc['db_num_rows']($request) != 0)
+			$avatarData = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		cache_put_data('getAvatar_id-' . $id_attach, $avatarData, 900);
+	}
 
 	return $avatarData;
 }
@@ -1340,7 +1348,7 @@ function url_image_size($url)
 		if ($fp != false)
 		{
 			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/DIALOGO' . "\r\n" . 'Connection: close' . "\r\n\r\n");
+			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/ELKARTE' . "\r\n" . 'Connection: close' . "\r\n\r\n");
 
 			// Read in the HTTP/1.1 or whatever.
 			$test = substr(fgets($fp, 11), -1);

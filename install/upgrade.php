@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -643,7 +643,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Dialogo Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -717,7 +717,7 @@ function upgradeExit($fallThrough = false)
 			if (function_exists('debug_print_backtrace'))
 				debug_print_backtrace();
 
-			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the Dialogo Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the Elkarte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
 			flush();
 			die();
 		}
@@ -799,7 +799,7 @@ function loadEssentialData()
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
-	define('DIALOGO', 1);
+	define('ELKARTE', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')
@@ -939,10 +939,10 @@ function WelcomeLogin()
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
-		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets DIALOGO\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ELKARTE\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
-		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of DIALOGO.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of ELKARTE.<br /><br />Please ask your host to upgrade.');
 
 	// Do they have ALTER privileges?
 	if (!empty($databases[$db_type]['alter_support']) && $smcFunc['db_query']('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
@@ -971,7 +971,7 @@ function WelcomeLogin()
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
 	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
-		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />DIALOGO will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
+		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ELKARTE will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
 		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
@@ -1011,7 +1011,7 @@ function WelcomeLogin()
 				<li>Source Directory: ' . $boarddir . '</li>
 				<li>Cache Directory: ' . $cachedir_temp . '</li>
 			</ul>
-			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the Dialogo website before continuing.';
+			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the Elkarte website before continuing.';
 
 	// Either we're logged in or we're going to present the login.
 	if (checkLogin())
@@ -2937,7 +2937,7 @@ function cmdStep0()
 			$_GET['conv'] = 1;
 		elseif ($i != 0)
 		{
-			echo 'DIALOGO Command-line Upgrader
+			echo 'ELKARTE Command-line Upgrader
 Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
     --language=LANG         Reset the forum\'s language to LANG.
@@ -3286,7 +3286,7 @@ function template_chmod()
 	// @todo Temporary!
 	$txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
 	$txt['ftp_login'] = 'Your FTP connection information';
-	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup DIALOGO.';
+	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup ELKARTE.';
 	$txt['ftp_server'] = 'Server';
 	$txt['ftp_server_info'] = 'The address (often localhost) and port for your FTP server.';
 	$txt['ftp_port'] = 'Port';
@@ -3297,7 +3297,7 @@ function template_chmod()
 	$txt['ftp_path'] = 'Install Path';
 	$txt['ftp_path_info'] = 'This is the <em>relative</em> path you use in your FTP client <a href="' . $_SERVER['PHP_SELF'] . '?ftphelp" onclick="window.open(this.href, \'\', \'width=450,height=250\');return false;" target="_blank">(more help)</a>.';
 	$txt['ftp_path_found_info'] = 'The path in the box above was automatically detected.';
-	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<tt>www</tt>&quot;, &quot;<tt>public_html</tt>&quot;, or &quot;<tt>httpdocs</tt>&quot; - but it should include the directory DIALOGO is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
+	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<tt>www</tt>&quot;, &quot;<tt>public_html</tt>&quot;, or &quot;<tt>httpdocs</tt>&quot; - but it should include the directory ELKARTE is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
 	$txt['ftp_path_help_close'] = 'Close';
 	$txt['ftp_connect'] = 'Connect';
 
@@ -3429,7 +3429,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
+			<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
@@ -3530,7 +3530,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/" title="Dialogo Community" target="_blank" class="new_win">DIALOGO &copy;2011, Dialogo</a></div>
+		<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/" title="Elkarte Community" target="_blank" class="new_win">ELKARTE &copy;2011, Elkarte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -3756,7 +3756,7 @@ function template_welcome_message()
 				if (!(\'ourVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/DIALOGO\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/ELKARTE\s?/g, \'\');
 
 				ourVer = document.getElementById(\'ourVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
@@ -4265,7 +4265,7 @@ function template_clean_mods()
 	$upcontext['chmod_in_form'] = true;
 
 	echo '
-	<h3>DIALOGO has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
+	<h3>ELKARTE has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">';
 
 	// In case it's required.
@@ -4315,7 +4315,7 @@ function template_cleanup_done()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>DIALOGO has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
+	<h3>ELKARTE has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">
 		<table width="90%" align="center" cellspacing="1" cellpadding="2" style="background-color: black;">
 			<tr style="background-color: #eeeeee;">
@@ -4343,7 +4343,7 @@ function template_upgrade_templates()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>There have been numerous language and template changes since the previous version of DIALOGO. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
+	<h3>There have been numerous language and template changes since the previous version of ELKARTE. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1', $upcontext['is_test'] ? '' : ';forreal=1', '" name="upform" id="upform" method="post">';
 
 	// Any files need to be writable?
@@ -4354,7 +4354,7 @@ function template_upgrade_templates()
 	if ($upcontext['temp_progress'] == 0 && !$upcontext['is_test'] && (!empty($upcontext['languages']) || !empty($upcontext['themes'])))
 	{
 		echo '
-		The following template files will be updated to ensure they are compatible with this version of DIALOGO. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
+		The following template files will be updated to ensure they are compatible with this version of ELKARTE. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
 		<table width="90%" align="center" cellspacing="1" cellpadding="2" style="background-color: black;">
 			<tr style="background-color: #eeeeee;">
 				<td width="80%"><strong>Area</strong></td>
@@ -4446,7 +4446,7 @@ function template_upgrade_complete()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
 
 	echo '
-	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of DIALOGO</a>.  Hope you like it!</h3>
+	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of ELKARTE</a>.  Hope you like it!</h3>
 	<form action="', $boardurl, '/index.php">';
 
 	if (!empty($upcontext['can_delete_script']))
@@ -4464,8 +4464,8 @@ function template_upgrade_complete()
 			<img src="', $boardurl, '/Themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
-			If you had any problems with this upgrade, or have any problems using Dialogo, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
+			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
-			Dialogo';
+			Elkarte';
 }

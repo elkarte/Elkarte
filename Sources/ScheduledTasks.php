@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1247,7 +1247,7 @@ function loadEssentialThemeData()
 }
 
 /**
- * This retieves data (e.g. last version of DIALOGO)
+ * This retieves data (e.g. last version of ELKARTE)
  */
 function scheduled_fetchFiles()
 {
@@ -1284,7 +1284,7 @@ function scheduled_fetchFiles()
 	foreach ($js_files as $ID_FILE => $file)
 	{
 		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.spudsdesign.com' : '';
+		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.elkarte.net' : '';
 		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
 
 		// Get the file
@@ -1475,6 +1475,20 @@ function scheduled_weekly_maintenance()
 
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}log_banned
+				WHERE log_time < {int:log_time}',
+				array(
+					'log_time' => $t,
+				)
+			);
+		}
+
+		if (!empty($modSettings['pruneBadbehaviorLog']))
+		{
+			// Figure out when our cutoff time is.  1 day = 86400 seconds.
+			$t = time() - $modSettings['pruneBadbehaviorLog'] * 86400;
+
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}log_badbehavior
 				WHERE log_time < {int:log_time}',
 				array(
 					'log_time' => $t,

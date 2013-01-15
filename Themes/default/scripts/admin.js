@@ -1,3 +1,19 @@
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * Handle the JavaScript surrounding the admin and moderation center.
+ */
+
 /*
 	smf_AdminIndex(oOptions)
 	{
@@ -7,18 +23,7 @@
 		public showCurrentVersion()
 		public checkUpdateAvailable()
 	}
-
-	smf_ViewVersions(oOptions)
-	{
-		public init()
-		public loadViewVersions
-		public swapOption(oSendingElement, sName)
-		public compareVersions(sCurrent, sTarget)
-		public determineVersions()
-	}
 */
-
-// Handle the JavaScript surrounding the admin and moderation center.
 function smf_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
@@ -103,6 +108,16 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 	}
 }
 
+/*
+	smf_ViewVersions(oOptions)
+	{
+		public init()
+		public loadViewVersions
+		public swapOption(oSendingElement, sName)
+		public compareVersions(sCurrent, sTarget)
+		public determineVersions()
+	}
+*/
 function smf_ViewVersions (oOptions)
 {
 	this.opt = oOptions;
@@ -409,7 +424,6 @@ function createNamedElement(type, name, customFields)
 function addAnotherQuestion()
 {
 	var newDT = document.createElement("dt");
-
 	var newInput = createNamedElement("input", "question[]");
 	newInput.type = "text";
 	newInput.className = "input_text";
@@ -417,8 +431,7 @@ function addAnotherQuestion()
 	newInput.setAttribute("class", "verification_question");
 	newDT.appendChild(newInput);
 
-	newDD = document.createElement("dd");
-
+	var newDD = document.createElement("dd");
 	newInput = createNamedElement("input", "answer[]");
 	newInput.type = "text";
 	newInput.className = "input_text";
@@ -426,6 +439,40 @@ function addAnotherQuestion()
 	newInput.setAttribute("class", "verification_answer");
 	newDD.appendChild(newInput);
 
+	placeHolder.parentNode.insertBefore(newDT, placeHolder);
+	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}
+
+// Add a new dt/dd pair above a parent selector
+function addAnotherOption(parent, oDtName, oDdName)
+{
+	// Some defaults to use if none are passed
+	oDtName['type'] = oDtName['type'] || 'text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
+	oDtName['size'] = oDtName['size'] || '20';
+
+	oDdName['type'] = oDdName['type'] || 'text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
+	oDdName['size'] = oDdName['size'] || '20';
+
+	// our new <dt> element
+	var newDT = document.createElement('dt');
+	var newInput = createNamedElement('input', oDtName['name']);
+	newInput.type = oDtName['type'];
+	newInput.setAttribute('class', oDtName['class']);
+	newInput.size = oDtName['size'];
+	newDT.appendChild(newInput);
+
+	// and its matching <dd>
+	var newDD = document.createElement('dd');
+	newInput = createNamedElement('input', oDdName['name']);
+	newInput.type = oDdName['type'];
+	newInput.size = oDdName['size'];
+	newInput.setAttribute('class', oDdName['class']);
+	newDD.appendChild(newInput);
+
+	// place the new dt/dd pair before our parent
+	var placeHolder = document.getElementById(parent);
 	placeHolder.parentNode.insertBefore(newDT, placeHolder);
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
@@ -632,8 +679,8 @@ function toggleCache ()
 }
 
 /*
-* Attachments Settings
-*/
+ * Attachments Settings
+ */
 function toggleSubDir ()
 {
 	var auto_attach = document.getElementById('automanage_attachments');
@@ -657,6 +704,7 @@ function toggleSubDir ()
 	}
 		toggleBaseDir();
 }
+
 function toggleBaseDir ()
 {
 	var auto_attach = document.getElementById('automanage_attachments');
