@@ -1312,7 +1312,7 @@ img.sort {
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	margin: 0 auto;
-	min-width: 760px;
+	min-width: 750px;
 	width: 95%;
 	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
 	max-width: 100em;
@@ -3885,12 +3885,9 @@ span.hidelink {
 	z-index: 1;
 }
 
-/* Experimental additions. @todo */
-/*-------------------------*/
-
-/* Drop the stats cell from the board index on narrow screens. */
-/* Much more user-friendly IMHO. */
-
+/* Experimental media screen additions. */
+/*--------------------------------------*/
+/* Drop cell(s) from the index on narrow screens. */
 @media screen and (max-width: 1220px) {
 	.table_list td.stats {
 		display: none;
@@ -3899,6 +3896,40 @@ span.hidelink {
 		border-left: 1px solid #ccc;
 		padding: 1px 5px 2px 10px;
 		margin-top: 1px;
+	}
+	.table_grid td.stats, .table_grid th.stats {
+		display: none;
+	}
+	.table_grid td.lastpost p {
+		border-left: 1px solid #ccc;
+	}
+	.table_grid th.last_post {
+		width: 30%;
+	}
+}
+@media screen and (max-width: 360px) {
+	.table_list td.lastpost {
+		display: none;
+	}
+	.table_grid td.lastpost, .table_grid th.last_post {
+		display: none;
+	}
+	#wrapper, .frame {
+		min-width: 335px;
+		width: 100% !important;
+	}
+	.poster img.avatar {
+		width: 30px;
+	}
+	.poster {
+		width: 110px;
+		font-size: .8em;
+	}
+	.postarea, .moderatorbar {
+		margin: 0 0 0 110px;
+	}
+	.post {
+		margin: 0 0 0 5px;
 	}
 }
 
