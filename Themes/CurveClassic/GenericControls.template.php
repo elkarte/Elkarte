@@ -34,11 +34,15 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		<script type="text/javascript"><!-- // --><![CDATA[
 			$(document).ready(function(){',
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
-				$("#', $editor_id, '").sceditorBBCodePlugin({
+				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
 					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
-					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white"';
+					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
+					plugins: "bbcode",
+					parserOptions: {
+						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
+					}';
 
 		// Show the smileys.
 		if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)
@@ -46,15 +50,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			echo ',
 					emoticons:
 					{';
+
 			$countLocations = count($context['smileys']);
 			foreach ($context['smileys'] as $location => $smileyRows)
 			{
 				$countLocations--;
-				if ($location == 'postform')
+				if ($location === 'postform')
 					echo '
 						dropdown:
 						{';
-				elseif ($location == 'popup')
+				elseif ($location === 'popup')
 					echo '
 						popup:
 						{';
@@ -70,13 +75,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						echo '
 							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 					}
-					if (empty($smileyRow['isLast']) && $numRows != 1)
+
+					if (empty($smileyRow['isLast']) && $numRows !== 1)
 						echo ',
 						\'-', $emptyPlaceholder++, '\': \'\',';
 				}
+
 				echo '
 						}', $countLocations != 0 ? ',' : '';
 			}
+
 			echo '
 					}';
 		}
