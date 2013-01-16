@@ -52,7 +52,7 @@ $upgrade_path = dirname(__FILE__);
 $upgradeurl = $_SERVER['PHP_SELF'];
 
 // Where the images etc are kept.
-$oursite = 'http://www.spudsdesign.com/dialogo';
+$oursite = 'http://www.elkarte.net';
 
 // Disable the need for admins to login?
 $disable_security = false;
@@ -3530,7 +3530,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/" title="Elkarte Community" target="_blank" class="new_win">ELKARTE &copy;2011, Elkarte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">ELKARTE &copy;2011, Elkarte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -3600,7 +3600,7 @@ function template_welcome_message()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $txt;
 
 	echo '
-		<script type="text/javascript" src="http://www.spudsdesign.com/dialogo/current-version.js?version=' . CURRENT_VERSION . '"></script>
+		<script type="text/javascript" src="http://www.elkarte.net/current-version.js?version=' . CURRENT_VERSION . '"></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 			<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 	<form action="', $upcontext['form_url'], '" method="post" name="upform" id="upform" ', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
@@ -4464,7 +4464,7 @@ function template_upgrade_complete()
 			<img src="', $boardurl, '/Themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
-			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.spudsdesign.com/dialogo/index.php">look to us for assistance</a>.<br />
+			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
 			Elkarte';
