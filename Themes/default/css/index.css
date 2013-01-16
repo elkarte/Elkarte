@@ -816,14 +816,6 @@ div.title_bar {
 	background: #c5cfd9 url(../images/theme/bars.png) 0 -340px repeat-x;
 }
 
-/* Info center title bars are a bit different. */ /* @todo */
-/*div.title_barIC {
-	background: #dde3e9 url(../images/theme/bars.png) 0 0 repeat-x;
-}*/
-div.title_barIC h4.titlebg {
-	font-size: 1.1em;
-}
-
 /* Upshrinks in cat and title bars. */
 #upshrinkHeaderIC p.pminfo {
 	margin: 0;
@@ -1312,7 +1304,7 @@ img.sort {
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	margin: 0 auto;
-	min-width: 760px;
+	min-width: 750px;
 	width: 95%;
 	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
 	max-width: 100em;
@@ -1527,7 +1519,7 @@ ul li.greeting {
 	border: 1px solid #ccc;
 	border-radius: 2px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .navigate_section ul li {
 	float: left;
@@ -2067,6 +2059,9 @@ div#pollmoderation {
 	line-height: 1.5em;
 	text-align: center;
 }
+.poster .dropmenu>li .karma_allow a {
+	float: left;
+}
 .poster .dropmenu li:hover a, .poster .dropmenu li.sfhover a, .poster .dropmenu li a:hover,
 .poster .dropmenu li:hover a:hover, .poster .dropmenu li.sfhover a:hover, .poster .dropmenu li a {
 	background: none;
@@ -2239,7 +2234,6 @@ div.quickbuttons_wrap {
 	width: 100%;
 	float: left;
 }
-
 ul.quickbuttons {
 	margin: 11px 0 0 0;
 	padding: 0 0 4px 0;
@@ -2256,7 +2250,7 @@ ul.quickbuttons li {
 ul.quickbuttons li a {
 	padding: 0 4px 0 20px;
 	display: block;
-	line-height: 1.9em;
+	line-height: 2.0em;
 	float: left;
 }
 ul.quickbuttons li a.quote_button {
@@ -2266,34 +2260,34 @@ ul.quickbuttons a:hover {
 	color: #a70;
 }
 ul.quickbuttons li a.quote_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat -1px -1px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px 0px;
 }
 ul.quickbuttons li a.remove_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 3px -27px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -19px;
 }
 ul.quickbuttons li a.modify_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 3px -57px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -40px;
 }
 ul.quickbuttons li a.approve_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -90px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -60px;
 }
 ul.quickbuttons li a.restore_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -120px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -80px;
 }
 ul.quickbuttons li a.split_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 5px -147px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -100px;
 }
 ul.quickbuttons li a.reply_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -180px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -120px;
 }
 ul.quickbuttons li a.reply_all_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -180px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -120x;
 }
 ul.quickbuttons li a.notify_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -210px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -140px;
 }
 ul.quickbuttons li a.unapprove_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 4px -237px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -160px;
 }
 ul.quickbuttons li.inline_mod_check {
 	padding: 1px 1px 1px 1px;
@@ -2323,12 +2317,12 @@ ul.quickbuttons li.inline_mod_check {
 }
 .quickbuttons li.quick_edit, .quickbuttons li.post_options {
 	padding: 0 6px 0 22px;
-	line-height: 1.9em;
+	line-height: 2.0em;
 	position: relative;
 	color: #222;
 }
 .quickbuttons li.quick_edit img {
-	padding: 4px 7em 4px 4px;
+	padding: 4px 5em 4px 4px;
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -2392,7 +2386,7 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons ul li a, .quickbuttons ul li a:focus {
 	padding: 0 6px 0 26px;
 	display: block;
-	line-height: 2.2em;
+	line-height: 2.0em;
 	width: 12em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -3062,6 +3056,7 @@ dl {
 }
 #avatar_server_stored div {
 	float: left;
+	padding-right: 5px;
 }
 #avatar_upload {
 	overflow: auto;
@@ -3885,12 +3880,9 @@ span.hidelink {
 	z-index: 1;
 }
 
-/* Experimental additions. @todo */
-/*-------------------------*/
-
-/* Drop the stats cell from the board index on narrow screens. */
-/* Much more user-friendly IMHO. */
-
+/* Experimental media screen additions. */
+/*--------------------------------------*/
+/* Drop cell(s) from the index on narrow screens. */
 @media screen and (max-width: 1220px) {
 	.table_list td.stats {
 		display: none;
@@ -3899,6 +3891,40 @@ span.hidelink {
 		border-left: 1px solid #ccc;
 		padding: 1px 5px 2px 10px;
 		margin-top: 1px;
+	}
+	.table_grid td.stats, .table_grid th.stats {
+		display: none;
+	}
+	.table_grid td.lastpost p {
+		border-left: 1px solid #ccc;
+	}
+	.table_grid th.last_post {
+		width: 30%;
+	}
+}
+@media screen and (max-width: 360px) {
+	.table_list td.lastpost {
+		display: none;
+	}
+	.table_grid td.lastpost, .table_grid th.last_post {
+		display: none;
+	}
+	#wrapper, .frame {
+		min-width: 335px;
+		width: 100% !important;
+	}
+	.poster img.avatar {
+		width: 30px;
+	}
+	.poster {
+		width: 110px;
+		font-size: .8em;
+	}
+	.postarea, .moderatorbar {
+		margin: 0 0 0 110px;
+	}
+	.post {
+		margin: 0 0 0 5px;
 	}
 }
 
@@ -3951,7 +3977,7 @@ span.hidelink {
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .generic_list_wrapper {
 	margin-top: -5px;
@@ -4140,7 +4166,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 #postmodify #message{
 	width: 100%;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #postmodify .lastedit{
 	font-weight: bold;

@@ -53,9 +53,7 @@ table {
 
 /* Box sizing for the masses. Very handy for stabilising fluid layouts. */
 p, ul, ol, li, dl, dd ,dt, fieldset, form {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	padding: 0;
 	margin: 0;
 }
@@ -82,9 +80,7 @@ ul.reset, ul.reset li {
 	.input_file    - covers input[type=file] throughout all browsers
 */
 input, button, select, textarea, textarea.editor {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	font: 83.33%/125% "Verdana", "Geneva", "Helvetica", "Arial", sans-serif;
 	color: #333;
 	background: #fff;
@@ -122,9 +118,7 @@ textarea {
 	border-radius: 3px;
 }
 a.button_link {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	outline: none !important;
 	vertical-align: middle;
 	box-shadow: 0 2px 5px rgba(0,0,0,0.05) inset;
@@ -532,9 +526,7 @@ div.windowbg, div.windowbg2 {
 	border-radius: 5px;
 	overflow: auto;
 	padding: 10px 0;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 /* the page navigation area */
@@ -682,9 +674,7 @@ a.moderation_link img {
 	border: 1px solid #bbb;
 	background: #f5f5f0;
 	margin: 2px 1px 12px 1px;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .description_board {
 	margin: 12px 1px 0 1px;
@@ -830,9 +820,7 @@ h4.titlebg img.icon {
 
 /* Box-sizing for these should be useful. */
 div.cat_bar, div.title_bar, div.title_barIC {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	margin-bottom: 1px;
 	border-radius: 5px;
 }
@@ -967,9 +955,7 @@ img.sort {
 ----------------------------------------------------------- */
 
 .roundframe {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	margin: 2px 0 0 0;
 	padding: 9px;
 	background: #f5f5f5;
@@ -1031,9 +1017,7 @@ img.sort {
 	float: left;
 	width: 100%;
 	position: relative;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 /* Level 1 button background. */
@@ -1333,9 +1317,7 @@ ul#navigation li {
 #header, #header .frame, #top_section, #upper_wrap, #upper_section, #upper_section .user,
 #upper_section .news, .navigate_section, #content_section, #main_content_section,
 #lower_section, #lower_section .frame, #footer_section, #footer_section div.frame {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #admin_form_wrapper {
 	margin-bottom: 15pt;
@@ -3039,9 +3021,7 @@ img.centericon {
 	padding: 6px 0;
 }
 #statistics  div {
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #statistics div.title_bar {
 	margin: 4px 0 0 0;
