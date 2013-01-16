@@ -175,6 +175,7 @@ $txt['setting_guests_require_captcha_desc'] = '(Automatically set if you specify
 $txt['guests_report_require_captcha'] = 'Guests must pass verification when reporting a post';
 
 $txt['badbehavior_title'] = 'Bad Behavior Settings';
+$txt['badbehavior_details'] = 'Details';
 $txt['badbehavior_desc'] = 'Bad Behavior is designed to run as early as possible to throw out spam bots before they have the opportunity to vandalize your site or even to scrape your pages for e-mail addresses and forms to fill out.<br />Bad Behavior also blocks many e-mail address harvesters, resulting in less e-mail spam, and many automated Web site cracking tools, helping to improve your Web site’s overall security.';
 $txt['badbehavior_wl_desc'] = 'Inappropriate whitelisting WILL expose you to spam, or cause Bad Behavior to stop functioning entirely! <strong>DO NOT WHITELIST</strong> unless you are 100% CERTAIN that you should and know what you are doing.';
 $txt['badbehavior_enabled'] = 'Enable Bad Behavior Checking';
