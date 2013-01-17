@@ -712,7 +712,7 @@ function DatabaseSettings()
 	}
 	else
 	{
-		$incontext['db']['prefix'] = 'dialogo_';
+		$incontext['db']['prefix'] = 'elkarte_';
 
 		// Should we use a non standard port?
 		if (!empty($db_port))
