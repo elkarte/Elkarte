@@ -52,7 +52,7 @@ $language = 'english';
  * URL to your forum's folder. (without the trailing /!)
  * @var string
  */
-$boardurl = 'http://127.0.0.1/dialogo';
+$boardurl = 'http://127.0.0.1/elkarte';
 /**
  * Email address to send emails from. (like noreply@yourdomain.com.)
  * @var string
@@ -80,7 +80,7 @@ $db_server = 'localhost';
  * The database name
  * @var string
  */
-$db_name = 'dialogo';
+$db_name = 'elkarte';
 /**
  * Database username
  * @var string
@@ -106,7 +106,7 @@ $ssi_db_passwd = '';
  * This helps to prevent conflicts
  * @var string
  */
-$db_prefix = 'dialogo_';
+$db_prefix = 'elkarte_';
 /**
  * Use a persistent database connection
  * @var int|bool
