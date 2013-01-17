@@ -621,13 +621,13 @@ function template_show_error($error_id)
 	if (!empty($error['errors']))
 	{
 		echo '
-						<ul class="error" id="', $error_id, '_list">';
+								<ul class="error" id="', $error_id, '_list">';
 
 		foreach ($error['errors'] as $key => $error)
 			echo '
-							<li id="', $error_id, '_', $key, '">', $error, '</li>';
+									<li id="', $error_id, '_', $key, '">', $error, '</li>';
 		echo '
-						</ul>';
+								</ul>';
 	}
 	if (!empty($error['title']))
 		echo '
