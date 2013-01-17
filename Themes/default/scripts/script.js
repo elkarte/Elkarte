@@ -16,7 +16,6 @@
 
 var smf_formSubmitted = false;
 var lastKeepAliveCheck = new Date().getTime();
-var smf_editorArray = new Array();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
 var ua = navigator.userAgent.toLowerCase();
@@ -510,10 +509,6 @@ function isEmptyText(theField)
 function submitonce(theform)
 {
 	smf_formSubmitted = true;
-
-	// If there are any editors warn them submit is coming!
-	for (var i = 0; i < smf_editorArray.length; i++)
-		smf_editorArray[i].doSubmit();
 }
 
 function submitThisOnce(oControl)
