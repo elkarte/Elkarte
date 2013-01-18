@@ -1,7 +1,7 @@
 This is the **Elkarte** development repository.
 
 
-Elkarte is a modified version of the SMF forum software that is released under a open source compatible BSD license.
+Elkarte is a modified version of the SMF forum software.
 
 The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
@@ -16,3 +16,7 @@ by signing off your contributions, you acknowledge that you can and do license y
 
 Please see [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) for information on how to contribute to the development process.
 
+Site and IRC
+===
+Join us on IRC, on #elkarte channel on freenode.
+Project site: www.elkarte.net
