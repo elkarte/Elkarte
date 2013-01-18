@@ -933,6 +933,7 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 }
 
 function getSubsequentTopic($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+{
 	global $smcFunc;
 
 	$request = $smcFunc['db_query']('', '
