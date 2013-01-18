@@ -37,13 +37,6 @@ function template_main()
 	echo '
 			};';
 
-	// If this is a poll - use some javascript to ensure the user doesn't create a poll with illegal option combinations.
-	if ($context['make_poll'])
-		echo '
-			var pollOptionNum = 0, pollTabIndex;
-			var pollOptionId = ', $context['last_choice_id'], ';
-			var txt_option = "', $txt['option'], '";';
-
 	// If we are making a calendar event we want to ensure we show the current days in a month etc... this is done here.
 	if ($context['make_event'])
 		echo '

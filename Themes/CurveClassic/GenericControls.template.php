@@ -125,20 +125,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
 				$(".sceditor-container").find("textarea").each(function() {$(this).css({border: "1px solid red"})});
 				$(".sceditor-container").find("iframe").each(function() {$(this).css({border: "1px solid red"})});' : '',
-			'});';
-
-		// Now for backward compatibility let's collect few infos in the good ol' style
-		echo '
-			var oEditorHandle_', $editor_id, ' = new smc_Editor({
-				sUniqueId: ', JavaScriptEscape($editor_id), ',
-				sEditWidth: ', JavaScriptEscape($editor_context['width']), ',
-				sEditHeight: ', JavaScriptEscape($editor_context['height']), ',
-				bRichEditOff: ', empty($modSettings['disable_wysiwyg']) ? 'false' : 'true', ',
-				oSmileyBox: null,
-				oBBCBox: null,
-				resizeMaxHeight: \'100%\'
-			});
-			smf_editorArray[smf_editorArray.length] = oEditorHandle_', $editor_id, ';
+			'});
 		// ]]></script>';
 }
 
