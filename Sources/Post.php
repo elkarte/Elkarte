@@ -534,11 +534,6 @@ function action_post($post_errors = array())
 				fatal_lang_error('no_board', false);
 			$row = $smcFunc['db_fetch_assoc']($request);
 
-			$attachment_stuff = array($row);
-			while ($row2 = $smcFunc['db_fetch_assoc']($request))
-				$attachment_stuff[] = $row2;
-			$smcFunc['db_free_result']($request);
-
 			if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 			{
 				// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
