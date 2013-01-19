@@ -726,7 +726,7 @@ function list_getLanguages()
 		$languages[$lang['filename']] = array(
 			'id' => $lang['filename'],
 			'count' => 0,
-			'char_set' => $txt['lang_character_set'],
+			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
 			'name' => $smcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
@@ -1009,7 +1009,7 @@ function ModifyLanguage()
 	// Setup the primary settings context.
 	$context['primary_settings'] = array(
 		'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
-		'character_set' => $txt['lang_character_set'],
+		'character_set' => 'UTF-8',
 		'locale' => $txt['lang_locale'],
 		'dictionary' => $txt['lang_dictionary'],
 		'spelling' => $txt['lang_spelling'],

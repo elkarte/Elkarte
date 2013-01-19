@@ -28,7 +28,7 @@ function template_poll_edit()
 		var form_name = \'postmodify\';
 	// ]]></script>
 	<div id="edit_poll">
-		<form action="', $context['form_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
+		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
 			<div class="cat_bar">
 				<h3 class="catbg">', $context['page_title'], '</h3>
 			</div>';

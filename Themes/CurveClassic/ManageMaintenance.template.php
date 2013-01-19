@@ -578,66 +578,6 @@ function template_optimize()
 	</div>';
 }
 
-function template_convert_utf8()
-{
-	global $context, $txt, $settings, $scripturl;
-
-	echo '
-	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['utf8_title'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertutf8" method="post" accept-charset="UTF-8">
-					<p>', $txt['utf8_introduction'], '</p>
-					<div>', $txt['utf8_warning'], '</div>
-
-					<dl class="settings">
-						<dt><strong>', $txt['utf8_source_charset'], ':</strong></dt>
-						<dd><select name="src_charset">';
-	foreach ($context['charset_list'] as $charset)
-		echo '
-							<option value="', $charset, '"', $charset === $context['charset_detected'] ? ' selected="selected"' : '', '>', $charset, '</option>';
-	echo '
-							</select></dd>
-						<dt><strong>', $txt['utf8_database_charset'], ':</strong></dt>
-						<dd>', $context['database_charset'], '</dd>
-						<dt><strong>', $txt['utf8_target_charset'], ': </strong></dt>
-						<dd>', $txt['utf8_utf8'], '</dd>
-					</dl>
-					<hr class="hrcolor" />
-					<input type="submit" value="', $txt['utf8_proceed'], '" class="button_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					<input type="hidden" name="proceed" value="1" />
-				</form>
-			</div>
-		</div>
-	</div>';
-}
-
-function template_convert_entities()
-{
-	global $context, $txt, $settings, $scripturl;
-
-	echo '
-	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['entity_convert_title'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<p>', $txt['entity_convert_introduction'], '</p>
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertentities;start=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-				<hr class="hrcolor" />
-				<input type="submit" value="', $txt['entity_convert_proceed'], '" class="button_submit" />
-				</form>
-			</div>
-		</div>
-	</div>';
-}
-
 function template_convert_msgbody()
 {
 	global $context, $txt, $settings, $scripturl;

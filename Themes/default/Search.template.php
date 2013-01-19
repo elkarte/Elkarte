@@ -19,7 +19,7 @@ function template_main()
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
 
 	echo '
-				<form action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '" name="searchform" id="searchform">
+				<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
 					<div class="cat_bar">
 						<h3 class="catbg">
 							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
@@ -277,7 +277,7 @@ function template_results()
 						<p>', $txt['search_did_you_mean'], ' <a href="', $scripturl, '?action=search2;params=', $context['did_you_mean_params'], '">', $context['did_you_mean'], '</a>.</p>';
 
 		echo '
-						<form action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '">
+						<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 							<dl class="settings">
 								<dt class="righttext">
 									<strong>', $txt['search_for'], ':</strong>
@@ -313,7 +313,7 @@ function template_results()
 		// Quick moderation set to checkboxes? Oh, how fun :/.
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="', $context['character_set'], '" name="topicForm" id="topicForm">';
+				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm">';
 
 		echo '
 					<div class="cat_bar">
