@@ -127,7 +127,7 @@ $txt['who_poll'] = 'Posting a new poll in <a href="' . $scripturl . '?board=%1$d
 
 // Credits text
 $txt['credits'] = 'Credits';
-$txt['credits_intro'] = 'Dialogo wants to thank everyone who helped make it possilbe it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
+$txt['credits_intro'] = 'Elkarte wants to thank everyone who helped make it possilbe it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
 $txt['credits_team'] = 'The Team';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';

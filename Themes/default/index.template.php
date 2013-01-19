@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -57,7 +57,7 @@ function template_init()
 	$settings['doctype'] = 'xhtml';
 
 	// The version this template/theme is for. This should probably be the version of the forum it was created for.
-	$settings['theme_version'] = '2.0';
+	$settings['theme_version'] = '1.0';
 
 	// Set a setting that tells the theme that it can render the tabs.
 	$settings['use_tabs'] = true;
@@ -90,11 +90,17 @@ function template_html_above()
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>';
 
+	// Tell IE to render the page in standards not compatabilty mode. really for ie >= 8
+	// Note if this is not in the first 4k, its ignored, thats why its here
+	if (isBrowser('ie'))
+		echo '
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
+
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
 
 	// Save some database hits, if a width for multiple wrappers is set in admin.
-	if(!empty($settings['forum_width']))
+	if (!empty($settings['forum_width']))
 		echo '
 	<style type="text/css">#wrapper, .frame {width: ', $settings['forum_width'], ';}</style>';
 
@@ -102,24 +108,23 @@ function template_html_above()
 	//echo '
 	//<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
-	// load in any javascript files from mods and themes
-	template_javascript();
-
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
 	{
 		echo '
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
-	if (!empty($context['theme_variant']))
-		echo '
+		if (!empty($context['theme_variant']))
+			echo '
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl', $context['theme_variant'], '.css?alp21" />';
 	}
 
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
-	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '', '
+	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
+
+	echo '
 	<title>', $context['page_title_html_safe'], '</title>';
 
 	// Please don't index these Mr Robot.
@@ -149,6 +154,7 @@ function template_html_above()
 		echo '<link rel="next" href="', $context['links']['next'], '" />';
 	else if (!empty($context['current_topic']))
 		echo '<link rel="next" href="', $scripturl, '?topic=', $context['current_topic'], '.0;prev_next=next" />';
+
 	if (!empty($context['links']['prev']))
 		echo '<link rel="prev" href="', $context['links']['prev'], '" />';
 	else if (!empty($context['current_topic']))
@@ -158,6 +164,9 @@ function template_html_above()
 	if (!empty($context['current_board']))
 		echo '
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
+
+	// load in any javascript files from mods and themes
+	template_javascript();
 
 	// Output any remaining HTML headers. (from mods, maybe?)
 	echo $context['html_headers'];
@@ -217,9 +226,9 @@ function template_body_above()
 				echo '
 					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
 
-		// Can't limit it to a specific board if we are not in one
-		if (!empty($context['current_board']))
-			echo '
+			// Can't limit it to a specific board if we are not in one
+			if (!empty($context['current_board']))
+				echo '
 					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
 			echo '
 					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
@@ -253,7 +262,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Dialogo Community" title="Dialogo Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Elkarte Community" title="Elkarte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
@@ -299,7 +308,7 @@ function template_body_above()
 		if (!empty($context['user']['avatar']))
 			echo '
 						<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
-			echo '
+		echo '
 						<ul>
 							<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
 
@@ -332,7 +341,6 @@ function template_body_above()
 
 	// Show the menu here, according to the menu sub template, followed by the navigation tree.
 	template_menu();
-
 	theme_linktree();
 
 	echo '
@@ -361,12 +369,14 @@ function template_body_below()
 		<div class="frame">';
 
 	// There is now a global "Go to top" link at the right.
-		echo '
+	echo '
 			<a href="#top" id="bot"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
 			<ul class="reset">
-				<li class="copyright">', theme_copyright(), '</li>
+				<li class="copyright">', theme_copyright(), '
+				</li>
 				<li><a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a></li>
-				', !empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '', '
+				', !empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
+				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
 			</ul>';
 
 	// Show the load time?
@@ -377,7 +387,6 @@ function template_body_below()
 	echo '
 		</div>
 	</div>';
-
 }
 
 function template_html_below()
@@ -405,28 +414,28 @@ function theme_linktree($force_show = false)
 		return;
 
 	echo '
-	<div class="navigate_section">
-		<ul>';
+				<div class="navigate_section">
+					<ul>';
 
 	if ($context['user']['is_logged'])
-	echo '
-			<li class="unread_links">
-				<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
-				<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
-			</li>';
+		echo '
+						<li class="unread_links">
+							<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
+							<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
+						</li>';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	foreach ($context['linktree'] as $link_num => $tree)
 	{
 		echo '
-			<li', ($link_num == count($context['linktree']) - 1) ? ' class="last"' : '', '>';
+						<li', ($link_num == count($context['linktree']) - 1) ? ' class="last"' : '', '>';
 
 		// Don't show a separator for the first one.
 		// Better here. Always points to the next level when the linktree breaks to a second line.
 		// Picked a better looking HTML entity, and added support for RTL plus a span for styling.
 		if ($link_num != 0)
 			echo '
-				<span class="dividers">', $context['right_to_left'] ? ' &#9668; ' : ' &#9658; ', '</span>';
+							<span class="dividers">', $context['right_to_left'] ? ' &#9668; ' : ' &#9658; ', '</span>';
 
 		// Show something before the link?
 		if (isset($tree['extra_before']))
@@ -434,19 +443,19 @@ function theme_linktree($force_show = false)
 
 		// Show the link, including a URL if it should have one.
 		echo $settings['linktree_link'] && isset($tree['url']) ? '
-				<a href="' . $tree['url'] . '"><span>' . $tree['name'] . '</span></a>' : '<span>' . $tree['name'] . '</span>';
+							<a href="' . $tree['url'] . '"><span>' . $tree['name'] . '</span></a>' : '<span>' . $tree['name'] . '</span>';
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
 			echo $tree['extra_after'];
 
 		echo '
-			</li>';
+						</li>';
 	}
 
 	echo '
-		</ul>
-	</div>';
+					</ul>
+				</div>';
 
 	$shown_linktree = true;
 }
@@ -459,101 +468,101 @@ function template_menu()
 	global $context, $settings, $options, $scripturl, $txt;
 
 	echo '
-		<div id="main_menu">
-			<ul class="dropmenu" id="menu_nav">';
+				<div id="main_menu">
+					<ul class="dropmenu" id="menu_nav">';
 
 	// Note: Menu markup has been cleaned up to remove unnecessary spans and classes.
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-				<li id="button_', $act, '" ', !empty($button['sub_buttons']) ? 'class="subsections"' :'', '>
-					<a class="', $button['active_button'] ? 'active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>
-						', $button['title'], '
-					</a>';
+						<li id="button_', $act, '" ', !empty($button['sub_buttons']) ? 'class="subsections"' : '', '>
+							<a class="', $button['sub_buttons'] ? 'submenu' : '', !empty($button['active_button']) ? ' active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', $button['title'], '</a>';
+
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
-					<ul>';
+							<ul>';
 
 			foreach ($button['sub_buttons'] as $childbutton)
 			{
 				echo '
-						<li ', !empty($childbutton['sub_buttons']) ? 'class="subsections"' :'', '>
-							<a href="', $childbutton['href'], '" ' , isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>
-								', $childbutton['title'], '
-							</a>';
+								<li ', !empty($childbutton['sub_buttons']) ? 'class="subsections"' : '', '>
+									<a href="', $childbutton['href'], '" ' , isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>
+								', $childbutton['title'], '</a>';
+
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
 				{
 					echo '
-							<ul>';
+									<ul>';
 
 					foreach ($childbutton['sub_buttons'] as $grandchildbutton)
 						echo '
-								<li>
-									<a href="', $grandchildbutton['href'], '" ' , isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>
+										<li>
+											<a href="', $grandchildbutton['href'], '" ' , isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>
 										', $grandchildbutton['title'], '
-									</a>
-								</li>';
+											</a>
+										</li>';
 
 					echo '
-							</ul>';
+									</ul>';
 				}
 
 				echo '
-						</li>';
+								</li>';
 			}
-				echo '
-					</ul>';
+
+			echo '
+							</ul>';
 		}
+
 		echo '
-				</li>';
+						</li>';
 	}
 
 	// The upshrink image, right-floated. Yes, I know it takes some space from the menu bar.
 	// Menu bar will still accommodate ten buttons on a 1024, with theme set to 90%. That's more than enough.
 	// If anyone is terrified of losing 40px out of the menu bar, set your theme to 92% instead of 90%. :P
 	echo '
-				<li id="collapse_button">
-					<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="padding: 4px 9px 3px 9px; display: none;" />
-				</li>';
+						<li id="collapse_button">
+							<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="padding: 4px 9px 3px 9px; display: none;" />
+						</li>';
 
 	echo '
-			</ul>
-		</div>';
+					</ul>
+				</div>';
 
 	// Define the upper_section toggle in JavaScript.
 	// Note that this definition had to be shifted for the js to work with the new markup.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oMainHeaderToggle = new smc_Toggle({
-				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($options['collapse_header']) ? 'false' : 'true', ',
-				aSwappableContainers: [
-					\'inner_wrap\'
-				],
-				aSwapImages: [
-					{
-						sId: \'upshrink\',
-						srcExpanded: smf_images_url + \'/upshrink.png\',
-						altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-						srcCollapsed: smf_images_url + \'/upshrink2.png\',
-						altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
-					}
-				],
-				oThemeOptions: {
-					bUseThemeSettings: smf_member_id == 0 ? false : true,
-					sOptionName: \'collapse_header\',
-					sSessionVar: smf_session_var,
-					sSessionId: smf_session_id
-				},
-				oCookieOptions: {
-					bUseCookie: smf_member_id == 0 ? true : false,
-					sCookieName: \'upshrink\'
-				}
-			});
-		// ]]></script>';
-
+				<script type="text/javascript"><!-- // --><![CDATA[
+					var oMainHeaderToggle = new smc_Toggle({
+						bToggleEnabled: true,
+						bCurrentlyCollapsed: ', empty($options['collapse_header']) ? 'false' : 'true', ',
+						aSwappableContainers: [
+							\'inner_wrap\'
+						],
+						aSwapImages: [
+							{
+								sId: \'upshrink\',
+								srcExpanded: smf_images_url + \'/upshrink.png\',
+								altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+								srcCollapsed: smf_images_url + \'/upshrink2.png\',
+								altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+							}
+						],
+						oThemeOptions: {
+							bUseThemeSettings: smf_member_id == 0 ? false : true,
+							sOptionName: \'collapse_header\',
+							sSessionVar: smf_session_var,
+							sSessionId: smf_session_id
+						},
+						oCookieOptions: {
+							bUseCookie: smf_member_id == 0 ? true : false,
+							sCookieName: \'upshrink\'
+						}
+					});
+				// ]]></script>';
 }
 
 /**
@@ -581,7 +590,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		// Kept for backward compatibility
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 			$buttons[] = '
-				<li><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '><span>' . $txt[$value['text']] . '</span></a></li>';
+								<li><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '><span>' . $txt[$value['text']] . '</span></a></li>';
 	}
 
 	// No buttons? No button strip either.
@@ -589,9 +598,9 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		return;
 
 	echo '
-		<div class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
-			<ul>',
-				implode('', $buttons), '
-			</ul>
-		</div>';
+						<div class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
+							<ul>',
+								implode('', $buttons), '
+							</ul>
+						</div>';
 }

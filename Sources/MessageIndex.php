@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -46,10 +46,10 @@ function MessageIndex()
 
 	loadTemplate('MessageIndex');
 	loadJavascriptFile('topic.js');
-	
+
 	$context['name'] = $board_info['name'];
 	$context['description'] = $board_info['description'];
-	
+
 	// How many topics do we have in total?
 	$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
@@ -489,7 +489,7 @@ function MessageIndex()
 			if (!empty($settings['avatars_on_indexes']))
 			{
 				// Allow themers to show the latest poster's avatar along with the topic
-				if(!empty($row['avatar']))
+				if (!empty($row['avatar']))
 				{
 					if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 					{
@@ -678,7 +678,7 @@ function action_quickmod()
 
 	// Check the session = get or post.
 	checkSession('request');
-	
+
 	// Some help we may need
 	require_once($sourcedir . '/Subs-Topic.php');
 
@@ -1146,7 +1146,7 @@ function action_quickmod()
 
 	if (!empty($markCache))
 	{
-		$smcFunc['db_query']('', '
+		$request = $smcFunc['db_query']('', '
 			SELECT id_topic, disregarded
 			FROM {db_prefix}log_topics
 			WHERE id_topic IN ({array_int:selected_topics})
@@ -1163,7 +1163,7 @@ function action_quickmod()
 
 		$markArray = array();
 		foreach ($markCache as $topic)
-			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID']);
+			$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], $logged_topics[$topic]);
 
 		markTopicsRead($markArray, true);
 	}

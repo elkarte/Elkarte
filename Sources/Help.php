@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -34,7 +34,7 @@ function action_help()
 	loadLanguage('Manual');
 
 	// We need to know where our wiki is.
-	$context['wiki_url'] = 'https://github.com/Spuds/dialogo/wiki';
+	$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
 
 	// Sections were are going to link...
 	$context['manual_sections'] = array(
@@ -57,7 +57,7 @@ function action_help()
 	);
 
 	// Lastly, some minor template stuff.
-	$context['page_title'] = $txt['manual_dialogo_user_help'];
+	$context['page_title'] = $txt['manual_elkarte_user_help'];
 	$context['sub_template'] = 'manual';
 }
 

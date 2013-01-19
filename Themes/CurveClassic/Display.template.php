@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -263,6 +263,7 @@ function template_main()
 			if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
 				echo '
 								<li class="postgroup">', $message['member']['post_group'], '</li>';
+
 			echo '
 								<li class="icons">', $message['member']['group_icons'], '</li>';
 
@@ -336,6 +337,7 @@ function template_main()
 				echo '
 								<li class="profile">
 									<ul>';
+
 				// Don't show the profile button if you're not allowed to view the profile.
 				if ($message['member']['can_view_profile'])
 					echo '
@@ -377,7 +379,8 @@ function template_main()
 		}
 		// Otherwise, show the guest's email.
 		elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
-			echo '
+
+		echo '
 								<li class="email"><a href="', $scripturl, '?action=emailuser;sa=email;msg=', $message['id'], '" rel="nofollow">', ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']), '</a></li>';
 
 		// Done with the information about the poster... on to the post itself.
@@ -387,7 +390,7 @@ function template_main()
 						<div class="postarea">
 							<div class="flow_hidden">
 								<div class="keyinfo">
-									<div class="messageicon">
+									<div id="messageicon_', $message['id'], '" class="messageicon">
 										<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 									</div>
 									<h5 id="subject_', $message['id'], '">
@@ -466,6 +469,7 @@ function template_main()
 								<div class="noticebox approve_post">
 									', $txt['post_awaiting_approval'], '
 								</div>';
+
 		echo '
 								<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '</div>
 							</div>';
@@ -529,8 +533,9 @@ function template_main()
 				if (!$attachment['is_approved'] && $context['can_approve'])
 					echo '
 											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
+
 				echo '
-											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . $txt['attach_viewed'] : '<br />' . $txt['attach_downloaded']) . ' ' . $attachment['downloads'] . ' ' . $txt['attach_times'] . '
+											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sptrinf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sptrinf($txt['attach_downloaded'], $attachment['downloads'])), '
 										</div>';
 
 				echo '
@@ -574,6 +579,7 @@ function template_main()
 		if ($context['can_issue_warning'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 			echo '
 								<a href="', $scripturl, '?action=profile;area=issuewarning;u=', $message['member']['id'], ';msg=', $message['id'], '"><img class="centericon" src="', $settings['images_url'], '/warn.png" alt="', $txt['issue_warning_post'], '" title="', $txt['issue_warning_post'], '" /></a>';
+
 		echo '
 								<img class="centericon" src="', $settings['images_url'], '/ip.png" alt="" />';
 
@@ -710,10 +716,8 @@ function template_main()
 		{
 			// Show the actual posting area...
 			if ($context['show_bbc'])
-			{
 				echo '
 							<div id="bbcBox_message"></div>';
-			}
 
 			// What about smileys?
 			if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
@@ -727,6 +731,7 @@ function template_main()
 							// ]]></script>';
 
 		}
+
 		echo '
 							<div class="padding">
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
@@ -837,7 +842,7 @@ function template_main()
 							iTopicId: ', $context['current_topic'], ',
 							sTemplateBodyEdit: ', JavaScriptEscape('
 								<div id="quick_edit_body_container" style="width: 90%">
-									<div id="error_box" style="padding: 4px;" class="error"></div>
+									<div id="error_box" class="errorbox" style="display:none;"></div>
 									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 									<input type="hidden" name="\' + smf_session_var + \'" value="\' + smf_session_id + \'" />
 									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />

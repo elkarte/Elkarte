@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -80,7 +80,7 @@ function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	if (empty($db_options['dont_select_db']) && !@mysql_select_db($db_name, $connection) && empty($db_options['non_fatal']))
 		display_db_error();
 
-	// This makes it possible to have DIALOGO automatically change the sql_mode and autocommit if needed.
+	// This makes it possible to have ELKARTE automatically change the sql_mode and autocommit if needed.
 	if (isset($mysql_set_mode) && $mysql_set_mode === true)
 		$smcFunc['db_query']('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 		array(),
@@ -214,7 +214,7 @@ function smf_db_replacement__callback($matches)
 		break;
 
 		case 'identifier':
-			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for DIALOGO.
+			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for ELKARTE.
 			return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
 		break;
 
@@ -332,7 +332,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		}
 
 		// Don't overload it.
-		$st = microtime();
+		$st = microtime(true);
 		$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
 		$db_cache[$db_count]['f'] = $file;
 		$db_cache[$db_count]['l'] = $line;
@@ -373,7 +373,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		$clean .= substr($db_string, $old_pos);
 		$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-		// We don't use UNION in DIALOGO, at least so far.  But it's useful for injections.
+		// We don't use UNION in ELKARTE, at least so far.  But it's useful for injections.
 		if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 			$fail = true;
 		// Comments?  We don't use comments in our queries, we leave 'em outside!
@@ -402,7 +402,7 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 
 	// Debugging.
 	if (isset($db_show_debug) && $db_show_debug === true)
-		$db_cache[$db_count]['t'] = array_sum(explode(' ', microtime())) - array_sum(explode(' ', $st));
+		$db_cache[$db_count]['t'] = microtime(true) - $st;
 
 	return $ret;
 }
@@ -577,7 +577,7 @@ function smf_db_error($db_string, $connection = null)
 			if (in_array($query_errno, array(2006, 2013)) && $db_connection == $connection)
 			{
 				// Are we in SSI mode?  If so try that username and password first
-				if (DIALOGO == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+				if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 				{
 					if (empty($db_persist))
 						$db_connection = @mysql_connect($db_server, $ssi_db_user, $ssi_db_passwd);
@@ -641,7 +641,7 @@ function smf_db_error($db_string, $connection = null)
 		$context['error_message'] = $txt['try_again'];
 
 	// A database error is often the sign of a database in need of upgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
-	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'DIALOGO ' . @$modSettings['ourVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
+	if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'ELKARTE ' . @$modSettings['ourVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
 		$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['ourVersion']);
 
 	if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)

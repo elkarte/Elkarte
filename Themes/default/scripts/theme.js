@@ -1,7 +1,34 @@
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript associated with the current theme
+ */
+
 $(document).ready(function() {
 	// menu drop downs
-	$('ul.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
-	
+	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
+
+	// Smooth scroll navigation
+	$('.topbottom').bind('click', function(event) {		
+		event.preventDefault();
+
+		// Position to the id pagetop or pagebot
+		var link = $('#page' + this.hash.substring(1)),
+			link_y = link.height() + 15;
+
+		$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
+	});
+
 	// tooltips
 	$('.preview').SiteTooltip();
 

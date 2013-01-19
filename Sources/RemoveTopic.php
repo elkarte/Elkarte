@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -529,7 +529,7 @@ function removeMessage($message, $decreasePostCount = true)
 			if (!$user_info['is_guest'])
 			{
 				require_once($sourcedir . '/Subs-Topic.php');
-				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID']), true);
+				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 			}
 
 			// Mark recycle board as seen, if it was marked as seen before.

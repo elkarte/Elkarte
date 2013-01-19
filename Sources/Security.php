@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -134,7 +134,7 @@ function is_not_guest($message = '')
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
-	if (DIALOGO != 'SSI' && empty($context['theme_loaded']))
+	if (ELKARTE != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Never redirect to an attachment
@@ -276,7 +276,7 @@ function is_not_banned($forceCheck = false)
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			require_once($sourcedir . '/ManageBans.php');
+			loadAdminClass ('ManageBans.php');
 			updateBanMembers();
 		}
 	}
@@ -1343,4 +1343,42 @@ function constructBanQueryIP($fullip)
 			AND bi.ip_low4 = 255 AND bi.ip_high4 = 255)';
 
 	return $ban_query;
+}
+
+/**
+ * Decide if we are going to enable bad behavior scanning for this user
+ * - Admins and Moderators get a free pass
+ * - Optionally existing users with post counts over a limit are bypassed
+ * - Others get a humane frisking
+ */
+function loadBadBehavior()
+{
+	global $modSettings, $user_info, $context, $sourcedir, $bb2_results;
+
+	$bb_run = false;
+
+	// Bad Behavior Enabled?
+	if (!empty($modSettings['badbehavior_enabled']))
+	{
+		require_once($sourcedir . '/lib/bad-behavior/badbehavior-plugin.php');
+		$bb_run = true;
+
+		// We may want to give some folks a hallway pass
+		if (!$user_info['is_guest'])
+		{
+			if (!empty($user_info['is_mod']) || !empty($user_info['is_admin']))
+				$bb_run = false;
+			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] < 0)
+				$bb_run = false;
+			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] > 0 && ($user_info['posts'] > $modSettings['badbehavior_postcount_wl']))
+				$bb_run = false;
+		}
+
+		// Put on the sanitary gloves, its time for a patdown !
+		if ($bb_run === true)
+		{
+			$bb2_results = bb2_start(bb2_read_settings());
+			addInlineJavascript(bb2_insert_head());
+		}
+	}
 }

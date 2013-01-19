@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -38,7 +38,7 @@ if (!defined('DIALOGO'))
 function action_showfeed()
 {
 	global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-	global $query_this_board, $smcFunc, $forum_version, $cdata_override;
+	global $query_this_board, $smcFunc, $forum_version, $cdata_override, $settings;
 
 	// If it's not enabled, die.
 	if (empty($modSettings['xmlnews_enable']))
@@ -207,7 +207,7 @@ function action_showfeed()
 		if (isset($_REQUEST[$var]))
 			$cachekey[] = $_REQUEST[$var];
 	$cachekey = md5(serialize($cachekey) . (!empty($query_this_board) ? $query_this_board : ''));
-	$cache_t = microtime();
+	$cache_t = microtime(true);
 
 	// Get the associative array representing the xml.
 	if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
@@ -217,7 +217,7 @@ function action_showfeed()
 		$xml = $subActions[$_GET['sa']][0]($xml_format);
 
 		if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
-		|| (!$user_info['is_guest'] && (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.2))))
+		|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
 			cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 	}
 
@@ -247,11 +247,18 @@ function action_showfeed()
 	{
 		// Start with an RSS 2.0 header.
 		echo '
-<rss version=', $xml_format == 'rss2' ? '"2.0"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
+<rss version=', $xml_format == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
 	<channel>
 		<title>', $feed_title, '</title>
 		<link>', $scripturl, '</link>
-		<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>';
+		<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
+		<generator>Elkarte</generator>
+		<ttl>30</ttl>
+		<image>
+			<url>', $settings['default_theme_dir'], '/images/logo.png</url>
+			<title>', $feed_title, '</title>
+			<link>', $scripturl, '</link>
+		</image>';
 
 		// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
 		dumpTags($xml, 2, 'item', $xml_format);
@@ -301,7 +308,7 @@ function action_showfeed()
 
 	<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 	<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-	<generator uri="http://www.dialogocommunity.org" version="', strtr($forum_version, array('DIALOGO' => '')), '">DIALOGO</generator>
+	<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ELKARTE' => '')), '">ELKARTE</generator>
 	<author>
 		<name>', strip_tags($context['forum_name']), '</name>
 	</author>';
@@ -664,6 +671,7 @@ function action_xmlnews($xml_format)
 
 		// Being news, this actually makes sense in rss format.
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		{
 			$data[] = array(
 				'title' => cdata_parse($row['subject']),
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -674,13 +682,21 @@ function action_xmlnews($xml_format)
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
 				'guid' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 			);
+
+			// Add the poster name on if we are rss2
+			if ($xml_format == 'rss2') 
+				$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
+		}
 		elseif ($xml_format == 'rdf')
+		{
 			$data[] = array(
 				'title' => cdata_parse($row['subject']),
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 				'description' => cdata_parse($row['body']),
 			);
+		}
 		elseif ($xml_format == 'atom')
+		{
 			$data[] = array(
 				'title' => cdata_parse($row['subject']),
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -695,8 +711,10 @@ function action_xmlnews($xml_format)
 				'modified' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 				'id' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 			);
+		}
 		// The biggest difference here is more information.
 		else
+		{
 			$data[] = array(
 				'time' => htmlspecialchars(strip_tags(timeformat($row['poster_time']))),
 				'id' => $row['id_topic'],
@@ -715,6 +733,7 @@ function action_xmlnews($xml_format)
 				),
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 			);
+		}
 	}
 	$smcFunc['db_free_result']($request);
 
@@ -816,6 +835,7 @@ function action_xmlrecent($xml_format)
 
 		// Doesn't work as well as news, but it kinda does..
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		{
 			$data[] = array(
 				'title' => $row['subject'],
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
@@ -826,13 +846,21 @@ function action_xmlrecent($xml_format)
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
 				'guid' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg']
 			);
+
+			// add the poster name on if we are rss2
+			if ($xml_format == 'rss2') 
+				$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
+		}
 		elseif ($xml_format == 'rdf')
+		{
 			$data[] = array(
 				'title' => $row['subject'],
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'description' => cdata_parse($row['body']),
 			);
+		}
 		elseif ($xml_format == 'atom')
+		{
 			$data[] = array(
 				'title' => $row['subject'],
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
@@ -847,8 +875,10 @@ function action_xmlrecent($xml_format)
 				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 				'id' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 			);
+		}
 		// A lot of information here.  Should be enough to please the rss-ers.
 		else
+		{
 			$data[] = array(
 				'time' => htmlspecialchars(strip_tags(timeformat($row['poster_time']))),
 				'id' => $row['id_msg'],
@@ -876,6 +906,7 @@ function action_xmlrecent($xml_format)
 				),
 				'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg']
 			);
+		}
 	}
 	$smcFunc['db_free_result']($request);
 

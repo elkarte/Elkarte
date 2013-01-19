@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -186,9 +186,9 @@ function reloadSettings()
 	}
 
 	// Integration is cool.
-	if (defined('DIALOGO_INTEGRATION_SETTINGS'))
+	if (defined('ELKARTE_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = unserialize(DIALOGO_INTEGRATION_SETTINGS);
+		$integration_settings = unserialize(ELKARTE_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function, false);
 	}
@@ -318,7 +318,7 @@ function loadUserSettings()
 		// 2. RSS feeds and XMLHTTP requests don't count either.
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (DIALOGO != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (ELKARTE != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
@@ -393,7 +393,7 @@ function loadUserSettings()
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
 		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
 		{
-			require_once($sourcedir . '/ManageSearchEngines.php');
+			loadAdminClass ('ManageSearchEngines.php');
 			$user_info['possibly_robot'] = SpiderCheck();
 		}
 		elseif (!empty($modSettings['spider_mode']))
@@ -1395,7 +1395,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 
 		// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
-		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && DIALOGO != 'SSI')
+		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELKARTE != 'SSI')
 		{
 			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
 			if (empty($_GET))
@@ -1716,6 +1716,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	global $context, $settings, $txt, $scripturl, $boarddir, $db_show_debug;
+	static $default_loaded;
 
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
@@ -1725,13 +1726,17 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
 	else
 		$default_sheets = array('index.css');
-	loadCSSFile($default_sheets);
 
-	// Any specific template sheets we may have
+	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 		loadCSSFile(
 			array(implode('.css,', $style_sheets) . '.css')
 		);
+	elseif (empty($default_loaded))
+	{
+		loadCSSFile($default_sheets);
+		$default_loaded = true;
+	}
 
 	// No template to load?
 	if ($template_name === false)
@@ -1852,7 +1857,11 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	// Whoa ... we've done this before yes?
 	$cache_name = 'load_css_' . md5($settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
-		$context['css_files'] = $temp;
+	{
+		if (empty($context['css_files']))
+			$context['css_files'] = array();
+		$context['css_files'] += $temp;
+	}
 	else
 	{
 		// All the files in this group use the parameters as defined above
@@ -1931,7 +1940,11 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	// dejvu?
 	$cache_name = 'load_js_' . md5($settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
-		$context['javascript_files'] = $temp;
+	{
+		if (empty($context['javascript_files']))
+			$context['javascript_files'] = array();
+		$context['javascript_files'] += $temp;
+	}
 	else
 	{
 		// All the files in this group use the above parameters
@@ -1973,6 +1986,18 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		// Save it so we don't have to build this so often
 		cache_put_data($cache_name, $context['javascript_files'], 600);
 	}
+}
+
+/**
+ * Load an admin controller from the admin area.
+ *
+ * @param string $filename
+ */
+function loadAdminClass($filename)
+{
+	global $sourcedir;
+
+	require_once($sourcedir . '/admin/' . $filename);
 }
 
 /**
@@ -2525,18 +2550,18 @@ function loadDatabase()
 	require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (DIALOGO == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => DIALOGO == 'SSI'));
+		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'));
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
-	if (DIALOGO == 'SSI')
+	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -29,7 +29,6 @@ function template_main()
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
-
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
 
 	// Is this topic also a poll?
@@ -151,7 +150,7 @@ function template_main()
 	echo '
 			<div class="pagesection">
 				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -167,6 +166,7 @@ function template_main()
 						<span class="nextlinks floatright">', $context['previous_next'], '</span>
 					</h3>
 				</div>';
+
 	if (!empty($settings['display_who_viewing']))
 	{
 		echo '
@@ -222,13 +222,8 @@ function template_main()
 		// Show a link to the member's profile.
 		echo '
 										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-											<span style="padding: 6px; display: block;">', $message['member']['name'], '</span>';
+											<span class="name">', $message['member']['name'], '</span>';
 
-		// Show avatars, images, etc.?
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
-			echo '
-
-											', $message['member']['avatar']['image'], '';
 
 			echo '
 										</a>
@@ -241,7 +236,6 @@ function template_main()
 		// Don't show these things for guests.
 		if (!$message['member']['is_guest'])
 		{
-
 			// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
 			if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
 				echo '
@@ -286,19 +280,21 @@ function template_main()
 				{
 					if ($custom['placement'] != 1 || empty($custom['value']))
 						continue;
+
 					if (empty($shown))
-							{
-								$shown = true;
-								echo '
+					{
+						$shown = true;
+						echo '
 										<li class="cf_icons">
 											<ol>';
-							}
+					}
+
 					echo '
 												<li>', $custom['value'], '</li>';
 				}
 
-			if ($shown)
-				echo '
+				if ($shown)
+					echo '
 											</ol>
 										</li>';
 			}
@@ -320,7 +316,7 @@ function template_main()
 					echo '
 												<li><a href="', $scripturl, '?action=emailuser;sa=email;msg=', $message['id'], '" rel="nofollow">', ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']), '</a></li>';
 
-					echo '
+				echo '
 											</ol>
 										</li>';
 			}
@@ -343,7 +339,7 @@ function template_main()
 
 		// Stuff for the staff to wallop them with.
 		echo '
-										<li style="height: 2px; background: #ccc; box-shadow: 0 -1px 0 #fff inset;"></li>';
+										<li class="report_seperator"></li>';
 
 		// Maybe they want to report this post to the moderator(s)?
 		if ($context['can_report_moderator'])
@@ -355,8 +351,8 @@ function template_main()
 			echo '
 										<li class="issue_warning"><a href="', $scripturl, '?action=profile;area=issuewarning;u=', $message['member']['id'], ';msg=', $message['id'], '"><img src="', $settings['images_url'], '/warn.png" alt="', $txt['issue_warning_post'], '" title="', $txt['issue_warning_post'], '" /></a></li>';
 
-			//echo '
-			//						<img class="centericon" src="', $settings['images_url'], '/ip.png" alt="" />';
+		//echo '
+		//						<img class="centericon" src="', $settings['images_url'], '/ip.png" alt="" />';
 
 		// Show the IP to this user for this post - because you can moderate?
 		if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
@@ -381,6 +377,15 @@ function template_main()
 		// Done with the information about the poster... on to the post itself.
 			echo '
 									</ul>
+								</li>';
+
+		// Show avatars, images, etc.?
+		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
+			echo '
+								<li class="avatar">
+									<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
+										', $message['member']['avatar']['image'], '
+									</a>
 								</li>';
 
 		// Show the post group icons, but not for guests.
@@ -433,12 +438,12 @@ function template_main()
 						</div>
 						<div class="postarea">
 							<div class="keyinfo">
-								<div class="messageicon" ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="position: absolute; z-index: -1;"', '>
+								<div id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
 									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 								</div>
 
 								<h5 id="subject_', $message['id'], '">
-									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' - ', $message['subject'], '">', $message['timestamp'] < time() - 604800 ? $message['time'] : $message['subject'] , '</a>';
+									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' - ', $message['subject'], '">', $message['subject'], '</a>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'] && !empty($message['modified']['name']))
@@ -446,6 +451,7 @@ function template_main()
 									<span class="smalltext modified" id="modified_', $message['id'], '">
 										', $message['modified']['last_edit_text'], '
 									</span>';
+
 		echo '
 								</h5>
 								<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
@@ -527,7 +533,7 @@ function template_main()
 					echo '
 											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
 				echo '
-											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . $txt['attach_viewed'] : '<br />' . $txt['attach_downloaded']) . ' ' . $attachment['downloads'] . ' ' . $txt['attach_times'] . '
+											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
 										</div>';
 
 				echo '
@@ -566,50 +572,51 @@ function template_main()
 			echo '
 							<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a></li>';
 
-		// Can the user modify the contents of this post?  Show the modify inline image.
+		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" style="cursor: pointer; margin: 0;" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
 
-		// Can the user modify the contents of this post?
+		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'])
 			echo '
 							<li class="post_options"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '">', $txt['post_options'], '</a>';
 
-			echo '
+		// Let show them the other options they may have in a nice pulldown
+		echo '
 								<ul>';
 
-				// Can the user modify the contents of this post?
-				if ($message['can_modify'])
-					echo '
+		// Can the user modify the contents of this post?
+		if ($message['can_modify'])
+			echo '
 									<li><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="modify_button">', $txt['modify'], '</a></li>';
 
-				// How about... even... remove it entirely?!
-				if ($message['can_remove'])
-					echo '
+		// How about... even... remove it entirely?!
+		if ($message['can_remove'])
+			echo '
 									<li><a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button">', $txt['remove'], '</a></li>';
 
-				// What about splitting it off the rest of the topic?
-				if ($context['can_split'] && !empty($context['real_num_replies']))
-					echo '
+		// What about splitting it off the rest of the topic?
+		if ($context['can_split'] && !empty($context['real_num_replies']))
+			echo '
 									<li><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="split_button">', $txt['split'], '</a></li>';
 
-				// Can we restore topics?
-				if ($context['can_restore_msg'])
-					echo '
+		// Can we restore topics?
+		if ($context['can_restore_msg'])
+			echo '
 									<li><a href="', $scripturl, '?action=restoretopic;msgs=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="restore_button">', $txt['restore_message'], '</a></li>';
 
-				// Maybe we can approve it, maybe we should?
-				if ($message['can_approve'])
-					echo '
+		// Maybe we can approve it, maybe we should?
+		if ($message['can_approve'])
+			echo '
 									<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="approve_button">', $txt['approve'], '</a></li>';
 
-				// Maybe we can unapprove it?
-				if ($message['can_unapprove'])
+		// Maybe we can unapprove it?
+		if ($message['can_unapprove'])
 					echo '
 									<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="unapprove_button">', $txt['unapprove'], '</a></li>';
 
-			echo '
+		echo '
 								</ul>
 							</li>';
 
@@ -619,7 +626,6 @@ function template_main()
 							<li class="inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		if ($message['can_approve'] || $context['can_reply'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
-
 			echo '
 						</ul>';
 
@@ -634,6 +640,7 @@ function template_main()
 			{
 				if ($custom['placement'] != 2 || empty($custom['value']))
 					continue;
+
 				if (empty($shown))
 				{
 					$shown = true;
@@ -641,6 +648,7 @@ function template_main()
 							<div class="custom_fields_above_signature">
 								<ul class="reset nolist">';
 				}
+
 				echo '
 									<li>', $custom['value'], '</li>';
 			}
@@ -670,7 +678,7 @@ function template_main()
 	echo '
 			<div class="pagesection">
 				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -704,7 +712,7 @@ function template_main()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);" style="margin: 0;">
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" onsubmit="submitonce(this);" >
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -739,10 +747,8 @@ function template_main()
 		{
 			// Show the actual posting area...
 			if ($context['show_bbc'])
-			{
 				echo '
 							<div id="bbcBox_message"></div>';
-			}
 
 			// What about smileys?
 			if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
@@ -754,8 +760,8 @@ function template_main()
 							<script type="text/javascript"><!-- // --><![CDATA[
 								var post_box_name = "', $context['post_box_name'], '";
 							// ]]></script>';
-
 		}
+
 		echo '
 							<div class="padding">
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
@@ -860,13 +866,14 @@ function template_main()
 					if (\'XMLHttpRequest\' in window)
 					{
 						var oQuickModify = new QuickModify({
+							sIconHide: \'xx.png\',
 							sScriptUrl: smf_scripturl,
 							sClassName: \'quick_edit\',
 							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 							iTopicId: ', $context['current_topic'], ',
 							sTemplateBodyEdit: ', JavaScriptEscape('
 								<div id="quick_edit_body_container" style="width: 90%">
-									<div id="error_box" style="padding: 4px;" class="error"></div>
+									<div id="error_box" class="errorbox" style="display:none;"></div>
 									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 									<input type="hidden" name="\' + smf_session_var + \'" value="\' + smf_session_id + \'" />
 									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
@@ -875,8 +882,8 @@ function template_main()
 										<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
 									</div>
 								</div>'), ',
-							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 90%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
 							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
+							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
 							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
 							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',

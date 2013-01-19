@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -237,7 +237,7 @@ function getBoardIndex($boardIndexOptions)
 		if (!empty($settings['avatars_on_indexes']))
 		{
 			// Allow themers to show the latest poster's avatar along with the board
-			if(!empty($row_board['avatar']))
+			if (!empty($row_board['avatar']))
 			{
 				if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 				{

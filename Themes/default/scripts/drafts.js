@@ -1,4 +1,13 @@
-// The draft save object
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript associated with the drafts auto function.
+ */
+
 function smf_DraftAutoSave(oOptions)
 {
 	this.opt = oOptions;

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -104,7 +104,7 @@ function preparsecode(&$message, $previewing = false)
 			if (strpos($user_info['name'], '[') !== false || strpos($user_info['name'], ']') !== false || strpos($user_info['name'], '\'') !== false || strpos($user_info['name'], '"') !== false)
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]', $parts[$i]);
 			else
-				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] . ']$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] .  ']$2[/me]', $parts[$i]);
 
 			if (!$previewing && strpos($parts[$i], '[html]') !== false)
 			{
@@ -525,7 +525,7 @@ function action_spellcheck()
 	global $txt, $context, $smcFunc;
 
 	// A list of "words" we know about but pspell doesn't.
-	$known_words = array('dialogo', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
+	$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
 
 	loadLanguage('Post');
 	loadTemplate('Post');
@@ -1121,7 +1121,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once($sourcedir . '/Subs-Topic.php');
-			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id']), false);
+			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
 
@@ -1280,7 +1280,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once($sourcedir . '/Subs-Topic.php');
-			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID']), false);
+			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
 
@@ -1952,34 +1952,4 @@ function adminNotify($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
-}
-
-/**
- * Callback function for loademaitemplate on subject and body
- * Uses capture group 1 in array
- *
- * @param type $matches
- * @return string
- */
-function user_info_callback($matches)
-{
-	global $user_info;
-	if (empty($matches[1]))
-		return '';
-
-	$use_ref = true;
-	$ref = &$user_info;
-
-	foreach (explode('.', $matches[1]) as $index)
-	{
-		if ($use_ref && isset($ref[$index]))
-			$ref = &$ref[$index];
-		else
-		{
-			$use_ref = false;
-			break;
-		}
-	}
-
-	return $use_ref ? $ref : $matches[0];
 }

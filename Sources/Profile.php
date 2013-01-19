@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -779,7 +779,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// Parse BBCode
 		if ($row['bbc'])
 			$output_html = parse_bbc($output_html);
-		elseif($row['field_type'] == 'textarea')
+		elseif ($row['field_type'] == 'textarea')
 			// Allow for newlines at least
 			$output_html = strtr($output_html, array("\n" => '<br />'));
 

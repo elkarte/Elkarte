@@ -481,18 +481,14 @@ dl.themes_list dd {
 	clear: right;
 	margin: 0 0 1em 0;
 	padding: 0 .5em 0 0;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .modblock_right {
 	width: 50%;
 	float: right;
 	margin: 0 0 1em 0;
 	padding: 0 0 0 .5em;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .modbox {
 	height: 14em;

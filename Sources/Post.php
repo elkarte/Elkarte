@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -195,18 +195,19 @@ function action_post($post_errors = array())
 		// If you're not the owner, can you add to any poll?
 		else
 			isAllowedTo('poll_add_any');
+		$context['can_moderate_poll'] = true;
 
 		require_once($sourcedir . '/Subs-Members.php');
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.
-		$context['poll_options'] = array(
+		$context['poll'] = array(
 			'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
-			'hide' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
-			'expire' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
+			'hide_results' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
+			'expiration' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
 			'change_vote' => isset($_POST['poll_change_vote']),
 			'guest_vote' => isset($_POST['poll_guest_vote']),
-			'guest_vote_enabled' => in_array(-1, $allowedVoteGroups['allowed']),
+			'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
 		);
 
 		// Make all five poll choices empty.
@@ -406,7 +407,7 @@ function action_post($post_errors = array())
 
 		if (isset($_REQUEST['poll']))
 		{
-			$context['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
+			$context['poll']['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
 
 			$context['choices'] = array();
 			$choice_id = 0;
@@ -1026,6 +1027,14 @@ function action_post($post_errors = array())
 	else
 		$context['page_title'] = $txt['post_reply'];
 
+	// Update the topic summary, needed to show new posts in a preview
+	if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
+		getTopic();
+
+	// Just ajax previewing then lets stop now
+	if (isset($_REQUEST['xml']))
+		obExit();
+
 	// Build the link tree.
 	if (empty($topic))
 		$context['linktree'][] = array(
@@ -1073,51 +1082,38 @@ function action_post($post_errors = array())
 
 	// Store the ID.
 	$context['post_box_name'] = $editorOptions['id'];
-
 	$context['attached'] = '';
 	$context['make_poll'] = isset($_REQUEST['poll']);
+	if ($context['make_poll'])
+		loadTemplate('Poll');
 
-	// Message icons - customized icons are off?
+	// Message icons - customized or not, retrieve them...
 	$context['icons'] = getMessageIcons($board);
 
+	$context['icon_url'] = '';
+
 	if (!empty($context['icons']))
+	{
 		$context['icons'][count($context['icons']) - 1]['is_last'] = true;
+		$context['icons'][0]['selected'] = true;
+		$context['icon'] = $context['icons'][0]['value'];
+		$context['icon_url'] = $context['icons'][0]['url'];
+	}
 
 	// Are we starting a poll? if set the poll icon as selected if its available
 	if (isset($_REQUEST['poll']))
 	{
-	    foreach ($context['icons'] as $icons)
+		for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
 		{
-			if (isset($icons['value']) && $icons['value'] == 'poll')
+			if ($context['icons'][$i]['value'] == 'poll')
 			{
-				// if found we are done
+				$context['icons'][$i]['selected'] = true;
 				$context['icon'] = 'poll';
+				$context['icon_url'] = $context['icons'][$i]['url'];
 				break;
 			}
 		}
 	}
-
-	$context['icon_url'] = '';
-	for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
-	{
-		$context['icons'][$i]['selected'] = $context['icon'] == $context['icons'][$i]['value'];
-		if ($context['icons'][$i]['selected'])
-			$context['icon_url'] = $context['icons'][$i]['url'];
-	}
-	if (empty($context['icon_url']))
-	{
-		$context['icon_url'] = $settings[file_exists($settings['theme_dir'] . '/images/post/' . $context['icon'] . '.png') ? 'images_url' : 'default_images_url'] . '/post/' . $context['icon'] . '.png';
-		array_unshift($context['icons'], array(
-			'value' => $context['icon'],
-			'name' => $txt['current_icon'],
-			'url' => $context['icon_url'],
-			'is_last' => empty($context['icons']),
-			'selected' => true,
-		));
-	}
-
-	if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
-		getTopic();
 
 	// If the user can post attachments prepare the warning labels.
 	if ($context['can_post_attachment'])
@@ -1230,7 +1226,7 @@ function action_post2()
 				$keep_ids[] = (int) $dummy;
 
 		if (isset($_SESSION['temp_attachments']))
-			foreach($_SESSION['temp_attachments'] as $attachID => $attachment)
+			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 					continue;

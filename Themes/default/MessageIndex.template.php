@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -86,6 +86,7 @@ function template_main()
 			if (!empty($board['last_post']['id']))
 				echo '
 						<p>', $board['last_post']['last_post_message'], '</p>';
+
 			echo '
 					</td>
 				</tr>';
@@ -95,8 +96,9 @@ function template_main()
 			{
 				// Sort the links into an array with new boards bold so it can be imploded.
 				$children = array();
+
 				/* Each child in each board's children has:
-						id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post. */
+					id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post. */
 				foreach ($board['children'] as $child)
 				{
 					if (!$child['is_redirect'])
@@ -138,28 +140,29 @@ function template_main()
 	{
 		echo '
 	<div class="pagesection">
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
+		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
 		<div class="pagelinks floatleft">', $context['page_index'], '</div>
 		', template_button_strip($context['normal_buttons'], 'right'), '
 	</div>';
 
-	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
+		if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
 		{
-		echo '
-	<div id="description_board" class="generic_list_wrapper">
-		<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
-		<p>';
-	if (!empty($options['show_board_desc']) && $context['description'] != '')
-	echo '
-		', $context['description'], '&nbsp;';
+			echo '
+		<div id="description_board" class="generic_list_wrapper">
+			<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
+			<p>';
 
-	if (!empty($context['moderators']))
-	echo '
-		', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.';
+			if (!empty($options['show_board_desc']) && $context['description'] != '')
+				echo '
+			', $context['description'], '&nbsp;';
 
-	echo '
-		</p>
-	</div>';
+			if (!empty($context['moderators']))
+				echo '
+			', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.';
+
+			echo '
+			</p>
+		</div>';
 		}
 
 		// If Quick Moderation is enabled start the form.
@@ -169,21 +172,24 @@ function template_main()
 
 		echo '
 		<div class="tborder topic_table" id="messageindex">';
+
 		if (!empty($settings['display_who_viewing']))
 		{
-		echo '
+			echo '
 			<p class="whoisviewing">';
+
 			if ($settings['display_who_viewing'] == 1)
 				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-		else
+			else
 				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+
 			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
 
-		echo '
+			echo '
 			</p>';
 		}
-	echo '
 
+		echo '
 		<table class="table_grid" cellspacing="0">
 			<thead>
 				<tr class="catbg">';
@@ -193,7 +199,7 @@ function template_main()
 		{
 			echo '
 					<th scope="col" class="first_th" width="4%">&nbsp;</th>
-					<th scope="col" class="lefttext">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
+					<th scope="col" class="lefttext subject">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
 					<th scope="col" class="stats" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
 
 			// Show a "select all" box for quick moderation?
@@ -202,7 +208,7 @@ function template_main()
 					<th scope="col" class="lefttext last_th" width="22%">', $context['topics_headers']['last_post'], '</th>';
 			else
 				echo '
-					<th scope="col" class="lefttext" width="22%">', $context['topics_headers']['last_post'], '</th>';
+					<th scope="col" class="lefttext last_post" width="22%">', $context['topics_headers']['last_post'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -258,13 +264,13 @@ function template_main()
 			// Some columns require a different shade of the color class.
 			$alternate_class = $color_class . '2';
 
-			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
+			// [WIP] Markup can be cleaned up later.
 			echo '
 				<tr>
 					<td class="', $color_class, ' icon2">
-						<div style="position: relative; width: 40px; margin: auto;">
+						<div>
 							<img src="', $topic['first_post']['icon_url'], '" alt="" />
-							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" style="position: absolute; z-index: 5; right: 4px; bottom: -3px;" />' : '','
+							', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" class="fred" />' : '','
 						</div>
 					</td>
 					<td class="', $alternate_class, ' subject">
@@ -273,7 +279,7 @@ function template_main()
 			// [WIP] Methinks the orange icons look better if they aren't all over the page.
 			// Is this topic new? (assuming they are logged in!)
 			if ($topic['new'] && $context['user']['is_logged'])
-					echo '
+				echo '
 							<a href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
 
 			echo '
@@ -300,6 +306,7 @@ function template_main()
 			{
 				echo '
 					<td class="', $color_class, ' moderation" align="center">';
+
 				if ($options['display_quick_mod'] == 1)
 					echo '
 						<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />';
@@ -321,9 +328,11 @@ function template_main()
 					if ($topic['quick_mod']['move'])
 						echo '<a href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" width="16" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
 				}
+
 				echo '
 					</td>';
 			}
+
 			echo '
 				</tr>';
 		}
@@ -347,7 +356,7 @@ function template_main()
 			// Show a list of boards they can move the topic to.
 			if ($context['can_move'])
 				echo '
-			<span id="quick_mod_jump_to">&nbsp;</span>';
+						<span id="quick_mod_jump_to">&nbsp;</span>';
 
 			echo '
 						<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit qaction" />
@@ -369,7 +378,7 @@ function template_main()
 		echo '
 	<div class="pagesection">
 		', template_button_strip($context['normal_buttons'], 'right'), '
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
+		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
 		<div class="pagelinks">', $context['page_index'], '</div>
 	</div>';
 	}

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -152,7 +152,7 @@ function template_manual()
 
 	echo '
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_dialogo_user_help'], '</h3>
+				<h3 class="catbg">', $txt['manual_elkarte_user_help'], '</h3>
 			</div>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">

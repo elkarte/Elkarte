@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1001,4 +1001,27 @@ function setBoardNotification($id_member, $id_board, $on = false)
 			)
 		);
 	}
+}
+
+/**
+ * Returns all the boards accessible to the current user.
+ */
+function accessibleBoards()
+{
+	global $smcFunc;
+
+	// Find all the boards this user can see.
+	$result = $smcFunc['db_query']('', '
+		SELECT b.id_board
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}',
+		array(
+		)
+	);
+	$boards = array();
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$boards[] = $row['id_board'];
+	$smcFunc['db_free_result']($result);
+
+	return $boards;
 }

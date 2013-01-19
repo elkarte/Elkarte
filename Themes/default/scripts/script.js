@@ -1,18 +1,30 @@
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript utility functions
+ */
+
 var smf_formSubmitted = false;
 var lastKeepAliveCheck = new Date().getTime();
-var smf_editorArray = new Array();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
 var ua = navigator.userAgent.toLowerCase();
-
 var is_opera = ua.indexOf('opera') != -1;
 var is_ff = (ua.indexOf('firefox') != -1 || ua.indexOf('iceweasel') != -1 || ua.indexOf('icecat') != -1 || ua.indexOf('shiretoko') != -1 || ua.indexOf('minefield') != -1) && !is_opera;
 var is_gecko = ua.indexOf('gecko') != -1 && !is_opera;
-
 var is_chrome = ua.indexOf('chrome') != -1;
 var is_safari = ua.indexOf('applewebkit') != -1 && !is_chrome;
 var is_webkit = ua.indexOf('applewebkit') != -1;
-
 var is_ie = ua.indexOf('msie') != -1 && !is_opera;
 var is_iphone = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1;
 var is_android = ua.indexOf('android') != -1;
@@ -497,11 +509,8 @@ function isEmptyText(theField)
 function submitonce(theform)
 {
 	smf_formSubmitted = true;
-
-	// If there are any editors warn them submit is coming!
-	for (var i = 0; i < smf_editorArray.length; i++)
-		smf_editorArray[i].doSubmit();
 }
+
 function submitThisOnce(oControl)
 {
 	// oControl might also be a form.
@@ -665,7 +674,6 @@ function smf_avatarResize()
 	}
 }
 
-
 function hashLoginPassword(doForm, cur_session_id, token)
 {
 	// Compatibility.
@@ -753,7 +761,6 @@ function smc_preCacheImage(sSrc)
 	}
 }
 
-
 // *** smc_Cookie class.
 function smc_Cookie(oOptions)
 {
@@ -784,7 +791,6 @@ smc_Cookie.prototype.set = function(sKey, sValue)
 {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 }
-
 
 // *** smc_Toggle class.
 function smc_Toggle(oOptions)
@@ -948,7 +954,6 @@ smc_Toggle.prototype.toggle = function()
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
 }
-
 
 function ajax_indicator(turn_on)
 {
@@ -1276,8 +1281,9 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
 		if (oMessage.getElementsByTagName('error').length == 0)
 		{
-			if (this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0)
+			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
 				setInnerHTML(document.getElementById('modified_' + this.iCurMessageId), oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
+			
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		}
 	}
@@ -1494,12 +1500,12 @@ function pollOptions()
 
 	if (isEmptyText(expire_time) || expire_time.value == 0)
 	{
-		document.forms.postmodify.poll_hide[2].disabled = true;
-		if (document.forms.postmodify.poll_hide[2].checked)
-			document.forms.postmodify.poll_hide[1].checked = true;
+		document.forms[form_name].poll_hide[2].disabled = true;
+		if (document.forms[form_name].poll_hide[2].checked)
+			document.forms[form_name].poll_hide[1].checked = true;
 	}
 	else
-		document.forms.postmodify.poll_hide[2].disabled = false;
+		document.forms[form_name].poll_hide[2].disabled = false;
 }
 
 function generateDays(offset)
@@ -1550,20 +1556,19 @@ function selectBoards(ids, aFormID)
 		aForm["brd" + ids[i]].checked = !toggle;
 }
 
-function expandCollapseBoards()
+function expandCollapse(id, icon, speed)
 {
-	var current = document.getElementById("searchBoardsExpand").style.display != "none";
+	icon = icon || false;
+	speed = speed || 300;
+	var oId = $('#' + id);
 
-	$("#searchBoardsExpand").slideToggle(300);
-	document.getElementById("expandBoardsIcon").src = smf_images_url + (current ? "/expand.png" : "/collapse.png");
-}
+	// change the icon on the box as well?
+	if (icon)
+		$('#' + icon).attr("src", smf_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+	
+	// open or collaspe the content id
+	oId.slideToggle(speed);
 
-function expandCollapseLabels()
-{
-	var current = document.getElementById("searchLabelsExpand").style.display != "none";
-
-	$("#searchLabelsExpand").slideToggle();
-	document.getElementById("expandLabelsIcon").src = smf_images_url + (current ? "/expand.png" : "/collapse.png");
 }
 
 function updateRuleDef(optNum)

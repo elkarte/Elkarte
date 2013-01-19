@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -525,7 +525,7 @@ function template_ssi_above()
 			<div id="header"><div class="frame">
 				<div id="top_section">
 					<h1 class="forumtitle">SSI.php Examples</h1>
-					<img id="logo" src="Themes/default/images/logo.png" alt="Dialogo Community" title="Dialogo Community" />
+					<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 				</div>
 				<div id="upper_section" class="middletext" style="overflow: hidden;">
 					<div class="user"></div>
@@ -550,7 +550,7 @@ function template_ssi_below()
 				</div>
 			</div></div>
 			<div id="footer_section"><div class="frame">
-				<div class="smalltext"><a href="http://www.spudsdesign.com/dialogo/">Dialogo Community</a></div>
+				<div class="smalltext"><a href="http://www.elkarte.net/">Elkarte Community</a></div>
 			</div></div>
 		</div>
 	</body>

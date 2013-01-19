@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -46,7 +46,7 @@ function writeLog($force = false)
 	// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
 	if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once($sourcedir . '/ManageSearchEngines.php');
+		loadAdminClass ('ManageSearchEngines.php');
 		logSpider();
 	}
 
@@ -71,7 +71,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	// Grab the last all-of-DIALOGO-specific log_online deletion time.
+	// Grab the last all-of-ELKARTE-specific log_online deletion time.
 	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
@@ -141,7 +141,7 @@ function writeLog($force = false)
 		$_SESSION['timeOnlineUpdated'] = time();
 
 	// Set their login time, if not already done within the last minute.
-	if (DIALOGO != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
+	if (ELKARTE != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
 	{
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)

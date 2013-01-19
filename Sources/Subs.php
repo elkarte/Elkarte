@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -1036,7 +1036,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div>' . (isBrowser('gecko') || isBrowser('opera') ? '<pre style="margin: 0; padding: 0;">' : '') . '<code class="bbc_code">$1</code>' . (isBrowser('gecko') || isBrowser('opera') ? '</pre>' : ''),
+				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1073,7 +1073,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div>' . (isBrowser('gecko') || isBrowser('opera') ? '<pre style="margin: 0; padding: 0;">' : '') . '<code class="bbc_code">$1</code>' . (isBrowser('gecko') || isBrowser('opera') ? '</pre>' : ''),
+				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1327,6 +1327,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = highlight_php_code($add_begin ? \'&lt;?php \' . $data . \'?&gt;\' : $data);
 						if ($add_begin)
 							$data = preg_replace(array(\'~^(.+?)&lt;\?.{0,40}?php(?:&nbsp;|\s)~\', \'~\?&gt;((?:</(font|span)>)*)$~\'), \'$1\', $data, 2);
+						
+						// Fix the PHP code stuff...
+						$data = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", $data);
+						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
 					}'),
 				'block_level' => false,
 				'disabled_content' => '$1',
@@ -1591,7 +1595,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		if (($temp = cache_get_data($cache_key, 240)) != null)
 			return $temp;
 
-		$cache_t = microtime();
+		$cache_t = microtime(true);
 	}
 
 	if ($smileys === 'print')
@@ -2340,7 +2344,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	call_integration_hook('integrate_post_parsebbc', array($message, $smileys, $cache_id, $parse_tags));
 
 	// Cache the output if it took some time...
-	if (isset($cache_key, $cache_t) && array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.05)
+	if (isset($cache_key, $cache_t) && microtime(true) - $cache_t > 0.05)
 		cache_put_data($cache_key, $message, 240);
 
 	// If this was a force parse revert if needed.
@@ -2459,16 +2463,12 @@ function parsesmileys(&$message)
 function highlight_php_code($code)
 {
 	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => 'DIALOGO_TAB();', '&#91;' => '[')));
-
-	$oldlevel = error_reporting(0);
+	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
 
 	$buffer = str_replace(array("\n", "\r"), '', @highlight_string($code, true));
 
-	error_reporting($oldlevel);
-
 	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
-	$buffer = preg_replace('~DIALOGO_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
+	$buffer = preg_replace('~___TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
 
 	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
@@ -2780,7 +2780,7 @@ function setupThemeContext($forceload = false)
 	$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'pm');
 
 	// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
-	if($context['show_pm_popup'])
+	if ($context['show_pm_popup'])
 		addInlineJavascript('
 		$(document).ready(function(){
 			new smc_Popup({
@@ -3039,8 +3039,8 @@ function theme_copyright()
 	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
 
 	echo '
-			<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">' . $forum_copyright . '
-			</span>';
+					<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">', $forum_copyright, '
+					</span>';
 }
 
 /**
@@ -3052,7 +3052,7 @@ function template_footer()
 
 	// Show the load time?  (only makes sense for the footer.)
 	$context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
-	$context['load_time'] = round(array_sum(explode(' ', microtime())) - array_sum(explode(' ', $time_start)), 3);
+	$context['load_time'] = round(microtime(true) - $time_start, 3);
 	$context['load_queries'] = $db_count;
 
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
@@ -3078,7 +3078,7 @@ function template_footer()
 function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $sourcedir;
-	
+
 	// First up, load jquery
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
@@ -3380,7 +3380,7 @@ function host_from_ip($ip)
 
 	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null)
 		return $host;
-	$t = microtime();
+	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
 	if (!isset($host) && (strpos(strtolower(PHP_OS), 'win') === false || strpos(strtolower(PHP_OS), 'darwin') !== false) && mt_rand(0, 1) == 1)
@@ -3416,7 +3416,7 @@ function host_from_ip($ip)
 		$host = @gethostbyaddr($ip);
 
 	// It took a long time, so let's cache it!
-	if (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $t)) > 0.5)
+	if (microtime(true) - $t > 0.5)
 		cache_put_data('hostlookup-' . $ip, $host, 600);
 
 	return $host;
@@ -3496,24 +3496,6 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
 		return '<img src="' . $settings['images_url'] . '/buttons/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />' . ($label != '' ? '&nbsp;<strong>' . $txt[$label] . '</strong>' : '');
 	else
 		return '<img src="' . $settings['lang_images_url'] . '/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />';
-}
-
-/**
- * Load classes that are both (E_STRICT) PHP 4 and PHP 5 compatible.
- * - removed php4 support
- * - left shell in place for mod compatablily
- *
- * @param string $filename
- * @todo remove this function since we are no longer supporting PHP < 5
- */
-function loadClassFile($filename)
-{
-	global $sourcedir;
-
-	if (!file_exists($sourcedir . '/' . $filename))
-		fatal_lang_error('error_bad_file', 'general', array($sourcedir . '/' . $filename));
-
-	require_once($sourcedir . '/' . $filename);
 }
 
 /**

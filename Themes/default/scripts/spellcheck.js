@@ -1,8 +1,24 @@
+/**
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript associated with the spellchecking ((pspell)
+ */
+
 // These are variables the popup is going to want to access...
 var spell_formname, spell_fieldname, spell_full;
 
 // Spell check the specified field in the specified form.
-function spellCheck(formName, fieldName, bFull = true)
+function spellCheck(formName, fieldName, bFull)
 {
 	// Grab the (hidden) spell checking form.
 	var spellform = document.forms.spell_form;
@@ -10,7 +26,7 @@ function spellCheck(formName, fieldName, bFull = true)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = bFull;
+	spell_full = bFull || true;
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;

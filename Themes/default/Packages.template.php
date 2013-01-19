@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -647,13 +647,6 @@ function template_browse()
 					msgCollapsed: ', JavaScriptEscape($txt['package_advanced_button']), '
 				}
 			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
-				sThemeId: \'1\'
-			}
 		});
 	// ]]></script>
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
@@ -756,7 +749,7 @@ function template_servers()
 								<strong>' . $txt['server_name'] . ':</strong>
 							</dt>
 							<dd>
-								<input type="text" name="servername" size="44" value="DIALOGO" class="input_text" />
+								<input type="text" name="servername" size="44" value="ELKARTE" class="input_text" />
 							</dd>
 							<dt>
 								<strong>' . $txt['serverurl'] . ':</strong>

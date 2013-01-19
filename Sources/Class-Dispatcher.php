@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
  *
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
@@ -17,7 +17,7 @@ if (!defined('DIALOGO'))
  * Try first the critical functionality (maintenance, no guest access)
  * Then, in order:
  *   forum's main actions: board index, message index, display topic
- *   the current/legacy file/functions registered by Dialogo core
+ *   the current/legacy file/functions registered by Elkarte core
  * Fall back to naming patterns:
  *   filename=[action].php function=[sa]
  *   filename=[action].controller.php method=action_[sa]
@@ -114,7 +114,7 @@ class site_Dispatcher
 			'activate' => array('Register.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
 			// 'announce' => array('Announce.php', 'action_announce'),
-			'attachapprove' => array('ManageAttachments.php', 'action_attachapprove'),
+			'attachapprove' => array('ModerateAttachments.php', 'action_attachapprove'),
 			'buddy' => array('Members.php', 'action_buddy'),
 			'calendar' => array('Calendar.php', 'action_calendar'),
 			'collapse' => array('BoardIndex.php', 'action_collapse'),
@@ -139,7 +139,7 @@ class site_Dispatcher
 			'login' => array('LogInOut.php', 'action_login'),
 			'login2' => array('LogInOut.php', 'action_login2'),
 			'logout' => array('LogInOut.php', 'action_logout'),
-			'markasread' => array('Markasread.php', 'action_markasread'),
+			'markasread' => array('Markasread.php', 'markasread'),
 			'mergetopics' => array('SplitTopics.php', 'MergeTopics'),
 			'memberlist' => array('Memberlist.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.php', 'action_modcenter'),
@@ -188,16 +188,21 @@ class site_Dispatcher
 			'xmlhttp' => array('Xml.php', 'action_xmlhttp'),
 		);
 
+		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
+
 		// allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
+			// admin files have their own place
+			$path = $sourcedir . (in_array($_GET['action'], $adminActions) ? '/admin' : '');
+
 			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
 			{
-				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_controller_name = $actionArray[$_GET['action']][1];
 
 				// if the method is coded in, use it
@@ -212,7 +217,7 @@ class site_Dispatcher
 			// then it's one of our legacy functions
 			else
 			{
-				$this->_file_name = $sourcedir . '/' . $actionArray[$_GET['action']][0];
+				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_function_name = $actionArray[$_GET['action']][1];
 			}
 		}

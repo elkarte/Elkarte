@@ -110,7 +110,6 @@ select {
 select option  {
 	padding: 0 4px;
 }
-
 input:hover, textarea:hover, button:hover, select:hover {
 	outline: none !important;
 	border: 1px solid #999;
@@ -151,12 +150,20 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 }
 a.button_link {
 	color: #000;
-	padding: 1px 5px;
+	padding: 2px 5px;
 	margin: 0 !important;
 	font-size: 0.9em;
+	line-height: 18px; 
 }
 .button_link:hover {
 	text-decoration: none;
+}
+.selectbox select {
+	margin: 0 !important;
+}
+/* FF rounding error on zoom? */
+#firefox a.button_link {
+	line-height: 17.25px;
 }
 
 /* the new "button" */
@@ -347,8 +354,9 @@ em {
 	overflow: auto;
 	white-space: nowrap;
 	/* Show a scrollbar after about 6 lines. */
-	/* This is much better than the old max-height css. */
-	height: 10em;
+	/* This is much better than the old max-height css.
+	height: 10em;*/
+	max-height: 20em;
 	resize: vertical;
 }
 
@@ -430,7 +438,8 @@ a img {
 }
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: red;
+	font-style: italic;
+	color: blue;
 }
 
 /* Highlighted text - such as search results. */
@@ -565,25 +574,6 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 	border-left: 1px solid #bbb;
 	border-top: 1px solid #aaa;
 	box-shadow: -1px -1px 2px rgba(0,0,0,0.07), -1px -2px 4px rgba(255,255,255,0.33) inset;
-}
-
-
-
-/* Sticky topics get a different background */
-.stickybg {
-	background: #e8d8cf;
-}
-.stickybg2 {
-	background: #f2e3d9;
-}
-
-/* Plain locked topics just get the icon. */
-/* Nobody wants them to stand out much. */
-.lockedbg {
-	background: #e7eaef;
-}
-.lockedbg2 {
-	background: #f0f4f7;
 }
 
 /* Posts and personal messages displayed throughout the forum. */
@@ -824,14 +814,6 @@ div.cat_bar {
 }
 div.title_bar {
 	background: #c5cfd9 url(../images/theme/bars.png) 0 -340px repeat-x;
-}
-
-/* Info center title bars are a bit different. */ /* @todo */
-/*div.title_barIC {
-	background: #dde3e9 url(../images/theme/bars.png) 0 0 repeat-x;
-}*/
-div.title_barIC h4.titlebg {
-	font-size: 1.1em;
 }
 
 /* Upshrinks in cat and title bars. */
@@ -1322,7 +1304,8 @@ img.sort {
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	margin: 0 auto;
-	min-width: 760px;
+	min-width: 750px;
+	width: 95%;
 	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
 	max-width: 100em;
 }
@@ -1378,16 +1361,21 @@ img.sort {
 #search_form select {
 	padding: 1px;
 }
+#chrome #search_form select {
+	padding: 2px;
+}
 #search_form .button_submit {
-	padding: 1px 2px;
-	margin: 1px 5px;
+	padding: 1px 3px 0;
+	margin: 2px 5px 0;
 	background: #fff url(../images/theme/lower_section.png) 0 45% repeat-x;
 	color: #333;
 }
-/* @todo In practice it may be better to set a different value for Firefox and Opera only, */
-/*	just to save a little bit of code. Will wait for Opera detection on body tag. */
-#ie #search_form .button_submit, #chrome #search_form .button_submit {
-	padding: 3px 5px;
+#ie9 #search_form .button_submit {
+	padding: 1px 3px 2px;
+	margin: 1px 5px;
+}
+#chrome #search_form .button_submit {
+	margin: 1px 5px;
 }
 #search_form .button_submit:hover {
 	background: #fff url(../images/theme/upper_section.png) 0 45% repeat-x;
@@ -1531,7 +1519,7 @@ ul li.greeting {
 	border: 1px solid #ccc;
 	border-radius: 2px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .navigate_section ul li {
 	float: left;
@@ -1622,7 +1610,7 @@ ul li.greeting {
 ------------------------------------------------------- */
 .table_list {
 	width: 100%;
-	border-collapse: collapse;
+	border-spacing: 0;
 }
 .table_list .header td {
 	padding: 0;
@@ -1631,7 +1619,7 @@ ul li.greeting {
 	padding: 7px;
 }
 .table_list .header .cat_bar {
-	margin: 0 0 0 -1px;
+	margin: 0;
 }
 .table_list .icon, .table_list .info, .table_list .stats, .table_list.lastpost {
 	border-top: 2px solid #fff;
@@ -1716,7 +1704,7 @@ ul li.greeting {
 
 /* the posting icons */
 #posting_icons {
-	padding: 0 12px 6px 12px;
+	padding: 0 6px 0 0;
 	margin: 0 0 12px 0;
 	line-height: 12px;
 	float: left;
@@ -1830,7 +1818,7 @@ div.table_frame .table_list {
 	border-collapse: collapse;
 	margin: 2px 0;
 }
-#messageindex {
+#messageindex, #unread {
 	clear: both;
 }
 /* the page navigation area */
@@ -1863,6 +1851,7 @@ p.whoisviewing {
 }
 select.qaction, input.qaction {
 	padding: 0;
+	margin: 2px 0 0;
 }
 .qaction_cell .button_submit {
 	margin: 2px 4px 0 4px;
@@ -1876,6 +1865,9 @@ select.qaction, input.qaction {
 	border: 1px solid #ddd;
 	border-radius: 3px;
 	padding: 8px 12px 0 12px;
+}
+#topic_icons.description.none {
+	margin-top: 0;
 }
 #topic_icons p {
 	line-height: 2em;
@@ -2018,8 +2010,7 @@ div#pollmoderation {
 	margin: 4px 0 0 0;
 }
 /* poster and postarea + moderation area underneath */
-#forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg,
-#forumposts .approvebg2, #personal_messages div.windowbg, #personal_messages div.windowbg2 {
+#forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg, #forumposts .approvebg2 {
 	overflow: visible;
 }
 .post_wrapper:after {
@@ -2045,6 +2036,10 @@ div#pollmoderation {
 	color: #c06002;
 	display: block;
 }
+.poster h4 span{
+	padding: 6px;
+	display: block;
+}
 /* Nifty new flyout menu for the poster info. */
 /* @todo Can probably clean up the CSS here a bit. */
 /* Check inheritance with font size in the dropdown. */
@@ -2063,6 +2058,9 @@ div#pollmoderation {
 	background: none;
 	line-height: 1.5em;
 	text-align: center;
+}
+.poster .dropmenu>li .karma_allow a {
+	float: left;
 }
 .poster .dropmenu li:hover a, .poster .dropmenu li.sfhover a, .poster .dropmenu li a:hover,
 .poster .dropmenu li:hover a:hover, .poster .dropmenu li.sfhover a:hover, .poster .dropmenu li a {
@@ -2113,6 +2111,11 @@ div#pollmoderation {
 	width: 100%;
 	font-size: 1.1em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+.poster .dropmenu  li ul li.report_seperator {
+	height: 2px;
+	background: #ccc;
+	box-shadow: 0 -1px 0 #fff inset;
 }
 .poster .dropmenu  li ul li hr {
 	margin: 4px 3px;
@@ -2231,7 +2234,6 @@ div.quickbuttons_wrap {
 	width: 100%;
 	float: left;
 }
-
 ul.quickbuttons {
 	margin: 11px 0 0 0;
 	padding: 0 0 4px 0;
@@ -2248,7 +2250,7 @@ ul.quickbuttons li {
 ul.quickbuttons li a {
 	padding: 0 4px 0 20px;
 	display: block;
-	line-height: 1.9em;
+	line-height: 2.0em;
 	float: left;
 }
 ul.quickbuttons li a.quote_button {
@@ -2258,34 +2260,34 @@ ul.quickbuttons a:hover {
 	color: #a70;
 }
 ul.quickbuttons li a.quote_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat -1px -1px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px 0px;
 }
 ul.quickbuttons li a.remove_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 3px -27px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -19px;
 }
 ul.quickbuttons li a.modify_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 3px -57px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -40px;
 }
 ul.quickbuttons li a.approve_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -90px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -60px;
 }
 ul.quickbuttons li a.restore_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -120px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -80px;
 }
 ul.quickbuttons li a.split_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 5px -147px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -100px;
 }
 ul.quickbuttons li a.reply_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -180px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -120px;
 }
 ul.quickbuttons li a.reply_all_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -180px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -120x;
 }
 ul.quickbuttons li a.notify_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 0 -210px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -140px;
 }
 ul.quickbuttons li a.unapprove_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 4px -237px;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -160px;
 }
 ul.quickbuttons li.inline_mod_check {
 	padding: 1px 1px 1px 1px;
@@ -2315,15 +2317,17 @@ ul.quickbuttons li.inline_mod_check {
 }
 .quickbuttons li.quick_edit, .quickbuttons li.post_options {
 	padding: 0 6px 0 22px;
-	line-height: 1.9em;
+	line-height: 2.0em;
 	position: relative;
 	color: #222;
 }
 .quickbuttons li.quick_edit img {
-	padding: 4px 7em 4px 4px;
+	padding: 4px 5em 4px 4px;
 	position: absolute;
 	left: 0;
 	top: 0;
+	cursor: pointer;
+	margin: 0;
 }
 .quickbuttons li.quick_edit {
 	display: none;
@@ -2382,7 +2386,7 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons ul li a, .quickbuttons ul li a:focus {
 	padding: 0 6px 0 26px;
 	display: block;
-	line-height: 2.2em;
+	line-height: 2.0em;
 	width: 12em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -2452,6 +2456,9 @@ ul.quickbuttons li.inline_mod_check {
 ---------------------------------------------------- */
 form#postmodify .roundframe {
 	padding: 12px 12%;
+}
+form#postmodify {
+	margin: 0;
 }
 #post_header, .postbox {
 	padding: 6px;
@@ -2709,9 +2716,6 @@ dl.send_mail dd {
 #report_topic dl.settings dd {
 	width: 79%;
 }
-#report_comment {
-	width: 70%;
-}
 
 /* Styles for the split topic section.
 ---------------------------------------------------- */
@@ -2889,35 +2893,6 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 	padding: 4px;
 }
 
-/* Sticky topics get a different background */
-.topic_table td.stickybg {
-	background:  #e8d8cf url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.topic_table td.stickybg2 {
-	background:  #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.topic_table td.locked_sticky, .topic_table td.stickybglockedbg {
-	background: #e8d8cf url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-.topic_table td.locked_sticky2, .topic_table td.stickybglockedbg2 {
-	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-
-/* Plain locked topics just get the icon. */
-/* Nobody wants them to stand out much. */
-.topic_table td.lockedbg {
-	background: #e7eaef url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-.topic_table td.lockedbg2 {
-	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-
-/* Stop those damned icons popping up in every table cell! */
-.topic_table td.icon1, .topic_table td.icon2, .topic_table td.stats,
-.topic_table td.lastpost, .topic_table td.moderation {
-	background-image: none;
-}
-
 .errorfile_table {
 	background: #f0f4f7;
 	border-spacing: 3;
@@ -3039,9 +3014,10 @@ dl {
 	margin-right: 5px;
 	height: 20px;
 }
-#basicinfo#userstatus {
+#basicinfo #userstatus {
 	display: block;
 	clear: both;
+	margin-top: 6px;
 }
 #basicinfo #userstatus img {
 	vertical-align: middle;
@@ -3080,6 +3056,7 @@ dl {
 }
 #avatar_server_stored div {
 	float: left;
+	padding-right: 5px;
 }
 #avatar_upload {
 	overflow: auto;
@@ -3480,7 +3457,7 @@ tr.windowbg2 td.stats_day {
 	margin: 0 0 0 9em;
 }
 #personal_messages div.labels {
-	padding: 0 12px 0 0;
+	margin: 11px 0 0;
 }
 #personal_messages .capacity_bar {
 	background: #f0f4f7;
@@ -3707,10 +3684,10 @@ span.hidelink {
 	float: left;
 	padding: 2px;
 	text-align: right;
-	width: 20%;
+	width: 15%;
 }
 #advanced_search dd {
-	width: 75%;
+	width: 80%;
 	float: left;
 	padding: 2px;
 	margin: 0 0 0 6px;
@@ -3804,6 +3781,7 @@ span.hidelink {
 	width: 100%;
 	height: 100%;
 	background: rgba(40,64,80,0.5);
+	z-index: 100;
 }
 .popup_window
 {
@@ -3902,12 +3880,9 @@ span.hidelink {
 	z-index: 1;
 }
 
-/* Experimental additions. @todo */
-/*-------------------------*/
-
-/* Drop the stats cell from the board index on narrow screens. */
-/* Much more user-friendly IMHO. */
-
+/* Experimental media screen additions. */
+/*--------------------------------------*/
+/* Drop cell(s) from the index on narrow screens. */
 @media screen and (max-width: 1220px) {
 	.table_list td.stats {
 		display: none;
@@ -3916,6 +3891,40 @@ span.hidelink {
 		border-left: 1px solid #ccc;
 		padding: 1px 5px 2px 10px;
 		margin-top: 1px;
+	}
+	.table_grid td.stats, .table_grid th.stats {
+		display: none;
+	}
+	.table_grid td.lastpost p {
+		border-left: 1px solid #ccc;
+	}
+	.table_grid th.last_post {
+		width: 30%;
+	}
+}
+@media screen and (max-width: 360px) {
+	.table_list td.lastpost {
+		display: none;
+	}
+	.table_grid td.lastpost, .table_grid th.last_post {
+		display: none;
+	}
+	#wrapper, .frame {
+		min-width: 335px;
+		width: 100% !important;
+	}
+	.poster img.avatar {
+		width: 30px;
+	}
+	.poster {
+		width: 110px;
+		font-size: .8em;
+	}
+	.postarea, .moderatorbar {
+		margin: 0 0 0 110px;
+	}
+	.post {
+		margin: 0 0 0 5px;
 	}
 }
 
@@ -3959,7 +3968,7 @@ span.hidelink {
 /* The generic wrapper thingy for teh awesome cool looks innit. */
 /* This lot will be simplified once I get all the styling hooks in place. */
 .generic_list_wrapper, .action_profile  #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
-#notify_options .windowbg2, #info_center, #profileview, #messageindex, #mlist,
+#notify_options .windowbg2, #info_center, #profileview, #messageindex, #unread, #mlist,
 #main_grid table, .core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
 	background: #f0f4f7;
 	margin: 12px 0 0 0;
@@ -3968,7 +3977,7 @@ span.hidelink {
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .generic_list_wrapper {
 	margin-top: -5px;
@@ -4024,7 +4033,7 @@ span.hidelink {
 	border: none;
 	box-shadow: none;
 }
-/* Some caution required here, as Post.template.php topic summary shares #recent with recent posts. */
+/* Post.template topic summary uses #recent */
 #recent .core_posts {
 	padding: 8px 0;
 }
@@ -4157,7 +4166,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 #postmodify #message{
 	width: 100%;
-	-moz-box-sizing: border-box; box-sizing: border-box; -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #postmodify .lastedit{
 	font-weight: bold;
@@ -4165,9 +4174,22 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 
 /* Subtle zebra striping to make tables easier to follow. Will make a solution for IE8. */
 /* CSS for locked, sticky, etc has not been applied yet. Don't panic. She'll be right, mate. :P */
-.table_grid td.statsbar div{display: none;}
+.table_grid td.statsbar div {
+	display: none;
+}
 .table_grid  tr td:first-child, .table_grid td.icon2 {
 	border-left: 1px solid #ccc;
+}
+.table_grid  img.fred {
+	position: absolute;
+	z-index: 5;
+	right: 4px;
+	bottom: -3px;
+}
+.table_grid td.icon2 div {
+	position: relative;
+	width: 40px;
+	margin: auto;
 }
 .table_grid td.lastpost, .table_grid td.whos_viewing, .table_grid td.moderation, .table_grid td.qaction_cell {
 	border-right: 1px solid #ccc;
@@ -4186,6 +4208,50 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid td.whos_viewing {
 	font-size: 0.9em;
 }
+
+/* @todo tempo Colors for locked and sticky topics so we something to look at till this is done :P*/
+.table_grid tr td.stickybg {
+	background: #f2e3d9; /*e8d8cf*/
+}
+.table_grid tr td.stickybg2 {
+	background: #f2e3d9;
+}
+.table_grid tr td.lockedbg {
+	background: #f0f4f7 /*e7eaef*/
+}
+.table_grid tr td.lockedbg2 {
+	background: #f0f4f7;
+}
+/* And now those precious little icons, boy are they cute ! */
+.table_grid tr td.stickybg.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+.table_grid tr td.stickybg2.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+.table_grid tr td.locked_sticky.subject, .table_grid tr td.stickybglockedbg.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.locked_sticky2.subject, .table_grid tr td.stickybglockedbg2.subject {
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.lockedbg.subject {
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+.table_grid tr td.lockedbg2.subject{
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+/* Search results need some help as well */
+.search_results_posts .lockedbg {
+	background:  #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+}
+.search_results_posts .stickybg {
+	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 95% 15px;
+}
+.search_results_posts .locked_stickybg {
+	background:  #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+}
+
 /* Colors for background of posts requiring approval */
 #forumposts .approvebg {
 	color: #222;
