@@ -39,12 +39,12 @@ function AdminMain()
 	// No indexing evil stuff.
 	$context['robot_no_index'] = true;
 
-	require_once($sourcedir . '/Subs-Menu.php');
+	require_once($sourcedir . '/subs/Menu.subs.php');
 
 	// Some preferences.
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
-	// Define the menu structure - see Subs-Menu.php for details!
+	// Define the menu structure - see subs/Menu.subs.php for details!
 	$admin_areas = array(
 		'forum' => array(
 			'title' => $txt['admin_main'],
@@ -557,7 +557,7 @@ function AdminHome()
 	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 	// Find all of this forum's administrators...
-	require_once($sourcedir . '/Subs-Membergroups.php');
+	require_once($sourcedir . '/subs/Membergroups.subs.php');
 	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 	{
 		// Add a 'more'-link if there are more than 32.
@@ -565,7 +565,7 @@ function AdminHome()
 	}
 
 	// Load the credits stuff.
-	require_once($sourcedir . '/Who.php');
+	require_once($sourcedir . '/controllers/Who.controller.php');
 	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.
@@ -573,7 +573,7 @@ function AdminHome()
 	$context['forum_version'] = $forum_version;
 
 	// Get a list of current server versions.
-	require_once($sourcedir . '/Subs-Admin.php');
+	require_once($sourcedir . '/subs/Admin.subs.php');
 	$checkFor = array(
 		'gd',
 		'imagick',
@@ -733,7 +733,7 @@ function AdminSearch()
 		$context['admin_preferences']['sb'] = $context['search_type'];
 
 		// Update the preferences.
-		require_once($sourcedir . '/Subs-Admin.php');
+		require_once($sourcedir . '/subs/Admin.subs.php');
 		updateAdminPreferences();
 	}
 
@@ -924,7 +924,7 @@ function AdminSearchOM()
 	$postVars = implode('+', $postVars);
 
 	// Get the results from the doc site.
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 	// Demo URL:
 	// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
@@ -937,7 +937,7 @@ function AdminSearchOM()
 
 	// Otherwise we simply walk through the XML and stick it in context for display.
 	$context['search_results'] = array();
-	require_once($sourcedir . '/Class-Package.php');
+	require_once($sourcedir . '/subs/XmlArray.class.php');
 
 	// Get the results loaded into an array for processing!
 	$results = new xmlArray($search_results, false);

@@ -389,7 +389,7 @@ function PermissionByBoard()
 	loadPermissionProfiles();
 
 	// Get the board tree.
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($sourcedir . '/subs/Boards.subs.php');
 
 	getBoardTree();
 
@@ -702,7 +702,7 @@ function ModifyMembergroup()
 		$context['admin_preferences']['pv'] = $_GET['view'] == 'classic' ? 'classic' : 'simple';
 
 		// Update the users preferences.
-		require_once($sourcedir . '/Subs-Admin.php');
+		require_once($sourcedir . '/subs/Admin.subs.php');
 		updateAdminPreferences();
 	}
 

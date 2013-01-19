@@ -1107,7 +1107,7 @@ function VersionDetail()
 	isAllowedTo('admin_forum');
 
 	// Call the function that'll get all the version info we need.
-	require_once($sourcedir . '/Subs-Admin.php');
+	require_once($sourcedir . '/subs/Admin.subs.php');
 	$versionOptions = array(
 		'include_ssi' => true,
 		'include_subscriptions' => true,
@@ -1141,7 +1141,7 @@ function MaintainReattributePosts()
 	checkSession();
 
 	// Find the member.
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once($sourcedir . '/subs/Auth.subs.php');
 	$members = findMembers($_POST['to']);
 
 	if (empty($members))
@@ -1154,7 +1154,7 @@ function MaintainReattributePosts()
 	$membername = $_POST['type'] == 'name' ? $_POST['from_name'] : '';
 
 	// Now call the reattribute function.
-	require_once($sourcedir . '/Subs-Members.php');
+	require_once($sourcedir . '/subs/Members.subs.php');
 	reattributePosts($memID, $email, $membername, !empty($_POST['posts']));
 
 	$context['maintenance_finished'] = $txt['maintain_reattribute_posts'];
@@ -1252,7 +1252,7 @@ function MaintainPurgeInactiveMembers()
 		}
 		$smcFunc['db_free_result']($request);
 
-		require_once($sourcedir . '/Subs-Members.php');
+		require_once($sourcedir . '/subs/Members.subs.php');
 		deleteMembers($members);
 	}
 
@@ -1302,7 +1302,7 @@ function MaintainRemoveOldDrafts()
 	// If we have old drafts, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($sourcedir . '/Subs-Drafts.php');
+		require_once($sourcedir . '/subs/Drafts.subs.php');
 		deleteDrafts($drafts, -1, false);
 	}
 }
@@ -1389,7 +1389,7 @@ function MaintainMassMoveTopics()
 			}
 
 			// Lets move them.
-			require_once($sourcedir . '/Subs-Topic.php');
+			require_once($sourcedir . '/subs/Topic.subs.php');
 			moveTopics($topics, $id_board_to);
 
 			// We've done at least ten more topics.

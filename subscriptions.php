@@ -26,7 +26,7 @@ require_once(dirname(__FILE__) . '/SSI.php');
 loadAdminClass ('ManagePaid.php');
 
 // For any admin emailing.
-require_once($sourcedir . '/Subs-Admin.php');
+require_once($sourcedir . '/subs/Admin.subs.php');
 
 loadLanguage('ManagePaid');
 

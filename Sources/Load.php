@@ -117,12 +117,12 @@ function reloadSettings()
 		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
 			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
 			global $sourcedir;
-			require_once($sourcedir . \'/Subs-Charset.php\');
+			require_once($sourcedir . \'/subs/Charset.subs.php\');
 			return utf8_strtolower($string);'),
 		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
 			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
 			global $sourcedir;
-			require_once($sourcedir . \'/Subs-Charset.php\');
+			require_once($sourcedir . \'/subs/Charset.subs.php\');
 			return utf8_strtoupper($string);'),
 		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
 			global $smcFunc;
@@ -305,7 +305,7 @@ function loadUserSettings()
 		// If we no longer have the member maybe they're being all hackey, stop brute force!
 		if (!$id_member)
 		{
-			require_once($sourcedir . '/LogInOut.php');
+			require_once($sourcedir . '/controllers/LogInOut.controller.php');
 			validatePasswordFlood(!empty($user_settings['id_member']) ? $user_settings['id_member'] : $id_member, !empty($user_settings['passwd_flood']) ? $user_settings['passwd_flood'] : false, $id_member != 0);
 		}
 	}
@@ -858,7 +858,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($sourcedir . '/Subs-Auth.php');
+			require_once($sourcedir . '/subs/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -1209,7 +1209,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 /**
  * Loads information about what browser the user is viewing with and places it in $context
- *  - uses the class from Class-BrowerDetect.php
+ *  - uses the class from BrowserDetect.class.php
  *
  */
 function detectBrowser()
@@ -2428,7 +2428,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($sourcedir . '/Subs-Package.php');
+			require_once($sourcedir . '/subs/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))
@@ -2543,11 +2543,11 @@ function loadDatabase()
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $sourcedir, $db_prefix;
 
 	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php'))
+	if (empty($db_type) || !file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
 	// Load the file for the database.
-	require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+	require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
