@@ -1209,7 +1209,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 /**
  * Loads information about what browser the user is viewing with and places it in $context
- *  - uses the class from Class-BrowerDetect.php
+ *  - uses the class from BrowserDetect.class.php
  *
  */
 function detectBrowser()

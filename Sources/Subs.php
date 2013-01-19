@@ -3071,7 +3071,7 @@ function template_footer()
  * Output the Javascript files
  * 	- tabbing in this function is to make the HTML source look proper
  *  - if defered is set function will output all JS (source & inline) set to load at page end
- *  - if the admin option to combine files is set, will use Class-Combiner
+ *  - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
  */
@@ -3110,7 +3110,7 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Class-Combine.php');
+			require_once($sourcedir . '/Combine.class.php');
 			$combiner = new site_Combiner;
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -3179,7 +3179,7 @@ function template_javascript($do_defered = false)
 
 /**
  * Output the CSS files
- *  - if the admin option to combine files is set, will use Class-Combiner
+ *  - if the admin option to combine files is set, will use Combiner.class
  */
 function template_css()
 {
@@ -3193,7 +3193,7 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Class-Combine.php');
+			require_once($sourcedir . '/Combine.class.php');
 			$combiner = new site_Combiner;
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))

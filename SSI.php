@@ -70,7 +70,7 @@ require_once($sourcedir . '/Logging.php');
 require_once($sourcedir . '/Load.php');
 require_once($sourcedir . '/Subs-Cache.php');
 require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/Class-BrowserDetect.php');
+require_once($sourcedir . '/BrowserDetect.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();

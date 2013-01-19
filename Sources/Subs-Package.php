@@ -481,7 +481,7 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an xmlArray.
-	require_once($sourcedir . '/Class-Package.php');
+	require_once($sourcedir . '/Package.class.php');
 	$packageInfo = new xmlArray($packageInfo);
 
 	// @todo Error message of some sort?
@@ -705,7 +705,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
 		// Load the file containing the ftp_connection class.
-		require_once($sourcedir . '/Class-Package.php');
+		require_once($sourcedir . '/Package.class.php');
 
 		$package_ftp = new ftp_connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 	}
@@ -713,7 +713,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if (empty($package_ftp) && isset($_POST['ftp_username']))
 	{
-		require_once($sourcedir . '/Class-Package.php');
+		require_once($sourcedir . '/Package.class.php');
 		$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
@@ -779,7 +779,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				require_once($sourcedir . '/Class-Package.php');
+				require_once($sourcedir . '/Package.class.php');
 				$ftp = new ftp_connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
@@ -898,7 +898,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_SESSION['pack_ftp']))
 	{
 		// Load the file containing the ftp_connection class.
-		require_once($sourcedir . '/Class-Package.php');
+		require_once($sourcedir . '/Package.class.php');
 
 		$package_ftp = new ftp_connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
@@ -938,7 +938,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_POST['ftp_username']))
 	{
-		require_once($sourcedir . '/Class-Package.php');
+		require_once($sourcedir . '/Package.class.php');
 		$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
@@ -956,7 +956,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			require_once($sourcedir . '/Class-Package.php');
+			require_once($sourcedir . '/Package.class.php');
 			$ftp = new ftp_connection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
@@ -1898,7 +1898,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 	global $boarddir, $sourcedir, $settings, $txt, $modSettings, $package_ftp;
 
 	@set_time_limit(600);
-	require_once($sourcedir . '/Class-Package.php');
+	require_once($sourcedir . '/Package.class.php');
 	$xml = new xmlArray(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
@@ -3047,7 +3047,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] == 'ftp')
 	{
 		// Include the file containing the ftp_connection class.
-		require_once($sourcedir . '/Class-Package.php');
+		require_once($sourcedir . '/Package.class.php');
 
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new ftp_connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
@@ -3078,7 +3078,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
 		// Include the file containing the curl_fetch_web_data class.
-		require_once($sourcedir . '/Class-CurlFetchWeb.php');
+		require_once($sourcedir . '/CurlFetchWeb.class.php');
 
 		$fetch_data = new curl_fetch_web_data();
 		$fetch_data->get_url_data($url, $post_data);
