@@ -480,7 +480,7 @@ function ModifyProfile($post_errors = array())
 
 	// File to include?
 	if (isset($profile_include_data['file']))
-		require_once($sourcedir . '/' . $profile_include_data['file']);
+		require_once($sourcedir . '/controllers/' . $profile_include_data['file']);
 
 	// Make sure that the area function does exist!
 	if (!isset($profile_include_data['function']) || !function_exists($profile_include_data['function']))
@@ -593,7 +593,7 @@ function ModifyProfile($post_errors = array())
 		{
 			$force_redirect = true;
 			// Ensure we include this.
-			require_once($sourcedir . '/ProfileOptions.php');
+			require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 			saveProfileChanges($profile_vars, $post_errors, $memID);
 		}
 

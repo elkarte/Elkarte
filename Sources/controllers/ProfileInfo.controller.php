@@ -96,7 +96,7 @@ function summary($memID)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		include_once($sourcedir . '/Who.php');
+		include_once($sourcedir . '/controllers/Who.controller.php');
 		$action = determineActions($user_profile[$memID]['url']);
 
 		if ($action !== false)
@@ -323,7 +323,7 @@ function showPosts($memID)
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 		// We can be lazy, since removeMessage() will check the permissions for us.
-		require_once($sourcedir . '/RemoveTopic.php');
+		require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 		removeMessage((int) $_GET['delete']);
 
 		// Add it to the mod log.
@@ -1405,7 +1405,7 @@ function viewWarning($memID)
 
 	// Let's use a generic list to get all the current warnings, and use the issue warnings grab-a-granny thing.
 	require_once($sourcedir . '/subs/List.subs.php');
-	require_once($sourcedir . '/Profile-Actions.php');
+	require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 
 	$listOptions = array(
 		'id' => 'view_warnings',

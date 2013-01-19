@@ -565,7 +565,7 @@ function AdminHome()
 	}
 
 	// Load the credits stuff.
-	require_once($sourcedir . '/Who.php');
+	require_once($sourcedir . '/controllers/Who.controller.php');
 	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.
