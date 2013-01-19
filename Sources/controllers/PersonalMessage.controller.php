@@ -1176,7 +1176,7 @@ function action_sendmessage()
 	// Generate a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_pm_save']))
 	{
-		require_once($sourcedir . '/Drafts.php');
+		require_once($sourcedir . '/controllers/Drafts.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
 		showDrafts($user_info['id'], $pm_seed, 1);
 	}
@@ -1231,7 +1231,7 @@ function action_messagedrafts()
 	list ($memID) = $memberResult;
 
 	// drafts is where the functions reside
-	require_once($sourcedir . '/Drafts.php');
+	require_once($sourcedir . '/controllers/Drafts.controller.php');
 	showPMDrafts($memID);
 }
 
@@ -1430,7 +1430,7 @@ function action_sendmessage2()
 
 	// PM Drafts enabled and needed?
 	if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-		require_once($sourcedir . '/Drafts.php');
+		require_once($sourcedir . '/controllers/Drafts.controller.php');
 
 	loadLanguage('PersonalMessage', '', false);
 
