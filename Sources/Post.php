@@ -507,105 +507,16 @@ function action_post($post_errors = array())
 		// Previewing an edit?
 		if (isset($_REQUEST['msg']) && !empty($topic))
 		{
+			require_once($sourcedir . '/Subs-Messages.php');
 			// Get the existing message.
-			$request = $smcFunc['db_query']('', '
-				SELECT
-					m.id_member, m.modified_time, m.smileys_enabled, m.body,
-					m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
-					IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,
-					a.approved AS attachment_approved, t.id_member_started AS id_member_poster,
-					m.poster_time, log.id_action
-				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-					LEFT JOIN {db_prefix}attachments AS a ON (a.id_msg = m.id_msg AND a.attachment_type = {int:attachment_type})
-					LEFT JOIN {db_prefix}log_actions AS log ON (m.id_topic = log.id_topic AND log.action = {string:announce_action})
-				WHERE m.id_msg = {int:id_msg}
-					AND m.id_topic = {int:current_topic}',
-				array(
-					'current_topic' => $topic,
-					'attachment_type' => 0,
-					'id_msg' => $_REQUEST['msg'],
-					'announce_action' => 'announce_topic',
-				)
-			);
+			$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 			// The message they were trying to edit was most likely deleted.
 			// @todo Change this error message?
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($message === false)
 				fatal_lang_error('no_board', false);
-			$row = $smcFunc['db_fetch_assoc']($request);
 
-			if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
-			{
-				// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
-				if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-					fatal_lang_error('modify_post_time_passed', false);
-				elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
-					isAllowedTo('modify_replies');
-				else
-					isAllowedTo('modify_own');
-			}
-			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_any'))
-				isAllowedTo('modify_replies');
-			else
-				isAllowedTo('modify_any');
-
-			if ($context['can_announce'] && !empty($row['id_action']))
-			{
-				loadLanguage('Errors');
-				$context['post_error']['messages'][] = $txt['error_topic_already_announced'];
-			}
-
-			if (!empty($modSettings['attachmentEnable']))
-			{
-				$request = $smcFunc['db_query']('', '
-					SELECT IFNULL(size, -1) AS filesize, filename, id_attach, approved
-					FROM {db_prefix}attachments
-					WHERE id_msg = {int:id_msg}
-						AND attachment_type = {int:attachment_type}
-					ORDER BY id_attach',
-					array(
-						'id_msg' => (int) $_REQUEST['msg'],
-						'attachment_type' => 0,
-					)
-				);
-
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-				{
-					if ($row['filesize'] <= 0)
-						continue;
-					$context['current_attachments'][] = array(
-						'name' => htmlspecialchars($row['filename']),
-						'size' => $row['filesize'],
-						'id' => $row['id_attach'],
-						'approved' => $row['approved'],
-					);
-				}
-				$smcFunc['db_free_result']($request);
-			}
-
-			// Allow moderators to change names....
-			if (allowedTo('moderate_forum') && !empty($topic))
-			{
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member, poster_name, poster_email
-					FROM {db_prefix}messages
-					WHERE id_msg = {int:id_msg}
-						AND id_topic = {int:current_topic}
-					LIMIT 1',
-					array(
-						'current_topic' => $topic,
-						'id_msg' => (int) $_REQUEST['msg'],
-					)
-				);
-				$row = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
-
-				if (empty($row['id_member']))
-				{
-					$context['name'] = htmlspecialchars($row['poster_name']);
-					$context['email'] = htmlspecialchars($row['poster_email']);
-				}
-			}
+			checkMessagePermissions($message['message']);
+			prepareMessageContext($message);
 		}
 
 		// No check is needed, since nothing is really posted.
@@ -616,57 +527,15 @@ function action_post($post_errors = array())
 	{
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
+		require_once($sourcedir . '/Subs-Messages.php');
 		// Get the existing message.
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
-				m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
-				IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,
-				a.approved AS attachment_approved, t.id_member_started AS id_member_poster,
-				m.poster_time, log.id_action
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_msg = m.id_msg AND a.attachment_type = {int:attachment_type})
-					LEFT JOIN {db_prefix}log_actions AS log ON (m.id_topic = log.id_topic AND log.action = {string:announce_action})
-			WHERE m.id_msg = {int:id_msg}
-				AND m.id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-				'attachment_type' => 0,
-				'id_msg' => $_REQUEST['msg'],
-				'announce_action' => 'announce_topic',
-			)
-		);
+		$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 		// The message they were trying to edit was most likely deleted.
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($message === false)
 			fatal_lang_error('no_message', false);
-		$row = $smcFunc['db_fetch_assoc']($request);
 
-		$attachment_stuff = array($row);
-		while ($row2 = $smcFunc['db_fetch_assoc']($request))
-			$attachment_stuff[] = $row2;
-		$smcFunc['db_free_result']($request);
-
-		if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
-		{
-			// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
-			if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-				fatal_lang_error('modify_post_time_passed', false);
-			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
-				isAllowedTo('modify_replies');
-			else
-				isAllowedTo('modify_own');
-		}
-		elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_any'))
-			isAllowedTo('modify_replies');
-		else
-			isAllowedTo('modify_any');
-
-		if ($context['can_announce'] && !empty($row['id_action']))
-		{
-			loadLanguage('Errors');
-			$context['post_error']['messages'][] = $txt['error_topic_already_announced'];
-		}
+		checkMessagePermissions($message['message']);
+		prepareMessageContext($message);
 
 		// When was it last modified?
 		if (!empty($row['modified_time']))
@@ -676,46 +545,18 @@ function action_post($post_errors = array())
 		}
 
 		// Get the stuff ready for the form.
-		$form_subject = $row['subject'];
-		$form_message = un_preparsecode($row['body']);
+		$form_subject = $message['message']['subject'];
+		$form_message = un_preparsecode($message['message']['body']);
 		censorText($form_message);
 		censorText($form_subject);
 
 		// Check the boxes that should be checked.
-		$context['use_smileys'] = !empty($row['smileys_enabled']);
-		$context['icon'] = $row['icon'];
+		$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
+		$context['icon'] = $message['message']['icon'];
 
 		// Show an "approve" box if the user can approve it, and the message isn't approved.
-		if (!$row['approved'] && !$context['show_approval'])
+		if (! $message['message']['approved'] && !$context['show_approval'])
 			$context['show_approval'] = allowedTo('approve_posts');
-
-		// Sort the attachments so they are in the order saved
-		$temp = array();
-		foreach ($attachment_stuff as $attachment)
-		{
-			if ($attachment['filesize'] >= 0 && !empty($modSettings['attachmentEnable']))
-				$temp[$attachment['id_attach']] = $attachment;
-
-		}
-		ksort($temp);
-
-		// Load up 'em attachments!
-		foreach ($temp as $attachment)
-		{
-			$context['current_attachments'][] = array(
-				'name' => htmlspecialchars($attachment['filename']),
-				'size' => $attachment['filesize'],
-				'id' => $attachment['id_attach'],
-				'approved' => $attachment['attachment_approved'],
-			);
-		}
-
-		// Allow moderators to change names....
-		if (allowedTo('moderate_forum') && empty($row['id_member']))
-		{
-			$context['name'] = htmlspecialchars($row['poster_name']);
-			$context['email'] = htmlspecialchars($row['poster_email']);
-		}
 
 		// Set the destinaton.
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
