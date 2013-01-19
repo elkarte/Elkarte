@@ -66,7 +66,7 @@ function action_plushsearch1()
 	$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'search',
 		);
@@ -336,7 +336,7 @@ function action_plushsearch2()
 	isAllowedTo('search_posts');
 
 	require_once($sourcedir . '/controllers/Display.controller.php');
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Search has a special database set.
 	db_extend('search');
@@ -919,7 +919,7 @@ function action_plushsearch2()
 			$context['search_errors']['need_verification_code'] = true;
 		else
 		{
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
@@ -2708,7 +2708,7 @@ function findSearchAPI()
 {
 	global $sourcedir, $modSettings, $search_versions, $searchAPI, $txt;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Search has a special database set.
 	db_extend('search');

@@ -44,7 +44,7 @@ function Display()
 	loadTemplate('Display');
 
 	// And the topic functions
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -275,7 +275,7 @@ function Display()
 	$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -975,7 +975,7 @@ function Display()
 		if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
 		{
 			// Needed for the editor and message icons.
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 
 			// Now create the editor.
 			$editorOptions = array(
@@ -1227,7 +1227,7 @@ function loadAttachmentContext($id_msg)
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
-					require_once($sourcedir . '/subs/Graphics.subs.php');
+					require_once($librarydir . '/Graphics.subs.php');
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 					{
 						// So what folder are we putting this image in?

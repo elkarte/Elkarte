@@ -601,7 +601,7 @@ function showAttachments($memID)
 	if (empty($boardsAllowed))
 		$boardsAllowed = array(-1);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// This is all the information required to list attachments.
 	$listOptions = array(
@@ -813,7 +813,7 @@ function showDisregarded($memID)
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
 		return;
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// And here they are: the topics you don't like
 	$listOptions = array(
@@ -1404,7 +1404,7 @@ function viewWarning($memID)
 	$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
 
 	// Let's use a generic list to get all the current warnings, and use the issue warnings grab-a-granny thing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 
 	$listOptions = array(
@@ -1472,7 +1472,7 @@ function viewWarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// Create some common text bits for the template.

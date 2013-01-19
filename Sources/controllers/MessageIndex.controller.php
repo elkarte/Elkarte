@@ -209,7 +209,7 @@ function MessageIndex()
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 	$context['can_approve_posts'] = allowedTo('approve_posts');
 
-	require_once($sourcedir . '/subs/BoardIndex.subs.php');
+	require_once($librarydir . '/BoardIndex.subs.php');
 	$boardIndexOptions = array(
 		'include_categories' => false,
 		'base_level' => $board_info['child_level'] + 1,
@@ -680,7 +680,7 @@ function action_quickmod()
 	checkSession('request');
 
 	// Some help we may need
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// Lets go straight to the restore area.
 	if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
@@ -690,7 +690,7 @@ function action_quickmod()
 		$_SESSION['topicseen_cache'] = array();
 
 	// This is going to be needed to send off the notifications and for updateLastMessages().
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Remember the last board they moved things to.
 	if (isset($_REQUEST['move_to']))

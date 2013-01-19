@@ -812,7 +812,7 @@ function action_unread()
 		if ($num_topics == 0)
 		{
 			// Mark the boards as read if there are no unread topics!
-			require_once($sourcedir . '/subs/Boards.subs.php');
+			require_once($librarydir . '/Boards.subs.php');
 			markBoardsRead(empty($boards) ? $board : $boards);
 
 			$context['topics'] = array();
@@ -898,7 +898,7 @@ function action_unread()
 			if ($context['showing_all_topics'])
 			{
 				// Since there are no unread topics, mark the boards as read!
-				require_once($sourcedir . '/subs/Boards.subs.php');
+				require_once($librarydir . '/Boards.subs.php');
 				markBoardsRead(empty($boards) ? $board : $boards);
 			}
 

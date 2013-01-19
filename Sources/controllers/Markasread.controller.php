@@ -57,7 +57,7 @@ function action_markboards()
 {
 	global $sourcedir, $modSettings;
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	// Find all the boards this user can see.
 	$boards = accessibleBoards();
@@ -105,7 +105,7 @@ function action_markreplies()
 	foreach ($topics as $id_topic)
 		$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], $logged_topics[$id_topic]);
 
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	markTopicsRead($markRead, true);
 
 	if (isset($_SESSION['topicseen_cache']))
@@ -187,7 +187,7 @@ function action_marktopic()
 	}
 
 	// Blam, unread!
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
 
 	redirectexit('board=' . $board . '.0');
@@ -207,7 +207,7 @@ function action_markasread()
 
 	checkSession('get');
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	$categories = array();
 	$boards = array();

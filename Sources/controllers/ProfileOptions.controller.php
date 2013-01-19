@@ -1655,7 +1655,7 @@ function authentication($memID, $saving = false)
 			// Is it valid?
 			else
 			{
-				require_once($sourcedir . '/subs/Auth.subs.php');
+				require_once($librarydir . '/Auth.subs.php');
 				$passwordErrors = validatePassword($_POST['passwrd1'], $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 				// Were there errors?
@@ -1687,7 +1687,7 @@ function authentication($memID, $saving = false)
 		// Not right yet!
 		elseif ($_POST['authenticate'] == 'openid' && !empty($_POST['openid_identifier']))
 		{
-			require_once($sourcedir . '/subs/OpenID.subs.php');
+			require_once($librarydir . '/OpenID.subs.php');
 			$_POST['openid_identifier'] = openID_canonize($_POST['openid_identifier']);
 
 			if (openid_member_exists($_POST['openid_identifier']))
@@ -1723,7 +1723,7 @@ function notification($memID)
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $sourcedir, $settings;
 
 	// Gonna want this for the list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// Fine, start with the board list.
 	$listOptions = array(
@@ -2535,7 +2535,7 @@ function profileSaveAvatarData(&$value)
 		if (!is_writable($uploadDir))
 			fatal_lang_error('attachments_no_write', 'critical');
 
-		require_once($sourcedir . '/subs/Package.subs.php');
+		require_once($librarydir . '/Package.subs.php');
 
 		$url = parse_url($_POST['userpicpersonal']);
 		$contents = fetch_web_data('http://' . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
@@ -2664,7 +2664,7 @@ function profileSaveAvatarData(&$value)
 			elseif (is_array($sizes))
 			{
 				// Now try to find an infection.
-				require_once($sourcedir . '/subs/Graphics.subs.php');
+				require_once($librarydir . '/Graphics.subs.php');
 				if (!checkImageContents($_FILES['attachment']['tmp_name'], !empty($modSettings['avatar_paranoid'])))
 				{
 					// It's bad. Try to re-encode the contents?
@@ -2750,7 +2750,7 @@ function profileValidateSignature(&$value)
 {
 	global $sourcedir, $modSettings, $smcFunc, $txt;
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Admins can do whatever they hell they want!
 	if (!allowedTo('admin_forum'))
@@ -2972,7 +2972,7 @@ function profileReloadUser()
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
-		require_once($sourcedir . '/subs/Auth.subs.php');
+		require_once($librarydir . '/Auth.subs.php');
 		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
 	}
 
@@ -2987,7 +2987,7 @@ function profileSendActivation()
 {
 	global $sourcedir, $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
 
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Shouldn't happen but just in case.
 	if (empty($profile_vars['email_address']))
@@ -3291,7 +3291,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 		);
 
 		// Send an email to all group moderators etc.
-		require_once($sourcedir . '/subs/Mail.subs.php');
+		require_once($librarydir . '/Mail.subs.php');
 
 		// Do we have any group moderators?
 		$request = $smcFunc['db_query']('', '
@@ -3310,7 +3310,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 		// Otherwise this is the backup!
 		if (empty($moderators))
 		{
-			require_once($sourcedir . '/subs/Members.subs.php');
+			require_once($librarydir . '/Members.subs.php');
 			$moderators = membersAllowedTo('manage_membergroups');
 		}
 

@@ -42,7 +42,7 @@ function action_lock()
 	checkSession('get');
 
 	// Get subs/Post.subs.php for sendNotifications.
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Find out who started the topic - in case User Topic Locking is enabled.
 	$request = $smcFunc['db_query']('', '
@@ -126,7 +126,7 @@ function action_sticky()
 	checkSession('get');
 
 	// We need subs/Post.subs.php for the sendNotifications() function.
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Is this topic already stickied, or no?
 	$request = $smcFunc['db_query']('', '

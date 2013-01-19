@@ -37,7 +37,7 @@ function ModifyProfile($post_errors = array())
 		loadLanguage('Profile+Drafts');
 	loadTemplate('Profile');
 
-	require_once($sourcedir . '/subs/Menu.subs.php');
+	require_once($librarydir . '/Menu.subs.php');
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
@@ -532,7 +532,7 @@ function ModifyProfile($post_errors = array())
 			// If we're using OpenID try to revalidate.
 			if (!empty($user_settings['openid_uri']))
 			{
-				require_once($sourcedir . '/subs/OpenID.subs.php');
+				require_once($librarydir . '/OpenID.subs.php');
 				openID_revalidate();
 			}
 			else

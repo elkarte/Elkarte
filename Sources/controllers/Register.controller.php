@@ -174,7 +174,7 @@ function action_register($reg_errors = array())
 	// Generate a visual verification code to make sure the user is no bot.
 	if (!empty($modSettings['reg_verification']))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'register',
 		);
@@ -267,7 +267,7 @@ function action_register2($verifiedOpenID = false)
 		// Check whether the visual verification code was entered correctly.
 		if (!empty($modSettings['reg_verification']))
 		{
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 			$verificationOptions = array(
 				'id' => 'register',
 			);
@@ -318,7 +318,7 @@ function action_register2($verifiedOpenID = false)
 		$_POST['secret_answer'] = md5($_POST['secret_answer']);
 
 	// Needed for isReservedName() and registerMember().
-	require_once($sourcedir . '/subs/Members.subs.php');
+	require_once($librarydir . '/Members.subs.php');
 
 	// Validation... even if we're not a mall.
 	if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
@@ -466,7 +466,7 @@ function action_register2($verifiedOpenID = false)
 			if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
 				$save_variables[$k] = $v;
 
-		require_once($sourcedir . '/subs/OpenID.subs.php');
+		require_once($librarydir . '/OpenID.subs.php');
 		openID_validate($_POST['openid_identifier'], false, $save_variables);
 	}
 	// If we've come from OpenID set up some default stuff.
@@ -616,7 +616,7 @@ function action_activate()
 	// Resend the password, but only if the account wasn't activated yet.
 	if (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'resend' && ($row['is_activated'] == 0 || $row['is_activated'] == 2) && (!isset($_REQUEST['code']) || $_REQUEST['code'] == ''))
 	{
-		require_once($sourcedir . '/subs/Mail.subs.php');
+		require_once($librarydir . '/Mail.subs.php');
 
 		$replacements = array(
 			'REALNAME' => $row['real_name'],
@@ -668,7 +668,7 @@ function action_activate()
 
 	if (!isset($_POST['new_email']))
 	{
-		require_once($sourcedir . '/subs/Post.subs.php');
+		require_once($librarydir . '/Post.subs.php');
 
 		adminNotify('activation', $row['id_member'], $row['member_name']);
 	}
@@ -801,7 +801,7 @@ function action_verificationcode()
 	// If we have GD, try the nice code.
 	elseif (empty($_REQUEST['format']))
 	{
-		require_once($sourcedir . '/subs/Graphics.subs.php');
+		require_once($librarydir . '/Graphics.subs.php');
 
 		if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
 			header('HTTP/1.1 400 Bad Request');
@@ -826,7 +826,7 @@ function action_verificationcode()
 
 	elseif ($_REQUEST['format'] === '.wav')
 	{
-		require_once($sourcedir . '/subs/Sound.subs.php');
+		require_once($librarydir . '/Sound.subs.php');
 
 		if (!createWaveFile($code))
 			header('HTTP/1.1 400 Bad Request');
@@ -852,7 +852,7 @@ function RegisterCheckUsername()
 	// Clean it up like mother would.
 	$context['checked_username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $context['checked_username']);
 
-	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
 	$errors = validateUsername(0, $context['checked_username'], true);
 
 	$context['valid_username'] = empty($errors);
@@ -884,7 +884,7 @@ function action_contact()
 		$context['errors'] = array();
 
 		// Could they get the right send topic verification code?
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
@@ -924,7 +924,7 @@ function action_contact()
 
 			if (!empty($admins))
 			{
-				require_once($sourcedir . '/subs/Post.subs.php');
+				require_once($librarydir . '/Post.subs.php');
 				sendpm(array('to' => $admins, 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
 
 			}
@@ -944,7 +944,7 @@ function action_contact()
 	{
 		$context['sub_template'] = 'contact_form';
 
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);

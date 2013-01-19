@@ -858,7 +858,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($sourcedir . '/subs/Auth.subs.php');
+			require_once($librarydir . '/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -2428,7 +2428,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($sourcedir . '/subs/Package.subs.php');
+			require_once($librarydir . '/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))

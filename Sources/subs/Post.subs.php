@@ -633,7 +633,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$topics = array($topics);
 
 	// Email functions will be helpful here
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Get the subject and body...
 	$result = $smcFunc['db_query']('', '
@@ -1120,7 +1120,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
@@ -1279,7 +1279,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
@@ -1592,7 +1592,7 @@ function sendApprovalNotifications(&$topicData)
 		return;
 
 	// Email ahoy
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	$topics = array();
 	$digest_insert = array();
@@ -1871,7 +1871,7 @@ function adminNotify($type, $memberID, $member_name = null)
 		return;
 
 	// Needed to notify admins, or anyone
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	if ($member_name == null)
 	{

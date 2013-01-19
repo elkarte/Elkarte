@@ -39,7 +39,7 @@ function AdminMain()
 	// No indexing evil stuff.
 	$context['robot_no_index'] = true;
 
-	require_once($sourcedir . '/subs/Menu.subs.php');
+	require_once($librarydir . '/Menu.subs.php');
 
 	// Some preferences.
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
@@ -557,7 +557,7 @@ function AdminHome()
 	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 	// Find all of this forum's administrators...
-	require_once($sourcedir . '/subs/Membergroups.subs.php');
+	require_once($librarydir . '/Membergroups.subs.php');
 	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 	{
 		// Add a 'more'-link if there are more than 32.
@@ -573,7 +573,7 @@ function AdminHome()
 	$context['forum_version'] = $forum_version;
 
 	// Get a list of current server versions.
-	require_once($sourcedir . '/subs/Admin.subs.php');
+	require_once($librarydir . '/Admin.subs.php');
 	$checkFor = array(
 		'gd',
 		'imagick',
@@ -733,7 +733,7 @@ function AdminSearch()
 		$context['admin_preferences']['sb'] = $context['search_type'];
 
 		// Update the preferences.
-		require_once($sourcedir . '/subs/Admin.subs.php');
+		require_once($librarydir . '/Admin.subs.php');
 		updateAdminPreferences();
 	}
 
@@ -924,7 +924,7 @@ function AdminSearchOM()
 	$postVars = implode('+', $postVars);
 
 	// Get the results from the doc site.
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 	// Demo URL:
 	// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
@@ -937,7 +937,7 @@ function AdminSearchOM()
 
 	// Otherwise we simply walk through the XML and stick it in context for display.
 	$context['search_results'] = array();
-	require_once($sourcedir . '/subs/XmlArray.class.php');
+	require_once($librarydir . '/XmlArray.class.php');
 
 	// Get the results loaded into an array for processing!
 	$results = new xmlArray($search_results, false);

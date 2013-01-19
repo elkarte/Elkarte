@@ -291,7 +291,7 @@ function action_list()
 		),
 	);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -1325,7 +1325,7 @@ function action_browse()
 	}
 
 	// Create the list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// The list is the only thing to show, so make it the default sub template.
@@ -1559,7 +1559,7 @@ function action_log()
 
 	createToken('admin-bl');
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['page_title'] = $txt['ban_log'];

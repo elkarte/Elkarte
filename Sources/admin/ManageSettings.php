@@ -1547,7 +1547,7 @@ function ShowCustomProfiles()
 
 	createToken('admin-scp');
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'standard_profile_fields',
@@ -2509,7 +2509,7 @@ function list_integration_hooks()
 	}
 
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($list_options);
 
 	$context['page_title'] = $txt['hooks_title_list'];

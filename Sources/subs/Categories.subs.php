@@ -81,7 +81,7 @@ function modifyCategory($category_id, $catOptions)
 				);
 
 		// If the category order changed, so did the board order.
-		require_once($sourcedir . '/subs/Boards.subs.php');
+		require_once($librarydir . '/Boards.subs.php');
 		reorderBoards();
 	}
 
@@ -188,7 +188,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 {
 	global $sourcedir, $smcFunc, $cat_tree;
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	getBoardTree();
 

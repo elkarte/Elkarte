@@ -209,7 +209,7 @@ function action_browsemail()
 		),
 	);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	loadTemplate('ManageMail');

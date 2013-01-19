@@ -91,7 +91,7 @@ function EditNews()
 	global $txt, $modSettings, $context, $sourcedir, $user_info, $scripturl;
 	global $smcFunc;
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// The 'remove selected' button was pressed.
 	if (!empty($_POST['delete_selection']) && !empty($_POST['remove']))
@@ -135,7 +135,7 @@ function EditNews()
 	}
 
 	// We're going to want this for making our list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$context['page_title'] = $txt['admin_edit_news'];
 
@@ -443,7 +443,7 @@ function ComposeMailing()
 	$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}');
 
 	// Needed for the WYSIWYG editor.
-	require_once($sourcedir . '/subs/Editor.subs.php');
+	require_once($librarydir . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -462,7 +462,7 @@ function ComposeMailing()
 
 	if (isset($context['preview']))
 	{
-		require_once($sourcedir . '/subs/Mail.subs.php');
+		require_once($librarydir . '/Mail.subs.php');
 		$context['recipients']['members'] = !empty($_POST['members']) ? explode(',', $_POST['members']) : array();
 		$context['recipients']['exclude_members'] = !empty($_POST['exclude_members']) ? explode(',', $_POST['exclude_members']) : array();
 		$context['recipients']['groups'] = !empty($_POST['groups']) ? explode(',', $_POST['groups']) : array();
@@ -485,7 +485,7 @@ function ComposeMailing()
 		$toClean[] = 'exclude_members';
 	if (!empty($toClean))
 	{
-		require_once($sourcedir . '/subs/Auth.subs.php');
+		require_once($librarydir . '/Auth.subs.php');
 		foreach ($toClean as $type)
 		{
 			// Remove the quotes.
@@ -738,9 +738,9 @@ function SendMailing($clean_only = false)
 		return;
 
 	// Some functions we will need
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 	if ($context['send_pm'])
-		require_once($sourcedir . '/subs/PersonalMessage.subs.php');
+		require_once($librarydir . '/PersonalMessage.subs.php');
 
 	// We are relying too much on writing to superglobals...
 	$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';

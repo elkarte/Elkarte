@@ -139,7 +139,7 @@ function SetCensor()
 
 	if (isset($_POST['censortest']))
 	{
-		require_once($sourcedir . '/subs/Post.subs.php');
+		require_once($librarydir . '/Post.subs.php');
 		$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES);
 		preparsecode($censorText);
 		$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));

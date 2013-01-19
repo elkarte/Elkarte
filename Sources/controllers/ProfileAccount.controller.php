@@ -125,7 +125,7 @@ function action_issuewarning($memID)
 			// Send the PM?
 			else
 			{
-				require_once($sourcedir . '/subs/PersonalMessage.subs.php');
+				require_once($librarydir . '/PersonalMessage.subs.php');
 				$from = array(
 					'id' => 0,
 					'name' => $context['forum_name'],
@@ -202,7 +202,7 @@ function action_issuewarning($memID)
 
 		if (!empty($_POST['warn_body']))
 		{
-			require_once($sourcedir . '/subs/Post.subs.php');
+			require_once($librarydir . '/Post.subs.php');
 
 			preparsecode($warning_body);
 			$warning_body = parse_bbc($warning_body, true);
@@ -229,7 +229,7 @@ function action_issuewarning($memID)
 	$context['page_title'] = $txt['profile_issue_warning'];
 
 	// Let's use a generic list to get all the current warnings
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// Work our the various levels.
 	$context['level_effects'] = array(
@@ -331,7 +331,7 @@ function action_issuewarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// Are they warning because of a message?
@@ -548,7 +548,7 @@ function action_deleteaccount2($memID)
 	}
 
 	// This file is needed for the deleteMembers function.
-	require_once($sourcedir . '/subs/Members.subs.php');
+	require_once($librarydir . '/Members.subs.php');
 
 	// Do you have permission to delete others profiles, or is that your profile you wanna delete?
 	if ($memID != $user_info['id'])
@@ -560,7 +560,7 @@ function action_deleteaccount2($memID)
 		if ($_POST['remove_type'] != 'none' && allowedTo('moderate_forum'))
 		{
 			// Include subs/Topic.subs.php - essential for this type of work!
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')
