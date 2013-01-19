@@ -70,7 +70,7 @@ function action_modcenter($dont_call = false)
 					'enabled' => empty($modSettings['securityDisable_moderate']),
 				),
 				'notice' => array(
-					'file' => 'ModerationCenter.php',
+					'file' => 'ModerationCenter.controller.php',
 					'function' => 'ShowNotice',
 					'select' => 'index'
 				),
@@ -121,7 +121,7 @@ function action_modcenter($dont_call = false)
 				'reports' => array(
 					'label' => $txt['mc_reported_posts'],
 					'enabled' => $context['can_moderate_boards'],
-					'file' => 'ModerationCenter.php',
+					'file' => 'ModerationCenter.controller.php',
 					'function' => 'ReportedPosts',
 					'subsections' => array(
 						'open' => array($txt['mc_reportedp_active']),
@@ -145,13 +145,13 @@ function action_modcenter($dont_call = false)
 				),
 				'groups' => array(
 					'label' => $txt['mc_group_requests'],
-					'file' => 'Groups.php',
+					'file' => 'Groups.controller.php',
 					'function' => 'action_groups',
 					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				),
 				'viewgroups' => array(
 					'label' => $txt['mc_view_groups'],
-					'file' => 'Groups.php',
+					'file' => 'Groups.controller.php',
 					'function' => 'action_groups',
 				),
 			),

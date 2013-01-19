@@ -623,7 +623,7 @@ function action_deleteaccount2($memID)
 	{
 		deleteMembers($memID);
 
-		require_once($sourcedir . '/LogInOut.php');
+		require_once($sourcedir . '/LogInOut.controller.php');
 		LogOut(true);
 
 		redirectexit();

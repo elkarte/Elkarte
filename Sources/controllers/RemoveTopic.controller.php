@@ -338,7 +338,7 @@ function removeMessage($message, $decreasePostCount = true)
 	);
 	if ($smcFunc['db_affected_rows']() != 0)
 	{
-		require_once($sourcedir . '/ModerationCenter.php');
+		require_once($sourcedir . '/ModerationCenter.controller.php');
 		updateSettings(array('last_mod_report_action' => time()));
 		recountOpenReports();
 	}

@@ -124,7 +124,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 			// Close reports that are being recycled.
-			require_once($sourcedir . '/ModerationCenter.php');
+			require_once($sourcedir . '/ModerationCenter.controller.php');
 
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}log_reported
@@ -1061,7 +1061,7 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 function setTopicRegard($id_member, $topic, $on = false)
 {
 	global $smcFunc, $user_info;
-	
+
 	// find the current entry if it exists that is
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg
@@ -1075,7 +1075,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	);
 	list($was_set) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
-	
+
 	// Set topic disregard on/off for this topic.
 	$smcFunc['db_insert'](empty($was_set) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
@@ -1114,10 +1114,10 @@ function getTopicInfo($topic_parameters, $full = false, $topic_selects = array()
 
 	// Create the query, taking full and integration in to account
 	$request = $smcFunc['db_query']('', '
-		SELECT 
+		SELECT
 			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg, t.id_member_started, t.id_member_updated, t.id_poll,
-			t.num_replies, t.num_views, t.locked, t.redirect_expires, 
-			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($full ? ', ms.subject, 
+			t.num_replies, t.num_views, t.locked, t.redirect_expires,
+			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($full ? ', ms.subject,
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!empty($topic_selects) ? implode(',', $topic_selects) : '') . '
@@ -1125,8 +1125,8 @@ function getTopicInfo($topic_parameters, $full = false, $topic_selects = array()
 		FROM {db_prefix}topics AS t' . ($full ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($full && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:current_topic} AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})' : '') . 
-			(!empty($topic_tables) ? implode("\n\t", $topic_tables) : '') . '		
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})' : '') .
+			(!empty($topic_tables) ? implode("\n\t", $topic_tables) : '') . '
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
 			$topic_parameters

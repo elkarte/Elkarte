@@ -58,7 +58,7 @@ class site_Dispatcher
 			// You can only login
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
-				$this->_file_name = $sourcedir . '/LogInOut.php';
+				$this->_file_name = $sourcedir . '/LogInOut.controller.php';
 				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
@@ -91,7 +91,7 @@ class site_Dispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_file_name = $sourcedir . '/MessageIndex.php';
+				$this->_file_name = $sourcedir . '/MessageIndex.controller.php';
 				$this->_function_name = 'MessageIndex';
 			}
 			// board=b;topic=t topic display
@@ -225,7 +225,7 @@ class site_Dispatcher
 		// add-ons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
-			// i.e. action=help => Help.php...
+			// i.e. action=help => Help.controller.php...
 			// if the function name fits the pattern, that'd be 'show'...
 			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
 			{

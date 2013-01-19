@@ -32,7 +32,7 @@ function action_postmoderation()
 	loadTemplate('ModerationCenter');
 
 	// Probably need this...
-	require_once($sourcedir . '/ModerationCenter.php');
+	require_once($sourcedir . '/ModerationCenter.controller.php');
 
 	// Allowed sub-actions, you know the drill by now!
 	$subactions = array(

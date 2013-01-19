@@ -477,7 +477,7 @@ function logActions($logs)
 			// Alright, if we get any result back, update open reports.
 			if ($smcFunc['db_num_rows']($request) > 0)
 			{
-				require_once($sourcedir . '/ModerationCenter.php');
+				require_once($sourcedir . '/ModerationCenter.controller.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}

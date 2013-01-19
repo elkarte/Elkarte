@@ -385,7 +385,7 @@ function fix_possible_url($val)
 
 /**
  * Ensures supplied data is properly encpsulated in cdata xml tags
- * Called from action_xmlprofile in News.php
+ * Called from action_xmlprofile in News.controller.php
  *
  * @param type $data
  * @param type $ns
@@ -684,7 +684,7 @@ function action_xmlnews($xml_format)
 			);
 
 			// Add the poster name on if we are rss2
-			if ($xml_format == 'rss2') 
+			if ($xml_format == 'rss2')
 				$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
 		}
 		elseif ($xml_format == 'rdf')
@@ -848,7 +848,7 @@ function action_xmlrecent($xml_format)
 			);
 
 			// add the poster name on if we are rss2
-			if ($xml_format == 'rss2') 
+			if ($xml_format == 'rss2')
 				$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
 		}
 		elseif ($xml_format == 'rdf')

@@ -14,7 +14,8 @@
  * @version 1.0 Alpha
  *
  * This file contains the functions for voting, locking, removing and
- * editing polls. Note that that posting polls is done in Post.php.
+ * editing polls. Note that that posting polls is done in
+ * Post.controller.php.
  *
  */
 
