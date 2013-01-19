@@ -127,7 +127,7 @@ function action_servers()
 	{
 		if (isset($_POST['ftp_username']))
 		{
-			require_once($sourcedir . '/Class-Package.php');
+			require_once($sourcedir . '/Package.class.php');
 			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
