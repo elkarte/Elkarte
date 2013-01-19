@@ -335,7 +335,7 @@ function action_plushsearch2()
 	// Are you allowed?
 	isAllowedTo('search_posts');
 
-	require_once($sourcedir . '/Display.controller.php');
+	require_once($sourcedir . '/controllers/Display.controller.php');
 	require_once($sourcedir . '/subs/Package.subs.php');
 
 	// Search has a special database set.

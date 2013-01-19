@@ -199,7 +199,7 @@ function CalendarPost()
 		if ($_REQUEST['eventid'] == -1 && isset($_POST['link_to_board']))
 		{
 			$_REQUEST['calendar'] = 1;
-			require_once($sourcedir . '/Post.controller.php');
+			require_once($sourcedir . '/controllers/Post.controller.php');
 			return action_post();
 		}
 		// New...
@@ -259,7 +259,7 @@ function CalendarPost()
 	if (empty($modSettings['cal_allow_unlinked']) && empty($_REQUEST['eventid']))
 	{
 		$_REQUEST['calendar'] = 1;
-		require_once($sourcedir . '/Post.controller.php');
+		require_once($sourcedir . '/controllers/Post.controller.php');
 		return action_post();
 	}
 

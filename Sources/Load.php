@@ -305,7 +305,7 @@ function loadUserSettings()
 		// If we no longer have the member maybe they're being all hackey, stop brute force!
 		if (!$id_member)
 		{
-			require_once($sourcedir . '/LogInOut.controller.php');
+			require_once($sourcedir . '/controllers/LogInOut.controller.php');
 			validatePasswordFlood(!empty($user_settings['id_member']) ? $user_settings['id_member'] : $id_member, !empty($user_settings['passwd_flood']) ? $user_settings['passwd_flood'] : false, $id_member != 0);
 		}
 	}

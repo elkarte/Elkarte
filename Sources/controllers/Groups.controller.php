@@ -47,7 +47,7 @@ function action_groups()
 	// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
 	if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 	{
-		require_once($sourcedir . '/ModerationCenter.controller.php');
+		require_once($sourcedir . '/controllers/ModerationCenter.controller.php');
 		$_GET['area'] = $_REQUEST['sa'] == 'requests' ? 'groups' : 'viewgroups';
 		action_modcenter(true);
 	}

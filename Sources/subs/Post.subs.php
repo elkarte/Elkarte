@@ -1497,7 +1497,7 @@ function approvePosts($msgs, $approve = true)
 	{
 		if (!empty($notification_topics))
 		{
-			require_once($sourcedir . '/Post.controller.php');
+			require_once($sourcedir . '/controllers/Post.controller.php');
 			notifyMembersBoard($notification_topics);
 		}
 		if (!empty($notification_posts))
