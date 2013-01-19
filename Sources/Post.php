@@ -537,13 +537,6 @@ function action_post($post_errors = array())
 		checkMessagePermissions($message['message']);
 		prepareMessageContext($message);
 
-		// When was it last modified?
-		if (!empty($row['modified_time']))
-		{
-			$context['last_modified'] = timeformat($row['modified_time']);
-			$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $row['modified_name']);
-		}
-
 		// Get the stuff ready for the form.
 		$form_subject = $message['message']['subject'];
 		$form_message = un_preparsecode($message['message']['body']);
@@ -553,10 +546,6 @@ function action_post($post_errors = array())
 		// Check the boxes that should be checked.
 		$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
 		$context['icon'] = $message['message']['icon'];
-
-		// Show an "approve" box if the user can approve it, and the message isn't approved.
-		if (! $message['message']['approved'] && !$context['show_approval'])
-			$context['show_approval'] = allowedTo('approve_posts');
 
 		// Set the destinaton.
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');

@@ -100,7 +100,7 @@ function checkMessagePermissions($message)
 
 function prepareMessageContext($message)
 {
-	global $context;
+	global $context, $txt;
 
 	// Load up 'em attachments!
 	foreach ($message['attachment_stuff'] as $attachment)
@@ -119,4 +119,15 @@ function prepareMessageContext($message)
 		$context['name'] = htmlspecialchars($message['message']['poster_name']);
 		$context['email'] = htmlspecialchars($message['message']['poster_email']);
 	}
+
+	// When was it last modified?
+	if (!empty($message['message']['modified_time']))
+	{
+		$context['last_modified'] = timeformat($message['message']['modified_time']);
+		$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $message['message']['modified_name']);
+	}
+
+	// Show an "approve" box if the user can approve it, and the message isn't approved.
+	if (! $message['message']['approved'] && !$context['show_approval'])
+		$context['show_approval'] = allowedTo('approve_posts');
 }
