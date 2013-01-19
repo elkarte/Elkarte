@@ -20,7 +20,7 @@ function template_ask()
 
 	echo '
 	<div id="split_topics">
-		<form action="', $scripturl, '?action=splittopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=splittopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="at" value="', $context['message']['id'], '" />
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['split'], '</h3>
@@ -87,7 +87,7 @@ function template_select()
 
 	echo '
 	<div id="split_topics">
-		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 			<div id="not_selected" class="floatleft">
 				<div class="cat_bar">
 					<h3 class="catbg">', $txt['split'], ' - ', $txt['select_split_posts'], '</h3>
@@ -289,7 +289,7 @@ function template_merge()
 							<strong>', $txt['target_board'], ':</strong>
 						</dt>
 						<dd>
-							<form action="' . $scripturl . '?action=mergetopics;from=' . $context['origin_topic'] . ';targetboard=' . $context['target_board'] . ';board=' . $context['current_board'] . '.0" method="post" accept-charset="', $context['character_set'], '">
+							<form action="' . $scripturl . '?action=mergetopics;from=' . $context['origin_topic'] . ';targetboard=' . $context['target_board'] . ';board=' . $context['current_board'] . '.0" method="post" accept-charset="UTF-8">
 								<input type="hidden" name="from" value="' . $context['origin_topic'] . '" />
 								<select name="targetboard" onchange="this.form.submit();">';
 			foreach ($context['boards'] as $board)
@@ -310,7 +310,7 @@ function template_merge()
 							<strong>', $txt['merge_to_topic_id'], ': </strong>
 						</dt>
 						<dd>
-							<form action="', $scripturl , '?action=mergetopics;sa=options" method="post" accept-charset="', $context['character_set'], '">
+							<form action="', $scripturl , '?action=mergetopics;sa=options" method="post" accept-charset="UTF-8">
 								<input type="hidden" name="topics[]" value="', $context['origin_topic'], '" />
 								<input type="text" name="topics[]" class="input_text" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -357,7 +357,7 @@ function template_merge_extra_options()
 
 	echo '
 	<div id="merge_topics">
-		<form action="', $scripturl, '?action=mergetopics;sa=execute;" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=mergetopics;sa=execute;" method="post" accept-charset="UTF-8">
 			<div class="title_bar">
 				<h3 class="titlebg">', $txt['merge_topic_list'], '</h3>
 			</div>

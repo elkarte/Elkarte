@@ -86,13 +86,6 @@ function action_requestmembers()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (function_exists('iconv'))
-		{
-			$utf8 = iconv($txt['lang_character_set'], 'UTF-8', $row['real_name']);
-			if ($utf8)
-				$row['real_name'] = $utf8;
-		}
-
 		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
 		if (preg_match('~&#\d+;~', $row['real_name']) != 0)

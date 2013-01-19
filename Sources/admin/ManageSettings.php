@@ -890,8 +890,8 @@ function ModifySpamSettings($return_config = false)
 		$count_questions = 0;
 		foreach ($_POST['question'] as $id => $question)
 		{
-			$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT, $context['character_set']));
-			$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT, $context['character_set'])));
+			$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
+			$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT)));
 
 			// Already existed?
 			if (isset($context['question_answers'][$id]))

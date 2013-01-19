@@ -30,7 +30,7 @@ function template_admin()
 	if ($context['user']['is_admin'])
 		echo '
 			<object id="quick_search">
-				<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" class="floatright">
+				<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
 					<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
 					<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
 					<select name="search_type" id="search_type">
@@ -581,7 +581,7 @@ function template_edit_censored()
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
 			<div id="section_header" class="cat_bar">
 				<h3 class="catbg">
 					', $txt['admin_censored_words'], '
@@ -685,7 +685,7 @@ function template_not_done()
 				</div>';
 
 	echo '
-				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="', $context['character_set'], '" style="margin: 0;" name="autoSubmit" id="autoSubmit">
+				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" style="margin: 0;" name="autoSubmit" id="autoSubmit">
 					<hr class="hrcolor" />
 					<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
 					', $context['continue_post_data'], '
@@ -714,7 +714,7 @@ function template_show_settings()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
+		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	// Is there a custom title?
 	if (isset($context['settings_title']))
@@ -999,7 +999,7 @@ function template_edit_profile_field()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<div id="section_header" class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '
@@ -1212,7 +1212,7 @@ function template_admin_search_results()
 		<div id="section_header" class="cat_bar">
 			<h3 class="catbg">
 				<object id="quick_search">
-					<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" class="floatright">
+					<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
 						<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
 						<input type="hidden" name="search_type" value="', $context['search_type'], '" />
 						<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
@@ -1381,7 +1381,7 @@ function template_core_features()
 				</h3>
 
 			</div>
-		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="', $context['character_set'], '">
+		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
 	$alternate = true;
@@ -1635,7 +1635,7 @@ function template_clean_cache_button_below()
 	</div>
 	<div class="windowbg">
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="', $context['character_set'], '">
+			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
 				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" /></span>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -150,7 +150,7 @@ loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 // @todo: probably not the best place, but somewhere it should be set...
 if (!headers_sent())
-	header('Content-Type: text/html; charset=' . (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set']));
+	header('Content-Type: text/html; charset=UTF-8');
 
 // Take care of any banning that needs to be done.
 if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
@@ -1019,7 +1019,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 		return $user_info['is_guest'];
 
 	echo '
-		<form action="', $scripturl, '?action=login2" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
 			<table border="0" cellspacing="1" cellpadding="0" class="ssi_table">
 				<tr>
 					<td align="right"><label for="user">', $txt['username'], ':</label>&nbsp;</td>
@@ -1169,7 +1169,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	if ($allow_view_results)
 	{
 		echo '
-		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="', $context['character_set'], '">
+		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
 			<strong>', $return['question'], '</strong><br />
 			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
 
@@ -1321,7 +1321,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 	if ($return['allow_vote'])
 	{
 		echo '
-			<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="', $context['character_set'], '">
+			<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
 				<strong>', $return['question'], '</strong><br />
 				', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
 
@@ -1482,7 +1482,7 @@ function ssi_quickSearch($output_method = 'echo')
 		return $scripturl . '?action=search';
 
 	echo '
-		<form action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="advanced" value="0" /><input type="text" name="ssi_search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
 		</form>';
 }

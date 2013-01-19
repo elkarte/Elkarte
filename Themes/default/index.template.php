@@ -120,7 +120,7 @@ function template_html_above()
 	}
 
 	echo '
-	<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
 
@@ -209,7 +209,7 @@ function template_body_above()
 	if ($context['allow_search'])
 	{
 		echo '
-			<form id="search_form" class="floatright" action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '">
+			<form id="search_form" class="floatright" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 				<input type="text" name="search" value="" class="input_text" />&nbsp;';
 
 		// Using the quick search dropdown?
@@ -278,7 +278,7 @@ function template_body_above()
 	{
 		echo '
 						<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-						<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="', $context['character_set'], '" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+						<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 							<input type="text" name="user" size="10" class="input_text" />
 							<input type="password" name="passwrd" size="10" class="input_password" />
 							<select name="cookielength">
