@@ -670,7 +670,7 @@ function StaffReport()
 {
 	global $sourcedir, $context, $txt, $smcFunc;
 
-	require_once($sourcedir . '/Subs-Members.php');
+	require_once($sourcedir . '/subs/Members.subs.php.php');
 
 	// Fetch all the board names.
 	$request = $smcFunc['db_query']('', '

@@ -64,14 +64,14 @@ class site_Dispatcher
 			// "maintenance mode" page
 			else
 			{
-				$this->_file_name = $sourcedir . '/Subs-Auth.php';
+				$this->_file_name = $sourcedir . '/Auth.subs.php';
 				$this->_function_name = 'InMaintenance';
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
-			$this->_file_name = $sourcedir . '/Subs-Auth.php';
+			$this->_file_name = $sourcedir . '/Auth.subs.php';
 			$this->_function_name = 'KickGuest';
 		}
 		elseif (empty($_GET['action']))
@@ -133,7 +133,7 @@ class site_Dispatcher
 			'quickhelp' => array('Help.controller.php', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'action_jsoption'),
-			'loadeditorlocale' => array('Subs-Editor.php', 'action_loadlocale'),
+			'loadeditorlocale' => array('subs/Editor.subs.php.php', 'action_loadlocale'),
 			'lock' => array('Topic.controller.php', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'action_lockvoting'),
 			'login' => array('LogInOut.controller.php', 'action_login'),
@@ -148,7 +148,7 @@ class site_Dispatcher
 			'movetopic2' => array('MoveTopic.controller.php', 'action_movetopic2'),
 			'notify' => array('Notify.controller.php', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'action_notifyboard'),
-			'openidreturn' => array('Subs-OpenID.php', 'action_openidreturn'),
+			'openidreturn' => array('OpenID.subs.php', 'action_openidreturn'),
 			'pm' => array('PersonalMessage.controller.php', 'action_pm'),
 			'post' => array('Post.controller.php', 'action_post'),
 			'post2' => array('Post.controller.php', 'action_post2'),
@@ -170,7 +170,7 @@ class site_Dispatcher
 			'search2' => array('Search.controller.php', 'action_plushsearch2'),
 			// 'sendtopic' => array('Emailuser.controller.php', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'action_suggest'),
-			'spellcheck' => array('Subs-Post.php', 'action_spellcheck'),
+			'spellcheck' => array('Post.subs.php', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'action_stats'),
 			'sticky' => array('Topic.controller.php', 'action_sticky'), // done

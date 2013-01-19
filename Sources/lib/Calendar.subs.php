@@ -628,7 +628,7 @@ function cache_getRecentEvents($eventOptions)
 	global $modSettings, $user_info, $scripturl;
 
 	// With the 'static' cached data we can calculate the user-specific data.
-	$cached_data = cache_quick_get('calendar_index', 'Subs-Calendar.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
+	$cached_data = cache_quick_get('calendar_index', 'subs/Calendar.subs.php.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
 	// Get the information about today (from user perspective).
 	$today = getTodayInfo();

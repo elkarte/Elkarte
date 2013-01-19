@@ -82,7 +82,7 @@ function action_repairboards()
 		$context['error_search'] = false;
 		$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
 
-		require_once($sourcedir . '/Subs-Boards.php');
+		require_once($sourcedir . '/subs/Boards.subs.php.php');
 
 		// Actually do the fix.
 		findForumErrors(true);

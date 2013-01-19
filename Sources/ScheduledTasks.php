@@ -284,7 +284,7 @@ function scheduled_approval_notification()
 	$smcFunc['db_free_result']($request);
 
 	// Get the mailing stuff.
-	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($sourcedir . '/subs/Mail.subs.php.php');
 
 	// Need the below for loadLanguage to work!
 	loadEssentialThemeData();
@@ -453,7 +453,7 @@ function scheduled_daily_maintenance()
 	// Regenerate the Diffie-Hellman keys if OpenID is enabled.
 	if (!empty($modSettings['enableOpenID']))
 	{
-		require_once($sourcedir . '/Subs-OpenID.php');
+		require_once($sourcedir . '/subs/OpenID.subs.php.php');
 		openID_setup_DH(true);
 	}
 	elseif (!empty($modSettings['dh_keys']))
@@ -535,7 +535,7 @@ function scheduled_daily_digest()
 	global $is_weekly, $txt, $mbname, $scripturl, $sourcedir, $smcFunc, $context, $modSettings;
 
 	// We'll want this...
-	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($sourcedir . '/subs/Mail.subs.php.php');
 	loadEssentialThemeData();
 
 	$is_weekly = !empty($is_weekly) ? 1 : 0;
@@ -972,7 +972,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		return false;
 
 	if (!empty($modSettings['mail_type']) && $modSettings['smtp_host'] != '')
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	// Send each email, yea!
 	$failed_emails = array();
@@ -1275,7 +1275,7 @@ function scheduled_fetchFiles()
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php.php');
 
 	// Just in case we run into a problem.
 	loadEssentialThemeData();
@@ -1324,7 +1324,7 @@ function scheduled_birthdayemails()
 	loadEssentialThemeData();
 
 	// Going to need this to send the emails.
-	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($sourcedir . '/subs/Mail.subs.php.php');
 
 	$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
 
@@ -1642,7 +1642,7 @@ function scheduled_paid_subscriptions()
 		// If this is the first one load the important bits.
 		if (empty($subs_reminded))
 		{
-			require_once($sourcedir . '/Subs-Mail.php');
+			require_once($sourcedir . '/subs/Mail.subs.php.php');
 			// Need the below for loadLanguage to work!
 			loadEssentialThemeData();
 		}
@@ -1750,7 +1750,7 @@ function scheduled_remove_topic_redirect()
 	// Zap, your gone
 	if (count($topics) > 0)
 	{
-		require_once($sourcedir . '/Subs-Topic.php');
+		require_once($sourcedir . '/subs/Topic.subs.php.php');
 		removeTopics($topics, false, true);
 	}
 
@@ -1790,7 +1790,7 @@ function scheduled_remove_old_drafts()
 	// If we have old one, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($sourcedir . '/Subs-Drafts.php');
+		require_once($sourcedir . '/subs/Drafts.subs.php.php');
 		deleteDrafts($drafts, -1, false);
 	}
 

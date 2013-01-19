@@ -19,7 +19,7 @@ global $sourcedir;
 
 // language and helper functions
 loadLanguage('Drafts');
-require_once($sourcedir . '/Subs-Drafts.php');
+require_once($sourcedir . '/Drafts.subs.php');
 
 /**
  * Saves a post draft in the user_drafts table

@@ -532,7 +532,7 @@ function dumpTags($data, $i, $tag = null, $xml_format = '')
 /**
  * Retrieve the list of members from database.
  * The array will be generated to match the format.
- * @todo get the list of members from Subs-Members.
+ * @todo get the list of members from subs/Members.subs.php.
  *
  * @param string $xml_format
  * @return array

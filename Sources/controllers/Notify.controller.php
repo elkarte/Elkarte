@@ -44,7 +44,7 @@ function action_notify()
 		fatal_lang_error('not_a_topic', false);
 
 	// Our topic functions are here
-	require_once($sourcedir . '/Subs-Topic.php');
+	require_once($sourcedir . '/subs/Topic.subs.php.php');
 
 	// What do we do?  Better ask if they didn't say..
 	if (empty($_GET['sa']))
@@ -100,7 +100,7 @@ function action_notifyboard()
 	isAllowedTo('mark_notify');
 
 	// our board functions are here
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($sourcedir . '/subs/Boards.subs.php.php');
 
 	// You have to specify a board to turn notifications on!
 	if (empty($board))
@@ -157,7 +157,7 @@ function action_disregardtopic()
 	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
 
 	// our topic functions are here
-	require_once($sourcedir . '/Subs-Topic.php');
+	require_once($sourcedir . '/subs/Topic.subs.php.php');
 
 	// Let's do something only if the function is enabled
 	if (!$user_info['is_guest'] && !empty($modSettings['enable_disregard']))

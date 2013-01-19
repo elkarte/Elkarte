@@ -117,12 +117,12 @@ function reloadSettings()
 		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
 			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
 			global $sourcedir;
-			require_once($sourcedir . \'/Subs-Charset.php\');
+			require_once($sourcedir . \'/subs/Charset.subs.php\');
 			return utf8_strtolower($string);'),
 		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
 			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
 			global $sourcedir;
-			require_once($sourcedir . \'/Subs-Charset.php\');
+			require_once($sourcedir . \'/subs/Charset.subs.php\');
 			return utf8_strtoupper($string);'),
 		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
 			global $smcFunc;
@@ -858,7 +858,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($sourcedir . '/Subs-Auth.php');
+			require_once($sourcedir . '/subs/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -2428,7 +2428,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($sourcedir . '/Subs-Package.php');
+			require_once($sourcedir . '/subs/Package.subs.php.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))

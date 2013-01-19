@@ -34,10 +34,10 @@ function action_removetopic2()
 	checkSession('get');
 
 	// This file needs to be included for sendNotifications().
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	// This needs to be included for all the topic db functions
-	require_once($sourcedir . '/Subs-Topic.php');
+	require_once($sourcedir . '/subs/Topic.subs.php.php');
 
 	// Trying to fool us around, are we?
 	if (empty($topic))
@@ -375,7 +375,7 @@ function removeMessage($message, $decreasePostCount = true)
 			fatal_lang_error('delFirstPost', false);
 
 		// This needs to be included for topic functions
-		require_once($sourcedir . '/Subs-Topic.php');
+		require_once($sourcedir . '/subs/Topic.subs.php.php');
 
 		removeTopics($row['id_topic']);
 		return true;
@@ -528,7 +528,7 @@ function removeMessage($message, $decreasePostCount = true)
 			// Mark recycled topic as read.
 			if (!$user_info['is_guest'])
 			{
-				require_once($sourcedir . '/Subs-Topic.php');
+				require_once($sourcedir . '/subs/Topic.subs.php.php');
 				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 			}
 
@@ -656,7 +656,7 @@ function removeMessage($message, $decreasePostCount = true)
 	));
 
 	// And now to update the last message of each board we messed with.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 	if ($recycle)
 		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
 	else
@@ -685,7 +685,7 @@ function action_restoretopic()
 	isAllowedTo('move_any', $modSettings['recycle_board']);
 
 	// We need this file.
-	require_once($sourcedir . '/Subs-Topic.php');
+	require_once($sourcedir . '/subs/Topic.subs.php.php');
 
 	$unfound_messages = array();
 	$topics_to_restore = array();
@@ -1040,7 +1040,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$topic_exists = true;
 	if ($smcFunc['db_num_rows']($request) == 0)
 	{
-		require_once($sourcedir . '/Subs-Topic.php');
+		require_once($sourcedir . '/subs/Topic.subs.php.php');
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
@@ -1130,7 +1130,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	);
 
 	// Need it to update some stats.
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	// Update stats.
 	updateStats('topic');

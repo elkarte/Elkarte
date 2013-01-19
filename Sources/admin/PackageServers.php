@@ -28,7 +28,7 @@ function PackageServers()
 	global $txt, $scripturl, $context, $boarddir, $sourcedir, $modSettings;
 
 	isAllowedTo('admin_forum');
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php.php');
 
 	// Use the Packages template... no reason to separate.
 	loadLanguage('Packages');

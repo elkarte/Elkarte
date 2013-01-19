@@ -42,8 +42,8 @@ function action_splittopics()
 	// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('SplitTopics');
-	require_once($sourcedir . '/Subs-Boards.php');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Boards.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	$subActions = array(
 		'selectTopics' => 'SplitSelectTopics',
@@ -768,7 +768,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
-		require_once($sourcedir . '/Subs-Topic.php');
+		require_once($sourcedir . '/subs/Topic.subs.php.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
@@ -1446,7 +1446,7 @@ function MergeExecute($topics = array())
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
 
-		require_once($sourcedir . '/Subs-Topic.php');
+		require_once($sourcedir . '/subs/Topic.subs.php.php');
 		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);
 
@@ -1559,7 +1559,7 @@ function MergeExecute($topics = array())
 	list($id_board) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	// Update all the statistics.
 	updateStats('topic');

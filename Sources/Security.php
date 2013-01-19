@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  * Check if the user is who he/she says he is
  * Makes sure the user is who they claim to be by requiring a password to be typed in every hour.
  * Is turned on and off by the securityDisable setting.
- * Uses the adminLogin() function of Subs-Auth.php if they need to login, which saves all request (post and get) data.
+ * Uses the adminLogin() function of subs/Auth.subs.php.php if they need to login, which saves all request (post and get) data.
  *
  * @param string $type = admin
  */
@@ -52,7 +52,7 @@ function validateSession($type = 'admin')
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 		return;
 
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once($sourcedir . '/subs/Auth.subs.php.php');
 
 	// Hashed password, ahoy!
 	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 40)
@@ -87,7 +87,7 @@ function validateSession($type = 'admin')
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
-		require_once($sourcedir . '/Subs-OpenID.php');
+		require_once($sourcedir . '/subs/OpenID.subs.php.php');
 		openID_revalidate();
 
 		$_SESSION[$type . '_time'] = time();
@@ -311,7 +311,7 @@ function is_not_banned($forceCheck = false)
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))
 		{
-			require_once($sourcedir . '/Subs-Auth.php');
+			require_once($sourcedir . '/subs/Auth.subs.php.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 			smf_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
 		}
@@ -351,7 +351,7 @@ function is_not_banned($forceCheck = false)
 		);
 
 		// A goodbye present.
-		require_once($sourcedir . '/Subs-Auth.php');
+		require_once($sourcedir . '/subs/Auth.subs.php.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 
@@ -482,7 +482,7 @@ function banPermissions()
 		$user_info['mod_cache'] = $_SESSION['mc'];
 	else
 	{
-		require_once($sourcedir . '/Subs-Auth.php');
+		require_once($sourcedir . '/subs/Auth.subs.php.php');
 		rebuildModCache();
 	}
 

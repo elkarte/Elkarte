@@ -182,7 +182,7 @@ function action_send()
 	$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($message, false, $id_msg), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 
 	// We need this in order to be able send emails.
-	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($sourcedir . '/subs/Mail.subs.php.php');
 
 	// Select the email addresses for this batch.
 	$request = $smcFunc['db_query']('', '

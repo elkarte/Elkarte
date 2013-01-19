@@ -296,7 +296,7 @@ function action_activateaccount($memID)
 		// If we are approving the deletion of an account, we do something special ;)
 		if ($user_profile[$memID]['is_activated'] == 4)
 		{
-			require_once($sourcedir . '/Subs-Members.php');
+			require_once($sourcedir . '/subs/Members.subs.php.php');
 			deleteMembers($context['id_member']);
 			redirectexit();
 		}

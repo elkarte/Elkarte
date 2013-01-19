@@ -384,7 +384,7 @@ function action_unapproved_attachments()
 		}
 	}
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php.php');
 
 	$listOptions = array(
 		'id' => 'mc_unapproved_attach',
@@ -647,7 +647,7 @@ function action_approve()
 
 	$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	isAllowedTo('approve_posts');
 
@@ -696,7 +696,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
 {
 	global $sourcedir;
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 	if ($current_view == 'topics')
 	{
 		approveTopics($messages);
@@ -740,7 +740,7 @@ function approveAllData()
 
 	if (!empty($msgs))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($sourcedir . '/subs/Post.subs.php.php');
 		approvePosts($msgs);
 	}
 
@@ -778,7 +778,7 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
-	require_once($sourcedir . '/Subs-Topic.php');
+	require_once($sourcedir . '/subs/Topic.subs.php.php');
 	if ($current_view == 'topics')
 	{
 		removeTopics($messages);

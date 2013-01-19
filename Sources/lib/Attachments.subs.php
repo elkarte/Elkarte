@@ -551,7 +551,7 @@ function attachmentChecks($attachID)
 	$size = @getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	if (isset($validImageTypes[$size[2]]))
 	{
-		require_once($sourcedir . '/Subs-Graphics.php');
+		require_once($sourcedir . '/subs/Graphics.subs.php.php');
 		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
@@ -599,7 +599,7 @@ function attachmentChecks($attachID)
 		if (empty($modSettings['attachment_full_notified']) && !empty($modSettings['attachmentDirSizeLimit']) && $modSettings['attachmentDirSizeLimit'] > 4000 && $context['dir_size'] > ($modSettings['attachmentDirSizeLimit'] - 2000) * 1024
 			|| (!empty($modSettings['attachmentDirFileLimit']) && $modSettings['attachmentDirFileLimit'] * .95 < $context['dir_files'] && $modSettings['attachmentDirFileLimit'] > 500))
 		{
-			require_once($sourcedir . '/Subs-Admin.php');
+			require_once($sourcedir . '/subs/Admin.subs.php');
 			emailAdmins('admin_attachments_full');
 			updateSettings(array('attachment_full_notified' => 1));
 		}
@@ -694,7 +694,7 @@ function createAttachment(&$attachmentOptions)
 	global $modSettings, $sourcedir, $smcFunc, $context;
 	global $txt, $boarddir;
 
-	require_once($sourcedir . '/Subs-Graphics.php');
+	require_once($sourcedir . '/subs/Graphics.subs.php.php');
 
 	// These are the only valid image types.
 	$validImageTypes = array(
@@ -1203,7 +1203,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
- * @uses Subs-Graphics.php
+ * @uses subs/Graphics.subs.php.php
  *
  * @param string $temporary_path the full path to the temporary file
  * @param int $memID member ID
@@ -1250,7 +1250,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
 
 	// Resize it.
-	require_once $sourcedir . '/Subs-Graphics.php';
+	require_once $sourcedir . '/subs/Graphics.subs.php.php';
 	if (!empty($modSettings['avatar_download_png']))
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
  	else
@@ -1307,7 +1307,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 /**
  * Get the size of a specified image with better error handling.
- * @todo see if it's better in Subs-Graphics, but one step at the time.
+ * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
  * Uses getimagesize() to determine the size of a file.
  * Attempts to connect to the server first so it won't time out.
  *
@@ -1362,7 +1362,7 @@ function url_image_size($url)
 				// This probably means allow_url_fopen is off, let's try GD.
 				if ($size === false && function_exists('imagecreatefromstring'))
 				{
-					include_once($sourcedir . '/Subs-Package.php');
+					include_once($sourcedir . '/subs/Package.subs.php.php');
 
 					// It's going to hate us for doing this, but another request...
 					$image = @imagecreatefromstring(fetch_web_data($url));

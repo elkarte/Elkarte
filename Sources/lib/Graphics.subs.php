@@ -217,7 +217,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		'15' => 'wbmp'
 	);
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php.php');
 
 	// Get the image file, we have to work with something after all
 	$fp_destination = fopen($destination, 'wb');

@@ -412,8 +412,8 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	loadLanguage('PersonalMessage');
 
 	// Needed for our email and post functions
-	require_once($sourcedir . '/Subs-Mail.php');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php.php');
 
 	$onBehalf = $from !== null;
 

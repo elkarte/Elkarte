@@ -76,7 +76,7 @@ function action_grouplist()
 	$context['page_title'] = $txt['viewing_groups'];
 
 	// Making a list is not hard with this beauty.
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php.php');
 
 	// Use the standard templates for showing this.
 	$listOptions = array(
@@ -85,7 +85,7 @@ function action_grouplist()
 		'base_href' => $scripturl . '?action=moderate;area=viewgroups;sa=view',
 		'default_sort_col' => 'group',
 		'get_items' => array(
-			'file' => $sourcedir . '/Subs-Membergroups.php',
+			'file' => $sourcedir . '/subs/Membergroups.subs.php.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -280,7 +280,7 @@ function action_groupmembers()
 		foreach ($_REQUEST['rem'] as $key => $group)
 			$_REQUEST['rem'][$key] = (int) $group;
 
-		require_once($sourcedir . '/Subs-Membergroups.php');
+		require_once($sourcedir . '/subs/Membergroups.subs.php.php');
 		removeMembersFromGroups($_REQUEST['rem'], $_REQUEST['group'], true);
 	}
 	// Must be adding new members to the group...
@@ -348,7 +348,7 @@ function action_groupmembers()
 		// Do the updates...
 		if (!empty($members))
 		{
-			require_once($sourcedir . '/Subs-Membergroups.php');
+			require_once($sourcedir . '/subs/Membergroups.subs.php.php');
 			addMembersToGroup($members, $_REQUEST['group'], isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
 		}
 	}
@@ -566,7 +566,7 @@ function action_grouprequests()
 
 			if (!empty($email_details))
 			{
-				require_once($sourcedir . '/Subs-Mail.php');
+				require_once($sourcedir . '/subs/Mail.subs.php.php');
 
 				// They are being approved?
 				if ($_POST['req_action'] == 'approve')
@@ -634,7 +634,7 @@ function action_grouprequests()
 	}
 
 	// We're going to want this for making our list.
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php.php');
 
 	// This is all the information required for a group listing.
 	$listOptions = array(

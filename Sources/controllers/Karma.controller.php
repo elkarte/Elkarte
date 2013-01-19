@@ -42,7 +42,7 @@ function action_karma()
 	checkSession('get');
 
 	// we hold karma here.
-	require_once($sourcedir . '/Subs-Karma.php');
+	require_once($sourcedir . '/subs/Karma.subs.php.php');
 
 	// If you don't have enough posts, tough luck.
 	// @todo Should this be dropped in favor of post group permissions?
