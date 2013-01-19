@@ -858,7 +858,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($librarydir . '/Auth.subs.php');
+			require_once($sourcedir . '/subs/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -2001,6 +2001,30 @@ function loadAdminClass($filename)
 }
 
 /**
+ * Load a controller.
+ *
+ * @param string $filename
+ */
+function loadController($filename)
+{
+	global $controllerdir;
+
+	require_once($controllerdir . '/' . $filename);
+}
+
+/**
+ * Load a library.
+ *
+ * @param string $filename
+ */
+function loadLibrary($filename)
+{
+	global $librarydir;
+
+	require_once($librarydir . '/' . $filename);
+}
+
+/**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  * Cleaner and easier (for modders) than to use the function below.
  *
@@ -2428,7 +2452,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($librarydir . '/Package.subs.php');
+			require_once($sourcedir . '/subs/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))
