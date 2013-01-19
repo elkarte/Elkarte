@@ -120,7 +120,7 @@ function EditSmileySettings($return_config = false)
 	global $modSettings, $context, $settings, $txt, $boarddir, $sourcedir, $scripturl;
 
 	// The directories...
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 
 	// Get the names of the smiley sets.
@@ -540,7 +540,7 @@ function AddSmiley()
 	global $modSettings, $context, $settings, $txt, $boarddir, $smcFunc;
 
 	// Get a list of all known smiley sets.
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 	$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -1138,7 +1138,7 @@ function EditSmileys()
 	elseif ($context['sub_action'] == 'modifysmiley')
 	{
 		// Get a list of all known smiley sets.
-		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 		$set_names = explode("\n", $modSettings['smiley_sets_names']);

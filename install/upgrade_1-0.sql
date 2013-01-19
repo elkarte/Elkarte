@@ -1933,8 +1933,8 @@ upgrade_query("
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
-	('smileys_dir', '{$sboarddir}/Smileys'),
-	('smileys_url', '{$boardurl}/Smileys'),
+	('smileys_dir', '{$sboarddir}/smileys'),
+	('smileys_url', '{$boardurl}/smileys'),
 	('smiley_sets_known', 'default,classic'),
 	('smiley_sets_names', 'Default\nClassic'),
 	('smiley_sets_default', 'default'),
