@@ -550,7 +550,7 @@ function action_browse()
 	);
 
 	// Create the list.
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 }
 
@@ -1988,7 +1988,7 @@ function action_attachpaths()
 			),
 		),
 	);
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 
 	if (!empty($modSettings['attachment_basedirectories']))

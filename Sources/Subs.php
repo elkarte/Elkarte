@@ -1327,7 +1327,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = highlight_php_code($add_begin ? \'&lt;?php \' . $data . \'?&gt;\' : $data);
 						if ($add_begin)
 							$data = preg_replace(array(\'~^(.+?)&lt;\?.{0,40}?php(?:&nbsp;|\s)~\', \'~\?&gt;((?:</(font|span)>)*)$~\'), \'$1\', $data, 2);
-						
+
 						// Fix the PHP code stuff...
 						$data = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", $data);
 						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
@@ -2802,7 +2802,7 @@ function setupThemeContext($forceload = false)
 		window.onload = smf_avatarResize;'));
 	}
 
-	// This looks weird, but it's because BoardIndex.php references the variable.
+	// This looks weird, but it's because BoardIndex.controller.php references the variable.
 	$context['common_stats']['latest_member'] = array(
 		'id' => $modSettings['latestMember'],
 		'name' => $modSettings['latestRealName'],
@@ -3071,7 +3071,7 @@ function template_footer()
  * Output the Javascript files
  * 	- tabbing in this function is to make the HTML source look proper
  *  - if defered is set function will output all JS (source & inline) set to load at page end
- *  - if the admin option to combine files is set, will use Class-Combiner
+ *  - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
  */
@@ -3110,7 +3110,7 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Class-Combine.php');
+			require_once($sourcedir . '/Combine.class.php');
 			$combiner = new site_Combiner;
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -3179,7 +3179,7 @@ function template_javascript($do_defered = false)
 
 /**
  * Output the CSS files
- *  - if the admin option to combine files is set, will use Class-Combiner
+ *  - if the admin option to combine files is set, will use Combiner.class
  */
 function template_css()
 {
@@ -3193,7 +3193,7 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Class-Combine.php');
+			require_once($sourcedir . '/Combine.class.php');
 			$combiner = new site_Combiner;
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))

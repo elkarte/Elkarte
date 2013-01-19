@@ -32,7 +32,7 @@ function action_badbehaviorlog()
 	loadTemplate('BadBehavior');
 
 	// Functions we will need
-	require_once($sourcedir . '/Subs-BadBehavior.php');
+	require_once($sourcedir . '/subs/BadBehavior.subs.php');
 
 	// You can filter by any of the following columns:
 	$filters = array(
