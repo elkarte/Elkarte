@@ -59,7 +59,7 @@ function action_jumpto()
 	global $user_info, $context, $smcFunc, $sourcedir;
 
 	// Find the boards/cateogories they can see.
-	require_once($sourcedir . '/subs/MessageIndex.subs.php.php');
+	require_once($sourcedir . '/subs/MessageIndex.subs.php');
 	$boardListOptions = array(
 		'use_permissions' => true,
 		'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
@@ -81,7 +81,7 @@ function action_messageicons()
 {
 	global $context, $sourcedir, $board;
 
-	require_once($sourcedir . '/subs/Editor.subs.php.php');
+	require_once($sourcedir . '/subs/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
 
 	$context['sub_template'] = 'message_icons';
@@ -210,7 +210,7 @@ function newspreview()
 {
 	global $context, $sourcedir, $smcFunc;
 
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 
 	$errors = array();
 	$news = !isset($_POST['news'])? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
@@ -238,7 +238,7 @@ function newsletterpreview()
 {
 	global $context, $sourcedir, $smcFunc, $txt;
 
-	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Mail.subs.php');
 	loadLanguage('Errors');
 
 	$context['post_error']['messages'] = array();
@@ -339,7 +339,7 @@ function warning_preview()
 {
 	global $context, $sourcedir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
 
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 	loadLanguage('Errors');
 	loadLanguage('ModerationCenter');
 

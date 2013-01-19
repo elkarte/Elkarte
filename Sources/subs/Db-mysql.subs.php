@@ -544,9 +544,9 @@ function smf_db_error($db_string, $connection = null)
 		// Check for errors like 145... only fix it once every three days, and send an email. (can't use empty because it might not be set yet...)
 		if (!empty($fix_tables))
 		{
-			// subs/Admin.subs.php for updateSettingsFile(), subs/Mail.subs.php.php for sendmail().
+			// subs/Admin.subs.php for updateSettingsFile(), subs/Mail.subs.php for sendmail().
 			require_once($sourcedir . '/subs/Admin.subs.php');
-			require_once($sourcedir . '/subs/Mail.subs.php.php');
+			require_once($sourcedir . '/subs/Mail.subs.php');
 
 			// Make a note of the REPAIR...
 			cache_put_data('db_last_error', time(), 600);

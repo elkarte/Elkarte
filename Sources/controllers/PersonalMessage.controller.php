@@ -40,7 +40,7 @@ function action_pm()
 	isAllowedTo('pm_read');
 
 	// This file contains the our PM functions such as mark, send, delete
-	require_once($sourcedir . '/subs/PersonalMessage.subs.php.php');
+	require_once($sourcedir . '/subs/PersonalMessage.subs.php');
 
 	loadLanguage('PersonalMessage+Drafts');
 
@@ -308,7 +308,7 @@ function messageIndexBar($area)
 		);
 	}
 
-	require_once($sourcedir . '/subs/Menu.subs.php.php');
+	require_once($sourcedir . '/subs/Menu.subs.php');
 
 	// What page is this, again?
 	$current_page = $scripturl . '?action=pm' . (!empty($_REQUEST['sa']) ? ';sa=' . $_REQUEST['sa'] : '') . (!empty($context['folder']) ? ';f=' . $context['folder'] : '') . (!empty($context['current_label_id']) ? ';l=' . $context['current_label_id'] : '');
@@ -1182,7 +1182,7 @@ function action_sendmessage()
 	}
 
 	// Needed for the WYSIWYG editor.
-	require_once($sourcedir . '/subs/Editor.subs.php.php');
+	require_once($sourcedir . '/subs/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -1376,7 +1376,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	}
 
 	// We need to load the editor once more.
-	require_once($sourcedir . '/subs/Editor.subs.php.php');
+	require_once($sourcedir . '/subs/Editor.subs.php');
 
 	// Create it...
 	$editorOptions = array(
@@ -1398,7 +1398,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 	if ($context['require_verification'] && !isset($_REQUEST['xml']))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php.php');
+		require_once($sourcedir . '/subs/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
@@ -1425,8 +1425,8 @@ function action_sendmessage2()
 	global $user_info, $modSettings, $scripturl, $smcFunc;
 
 	isAllowedTo('pm_send');
-	require_once($sourcedir . '/subs/Auth.subs.php.php');
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 
 	// PM Drafts enabled and needed?
 	if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
@@ -1590,7 +1590,7 @@ function action_sendmessage2()
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php.php');
+		require_once($sourcedir . '/subs/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'pm',
 		);

@@ -299,7 +299,7 @@ function ModifyCookieSettings($return_config = false)
 		if ($cookiename != $_POST['cookiename'])
 		{
 			$original_session_id = $context['session_id'];
-			include_once($sourcedir . '/subs/Auth.subs.php.php');
+			include_once($sourcedir . '/subs/Auth.subs.php');
 
 			// Remove the old cookie.
 			setLoginCookie(-3600, 0);

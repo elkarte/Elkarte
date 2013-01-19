@@ -99,7 +99,7 @@ function action_sendtopic()
 	spamProtection('sendtopic');
 
 	// This is needed for sendmail().
-	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Mail.subs.php');
 
 	// Trim the names..
 	$_POST['y_name'] = trim($_POST['y_name']);
@@ -224,7 +224,7 @@ function action_email()
 	// Are we actually sending it?
 	if (isset($_POST['send']) && isset($_POST['email_body']))
 	{
-		require_once($sourcedir . '/subs/Mail.subs.php.php');
+		require_once($sourcedir . '/subs/Mail.subs.php');
 
 		checkSession();
 
@@ -329,7 +329,7 @@ function action_reporttm()
 	$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php.php');
+		require_once($sourcedir . '/subs/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'report',
 		);
@@ -393,7 +393,7 @@ function action_reporttm2()
 	// Make sure they aren't spamming.
 	spamProtection('reporttm');
 
-	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Mail.subs.php');
 
 	// No errors, yet.
 	$post_errors = array();
@@ -427,7 +427,7 @@ function action_reporttm2()
 	// Could they get the right verification code?
 	if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php.php');
+		require_once($sourcedir . '/subs/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'report',
 		);
@@ -473,7 +473,7 @@ function action_reporttm2()
 	$subject = un_htmlspecialchars($message['subject']);
 
 	// Get a list of members with the moderate_board permission.
-	require_once($sourcedir . '/subs/Members.subs.php.php');
+	require_once($sourcedir . '/subs/Members.subs.php');
 	$moderators = membersAllowedTo('moderate_board', $board);
 
 	$request = $smcFunc['db_query']('', '

@@ -419,7 +419,7 @@ function resetPassword($memID, $username = null)
 
 	// Language... and a required file.
 	loadLanguage('Login');
-	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Mail.subs.php');
 
 	// Get some important details.
 	$request = $smcFunc['db_query']('', '
@@ -499,7 +499,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
 
 	if ($check_reserved_name)
 	{
-		require_once($sourcedir . '/subs/Members.subs.php.php');
+		require_once($sourcedir . '/subs/Members.subs.php');
 		if (isReservedName($username, $memID, false))
 			$errors[] = array('done', '(' . htmlspecialchars($username) . ') ' . $txt['name_in_use']);
 	}

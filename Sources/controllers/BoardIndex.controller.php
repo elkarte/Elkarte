@@ -41,7 +41,7 @@ function action_boardindex()
 		$context['robot_no_index'] = true;
 
 	// Retrieve the categories and boards.
-	require_once($sourcedir . '/subs/BoardIndex.subs.php.php');
+	require_once($sourcedir . '/subs/BoardIndex.subs.php');
 	$boardIndexOptions = array(
 		'include_categories' => true,
 		'base_level' => 0,
@@ -64,7 +64,7 @@ function action_boardindex()
 
 	// Are we showing all membergroups on the board index?
 	if (!empty($settings['show_group_key']))
-		$context['membergroups'] = cache_quick_get('membergroup_list', 'subs/Membergroups.subs.php.php', 'cache_getMembergroupList', array());
+		$context['membergroups'] = cache_quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
 
 	// Track most online statistics? (subs/Members.subs.phpOnline.php)
 	if (!empty($modSettings['trackStats']))
@@ -76,7 +76,7 @@ function action_boardindex()
 		$latestPostOptions = array(
 			'number_posts' => $settings['number_recent_posts'],
 		);
-		$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php.php', 'cache_getLastPosts', array($latestPostOptions));
+		$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 	}
 
 	$settings['display_recent_bar'] = !empty($settings['number_recent_posts']) ? $settings['number_recent_posts'] : 0;
@@ -95,7 +95,7 @@ function action_boardindex()
 			'include_events' => $modSettings['cal_showevents'] > 1,
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
-		$context += cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php.php', 'cache_getRecentEvents', array($eventOptions));
+		$context += cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 		// Whether one or multiple days are shown on the board index.
 		$context['calendar_only_today'] = $modSettings['cal_days_for_index'] == 1;
@@ -137,7 +137,7 @@ function action_collapse()
 	if (in_array($_REQUEST['sa'], array('expand', 'collapse', 'toggle')) && isset($_REQUEST['c']))
 	{
 		// And collapse/expand/toggle the category.
-		require_once($sourcedir . '/subs/Categories.subs.php.php');
+		require_once($sourcedir . '/subs/Categories.subs.php');
 		collapseCategories(array((int) $_REQUEST['c']), $_REQUEST['sa'], array($user_info['id']));
 	}
 

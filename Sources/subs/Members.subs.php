@@ -319,7 +319,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete personal messages.
-	require_once($sourcedir . '/subs/PersonalMessage.subs.php.php');
+	require_once($sourcedir . '/subs/PersonalMessage.subs.php');
 	deleteMessages(null, null, $users);
 
 	$smcFunc['db_query']('', '
@@ -440,8 +440,8 @@ function registerMember(&$regOptions, $return_errors = false)
 	loadLanguage('Login');
 
 	// We'll need some external functions.
-	require_once($sourcedir . '/subs/Auth.subs.php.php');
-	require_once($sourcedir . '/subs/Mail.subs.php.php');
+	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($sourcedir . '/subs/Mail.subs.php');
 
 	// Put any errors in here.
 	$reg_errors = array();
@@ -791,7 +791,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		}
 
 		// Send admin their notification.
-		require_once($sourcedir . '/subs/Post.subs.php.php');
+		require_once($sourcedir . '/subs/Post.subs.php');
 		adminNotify('standard', $memberID, $regOptions['username']);
 	}
 	// Need to activate their account - or fall under COPPA.
@@ -836,7 +836,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 		// Admin gets informed here...
-		require_once($sourcedir . '/subs/Post.subs.php.php');
+		require_once($sourcedir . '/subs/Post.subs.php');
 		adminNotify('approval', $memberID, $regOptions['username']);
 	}
 

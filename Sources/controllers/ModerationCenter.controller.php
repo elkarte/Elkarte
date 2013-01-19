@@ -42,7 +42,7 @@ function action_modcenter($dont_call = false)
 		isAllowedTo('access_mod_center');
 
 	// We're gonna want a menu of some kind.
-	require_once($sourcedir . '/subs/Menu.subs.php.php');
+	require_once($sourcedir . '/subs/Menu.subs.php');
 
 	// Load the language, and the template.
 	loadLanguage('ModerationCenter');
@@ -51,7 +51,7 @@ function action_modcenter($dont_call = false)
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 	$context['robot_no_index'] = true;
 
-	// This is the menu structure - refer to subs/Menu.subs.php.php for the details.
+	// This is the menu structure - refer to subs/Menu.subs.php for the details.
 	$moderation_areas = array(
 		'main' => array(
 			'title' => $txt['mc_main'],
@@ -929,7 +929,7 @@ function ModReport()
 
 	// What have the other moderators done to this message?
 	require_once($sourcedir . '/Modlog.php');
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	loadLanguage('Modlog');
 
 	// This is all the information from the moderation log.
@@ -1136,7 +1136,7 @@ function ViewWatchedUsers()
 			$approve_query = ' AND 0';
 	}
 
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	// This is all the information required for a watched user listing.
 	$listOptions = array(
@@ -1523,7 +1523,7 @@ function ViewWarningLog()
 	// Setup context as always.
 	$context['page_title'] = $txt['mc_warning_log_title'];
 
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	// This is all the information required for a watched user listing.
 	$listOptions = array(
@@ -1729,7 +1729,7 @@ function ViewWarningTemplates()
 	// Setup context as always.
 	$context['page_title'] = $txt['mc_warning_templates_title'];
 
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	// This is all the information required for a watched user listing.
 	$listOptions = array(
@@ -1955,7 +1955,7 @@ function ModifyWarningTemplate()
 		validateToken('mod-wt');
 
 		// To check the BBC is pretty good...
-		require_once($sourcedir . '/subs/Post.subs.php.php');
+		require_once($sourcedir . '/subs/Post.subs.php');
 
 		// Bit of cleaning!
 		$_POST['template_body'] = trim($_POST['template_body']);

@@ -1297,7 +1297,7 @@ function action_installtheme()
 	isAllowedTo('admin_forum');
 	checkSession('request');
 
-	require_once($sourcedir . '/subs/Package.subs.php.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 
 	loadTemplate('Themes');
 

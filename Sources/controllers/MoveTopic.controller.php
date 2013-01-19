@@ -38,7 +38,7 @@ function action_movetopic()
 		fatal_lang_error('no_access', false);
 
 	// Retrieve the basic topic information for whats being moved
-	require_once($sourcedir . '/subs/Topic.subs.php.php');
+	require_once($sourcedir . '/subs/Topic.subs.php');
 	$topic_info = getTopicInfo($topic, true);
 	
 	if ($topic_info === false)
@@ -115,7 +115,7 @@ function action_movetopic()
 	}
 
 	// We will need this
-	require_once($sourcedir . '/subs/Topic.subs.php.php');
+	require_once($sourcedir . '/subs/Topic.subs.php');
 	moveTopicConcurrence();
 
 	// Register this form and get a sequence number in $context.
@@ -131,7 +131,7 @@ function action_movetopic()
  * Upon successful completion redirects to message index.
  * Accessed via ?action=movetopic2.
  *
- * @uses subs/Post.subs.php.php.
+ * @uses subs/Post.subs.php.
  */
 function action_movetopic2()
 {
@@ -150,7 +150,7 @@ function action_movetopic2()
 		fatal_lang_error('movetopic_no_board', false);
 
 	// We will need this
-	require_once($sourcedir . '/subs/Topic.subs.php.php');
+	require_once($sourcedir . '/subs/Topic.subs.php');
 	moveTopicConcurrence();
 
 	// Make sure this form hasn't been submitted before.
@@ -187,7 +187,7 @@ function action_movetopic2()
 	}
 
 	checkSession();
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 
 	// The destination board must be numeric.
 	$toboard = (int) $_POST['toboard'];

@@ -160,7 +160,7 @@ function action_trackactivity($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 
 	// @todo cache this
@@ -487,7 +487,7 @@ function action_trackip($memID = 0)
 	ksort($context['ips']);
 
 	// Gonna want this for the list.
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	// Start with the user messages.
 	$listOptions = array(
@@ -727,7 +727,7 @@ function action_tracklogin($memID = 0)
 	global $context, $smcFunc;
 
 	// Gonna want this for the list.
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	if ($memID == 0)
 		$context['base_url'] = $scripturl . '?action=trackip';
@@ -866,7 +866,7 @@ function action_trackedits($memID)
 {
 	global $scripturl, $txt, $modSettings, $sourcedir, $context, $smcFunc;
 
-	require_once($sourcedir . '/subs/List.subs.php.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	// Get the names of any custom fields.
 	$request = $smcFunc['db_query']('', '

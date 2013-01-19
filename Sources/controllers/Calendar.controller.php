@@ -64,7 +64,7 @@ function action_calendar()
 		$context['robot_no_index'] = true;
 
 	// Get the current day of month...
-	require_once($sourcedir . '/subs/Calendar.subs.php.php');
+	require_once($sourcedir . '/subs/Calendar.subs.php');
 	$today = getTodayInfo();
 
 	// If the month and year are not passed in, use today's date as a starting point.
@@ -176,7 +176,7 @@ function CalendarPost()
 	isAllowedTo('calendar_post');
 
 	// We need this for all kinds of useful functions.
-	require_once($sourcedir . '/subs/Calendar.subs.php.php');
+	require_once($sourcedir . '/subs/Calendar.subs.php');
 
 	// Cast this for safety...
 	if (isset($_REQUEST['eventid']))
@@ -287,7 +287,7 @@ function CalendarPost()
 			fatal_lang_error('cannot_post_new', 'permission');
 
 		// Load the list of boards and categories in the context.
-		require_once($sourcedir . '/subs/MessageIndex.subs.php.php');
+		require_once($sourcedir . '/subs/MessageIndex.subs.php');
 		$boardListOptions = array(
 			'included_boards' => in_array(0, $boards) ? null : $boards,
 			'not_redirection' => true,
@@ -352,7 +352,7 @@ function action_ical()
 		fatal_lang_error('no_access', false);
 
 	// This is kinda wanted.
-	require_once($sourcedir . '/subs/Calendar.subs.php.php');
+	require_once($sourcedir . '/subs/Calendar.subs.php');
 
 	// Load up the event in question and check it exists.
 	$event = getEventProperties($_REQUEST['eventid']);

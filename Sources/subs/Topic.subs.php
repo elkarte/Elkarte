@@ -120,7 +120,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 
 			// Move the topics to the recycle board.
-			require_once($sourcedir . '/subs/Topic.subs.php.php');
+			require_once($sourcedir . '/subs/Topic.subs.php');
 			moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 			// Close reports that are being recycled.
@@ -353,7 +353,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		'calendar_updated' => time(),
 	));
 
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 	$updates = array();
 	foreach ($adjustBoards as $stats)
 		$updates[] = $stats['id_board'];
@@ -661,7 +661,7 @@ function moveTopics($topics, $toBoard)
 		foreach ($topics as $topic_id)
 			cache_put_data('topic_board-' . $topic_id, null, 120);
 
-	require_once($sourcedir . '/subs/Post.subs.php.php');
+	require_once($sourcedir . '/subs/Post.subs.php');
 
 	$updates = array_keys($fromBoards);
 	$updates[] = $toBoard;

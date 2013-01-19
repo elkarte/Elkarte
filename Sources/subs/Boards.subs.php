@@ -619,7 +619,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		$topics[] = $row['id_topic'];
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/subs/Topic.subs.php.php');
+	require_once($sourcedir . '/subs/Topic.subs.php');
 	removeTopics($topics, false);
 
 	// Delete the board's logs.

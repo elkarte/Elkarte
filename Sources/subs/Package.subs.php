@@ -682,7 +682,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once($sourcedir . '/subs/List.subs.php.php');
+		require_once($sourcedir . '/subs/List.subs.php');
 		createList($listOptions);
 
 		// If we just restored permissions then whereever we are, we are now done and dusted.
@@ -3200,5 +3200,5 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 if (!function_exists('smf_crc32'))
 {
 	global $sourcedir;
-	require_once $sourcedir . '/subs/Compat.subs.php.php';
+	require_once $sourcedir . '/subs/Compat.subs.php';
 }

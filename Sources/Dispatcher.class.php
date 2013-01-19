@@ -133,7 +133,7 @@ class site_Dispatcher
 			'quickhelp' => array('Help.controller.php', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'action_jsoption'),
-			'loadeditorlocale' => array('subs/Editor.subs.php.php', 'action_loadlocale'),
+			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lock' => array('Topic.controller.php', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'action_lockvoting'),
 			'login' => array('LogInOut.controller.php', 'action_login'),

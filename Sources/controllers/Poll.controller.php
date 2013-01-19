@@ -214,7 +214,7 @@ function action_vote()
 			)
 		);
 
-		require_once($sourcedir . '/subs/Auth.subs.php.php');
+		require_once($sourcedir . '/subs/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 	}
@@ -353,7 +353,7 @@ function action_editpoll()
 	$context['can_moderate_poll'] = isset($_REQUEST['add']) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 	// Do we enable guest voting?
-	require_once($sourcedir . '/subs/Members.subs.php.php');
+	require_once($sourcedir . '/subs/Members.subs.php');
 	$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
 
 	// Want to make sure before you actually submit?  Must be a lot of options, or something.
@@ -699,7 +699,7 @@ function action_editpoll2()
 	// Make sure guests are actually allowed to vote generally.
 	if ($_POST['poll_guest_vote'])
 	{
-		require_once($sourcedir . '/subs/Members.subs.php.php');
+		require_once($sourcedir . '/subs/Members.subs.php');
 		$allowedGroups = groupsAllowedTo('poll_vote', $board);
 		if (!in_array(-1, $allowedGroups['allowed']))
 			$_POST['poll_guest_vote'] = 0;

@@ -2428,7 +2428,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($sourcedir . '/subs/Package.subs.php.php');
+			require_once($sourcedir . '/subs/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))
