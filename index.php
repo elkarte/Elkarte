@@ -55,7 +55,7 @@ require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Logging.php');
 require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/subs/Cache.subs.php.php');
+require_once($sourcedir . '/subs/Cache.subs.php');
 require_once($sourcedir . '/Security.php');
 require_once($sourcedir . '/BrowserDetect.class.php');
 
