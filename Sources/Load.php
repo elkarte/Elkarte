@@ -2543,11 +2543,11 @@ function loadDatabase()
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $sourcedir, $db_prefix;
 
 	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists($sourcedir . '/subs/Db-' . $db_type . '.subs.php'))
+	if (empty($db_type) || !file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
 	// Load the file for the database.
-	require_once($sourcedir . '/subs/Db-' . $db_type . '.subs.php');
+	require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))

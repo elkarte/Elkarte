@@ -815,9 +815,9 @@ function loadEssentialData()
 	// Get the database going!
 	if (empty($db_type))
 		$db_type = 'mysql';
-	if (file_exists($sourcedir . '/Db-' . $db_type . '.subs.php'))
+	if (file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
 	{
-		require_once($sourcedir . '/Db-' . $db_type . '.subs.php');
+		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
 		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
@@ -849,7 +849,7 @@ function loadEssentialData()
 	}
 	else
 	{
-		return throw_error('Cannot find ' . $sourcedir . '/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
+		return throw_error('Cannot find ' . $sourcedir . '/database/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
 	}
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
@@ -922,7 +922,7 @@ function WelcomeLogin()
 	// Check for some key files - one template, one language, and a new and an old source file.
 	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
 		&& @file_exists($sourcedir . '/QueryString.php')
-		&& @file_exists($sourcedir . '/Db-' . $db_type . '.subs.php')
+		&& @file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php')
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
 
 	// Need legacy scripts?

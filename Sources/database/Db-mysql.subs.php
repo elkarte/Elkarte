@@ -100,7 +100,7 @@ function db_extend($type = 'extra')
 {
 	global $sourcedir, $db_type;
 
-	require_once($sourcedir . '/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
+	require_once($sourcedir . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
 	$initFunc = 'db_' . $type . '_init';
 	$initFunc();
 }
