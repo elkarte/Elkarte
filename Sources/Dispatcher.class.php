@@ -197,7 +197,7 @@ class site_Dispatcher
 		if (isset($actionArray[$_GET['action']]))
 		{
 			// admin files have their own place
-			$path = $sourcedir . (in_array($_GET['action'], $adminActions) ? '/admin' : '');
+			$path = $sourcedir . (in_array($_GET['action'], $adminActions) ? '/admin' : '/controllers');
 
 			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
