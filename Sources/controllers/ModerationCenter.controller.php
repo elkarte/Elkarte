@@ -82,7 +82,7 @@ function action_modcenter($dont_call = false)
 				'modlog' => array(
 					'label' => $txt['modlog_view'],
 					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-					'file' => 'Modlog.php',
+					'file' => 'admin/Modlog.php',
 					'function' => 'action_modlog',
 				),
 				'warnings' => array(
@@ -103,7 +103,7 @@ function action_modcenter($dont_call = false)
 				'postmod' => array(
 					'label' => $txt['mc_unapproved_posts'],
 					'enabled' => $context['can_moderate_approvals'],
-					'file' => 'PostModeration.php',
+					'file' => 'controllers/PostModeration.controller.php',
 					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=postmod',
 					'subsections' => array(
@@ -114,7 +114,7 @@ function action_modcenter($dont_call = false)
 				'attachmod' => array(
 					'label' => $txt['mc_unapproved_attachments'],
 					'enabled' => $context['can_moderate_approvals'],
-					'file' => 'PostModeration.php',
+					'file' => 'controllers/PostModeration.controller.php',
 					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 				),
