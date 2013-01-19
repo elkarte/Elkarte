@@ -764,7 +764,7 @@ function markTopicsRead($mark_topics, $was_set = false)
  */
 function updateReadNotificationsFor($id_topic, $id_board)
 {
-	global $smcFunc, $user_info;
+	global $smcFunc, $user_info, $context;
 
 	// Check for notifications on this topic OR board.
 	$request = $smcFunc['db_query']('', '
