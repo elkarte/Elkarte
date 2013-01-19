@@ -107,7 +107,7 @@ load_lang_file();
 $installurl = $_SERVER['PHP_SELF'];
 
 // This is where home is.
-$oursite = 'http://www.spudsdesign.com/dialogo/';
+$oursite = 'http://www.elkarte.net/';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
@@ -285,7 +285,7 @@ function load_lang_file()
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
 
-		<p>If you continue to get this error message, feel free to <a href="http://www.spudsdesign.com/dialogo/">look to us for support</a>.</p>
+		<p>If you continue to get this error message, feel free to <a href="http://www.elkarte.net/">look to us for support</a>.</p>
 	</div>
 	</body>
 </html>';
@@ -406,7 +406,7 @@ function Welcome()
 		{
 			if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
 				$probably_installed++;
-			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/dialogo\';~', $line))
+			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
 				$probably_installed++;
 		}
 
@@ -712,7 +712,7 @@ function DatabaseSettings()
 	}
 	else
 	{
-		$incontext['db']['prefix'] = 'dialogo_';
+		$incontext['db']['prefix'] = 'elkarte_';
 
 		// Should we use a non standard port?
 		if (!empty($db_port))
@@ -2123,7 +2123,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul class="reset">
-					<li class="copyright"><a href="http://www.spudsdesign.com/dialogo/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
+					<li class="copyright"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
 				</ul>
 			</div>
 		</div>
@@ -2346,14 +2346,14 @@ function template_database_settings()
 			</tr><tr id="db_name_contain">
 				<td valign="top" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
 				<td>
-					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'dialogo' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
+					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'elkarte' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_info'], '
 					<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span></div>
 				</td>
 			</tr><tr id="db_filename_contain" style="display: none;">
 				<td valign="top" class="textbox"><label for="db_filename_input">', $txt['db_settings_database_file'], ':</label></td>
 				<td>
-					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/dialogo_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
+					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/elkarte_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_file_info'], '</div>
 				</td>
 			</tr><tr>

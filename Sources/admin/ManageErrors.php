@@ -356,7 +356,7 @@ function ViewFile()
 	$excluded = array('settings.php', 'settings_bak.php');
 	$basename = strtolower(basename($file));
 	$ext = strrchr($basename, '.');
-	if ($ext !== '.php' || (strpos($file, $real_board) === false || strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
+	if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
 		fatal_lang_error('error_bad_file', true, array(htmlspecialchars($file)));
 
 	// get the min and max lines

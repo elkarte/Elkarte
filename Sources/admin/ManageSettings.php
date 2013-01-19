@@ -1007,7 +1007,7 @@ function ModifySpamSettings($return_config = false)
  */
 function ModifyBadBehaviorSettings($return_config = false)
 {
-	global $txt, $scripturl, $context, $modSettings;
+	global $txt, $scripturl, $context, $modSettings, $boardurl;
 
 	// Our callback templates are here
 	loadTemplate('BadBehavior');
@@ -1024,7 +1024,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 
 	// Have we blocked anything in the last 7 days?
 	if (!empty($modSettings['badbehavior_enabled']))
-		$context['settings_message'][] = bb2_insert_stats(true);
+		$context['settings_message'][] = bb2_insert_stats(true) . '<a href="' . $boardurl . '/index.php?action=admin;area=logs;sa=badbehaviorlog" /> [' . $txt['badbehavior_details'] . ']</a>';
 
 	// Current whitelist data
 	$whitelist = array('badbehavior_ip_wl', 'badbehavior_useragent_wl', 'badbehavior_url_wl');
