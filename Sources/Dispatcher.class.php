@@ -227,9 +227,9 @@ class site_Dispatcher
 		{
 			// i.e. action=help => Help.controller.php...
 			// if the function name fits the pattern, that'd be 'show'...
-			if (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.php'))
+			if (file_exists($sourcedir . '/controllers/' . ucfirst($_GET['action']) . '.php'))
 			{
-				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '.php';
+				$this->_file_name = $sourcedir . '/controllers/' . ucfirst($_GET['action']) . '.php';
 
 				// procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
@@ -244,9 +244,9 @@ class site_Dispatcher
 			// action=drafts => Drafts.controller.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
 			// ... if it ain't there yet, no problem.
-			elseif (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			elseif (file_exists($sourcedir . '/controllers/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action'] . '.controller.php');
+				$this->_file_name = $sourcedir . '/controllers/' . ucfirst($_GET['action'] . '.controller.php');
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];

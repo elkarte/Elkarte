@@ -491,7 +491,7 @@ function banPermissions()
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
-		require_once($sourcedir . '/ModerationCenter.controller.php');
+		require_once($sourcedir . '/controllers/ModerationCenter.controller.php');
 		recountOpenReports();
 	}
 	else
