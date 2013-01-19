@@ -48,7 +48,7 @@ class site_Dispatcher
 		// default action of the forum: board index
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
-			'file' => $sourcedir . '/BoardIndex.controller.php',
+			'file' => $sourcedir . '/controllers/BoardIndex.controller.php',
 			'function' => 'action_boardindex'
 		);
 
@@ -58,7 +58,7 @@ class site_Dispatcher
 			// You can only login
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
-				$this->_file_name = $sourcedir . '/LogInOut.controller.php';
+				$this->_file_name = $sourcedir . '/controllers/LogInOut.controller.php';
 				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
@@ -91,13 +91,13 @@ class site_Dispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_file_name = $sourcedir . '/MessageIndex.controller.php';
+				$this->_file_name = $sourcedir . '/controllers/MessageIndex.controller.php';
 				$this->_function_name = 'MessageIndex';
 			}
 			// board=b;topic=t topic display
 			else
 			{
-				$this->_file_name = $sourcedir . '/Display.controller.php';
+				$this->_file_name = $sourcedir . '/controllers/Display.controller.php';
 				$this->_function_name = 'Display';
 			}
 		}
@@ -313,7 +313,7 @@ class site_Dispatcher
 			{
 				// things went pretty bad, huh?
 				// board index :P
-				require_once($sourcedir . '/BoardIndex.controller.php');
+				require_once($sourcedir . '/controllers/BoardIndex.controller.php');
 				return 'action_boardindex';
 			}
 		}
