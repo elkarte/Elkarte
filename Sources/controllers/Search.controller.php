@@ -335,7 +335,7 @@ function action_plushsearch2()
 	// Are you allowed?
 	isAllowedTo('search_posts');
 
-	require_once($sourcedir . '/Display.php');
+	require_once($sourcedir . '/Display.controller.php');
 	require_once($sourcedir . '/Subs-Package.php');
 
 	// Search has a special database set.
@@ -2433,7 +2433,7 @@ function MessageSearch2()
 
 /**
  * Callback to return messages - saves memory.
- * @todo Fix this, update it, whatever... from Display.php mainly.
+ * @todo Fix this, update it, whatever... from Display.controller.php mainly.
  * Note that the call to loadAttachmentContext() doesn't work:
  * this function doesn't fulfill the pre-condition to fill $attachments global...
  * So all it does is to fallback and return.

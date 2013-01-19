@@ -1327,7 +1327,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = highlight_php_code($add_begin ? \'&lt;?php \' . $data . \'?&gt;\' : $data);
 						if ($add_begin)
 							$data = preg_replace(array(\'~^(.+?)&lt;\?.{0,40}?php(?:&nbsp;|\s)~\', \'~\?&gt;((?:</(font|span)>)*)$~\'), \'$1\', $data, 2);
-						
+
 						// Fix the PHP code stuff...
 						$data = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", $data);
 						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
@@ -2802,7 +2802,7 @@ function setupThemeContext($forceload = false)
 		window.onload = smf_avatarResize;'));
 	}
 
-	// This looks weird, but it's because BoardIndex.php references the variable.
+	// This looks weird, but it's because BoardIndex.controller.php references the variable.
 	$context['common_stats']['latest_member'] = array(
 		'id' => $modSettings['latestMember'],
 		'name' => $modSettings['latestRealName'],

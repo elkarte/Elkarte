@@ -267,7 +267,7 @@ function sig_preview()
 	$is_owner = $user == $user_info['id'];
 
 	// @todo Temporary
-	// Borrowed from loadAttachmentContext in Display.php
+	// Borrowed from loadAttachmentContext in Display.controller.php
 	$can_change = $is_owner ? allowedTo(array('profile_extra_any', 'profile_extra_own')) : allowedTo('profile_extra_any');
 
 	$errors = array();

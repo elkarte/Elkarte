@@ -244,7 +244,7 @@ function action_post($post_errors = array())
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
 				// @todo this shouldn't call directly CalendarPost()
-				require_once($sourcedir . '/Calendar.php');
+				require_once($sourcedir . '/Calendar.controller.php');
 				return CalendarPost();
 			}
 
