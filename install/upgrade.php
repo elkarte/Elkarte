@@ -138,9 +138,9 @@ if (isset($_GET['ssi']))
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Cache.subs.php');
+	require_once($sourcedir . '/subs/Cache.subs.php');
 	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/Package.subs.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 
 	loadUserSettings();
 	loadPermissions();
@@ -1938,7 +1938,7 @@ function cli_scheduled_fetchFiles()
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
-	require_once($sourcedir . '/Package.subs.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 
 	foreach ($js_files as $ID_FILE => $file)
 	{

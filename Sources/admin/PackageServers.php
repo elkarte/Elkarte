@@ -127,7 +127,7 @@ function action_servers()
 	{
 		if (isset($_POST['ftp_username']))
 		{
-			require_once($sourcedir . '/Package.class.php');
+			require_once($sourcedir . '/subs/FTPConnection.class.php');
 			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
@@ -145,7 +145,7 @@ function action_servers()
 		{
 			if (!isset($ftp))
 			{
-				require_once($sourcedir . '/Package.class.php');
+				require_once($sourcedir . '/subs/FTPConnection.class.php');
 				$ftp = new ftp_connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
@@ -256,7 +256,7 @@ function action_browseserver()
 	@set_time_limit(600);
 
 	// Read packages.xml and parse into xmlArray. (the true tells it to trim things ;).)
-	require_once($sourcedir . '/Package.class.php');
+	require_once($sourcedir . '/subs/XmlArray.class.php');
 	$listing = new xmlArray(fetch_web_data($_GET['package']), true);
 
 	// Errm.... empty file?  Try the URL....
