@@ -1108,7 +1108,7 @@ function ViewWatchedUsers()
 
 		if (!empty($toDelete))
 		{
-			require_once($sourcedir . '/RemoveTopic.php');
+			require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 			// If they don't have permission we'll let it error - either way no chance of a security slip here!
 			foreach ($toDelete as $did)
 				removeMessage($did);

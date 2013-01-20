@@ -1270,7 +1270,7 @@ function MaintainRemoveOldPosts()
 	validateToken('admin-maint');
 
 	// Actually do what we're told!
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 	RemoveOldTopics2();
 }
 
