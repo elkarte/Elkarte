@@ -507,7 +507,7 @@ function action_post($post_errors = array())
 		// Previewing an edit?
 		if (isset($_REQUEST['msg']) && !empty($topic))
 		{
-			require_once($sourcedir . '/Subs-Messages.php');
+			require_once($librarydir . '/Messages.subs.php');
 			// Get the existing message.
 			$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 			// The message they were trying to edit was most likely deleted.
@@ -527,7 +527,7 @@ function action_post($post_errors = array())
 	{
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-		require_once($sourcedir . '/Subs-Messages.php');
+		require_once($librarydir . '/Messages.subs.php');
 		// Get the existing message.
 		$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 		// The message they were trying to edit was most likely deleted.
