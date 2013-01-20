@@ -82,7 +82,7 @@ function ModifyMembergroups()
  */
 function MembergroupIndex()
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $sourcedir, $user_info;
+	global $txt, $scripturl, $context, $settings, $smcFunc, $librarydir, $user_info;
 
 	$context['page_title'] = $txt['membergroups_title'];
 
@@ -93,7 +93,7 @@ function MembergroupIndex()
 		'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : ''),
 		'default_sort_col' => 'name',
 		'get_items' => array(
-			'file' => $sourcedir . '/subs/Membergroups.subs.php',
+			'file' => $librarydir . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -196,7 +196,7 @@ function MembergroupIndex()
 		),
 	);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// The second list shows the post count based groups.
@@ -210,7 +210,7 @@ function MembergroupIndex()
 			'desc' => 'desc2',
 		),
 		'get_items' => array(
-			'file' => $sourcedir . '/subs/Membergroups.subs.php',
+			'file' => $librarydir . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'post_count',
@@ -629,11 +629,11 @@ function AddMembergroup()
  */
 function DeleteMembergroup()
 {
-	global $sourcedir;
+	global $librarydir;
 
 	checkSession('get');
 
-	require_once($sourcedir . '/subs/Membergroups.subs.php');
+	require_once($librarydir . '/Membergroups.subs.php');
 	deleteMembergroups((int) $_REQUEST['group']);
 
 	// Go back to the membergroup index.
@@ -652,7 +652,7 @@ function DeleteMembergroup()
  */
 function EditMembergroup()
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc;
+	global $context, $txt, $librarydir, $modSettings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) && $_REQUEST['group'] > 0 ? (int) $_REQUEST['group'] : 0;
 
@@ -689,7 +689,7 @@ function EditMembergroup()
 		checkSession();
 		validateToken('admin-mmg');
 
-		require_once($sourcedir . '/subs/Membergroups.subs.php');
+		require_once($librarydir . '/Membergroups.subs.php');
 		deleteMembergroups($_REQUEST['group']);
 
 		redirectexit('action=admin;area=membergroups;');

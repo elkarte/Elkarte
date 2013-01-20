@@ -404,7 +404,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 
 /**
  * Generates a random password for a user and emails it to them.
- * - called by Profile.php when changing someone's username.
+ * - called by ProfileOptions controller when changing someone's username.
  * - checks the validity of the new username.
  * - generates and sets a new password for the given user.
  * - mails the new password to the email address of the user.
@@ -415,11 +415,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $sourcedir, $modSettings, $smcFunc, $language;
+	global $sourcedir, $librarydir, $modSettings, $smcFunc, $language;
 
 	// Language... and a required file.
 	loadLanguage('Login');
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Get some important details.
 	$request = $smcFunc['db_query']('', '
@@ -478,7 +478,7 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $sourcedir, $txt, $smcFunc, $user_info;
+	global $sourcedir, $librarydir, $txt, $smcFunc, $user_info;
 
 	$errors = array();
 
@@ -499,7 +499,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
 
 	if ($check_reserved_name)
 	{
-		require_once($sourcedir . '/subs/Members.subs.php');
+		require_once($librarydir . '/Members.subs.php');
 		if (isReservedName($username, $memID, false))
 			$errors[] = array('done', '(' . htmlspecialchars($username) . ') ' . $txt['name_in_use']);
 	}

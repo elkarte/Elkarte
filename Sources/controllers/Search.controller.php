@@ -40,7 +40,7 @@ $GLOBALS['search_versions'] = array(
  */
 function action_plushsearch1()
 {
-	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc, $sourcedir;
+	global $txt, $scripturl, $modSettings, $librarydir, $user_info, $context, $smcFunc, $sourcedir;
 
 	// Is the load average too high to allow searching just now?
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
@@ -66,7 +66,7 @@ function action_plushsearch1()
 	$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'search',
 		);
@@ -253,7 +253,7 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $sourcedir, $txt, $db_connection;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, $smcFunc;
+	global $excludedWords, $participants, $smcFunc, $librarydir;
 
 	// if comming from the quick search box, and we want to search on members, well we need to do that ;)
 	if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
@@ -336,7 +336,7 @@ function action_plushsearch2()
 	isAllowedTo('search_posts');
 
 	require_once($sourcedir . '/controllers/Display.controller.php');
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Search has a special database set.
 	db_extend('search');
@@ -919,7 +919,7 @@ function action_plushsearch2()
 			$context['search_errors']['need_verification_code'] = true;
 		else
 		{
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
@@ -2706,9 +2706,9 @@ function prepareSearchContext($reset = false)
  */
 function findSearchAPI()
 {
-	global $sourcedir, $modSettings, $search_versions, $searchAPI, $txt;
+	global $sourcedir, $librarydir, $modSettings, $search_versions, $searchAPI, $txt;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Search has a special database set.
 	db_extend('search');

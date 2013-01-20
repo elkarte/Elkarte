@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function Packages()
 {
-	global $txt, $scripturl, $sourcedir, $context;
+	global $txt, $scripturl, $sourcedir, $librarydir, $context;
 
 	// @todo Remove this!
 	if (isset($_GET['get']) || isset($_GET['pgdownload']))
@@ -37,7 +37,7 @@ function Packages()
 	isAllowedTo('admin_forum');
 
 	// Load all the basic stuff.
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 	loadLanguage('Packages');
 	loadTemplate('Packages', 'admin');
 
@@ -99,7 +99,7 @@ function Packages()
  */
 function PackageInstallTest()
 {
-	global $boarddir, $txt, $context, $scripturl, $sourcedir, $modSettings, $smcFunc, $settings;
+	global $boarddir, $txt, $context, $scripturl, $sourcedir, $librarydir, $modSettings, $smcFunc, $settings;
 
 	// You have to specify a file!!
 	if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -109,7 +109,7 @@ function PackageInstallTest()
 	// Do we have an existing id, for uninstalls and the like.
 	$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Load up the package FTP information?
 	create_chmod_control();
@@ -331,7 +331,7 @@ function PackageInstallTest()
 
 			if (!empty($action['parse_bbc']))
 			{
-				require_once($sourcedir . '/subs/Post.subs.php');
+				require_once($librarydir . '/Post.subs.php');
 				preparsecode($context[$type]);
 				$context[$type] = parse_bbc($context[$type]);
 			}
@@ -765,7 +765,7 @@ function PackageInstallTest()
  */
 function PackageInstall()
 {
-	global $boarddir, $txt, $context, $boardurl, $scripturl, $sourcedir, $modSettings;
+	global $boarddir, $txt, $context, $boardurl, $scripturl, $sourcedir, $librarydir, $modSettings;
 	global $user_info, $smcFunc;
 
 	// Make sure we don't install this mod twice.
@@ -780,7 +780,7 @@ function PackageInstall()
 	// If this is an uninstall, we'll have an id.
 	$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// @todo Perhaps do it in steps, if necessary?
 
@@ -1215,9 +1215,9 @@ function PackageInstall()
  */
 function PackageList()
 {
-	global $txt, $scripturl, $boarddir, $context, $sourcedir;
+	global $txt, $scripturl, $boarddir, $context, $sourcedir, $librarydir;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// No package?  Show him or her the door.
 	if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -1247,7 +1247,7 @@ function ExamineFile()
 {
 	global $txt, $scripturl, $boarddir, $context, $sourcedir;
 
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// No package?  Show him or her the door.
 	if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -1315,12 +1315,12 @@ function InstalledList()
  */
 function FlushInstall()
 {
-	global $boarddir, $sourcedir, $smcFunc;
+	global $boarddir, $sourcedir, $librarydir, $smcFunc;
 
 	// Always check the session.
 	checkSession('get');
 
-	include_once($sourcedir . '/subs/Package.subs.php');
+	include_once($librarydir . '/Package.subs.php');
 
 	// Record when we last did this.
 	package_put_contents($boarddir . '/Packages/installed.list', time());
@@ -1374,9 +1374,9 @@ function PackageRemove()
  */
 function PackageBrowse()
 {
-	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $settings;
+	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $librarydir, $settings;
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$context['page_title'] .= ' - ' . $txt['browse_packages'];
 	$context['forum_version'] = $forum_version;
@@ -1832,7 +1832,7 @@ function PackageOptions()
  */
 function ViewOperations()
 {
-	global $context, $txt, $boarddir, $sourcedir, $smcFunc, $modSettings;
+	global $context, $txt, $boarddir, $sourcedir, $librarydir, $smcFunc, $modSettings;
 
 	// Can't be in here buddy.
 	isAllowedTo('admin_forum');
@@ -1842,7 +1842,7 @@ function ViewOperations()
 		fatal_lang_error('operation_invalid', 'general');
 
 	// Load the required file.
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Uninstalling the mod?
 	$reverse = isset($_REQUEST['reverse']) ? true : false;

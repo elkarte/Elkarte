@@ -71,12 +71,12 @@ function action_groups()
  */
 function action_grouplist()
 {
-	global $txt, $context, $sourcedir, $scripturl, $user_info;
+	global $txt, $context, $sourcedir, $librarydir, $scripturl, $user_info;
 
 	$context['page_title'] = $txt['viewing_groups'];
 
 	// Making a list is not hard with this beauty.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// Use the standard templates for showing this.
 	$listOptions = array(
@@ -85,7 +85,7 @@ function action_grouplist()
 		'base_href' => $scripturl . '?action=moderate;area=viewgroups;sa=view',
 		'default_sort_col' => 'group',
 		'get_items' => array(
-			'file' => $sourcedir . '/subs/Membergroups.subs.php',
+			'file' => $librarydir . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -199,7 +199,7 @@ function action_grouplist()
  */
 function action_groupmembers()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $sourcedir, $librarydir, $user_info, $settings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
@@ -280,7 +280,7 @@ function action_groupmembers()
 		foreach ($_REQUEST['rem'] as $key => $group)
 			$_REQUEST['rem'][$key] = (int) $group;
 
-		require_once($sourcedir . '/subs/Membergroups.subs.php');
+		require_once($librarydir . '/Membergroups.subs.php');
 		removeMembersFromGroups($_REQUEST['rem'], $_REQUEST['group'], true);
 	}
 	// Must be adding new members to the group...
@@ -348,7 +348,7 @@ function action_groupmembers()
 		// Do the updates...
 		if (!empty($members))
 		{
-			require_once($sourcedir . '/subs/Membergroups.subs.php');
+			require_once($librarydir . '/Membergroups.subs.php');
 			addMembersToGroup($members, $_REQUEST['group'], isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
 		}
 	}
@@ -447,7 +447,7 @@ function action_groupmembers()
  */
 function action_grouprequests()
 {
-	global $txt, $context, $scripturl, $user_info, $sourcedir, $smcFunc, $modSettings, $language;
+	global $txt, $context, $scripturl, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings, $language;
 
 	// Set up the template stuff...
 	$context['page_title'] = $txt['mc_group_requests'];
@@ -566,7 +566,7 @@ function action_grouprequests()
 
 			if (!empty($email_details))
 			{
-				require_once($sourcedir . '/subs/Mail.subs.php');
+				require_once($librarydir . '/Mail.subs.php');
 
 				// They are being approved?
 				if ($_POST['req_action'] == 'approve')
@@ -634,7 +634,7 @@ function action_grouprequests()
 	}
 
 	// We're going to want this for making our list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// This is all the information required for a group listing.
 	$listOptions = array(

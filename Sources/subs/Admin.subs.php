@@ -453,10 +453,10 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global $smcFunc, $sourcedir, $language, $modSettings;
+	global $smcFunc, $sourcedir, $librarydir, $language, $modSettings;
 
 	// We certainly want this.
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
 	$request = $smcFunc['db_query']('', '

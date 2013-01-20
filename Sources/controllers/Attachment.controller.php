@@ -37,7 +37,7 @@ function action_attachment()
  */
 function action_dlattach()
 {
-	global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc;
+	global $txt, $modSettings, $user_info, $scripturl, $context, $librarydir, $topic, $smcFunc;
 
 	// Some defaults that we need.
 	$context['character_set'] = 'UTF-8';
@@ -48,7 +48,7 @@ function action_dlattach()
 		fatal_lang_error('no_access', false);
 
 	// We need to do some work on attachments and avatars.
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	$_REQUEST['attach'] = isset($_REQUEST['attach']) ? (int) $_REQUEST['attach'] : (int) $_REQUEST['id'];
 

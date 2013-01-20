@@ -56,10 +56,10 @@ function action_xmlhttp()
  */
 function action_jumpto()
 {
-	global $user_info, $context, $smcFunc, $sourcedir;
+	global $user_info, $context, $smcFunc, $sourcedir, $librarydir;
 
 	// Find the boards/cateogories they can see.
-	require_once($sourcedir . '/subs/MessageIndex.subs.php');
+	require_once($librarydir . '/MessageIndex.subs.php');
 	$boardListOptions = array(
 		'use_permissions' => true,
 		'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
@@ -79,9 +79,9 @@ function action_jumpto()
 
 function action_messageicons()
 {
-	global $context, $sourcedir, $board;
+	global $context, $sourcedir, $librarydir, $board;
 
-	require_once($sourcedir . '/subs/Editor.subs.php');
+	require_once($librarydir . '/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
 
 	$context['sub_template'] = 'message_icons';
@@ -208,9 +208,9 @@ function action_previews()
 
 function newspreview()
 {
-	global $context, $sourcedir, $smcFunc;
+	global $context, $sourcedir, $librarydir, $smcFunc;
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	$errors = array();
 	$news = !isset($_POST['news'])? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
@@ -236,9 +236,9 @@ function newspreview()
 }
 function newsletterpreview()
 {
-	global $context, $sourcedir, $smcFunc, $txt;
+	global $context, $sourcedir, $librarydir, $smcFunc, $txt;
 
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 	loadLanguage('Errors');
 
 	$context['post_error']['messages'] = array();
@@ -337,9 +337,9 @@ function sig_preview()
 
 function warning_preview()
 {
-	global $context, $sourcedir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $sourcedir, $librarydir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 	loadLanguage('Errors');
 	loadLanguage('ModerationCenter');
 

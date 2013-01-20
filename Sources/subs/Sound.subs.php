@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.
- * Used by action_verificationcode() (Register.php).
+ * Used by action_verificationcode() (Register.controller.php).
  *
  * @param string $word
  * @return boolean false on failure

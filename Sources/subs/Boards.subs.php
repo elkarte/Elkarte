@@ -570,7 +570,7 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $sourcedir, $boards, $smcFunc;
+	global $sourcedir, $librarydir, $boards, $smcFunc;
 
 	// No boards to delete? Return!
 	if (empty($boards_to_remove))
@@ -619,7 +619,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		$topics[] = $row['id_topic'];
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	removeTopics($topics, false);
 
 	// Delete the board's logs.

@@ -38,7 +38,7 @@ function action_post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
-	global $sourcedir, $options, $smcFunc, $language;
+	global $sourcedir, $librarydir, $options, $smcFunc, $language;
 
 	loadLanguage('Post');
 
@@ -54,7 +54,7 @@ function action_post($post_errors = array())
 	if (empty($board) && !$context['make_event'])
 		fatal_lang_error('no_board', false);
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	if (isset($_REQUEST['xml']))
 	{
@@ -197,7 +197,7 @@ function action_post($post_errors = array())
 			isAllowedTo('poll_add_any');
 		$context['can_moderate_poll'] = true;
 
-		require_once($sourcedir . '/subs/Members.subs.php');
+		require_once($librarydir . '/Members.subs.php');
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.
@@ -302,7 +302,7 @@ function action_post($post_errors = array())
 				fatal_lang_error('cannot_post_new', 'user');
 
 			// Load a list of boards for this event in the context.
-			require_once($sourcedir . '/subs/MessageIndex.subs.php');
+			require_once($librarydir . '/MessageIndex.subs.php');
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
@@ -507,7 +507,7 @@ function action_post($post_errors = array())
 		// Previewing an edit?
 		if (isset($_REQUEST['msg']) && !empty($topic))
 		{
-			require_once($sourcedir . '/Subs-Messages.php');
+			require_once($librarydir . '/Messages.subs.php');
 			// Get the existing message.
 			$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 			// The message they were trying to edit was most likely deleted.
@@ -527,7 +527,7 @@ function action_post($post_errors = array())
 	{
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-		require_once($sourcedir . '/Subs-Messages.php');
+		require_once($librarydir . '/Messages.subs.php');
 		// Get the existing message.
 		$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 		// The message they were trying to edit was most likely deleted.
@@ -791,7 +791,7 @@ function action_post($post_errors = array())
 	$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -888,7 +888,7 @@ function action_post($post_errors = array())
 	}
 
 	// Needed for the editor and message icons.
-	require_once($sourcedir . '/subs/Editor.subs.php');
+	require_once($librarydir . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -989,7 +989,7 @@ function action_post($post_errors = array())
  */
 function action_post2()
 {
-	global $board, $topic, $txt, $modSettings, $sourcedir, $context;
+	global $board, $topic, $txt, $modSettings, $sourcedir, $librarydir, $context;
 	global $user_info, $board_info, $options, $smcFunc;
 
 	// Sneaking off, are we?
@@ -1023,7 +1023,7 @@ function action_post2()
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -1032,7 +1032,7 @@ function action_post2()
 			$post_errors = array_merge($post_errors, $context['require_verification']);
 	}
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 	loadLanguage('Post');
 
 	// Drafts enabled and needed?
@@ -1062,7 +1062,7 @@ function action_post2()
 
 		if (!empty($_REQUEST['msg']))
 		{
-			require_once($sourcedir . '/Subs-Attachments.php');
+			require_once($librarydir . '/Attachments.subs.php');
 			$attachmentQuery = array(
 				'attachment_type' => 0,
 				'id_msg' => (int) $_REQUEST['msg'],
@@ -1076,7 +1076,7 @@ function action_post2()
 	$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 	if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 	{
-		 require_once($sourcedir . '/Subs-Attachments.php');
+		 require_once($librarydir . '/Attachments.subs.php');
 		 processAttachments();
 	}
 
@@ -1409,7 +1409,7 @@ function action_post2()
 	if ($posterIsGuest)
 	{
 		// If user is a guest, make sure the chosen name isn't taken.
-		require_once($sourcedir . '/subs/Members.subs.php');
+		require_once($librarydir . '/Members.subs.php');
 		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($row['poster_name']) || $_POST['guestname'] != $row['poster_name']))
 			$post_errors[] = 'bad_name';
 	}
@@ -1471,7 +1471,7 @@ function action_post2()
 		// Make sure guests are actually allowed to vote generally.
 		if ($_POST['poll_guest_vote'])
 		{
-			require_once($sourcedir . '/subs/Members.subs.php');
+			require_once($librarydir . '/Members.subs.php');
 			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 			if (!in_array(-1, $allowedVoteGroups['allowed']))
 				$_POST['poll_guest_vote'] = 0;
@@ -1672,7 +1672,7 @@ function action_post2()
 	// Editing or posting an event?
 	if (isset($_POST['calendar']) && (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1))
 	{
-		require_once($sourcedir . '/subs/Calendar.subs.php');
+		require_once($librarydir . '/Calendar.subs.php');
 
 		// Make sure they can link an event to this post.
 		canLinkEvent();
@@ -1693,7 +1693,7 @@ function action_post2()
 		$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 		// Validate the post...
-		require_once($sourcedir . '/subs/Calendar.subs.php');
+		require_once($librarydir . '/Calendar.subs.php');
 		validateEventPost();
 
 		// If you're not allowed to edit any events, you have to be the poster.
@@ -1900,9 +1900,9 @@ function action_post2()
 function notifyMembersBoard(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $board, $smcFunc, $context;
+	global $modSettings, $librarydir, $board, $smcFunc, $context;
 
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))
@@ -2117,7 +2117,7 @@ function getTopic()
 function action_quotefast()
 {
 	global $modSettings, $user_info, $txt, $settings, $context;
-	global $sourcedir, $smcFunc;
+	global $librarydir, $smcFunc;
 
 	loadLanguage('Post');
 	if (!isset($_REQUEST['xml']))
@@ -2126,7 +2126,7 @@ function action_quotefast()
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 	}
 
-	include_once($sourcedir . '/subs/Post.subs.php');
+	include_once($librarydir . '/Post.subs.php');
 
 	$moderate_boards = boardsAllowedTo('moderate_board');
 
@@ -2221,7 +2221,7 @@ function action_quotefast()
  */
 function action_jsmodify()
 {
-	global $sourcedir, $modSettings, $board, $topic, $txt;
+	global $sourcedir, $librarydir, $modSettings, $board, $topic, $txt;
 	global $user_info, $context, $smcFunc, $language;
 
 	// We have to have a topic!
@@ -2229,7 +2229,7 @@ function action_jsmodify()
 		obExit(false);
 
 	checkSession('get');
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Assume the first message if no message ID was given.
 	$request = $smcFunc['db_query']('', '

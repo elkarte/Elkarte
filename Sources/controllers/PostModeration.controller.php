@@ -314,7 +314,7 @@ function action_unapproved()
  */
 function action_unapproved_attachments()
 {
-	global $txt, $scripturl, $context, $user_info, $sourcedir, $smcFunc, $modSettings;
+	global $txt, $scripturl, $context, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings;
 
 	$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -350,7 +350,7 @@ function action_unapproved_attachments()
 		checkSession('request');
 
 		// This will be handy.
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 
 		// Confirm the attachments are eligible for changing!
 		$request = $smcFunc['db_query']('', '
@@ -384,7 +384,7 @@ function action_unapproved_attachments()
 		}
 	}
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'mc_unapproved_attach',
@@ -641,13 +641,13 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function action_approve()
 {
-	global $user_info, $topic, $board, $sourcedir, $smcFunc;
+	global $user_info, $topic, $board, $sourcedir, $librarydir, $smcFunc;
 
 	checkSession('get');
 
 	$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	isAllowedTo('approve_posts');
 
@@ -694,9 +694,9 @@ function action_approve()
  */
 function approveMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 	if ($current_view == 'topics')
 	{
 		approveTopics($messages);
@@ -722,7 +722,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc, $sourcedir;
+	global $smcFunc, $librarydir;
 
 	// Start with messages and topics.
 	$request = $smcFunc['db_query']('', '
@@ -740,7 +740,7 @@ function approveAllData()
 
 	if (!empty($msgs))
 	{
-		require_once($sourcedir . '/subs/Post.subs.php');
+		require_once($librarydir . '/Post.subs.php');
 		approvePosts($msgs);
 	}
 
@@ -760,7 +760,7 @@ function approveAllData()
 
 	if (!empty($attaches))
 	{
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 		approveAttachments($attaches);
 	}
 }
@@ -774,11 +774,11 @@ function approveAllData()
  */
 function removeMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir, $modSettings;
+	global $sourcedir, $librarydir, $modSettings;
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	if ($current_view == 'topics')
 	{
 		removeTopics($messages);

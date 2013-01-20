@@ -28,16 +28,16 @@ if (!defined('ELKARTE'))
  */
 function action_removetopic2()
 {
-	global $user_info, $topic, $board, $sourcedir, $smcFunc, $context, $modSettings;
+	global $user_info, $topic, $board, $librarydir, $smcFunc, $context, $modSettings;
 
 	// Make sure they aren't being lead around by someone. (:@)
 	checkSession('get');
 
 	// This file needs to be included for sendNotifications().
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// This needs to be included for all the topic db functions
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// Trying to fool us around, are we?
 	if (empty($topic))
@@ -234,7 +234,7 @@ function RemoveOldTopics2()
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $sourcedir, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $sourcedir, $librarydir, $modSettings, $user_info, $smcFunc, $context;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -375,7 +375,7 @@ function removeMessage($message, $decreasePostCount = true)
 			fatal_lang_error('delFirstPost', false);
 
 		// This needs to be included for topic functions
-		require_once($sourcedir . '/subs/Topic.subs.php');
+		require_once($librarydir . '/Topic.subs.php');
 
 		removeTopics($row['id_topic']);
 		return true;
@@ -528,7 +528,7 @@ function removeMessage($message, $decreasePostCount = true)
 			// Mark recycled topic as read.
 			if (!$user_info['is_guest'])
 			{
-				require_once($sourcedir . '/subs/Topic.subs.php');
+				require_once($librarydir . '/Topic.subs.php');
 				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 			}
 
@@ -637,7 +637,7 @@ function removeMessage($message, $decreasePostCount = true)
 		}
 
 		// Delete attachment(s) if they exist.
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 		$attachmentQuery = array(
 			'attachment_type' => 0,
 			'id_msg' => $message,
@@ -656,7 +656,7 @@ function removeMessage($message, $decreasePostCount = true)
 	));
 
 	// And now to update the last message of each board we messed with.
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 	if ($recycle)
 		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
 	else
@@ -672,7 +672,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function action_restoretopic()
 {
-	global $context, $smcFunc, $modSettings, $sourcedir;
+	global $context, $smcFunc, $modSettings, $librarydir;
 
 	// Check session.
 	checkSession('get');
@@ -685,7 +685,7 @@ function action_restoretopic()
 	isAllowedTo('move_any', $modSettings['recycle_board']);
 
 	// We need this file.
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	$unfound_messages = array();
 	$topics_to_restore = array();
@@ -910,7 +910,7 @@ function action_restoretopic()
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $smcFunc, $modSettings, $sourcedir;
+	global $context, $smcFunc, $modSettings, $librarydir;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
@@ -1040,7 +1040,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$topic_exists = true;
 	if ($smcFunc['db_num_rows']($request) == 0)
 	{
-		require_once($sourcedir . '/subs/Topic.subs.php');
+		require_once($librarydir . '/Topic.subs.php');
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
@@ -1130,7 +1130,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	);
 
 	// Need it to update some stats.
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Update stats.
 	updateStats('topic');

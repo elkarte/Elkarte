@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
 {
-	global $sourcedir, $modSettings, $smcFunc;
+	global $sourcedir, $librarydir, $modSettings, $smcFunc;
 
 	// Nothing to do?
 	if (empty($topics))
@@ -120,7 +120,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 
 			// Move the topics to the recycle board.
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 			moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 			// Close reports that are being recycled.
@@ -254,7 +254,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s), if they exist.
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -353,7 +353,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		'calendar_updated' => time(),
 	));
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 	$updates = array();
 	foreach ($adjustBoards as $stats)
 		$updates[] = $stats['id_board'];
@@ -372,7 +372,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopics($topics, $toBoard)
 {
-	global $sourcedir, $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, $smcFunc, $librarydir;
 
 	// Empty array?
 	if (empty($topics))
@@ -661,7 +661,7 @@ function moveTopics($topics, $toBoard)
 		foreach ($topics as $topic_id)
 			cache_put_data('topic_board-' . $topic_id, null, 120);
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	$updates = array_keys($fromBoards);
 	$updates[] = $toBoard;

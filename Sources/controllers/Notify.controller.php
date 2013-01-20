@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  */
 function action_notify()
 {
-	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $smcFunc;
+	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Make sure they aren't a guest or something - guests can't really receive notifications!
 	is_not_guest();
@@ -44,7 +44,7 @@ function action_notify()
 		fatal_lang_error('not_a_topic', false);
 
 	// Our topic functions are here
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// What do we do?  Better ask if they didn't say..
 	if (empty($_GET['sa']))
@@ -93,14 +93,14 @@ function action_notify()
  */
 function action_notifyboard()
 {
-	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $smcFunc;
+	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Permissions are an important part of anything ;).
 	is_not_guest();
 	isAllowedTo('mark_notify');
 
 	// our board functions are here
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	// You have to specify a board to turn notifications on!
 	if (empty($board))
@@ -154,10 +154,10 @@ function action_notifyboard()
  */
 function action_disregardtopic()
 {
-	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
+	global $smcFunc, $user_info, $topic, $sourcedir, $librarydir, $modSettings;
 
 	// our topic functions are here
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// Let's do something only if the function is enabled
 	if (!$user_info['is_guest'] && !empty($modSettings['enable_disregard']))
