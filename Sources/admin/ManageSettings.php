@@ -1124,7 +1124,7 @@ function ModifyBadBehaviorSettings($return_config = false)
  */
 function ModifySignatureSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl;
+	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl, $librarydir;
 
 	$config_vars = array(
 			// Are signatures even enabled?
@@ -1322,7 +1322,7 @@ function ModifySignatureSettings($return_config = false)
 							if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 							{
 								// We'll mess up with images, who knows.
-								require_once($sourcedir . '/Subs-Attachments.php');
+								require_once($librarydir . '/Attachments.subs.php');
 
 								$sizes = url_image_size($matches[7][$key]);
 								if (is_array($sizes))

@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function action_removetopic2()
 {
-	global $user_info, $topic, $board, $sourcedir, $librarydir, $smcFunc, $context, $modSettings;
+	global $user_info, $topic, $board, $librarydir, $smcFunc, $context, $modSettings;
 
 	// Make sure they aren't being lead around by someone. (:@)
 	checkSession('get');
@@ -637,7 +637,7 @@ function removeMessage($message, $decreasePostCount = true)
 		}
 
 		// Delete attachment(s) if they exist.
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 		$attachmentQuery = array(
 			'attachment_type' => 0,
 			'id_msg' => $message,
@@ -672,7 +672,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function action_restoretopic()
 {
-	global $context, $smcFunc, $modSettings, $sourcedir, $librarydir;
+	global $context, $smcFunc, $modSettings, $librarydir;
 
 	// Check session.
 	checkSession('get');
@@ -910,7 +910,7 @@ function action_restoretopic()
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $smcFunc, $modSettings, $sourcedir, $librarydir;
+	global $context, $smcFunc, $modSettings, $librarydir;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 

@@ -1062,7 +1062,7 @@ function action_post2()
 
 		if (!empty($_REQUEST['msg']))
 		{
-			require_once($sourcedir . '/Subs-Attachments.php');
+			require_once($librarydir . '/Attachments.subs.php');
 			$attachmentQuery = array(
 				'attachment_type' => 0,
 				'id_msg' => (int) $_REQUEST['msg'],
@@ -1076,7 +1076,7 @@ function action_post2()
 	$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 	if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 	{
-		 require_once($sourcedir . '/Subs-Attachments.php');
+		 require_once($librarydir . '/Attachments.subs.php');
 		 processAttachments();
 	}
 
@@ -1900,7 +1900,7 @@ function action_post2()
 function notifyMembersBoard(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $librarydir, $board, $smcFunc, $context;
+	global $modSettings, $librarydir, $board, $smcFunc, $context;
 
 	require_once($librarydir . '/Mail.subs.php');
 
@@ -2117,7 +2117,7 @@ function getTopic()
 function action_quotefast()
 {
 	global $modSettings, $user_info, $txt, $settings, $context;
-	global $sourcedir, $librarydir, $smcFunc;
+	global $librarydir, $smcFunc;
 
 	loadLanguage('Post');
 	if (!isset($_REQUEST['xml']))

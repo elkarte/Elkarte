@@ -145,7 +145,7 @@ function action_selectgroup()
 function action_send()
 {
 	global $topic, $board, $board_info, $context, $modSettings;
-	global $language, $scripturl, $txt, $user_info, $sourcedir, $librarydir, $smcFunc;
+	global $language, $scripturl, $txt, $user_info, $librarydir, $smcFunc;
 
 	checkSession();
 

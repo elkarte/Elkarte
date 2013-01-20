@@ -254,7 +254,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s), if they exist.
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -372,7 +372,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopics($topics, $toBoard)
 {
-	global $sourcedir, $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, $smcFunc, $librarydir;
 
 	// Empty array?
 	if (empty($topics))

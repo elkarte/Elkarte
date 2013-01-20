@@ -350,7 +350,7 @@ function action_unapproved_attachments()
 		checkSession('request');
 
 		// This will be handy.
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 
 		// Confirm the attachments are eligible for changing!
 		$request = $smcFunc['db_query']('', '
@@ -722,7 +722,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc, $sourcedir, $librarydir;
+	global $smcFunc, $librarydir;
 
 	// Start with messages and topics.
 	$request = $smcFunc['db_query']('', '
@@ -760,7 +760,7 @@ function approveAllData()
 
 	if (!empty($attaches))
 	{
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 		approveAttachments($attaches);
 	}
 }

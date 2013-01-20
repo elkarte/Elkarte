@@ -91,9 +91,9 @@ function ManageAttachments()
 
 function action_attachments($return_config = false)
 {
-	global $txt, $modSettings, $scripturl, $context, $options, $sourcedir, $boarddir;
+	global $txt, $modSettings, $scripturl, $context, $options, $librarydir, $boarddir;
 
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	// Get the current attachment directory.
 	$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
@@ -277,7 +277,7 @@ function action_attachments($return_config = false)
  */
 function action_avatars($return_config = false)
 {
-	global $txt, $context, $modSettings, $sourcedir, $scripturl;
+	global $txt, $context, $modSettings, $librarydir, $scripturl;
 
 	// Perform a test to see if the GD module or ImageMagick are installed.
 	$testImg = get_extension_funcs('gd') || class_exists('Imagick');
@@ -667,12 +667,12 @@ function list_getNumFiles($browse_type)
  */
 function action_maintenance()
 {
-	global $context, $modSettings, $txt, $smcFunc, $sourcedir;
+	global $context, $modSettings, $txt, $smcFunc, $librarydir;
 
 	$context['sub_template'] = 'maintenance';
 
 	// We're working with them attachments here!
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	// we need our attachments directories...
 	$attach_dirs = getAttachmentDirs();
@@ -796,14 +796,14 @@ function action_moveAvatars()
  */
 function action_byAge()
 {
-	global $modSettings, $smcFunc, $sourcedir;
+	global $modSettings, $smcFunc, $librarydir;
 
 	checkSession('post', 'admin');
 
 	// @todo Ignore messages in topics that are stickied?
 
 	// someone has to do the dirty work
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	// Deleting an attachment?
 	if ($_REQUEST['type'] != 'avatars')
@@ -840,12 +840,12 @@ function action_byAge()
  */
 function action_bySize()
 {
-	global $modSettings, $smcFunc, $sourcedir;
+	global $modSettings, $smcFunc, $librarydir;
 
 	checkSession('post', 'admin');
 
 	// we'll need this
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	// Find humungous attachments.
 	$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
@@ -872,14 +872,14 @@ function action_bySize()
  */
 function action_remove()
 {
-	global $txt, $smcFunc, $language, $sourcedir;
+	global $txt, $smcFunc, $language, $librarydir;
 
 	checkSession('post');
 
 	if (!empty($_POST['remove']))
 	{
 		// we'll need this
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 
 		$attachments = array();
 		// There must be a quicker way to pass this safety test??
@@ -921,12 +921,12 @@ function action_remove()
  */
 function action_removeall()
 {
-	global $txt, $smcFunc, $sourcedir;
+	global $txt, $smcFunc, $librarydir;
 
 	checkSession('get', 'admin');
 
 	// lots of work to do
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
@@ -1562,7 +1562,7 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
  */
 function action_attachpaths()
 {
-	global $modSettings, $scripturl, $context, $txt, $sourcedir, $boarddir, $smcFunc;
+	global $modSettings, $scripturl, $context, $txt, $librarydir, $boarddir, $smcFunc;
 
 	// Since this needs to be done eventually.
 	if (!is_array($modSettings['attachmentUploadDir']))
@@ -1599,7 +1599,7 @@ function action_attachpaths()
 				}
 
 				// OK, so let's try to create it then.
-				require_once($sourcedir . '/Subs-Attachments.php');
+				require_once($librarydir . '/Attachments.subs.php');
 				if (automanage_attachments_create_directory($path))
 					$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
 				else
@@ -2210,7 +2210,7 @@ function list_getBaseDirs()
  */
 function attachDirStatus($dir, $expected_files)
 {
-	global $sourcedir, $context;
+	global $librarydir, $context;
 
 	if (!is_dir($dir))
 		return array('does_not_exist', true, '');
@@ -2245,7 +2245,7 @@ function attachDirStatus($dir, $expected_files)
  */
 function action_transfer()
 {
-	global $modSettings, $context, $smcFunc, $sourcedir, $txt, $boarddir;
+	global $modSettings, $context, $smcFunc, $librarydir, $txt, $boarddir;
 
 	checkSession();
 
@@ -2299,7 +2299,7 @@ function action_transfer()
 		// Where are they going?
 		if (!empty($_POST['auto']))
 		{
-			require_once($sourcedir . '/Subs-Attachments.php');
+			require_once($librarydir . '/Attachments.subs.php');
 
 			$modSettings['automanage_attachments'] = 1;
 			$modSettings['use_subdirectories_for_attachments'] = $_POST['auto'] == -1 ? 0 : 1;

@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 function Display()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings;
-	global $options, $sourcedir, $librarydir, $user_info, $board_info, $topic, $board;
+	global $options, $librarydir, $user_info, $board_info, $topic, $board;
 	global $attachments, $messages_request, $topicinfo, $language, $smcFunc;
 
 	// What are you gonna display if these are empty?!
@@ -1186,7 +1186,7 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $sourcedir, $librarydir, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic, $librarydir, $smcFunc;
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
@@ -1281,7 +1281,7 @@ function loadAttachmentContext($id_msg)
 							// Do we need to remove an old thumbnail?
 							if (!empty($old_id_thumb))
 							{
-								require_once($sourcedir . '/Subs-Attachments.php');
+								require_once($librarydir . '/Attachments.subs.php');
 								removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 							}
 						}
@@ -1363,7 +1363,7 @@ function action_quickmod2()
 	// Check the session = get or post.
 	checkSession('request');
 
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 
 	if (empty($_REQUEST['msgs']))
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);

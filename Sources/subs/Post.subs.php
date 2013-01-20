@@ -294,7 +294,7 @@ function un_preparsecode($message)
  */
 function fixTags(&$message)
 {
-	global $modSettings, $sourcedir;
+	global $modSettings, $librarydir;
 
 	// WARNING: Editing the below can cause large security holes in your forum.
 	// Edit only if you are sure you know what you are doing.
@@ -371,7 +371,7 @@ function fixTags(&$message)
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
 	{
 		// We'll need this for image processing
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 
 		// Find all the img tags - with or without width and height.
 		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);

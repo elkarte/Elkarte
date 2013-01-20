@@ -2349,7 +2349,7 @@ function profileLoadSignatureData()
  */
 function profileLoadAvatarData()
 {
-	global $context, $cur_profile, $modSettings, $scripturl, $sourcedir;
+	global $context, $cur_profile, $modSettings, $scripturl, $librarydir;
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
@@ -2395,7 +2395,7 @@ function profileLoadAvatarData()
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
 	{
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 		$context['avatar_list'] = array();
 		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
 	}
@@ -2523,7 +2523,7 @@ function profileSaveAvatarData(&$value)
 	if (empty($memID) && !empty($context['password_auth_failed']))
 		return false;
 
-	require_once($sourcedir . '/Subs-Attachments.php');
+	require_once($librarydir . '/Attachments.subs.php');
 
 	// We need to know where we're going to be putting it..
 	$uploadDir = getAvatarPath();
@@ -2605,7 +2605,7 @@ function profileSaveAvatarData(&$value)
 				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
-					require_once($sourcedir . '/Subs-Attachments.php');
+					require_once($librarydir . '/Attachments.subs.php');
 					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
 					{
 						$profile_vars['avatar'] = '';
@@ -2649,7 +2649,7 @@ function profileSaveAvatarData(&$value)
 					@chmod($uploadDir . '/avatar_tmp_' . $memID, 0644);
 
 					// @todo remove this require when appropriate
-					require_once($sourcedir . '/Subs-Attachments.php');
+					require_once($librarydir . '/Attachments.subs.php');
 					if (!saveAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
 						return 'bad_avatar';
 
