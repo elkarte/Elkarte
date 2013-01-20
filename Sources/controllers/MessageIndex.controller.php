@@ -752,7 +752,7 @@ function action_quickmod()
 			if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 				redirectexit($redirect_url);
 
-			require_once($sourcedir . '/SplitTopics.php');
+			require_once($sourcedir . '/controllers/SplitTopics.controller.php');
 			return MergeExecute($_REQUEST['topics']);
 		}
 

@@ -144,13 +144,13 @@ function action_register($reg_errors = array())
 	}
 
 	// Any custom fields we want filled in?
-	require_once($sourcedir . '/Profile.php');
+	require_once($sourcedir . '/controllers/Profile.controller.php');
 	loadCustomFields(0, 'register');
 
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($sourcedir . '/ProfileOptions.php');
+		require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 
 		// Setup some important context.
 		loadLanguage('Profile');
@@ -494,8 +494,7 @@ function action_register2($verifiedOpenID = false)
 	// We'll do custom fields after as then we get to use the helper function!
 	if (!empty($_POST['customfield']))
 	{
-		require_once($sourcedir . '/Profile.php');
-		require_once($sourcedir . '/ProfileOptions.php');
+		require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 		makeCustomFieldChanges($memberID, 'register');
 	}
 

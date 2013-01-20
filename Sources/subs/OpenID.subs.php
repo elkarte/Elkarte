@@ -357,7 +357,7 @@ function action_openidreturn()
 		// Were we just verifying the registration state?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
-			require_once($sourcedir . '/Register.php');
+			require_once($sourcedir . '/controllers/Register.controller.php');
 			return action_register2(true);
 		}
 		else
