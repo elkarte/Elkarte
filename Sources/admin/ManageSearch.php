@@ -714,14 +714,14 @@ function loadSearchAPIs()
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.php$~', $file, $matches))
+			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
 			{
 				// Check that this is definitely a valid API!
 				$fp = fopen($sourcedir . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '* SearchAPI-' . $matches[1] . '.php') !== false)
+				if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 				{
 					require_once($sourcedir . '/' . $file);
 
@@ -1021,7 +1021,7 @@ index elkarte_base_index
 	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
 	stopwords 		= ' . $modSettings['sphinx_stopword_path'], '
 	min_word_len 	= 2
-	charset_type 	= ', isset($db_character_set) && $db_character_set === 'utf8' ? 'utf-8' : 'sbcs', '
+	charset_type 	= utf-8
 	charset_table 	= 0..9, A..Z->a..z, _, a..z
 }
 

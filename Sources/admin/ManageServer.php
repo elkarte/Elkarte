@@ -299,7 +299,7 @@ function ModifyCookieSettings($return_config = false)
 		if ($cookiename != $_POST['cookiename'])
 		{
 			$original_session_id = $context['session_id'];
-			include_once($sourcedir . '/Subs-Auth.php');
+			include_once($sourcedir . '/subs/Auth.subs.php');
 
 			// Remove the old cookie.
 			setLoginCookie(-3600, 0);
@@ -757,7 +757,7 @@ function saveSettings(&$config_vars)
 
 	// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 	if (isset($_POST['cookiename']))
-		$_POST['cookiename'] = preg_replace('~[,;\s\.$]+~' . ($context['utf8'] ? 'u' : ''), '', $_POST['cookiename']);
+		$_POST['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $_POST['cookiename']);
 
 	// Fix the forum's URL if necessary.
 	if (isset($_POST['boardurl']))
@@ -824,7 +824,7 @@ function saveSettings(&$config_vars)
 	}
 
 	// Save the relevant settings in the Settings.php file.
-	require_once($sourcedir . '/Subs-Admin.php');
+	require_once($sourcedir . '/subs/Admin.subs.php');
 	updateSettingsFile($new_settings);
 
 	// Now loop through the remaining (database-based) settings.

@@ -120,7 +120,7 @@ function EditSmileySettings($return_config = false)
 	global $modSettings, $context, $settings, $txt, $boarddir, $sourcedir, $scripturl;
 
 	// The directories...
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 
 	// Get the names of the smiley sets.
@@ -470,7 +470,7 @@ function EditSmileySets()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 }
 
@@ -540,7 +540,7 @@ function AddSmiley()
 	global $modSettings, $context, $settings, $txt, $boarddir, $smcFunc;
 
 	// Get a list of all known smiley sets.
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 	$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -1127,7 +1127,7 @@ function EditSmileys()
 				}',
 		);
 
-		require_once($sourcedir . '/Subs-List.php');
+		require_once($sourcedir . '/subs/List.subs.php');
 		createList($listOptions);
 
 		// The list is the only thing to show, so make it the main template.
@@ -1138,7 +1138,7 @@ function EditSmileys()
 	elseif ($context['sub_action'] == 'modifysmiley')
 	{
 		// Get a list of all known smiley sets.
-		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 		$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -1416,7 +1416,7 @@ function InstallSmileySet()
 	loadLanguage('Errors');
 	loadLanguage('Packages');
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 
 	// Installing unless proven otherwise
 	$testing = false;
@@ -1533,7 +1533,7 @@ function InstallSmileySet()
 
 			if (!empty($action['parse_bbc']))
 			{
-				require_once($sourcedir . '/Subs-Post.php');
+				require_once($sourcedir . '/subs/Post.subs.php');
 				preparsecode($context[$type]);
 				$context[$type] = parse_bbc($context[$type]);
 			}
@@ -1952,7 +1952,7 @@ function EditMessageIcons()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 
 	// If we're adding/editing an icon we'll need a list of boards
@@ -1972,7 +1972,7 @@ function EditMessageIcons()
 			'use_permissions' => true,
 			'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 		);
-		require_once($sourcedir . '/Subs-MessageIndex.php');
+		require_once($sourcedir . '/subs/MessageIndex.subs.php');
 		$context['categories'] = getBoardList($boardListOptions);
 	}
 }

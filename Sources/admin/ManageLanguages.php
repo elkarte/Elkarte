@@ -74,7 +74,7 @@ function AddLanguage()
 	if (!empty($_POST['smf_add_sub']))
 	{
 		// Need fetch_web_data.
-		require_once($sourcedir . '/Subs-Package.php');
+		require_once($sourcedir . '/subs/Package.subs.php');
 
 		$context['smf_search_term'] = htmlspecialchars(trim($_POST['smf_add']));
 
@@ -129,7 +129,7 @@ function AddLanguage()
 			),
 		);
 
-		require_once($sourcedir . '/Subs-List.php');
+		require_once($sourcedir . '/subs/List.subs.php');
 		createList($listOptions);
 
 		$context['default_list'] = 'smf_languages';
@@ -153,7 +153,7 @@ function list_getLanguagesList()
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
 
 	// Load the class file and stick it into an array.
-	require_once($sourcedir . '/Class-Package.php');
+	require_once($sourcedir . '/subs/XmlArray.class.php');
 	$language_list = new xmlArray(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
@@ -176,7 +176,7 @@ function list_getLanguagesList()
 				'id' => $file->fetch('id'),
 				'name' => $smcFunc['ucwords']($file->fetch('name')),
 				'version' => $file->fetch('version'),
-				'utf8' => $file->fetch('utf8') ? $txt['yes'] : $txt['no'],
+				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
 				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elkarte_install'] . '</a>',
 			);
@@ -203,7 +203,7 @@ function DownloadLanguage()
 	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
 
 	loadLanguage('ManageSettings');
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/subs/Package.subs.php');
 
 	// Clearly we need to know what to request.
 	if (!isset($_GET['did']))
@@ -552,12 +552,9 @@ function DownloadLanguage()
 
 	// Kill the cache, as it is now invalid..
 	if (!empty($modSettings['cache_enable']))
-	{
 		cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-		cache_put_data('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-	}
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 
 	$context['default_list'] = 'lang_main_files_list';
@@ -580,7 +577,7 @@ function ModifyLanguages()
 
 		if ($_POST['def_language'] != $language)
 		{
-			require_once($sourcedir . '/Subs-Admin.php');
+			require_once($sourcedir . '/subs/Admin.subs.php');
 			updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
 			$language = $_POST['def_language'];
 		}
@@ -677,7 +674,7 @@ function ModifyLanguages()
 				'class' => 'smalltext alert',
 			);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -711,7 +708,7 @@ function list_getLanguages()
 
 	// Override these for now.
 	$settings['actual_theme_dir'] = $settings['base_theme_dir'] = $settings['default_theme_dir'];
-	getLanguages(true, false);
+	getLanguages(true);
 
 	// Put them back.
 	$settings['actual_theme_dir'] = $backup_actual_theme_dir;
@@ -729,7 +726,7 @@ function list_getLanguages()
 		$languages[$lang['filename']] = array(
 			'id' => $lang['filename'],
 			'count' => 0,
-			'char_set' => $txt['lang_character_set'],
+			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
 			'name' => $smcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
@@ -795,8 +792,8 @@ function ModifyLanguageSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
-	// Get our languages. No cache and use utf8.
-	getLanguages(false, false);
+	// Get our languages. No cache.
+	getLanguages(false);
 	foreach ($context['languages'] as $lang)
 		$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
@@ -923,7 +920,7 @@ function ModifyLanguage()
 		validateToken('admin-mlang');
 
 		// @todo Todo: FTP Controls?
-		require_once($sourcedir . '/Subs-Package.php');
+		require_once($sourcedir . '/subs/Package.subs.php');
 
 		// First, Make a backup?
 		if (!empty($modSettings['package_make_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['lang_id'] . '$$$'))
@@ -966,15 +963,12 @@ function ModifyLanguage()
 
 		// Fifth, update getLanguages() cache.
 		if (!empty($modSettings['cache_enable']))
-		{
 			cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-			cache_put_data('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-		}
 
 		// Sixth, if we deleted the default language, set us back to english?
 		if ($context['lang_id'] == $language)
 		{
-			require_once($sourcedir . '/Subs-Admin.php');
+			require_once($sourcedir . '/subs/Admin.subs.php');
 			$language = 'english';
 			updateSettingsFile(array('language' => '\'' . $language . '\''));
 		}
@@ -1015,7 +1009,7 @@ function ModifyLanguage()
 	// Setup the primary settings context.
 	$context['primary_settings'] = array(
 		'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
-		'character_set' => $txt['lang_character_set'],
+		'character_set' => 'UTF-8',
 		'locale' => $txt['lang_locale'],
 		'dictionary' => $txt['lang_dictionary'],
 		'spelling' => $txt['lang_spelling'],

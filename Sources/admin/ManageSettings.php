@@ -890,8 +890,8 @@ function ModifySpamSettings($return_config = false)
 		$count_questions = 0;
 		foreach ($_POST['question'] as $id => $question)
 		{
-			$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT, $context['character_set']));
-			$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT, $context['character_set'])));
+			$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
+			$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT)));
 
 			// Already existed?
 			if (isset($context['question_answers'][$id]))
@@ -1547,7 +1547,7 @@ function ShowCustomProfiles()
 
 	createToken('admin-scp');
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'standard_profile_fields',
@@ -2509,7 +2509,7 @@ function list_integration_hooks()
 	}
 
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/subs/List.subs.php');
 	createList($list_options);
 
 	$context['page_title'] = $txt['hooks_title_list'];
