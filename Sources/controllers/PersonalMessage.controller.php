@@ -159,8 +159,8 @@ function action_pm()
 		'removeall' => 'action_removemessage',
 		'removeall2' => 'action_removemessage2',
 		'report' => 'action_reportmessage',
-		'search' => array('Search.php','MessageSearch'),
-		'search2' => array('Search.php','MessageSearch2'),
+		'search' => array('Search.controller.php','MessageSearch'),
+		'search2' => array('Search.controller.php','MessageSearch2'),
 		'send' => 'action_sendmessage',
 		'send2' => 'action_sendmessage2',
 		'settings' => 'action_messagesettings',
@@ -178,7 +178,7 @@ function action_pm()
 		// So it was set - let's go to that action.
 		if (is_array($subActions[$_REQUEST['sa']]))
 		{
-			require_once($sourcedir . '/' . $subActions[$_REQUEST['sa']][0]);
+			require_once($sourcedir . '/controllers/' . $subActions[$_REQUEST['sa']][0]);
 			$subActions[$_REQUEST['sa']][1]();
 		}
 		else
