@@ -23,291 +23,11 @@ if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
- * Make any theme changes that are sent with the profile.
- *
- * @param int $memID
- * @param int $id_theme
- */
-function makeThemeChanges($memID, $id_theme)
-{
-	global $modSettings, $smcFunc, $context, $user_info;
-
-	$reservedVars = array(
-		'actual_theme_url',
-		'actual_images_url',
-		'base_theme_dir',
-		'base_theme_url',
-		'default_images_url',
-		'default_theme_dir',
-		'default_theme_url',
-		'default_template',
-		'images_url',
-		'number_recent_posts',
-		'smiley_sets_default',
-		'theme_dir',
-		'theme_id',
-		'theme_layers',
-		'theme_templates',
-		'theme_url',
-	);
-
-	// Can't change reserved vars.
-	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		fatal_lang_error('no_access', false);
-
-	// Don't allow any overriding of custom fields with default or non-default options.
-	$request = $smcFunc['db_query']('', '
-		SELECT col_name
-		FROM {db_prefix}custom_fields
-		WHERE active = {int:is_active}',
-		array(
-			'is_active' => 1,
-		)
-	);
-	$custom_fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$custom_fields[] = $row['col_name'];
-	$smcFunc['db_free_result']($request);
-
-	// These are the theme changes...
-	$themeSetArray = array();
-	if (isset($_POST['options']) && is_array($_POST['options']))
-	{
-		foreach ($_POST['options'] as $opt => $val)
-		{
-			if (in_array($opt, $custom_fields))
-				continue;
-
-			// These need to be controlled.
-			if ($opt == 'topics_per_page' || $opt == 'messages_per_page')
-				$val = max(0, min($val, 50));
-			// We don't set this per theme anymore.
-			elseif ($opt == 'allow_no_censored')
-				continue;
-
-			$themeSetArray[] = array($memID, $id_theme, $opt, is_array($val) ? implode(',', $val) : $val);
-		}
-	}
-
-	$erase_options = array();
-	if (isset($_POST['default_options']) && is_array($_POST['default_options']))
-		foreach ($_POST['default_options'] as $opt => $val)
-		{
-			if (in_array($opt, $custom_fields))
-				continue;
-
-			// These need to be controlled.
-			if ($opt == 'topics_per_page' || $opt == 'messages_per_page')
-				$val = max(0, min($val, 50));
-			// Only let admins and owners change the censor.
-			elseif ($opt == 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
-					continue;
-
-			$themeSetArray[] = array($memID, 1, $opt, is_array($val) ? implode(',', $val) : $val);
-			$erase_options[] = $opt;
-		}
-
-	// If themeSetArray isn't still empty, send it to the database.
-	if (empty($context['password_auth_failed']))
-	{
-		if (!empty($themeSetArray))
-		{
-			$smcFunc['db_insert']('replace',
-				'{db_prefix}themes',
-				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-				$themeSetArray,
-				array('id_member', 'id_theme', 'variable')
-			);
-		}
-
-		if (!empty($erase_options))
-		{
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}themes
-				WHERE id_theme != {int:id_theme}
-					AND variable IN ({array_string:erase_variables})
-					AND id_member = {int:id_member}',
-				array(
-					'id_theme' => 1,
-					'id_member' => $memID,
-					'erase_variables' => $erase_options
-				)
-			);
-		}
-
-		$themes = explode(',', $modSettings['knownThemes']);
-		foreach ($themes as $t)
-			cache_put_data('theme_settings-' . $t . ':' . $memID, null, 60);
-	}
-}
-
-/**
- * Make any notification changes that need to be made.
- *
- * @param int $memID id_member
- */
-function makeNotificationChanges($memID)
-{
-	global $smcFunc;
-
-	// Update the boards they are being notified on.
-	if (isset($_POST['edit_notify_boards']) && !empty($_POST['notify_boards']))
-	{
-		// Make sure only integers are deleted.
-		foreach ($_POST['notify_boards'] as $index => $id)
-			$_POST['notify_boards'][$index] = (int) $id;
-
-		// id_board = 0 is reserved for topic notifications.
-		$_POST['notify_boards'] = array_diff($_POST['notify_boards'], array(0));
-
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_board IN ({array_int:board_list})
-				AND id_member = {int:selected_member}',
-			array(
-				'board_list' => $_POST['notify_boards'],
-				'selected_member' => $memID,
-			)
-		);
-	}
-
-	// We are editing topic notifications......
-	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
-	{
-		foreach ($_POST['notify_topics'] as $index => $id)
-			$_POST['notify_topics'][$index] = (int) $id;
-
-		// Make sure there are no zeros left.
-		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
-
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_topic IN ({array_int:topic_list})
-				AND id_member = {int:selected_member}',
-			array(
-				'topic_list' => $_POST['notify_topics'],
-				'selected_member' => $memID,
-			)
-		);
-	}
-}
-
-/**
- * Save any changes to the custom profile fields
- *
- * @param int $memID
- * @param string $area
- * @param bool $sanitize = true
- */
-function makeCustomFieldChanges($memID, $area, $sanitize = true)
-{
-	global $context, $smcFunc, $user_profile, $user_info, $modSettings, $sourcedir;
-
-	if ($sanitize && isset($_POST['customfield']))
-		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
-
-	$where = $area == 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
-
-	// Load the fields we are saving too - make sure we save valid data (etc).
-	$request = $smcFunc['db_query']('', '
-		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
-		FROM {db_prefix}custom_fields
-		WHERE ' . $where . '
-			AND active = {int:is_active}',
-		array(
-			'is_active' => 1,
-			'area' => $area,
-		)
-	);
-	$changes = array();
-	$log_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		/* This means don't save if:
-			- The user is NOT an admin.
-			- The data is not freely viewable and editable by users.
-			- The data is not invisible to users but editable by the owner (or if it is the user is not the owner)
-			- The area isn't registration, and if it is that the field is not suppossed to be shown there.
-		*/
-		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != $user_info['id'] || $row['private'] != 2) && ($area != 'register' || $row['show_reg'] == 0))
-			continue;
-
-		// Validate the user data.
-		if ($row['field_type'] == 'check')
-			$value = isset($_POST['customfield'][$row['col_name']]) ? 1 : 0;
-		elseif ($row['field_type'] == 'select' || $row['field_type'] == 'radio')
-		{
-			$value = $row['default_value'];
-			foreach (explode(',', $row['field_options']) as $k => $v)
-				if (isset($_POST['customfield'][$row['col_name']]) && $_POST['customfield'][$row['col_name']] == $k)
-					$value = $v;
-		}
-		// Otherwise some form of text!
-		else
-		{
-			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
-			if ($row['field_length'])
-				$value = $smcFunc['substr']($value, 0, $row['field_length']);
-
-			// Any masks?
-			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
-			{
-				// @todo We never error on this - just ignore it at the moment...
-				if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-					$value = '';
-				elseif ($row['mask'] == 'number')
-				{
-					$value = (int) $value;
-				}
-				elseif (substr($row['mask'], 0, 5) == 'regex' && preg_match(substr($row['mask'], 5), $value) === 0)
-					$value = '';
-			}
-		}
-
-		// Did it change?
-		if (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] != $value)
-		{
-			$log_changes[] = array(
-				'action' => 'customfield_' . $row['col_name'],
-				'log_type' => 'user',
-				'extra' => array(
-					'previous' => !empty($user_profile[$memID]['options'][$row['col_name']]) ? $user_profile[$memID]['options'][$row['col_name']] : '',
-					'new' => $value,
-					'applicator' => $user_info['id'],
-					'member_affected' => $memID,
-				),
-			);
-			$changes[] = array(1, $row['col_name'], $value, $memID);
-			$user_profile[$memID]['options'][$row['col_name']] = $value;
-		}
-	}
-	$smcFunc['db_free_result']($request);
-
-	call_integration_hook('integrate_save_custom_profile_fields', array($changes, $log_changes, $memID, $area, $sanitize));
-
-	// Make those changes!
-	if (!empty($changes) && empty($context['password_auth_failed']))
-	{
-		$smcFunc['db_insert']('replace',
-			'{db_prefix}themes',
-			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
-			$changes,
-			array('id_theme', 'variable', 'id_member')
-		);
-		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
-		{
-			require_once($sourcedir . '/Logging.php');
-			logActions($log_changes);
-		}
-	}
-}
-
-/**
  * Show all the users buddies, as well as a add/delete interface.
  *
  * @param int $memID id_member
  */
-function editBuddyIgnoreLists($memID)
+function action_editBuddyIgnoreLists($memID)
 {
 	global $sourcedir, $context, $txt, $scripturl, $modSettings, $user_profile;
 
@@ -320,8 +40,8 @@ function editBuddyIgnoreLists($memID)
 	$context['can_send_email'] = allowedTo('send_email_to_members');
 
 	$subActions = array(
-		'buddies' => array('editBuddies', $txt['editBuddies']),
-		'ignore' => array('editIgnoreList', $txt['editIgnoreList']),
+		'buddies' => array('action_editBuddies', $txt['editBuddies']),
+		'ignore' => array('action_editIgnoreList', $txt['editIgnoreList']),
 	);
 
 	$context['list_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
@@ -346,7 +66,7 @@ function editBuddyIgnoreLists($memID)
  *
  * @param int $memID id_member
  */
-function editBuddies($memID)
+function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext, $smcFunc;
@@ -464,11 +184,12 @@ function editBuddies($memID)
 }
 
 /**
- * Allows the user to view their ignore list, as well as the option to manage members on it.
+ * Allows the user to view their ignore list,
+ * as well as the option to manage members on it.
  *
  * @param int $memID id_member
  */
-function editIgnoreList($memID)
+function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext, $smcFunc;
@@ -609,11 +330,11 @@ function account($memID)
 }
 
 /**
- * @todo Needs a description
+ * Allow the user to change the forum options in their profile.
  *
  * @param int $memID id_member
  */
-function forumProfile($memID)
+function action_forumProfile($memID)
 {
 	global $context, $user_profile, $user_info, $txt, $modSettings, $librarydir;
 
@@ -664,11 +385,11 @@ function action_pmprefs($memID)
 }
 
 /**
- * @todo needs a description
+ * Allow the user to pick a theme.
  *
  * @param int $memID id_member
  */
-function theme($memID)
+function action_themepick($memID)
 {
 	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc, $librarydir;
 
@@ -691,12 +412,13 @@ function theme($memID)
 }
 
 /**
- * Changing authentication method? Only appropriate for people using OpenID.
+ * Changing authentication method?
+ * Only appropriate for people using OpenID.
  *
  * @param int $memID id_member
  * @param bool $saving = false
  */
-function authentication($memID, $saving = false)
+function action_authentication($memID, $saving = false)
 {
 	global $context, $cur_profile, $sourcedir, $librarydir, $txt, $post_errors, $modSettings;
 
@@ -780,7 +502,7 @@ function authentication($memID, $saving = false)
  *
  * @param int $memID id_member
  */
-function notification($memID)
+function action_notification($memID)
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $sourcedir, $librarydir, $settings;
 
