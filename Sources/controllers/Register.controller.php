@@ -150,7 +150,7 @@ function action_register($reg_errors = array())
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
+		require_once($librarydir . '/Profile.subs.php');
 
 		// Setup some important context.
 		loadLanguage('Profile');

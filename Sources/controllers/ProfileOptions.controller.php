@@ -660,93 +660,6 @@ function loadProfileFields($force_reload = false)
 }
 
 /**
- * Setup the context for a page load!
- *
- * @param array $fields
- */
-function setupProfileContext($fields)
-{
-	global $profile_fields, $context, $cur_profile, $smcFunc, $txt;
-
-	// Make sure we have this!
-	loadProfileFields(true);
-
-	// First check for any linked sets.
-	foreach ($profile_fields as $key => $field)
-		if (isset($field['link_with']) && in_array($field['link_with'], $fields))
-			$fields[] = $key;
-
-	// Some default bits.
-	$context['profile_prehtml'] = '';
-	$context['profile_posthtml'] = '';
-	$context['profile_javascript'] = '';
-	$context['profile_onsubmit_javascript'] = '';
-
-	$i = 0;
-	$last_type = '';
-	foreach ($fields as $key => $field)
-	{
-		if (isset($profile_fields[$field]))
-		{
-			// Shortcut.
-			$cur_field = &$profile_fields[$field];
-
-			// Does it have a preload and does that preload succeed?
-			if (isset($cur_field['preload']) && !$cur_field['preload']())
-				continue;
-
-			// If this is anything but complex we need to do more cleaning!
-			if ($cur_field['type'] != 'callback' && $cur_field['type'] != 'hidden')
-			{
-				if (!isset($cur_field['label']))
-					$cur_field['label'] = isset($txt[$field]) ? $txt[$field] : $field;
-
-				// Everything has a value!
-				if (!isset($cur_field['value']))
-				{
-					$cur_field['value'] = isset($cur_profile[$field]) ? $cur_profile[$field] : '';
-				}
-
-				// Any input attributes?
-				$cur_field['input_attr'] = !empty($cur_field['input_attr']) ? implode(',', $cur_field['input_attr']) : '';
-			}
-
-			// Was there an error with this field on posting?
-			if (isset($context['profile_errors'][$field]))
-				$cur_field['is_error'] = true;
-
-			// Any javascript stuff?
-			if (!empty($cur_field['js_submit']))
-				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
-			if (!empty($cur_field['js']))
-				$context['profile_javascript'] .= $cur_field['js'];
-
-			// Any template stuff?
-			if (!empty($cur_field['prehtml']))
-				$context['profile_prehtml'] .= $cur_field['prehtml'];
-			if (!empty($cur_field['posthtml']))
-				$context['profile_posthtml'] .= $cur_field['posthtml'];
-
-			// Finally put it into context?
-			if ($cur_field['type'] != 'hidden')
-			{
-				$last_type = $cur_field['type'];
-				$context['profile_fields'][$field] = &$profile_fields[$field];
-			}
-		}
-		// Bodge in a line break - without doing two in a row ;)
-		elseif ($field == 'hr' && $last_type != 'hr' && $last_type != '')
-		{
-			$last_type = 'hr';
-			$context['profile_fields'][$i++]['type'] = 'hr';
-		}
-	}
-
-	// Free up some memory.
-	unset($profile_fields);
-}
-
-/**
  * Save the profile changes.
  */
 function saveProfileFields()
@@ -1533,7 +1446,7 @@ function editIgnoreList($memID)
  */
 function account($memID)
 {
-	global $context, $txt;
+	global $context, $txt, $librarydir;
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -1542,6 +1455,7 @@ function account($memID)
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['account_info'];
 
+	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
@@ -1560,7 +1474,7 @@ function account($memID)
  */
 function forumProfile($memID)
 {
-	global $context, $user_profile, $user_info, $txt, $modSettings;
+	global $context, $user_profile, $user_info, $txt, $modSettings, $librarydir;
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -1570,6 +1484,7 @@ function forumProfile($memID)
 	$context['page_desc'] = $txt['forumProfile_info'];
 	$context['show_preview_button'] = true;
 
+	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'avatar_choice', 'hr', 'personal_text', 'hr',
@@ -1588,7 +1503,7 @@ function forumProfile($memID)
  */
 function pmprefs($memID)
 {
-	global $sourcedir, $context, $txt, $scripturl;
+	global $sourcedir, $context, $txt, $scripturl, $librarydir;
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
@@ -1596,6 +1511,7 @@ function pmprefs($memID)
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['pm_settings_desc'];
 
+	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'pm_prefs',
@@ -1610,7 +1526,7 @@ function pmprefs($memID)
  */
 function theme($memID)
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
+	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc, $librarydir;
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -1619,6 +1535,7 @@ function theme($memID)
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['theme_info'];
 
+	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'id_theme', 'smiley_set', 'hr',
