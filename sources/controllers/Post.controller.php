@@ -518,7 +518,11 @@ function action_post()
 			if ($message === false)
 				fatal_lang_error('no_board', false);
 
-			checkMessagePermissions($message['message']);
+			$errors = checkMessagePermissions($message['message']);
+			if (!empty($errors))
+				foreach ($errors as $error)
+					$post_errors->addError($error);
+
 			prepareMessageContext($message);
 		}
 
@@ -537,7 +541,11 @@ function action_post()
 		if ($message === false)
 			fatal_lang_error('no_message', false);
 
-		checkMessagePermissions($message['message']);
+		$errors = checkMessagePermissions($message['message']);
+		if (!empty($errors))
+			foreach ($errors as $error)
+				$post_errors->addError($error);
+
 		prepareMessageContext($message);
 
 		// Get the stuff ready for the form.
