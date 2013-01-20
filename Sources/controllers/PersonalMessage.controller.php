@@ -2191,11 +2191,8 @@ function action_messagelabels()
  */
 function action_messagesettings()
 {
-	global $txt, $user_settings, $user_info, $context, $sourcedir, $smcFunc;
+	global $txt, $user_settings, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 	global $scripturl, $profile_vars, $cur_profile, $user_profile;
-
-	// Need this for the display.
-	require_once($sourcedir . '/ProfileOptions.php');
 
 	// We want them to submit back to here.
 	$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';
@@ -2230,6 +2227,7 @@ function action_messagesettings()
 		$_POST = htmlspecialchars__recursive($_POST);
 
 		// Save the fields.
+		require_once($librarydir . '/Profile.subs.php');
 		saveProfileFields();
 
 		if (!empty($profile_vars))
@@ -2237,7 +2235,8 @@ function action_messagesettings()
 	}
 
 	// Load up the fields.
-	pmprefs($user_info['id']);
+	require_once($sourcedir . '/ProfileOptions.controller.php');
+	action_pmprefs($user_info['id']);
 }
 
 /**

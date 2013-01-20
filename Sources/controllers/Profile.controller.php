@@ -39,6 +39,7 @@ function ModifyProfile($post_errors = array())
 
 	require_once($librarydir . '/Menu.subs.php');
 
+
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
 		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
@@ -234,7 +235,7 @@ function ModifyProfile($post_errors = array())
 				'pmprefs' => array(
 					'label' => $txt['pmprefs'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'pmprefs',
+					'function' => 'action_pmprefs',
 					'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 					'sc' => 'post',
 					'token' => 'profile-pm%u',
@@ -520,6 +521,8 @@ function ModifyProfile($post_errors = array())
 	$post_errors = array();
 	$profile_vars = array();
 
+	require_once($librarydir . '/Profile.subs.php');
+
 	// Right - are we saving - if so let's save the old data first.
 	if ($context['completed_save'])
 	{
@@ -584,9 +587,7 @@ function ModifyProfile($post_errors = array())
 		}
 		// Authentication changes?
 		elseif ($current_area == 'authentication')
-		{
 			authentication($memID, true);
-		}
 		elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'pmprefs')))
 			saveProfileFields();
 		else

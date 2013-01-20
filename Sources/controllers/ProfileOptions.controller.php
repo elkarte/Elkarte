@@ -23,145 +23,6 @@ if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
- * Save the profile changes.
- */
-function saveProfileFields()
-{
-	global $profile_fields, $profile_vars, $context, $old_profile;
-	global $post_errors, $sourcedir, $librarydir, $modSettings, $cur_profile, $smcFunc;
-
-	require_once($librarydir . '/Profile.subs.php');
-
-	// Load them up.
-	loadProfileFields();
-
-	// This makes things easier...
-	$old_profile = $cur_profile;
-
-	// This allows variables to call activities when they save
-	// - by default just to reload their settings
-	$context['profile_execute_on_save'] = array();
-	if ($context['user']['is_owner'])
-		$context['profile_execute_on_save']['reload_user'] = 'profileReloadUser';
-
-	// Assume we log nothing.
-	$context['log_changes'] = array();
-
-	// Cycle through the profile fields working out what to do!
-	foreach ($profile_fields as $key => $field)
-	{
-		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key == 'signature'))
-			continue;
-
-		// What gets updated?
-		$db_key = isset($field['save_key']) ? $field['save_key'] : $key;
-
-		// Right - we have something that is enabled, we can act upon and has a value posted to it. Does it have a validation function?
-		if (isset($field['input_validate']))
-		{
-			$is_valid = $field['input_validate']($_POST[$key]);
-			// An error occured - set it as such!
-			if ($is_valid !== true)
-			{
-				// Is this an actual error?
-				if ($is_valid !== false)
-				{
-					$post_errors[$key] = $is_valid;
-					$profile_fields[$key]['is_error'] = $is_valid;
-				}
-				// Retain the old value.
-				$cur_profile[$key] = $_POST[$key];
-				continue;
-			}
-		}
-
-		// Are we doing a cast?
-		$field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];
-
-		// Finally, clean up certain types.
-		if ($field['cast_type'] == 'int')
-			$_POST[$key] = (int) $_POST[$key];
-		elseif ($field['cast_type'] == 'float')
-			$_POST[$key] = (float) $_POST[$key];
-		elseif ($field['cast_type'] == 'check')
-			$_POST[$key] = !empty($_POST[$key]) ? 1 : 0;
-
-		// If we got here we're doing OK.
-		if ($field['type'] != 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
-		{
-			// Set the save variable.
-			$profile_vars[$db_key] = $_POST[$key];
-			// And update the user profile.
-			$cur_profile[$key] = $_POST[$key];
-
-			// Are we logging it?
-			if (!empty($field['log_change']) && isset($old_profile[$key]))
-				$context['log_changes'][$key] = array(
-					'previous' => $old_profile[$key],
-					'new' => $_POST[$key],
-				);
-		}
-
-		// Logging group changes are a bit different...
-		if ($key == 'id_group' && $field['log_change'])
-		{
-			profileLoadGroups();
-
-			// Any changes to primary group?
-			if ($_POST['id_group'] != $old_profile['id_group'])
-			{
-				$context['log_changes']['id_group'] = array(
-					'previous' => !empty($old_profile[$key]) && isset($context['member_groups'][$old_profile[$key]]) ? $context['member_groups'][$old_profile[$key]]['name'] : '',
-					'new' => !empty($_POST[$key]) && isset($context['member_groups'][$_POST[$key]]) ? $context['member_groups'][$_POST[$key]]['name'] : '',
-				);
-			}
-
-			// Prepare additional groups for comparison.
-			$additional_groups = array(
-				'previous' => !empty($old_profile['additional_groups']) ? explode(',', $old_profile['additional_groups']) : array(),
-				'new' => !empty($_POST['additional_groups']) ? array_diff($_POST['additional_groups'], array(0)) : array(),
-			);
-
-			sort($additional_groups['previous']);
-			sort($additional_groups['new']);
-
-			// What about additional groups?
-			if ($additional_groups['previous'] != $additional_groups['new'])
-			{
-				foreach ($additional_groups as $type => $groups)
-				{
-					foreach ($groups as $id => $group)
-					{
-						if (isset($context['member_groups'][$group]))
-							$additional_groups[$type][$id] = $context['member_groups'][$group]['name'];
-						else
-							unset($additional_groups[$type][$id]);
-					}
-					$additional_groups[$type] = implode(', ', $additional_groups[$type]);
-				}
-
-				$context['log_changes']['additional_groups'] = $additional_groups;
-			}
-		}
-	}
-
-	// @todo Temporary
-	if ($context['user']['is_owner'])
-		$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
-	else
-		$changeOther = allowedTo('profile_extra_any');
-	if ($changeOther && empty($post_errors))
-	{
-		makeThemeChanges($context['id_member'], isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
-		if (!empty($_REQUEST['sa']))
-			makeCustomFieldChanges($context['id_member'], $_REQUEST['sa'], false);
-	}
-
-	// Free memory!
-	unset($profile_fields);
-}
-
-/**
  * Save the profile changes
  *
  * @param array &$profile_variables
@@ -872,7 +733,7 @@ function forumProfile($memID)
  *
  * @param int $memID id_member
  */
-function pmprefs($memID)
+function action_pmprefs($memID)
 {
 	global $sourcedir, $context, $txt, $scripturl, $librarydir;
 
@@ -2209,45 +2070,6 @@ function profileValidateSignature(&$value)
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
 		return 'signature_max_length';
 	}
-
-	return true;
-}
-
-/**
- * Validate an email address.
- *
- * @param string $email
- * @param int $memID = 0
- * @return boolean|string
- */
-function profileValidateEmail($email, $memID = 0)
-{
-	global $smcFunc, $context;
-
-	$email = strtr($email, array('&#039;' => '\''));
-
-	// Check the name and email for validity.
-	if (trim($email) == '')
-		return 'no_email';
-	if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
-		return 'bad_email';
-
-	// Email addresses should be and stay unique.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
-			email_address = {string:email_address}
-		LIMIT 1',
-		array(
-			'selected_member' => $memID,
-			'email_address' => $email,
-		)
-	);
-
-	if ($smcFunc['db_num_rows']($request) > 0)
-		return 'email_taken';
-	$smcFunc['db_free_result']($request);
 
 	return true;
 }
