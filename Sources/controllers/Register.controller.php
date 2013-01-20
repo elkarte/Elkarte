@@ -144,14 +144,12 @@ function action_register($reg_errors = array())
 	}
 
 	// Any custom fields we want filled in?
-	require_once($sourcedir . '/controllers/Profile.controller.php');
+	require_once($librarydir . '/Profile.subs.php');
 	loadCustomFields(0, 'register');
 
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($librarydir . '/Profile.subs.php');
-
 		// Setup some important context.
 		loadLanguage('Profile');
 		loadTemplate('Profile');

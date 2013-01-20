@@ -1448,6 +1448,9 @@ function account($memID)
 {
 	global $context, $txt, $librarydir;
 
+	// be sure we have this
+	require_once($librarydir . '/Profile.subs.php');
+
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
 		loadCustomFields($memID, 'account');
@@ -1455,7 +1458,6 @@ function account($memID)
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['account_info'];
 
-	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
@@ -1476,6 +1478,9 @@ function forumProfile($memID)
 {
 	global $context, $user_profile, $user_info, $txt, $modSettings, $librarydir;
 
+	// make sure we have this
+	require_once($librarydir . '/Profile.subs.php');
+
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'forumprofile');
@@ -1484,7 +1489,6 @@ function forumProfile($memID)
 	$context['page_desc'] = $txt['forumProfile_info'];
 	$context['show_preview_button'] = true;
 
-	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'avatar_choice', 'hr', 'personal_text', 'hr',
@@ -1505,13 +1509,14 @@ function pmprefs($memID)
 {
 	global $sourcedir, $context, $txt, $scripturl, $librarydir;
 
+	require_once($librarydir . '/Profile.subs.php');
+
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
 
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['pm_settings_desc'];
 
-	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'pm_prefs',
@@ -1528,6 +1533,8 @@ function theme($memID)
 {
 	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc, $librarydir;
 
+	require_once($librarydir . '/Profile.subs.php');
+
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'theme');
@@ -1535,7 +1542,6 @@ function theme($memID)
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['theme_info'];
 
-	require_once($librarydir . '/Profile.subs.php');
 	setupProfileContext(
 		array(
 			'id_theme', 'smiley_set', 'hr',

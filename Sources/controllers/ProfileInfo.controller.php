@@ -24,7 +24,8 @@ if (!defined('ELKARTE'))
  */
 function summary($memID)
 {
-	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile, $sourcedir, $scripturl, $smcFunc, $settings;
+	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
+	global $sourcedir, $librarydir, $scripturl, $smcFunc, $settings;
 
 	// Attempt to load the member's profile data.
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
@@ -247,7 +248,8 @@ function summary($memID)
 		}
 	}
 
-	// To finish this off, custom profile fields
+	// To finish this off, custom profile fields.
+	require_once($librarydir . '/Profile.subs.php');
 	loadCustomFields($memID);
 }
 
