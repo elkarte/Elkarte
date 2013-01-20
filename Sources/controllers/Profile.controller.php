@@ -174,7 +174,7 @@ function ModifyProfile($post_errors = array())
 				'account' => array(
 					'label' => $txt['account'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'account',
+					'function' => 'action_account',
 					'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
 					'sc' => 'post',
 					'token' => 'profile-ac%u',
@@ -247,7 +247,7 @@ function ModifyProfile($post_errors = array())
 				'ignoreboards' => array(
 					'label' => $txt['ignoreboards'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'ignoreboards',
+					'function' => 'action_ignoreboards',
 					'enabled' => !empty($modSettings['allow_ignore_boards']),
 					'sc' => 'post',
 					'token' => 'profile-ib%u',

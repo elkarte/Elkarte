@@ -300,11 +300,11 @@ function action_editIgnoreList($memID)
 }
 
 /**
- * @todo Needs a description
+ * Allows the user to see or change their account info.
  *
  * @param int $memID id_member
  */
-function account($memID)
+function action_account($memID)
 {
 	global $context, $txt, $librarydir;
 
@@ -907,11 +907,12 @@ function loadThemeOptions($memID)
 }
 
 /**
- * @todo needs a description
+ * Allows the user to see the list of their ignored boards.
+ * (and un-ignore them)
  *
  * @param int $memID id_member
  */
-function ignoreboards($memID)
+function action_ignoreboards($memID)
 {
 	global $txt, $user_info, $context, $modSettings, $smcFunc, $cur_profile;
 
