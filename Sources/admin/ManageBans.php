@@ -102,7 +102,7 @@ function Ban()
 function action_list()
 {
 	global $txt, $context, $ban_request, $ban_counts, $scripturl;
-	global $user_info, $smcFunc, $sourcedir;
+	global $user_info, $smcFunc, $sourcedir, $librarydir;
 
 	// User pressed the 'remove selection button'.
 	if (!empty($_POST['removeBans']) && !empty($_POST['remove']) && is_array($_POST['remove']))
@@ -1134,7 +1134,7 @@ function action_edittrigger()
 function action_browse()
 {
 	global $modSettings, $context, $scripturl, $smcFunc, $txt;
-	global $sourcedir, $settings;
+	global $sourcedir, $librarydir, $settings;
 
 	if (!empty($_POST['remove_triggers']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 	{
@@ -1416,7 +1416,7 @@ function list_getNumBanTriggers($trigger_type)
  */
 function action_log()
 {
-	global $scripturl, $context, $smcFunc, $sourcedir, $txt;
+	global $scripturl, $context, $smcFunc, $sourcedir, $librarydir, $txt;
 	global $context;
 
 	// Delete one or more entries.

@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function action_boardindex()
 {
-	global $txt, $user_info, $sourcedir, $modSettings, $context, $settings, $scripturl;
+	global $txt, $user_info, $sourcedir, $librarydir, $modSettings, $context, $settings, $scripturl;
 
 	loadTemplate('BoardIndex');
 
@@ -123,7 +123,7 @@ function action_boardindex()
  */
 function action_collapse()
 {
-	global $user_info, $sourcedir, $context;
+	global $user_info, $sourcedir, $librarydir, $context;
 
 	// Just in case, no need, no need.
 	$context['robot_no_index'] = true;

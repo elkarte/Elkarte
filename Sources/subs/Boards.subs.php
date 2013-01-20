@@ -570,7 +570,7 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $sourcedir, $boards, $smcFunc;
+	global $sourcedir, $librarydir, $boards, $smcFunc;
 
 	// No boards to delete? Return!
 	if (empty($boards_to_remove))

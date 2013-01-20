@@ -1290,7 +1290,7 @@ function action_picktheme()
  */
 function action_installtheme()
 {
-	global $sourcedir, $boarddir, $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
+	global $librarydir, $boarddir, $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
 
 	checkSession('request');
 
@@ -1476,7 +1476,7 @@ function action_installtheme()
 		{
 			$theme_info = file_get_contents($theme_dir . '/theme_info.xml');
 			// Parse theme-info.xml into an xmlArray.
-			require_once($sourcedir . '/Package.class.php');
+			require_once($librarydir . '/XmlArray.class.php');
 			$theme_info_xml = new xmlArray($theme_info);
 			// @todo Error message of some sort?
 			if (!$theme_info_xml->exists('theme-info[0]'))

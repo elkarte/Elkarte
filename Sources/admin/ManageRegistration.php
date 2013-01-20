@@ -92,7 +92,7 @@ function RegCenter()
  */
 function AdminRegister()
 {
-	global $txt, $context, $sourcedir, $scripturl, $smcFunc;
+	global $txt, $context, $sourcedir, $librarydir, $scripturl, $smcFunc;
 
 	if (!empty($_POST['regSubmit']))
 	{

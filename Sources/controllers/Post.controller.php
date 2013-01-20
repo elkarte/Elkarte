@@ -38,7 +38,7 @@ function action_post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
-	global $sourcedir, $options, $smcFunc, $language;
+	global $sourcedir, $librarydir, $options, $smcFunc, $language;
 
 	loadLanguage('Post');
 
@@ -989,7 +989,7 @@ function action_post($post_errors = array())
  */
 function action_post2()
 {
-	global $board, $topic, $txt, $modSettings, $sourcedir, $context;
+	global $board, $topic, $txt, $modSettings, $sourcedir, $librarydir, $context;
 	global $user_info, $board_info, $options, $smcFunc;
 
 	// Sneaking off, are we?
@@ -1900,7 +1900,7 @@ function action_post2()
 function notifyMembersBoard(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $board, $smcFunc, $context;
+	global $modSettings, $sourcedir, $librarydir, $board, $smcFunc, $context;
 
 	require_once($librarydir . '/Mail.subs.php');
 
@@ -2117,7 +2117,7 @@ function getTopic()
 function action_quotefast()
 {
 	global $modSettings, $user_info, $txt, $settings, $context;
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $librarydir, $smcFunc;
 
 	loadLanguage('Post');
 	if (!isset($_REQUEST['xml']))
@@ -2221,7 +2221,7 @@ function action_quotefast()
  */
 function action_jsmodify()
 {
-	global $sourcedir, $modSettings, $board, $topic, $txt;
+	global $sourcedir, $librarydir, $modSettings, $board, $topic, $txt;
 	global $user_info, $context, $smcFunc, $language;
 
 	// We have to have a topic!

@@ -425,7 +425,7 @@ function action_recent()
  */
 function action_unread()
 {
-	global $board, $txt, $scripturl, $sourcedir;
+	global $board, $txt, $scripturl, $sourcedir, $librarydir;
 	global $user_info, $context, $settings, $modSettings, $smcFunc, $options;
 
 	// Guests can't have unread things, we don't know anything about them.

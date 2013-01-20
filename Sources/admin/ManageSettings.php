@@ -1037,7 +1037,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			$context[$list] = unserialize($modSettings[$list]);
 
 		if (!empty($modSettings[$list . '_desc']))
-			$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);	
+			$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);
 	}
 
 	// Build up our options array
@@ -1058,7 +1058,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			'',
 			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
-			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),	
+			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
 		array('title', 'badbehavior_whitelist_title'),
 			array('desc', 'badbehavior_wl_desc'),
 			array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
@@ -1100,7 +1100,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 	}
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
-	
+
 	// javascript vars for the "add more xyz" buttons in the callback forms
 	addInlineJavascript('
 	var sUrlParent = \'add_more_url_placeholder\';
@@ -1502,7 +1502,7 @@ function pauseSignatureApplySettings()
 function ShowCustomProfiles()
 {
 	global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
-	global $modSettings, $sourcedir;
+	global $modSettings, $sourcedir, $librarydir;
 
 	$context['page_title'] = $txt['custom_profile_title'];
 	$context['sub_template'] = 'show_custom_profile';
@@ -2341,7 +2341,7 @@ function ModifyGeneralModSettings($return_config = false)
  */
 function list_integration_hooks()
 {
-	global $sourcedir, $scripturl, $context, $txt, $modSettings, $settings;
+	global $sourcedir, $librarydir, $scripturl, $context, $txt, $modSettings, $settings;
 
 	$context['filter_url'] = '';
 	$context['current_filter'] = '';

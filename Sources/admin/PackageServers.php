@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function PackageServers()
 {
-	global $txt, $scripturl, $context, $boarddir, $sourcedir, $modSettings;
+	global $txt, $scripturl, $context, $boarddir, $sourcedir, $librarydir, $modSettings;
 
 	isAllowedTo('admin_forum');
 	require_once($librarydir . '/Package.subs.php');
@@ -89,7 +89,7 @@ function PackageServers()
  */
 function action_servers()
 {
-	global $txt, $scripturl, $context, $boarddir, $sourcedir, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $boarddir, $sourcedir, $librarydir, $modSettings, $smcFunc;
 
 	// Ensure we use the correct template, and page title.
 	$context['sub_template'] = 'servers';
@@ -184,7 +184,7 @@ function action_servers()
  */
 function action_browseserver()
 {
-	global $txt, $boardurl, $context, $scripturl, $boarddir, $sourcedir, $forum_version, $context, $smcFunc;
+	global $txt, $boardurl, $context, $scripturl, $boarddir, $sourcedir, $librarydir, $forum_version, $context, $smcFunc;
 
 	if (isset($_GET['server']))
 	{

@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function AdminMain()
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $options, $smcFunc, $boarddir;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $librarydir, $options, $smcFunc, $boarddir;
 
 	// Load the language and templates....
 	loadLanguage('Admin');
@@ -551,7 +551,7 @@ function AdminMain()
 */
 function AdminHome()
 {
-	global $sourcedir, $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+	global $sourcedir, $librarydir, $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
 
 	// You have to be able to do at least one of the below to see this page.
 	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -710,7 +710,7 @@ if (!(\'smfForum_sessionvar\' in window))
  */
 function AdminSearch()
 {
-	global $txt, $context, $smcFunc, $sourcedir;
+	global $txt, $context, $smcFunc, $sourcedir, $librarydir;
 
 	isAllowedTo('admin_forum');
 
@@ -908,7 +908,7 @@ function AdminSearchMember()
  */
 function AdminSearchOM()
 {
-	global $context, $sourcedir;
+	global $context, $sourcedir, $librarydir;
 
 	$context['doc_apiurl'] = 'https://github.com/elkarte/Elkarte/wiki/api.php';
 	$context['doc_scripturl'] = 'https://github.com/elkarte/Elkarte/wiki/';

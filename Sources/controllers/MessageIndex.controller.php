@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 function MessageIndex()
 {
 	global $txt, $scripturl, $board, $modSettings, $context;
-	global $options, $settings, $board_info, $user_info, $smcFunc, $sourcedir;
+	global $options, $settings, $board_info, $user_info, $smcFunc, $sourcedir, $librarydir;
 
 	// If this is a redirection board head off.
 	if ($board_info['redirect'])
@@ -674,7 +674,7 @@ function MessageIndex()
  */
 function action_quickmod()
 {
-	global $sourcedir, $board, $user_info, $modSettings, $smcFunc, $context;
+	global $sourcedir, $librarydir, $board, $user_info, $modSettings, $smcFunc, $context;
 
 	// Check the session = get or post.
 	checkSession('request');

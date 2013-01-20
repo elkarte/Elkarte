@@ -287,7 +287,7 @@ function subscriptions($memID)
  */
 function action_activateaccount($memID)
 {
-	global $sourcedir, $context, $user_profile, $modSettings, $user_info;
+	global $sourcedir, $context, $user_profile, $modSettings, $user_info, $librarydir;
 
 	isAllowedTo('moderate_forum');
 

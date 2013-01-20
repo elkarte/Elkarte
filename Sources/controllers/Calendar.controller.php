@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function action_calendar()
 {
-	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir;
+	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir, $librarydir;
 
 	// Permissions, permissions, permissions.
 	isAllowedTo('calendar_view');
@@ -169,7 +169,7 @@ function action_calendar()
  */
 function CalendarPost()
 {
-	global $context, $txt, $user_info, $sourcedir, $scripturl;
+	global $context, $txt, $user_info, $sourcedir, $librarydir, $scripturl;
 	global $modSettings, $topic, $smcFunc;
 
 	// Well - can they?
@@ -341,7 +341,7 @@ function CalendarPost()
  */
 function action_ical()
 {
-	global $smcFunc, $sourcedir, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
+	global $smcFunc, $sourcedir, $librarydir, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 	// You can't export if the calendar export feature is off.
 	if (empty($modSettings['cal_export']))

@@ -926,7 +926,7 @@ function ForumSettings()
 		// UTF-8 requires a setting to override any language charset.
 		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
 		{
-			// our uft-8 check support on the db failed .... 
+			// our uft-8 check support on the db failed ....
 			$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
 			return false;
 		}
@@ -1359,7 +1359,7 @@ function DeleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $sourcedir, $librarydir, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';

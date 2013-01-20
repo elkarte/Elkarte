@@ -71,7 +71,7 @@ function action_history($memID)
  */
 function action_trackactivity($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir;
+	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir;
 	global $user_profile, $context, $smcFunc;
 
 	// Verify if the user has sufficient permissions.
@@ -438,7 +438,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 function action_trackip($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc;
+	global $context, $smcFunc, $librarydir;
 
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
@@ -724,7 +724,7 @@ function action_trackip($memID = 0)
 function action_tracklogin($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc;
+	global $context, $smcFunc, $librarydir;
 
 	// Gonna want this for the list.
 	require_once($librarydir . '/List.subs.php');
@@ -864,7 +864,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir, $context, $smcFunc;
+	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir, $context, $smcFunc;
 
 	require_once($librarydir . '/List.subs.php');
 

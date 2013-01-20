@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function action_karma()
 {
-	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir;
+	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir, $librarydir;
 
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))

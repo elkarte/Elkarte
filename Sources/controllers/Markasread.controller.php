@@ -55,7 +55,7 @@ function markasread()
  */
 function action_markboards()
 {
-	global $sourcedir, $modSettings;
+	global $sourcedir, $librarydir, $modSettings;
 
 	require_once($librarydir . '/Boards.subs.php');
 
@@ -81,7 +81,7 @@ function action_markboards()
  */
 function action_markreplies()
 {
-	global $user_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// Make sure all the topics are integers!
 	$topics = array_map('intval', explode('-', $_REQUEST['topics']));
@@ -120,7 +120,7 @@ function action_markreplies()
  */
 function action_marktopic()
 {
-	global $board, $topic, $user_info, $smcFunc, $sourcedir;
+	global $board, $topic, $user_info, $smcFunc, $sourcedir, $librarydir;
 
 	// Mark a topic unread.
 	// First, let's figure out what the latest message is.
@@ -200,7 +200,7 @@ function action_marktopic()
  */
 function action_markasread()
 {
-	global $board, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir;
+	global $board, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// no guests
 	is_not_guest();

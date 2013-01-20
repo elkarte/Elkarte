@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $librarydir, $smcFunc;
 
 	$catUpdates = array();
 	$catParameters = array();
@@ -186,7 +186,7 @@ function createCategory($catOptions)
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $sourcedir, $smcFunc, $cat_tree;
+	global $sourcedir, $librarydir, $smcFunc, $cat_tree;
 
 	require_once($librarydir . '/Boards.subs.php');
 

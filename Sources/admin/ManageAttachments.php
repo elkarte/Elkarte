@@ -373,7 +373,7 @@ function action_avatars($return_config = false)
 function action_browse()
 {
 	global $context, $txt, $scripturl, $options, $modSettings;
-	global $smcFunc, $sourcedir;
+	global $smcFunc, $librarydir;
 
 	$context['sub_template'] = 'browse';
 
@@ -1854,7 +1854,7 @@ function action_attachpaths()
 		// Or adding a new one?
 		if (!empty($_POST['new_base_dir']))
 		{
-			require_once($sourcedir . '/Subs-Attachments.php');
+			require_once($librarydir . '/Attachments.subs.php');
 			$_POST['new_base_dir'] = htmlspecialchars($_POST['new_base_dir'], ENT_QUOTES);
 
 			$current_dir = $modSettings['currentAttachmentUploadDir'];

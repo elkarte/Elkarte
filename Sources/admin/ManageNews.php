@@ -88,7 +88,7 @@ function ManageNews()
  */
 function EditNews()
 {
-	global $txt, $modSettings, $context, $sourcedir, $user_info, $scripturl;
+	global $txt, $modSettings, $context, $sourcedir, $librarydir, $user_info, $scripturl;
 	global $smcFunc;
 
 	require_once($librarydir . '/Post.subs.php');
@@ -433,7 +433,7 @@ function SelectMailingMembers()
  */
 function ComposeMailing()
 {
-	global $txt, $sourcedir, $context, $smcFunc, $scripturl, $modSettings;
+	global $txt, $sourcedir, $librarydir, $context, $smcFunc, $scripturl, $modSettings;
 
 	// Setup the template!
 	$context['page_title'] = $txt['admin_newsletters'];

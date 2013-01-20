@@ -52,7 +52,7 @@ function action_reminder()
  */
 function action_picktype()
 {
-	global $context, $txt, $scripturl, $sourcedir, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
+	global $context, $txt, $scripturl, $sourcedir, $librarydir, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
 
 	checkSession();
 	validateToken('remind');
@@ -202,7 +202,7 @@ function action_setpassword()
  */
 function action_setpassword2()
 {
-	global $context, $txt, $modSettings, $smcFunc, $sourcedir;
+	global $context, $txt, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	checkSession();
 	validateToken('remind-sp');
@@ -334,7 +334,7 @@ function SecretAnswerInput()
  */
 function action_secret2()
 {
-	global $txt, $context, $modSettings, $smcFunc, $sourcedir;
+	global $txt, $context, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	checkSession();
 	validateToken('remind-sai');

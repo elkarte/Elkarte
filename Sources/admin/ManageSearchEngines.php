@@ -148,7 +148,7 @@ function ManageSearchEngineSettings($return_config = false)
  */
 function ViewSpiders()
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc;
+	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc;
 
 	if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
 	{
@@ -673,7 +673,7 @@ function consolidateSpiderStats()
  */
 function SpiderLogs()
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc, $modSettings;
+	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc, $modSettings;
 
 	// Load the template and language just incase.
 	loadLanguage('Search');
@@ -850,7 +850,7 @@ function list_getNumSpiderLogs()
  */
 function SpiderStats()
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc;
+	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc;
 
 	// Force an update of the stats every 60 seconds.
 	if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)

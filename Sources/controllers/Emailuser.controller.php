@@ -53,7 +53,7 @@ function action_emailuser()
  */
 function action_sendtopic()
 {
-	global $topic, $txt, $context, $scripturl, $sourcedir, $smcFunc, $modSettings;
+	global $topic, $txt, $context, $scripturl, $sourcedir, $librarydir, $smcFunc, $modSettings;
 
 	// Check permissions...
 	isAllowedTo('send_topic');
@@ -156,7 +156,7 @@ function action_sendtopic()
  */
 function action_email()
 {
-	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl, $sourcedir;
+	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl, $sourcedir, $librarydir;
 
 	// Can the user even see this information?
 	if ($user_info['is_guest'] && !empty($modSettings['guest_hideContacts']))
@@ -289,7 +289,7 @@ function action_email()
  */
 function action_reporttm()
 {
-	global $txt, $topic, $sourcedir, $modSettings, $user_info, $context, $smcFunc;
+	global $txt, $topic, $sourcedir, $librarydir, $modSettings, $user_info, $context, $smcFunc;
 
 	$context['robot_no_index'] = true;
 
@@ -385,7 +385,7 @@ function action_reporttm()
  */
 function action_reporttm2()
 {
-	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $sourcedir, $language, $context, $smcFunc;
+	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $sourcedir, $librarydir, $language, $context, $smcFunc;
 
 	// You must have the proper permissions!
 	isAllowedTo('report_any');

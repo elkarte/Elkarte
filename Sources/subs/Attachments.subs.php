@@ -511,7 +511,7 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $sourcedir, $smcFunc;
+	global $modSettings, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if ( empty($_SESSION['temp_attachments'][$attachID]))
@@ -691,7 +691,7 @@ function attachmentChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $sourcedir, $smcFunc, $context;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc, $context;
 	global $txt, $boarddir;
 
 	require_once($librarydir . '/Graphics.subs.php');
@@ -1214,7 +1214,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, $sourcedir, $smcFunc;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc;
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1316,7 +1316,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  */
 function url_image_size($url)
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	// Make sure it is a proper URL.
 	$url = str_replace(' ', '%20', $url);

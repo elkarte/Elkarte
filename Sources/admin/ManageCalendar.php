@@ -72,7 +72,7 @@ function ManageCalendar()
  */
 function ModifyHolidays()
 {
-	global $sourcedir, $scripturl, $txt, $context;
+	global $librarydir, $scripturl, $txt, $context;
 
 	// Submitting something...
 	if (isset($_REQUEST['delete']) && !empty($_REQUEST['holiday']))

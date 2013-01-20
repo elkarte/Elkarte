@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $sourcedir, $user_info, $sc, $user_settings;
+	global $modSettings, $sourcedir, $librarydir, $user_info, $sc, $user_settings;
 
 	// We don't care if the option is off, because Guests should NEVER get past here.
 	is_not_guest();
@@ -178,7 +178,7 @@ function is_not_guest($message = '')
 function is_not_banned($forceCheck = false)
 {
 	global $txt, $modSettings, $context, $user_info;
-	global $sourcedir, $cookiename, $user_settings, $smcFunc;
+	global $sourcedir, $librarydir, $cookiename, $user_settings, $smcFunc;
 
 	// You cannot be banned if you are an admin - doesn't help if you log out.
 	if ($user_info['is_admin'])
@@ -422,7 +422,7 @@ function is_not_banned($forceCheck = false)
  */
 function banPermissions()
 {
-	global $user_info, $sourcedir, $modSettings, $context;
+	global $user_info, $sourcedir, $librarydir, $modSettings, $context;
 
 	// Somehow they got here, at least take away all permissions...
 	if (isset($_SESSION['ban']['cannot_access']))

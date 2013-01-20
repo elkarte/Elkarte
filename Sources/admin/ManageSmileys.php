@@ -194,7 +194,7 @@ function EditSmileySettings($return_config = false)
 function EditSmileySets()
 {
 	global $modSettings, $context, $settings, $txt, $boarddir;
-	global $smcFunc, $scripturl, $sourcedir;
+	global $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Set the right tab to be selected.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
@@ -787,7 +787,7 @@ function AddSmiley()
 function EditSmileys()
 {
 	global $modSettings, $context, $settings, $txt, $boarddir;
-	global $smcFunc, $scripturl, $sourcedir;
+	global $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Force the correct tab to be displayed.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
@@ -1041,7 +1041,7 @@ function EditSmileys()
 						'value' => $txt['smileys_modify'],
 						'class' => 'centercol',
 					),
-					'data' => array(
+					'data' =>  array(
 						'sprintf' => array(
 							'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
@@ -1408,7 +1408,7 @@ function EditSmileyOrder()
  */
 function InstallSmileySet()
 {
-	global $sourcedir, $boarddir, $modSettings, $smcFunc, $scripturl, $context, $txt, $user_info;
+	global $sourcedir, $librarydir, $boarddir, $modSettings, $smcFunc, $scripturl, $context, $txt, $user_info;
 
 	isAllowedTo('manage_smileys');
 	checkSession('request');
@@ -1712,7 +1712,7 @@ function ImportSmileys($smileyPath)
 function EditMessageIcons()
 {
 	global $user_info, $modSettings, $context, $settings, $txt;
-	global $boarddir, $smcFunc, $scripturl, $sourcedir;
+	global $boarddir, $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Get a list of icons.
 	$context['icons'] = array();

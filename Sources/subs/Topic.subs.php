@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
 {
-	global $sourcedir, $modSettings, $smcFunc;
+	global $sourcedir, $librarydir, $modSettings, $smcFunc;
 
 	// Nothing to do?
 	if (empty($topics))

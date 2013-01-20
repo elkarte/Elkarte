@@ -668,7 +668,7 @@ function GroupPermissionsReport()
  */
 function StaffReport()
 {
-	global $sourcedir, $context, $txt, $smcFunc;
+	global $sourcedir, $librarydir, $context, $txt, $smcFunc;
 
 	require_once($librarydir . '/Members.subs.php');
 

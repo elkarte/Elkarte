@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function action_removetopic2()
 {
-	global $user_info, $topic, $board, $sourcedir, $smcFunc, $context, $modSettings;
+	global $user_info, $topic, $board, $sourcedir, $librarydir, $smcFunc, $context, $modSettings;
 
 	// Make sure they aren't being lead around by someone. (:@)
 	checkSession('get');
@@ -234,7 +234,7 @@ function RemoveOldTopics2()
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $sourcedir, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $sourcedir, $librarydir, $modSettings, $user_info, $smcFunc, $context;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -672,7 +672,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function action_restoretopic()
 {
-	global $context, $smcFunc, $modSettings, $sourcedir;
+	global $context, $smcFunc, $modSettings, $sourcedir, $librarydir;
 
 	// Check session.
 	checkSession('get');
@@ -910,7 +910,7 @@ function action_restoretopic()
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $smcFunc, $modSettings, $sourcedir;
+	global $context, $smcFunc, $modSettings, $sourcedir, $librarydir;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 

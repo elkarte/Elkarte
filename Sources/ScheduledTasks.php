@@ -148,7 +148,7 @@ function AutoTask()
  */
 function scheduled_approval_notification()
 {
-	global $scripturl, $modSettings, $mbname, $txt, $sourcedir, $smcFunc;
+	global $scripturl, $modSettings, $mbname, $txt, $sourcedir, $librarydir, $smcFunc;
 
 	// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
 	$request = $smcFunc['db_query']('', '
@@ -365,7 +365,7 @@ function scheduled_approval_notification()
  */
 function scheduled_daily_maintenance()
 {
-	global $smcFunc, $modSettings, $sourcedir, $db_type;
+	global $smcFunc, $modSettings, $sourcedir, $librarydir, $db_type;
 
 	// First clean out the cache.
 	clean_cache();
@@ -532,7 +532,7 @@ function scheduled_auto_optimize()
  */
 function scheduled_daily_digest()
 {
-	global $is_weekly, $txt, $mbname, $scripturl, $sourcedir, $smcFunc, $context, $modSettings;
+	global $is_weekly, $txt, $mbname, $scripturl, $sourcedir, $librarydir, $smcFunc, $context, $modSettings;
 
 	// We'll want this...
 	require_once($librarydir . '/Mail.subs.php');
@@ -856,7 +856,7 @@ function scheduled_weekly_digest()
  */
 function ReduceMailQueue($number = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $smcFunc, $sourcedir;
+	global $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// Are we intending another script to be sending out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
@@ -1251,7 +1251,7 @@ function loadEssentialThemeData()
  */
 function scheduled_fetchFiles()
 {
-	global $sourcedir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
+	global $sourcedir, $librarydir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
 
 	// What files do we want to get
 	$request = $smcFunc['db_query']('', '
@@ -1318,7 +1318,7 @@ function scheduled_fetchFiles()
  */
 function scheduled_birthdayemails()
 {
-	global $modSettings, $sourcedir, $mbname, $txt, $smcFunc, $birthdayEmails;
+	global $modSettings, $sourcedir, $librarydir, $mbname, $txt, $smcFunc, $birthdayEmails;
 
 	// Need this in order to load the language files.
 	loadEssentialThemeData();
@@ -1599,7 +1599,7 @@ function scheduled_weekly_maintenance()
  */
 function scheduled_paid_subscriptions()
 {
-	global $txt, $sourcedir, $scripturl, $smcFunc, $modSettings, $language;
+	global $txt, $sourcedir, $librarydir, $scripturl, $smcFunc, $modSettings, $language;
 
 	// Start off by checking for removed subscriptions.
 	$request = $smcFunc['db_query']('', '
@@ -1724,7 +1724,7 @@ function scheduled_remove_temp_attachments()
  */
 function scheduled_remove_topic_redirect()
 {
-	global $smcFunc, $sourcedir;
+	global $smcFunc, $sourcedir, $librarydir;
 
 	// init
 	$topics = array();
@@ -1762,7 +1762,7 @@ function scheduled_remove_topic_redirect()
  */
 function scheduled_remove_old_drafts()
 {
-	global $smcFunc, $sourcedir, $modSettings;
+	global $smcFunc, $sourcedir, $librarydir, $modSettings;
 
 	if (empty($modSettings['drafts_keep_days']))
 		return true;

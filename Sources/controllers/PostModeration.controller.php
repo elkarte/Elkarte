@@ -314,7 +314,7 @@ function action_unapproved()
  */
 function action_unapproved_attachments()
 {
-	global $txt, $scripturl, $context, $user_info, $sourcedir, $smcFunc, $modSettings;
+	global $txt, $scripturl, $context, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings;
 
 	$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -641,7 +641,7 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function action_approve()
 {
-	global $user_info, $topic, $board, $sourcedir, $smcFunc;
+	global $user_info, $topic, $board, $sourcedir, $librarydir, $smcFunc;
 
 	checkSession('get');
 
@@ -694,7 +694,7 @@ function action_approve()
  */
 function approveMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	require_once($librarydir . '/Post.subs.php');
 	if ($current_view == 'topics')
@@ -722,7 +722,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc, $sourcedir;
+	global $smcFunc, $sourcedir, $librarydir;
 
 	// Start with messages and topics.
 	$request = $smcFunc['db_query']('', '
@@ -774,7 +774,7 @@ function approveAllData()
  */
 function removeMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir, $modSettings;
+	global $sourcedir, $librarydir, $modSettings;
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't

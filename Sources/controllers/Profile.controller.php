@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function ModifyProfile($post_errors = array())
 {
-	global $txt, $scripturl, $user_info, $context, $sourcedir, $user_profile, $cur_profile;
+	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
 
 	// Don't reload this as we may have processed error strings.

@@ -147,7 +147,7 @@ function ViewMembers()
  */
 function ViewMemberlist()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $smcFunc, $user_info;
+	global $txt, $scripturl, $context, $modSettings, $librarydir, $smcFunc, $user_info;
 
 	// Set the current sub action.
 	$context['sub_action'] = $_REQUEST['sa'];
@@ -680,7 +680,7 @@ function SearchMembers()
 function MembersAwaitingActivation()
 {
 	global $txt, $context, $scripturl, $modSettings, $smcFunc;
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	// Not a lot here!
 	$context['page_title'] = $txt['admin_members'];
@@ -1025,7 +1025,7 @@ function MembersAwaitingActivation()
  */
 function AdminApprove()
 {
-	global $txt, $context, $scripturl, $modSettings, $sourcedir, $language, $user_info, $smcFunc;
+	global $txt, $context, $scripturl, $modSettings, $sourcedir, $librarydir, $language, $user_info, $smcFunc;
 
 	// First, check our session.
 	checkSession();

@@ -254,7 +254,7 @@ function openID_removeAssociation($handle)
  */
 function action_openidreturn()
 {
-	global $smcFunc, $user_info, $user_profile, $sourcedir, $modSettings, $context, $sc, $user_settings;
+	global $smcFunc, $user_info, $user_profile, $sourcedir, $librarydir, $modSettings, $context, $sc, $user_settings;
 
 	// Is OpenID even enabled?
 	if (empty($modSettings['enableOpenID']))
@@ -547,7 +547,7 @@ function openid_generate_private_key()
  */
 function openID_getServerInfo($openid_url)
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	require_once($librarydir . '/Package.subs.php');
 

@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function action_pm()
 {
-	global $txt, $scripturl, $sourcedir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
+	global $txt, $scripturl, $sourcedir, $librarydir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
 
 	// No guests!
 	is_not_guest();
@@ -193,7 +193,7 @@ function action_pm()
  */
 function messageIndexBar($area)
 {
-	global $txt, $context, $scripturl, $sourcedir, $sc, $modSettings, $settings, $user_info, $options;
+	global $txt, $context, $scripturl, $sourcedir, $librarydir, $sc, $modSettings, $settings, $user_info, $options;
 
 	$pm_areas = array(
 		'folders' => array(
@@ -934,7 +934,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
  */
 function action_sendmessage()
 {
-	global $txt, $sourcedir, $scripturl, $modSettings;
+	global $txt, $sourcedir, $librarydir, $scripturl, $modSettings;
 	global $context, $options, $smcFunc, $language, $user_info;
 
 	isAllowedTo('pm_send');
@@ -1245,7 +1245,7 @@ function action_messagedrafts()
 function messagePostError($error_types, $named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global $smcFunc, $user_info, $sourcedir;
+	global $smcFunc, $user_info, $sourcedir, $librarydir;
 
 	if (!isset($_REQUEST['xml']))
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
@@ -1421,7 +1421,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
  */
 function action_sendmessage2()
 {
-	global $txt, $context, $sourcedir;
+	global $txt, $context, $sourcedir, $librarydir;
 	global $user_info, $modSettings, $scripturl, $smcFunc;
 
 	isAllowedTo('pm_send');

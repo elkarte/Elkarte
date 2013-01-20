@@ -71,7 +71,7 @@ function action_managemail()
 function action_browsemail()
 {
 	global $scripturl, $context, $modSettings, $txt, $smcFunc;
-	global $sourcedir;
+	global $librarydir;
 
 	// First, are we deleting something from the queue?
 	if (isset($_REQUEST['delete']))

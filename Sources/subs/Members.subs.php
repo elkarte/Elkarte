@@ -39,7 +39,7 @@ if (!defined('ELKARTE'))
  */
 function deleteMembers($users, $check_not_admin = false)
 {
-	global $sourcedir, $modSettings, $user_info, $smcFunc;
+	global $sourcedir, $librarydir, $modSettings, $user_info, $smcFunc;
 
 	// Try give us a while to sort this out...
 	@set_time_limit(600);
@@ -434,7 +434,7 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $return_errors = false)
 {
-	global $scripturl, $txt, $modSettings, $context, $sourcedir;
+	global $scripturl, $txt, $modSettings, $context, $sourcedir, $librarydir;
 	global $user_info, $options, $settings, $smcFunc;
 
 	loadLanguage('Login');

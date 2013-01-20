@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 */
 function action_lock()
 {
-	global $topic, $user_info, $sourcedir, $board, $smcFunc;
+	global $topic, $user_info, $sourcedir, $librarydir, $board, $smcFunc;
 
 	// Just quit if there's no topic to lock.
 	if (empty($topic))
@@ -110,7 +110,7 @@ function action_lock()
  */
 function action_sticky()
 {
-	global $modSettings, $topic, $board, $sourcedir, $smcFunc;
+	global $modSettings, $topic, $board, $sourcedir, $librarydir, $smcFunc;
 
 	// Make sure the user can sticky it, and they are stickying *something*.
 	isAllowedTo('make_sticky');

@@ -954,7 +954,7 @@ function ssi_boardStats($output_method = 'echo')
 // Shows a list of online users:  YY Guests, ZZ Users and then a list...
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $sourcedir, $settings, $modSettings;
+	global $user_info, $txt, $sourcedir, $librarydir, $settings, $modSettings;
 
 	require_once($librarydir . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
@@ -1365,7 +1365,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 // Takes care of voting - don't worry, this is done automatically.
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $librarydir, $modSettings;
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{

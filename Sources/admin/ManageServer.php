@@ -258,7 +258,7 @@ function ModifyDatabaseSettings($return_config = false)
  */
 function ModifyCookieSettings($return_config = false)
 {
-	global $context, $scripturl, $txt, $sourcedir, $modSettings, $cookiename, $user_settings, $boardurl;
+	global $context, $scripturl, $txt, $sourcedir, $librarydir, $modSettings, $cookiename, $user_settings, $boardurl;
 
 	// Define the variables we want to edit.
 	$config_vars = array(
@@ -751,7 +751,7 @@ function prepareDBSettingContext(&$config_vars)
 function saveSettings(&$config_vars)
 {
 	global $boarddir, $sc, $cookiename, $modSettings, $user_settings;
-	global $sourcedir, $context, $cachedir;
+	global $sourcedir, $librarydir, $context, $cachedir;
 
 	validateToken('admin-ssc');
 

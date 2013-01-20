@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function action_modcenter($dont_call = false)
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $options, $smcFunc;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $librarydir, $options, $smcFunc;
 
 	// Don't run this twice... and don't conflict with the admin bar.
 	if (isset($context['admin_area']))
@@ -785,7 +785,7 @@ function recountOpenReports()
  */
 function ModReport()
 {
-	global $user_info, $context, $sourcedir, $scripturl, $txt, $smcFunc;
+	global $user_info, $context, $sourcedir, $librarydir, $scripturl, $txt, $smcFunc;
 
 	// Have to at least give us something
 	if (empty($_REQUEST['report']))
@@ -1075,7 +1075,7 @@ function ShowNotice()
  */
 function ViewWatchedUsers()
 {
-	global $smcFunc, $modSettings, $context, $txt, $scripturl, $user_info, $sourcedir;
+	global $smcFunc, $modSettings, $context, $txt, $scripturl, $user_info, $sourcedir, $librarydir;
 
 	// Some important context!
 	$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1518,7 +1518,7 @@ function ViewWarnings()
  */
 function ViewWarningLog()
 {
-	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir;
+	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir, $librarydir;
 
 	// Setup context as always.
 	$context['page_title'] = $txt['mc_warning_log_title'];
@@ -1683,7 +1683,7 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function ViewWarningTemplates()
 {
-	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir, $user_info;
+	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir, $librarydir, $user_info;
 
 	// Submitting a new one?
 	if (isset($_POST['add']))
@@ -1902,7 +1902,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort)
  */
 function ModifyWarningTemplate()
 {
-	global $smcFunc, $context, $txt, $user_info, $sourcedir;
+	global $smcFunc, $context, $txt, $user_info, $sourcedir, $librarydir;
 
 	$context['id_template'] = isset($_REQUEST['tid']) ? (int) $_REQUEST['tid'] : 0;
 	$context['is_edit'] = $context['id_template'];

@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function action_splittopics()
 {
-	global $topic, $sourcedir;
+	global $topic, $sourcedir, $librarydir;
 
 	// And... which topic were you splitting, again?
 	if (empty($topic))
@@ -501,7 +501,7 @@ function SplitSelectionExecute()
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $sourcedir;
+	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $sourcedir, $librarydir;
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -979,7 +979,7 @@ function MergeIndex()
  */
 function MergeExecute($topics = array())
 {
-	global $user_info, $txt, $context, $scripturl, $sourcedir;
+	global $user_info, $txt, $context, $scripturl, $sourcedir, $librarydir;
 	global $smcFunc, $language, $modSettings;
 
 	// Check the session.

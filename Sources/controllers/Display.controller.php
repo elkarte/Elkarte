@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 function Display()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings;
-	global $options, $sourcedir, $user_info, $board_info, $topic, $board;
+	global $options, $sourcedir, $librarydir, $user_info, $board_info, $topic, $board;
 	global $attachments, $messages_request, $topicinfo, $language, $smcFunc;
 
 	// What are you gonna display if these are empty?!
@@ -1186,7 +1186,7 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $sourcedir, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic, $sourcedir, $librarydir, $smcFunc;
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();

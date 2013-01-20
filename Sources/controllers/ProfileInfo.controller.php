@@ -592,7 +592,7 @@ function showPosts($memID)
 function showAttachments($memID)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile, $sourcedir, $smcFunc;
+	global $context, $user_profile, $sourcedir, $librarydir, $smcFunc;
 
 	// OBEY permissions!
 	$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -807,7 +807,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function showDisregarded($memID)
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $sourcedir, $smcFunc;
+	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Only the owner can see the list (if the function is enabled of course)
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
@@ -1392,7 +1392,7 @@ function showPermissions($memID)
  */
 function viewWarning($memID)
 {
-	global $modSettings, $context, $sourcedir, $txt, $scripturl;
+	global $modSettings, $context, $sourcedir, $librarydir, $txt, $scripturl;
 
 	// Firstly, can we actually even be here?
 	if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))

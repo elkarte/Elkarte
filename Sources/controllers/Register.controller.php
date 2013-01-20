@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
 function action_register($reg_errors = array())
 {
 	global $txt, $boarddir, $context, $settings, $modSettings, $user_info;
-	global $language, $scripturl, $smcFunc, $sourcedir, $smcFunc, $cur_profile;
+	global $language, $scripturl, $smcFunc, $sourcedir, $librarydir, $smcFunc, $cur_profile;
 
 	// Is this an incoming AJAX check?
 	if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
@@ -222,7 +222,7 @@ function action_register($reg_errors = array())
  */
 function action_register2($verifiedOpenID = false)
 {
-	global $scripturl, $txt, $modSettings, $context, $sourcedir;
+	global $scripturl, $txt, $modSettings, $context, $sourcedir, $librarydir;
 	global $user_info, $options, $settings, $smcFunc;
 
 	checkSession();
@@ -530,7 +530,7 @@ function action_register2($verifiedOpenID = false)
  */
 function action_activate()
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $language, $user_info;
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $librarydir, $smcFunc, $language, $user_info;
 
 	// Logged in users should not bother to activate their accounts
 	if (!empty($user_info['id']))
@@ -773,7 +773,7 @@ function action_coppa()
  */
 function action_verificationcode()
 {
-	global $sourcedir, $modSettings, $context, $scripturl;
+	global $sourcedir, $librarydir, $modSettings, $context, $scripturl;
 
 	$verification_id = isset($_GET['vid']) ? $_GET['vid'] : '';
 	$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
@@ -841,7 +841,7 @@ function action_verificationcode()
  */
 function RegisterCheckUsername()
 {
-	global $sourcedir, $smcFunc, $context, $txt;
+	global $sourcedir, $librarydir, $smcFunc, $context, $txt;
 
 	// This is XML!
 	loadTemplate('Xml');
@@ -864,7 +864,7 @@ function RegisterCheckUsername()
  */
 function action_contact()
 {
-	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
+	global $context, $txt, $sourcedir, $librarydir, $smcFunc, $user_info, $modSettings;
 
 	// Already inside, no need to use this, just send a PM
 	// Disabled, you cannot enter.

@@ -351,7 +351,7 @@ function PermissionIndex()
  */
 function PermissionByBoard()
 {
-	global $context, $modSettings, $txt, $smcFunc, $sourcedir, $cat_tree, $boardList, $boards;
+	global $context, $modSettings, $txt, $smcFunc, $sourcedir, $librarydir, $cat_tree, $boardList, $boards;
 
 	$context['page_title'] = $txt['permissions_boards'];
 	$context['edit_all'] = isset($_GET['edit']);
@@ -689,7 +689,7 @@ function SetQuickGroups()
  */
 function ModifyMembergroup()
 {
-	global $context, $txt, $modSettings, $smcFunc, $sourcedir;
+	global $context, $txt, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	if (!isset($_GET['group']))
 		fatal_lang_error('no_access', false);

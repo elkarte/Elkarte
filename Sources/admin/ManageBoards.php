@@ -85,7 +85,7 @@ function ManageBoards()
  */
 function ManageBoardsMain()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $sourcedir, $txt;
+	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $librarydir, $txt;
 
 	loadTemplate('ManageBoards');
 
@@ -220,7 +220,7 @@ function ManageBoardsMain()
  */
 function EditCategory()
 {
-	global $txt, $context, $cat_tree, $boardList, $boards, $sourcedir;
+	global $txt, $context, $cat_tree, $boardList, $boards, $librarydir;
 
 	loadTemplate('ManageBoards');
 	require_once($librarydir . '/Boards.subs.php');
@@ -311,7 +311,7 @@ function EditCategory()
  */
 function EditCategory2()
 {
-	global $sourcedir;
+	global $librarydir;
 
 	checkSession();
 	validateToken('admin-bc-' . $_REQUEST['cat']);
@@ -376,7 +376,7 @@ function EditCategory2()
  */
 function EditBoard()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $sourcedir, $smcFunc, $modSettings;
+	global $txt, $context, $cat_tree, $boards, $boardList, $librarydir, $smcFunc, $modSettings;
 
 	loadTemplate('ManageBoards');
 	require_once($librarydir . '/Boards.subs.php');
@@ -592,7 +592,7 @@ function EditBoard()
  */
 function EditBoard2()
 {
-	global $txt, $sourcedir, $modSettings, $smcFunc, $context;
+	global $txt, $librarydir, $modSettings, $smcFunc, $context;
 
 	$_POST['boardid'] = (int) $_POST['boardid'];
 	checkSession();

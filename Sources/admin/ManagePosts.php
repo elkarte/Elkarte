@@ -85,7 +85,7 @@ function ManagePostSettings()
  */
 function SetCensor()
 {
-	global $txt, $modSettings, $context, $smcFunc, $sourcedir;
+	global $txt, $modSettings, $context, $smcFunc, $sourcedir, $librarydir;
 
 	if (!empty($_POST['save_censor']))
 	{

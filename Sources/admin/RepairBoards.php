@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function action_repairboards()
 {
-	global $txt, $context, $sourcedir, $salvageBoardID;
+	global $txt, $context, $sourcedir, $librarydir, $salvageBoardID;
 
 	isAllowedTo('admin_forum');
 

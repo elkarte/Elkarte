@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function Packages()
 {
-	global $txt, $scripturl, $sourcedir, $context;
+	global $txt, $scripturl, $sourcedir, $librarydir, $context;
 
 	// @todo Remove this!
 	if (isset($_GET['get']) || isset($_GET['pgdownload']))
@@ -99,7 +99,7 @@ function Packages()
  */
 function PackageInstallTest()
 {
-	global $boarddir, $txt, $context, $scripturl, $sourcedir, $modSettings, $smcFunc, $settings;
+	global $boarddir, $txt, $context, $scripturl, $sourcedir, $librarydir, $modSettings, $smcFunc, $settings;
 
 	// You have to specify a file!!
 	if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -765,7 +765,7 @@ function PackageInstallTest()
  */
 function PackageInstall()
 {
-	global $boarddir, $txt, $context, $boardurl, $scripturl, $sourcedir, $modSettings;
+	global $boarddir, $txt, $context, $boardurl, $scripturl, $sourcedir, $librarydir, $modSettings;
 	global $user_info, $smcFunc;
 
 	// Make sure we don't install this mod twice.
@@ -1215,7 +1215,7 @@ function PackageInstall()
  */
 function PackageList()
 {
-	global $txt, $scripturl, $boarddir, $context, $sourcedir;
+	global $txt, $scripturl, $boarddir, $context, $sourcedir, $librarydir;
 
 	require_once($librarydir . '/Package.subs.php');
 
@@ -1315,7 +1315,7 @@ function InstalledList()
  */
 function FlushInstall()
 {
-	global $boarddir, $sourcedir, $smcFunc;
+	global $boarddir, $sourcedir, $librarydir, $smcFunc;
 
 	// Always check the session.
 	checkSession('get');
@@ -1374,7 +1374,7 @@ function PackageRemove()
  */
 function PackageBrowse()
 {
-	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $settings;
+	global $txt, $boarddir, $scripturl, $context, $forum_version, $sourcedir, $librarydir, $settings;
 
 	require_once($librarydir . '/List.subs.php');
 
@@ -1832,7 +1832,7 @@ function PackageOptions()
  */
 function ViewOperations()
 {
-	global $context, $txt, $boarddir, $sourcedir, $smcFunc, $modSettings;
+	global $context, $txt, $boarddir, $sourcedir, $librarydir, $smcFunc, $modSettings;
 
 	// Can't be in here buddy.
 	isAllowedTo('admin_forum');

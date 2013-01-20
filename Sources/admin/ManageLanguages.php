@@ -68,7 +68,7 @@ function ManageLanguages()
  */
 function AddLanguage()
 {
-	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl;
+	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl;
 
 	// Are we searching for new languages courtesy of Simple Machines?
 	if (!empty($_POST['smf_add_sub']))
@@ -146,7 +146,7 @@ function AddLanguage()
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $librarydir, $smcFunc, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
@@ -200,7 +200,7 @@ function list_getLanguagesList()
  */
 function DownloadLanguage()
 {
-	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
+	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
 
 	loadLanguage('ManageSettings');
 	require_once($librarydir . '/Package.subs.php');
@@ -567,7 +567,7 @@ function DownloadLanguage()
 function ModifyLanguages()
 {
 	global $txt, $context, $scripturl;
-	global $user_info, $smcFunc, $sourcedir, $language, $boarddir, $forum_version;
+	global $user_info, $smcFunc, $librarydir, $language, $boarddir, $forum_version;
 
 	// Setting a new default?
 	if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -827,7 +827,7 @@ function ModifyLanguageSettings($return_config = false)
  */
 function ModifyLanguage()
 {
-	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $sourcedir, $language;
+	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $librarydir, $language;
 
 	loadLanguage('ManageSettings');
 

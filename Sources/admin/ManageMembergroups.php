@@ -82,7 +82,7 @@ function ModifyMembergroups()
  */
 function MembergroupIndex()
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $sourcedir, $user_info;
+	global $txt, $scripturl, $context, $settings, $smcFunc, $librarydir, $user_info;
 
 	$context['page_title'] = $txt['membergroups_title'];
 
@@ -629,7 +629,7 @@ function AddMembergroup()
  */
 function DeleteMembergroup()
 {
-	global $sourcedir;
+	global $librarydir;
 
 	checkSession('get');
 
@@ -652,7 +652,7 @@ function DeleteMembergroup()
  */
 function EditMembergroup()
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc;
+	global $context, $txt, $librarydir, $modSettings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) && $_REQUEST['group'] > 0 ? (int) $_REQUEST['group'] : 0;
 

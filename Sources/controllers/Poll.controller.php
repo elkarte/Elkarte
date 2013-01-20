@@ -34,7 +34,7 @@ if (!defined('ELKARTE'))
  */
 function action_vote()
 {
-	global $topic, $txt, $user_info, $smcFunc, $sourcedir, $modSettings;
+	global $topic, $txt, $user_info, $smcFunc, $sourcedir, $librarydir, $modSettings;
 
 	// Make sure you can vote.
 	isAllowedTo('poll_vote');
@@ -303,7 +303,7 @@ function action_lockvoting()
  */
 function action_editpoll()
 {
-	global $txt, $user_info, $context, $topic, $board, $smcFunc, $sourcedir, $scripturl;
+	global $txt, $user_info, $context, $topic, $board, $smcFunc, $sourcedir, $librarydir, $scripturl;
 
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
@@ -599,7 +599,7 @@ function action_editpoll()
 function action_editpoll2()
 {
 	global $txt, $topic, $board, $context;
-	global $modSettings, $user_info, $smcFunc, $sourcedir;
+	global $modSettings, $user_info, $smcFunc, $sourcedir, $librarydir;
 
 	// Sneaking off, are we?
 	if (empty($_POST))

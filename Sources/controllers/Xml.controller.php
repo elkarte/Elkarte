@@ -56,7 +56,7 @@ function action_xmlhttp()
  */
 function action_jumpto()
 {
-	global $user_info, $context, $smcFunc, $sourcedir;
+	global $user_info, $context, $smcFunc, $sourcedir, $librarydir;
 
 	// Find the boards/cateogories they can see.
 	require_once($librarydir . '/MessageIndex.subs.php');
@@ -79,7 +79,7 @@ function action_jumpto()
 
 function action_messageicons()
 {
-	global $context, $sourcedir, $board;
+	global $context, $sourcedir, $librarydir, $board;
 
 	require_once($librarydir . '/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
@@ -208,7 +208,7 @@ function action_previews()
 
 function newspreview()
 {
-	global $context, $sourcedir, $smcFunc;
+	global $context, $sourcedir, $librarydir, $smcFunc;
 
 	require_once($librarydir . '/Post.subs.php');
 
@@ -236,7 +236,7 @@ function newspreview()
 }
 function newsletterpreview()
 {
-	global $context, $sourcedir, $smcFunc, $txt;
+	global $context, $sourcedir, $librarydir, $smcFunc, $txt;
 
 	require_once($librarydir . '/Mail.subs.php');
 	loadLanguage('Errors');
@@ -337,7 +337,7 @@ function sig_preview()
 
 function warning_preview()
 {
-	global $context, $sourcedir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $sourcedir, $librarydir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
 
 	require_once($librarydir . '/Post.subs.php');
 	loadLanguage('Errors');

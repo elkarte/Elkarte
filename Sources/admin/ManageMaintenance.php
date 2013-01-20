@@ -1102,7 +1102,7 @@ function AdminBoardRecount()
  */
 function VersionDetail()
 {
-	global $forum_version, $txt, $sourcedir, $context;
+	global $forum_version, $txt, $librarydir, $context;
 
 	isAllowedTo('admin_forum');
 
@@ -1136,7 +1136,7 @@ function VersionDetail()
  */
 function MaintainReattributePosts()
 {
-	global $sourcedir, $context, $txt;
+	global $librarydir, $context, $txt;
 
 	checkSession();
 
@@ -1279,7 +1279,7 @@ function MaintainRemoveOldPosts()
  */
 function MaintainRemoveOldDrafts()
 {
-	global $sourcedir, $smcFunc;
+	global $librarydir, $smcFunc;
 
 	validateToken('admin-maint');
 
@@ -1314,7 +1314,7 @@ function MaintainRemoveOldDrafts()
  */
 function MaintainMassMoveTopics()
 {
-	global $smcFunc, $sourcedir, $context, $txt;
+	global $smcFunc, $librarydir, $context, $txt;
 
 	// Only admins.
 	isAllowedTo('admin_forum');

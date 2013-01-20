@@ -511,7 +511,7 @@ function getPackageInfo($gzfilename)
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
-	global $context, $modSettings, $package_ftp, $boarddir, $txt, $sourcedir, $scripturl;
+	global $context, $modSettings, $package_ftp, $boarddir, $txt, $sourcedir, $librarydir, $scripturl;
 
 	// If we're restoring the status of existing files prepare the data.
 	if ($restore_write_status && isset($_SESSION['pack_ftp']) && !empty($_SESSION['pack_ftp']['original_perms']))
@@ -3199,6 +3199,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 
 if (!function_exists('smf_crc32'))
 {
-	global $sourcedir;
+	global $librarydir;
 	require_once $librarydir . '/Compat.subs.php';
 }

@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  */
 function action_notify()
 {
-	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $smcFunc;
+	global $scripturl, $txt, $topic, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Make sure they aren't a guest or something - guests can't really receive notifications!
 	is_not_guest();
@@ -93,7 +93,7 @@ function action_notify()
  */
 function action_notifyboard()
 {
-	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $smcFunc;
+	global $scripturl, $txt, $board, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Permissions are an important part of anything ;).
 	is_not_guest();
@@ -154,7 +154,7 @@ function action_notifyboard()
  */
 function action_disregardtopic()
 {
-	global $smcFunc, $user_info, $topic, $sourcedir, $modSettings;
+	global $smcFunc, $user_info, $topic, $sourcedir, $librarydir, $modSettings;
 
 	// our topic functions are here
 	require_once($librarydir . '/Topic.subs.php');

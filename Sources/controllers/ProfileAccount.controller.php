@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning($memID)
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc, $sourcedir;
+	global $context, $cur_profile, $memberContext, $smcFunc, $sourcedir, $librarydir;
 
 	// make sure the sub-template is set...
 	$context['sub_template'] = 'issueWarning';
@@ -507,7 +507,7 @@ function action_deleteaccount($memID)
  */
 function action_deleteaccount2($memID)
 {
-	global $user_info, $sourcedir, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $sourcedir, $librarydir, $context, $cur_profile, $modSettings, $smcFunc;
 
 	// Try get more time...
 	@set_time_limit(600);

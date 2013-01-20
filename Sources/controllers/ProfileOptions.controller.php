@@ -1636,7 +1636,7 @@ function theme($memID)
  */
 function authentication($memID, $saving = false)
 {
-	global $context, $cur_profile, $sourcedir, $txt, $post_errors, $modSettings;
+	global $context, $cur_profile, $sourcedir, $librarydir, $txt, $post_errors, $modSettings;
 
 	loadLanguage('Login');
 
@@ -1720,7 +1720,7 @@ function authentication($memID, $saving = false)
  */
 function notification($memID)
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $sourcedir, $settings;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $sourcedir, $librarydir, $settings;
 
 	// Gonna want this for the list.
 	require_once($librarydir . '/List.subs.php');
@@ -2517,7 +2517,7 @@ function profileSaveGroups(&$value)
  */
 function profileSaveAvatarData(&$value)
 {
-	global $modSettings, $sourcedir, $smcFunc, $profile_vars, $cur_profile, $context;
+	global $modSettings, $sourcedir, $smcFunc, $profile_vars, $cur_profile, $context, $librarydir;
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -2748,7 +2748,7 @@ function profileSaveAvatarData(&$value)
  */
 function profileValidateSignature(&$value)
 {
-	global $sourcedir, $modSettings, $smcFunc, $txt;
+	global $sourcedir, $librarydir, $modSettings, $smcFunc, $txt;
 
 	require_once($librarydir . '/Post.subs.php');
 
@@ -2967,7 +2967,7 @@ function profileValidateEmail($email, $memID = 0)
  */
 function profileReloadUser()
 {
-	global $sourcedir, $modSettings, $context, $cur_profile, $smcFunc, $profile_vars;
+	global $sourcedir, $librarydir, $modSettings, $context, $cur_profile, $smcFunc, $profile_vars;
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
@@ -2985,7 +2985,7 @@ function profileReloadUser()
  */
 function profileSendActivation()
 {
-	global $sourcedir, $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
+	global $sourcedir, $librarydir, $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
 
 	require_once($librarydir . '/Mail.subs.php');
 
@@ -3142,7 +3142,7 @@ function groupMembership($memID)
  */
 function groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $sourcedir, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
+	global $user_info, $sourcedir, $librarydir, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
 
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))

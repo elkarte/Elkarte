@@ -203,7 +203,7 @@ function imageMemoryCheck($sizes)
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())

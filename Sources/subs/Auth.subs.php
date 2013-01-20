@@ -415,7 +415,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $sourcedir, $modSettings, $smcFunc, $language;
+	global $sourcedir, $librarydir, $modSettings, $smcFunc, $language;
 
 	// Language... and a required file.
 	loadLanguage('Login');
@@ -478,7 +478,7 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $sourcedir, $txt, $smcFunc, $user_info;
+	global $sourcedir, $librarydir, $txt, $smcFunc, $user_info;
 
 	$errors = array();
 

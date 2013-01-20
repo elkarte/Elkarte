@@ -71,7 +71,7 @@ function action_groups()
  */
 function action_grouplist()
 {
-	global $txt, $context, $sourcedir, $scripturl, $user_info;
+	global $txt, $context, $sourcedir, $librarydir, $scripturl, $user_info;
 
 	$context['page_title'] = $txt['viewing_groups'];
 
@@ -199,7 +199,7 @@ function action_grouplist()
  */
 function action_groupmembers()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $sourcedir, $librarydir, $user_info, $settings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
@@ -447,7 +447,7 @@ function action_groupmembers()
  */
 function action_grouprequests()
 {
-	global $txt, $context, $scripturl, $user_info, $sourcedir, $smcFunc, $modSettings, $language;
+	global $txt, $context, $scripturl, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings, $language;
 
 	// Set up the template stuff...
 	$context['page_title'] = $txt['mc_group_requests'];
