@@ -476,7 +476,7 @@ function EditSmileySets()
 
 /**
  * Callback function for createList().
- * @todo to be moved to Subs-Smileys?
+ * @todo to be moved to Smileys.subs?
  *
  * @param $start
  * @param $items_per_page
@@ -523,7 +523,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 
 /**
  * Callback function for createList().
- * @todo to be moved to Subs-Smileys?
+ * @todo to be moved to Smileys.subs?
  */
 function list_getNumSmileySets()
 {
