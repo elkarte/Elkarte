@@ -593,8 +593,6 @@ function ModifyProfile($post_errors = array())
 		else
 		{
 			$force_redirect = true;
-			// Ensure we include this.
-			require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 			saveProfileChanges($profile_vars, $post_errors, $memID);
 		}
 
