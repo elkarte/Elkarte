@@ -1353,14 +1353,14 @@ function constructBanQueryIP($fullip)
  */
 function loadBadBehavior()
 {
-	global $modSettings, $user_info, $context, $librarydir, $bb2_results;
+	global $modSettings, $user_info, $context, $sourcedir, $bb2_results;
 
 	$bb_run = false;
 
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
-		require_once($librarydir . '/bad-behavior/badbehavior-plugin.php');
+		require_once($sourcedir . '/lib/bad-behavior/badbehavior-plugin.php');
 		$bb_run = true;
 
 		// We may want to give some folks a hallway pass
