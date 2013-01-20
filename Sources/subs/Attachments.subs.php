@@ -511,7 +511,7 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $sourcedir, $smcFunc;
+	global $modSettings, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if ( empty($_SESSION['temp_attachments'][$attachID]))
@@ -551,7 +551,7 @@ function attachmentChecks($attachID)
 	$size = @getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	if (isset($validImageTypes[$size[2]]))
 	{
-		require_once($sourcedir . '/subs/Graphics.subs.php');
+		require_once($librarydir . '/Graphics.subs.php');
 		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
@@ -599,7 +599,7 @@ function attachmentChecks($attachID)
 		if (empty($modSettings['attachment_full_notified']) && !empty($modSettings['attachmentDirSizeLimit']) && $modSettings['attachmentDirSizeLimit'] > 4000 && $context['dir_size'] > ($modSettings['attachmentDirSizeLimit'] - 2000) * 1024
 			|| (!empty($modSettings['attachmentDirFileLimit']) && $modSettings['attachmentDirFileLimit'] * .95 < $context['dir_files'] && $modSettings['attachmentDirFileLimit'] > 500))
 		{
-			require_once($sourcedir . '/subs/Admin.subs.php');
+			require_once($librarydir . '/Admin.subs.php');
 			emailAdmins('admin_attachments_full');
 			updateSettings(array('attachment_full_notified' => 1));
 		}
@@ -691,10 +691,10 @@ function attachmentChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $sourcedir, $smcFunc, $context;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc, $context;
 	global $txt, $boarddir;
 
-	require_once($sourcedir . '/subs/Graphics.subs.php');
+	require_once($librarydir . '/Graphics.subs.php');
 
 	// These are the only valid image types.
 	$validImageTypes = array(
@@ -1214,7 +1214,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, $sourcedir, $smcFunc;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc;
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1250,7 +1250,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
 
 	// Resize it.
-	require_once $sourcedir . '/subs/Graphics.subs.php';
+	require_once $librarydir . '/Graphics.subs.php';
 	if (!empty($modSettings['avatar_download_png']))
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
  	else
@@ -1316,7 +1316,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  */
 function url_image_size($url)
 {
-	global $sourcedir;
+	global $sourcedir, $librarydir;
 
 	// Make sure it is a proper URL.
 	$url = str_replace(' ', '%20', $url);
@@ -1362,7 +1362,7 @@ function url_image_size($url)
 				// This probably means allow_url_fopen is off, let's try GD.
 				if ($size === false && function_exists('imagecreatefromstring'))
 				{
-					include_once($sourcedir . '/subs/Package.subs.php');
+					include_once($librarydir . '/Package.subs.php');
 
 					// It's going to hate us for doing this, but another request...
 					$image = @imagecreatefromstring(fetch_web_data($url));

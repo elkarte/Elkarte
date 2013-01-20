@@ -155,6 +155,17 @@ $boarddir = dirname(__FILE__);
  * @var string
  */
 $sourcedir = dirname(__FILE__) . '/Sources';
+/**
+ * Path to the library directory.
+ * @var string
+ */
+$librarydir = dirname(__FILE__) . '/Sources/subs';
+/**
+ * Path to the controllers directory.
+ * @var string
+ */
+$controllerdir = dirname(__FILE__) . '/Sources/controllers';
+
 
 ########## Error-Catching ##########
 # Note: You shouldn't touch these settings.

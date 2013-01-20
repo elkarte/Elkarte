@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
 function action_register($reg_errors = array())
 {
 	global $txt, $boarddir, $context, $settings, $modSettings, $user_info;
-	global $language, $scripturl, $smcFunc, $sourcedir, $smcFunc, $cur_profile;
+	global $language, $scripturl, $smcFunc, $sourcedir, $librarydir, $smcFunc, $cur_profile;
 
 	// Is this an incoming AJAX check?
 	if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
@@ -144,14 +144,12 @@ function action_register($reg_errors = array())
 	}
 
 	// Any custom fields we want filled in?
-	require_once($sourcedir . '/Profile.php');
+	require_once($librarydir . '/Profile.subs.php');
 	loadCustomFields(0, 'register');
 
 	// Or any standard ones?
 	if (!empty($modSettings['registration_fields']))
 	{
-		require_once($sourcedir . '/ProfileOptions.php');
-
 		// Setup some important context.
 		loadLanguage('Profile');
 		loadTemplate('Profile');
@@ -174,7 +172,7 @@ function action_register($reg_errors = array())
 	// Generate a visual verification code to make sure the user is no bot.
 	if (!empty($modSettings['reg_verification']))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'register',
 		);
@@ -222,7 +220,7 @@ function action_register($reg_errors = array())
  */
 function action_register2($verifiedOpenID = false)
 {
-	global $scripturl, $txt, $modSettings, $context, $sourcedir;
+	global $scripturl, $txt, $modSettings, $context, $sourcedir, $librarydir;
 	global $user_info, $options, $settings, $smcFunc;
 
 	checkSession();
@@ -267,7 +265,7 @@ function action_register2($verifiedOpenID = false)
 		// Check whether the visual verification code was entered correctly.
 		if (!empty($modSettings['reg_verification']))
 		{
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 			$verificationOptions = array(
 				'id' => 'register',
 			);
@@ -318,7 +316,7 @@ function action_register2($verifiedOpenID = false)
 		$_POST['secret_answer'] = md5($_POST['secret_answer']);
 
 	// Needed for isReservedName() and registerMember().
-	require_once($sourcedir . '/subs/Members.subs.php');
+	require_once($librarydir . '/Members.subs.php');
 
 	// Validation... even if we're not a mall.
 	if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
@@ -466,7 +464,7 @@ function action_register2($verifiedOpenID = false)
 			if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
 				$save_variables[$k] = $v;
 
-		require_once($sourcedir . '/subs/OpenID.subs.php');
+		require_once($librarydir . '/OpenID.subs.php');
 		openID_validate($_POST['openid_identifier'], false, $save_variables);
 	}
 	// If we've come from OpenID set up some default stuff.
@@ -494,8 +492,7 @@ function action_register2($verifiedOpenID = false)
 	// We'll do custom fields after as then we get to use the helper function!
 	if (!empty($_POST['customfield']))
 	{
-		require_once($sourcedir . '/Profile.php');
-		require_once($sourcedir . '/ProfileOptions.php');
+		require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 		makeCustomFieldChanges($memberID, 'register');
 	}
 
@@ -530,7 +527,7 @@ function action_register2($verifiedOpenID = false)
  */
 function action_activate()
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $language, $user_info;
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $librarydir, $smcFunc, $language, $user_info;
 
 	// Logged in users should not bother to activate their accounts
 	if (!empty($user_info['id']))
@@ -616,7 +613,7 @@ function action_activate()
 	// Resend the password, but only if the account wasn't activated yet.
 	if (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'resend' && ($row['is_activated'] == 0 || $row['is_activated'] == 2) && (!isset($_REQUEST['code']) || $_REQUEST['code'] == ''))
 	{
-		require_once($sourcedir . '/subs/Mail.subs.php');
+		require_once($librarydir . '/Mail.subs.php');
 
 		$replacements = array(
 			'REALNAME' => $row['real_name'],
@@ -668,7 +665,7 @@ function action_activate()
 
 	if (!isset($_POST['new_email']))
 	{
-		require_once($sourcedir . '/subs/Post.subs.php');
+		require_once($librarydir . '/Post.subs.php');
 
 		adminNotify('activation', $row['id_member'], $row['member_name']);
 	}
@@ -773,7 +770,7 @@ function action_coppa()
  */
 function action_verificationcode()
 {
-	global $sourcedir, $modSettings, $context, $scripturl;
+	global $sourcedir, $librarydir, $modSettings, $context, $scripturl;
 
 	$verification_id = isset($_GET['vid']) ? $_GET['vid'] : '';
 	$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
@@ -801,7 +798,7 @@ function action_verificationcode()
 	// If we have GD, try the nice code.
 	elseif (empty($_REQUEST['format']))
 	{
-		require_once($sourcedir . '/subs/Graphics.subs.php');
+		require_once($librarydir . '/Graphics.subs.php');
 
 		if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
 			header('HTTP/1.1 400 Bad Request');
@@ -826,7 +823,7 @@ function action_verificationcode()
 
 	elseif ($_REQUEST['format'] === '.wav')
 	{
-		require_once($sourcedir . '/subs/Sound.subs.php');
+		require_once($librarydir . '/Sound.subs.php');
 
 		if (!createWaveFile($code))
 			header('HTTP/1.1 400 Bad Request');
@@ -841,7 +838,7 @@ function action_verificationcode()
  */
 function RegisterCheckUsername()
 {
-	global $sourcedir, $smcFunc, $context, $txt;
+	global $sourcedir, $librarydir, $smcFunc, $context, $txt;
 
 	// This is XML!
 	loadTemplate('Xml');
@@ -852,7 +849,7 @@ function RegisterCheckUsername()
 	// Clean it up like mother would.
 	$context['checked_username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $context['checked_username']);
 
-	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
 	$errors = validateUsername(0, $context['checked_username'], true);
 
 	$context['valid_username'] = empty($errors);
@@ -864,7 +861,7 @@ function RegisterCheckUsername()
  */
 function action_contact()
 {
-	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings;
+	global $context, $txt, $sourcedir, $librarydir, $smcFunc, $user_info, $modSettings;
 
 	// Already inside, no need to use this, just send a PM
 	// Disabled, you cannot enter.
@@ -884,7 +881,7 @@ function action_contact()
 		$context['errors'] = array();
 
 		// Could they get the right send topic verification code?
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
@@ -924,7 +921,7 @@ function action_contact()
 
 			if (!empty($admins))
 			{
-				require_once($sourcedir . '/subs/Post.subs.php');
+				require_once($librarydir . '/Post.subs.php');
 				sendpm(array('to' => $admins, 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
 
 			}
@@ -944,7 +941,7 @@ function action_contact()
 	{
 		$context['sub_template'] = 'contact_form';
 
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);

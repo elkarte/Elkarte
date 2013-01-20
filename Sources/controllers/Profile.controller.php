@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function ModifyProfile($post_errors = array())
 {
-	global $txt, $scripturl, $user_info, $context, $sourcedir, $user_profile, $cur_profile;
+	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
 
 	// Don't reload this as we may have processed error strings.
@@ -37,7 +37,8 @@ function ModifyProfile($post_errors = array())
 		loadLanguage('Profile+Drafts');
 	loadTemplate('Profile');
 
-	require_once($sourcedir . '/subs/Menu.subs.php');
+	require_once($librarydir . '/Menu.subs.php');
+
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
@@ -234,7 +235,7 @@ function ModifyProfile($post_errors = array())
 				'pmprefs' => array(
 					'label' => $txt['pmprefs'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'pmprefs',
+					'function' => 'action_pmprefs',
 					'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 					'sc' => 'post',
 					'token' => 'profile-pm%u',
@@ -520,6 +521,8 @@ function ModifyProfile($post_errors = array())
 	$post_errors = array();
 	$profile_vars = array();
 
+	require_once($librarydir . '/Profile.subs.php');
+
 	// Right - are we saving - if so let's save the old data first.
 	if ($context['completed_save'])
 	{
@@ -532,7 +535,7 @@ function ModifyProfile($post_errors = array())
 			// If we're using OpenID try to revalidate.
 			if (!empty($user_settings['openid_uri']))
 			{
-				require_once($sourcedir . '/subs/OpenID.subs.php');
+				require_once($librarydir . '/OpenID.subs.php');
 				openID_revalidate();
 			}
 			else
@@ -584,9 +587,7 @@ function ModifyProfile($post_errors = array())
 		}
 		// Authentication changes?
 		elseif ($current_area == 'authentication')
-		{
 			authentication($memID, true);
-		}
 		elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'pmprefs')))
 			saveProfileFields();
 		else
@@ -676,136 +677,4 @@ function ModifyProfile($post_errors = array())
 	// Set the page title if it's not already set...
 	if (!isset($context['page_title']))
 		$context['page_title'] = $txt['profile'] . (isset($txt[$current_area]) ? ' - ' . $txt[$current_area] : '');
-}
-
-/**
- * Load any custom fields for this area... no area means load all, 'summary' loads all public ones.
- *
- * @param int $memID
- * @param string $area = 'summary'
- */
-function loadCustomFields($memID, $area = 'summary')
-{
-	global $context, $txt, $user_profile, $smcFunc, $user_info, $settings, $scripturl;
-
-	// Get the right restrictions in place...
-	$where = 'active = 1';
-	if (!allowedTo('admin_forum') && $area != 'register')
-	{
-		// If it's the owner they can see two types of private fields, regardless.
-		if ($memID == $user_info['id'])
-			$where .= $area == 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
-		else
-			$where .= $area == 'summary' ? ' AND private < 2' : ' AND private = 0';
-	}
-
-	if ($area == 'register')
-		$where .= ' AND show_reg != 0';
-	elseif ($area != 'summary')
-		$where .= ' AND show_profile = {string:area}';
-
-	// Load all the relevant fields - and data.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
-			default_value, bbc, enclose, placement
-		FROM {db_prefix}custom_fields
-		WHERE ' . $where,
-		array(
-			'area' => $area,
-		)
-	);
-	$context['custom_fields'] = array();
-	$context['custom_fields_required'] = false;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Shortcut.
-		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
-		$value = $exists ? $user_profile[$memID]['options'][$row['col_name']] : '';
-
-		// If this was submitted already then make the value the posted version.
-		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
-		{
-			$value = $smcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
-			if (in_array($row['field_type'], array('select', 'radio')))
-					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
-		}
-
-		// HTML for the input form.
-		$output_html = $value;
-		if ($row['field_type'] == 'check')
-		{
-			$true = (!$exists && $row['default_value']) || $value;
-			$input_html = '<input type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
-			$output_html = $true ? $txt['yes'] : $txt['no'];
-		}
-		elseif ($row['field_type'] == 'select')
-		{
-			$input_html = '<select name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
-			$options = explode(',', $row['field_options']);
-			foreach ($options as $k => $v)
-			{
-				$true = (!$exists && $row['default_value'] == $v) || $value == $v;
-				$input_html .= '<option value="' . $k . '"' . ($true ? ' selected="selected"' : '') . '>' . $v . '</option>';
-				if ($true)
-					$output_html = $v;
-			}
-
-			$input_html .= '</select>';
-		}
-		elseif ($row['field_type'] == 'radio')
-		{
-			$input_html = '<fieldset>';
-			$options = explode(',', $row['field_options']);
-			foreach ($options as $k => $v)
-			{
-				$true = (!$exists && $row['default_value'] == $v) || $value == $v;
-				$input_html .= '<label for="customfield_' . $row['col_name'] . '_' . $k . '"><input type="radio" name="customfield[' . $row['col_name'] . ']" class="input_radio" id="customfield_' . $row['col_name'] . '_' . $k . '" value="' . $k . '" ' . ($true ? 'checked="checked"' : '') . ' />' . $v . '</label><br />';
-				if ($true)
-					$output_html = $v;
-			}
-			$input_html .= '</fieldset>';
-		}
-		elseif ($row['field_type'] == 'text')
-		{
-			$input_html = '<input type="text" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
-		}
-		else
-		{
-			@list ($rows, $cols) = @explode(',', $row['default_value']);
-			$input_html = '<textarea name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $rows . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $cols . '"' : '') . '>' . $value . '</textarea>';
-		}
-
-		// Parse BBCode
-		if ($row['bbc'])
-			$output_html = parse_bbc($output_html);
-		elseif ($row['field_type'] == 'textarea')
-			// Allow for newlines at least
-			$output_html = strtr($output_html, array("\n" => '<br />'));
-
-		// Enclosing the user input within some other text?
-		if (!empty($row['enclose']) && !empty($output_html))
-			$output_html = strtr($row['enclose'], array(
-				'{SCRIPTURL}' => $scripturl,
-				'{IMAGES_URL}' => $settings['images_url'],
-				'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
-				'{INPUT}' => $output_html,
-			));
-
-		$context['custom_fields'][] = array(
-			'name' => $row['field_name'],
-			'desc' => $row['field_desc'],
-			'type' => $row['field_type'],
-			'input_html' => $input_html,
-			'output_html' => $output_html,
-			'placement' => $row['placement'],
-			'colname' => $row['col_name'],
-			'value' => $value,
-			'show_reg' => $row['show_reg'],
-		);
-		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
 }

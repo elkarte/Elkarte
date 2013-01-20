@@ -199,7 +199,7 @@ function reloadSettings()
 		$pre_includes = explode(',', $modSettings['integrate_pre_include']);
 		foreach ($pre_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir));
+			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$librarydir' => $librarydir));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -1998,6 +1998,30 @@ function loadAdminClass($filename)
 	global $sourcedir;
 
 	require_once($sourcedir . '/admin/' . $filename);
+}
+
+/**
+ * Load a controller.
+ *
+ * @param string $filename
+ */
+function loadController($filename)
+{
+	global $controllerdir;
+
+	require_once($controllerdir . '/' . $filename);
+}
+
+/**
+ * Load a library.
+ *
+ * @param string $filename
+ */
+function loadLibrary($filename)
+{
+	global $librarydir;
+
+	require_once($librarydir . '/' . $filename);
 }
 
 /**

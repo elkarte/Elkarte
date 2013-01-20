@@ -77,7 +77,7 @@ function ManageScheduledTasks()
  */
 function ScheduledTasks()
 {
-	global $context, $txt, $sourcedir, $smcFunc, $user_info, $modSettings, $scripturl;
+	global $context, $txt, $sourcedir, $librarydir, $smcFunc, $user_info, $modSettings, $scripturl;
 
 	// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 	// ... ironically I don't like pickle. </grudge>
@@ -261,7 +261,7 @@ function ScheduledTasks()
 		),
 	);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'view_scheduled_tasks';
@@ -424,7 +424,7 @@ function EditTask()
  */
 function TaskLog()
 {
-	global $scripturl, $context, $txt, $smcFunc, $sourcedir;
+	global $scripturl, $context, $txt, $smcFunc, $sourcedir, $librarydir;
 
 	// Lets load the language just incase we are outside the Scheduled area.
 	loadLanguage('ManageScheduledTasks');
@@ -517,7 +517,7 @@ function TaskLog()
 
 	createToken('admin-tl');
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';

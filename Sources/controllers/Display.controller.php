@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 function Display()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings;
-	global $options, $sourcedir, $user_info, $board_info, $topic, $board;
+	global $options, $librarydir, $user_info, $board_info, $topic, $board;
 	global $attachments, $messages_request, $topicinfo, $language, $smcFunc;
 
 	// What are you gonna display if these are empty?!
@@ -44,7 +44,7 @@ function Display()
 	loadTemplate('Display');
 
 	// And the topic functions
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -275,7 +275,7 @@ function Display()
 	$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	if ($context['require_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -975,7 +975,7 @@ function Display()
 		if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
 		{
 			// Needed for the editor and message icons.
-			require_once($sourcedir . '/subs/Editor.subs.php');
+			require_once($librarydir . '/Editor.subs.php');
 
 			// Now create the editor.
 			$editorOptions = array(
@@ -1186,7 +1186,7 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $sourcedir, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic, $librarydir, $smcFunc;
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
@@ -1227,7 +1227,7 @@ function loadAttachmentContext($id_msg)
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
-					require_once($sourcedir . '/subs/Graphics.subs.php');
+					require_once($librarydir . '/Graphics.subs.php');
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 					{
 						// So what folder are we putting this image in?
@@ -1281,7 +1281,7 @@ function loadAttachmentContext($id_msg)
 							// Do we need to remove an old thumbnail?
 							if (!empty($old_id_thumb))
 							{
-								require_once($sourcedir . '/Subs-Attachments.php');
+								require_once($librarydir . '/Attachments.subs.php');
 								removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 							}
 						}
@@ -1363,7 +1363,7 @@ function action_quickmod2()
 	// Check the session = get or post.
 	checkSession('request');
 
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 
 	if (empty($_REQUEST['msgs']))
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);

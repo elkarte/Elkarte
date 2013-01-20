@@ -55,9 +55,9 @@ function markasread()
  */
 function action_markboards()
 {
-	global $sourcedir, $modSettings;
+	global $sourcedir, $librarydir, $modSettings;
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	// Find all the boards this user can see.
 	$boards = accessibleBoards();
@@ -81,7 +81,7 @@ function action_markboards()
  */
 function action_markreplies()
 {
-	global $user_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// Make sure all the topics are integers!
 	$topics = array_map('intval', explode('-', $_REQUEST['topics']));
@@ -105,7 +105,7 @@ function action_markreplies()
 	foreach ($topics as $id_topic)
 		$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], $logged_topics[$id_topic]);
 
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	markTopicsRead($markRead, true);
 
 	if (isset($_SESSION['topicseen_cache']))
@@ -120,7 +120,7 @@ function action_markreplies()
  */
 function action_marktopic()
 {
-	global $board, $topic, $user_info, $smcFunc, $sourcedir;
+	global $board, $topic, $user_info, $smcFunc, $sourcedir, $librarydir;
 
 	// Mark a topic unread.
 	// First, let's figure out what the latest message is.
@@ -187,7 +187,7 @@ function action_marktopic()
 	}
 
 	// Blam, unread!
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
 
 	redirectexit('board=' . $board . '.0');
@@ -200,14 +200,14 @@ function action_marktopic()
  */
 function action_markasread()
 {
-	global $board, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir;
+	global $board, $user_info, $board_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// no guests
 	is_not_guest();
 
 	checkSession('get');
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	$categories = array();
 	$boards = array();

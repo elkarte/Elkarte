@@ -32,15 +32,15 @@ if (!defined('ELKARTE'))
 function action_movetopic()
 {
 	global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $sourcedir, $modSettings;
-	global $cat_tree, $boards, $boardList;
-	
+	global $cat_tree, $boards, $boardList, $librarydir;
+
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
 
 	// Retrieve the basic topic information for whats being moved
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	$topic_info = getTopicInfo($topic, true);
-	
+
 	if ($topic_info === false)
 		fatal_lang_error('topic_gone', false);
 
@@ -115,7 +115,7 @@ function action_movetopic()
 	}
 
 	// We will need this
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	moveTopicConcurrence();
 
 	// Register this form and get a sequence number in $context.
@@ -136,7 +136,7 @@ function action_movetopic()
 function action_movetopic2()
 {
 	global $txt, $board, $topic, $scripturl, $sourcedir, $modSettings, $context;
-	global $board, $language, $user_info, $smcFunc;
+	global $board, $language, $user_info, $smcFunc, $librarydir;
 
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
@@ -150,7 +150,7 @@ function action_movetopic2()
 		fatal_lang_error('movetopic_no_board', false);
 
 	// We will need this
-	require_once($sourcedir . '/subs/Topic.subs.php');
+	require_once($librarydir . '/Topic.subs.php');
 	moveTopicConcurrence();
 
 	// Make sure this form hasn't been submitted before.
@@ -187,7 +187,7 @@ function action_movetopic2()
 	}
 
 	checkSession();
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// The destination board must be numeric.
 	$toboard = (int) $_POST['toboard'];
@@ -364,7 +364,7 @@ function action_movetopic2()
 	// Log that they moved this topic.
 	if (!allowedTo('move_own') || $topic_info['id_member_started'] != $user_info['id'])
 		logAction('move', array('topic' => $topic, 'board_from' => $board, 'board_to' => $toboard));
-	
+
 	// Notify people that this topic has been moved?
 	sendNotifications($topic, 'move');
 

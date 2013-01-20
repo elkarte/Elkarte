@@ -24,7 +24,8 @@ if (!defined('ELKARTE'))
  */
 function summary($memID)
 {
-	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile, $sourcedir, $scripturl, $smcFunc, $settings;
+	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
+	global $sourcedir, $librarydir, $scripturl, $smcFunc, $settings;
 
 	// Attempt to load the member's profile data.
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
@@ -247,7 +248,8 @@ function summary($memID)
 		}
 	}
 
-	// To finish this off, custom profile fields
+	// To finish this off, custom profile fields.
+	require_once($librarydir . '/Profile.subs.php');
 	loadCustomFields($memID);
 }
 
@@ -592,7 +594,7 @@ function showPosts($memID)
 function showAttachments($memID)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile, $sourcedir, $smcFunc;
+	global $context, $user_profile, $sourcedir, $librarydir, $smcFunc;
 
 	// OBEY permissions!
 	$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -601,7 +603,7 @@ function showAttachments($memID)
 	if (empty($boardsAllowed))
 		$boardsAllowed = array(-1);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// This is all the information required to list attachments.
 	$listOptions = array(
@@ -807,13 +809,13 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function showDisregarded($memID)
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $sourcedir, $smcFunc;
+	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $sourcedir, $librarydir, $smcFunc;
 
 	// Only the owner can see the list (if the function is enabled of course)
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
 		return;
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// And here they are: the topics you don't like
 	$listOptions = array(
@@ -1392,7 +1394,7 @@ function showPermissions($memID)
  */
 function viewWarning($memID)
 {
-	global $modSettings, $context, $sourcedir, $txt, $scripturl;
+	global $modSettings, $context, $sourcedir, $librarydir, $txt, $scripturl;
 
 	// Firstly, can we actually even be here?
 	if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
@@ -1404,7 +1406,7 @@ function viewWarning($memID)
 	$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
 
 	// Let's use a generic list to get all the current warnings, and use the issue warnings grab-a-granny thing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 
 	$listOptions = array(
@@ -1472,7 +1474,7 @@ function viewWarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// Create some common text bits for the template.

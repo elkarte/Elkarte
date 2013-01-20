@@ -72,7 +72,7 @@ function ManageCalendar()
  */
 function ModifyHolidays()
 {
-	global $sourcedir, $scripturl, $txt, $context;
+	global $librarydir, $scripturl, $txt, $context;
 
 	// Submitting something...
 	if (isset($_REQUEST['delete']) && !empty($_REQUEST['holiday']))
@@ -84,7 +84,7 @@ function ModifyHolidays()
 			$_REQUEST['holiday'][$id] = (int) $id;
 
 		// Now the IDs are "safe" do the delete...
-		require_once($sourcedir . '/subs/Calendar.subs.php');
+		require_once($librarydir . '/Calendar.subs.php');
 		removeHolidays($_REQUEST['holiday']);
 	}
 
@@ -96,11 +96,11 @@ function ModifyHolidays()
 		'base_href' => $scripturl . '?action=admin;area=managecalendar;sa=holidays',
 		'default_sort_col' => 'name',
 		'get_items' => array(
-			'file' => $sourcedir . '/subs/Calendar.subs.php',
+			'file' => $librarydir . '/Calendar.subs.php',
 			'function' => 'list_getHolidays',
 		),
 		'get_count' => array(
-			'file' => $sourcedir . '/subs/Calendar.subs.php',
+			'file' => $librarydir . '/Calendar.subs.php',
 			'function' => 'list_getNumHolidays',
 		),
 		'no_items_label' => $txt['holidays_no_entries'],
@@ -172,7 +172,7 @@ function ModifyHolidays()
 		),
 	);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	//loadTemplate('ManageCalendar');

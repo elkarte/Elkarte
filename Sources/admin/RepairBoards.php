@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function action_repairboards()
 {
-	global $txt, $context, $sourcedir, $salvageBoardID;
+	global $txt, $context, $sourcedir, $librarydir, $salvageBoardID;
 
 	isAllowedTo('admin_forum');
 
@@ -82,7 +82,7 @@ function action_repairboards()
 		$context['error_search'] = false;
 		$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
 
-		require_once($sourcedir . '/subs/Boards.subs.php');
+		require_once($librarydir . '/Boards.subs.php');
 
 		// Actually do the fix.
 		findForumErrors(true);

@@ -668,9 +668,9 @@ function GroupPermissionsReport()
  */
 function StaffReport()
 {
-	global $sourcedir, $context, $txt, $smcFunc;
+	global $sourcedir, $librarydir, $context, $txt, $smcFunc;
 
-	require_once($sourcedir . '/subs/Members.subs.php');
+	require_once($librarydir . '/Members.subs.php');
 
 	// Fetch all the board names.
 	$request = $smcFunc['db_query']('', '

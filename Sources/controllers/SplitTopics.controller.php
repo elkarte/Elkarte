@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function action_splittopics()
 {
-	global $topic, $sourcedir;
+	global $topic, $sourcedir, $librarydir;
 
 	// And... which topic were you splitting, again?
 	if (empty($topic))
@@ -42,8 +42,8 @@ function action_splittopics()
 	// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('SplitTopics');
-	require_once($sourcedir . '/subs/Boards.subs.php');
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	$subActions = array(
 		'selectTopics' => 'SplitSelectTopics',
@@ -501,7 +501,7 @@ function SplitSelectionExecute()
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $sourcedir;
+	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $sourcedir, $librarydir;
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -768,7 +768,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
-		require_once($sourcedir . '/subs/Topic.subs.php');
+		require_once($librarydir . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
@@ -784,7 +784,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	require_once($sourcedir . '/Search.php');
+	require_once($sourcedir . '/controllers/Search.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'topicSplit')))
 		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
@@ -979,7 +979,7 @@ function MergeIndex()
  */
 function MergeExecute($topics = array())
 {
-	global $user_info, $txt, $context, $scripturl, $sourcedir;
+	global $user_info, $txt, $context, $scripturl, $sourcedir, $librarydir;
 	global $smcFunc, $language, $modSettings;
 
 	// Check the session.
@@ -1446,7 +1446,7 @@ function MergeExecute($topics = array())
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
 
-		require_once($sourcedir . '/subs/Topic.subs.php');
+		require_once($librarydir . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);
 
@@ -1559,7 +1559,7 @@ function MergeExecute($topics = array())
 	list($id_board) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// Update all the statistics.
 	updateStats('topic');
@@ -1572,7 +1572,7 @@ function MergeExecute($topics = array())
 	sendNotifications($id_topic, 'merge');
 
 	// If there's a search index that needs updating, update it...
-	require_once($sourcedir . '/Search.php');
+	require_once($sourcedir . '/controllers/Search.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'topicMerge')))
 		$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($_POST['enforce_subject']) ? null : array($context['response_prefix'], $target_subject));

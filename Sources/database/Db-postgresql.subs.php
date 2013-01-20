@@ -23,7 +23,7 @@ if (!defined('ELKARTE'))
 /**
  * Maps the implementations in this file (smf_db_function_name)
  * to the $smcFunc['db_function_name'] variable.
- * @see Subs-Db-mysql.php#smf_db_initiate
+ * @see Db-mysql.subs.php#smf_db_initiate
  *
  * @param type $db_server
  * @param type $db_name
