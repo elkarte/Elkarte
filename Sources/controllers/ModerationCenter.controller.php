@@ -66,12 +66,11 @@ function action_modcenter($dont_call = false)
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
-					'function' => 'ModEndSession',
+					'function' => 'action_modEndSession',
 					'enabled' => empty($modSettings['securityDisable_moderate']),
 				),
 				'notice' => array(
-					'file' => 'controllers/ModerationCenter.controller.php',
-					'function' => 'ShowNotice',
+					'function' => 'action_showNotice',
 					'select' => 'index'
 				),
 			),
@@ -88,7 +87,7 @@ function action_modcenter($dont_call = false)
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $context['can_moderate_boards'],
-					'function' => 'ViewWarnings',
+					'function' => 'action_viewWarnings',
 					'subsections' => array(
 						'log' => array($txt['mc_warning_log']),
 						'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
@@ -122,7 +121,7 @@ function action_modcenter($dont_call = false)
 					'label' => $txt['mc_reported_posts'],
 					'enabled' => $context['can_moderate_boards'],
 					'file' => 'controllers/ModerationCenter.controller.php',
-					'function' => 'ReportedPosts',
+					'function' => 'action_reportedPosts',
 					'subsections' => array(
 						'open' => array($txt['mc_reportedp_active']),
 						'closed' => array($txt['mc_reportedp_closed']),
@@ -137,7 +136,7 @@ function action_modcenter($dont_call = false)
 				'userwatch' => array(
 					'label' => $txt['mc_watched_users_title'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $context['can_moderate_boards'],
-					'function' => 'ViewWatchedUsers',
+					'function' => 'action_viewWatchedUsers',
 					'subsections' => array(
 						'member' => array($txt['mc_watched_users_member']),
 						'post' => array($txt['mc_watched_users_post']),
@@ -550,7 +549,7 @@ function ModBlockGroupRequests()
  * Browse all the reported posts...
  * @todo this needs to be given its own file?
  */
-function ReportedPosts()
+function action_reportedPosts()
 {
 	global $txt, $context, $scripturl, $modSettings, $user_info, $smcFunc;
 
@@ -569,7 +568,7 @@ function ReportedPosts()
 
 	// Are they wanting to view a particular report?
 	if (!empty($_REQUEST['report']))
-		return ModReport();
+		return action_modReport();
 
 	// Set up the comforting bits...
 	$context['page_title'] = $txt['mc_reported_posts'];
@@ -722,6 +721,7 @@ function ReportedPosts()
 
 /**
  * Act as an entrace for all group related activity.
+ *
  * @todo As for most things in this file, this needs to be moved somewhere appropriate?
  */
 function ModerateGroups()
@@ -780,10 +780,10 @@ function recountOpenReports()
 }
 
 /**
- * Get details about the moderation report... specified in
- * $_REQUEST['report'].
+ * Get details about the moderation report...
+ * specified in $_REQUEST['report'].
  */
-function ModReport()
+function action_modReport()
 {
 	global $user_info, $context, $sourcedir, $librarydir, $scripturl, $txt, $smcFunc;
 
@@ -928,7 +928,7 @@ function ModReport()
 	$smcFunc['db_free_result']($request);
 
 	// What have the other moderators done to this message?
-	require_once($sourcedir . '/Modlog.php');
+	loadAdminClass('Modlog.php');
 	require_once($librarydir . '/List.subs.php');
 	loadLanguage('Modlog');
 
@@ -1042,7 +1042,7 @@ function ModReport()
 /**
  * Show a notice sent to a user.
  */
-function ShowNotice()
+function action_showNotice()
 {
 	global $smcFunc, $txt, $context;
 
@@ -1073,7 +1073,7 @@ function ShowNotice()
 /**
  * View watched users.
  */
-function ViewWatchedUsers()
+function action_viewWatchedUsers()
 {
 	global $smcFunc, $modSettings, $context, $txt, $scripturl, $user_info, $sourcedir, $librarydir;
 
@@ -1487,14 +1487,14 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
 /**
  * Entry point for viewing warning related stuff.
  */
-function ViewWarnings()
+function action_viewWarnings()
 {
 	global $context, $txt;
 
 	$subActions = array(
-		'log' => array('ViewWarningLog'),
-		'templateedit' => array('ModifyWarningTemplate', 'issue_warning'),
-		'templates' => array('ViewWarningTemplates', 'issue_warning'),
+		'log' => array('action_viewWarningLog'),
+		'templateedit' => array('action_modifyWarningTemplate', 'issue_warning'),
+		'templates' => array('action_viewWarningTemplates', 'issue_warning'),
 	);
 
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']]))? $_REQUEST['sa'] : 'log';
@@ -1516,7 +1516,7 @@ function ViewWarnings()
 /**
  * Simply put, look at the warning log!
  */
-function ViewWarningLog()
+function action_viewWarningLog()
 {
 	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir, $librarydir;
 
@@ -1681,13 +1681,13 @@ function list_getWarnings($start, $items_per_page, $sort)
 /**
  * Load all the warning templates.
  */
-function ViewWarningTemplates()
+function action_viewWarningTemplates()
 {
 	global $smcFunc, $modSettings, $context, $txt, $scripturl, $sourcedir, $librarydir, $user_info;
 
 	// Submitting a new one?
 	if (isset($_POST['add']))
-		return ModifyWarningTemplate();
+		return action_modifyWarningTemplate();
 	elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
 	{
 		checkSession('post');
@@ -1900,7 +1900,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort)
 /**
  * Edit a warning template.
  */
-function ModifyWarningTemplate()
+function action_modifyWarningTemplate()
 {
 	global $smcFunc, $context, $txt, $user_info, $sourcedir, $librarydir;
 
@@ -2142,7 +2142,7 @@ function ModerationSettings()
 /**
  * This ends a moderator session, requiring authentication to access the MCP again.
  */
-function ModEndSession()
+function action_modEndSession()
 {
 	// This is so easy!
 	unset($_SESSION['moderate_time']);
