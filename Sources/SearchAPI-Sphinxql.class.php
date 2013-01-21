@@ -114,7 +114,7 @@ class Sphinxql_Search
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['Sphinx_Searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
 	}
 
 	/**
@@ -168,7 +168,7 @@ class Sphinxql_Search
 		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = mysql_connect(($modSettings['Sphinx_Searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['Sphinx_Searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
 			$query = 'SELECT * FROM elkarte_index';

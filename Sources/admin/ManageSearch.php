@@ -822,8 +822,8 @@ function EditSphinxSettings()
 			'sphinx_log_path' => rtrim($_POST['sphinx_log_path'], '/'),
 			'sphinx_stopword_path' => $_POST['sphinx_stopword_path'],
 			'sphinx_indexer_mem' => (int) $_POST['sphinx_indexer_mem'],
-			'Sphinx_Searchd_server' => $_POST['Sphinx_Searchd_server'],
-			'Sphinx_Searchd_port' => (int) $_POST['Sphinx_Searchd_port'],
+			'sphinx_searchd_server' => $_POST['sphinx_searchd_server'],
+			'sphinx_searchd_port' => (int) $_POST['sphinx_searchd_port'],
 			'sphinxql_searchd_port' => (int) $_POST['sphinxql_searchd_port'],
 			'sphinx_max_results' => (int) $_POST['sphinx_max_results'],
 		));
@@ -848,7 +848,7 @@ function EditSphinxSettings()
 			{
 				include_once($sourcedir . '/sphinxapi.php');
 				$mySphinx = new SphinxClient();
-				$mySphinx->SetServer($modSettings['Sphinx_Searchd_server'], (int) $modSettings['Sphinx_Searchd_port']);
+				$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 				$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results']);
 				$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 				$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
@@ -872,9 +872,9 @@ function EditSphinxSettings()
 		// try to connect via SphinxQL
 		if ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index']))
 		{
-			if (!empty($modSettings['Sphinx_Searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
+			if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
 			{
-				$result = mysql_connect(($modSettings['Sphinx_Searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['Sphinx_Searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+				$result = mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 				if ($result === false)
 				{
 					$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
@@ -1045,7 +1045,7 @@ indexer
 
 searchd
 {
-	listen 			= ', (empty($modSettings['Sphinx_Searchd_port']) ? 3312 : (int) $modSettings['Sphinx_Searchd_port']), '
+	listen 			= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
 	listen 			= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
 	log 			= ', $modSettings['sphinx_log_path'], '/searchd.log
 	query_log 		= ', $modSettings['sphinx_log_path'], '/query.log
