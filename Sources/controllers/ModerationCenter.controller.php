@@ -58,11 +58,11 @@ function action_modcenter($dont_call = false)
 			'areas' => array(
 				'index' => array(
 					'label' => $txt['moderation_center'],
-					'function' => 'ModerationHome',
+					'function' => 'action_moderationHome',
 				),
 				'settings' => array(
 					'label' => $txt['mc_settings'],
-					'function' => 'ModerationSettings',
+					'function' => 'action_moderationSettings',
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
@@ -120,7 +120,6 @@ function action_modcenter($dont_call = false)
 				'reports' => array(
 					'label' => $txt['mc_reported_posts'],
 					'enabled' => $context['can_moderate_boards'],
-					'file' => 'controllers/ModerationCenter.controller.php',
 					'function' => 'action_reportedPosts',
 					'subsections' => array(
 						'open' => array($txt['mc_reportedp_active']),
@@ -208,7 +207,7 @@ function action_modcenter($dont_call = false)
 /**
  * This function basically is the home page of the moderation center.
  */
-function ModerationHome()
+function action_moderationHome()
 {
 	global $txt, $context, $scripturl, $modSettings, $user_info, $user_settings;
 
@@ -2019,7 +2018,7 @@ function action_modifyWarningTemplate()
 /**
  * Change moderation preferences.
  */
-function ModerationSettings()
+function action_moderationSettings()
 {
 	global $context, $smcFunc, $txt, $sourcedir, $scripturl, $user_settings, $user_info;
 
