@@ -657,7 +657,17 @@ a.moderation_link, a.moderation_link:visited {
 	margin: -1px 0 12px 0;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
-
+/* a simple full sourounding box */
+.simplebox {
+	padding: .5em 1em;
+	font-size: 0.9em;
+	line-height: 1.4em;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background: none;
+	margin: .5em 0 1em 0;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
 /* an informative style */
 .information {
 	background: #f0f6f0;
