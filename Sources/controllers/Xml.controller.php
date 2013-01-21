@@ -257,9 +257,9 @@ function newsletterpreview()
 
 function sig_preview()
 {
-	global $context, $sourcedir, $smcFunc, $txt, $user_info;
+	global $context, $librarydir, $smcFunc, $txt, $user_info;
 
-	require_once($sourcedir . '/ProfileOptions.php');
+	require_once($librarydir . '/Profile.subs.php');
 	loadLanguage('Profile');
 	loadLanguage('Errors');
 
