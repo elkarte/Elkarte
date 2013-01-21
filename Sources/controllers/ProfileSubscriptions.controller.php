@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  *
  * @param int $memID
  */
-function subscriptions($memID)
+function action_subscriptions($memID)
 {
 	global $context, $txt, $sourcedir, $modSettings, $smcFunc, $scripturl;
 
