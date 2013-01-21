@@ -44,9 +44,13 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Load the settings...
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
+// Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if (empty($librarydir) || !file_exists($librarydir))
+	$librarydir = $sourcedir . '/subs';
+if (empty($controllerdir) || !file_exists($controllerdir))
+	$controllerdir = $sourcedir . '/controllers';
 
 // And important includes.
 require_once($sourcedir . '/QueryString.php');
