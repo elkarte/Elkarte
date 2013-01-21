@@ -885,9 +885,11 @@ function template_action_showPermissions()
 				</div>
 				<div class="windowbg smalltext">
 					<div class="content">', $txt['showPermissions_restricted_boards_desc'], ':<br />';
+
 				foreach ($context['no_access_boards'] as $no_access_board)
 					echo '
 						<a href="', $scripturl, '?board=', $no_access_board['id'], '.0">', $no_access_board['name'], '</a>', $no_access_board['is_last'] ? '' : ', ';
+
 				echo '
 					</div>
 				</div>';
@@ -899,6 +901,7 @@ function template_action_showPermissions()
 					<div class="cat_bar">
 						<h3 class="catbg">', $txt['showPermissions_general'], '</h3>
 					</div>';
+
 		if (!empty($context['member']['permissions']['general']))
 		{
 			echo '
@@ -931,6 +934,7 @@ function template_action_showPermissions()
 								</td>
 							</tr>';
 			}
+
 			echo '
 						</tbody>
 					</table>
@@ -976,6 +980,7 @@ function template_action_showPermissions()
 						</tr>
 					</thead>
 					<tbody>';
+
 			foreach ($context['member']['permissions']['board'] as $permission)
 			{
 				echo '
@@ -995,10 +1000,12 @@ function template_action_showPermissions()
 					echo '
 								', $txt['showPermissions_given'], ': &nbsp;', implode(', ', $permission['groups']['allowed']);
 				}
+
 				echo '
 							</td>
 						</tr>';
 			}
+
 			echo '
 					</tbody>
 				</table>';
@@ -1006,6 +1013,7 @@ function template_action_showPermissions()
 		else
 			echo '
 			<p class="windowbg2 description">', $txt['showPermissions_none_board'], '</p>';
+
 	echo '
 			</div>
 		</div>';
@@ -2022,10 +2030,11 @@ function template_load_warning_variables()
 	global $modSettings, $context;
 
 	$context['warningBarWidth'] = 200;
+
 	// Setup the colors - this is a little messy for theming.
 	$context['colors'] = array(
 		0 => 'green',
-		$modSettings['warning_watch'] => 'darkgreen',
+		$modSettings['warning_watch'] => 'green',
 		$modSettings['warning_moderate'] => 'orange',
 		$modSettings['warning_mute'] => 'red',
 	);
@@ -2128,7 +2137,7 @@ function template_issueWarning()
 				}
 
 				// Get the position of the container.
-				contain = document.getElementById(\'warning_contain\');
+				contain = document.getElementById(\'warning_progress\');
 				position = 0;
 				while (contain != null)
 				{
@@ -2181,6 +2190,7 @@ function template_issueWarning()
 
 	echo '
 			document.getElementById(\'warning_progress\').style.backgroundColor = color;
+			document.getElementById(\'warning_progress\').style.backgroundImage = "none";
 
 			// Also set the right effect.
 			effectText = "";';
@@ -2270,12 +2280,12 @@ function template_issueWarning()
 					<dd>
 						<div id="warndiv1" style="display: none;">
 							<div>
-								<span class="floatleft" style="padding: 0 0.5em"><a href="#" onclick="changeWarnLevel(-5); return false;">[-]</a></span>
-								<div class="floatleft" id="warning_contain" style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background-color: white; padding: 1px; position: relative;" onmousedown="setWarningBarPos(event, true);" onmousemove="setWarningBarPos(event, true);" onclick="setWarningBarPos(event);">
-									<div id="warning_text" style="padding-top: 1pt; width: 100%; z-index: 2; color: black; position: absolute; text-align: center; font-weight: bold;">', $context['member']['warning'], '%</div>
-									<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background-color: ', $context['current_color'], ';">&nbsp;</div>
+								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(-5); return false;">[-]</a></span>
+								<div  class="floatleft progress_bar" style="width: ', $context['warningBarWidth'], 'px; margin:0" onmousedown="setWarningBarPos(event, true);" onmousemove="setWarningBarPos(event, true);" onclick="setWarningBarPos(event);">
+									<div id="warning_text" class="full_bar">', $context['member']['warning'], '%</div>
+									<div id="warning_progress" class="green_percent" style="width: ', $context['member']['warning'], '%;">&nbsp;</div>
 								</div>
-								<span class="floatleft" style="padding: 0 0.5em"><a href="#" onclick="changeWarnLevel(5); return false;">[+]</a></span>
+								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(5); return false;">[+]</a></span>
 								<div class="clear_left smalltext">', $txt['profile_warning_impact'], ': <span id="cur_level_div">', $context['level_effects'][$context['current_level']], '</span></div>
 							</div>
 							<input type="hidden" name="warning_level" id="warning_level" value="SAME" />
@@ -2283,6 +2293,7 @@ function template_issueWarning()
 						<div id="warndiv2">
 							<input type="text" name="warning_level_nojs" size="6" maxlength="4" value="', $context['member']['warning'], '" class="input_text" />&nbsp;', $txt['profile_warning_max'], '
 							<div class="smalltext">', $txt['profile_warning_impact'], ':<br />';
+
 	// For non-javascript give a better list.
 	foreach ($context['level_effects'] as $limit => $effect)
 		echo '
