@@ -24,10 +24,8 @@ if (!defined('ELKARTE'))
 
 /**
  * Allow the change or view of profiles...
- *
- * @param array $post_errors = array()
  */
-function ModifyProfile($post_errors = array())
+function action_modifyprofile()
 {
 	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
@@ -38,7 +36,6 @@ function ModifyProfile($post_errors = array())
 	loadTemplate('Profile');
 
 	require_once($librarydir . '/Menu.subs.php');
-
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
@@ -92,7 +89,7 @@ function ModifyProfile($post_errors = array())
 				'summary' => array(
 					'label' => $txt['summary'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'summary',
+					'function' => 'action_summary',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'profile_view_any',
@@ -101,7 +98,7 @@ function ModifyProfile($post_errors = array())
 				'statistics' => array(
 					'label' => $txt['statPanel'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'statPanel',
+					'function' => 'action_statPanel',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'profile_view_any',
@@ -110,7 +107,7 @@ function ModifyProfile($post_errors = array())
 				'showposts' => array(
 					'label' => $txt['showPosts'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'showPosts',
+					'function' => 'action_showPosts',
 					'subsections' => array(
 						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
 						'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
@@ -125,7 +122,7 @@ function ModifyProfile($post_errors = array())
 				'showdrafts' => array(
 					'label' => $txt['drafts_show'],
 					'file' => 'Drafts.controller.php',
-					'function' => 'showProfileDrafts',
+					'function' => 'action_showProfileDrafts',
 					'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -135,7 +132,7 @@ function ModifyProfile($post_errors = array())
 				'permissions' => array(
 					'label' => $txt['showPermissions'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'showPermissions',
+					'function' => 'action_showPermissions',
 					'permission' => array(
 						'own' => 'manage_permissions',
 						'any' => 'manage_permissions',
@@ -160,7 +157,7 @@ function ModifyProfile($post_errors = array())
 					'label' => $txt['profile_view_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'viewWarning',
+					'function' => 'action_viewWarning',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'issue_warning',
@@ -587,7 +584,7 @@ function ModifyProfile($post_errors = array())
 		}
 		// Authentication changes?
 		elseif ($current_area == 'authentication')
-			authentication($memID, true);
+			action_authentication($memID, true);
 		elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'pmprefs')))
 			saveProfileFields();
 		else

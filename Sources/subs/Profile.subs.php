@@ -1419,3 +1419,868 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		}
 	}
 }
+
+/**
+ * Send the user a new activation email if they need to reactivate!
+ */
+function profileSendActivation()
+{
+	global $sourcedir, $librarydir, $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
+
+	require_once($librarydir . '/Mail.subs.php');
+
+	// Shouldn't happen but just in case.
+	if (empty($profile_vars['email_address']))
+		return;
+
+	$replacements = array(
+		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
+		'ACTIVATIONCODE' => $profile_vars['validation_code'],
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $context['id_member'],
+	);
+
+	// Send off the email.
+	$emaildata = loadEmailTemplate('activate_reactivate', $replacements, empty($cur_profile['lngfile']) || empty($modSettings['userLanguage']) ? $language : $cur_profile['lngfile']);
+	sendmail($profile_vars['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+
+	// Log the user out.
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_online
+		WHERE id_member = {int:selected_member}',
+		array(
+			'selected_member' => $context['id_member'],
+		)
+	);
+	$_SESSION['log_time'] = 0;
+	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));
+
+	if (isset($_COOKIE[$cookiename]))
+		$_COOKIE[$cookiename] = '';
+
+	loadUserSettings();
+
+	$context['user']['is_logged'] = false;
+	$context['user']['is_guest'] = true;
+
+	// Send them to the done-with-registration-login screen.
+	loadTemplate('Register');
+
+	$context['page_title'] = $txt['profile'];
+	$context['sub_template'] = 'after';
+	$context['title'] = $txt['activate_changed_email_title'];
+	$context['description'] = $txt['activate_changed_email_desc'];
+
+	// We're gone!
+	obExit();
+}
+
+/**
+ * Load key signature context data.
+ *
+ * @return true
+ */
+function profileLoadSignatureData()
+{
+	global $modSettings, $context, $txt, $cur_profile, $smcFunc, $memberContext;
+
+	// Signature limits.
+	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+	$sig_limits = explode(',', $sig_limits);
+
+	$context['signature_enabled'] = isset($sig_limits[0]) ? $sig_limits[0] : 0;
+	$context['signature_limits'] = array(
+		'max_length' => isset($sig_limits[1]) ? $sig_limits[1] : 0,
+		'max_lines' => isset($sig_limits[2]) ? $sig_limits[2] : 0,
+		'max_images' => isset($sig_limits[3]) ? $sig_limits[3] : 0,
+		'max_smileys' => isset($sig_limits[4]) ? $sig_limits[4] : 0,
+		'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
+		'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
+		'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
+		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : array(),
+	);
+	// Kept this line in for backwards compatibility!
+	$context['max_signature_length'] = $context['signature_limits']['max_length'];
+	// Warning message for signature image limits?
+	$context['signature_warning'] = '';
+	if ($context['signature_limits']['max_image_width'] && $context['signature_limits']['max_image_height'])
+		$context['signature_warning'] = sprintf($txt['profile_error_signature_max_image_size'], $context['signature_limits']['max_image_width'], $context['signature_limits']['max_image_height']);
+	elseif ($context['signature_limits']['max_image_width'] || $context['signature_limits']['max_image_height'])
+		$context['signature_warning'] = sprintf($txt['profile_error_signature_max_image_' . ($context['signature_limits']['max_image_width'] ? 'width' : 'height')], $context['signature_limits'][$context['signature_limits']['max_image_width'] ? 'max_image_width' : 'max_image_height']);
+
+	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
+
+	if (empty($context['do_preview']))
+		$context['member']['signature'] = empty($cur_profile['signature']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature']);
+	else
+	{
+		$signature = !empty($_POST['signature']) ? $_POST['signature'] : '';
+		$validation = profileValidateSignature($signature);
+		if (empty($context['post_errors']))
+		{
+			loadLanguage('Errors');
+			$context['post_errors'] = array();
+		}
+		$context['post_errors'][] = 'signature_not_yet_saved';
+		if ($validation !== true && $validation !== false)
+			$context['post_errors'][] = $validation;
+
+		censorText($context['member']['signature']);
+		$context['member']['current_signature'] = $context['member']['signature'];
+		censorText($signature);
+		$context['member']['signature_preview'] = parse_bbc($signature, true, 'sig' . $memberContext[$context['id_member']]);
+		$context['member']['signature'] = $_POST['signature'];
+	}
+
+	return true;
+}
+
+/**
+ * Load avatar context data.
+ *
+ * @return true
+ */
+function profileLoadAvatarData()
+{
+	global $context, $cur_profile, $modSettings, $scripturl, $librarydir;
+
+	$context['avatar_url'] = $modSettings['avatar_url'];
+
+	// Default context.
+	$context['member']['avatar'] += array(
+		'custom' => stristr($cur_profile['avatar'], 'http://') ? $cur_profile['avatar'] : 'http://',
+		'selection' => $cur_profile['avatar'] == '' || stristr($cur_profile['avatar'], 'http://') ? '' : $cur_profile['avatar'],
+		'id_attach' => $cur_profile['id_attach'],
+		'filename' => $cur_profile['filename'],
+		'allow_server_stored' => allowedTo('profile_server_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
+		'allow_upload' => allowedTo('profile_upload_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
+		'allow_external' => allowedTo('profile_remote_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
+	);
+
+	if ($cur_profile['avatar'] == '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
+	{
+		$context['member']['avatar'] += array(
+			'choice' => 'upload',
+			'server_pic' => 'blank.png',
+			'external' => 'http://'
+		);
+		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $cur_profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
+	}
+	elseif (stristr($cur_profile['avatar'], 'http://') && $context['member']['avatar']['allow_external'])
+		$context['member']['avatar'] += array(
+			'choice' => 'external',
+			'server_pic' => 'blank.png',
+			'external' => $cur_profile['avatar']
+		);
+	elseif ($cur_profile['avatar'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']) && $context['member']['avatar']['allow_server_stored'])
+		$context['member']['avatar'] += array(
+			'choice' => 'server_stored',
+			'server_pic' => $cur_profile['avatar'] == '' ? 'blank.png' : $cur_profile['avatar'],
+			'external' => 'http://'
+		);
+	else
+		$context['member']['avatar'] += array(
+			'choice' => 'none',
+			'server_pic' => 'blank.png',
+			'external' => 'http://'
+		);
+
+	// Get a list of all the avatars.
+	if ($context['member']['avatar']['allow_server_stored'])
+	{
+		require_once($librarydir . '/Attachments.subs.php');
+		$context['avatar_list'] = array();
+		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
+	}
+	else
+		$context['avatars'] = array();
+
+	// Second level selected avatar...
+	$context['avatar_selected'] = substr(strrchr($context['member']['avatar']['server_pic'], '/'), 1);
+	return true;
+}
+
+/**
+ * @todo needs description
+ *
+ * @return true
+ */
+function profileLoadGroups()
+{
+	global $cur_profile, $txt, $context, $smcFunc, $user_settings;
+
+	$context['member_groups'] = array(
+		0 => array(
+			'id' => 0,
+			'name' => $txt['no_primary_membergroup'],
+			'is_primary' => $cur_profile['id_group'] == 0,
+			'can_be_additional' => false,
+			'can_be_primary' => true,
+		)
+	);
+	$curGroups = explode(',', $cur_profile['additional_groups']);
+
+	// Load membergroups, but only those groups the user can assign.
+	$request = $smcFunc['db_query']('', '
+		SELECT group_name, id_group, hidden
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:moderator_group}
+			AND min_posts = {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
+			AND group_type != {int:is_protected}') . '
+		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		array(
+			'moderator_group' => 3,
+			'min_posts' => -1,
+			'is_protected' => 1,
+			'newbie_group' => 4,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		// We should skip the administrator group if they don't have the admin_forum permission!
+		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
+			continue;
+
+		$context['member_groups'][$row['id_group']] = array(
+			'id' => $row['id_group'],
+			'name' => $row['group_name'],
+			'is_primary' => $cur_profile['id_group'] == $row['id_group'],
+			'is_additional' => in_array($row['id_group'], $curGroups),
+			'can_be_additional' => true,
+			'can_be_primary' => $row['hidden'] != 2,
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	$context['member']['group_id'] = $user_settings['id_group'];
+
+	return true;
+}
+
+/**
+ * Load all the languages for the profile.
+ * @return boolean
+ */
+function profileLoadLanguages()
+{
+	global $context, $modSettings, $settings, $cur_profile, $language, $smcFunc;
+
+	$context['profile_languages'] = array();
+
+	// Get our languages!
+	getLanguages(true);
+
+	// Setup our languages.
+	foreach ($context['languages'] as $lang)
+		$context['profile_languages'][$lang['filename']] = $lang['name'];
+
+	ksort($context['profile_languages']);
+
+	// Return whether we should proceed with this.
+	return count($context['profile_languages']) > 1 ? true : false;
+}
+
+/**
+ * Reload a users settings.
+ */
+function profileReloadUser()
+{
+	global $sourcedir, $librarydir, $modSettings, $context, $cur_profile, $smcFunc, $profile_vars;
+
+	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
+	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
+	{
+		require_once($librarydir . '/Auth.subs.php');
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
+	}
+
+	loadUserSettings();
+	writeLog();
+}
+
+/**
+ * Validate the signature
+ *
+ * @param mixed &$value
+ * @return boolean|string
+ */
+function profileValidateSignature(&$value)
+{
+	global $sourcedir, $librarydir, $modSettings, $smcFunc, $txt;
+
+	require_once($librarydir . '/Post.subs.php');
+
+	// Admins can do whatever they hell they want!
+	if (!allowedTo('admin_forum'))
+	{
+		// Load all the signature limits.
+		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+		$sig_limits = explode(',', $sig_limits);
+		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
+
+		$unparsed_signature = strtr(un_htmlspecialchars($value), array("\r" => '', '&#039' => '\''));
+
+		// Too many lines?
+		if (!empty($sig_limits[2]) && substr_count($unparsed_signature, "\n") >= $sig_limits[2])
+		{
+			$txt['profile_error_signature_max_lines'] = sprintf($txt['profile_error_signature_max_lines'], $sig_limits[2]);
+			return 'signature_max_lines';
+		}
+
+		// Too many images?!
+		if (!empty($sig_limits[3]) && (substr_count(strtolower($unparsed_signature), '[img') + substr_count(strtolower($unparsed_signature), '<img')) > $sig_limits[3])
+		{
+			$txt['profile_error_signature_max_image_count'] = sprintf($txt['profile_error_signature_max_image_count'], $sig_limits[3]);
+			return 'signature_max_image_count';
+		}
+
+		// What about too many smileys!
+		$smiley_parsed = $unparsed_signature;
+		parsesmileys($smiley_parsed);
+		$smiley_count = substr_count(strtolower($smiley_parsed), '<img') - substr_count(strtolower($unparsed_signature), '<img');
+		if (!empty($sig_limits[4]) && $sig_limits[4] == -1 && $smiley_count > 0)
+			return 'signature_allow_smileys';
+		elseif (!empty($sig_limits[4]) && $sig_limits[4] > 0 && $smiley_count > $sig_limits[4])
+		{
+			$txt['profile_error_signature_max_smileys'] = sprintf($txt['profile_error_signature_max_smileys'], $sig_limits[4]);
+			return 'signature_max_smileys';
+		}
+
+		// Maybe we are abusing font sizes?
+		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)~i', $unparsed_signature, $matches) !== false && isset($matches[2]))
+		{
+			foreach ($matches[1] as $ind => $size)
+			{
+				$limit_broke = 0;
+				// Attempt to allow all sizes of abuse, so to speak.
+				if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
+					$limit_broke = $sig_limits[7] . 'px';
+				elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
+					$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
+				elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 16))
+					$limit_broke = ((float) $sig_limits[7] / 16) . 'em';
+				elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
+					$limit_broke = 'large';
+
+				if ($limit_broke)
+				{
+					$txt['profile_error_signature_max_font_size'] = sprintf($txt['profile_error_signature_max_font_size'], $limit_broke);
+					return 'signature_max_font_size';
+				}
+			}
+		}
+
+		// The difficult one - image sizes! Don't error on this - just fix it.
+		if ((!empty($sig_limits[5]) || !empty($sig_limits[6])))
+		{
+			// Get all BBC tags...
+			preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $unparsed_signature, $matches);
+			// ... and all HTML ones.
+			preg_match_all('~<img\s+src=(?:")?((?:http://|ftp://|https://|ftps://).+?)(?:")?(?:\s+alt=(?:")?(.*?)(?:")?)?(?:\s?/)?>~i', $unparsed_signature, $matches2, PREG_PATTERN_ORDER);
+			// And stick the HTML in the BBC.
+			if (!empty($matches2))
+			{
+				foreach ($matches2[0] as $ind => $dummy)
+				{
+					$matches[0][] = $matches2[0][$ind];
+					$matches[1][] = '';
+					$matches[2][] = '';
+					$matches[3][] = '';
+					$matches[4][] = '';
+					$matches[5][] = '';
+					$matches[6][] = '';
+					$matches[7][] = $matches2[1][$ind];
+				}
+			}
+
+			$replaces = array();
+			// Try to find all the images!
+			if (!empty($matches))
+			{
+				foreach ($matches[0] as $key => $image)
+				{
+					$width = -1; $height = -1;
+
+					// Does it have predefined restraints? Width first.
+					if ($matches[6][$key])
+						$matches[2][$key] = $matches[6][$key];
+					if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
+					{
+						$width = $sig_limits[5];
+						$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
+					}
+					elseif ($matches[2][$key])
+						$width = $matches[2][$key];
+					// ... and height.
+					if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
+					{
+						$height = $sig_limits[6];
+						if ($width != -1)
+							$width = $width * ($height / $matches[4][$key]);
+					}
+					elseif ($matches[4][$key])
+						$height = $matches[4][$key];
+
+					// If the dimensions are still not fixed - we need to check the actual image.
+					if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
+					{
+						$sizes = url_image_size($matches[7][$key]);
+						if (is_array($sizes))
+						{
+							// Too wide?
+							if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
+							{
+								$width = $sig_limits[5];
+								$sizes[1] = $sizes[1] * ($width / $sizes[0]);
+							}
+							// Too high?
+							if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
+							{
+								$height = $sig_limits[6];
+								if ($width == -1)
+									$width = $sizes[0];
+								$width = $width * ($height / $sizes[1]);
+							}
+							elseif ($width != -1)
+								$height = $sizes[1];
+						}
+					}
+
+					// Did we come up with some changes? If so remake the string.
+					if ($width != -1 || $height != -1)
+						$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
+				}
+				if (!empty($replaces))
+					$value = str_replace(array_keys($replaces), array_values($replaces), $value);
+			}
+		}
+
+		// Any disabled BBC?
+		$disabledSigBBC = implode('|', $disabledTags);
+		if (!empty($disabledSigBBC))
+		{
+			if (preg_match('~\[(' . $disabledSigBBC . '[ =\]/])~i', $unparsed_signature, $matches) !== false && isset($matches[1]))
+			{
+				$disabledTags = array_unique($disabledTags);
+				$txt['profile_error_signature_disabled_bbc'] = sprintf($txt['profile_error_signature_disabled_bbc'], implode(', ', $disabledTags));
+				return 'signature_disabled_bbc';
+			}
+		}
+	}
+
+	preparsecode($value);
+
+	// Too long?
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $smcFunc['strlen'](str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	{
+		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES));
+		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
+		return 'signature_max_length';
+	}
+
+	return true;
+}
+
+/**
+ * The avatar is incredibly complicated, what with the options... and what not.
+ * @todo argh, the avatar here. Take this out of here!
+ *
+ * @param array &$value
+ * @return mixed
+ */
+function profileSaveAvatarData(&$value)
+{
+	global $modSettings, $sourcedir, $smcFunc, $profile_vars, $cur_profile, $context, $librarydir;
+
+	$memID = $context['id_member'];
+	if (empty($memID) && !empty($context['password_auth_failed']))
+		return false;
+
+	require_once($librarydir . '/Attachments.subs.php');
+
+	// We need to know where we're going to be putting it..
+	$uploadDir = getAvatarPath();
+	$id_folder = getAvatarPathID();
+
+	$downloadedExternalAvatar = false;
+	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
+	{
+		if (!is_writable($uploadDir))
+			fatal_lang_error('attachments_no_write', 'critical');
+
+		require_once($librarydir . '/Package.subs.php');
+
+		$url = parse_url($_POST['userpicpersonal']);
+		$contents = fetch_web_data('http://' . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
+
+		if ($contents != false && $tmpAvatar = fopen($uploadDir . '/avatar_tmp_' . $memID, 'wb'))
+		{
+			fwrite($tmpAvatar, $contents);
+			fclose($tmpAvatar);
+
+			$downloadedExternalAvatar = true;
+			$_FILES['attachment']['tmp_name'] = $uploadDir . '/avatar_tmp_' . $memID;
+		}
+	}
+
+	if ($value == 'none')
+	{
+		$profile_vars['avatar'] = '';
+
+		// Reset the attach ID.
+		$cur_profile['id_attach'] = 0;
+		$cur_profile['attachment_type'] = 0;
+		$cur_profile['filename'] = '';
+
+		removeAttachments(array('id_member' => $memID));
+	}
+	elseif ($value == 'server_stored' && allowedTo('profile_server_avatar'))
+	{
+		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
+		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] == 'blank.png' ? '' : $profile_vars['avatar']) : '';
+
+		// Clear current profile...
+		$cur_profile['id_attach'] = 0;
+		$cur_profile['attachment_type'] = 0;
+		$cur_profile['filename'] = '';
+
+		// Get rid of their old avatar. (if uploaded.)
+		removeAttachments(array('id_member' => $memID));
+	}
+	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && empty($modSettings['avatar_download_external']))
+	{
+		// We need these clean...
+		$cur_profile['id_attach'] = 0;
+		$cur_profile['attachment_type'] = 0;
+		$cur_profile['filename'] = '';
+
+		// Remove any attached avatar...
+		removeAttachments(array('id_member' => $memID));
+
+		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
+
+		if ($profile_vars['avatar'] == 'http://' || $profile_vars['avatar'] == 'http:///')
+			$profile_vars['avatar'] = '';
+		// Trying to make us do something we'll regret?
+		elseif (substr($profile_vars['avatar'], 0, 7) != 'http://')
+			return 'bad_avatar';
+		// Should we check dimensions?
+		elseif (!empty($modSettings['avatar_max_height_external']) || !empty($modSettings['avatar_max_width_external']))
+		{
+			// Now let's validate the avatar.
+			$sizes = url_image_size($profile_vars['avatar']);
+
+			if (is_array($sizes) && (($sizes[0] > $modSettings['avatar_max_width_external'] && !empty($modSettings['avatar_max_width_external'])) || ($sizes[1] > $modSettings['avatar_max_height_external'] && !empty($modSettings['avatar_max_height_external']))))
+			{
+				// Houston, we have a problem. The avatar is too large!!
+				if ($modSettings['avatar_action_too_large'] == 'option_refuse')
+					return 'bad_avatar';
+				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
+				{
+					// @todo remove this if appropriate
+					require_once($librarydir . '/Attachments.subs.php');
+					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
+					{
+						$profile_vars['avatar'] = '';
+						$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
+						$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
+						$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
+					}
+					else
+						return 'bad_avatar';
+				}
+			}
+		}
+	}
+	elseif (($value == 'upload' && allowedTo('profile_upload_avatar')) || $downloadedExternalAvatar)
+	{
+		if ((isset($_FILES['attachment']['name']) && $_FILES['attachment']['name'] != '') || $downloadedExternalAvatar)
+		{
+			// Get the dimensions of the image.
+			if (!$downloadedExternalAvatar)
+			{
+				if (!is_writable($uploadDir))
+					fatal_lang_error('attachments_no_write', 'critical');
+
+				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadDir . '/avatar_tmp_' . $memID))
+					fatal_lang_error('attach_timeout', 'critical');
+
+				$_FILES['attachment']['tmp_name'] = $uploadDir . '/avatar_tmp_' . $memID;
+			}
+
+			$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+
+			// No size, then it's probably not a valid pic.
+			if ($sizes === false)
+				return 'bad_avatar';
+			// Check whether the image is too large.
+			elseif ((!empty($modSettings['avatar_max_width_upload']) && $sizes[0] > $modSettings['avatar_max_width_upload']) || (!empty($modSettings['avatar_max_height_upload']) && $sizes[1] > $modSettings['avatar_max_height_upload']))
+			{
+				if (!empty($modSettings['avatar_resize_upload']))
+				{
+					// Attempt to chmod it.
+					@chmod($uploadDir . '/avatar_tmp_' . $memID, 0644);
+
+					// @todo remove this require when appropriate
+					require_once($librarydir . '/Attachments.subs.php');
+					if (!saveAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+						return 'bad_avatar';
+
+					// Reset attachment avatar data.
+					$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
+					$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
+					$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
+				}
+				else
+					return 'bad_avatar';
+			}
+			elseif (is_array($sizes))
+			{
+				// Now try to find an infection.
+				require_once($librarydir . '/Graphics.subs.php');
+				if (!checkImageContents($_FILES['attachment']['tmp_name'], !empty($modSettings['avatar_paranoid'])))
+				{
+					// It's bad. Try to re-encode the contents?
+					if (empty($modSettings['avatar_reencode']) || (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2])))
+						return 'bad_avatar';
+					// We were successful. However, at what price?
+					$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+					// Hard to believe this would happen, but can you bet?
+					if ($sizes === false)
+						return 'bad_avatar';
+				}
+
+				$extensions = array(
+					'1' => 'gif',
+					'2' => 'jpg',
+					'3' => 'png',
+					'6' => 'bmp'
+				);
+
+				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'bmp';
+				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
+				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
+				list ($width, $height) = getimagesize($_FILES['attachment']['tmp_name']);
+				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+
+				// Remove previous attachments this member might have had.
+				removeAttachments(array('id_member' => $memID));
+
+				$smcFunc['db_insert']('',
+					'{db_prefix}attachments',
+					array(
+						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
+						'width' => 'int', 'height' => 'int', 'mime_type' => 'string', 'id_folder' => 'int',
+					),
+					array(
+						$memID, (empty($modSettings['custom_avatar_enabled']) ? 0 : 1), $destName, $file_hash, $extension, filesize($_FILES['attachment']['tmp_name']),
+						(int) $width, (int) $height, $mime_type, $id_folder,
+					),
+					array('id_attach')
+				);
+
+				$cur_profile['id_attach'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+				$cur_profile['filename'] = $destName;
+				$cur_profile['attachment_type'] = empty($modSettings['custom_avatar_enabled']) ? 0 : 1;
+
+				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash);
+				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
+				{
+					// I guess a man can try.
+					removeAttachments(array('id_member' => $memID));
+					fatal_lang_error('attach_timeout', 'critical');
+				}
+
+				// Attempt to chmod it.
+				@chmod($uploadDir . '/' . $destinationPath, 0644);
+			}
+			$profile_vars['avatar'] = '';
+
+			// Delete any temporary file.
+			if (file_exists($uploadDir . '/avatar_tmp_' . $memID))
+				@unlink($uploadDir . '/avatar_tmp_' . $memID);
+		}
+		// Selected the upload avatar option and had one already uploaded before or didn't upload one.
+		else
+			$profile_vars['avatar'] = '';
+	}
+	else
+		$profile_vars['avatar'] = '';
+
+	// Setup the profile variables so it shows things right on display!
+	$cur_profile['avatar'] = $profile_vars['avatar'];
+
+	return false;
+}
+
+/**
+ * Save a members group.
+ *
+ * @param int &$value
+ * @return true
+ */
+function profileSaveGroups(&$value)
+{
+	global $profile_vars, $old_profile, $context, $smcFunc, $cur_profile;
+
+	// Do we need to protect some groups?
+	if (!allowedTo('admin_forum'))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_group
+			FROM {db_prefix}membergroups
+			WHERE group_type = {int:is_protected}',
+			array(
+				'is_protected' => 1,
+			)
+		);
+		$protected_groups = array(1);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$protected_groups[] = $row['id_group'];
+		$smcFunc['db_free_result']($request);
+
+		$protected_groups = array_unique($protected_groups);
+	}
+
+	// The account page allows the change of your id_group - but not to a protected group!
+	if (empty($protected_groups) || count(array_intersect(array((int) $value, $old_profile['id_group']), $protected_groups)) == 0)
+		$value = (int) $value;
+	// ... otherwise it's the old group sir.
+	else
+		$value = $old_profile['id_group'];
+
+	// Find the additional membergroups (if any)
+	if (isset($_POST['additional_groups']) && is_array($_POST['additional_groups']))
+	{
+		$additional_groups = array();
+		foreach ($_POST['additional_groups'] as $group_id)
+		{
+			$group_id = (int) $group_id;
+			if (!empty($group_id) && (empty($protected_groups) || !in_array($group_id, $protected_groups)))
+				$additional_groups[] = $group_id;
+		}
+
+		// Put the protected groups back in there if you don't have permission to take them away.
+		$old_additional_groups = explode(',', $old_profile['additional_groups']);
+		foreach ($old_additional_groups as $group_id)
+		{
+			if (!empty($protected_groups) && in_array($group_id, $protected_groups))
+				$additional_groups[] = $group_id;
+		}
+
+		if (implode(',', $additional_groups) !== $old_profile['additional_groups'])
+		{
+			$profile_vars['additional_groups'] = implode(',', $additional_groups);
+			$cur_profile['additional_groups'] = implode(',', $additional_groups);
+		}
+	}
+
+	// Too often, people remove delete their own account, or something.
+	if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
+	{
+		$stillAdmin = $value == 1 || (isset($additional_groups) && in_array(1, $additional_groups));
+
+		// If they would no longer be an admin, look for any other...
+		if (!$stillAdmin)
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_member
+				FROM {db_prefix}members
+				WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
+					AND id_member != {int:selected_member}
+				LIMIT 1',
+				array(
+					'admin_group' => 1,
+					'selected_member' => $context['id_member'],
+				)
+			);
+			list ($another) = $smcFunc['db_fetch_row']($request);
+			$smcFunc['db_free_result']($request);
+
+			if (empty($another))
+				fatal_lang_error('at_least_one_admin', 'critical');
+		}
+	}
+
+	// If we are changing group status, update permission cache as necessary.
+	if ($value != $old_profile['id_group'] || isset($profile_vars['additional_groups']))
+	{
+		if ($context['user']['is_owner'])
+			$_SESSION['mc']['time'] = 0;
+		else
+			updateSettings(array('settings_updated' => time()));
+	}
+
+	return true;
+}
+
+/**
+ * Get the data about a users warnings.
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID the member ID
+ * @return array the preview warnings
+ */
+function list_getUserWarnings($start, $items_per_page, $sort, $memID)
+{
+	global $smcFunc, $scripturl;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
+			lc.log_time, lc.body, lc.counter, lc.id_notice
+		FROM {db_prefix}log_comments AS lc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+		WHERE lc.id_recipient = {int:selected_member}
+			AND lc.comment_type = {string:warning}
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'selected_member' => $memID,
+			'warning' => 'warning',
+		)
+	);
+	$previous_warnings = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$previous_warnings[] = array(
+			'issuer' => array(
+				'id' => $row['id_member'],
+				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
+			),
+			'time' => timeformat($row['log_time']),
+			'reason' => $row['body'],
+			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
+			'id_notice' => $row['id_notice'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $previous_warnings;
+}
+
+/**
+ * Get the number of warnings a user has.
+ *
+ * @param int $memID
+ * @return int Total number of warnings for the user
+ */
+function list_getUserWarningCount($memID)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_comments
+		WHERE id_recipient = {int:selected_member}
+			AND comment_type = {string:warning}',
+		array(
+			'selected_member' => $memID,
+			'warning' => 'warning',
+		)
+	);
+	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $total_warnings;
+}
