@@ -1001,7 +1001,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'b',
-				'before' => '<strong>',
+				'before' => '<strong class="bbc_strong">',
 				'after' => '</strong>',
 			),
 			array(

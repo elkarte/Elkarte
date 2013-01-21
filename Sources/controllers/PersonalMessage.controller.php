@@ -934,7 +934,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
  */
 function action_sendmessage()
 {
-	global $txt, $sourcedir, $librarydir, $scripturl, $modSettings;
+	global $txt, $sourcedir, $librarydir, $controllerdir, $scripturl, $modSettings;
 	global $context, $options, $smcFunc, $language, $user_info;
 
 	isAllowedTo('pm_send');
@@ -1176,7 +1176,7 @@ function action_sendmessage()
 	// Generate a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_pm_save']))
 	{
-		require_once($sourcedir . '/controllers/Drafts.php');
+		require_once($controllerdir . '/Drafts.controller.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
 		showDrafts($user_info['id'], $pm_seed, 1);
 	}
