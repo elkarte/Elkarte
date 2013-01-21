@@ -584,7 +584,7 @@ function action_modifyprofile()
 		}
 		// Authentication changes?
 		elseif ($current_area == 'authentication')
-			authentication($memID, true);
+			action_authentication($memID, true);
 		elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'pmprefs')))
 			saveProfileFields();
 		else

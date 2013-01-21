@@ -2212,3 +2212,75 @@ function profileSaveGroups(&$value)
 
 	return true;
 }
+
+/**
+ * Get the data about a users warnings.
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID the member ID
+ * @return array the preview warnings
+ */
+function list_getUserWarnings($start, $items_per_page, $sort, $memID)
+{
+	global $smcFunc, $scripturl;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
+			lc.log_time, lc.body, lc.counter, lc.id_notice
+		FROM {db_prefix}log_comments AS lc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+		WHERE lc.id_recipient = {int:selected_member}
+			AND lc.comment_type = {string:warning}
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'selected_member' => $memID,
+			'warning' => 'warning',
+		)
+	);
+	$previous_warnings = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$previous_warnings[] = array(
+			'issuer' => array(
+				'id' => $row['id_member'],
+				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
+			),
+			'time' => timeformat($row['log_time']),
+			'reason' => $row['body'],
+			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
+			'id_notice' => $row['id_notice'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $previous_warnings;
+}
+
+/**
+ * Get the number of warnings a user has.
+ *
+ * @param int $memID
+ * @return int Total number of warnings for the user
+ */
+function list_getUserWarningCount($memID)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_comments
+		WHERE id_recipient = {int:selected_member}
+			AND comment_type = {string:warning}',
+		array(
+			'selected_member' => $memID,
+			'warning' => 'warning',
+		)
+	);
+	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $total_warnings;
+}

@@ -1394,7 +1394,7 @@ function showPermissions($memID)
  */
 function viewWarning($memID)
 {
-	global $modSettings, $context, $sourcedir, $librarydir, $txt, $scripturl;
+	global $modSettings, $context, $librarydir, $txt, $scripturl;
 
 	// Firstly, can we actually even be here?
 	if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
@@ -1405,9 +1405,10 @@ function viewWarning($memID)
 	$modSettings['warning_moderate'] = !empty($modSettings['warning_moderate']) && !empty($modSettings['postmod_active']) ? $modSettings['warning_moderate'] : 110;
 	$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
 
-	// Let's use a generic list to get all the current warnings, and use the issue warnings grab-a-granny thing.
+	// Let's use a generic list to get all the current warnings
+	// and use the issue warnings grab-a-granny thing.
 	require_once($librarydir . '/List.subs.php');
-	require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
+	require_once($librarydir . '/Profile.subs.php');
 
 	$listOptions = array(
 		'id' => 'view_warnings',
@@ -1474,7 +1475,6 @@ function viewWarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// Create some common text bits for the template.
