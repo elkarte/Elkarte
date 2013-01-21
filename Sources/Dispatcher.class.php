@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  * An add-on files to handle custom actions will be called if they follow
  * any of these patterns.
  */
-class site_Dispatcher
+class Site_Dispatcher
 {
 	// file name to load
 	private $_file_name;

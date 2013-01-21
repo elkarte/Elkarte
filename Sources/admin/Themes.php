@@ -1475,9 +1475,9 @@ function action_installtheme()
 		if (file_exists($theme_dir . '/theme_info.xml'))
 		{
 			$theme_info = file_get_contents($theme_dir . '/theme_info.xml');
-			// Parse theme-info.xml into an xmlArray.
+			// Parse theme-info.xml into an Xml_Array.
 			require_once($librarydir . '/XmlArray.class.php');
-			$theme_info_xml = new xmlArray($theme_info);
+			$theme_info_xml = new Xml_Array($theme_info);
 			// @todo Error message of some sort?
 			if (!$theme_info_xml->exists('theme-info[0]'))
 				return 'package_get_error_packageinfo_corrupt';

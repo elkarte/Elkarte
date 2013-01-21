@@ -3111,7 +3111,7 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Combine.class.php');
-			$combiner = new site_Combiner;
+			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
 			if (!empty($combine_name))
@@ -3194,7 +3194,7 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Combine.class.php');
-			$combiner = new site_Combiner;
+			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '

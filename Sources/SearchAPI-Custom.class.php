@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * SearchAPI-Custom.php, Custom Search API class .. used when custom ELKARTE index is used
  */
-class custom_search
+class Custom_Search
 {
 	/**
 	 *This is the last version of ELKARTE that this was tested on, to protect against API changes.

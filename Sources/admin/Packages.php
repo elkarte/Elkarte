@@ -1941,7 +1941,7 @@ function PackagePermissions()
 	if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 	{
 		require_once($librarydir . '/FTPConnection.class.php');
-		$ftp = new ftp_connection(null);
+		$ftp = new Ftp_Connection(null);
 		list ($username, $detect_path, $found_path) = $ftp->detect_path($boarddir);
 
 		$context['package_ftp'] = array(

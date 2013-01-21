@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  * SearchAPI-Sphinxql.php, used when an Sphinx search daemon is used and you want to access it
  * via Sphinx's own implementation of MySQL network protocol
  */
-class sphinxql_search
+class Sphinxql_Search
 {
 	/**
 	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.
@@ -78,7 +78,7 @@ class sphinxql_search
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 	}
 
-	/*
+	/**
 	 * Check whether the method can be performed by this API.
 	 *
 	 * @param mixed $methodName
@@ -157,7 +157,7 @@ class sphinxql_search
 			$wordsExclude[] = $fulltextWord;
 	}
 
-	/*
+	/**
 	 * This has it's own custom search.
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
@@ -227,7 +227,7 @@ class sphinxql_search
 				'num_results' => 0,
 				'matches' => array(),
 			);
-			
+
 			if (mysql_num_rows($request) != 0)
 				while ($match = mysql_fetch_assoc($request))
 					$cached_results['matches'][$match['id']] = array(
