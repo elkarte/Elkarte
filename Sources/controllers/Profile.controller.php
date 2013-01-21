@@ -275,7 +275,7 @@ function ModifyProfile($post_errors = array())
 				'groupmembership' => array(
 					'label' => $txt['groupmembership'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'groupMembership',
+					'function' => 'action_groupMembership',
 					'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 					'sc' => 'request',
 					'token' => 'profile-gm%u',
@@ -580,7 +580,7 @@ function ModifyProfile($post_errors = array())
 		}
 		elseif ($current_area == 'groupmembership' && empty($post_errors))
 		{
-			$msg = groupMembership2($profile_vars, $post_errors, $memID);
+			$msg = action_groupMembership2($profile_vars, $post_errors, $memID);
 
 			// Whatever we've done, we have nothing else to do here...
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $memID) . ';area=groupmembership' . (!empty($msg) ? ';msg=' . $msg : ''));

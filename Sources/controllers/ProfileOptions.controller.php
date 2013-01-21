@@ -1785,7 +1785,7 @@ function profileSendActivation()
  *
  * @param int $memID id_member
  */
-function groupMembership($memID)
+function action_groupMembership($memID)
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc;
 
@@ -1886,7 +1886,7 @@ function groupMembership($memID)
  * @param int $memID id_member
  * @return mixed
  */
-function groupMembership2($profile_vars, $post_errors, $memID)
+function action_groupMembership2($profile_vars, $post_errors, $memID)
 {
 	global $user_info, $sourcedir, $librarydir, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
 
