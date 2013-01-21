@@ -177,6 +177,6 @@ function smf_main()
 
 	// What shall we do?
 	require_once $sourcedir . '/Dispatcher.class.php';
-	$dispatcher = new site_Dispatcher();
+	$dispatcher = new Site_Dispatcher();
 	$dispatcher->dispatch();
 }

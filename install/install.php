@@ -563,7 +563,7 @@ function CheckFilesWritable()
 
 		if (isset($_POST['ftp_username']))
 		{
-			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
 			{
@@ -579,7 +579,7 @@ function CheckFilesWritable()
 		if (!isset($ftp) || $ftp->error !== false)
 		{
 			if (!isset($ftp))
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			// Save the error so we can mess with listing...
 			elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
 				$incontext['ftp_errors'][] = $ftp->last_message;
@@ -1507,7 +1507,7 @@ function DeleteInstall()
  *
  * Credit: http://www.faqs.org/rfcs/rfc959.html
  */
-class ftp_connection
+class Ftp_Connection
 {
 	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
@@ -1978,7 +1978,7 @@ function deleteInstaller()
 {
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
-		$ftp = new ftp_connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
 		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
 
 		$ftp->unlink('install.php');

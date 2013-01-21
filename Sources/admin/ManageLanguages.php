@@ -154,7 +154,7 @@ function list_getLanguagesList()
 
 	// Load the class file and stick it into an array.
 	require_once($librarydir . '/XmlArray.class.php');
-	$language_list = new xmlArray(fetch_web_data($url), true);
+	$language_list = new Xml_Array(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))

@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * SearchAPI-Standard.php, Standard non full index, non custom index search
  */
-class standard_search
+class Standard_Search
 {
 	/**
 	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.

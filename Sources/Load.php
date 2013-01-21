@@ -1215,7 +1215,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new browser_detector;
+	$detector = new Browser_Detector;
 	$detector->detectBrowser();
 }
 

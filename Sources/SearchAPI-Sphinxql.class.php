@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  * SearchAPI-Sphinxql.php, used when an Sphinx search daemon is used and you want to access it
  * via Sphinx's own implementation of MySQL network protocol
  */
-class sphinxql_search
+class Sphinxql_Search
 {
 	/**
 	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.
@@ -78,7 +78,7 @@ class sphinxql_search
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 	}
 
-	/*
+	/**
 	 * Check whether the method can be performed by this API.
 	 *
 	 * @param mixed $methodName
@@ -114,7 +114,7 @@ class sphinxql_search
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+		return !(empty($modSettings['Sphinx_Searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
 	}
 
 	/**
@@ -157,7 +157,7 @@ class sphinxql_search
 			$wordsExclude[] = $fulltextWord;
 	}
 
-	/*
+	/**
 	 * This has it's own custom search.
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
@@ -168,7 +168,7 @@ class sphinxql_search
 		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+			$mySphinx = mysql_connect(($modSettings['Sphinx_Searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['Sphinx_Searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
 			$query = 'SELECT * FROM elkarte_index';
@@ -227,7 +227,7 @@ class sphinxql_search
 				'num_results' => 0,
 				'matches' => array(),
 			);
-			
+
 			if (mysql_num_rows($request) != 0)
 				while ($match = mysql_fetch_assoc($request))
 					$cached_results['matches'][$match['id']] = array(

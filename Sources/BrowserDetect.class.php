@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  * - IE Versions: 4, 5, 5.5, 6, 7, 8, 9, 10 ... mobile and Mac
  * - Nokia
  */
-class browser_detector
+class Browser_Detector
 {
 	/**
 	 * Holds all browsers information. Its contents will be placed into $context['browser'].

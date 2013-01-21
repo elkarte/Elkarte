@@ -486,22 +486,22 @@ function template_manage_sphinx()
 							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '32', '" size="4" /> MB
 						</dd>
 						<dt>
-							<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'],'</strong></label><br />
-							<span class="smalltext">', $txt['sphinx_searchd_server_desc'], '</span>
+							<label for="Sphinx_Searchd_server_input"><strong>', $txt['Sphinx_Searchd_server'],'</strong></label><br />
+							<span class="smalltext">', $txt['Sphinx_Searchd_server_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', isset($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost', '" size="65" />
+							<input type="text" name="Sphinx_Searchd_server" id="Sphinx_Searchd_server_input" value="', isset($modSettings['Sphinx_Searchd_server']) ? $modSettings['Sphinx_Searchd_server'] : 'localhost', '" size="65" />
 						</dd>
 						<dt>
-							<label for="sphinx_searchd_port_input"><strong>',$txt['sphinx_searchd_port'],'</strong></label><br />
-							<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
+							<label for="Sphinx_Searchd_port_input"><strong>',$txt['Sphinx_Searchd_port'],'</strong></label><br />
+							<span class="smalltext">', $txt['Sphinx_Searchd_port_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '3312', '" size="4" />
+							<input type="text" name="Sphinx_Searchd_port" id="Sphinx_Searchd_port_input" value="', isset($modSettings['Sphinx_Searchd_port']) ? $modSettings['Sphinx_Searchd_port'] : '3312', '" size="4" />
 						</dd>
 						<dt>
-							<label for="sphinxql_searchd_port_input"><strong>', $txt['sphinx_searchd_qlport'], '</strong></label><br />
-							<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'],'</span>
+							<label for="sphinxql_searchd_port_input"><strong>', $txt['Sphinx_Searchd_qlport'], '</strong></label><br />
+							<span class="smalltext">', $txt['Sphinx_Searchd_qlport_desc'],'</span>
 						</dt>
 						<dd>
 							<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '3313', '" size="4" />

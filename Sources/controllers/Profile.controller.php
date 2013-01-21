@@ -39,7 +39,6 @@ function ModifyProfile($post_errors = array())
 
 	require_once($librarydir . '/Menu.subs.php');
 
-
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
 		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
