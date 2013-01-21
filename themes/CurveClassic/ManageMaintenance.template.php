@@ -613,7 +613,7 @@ function template_convert_msgbody()
 				<hr class="hrcolor" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-				<input type="submit" name="do_conversion" value="', $txt['entity_convert_proceed'], '" class="button_submit" />
+				<input type="submit" name="do_conversion" value="', $txt['convert_proceed'], '" class="button_submit" />
 				</form>
 			</div>
 		</div>
