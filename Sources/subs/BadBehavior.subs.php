@@ -104,7 +104,7 @@ function getBadBehaviorLogEntryCount($filter)
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $filter = '')
 {
-	global $context, $scripturl, $smcFunc;
+	global $context, $scripturl, $smcFunc, $sourcedir;
 
 	require_once($sourcedir . '/lib/bad-behavior/responses.inc.php');
 
