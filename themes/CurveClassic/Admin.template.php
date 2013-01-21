@@ -23,7 +23,7 @@ function template_admin()
 
 	// Welcome message for the admin.
 	echo '
-	<div id="admincenter">
+	<div id="admincenter">';
 
 	// Is there an update available?
 	echo '
