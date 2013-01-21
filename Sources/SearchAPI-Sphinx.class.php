@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  * SearchAPI-Sphinx.php, used when an Sphinx search daemon is used and access is via
  * Sphinx native search API (SphinxAPI)
  */
-class sphinx_search
+class Sphinx_Search
 {
 	/**
 	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.
@@ -78,7 +78,7 @@ class sphinx_search
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 	}
 
-	/*
+	/**
 	 * Check whether the method can be performed by this API.
 	 *
 	 * @param mixed $methodName
@@ -157,7 +157,7 @@ class sphinx_search
 			$wordsExclude[] = $fulltextWord;
 	}
 
-	/*
+	/**
 	 * This has it's own custom search.
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
@@ -270,7 +270,12 @@ class sphinx_search
 		return $cached_results['num_results'];
 	}
 
-	// Clean up a search word/phrase/term for Sphinx
+	/**
+	 * Clean up a search word/phrase/term for Sphinx.
+	 *
+	 * @param string $sphinx_term
+	 * @param string $sphinx_client
+	 */
 	private function _cleanWordSphinx($sphinx_term, $sphinx_client)
 	{
 		// Multiple quotation marks in a row can cause fatal errors, so handle them

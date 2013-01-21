@@ -940,7 +940,7 @@ function AdminSearchOM()
 	require_once($librarydir . '/XmlArray.class.php');
 
 	// Get the results loaded into an array for processing!
-	$results = new xmlArray($search_results, false);
+	$results = new Xml_Array($search_results, false);
 
 	// Move through the api layer.
 	if (!$results->exists('api'))

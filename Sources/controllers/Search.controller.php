@@ -2731,7 +2731,7 @@ function findSearchAPI()
 		log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
 		require_once($sourcedir . '/SearchAPI-Standard.class.php');
-		$searchAPI = new standard_search();
+		$searchAPI = new Standard_Search();
 	}
 
 	return $searchAPI;

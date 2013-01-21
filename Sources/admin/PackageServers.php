@@ -128,7 +128,7 @@ function action_servers()
 		if (isset($_POST['ftp_username']))
 		{
 			require_once($librarydir . '/FTPConnection.class.php');
-			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
 			{
@@ -146,7 +146,7 @@ function action_servers()
 			if (!isset($ftp))
 			{
 				require_once($librarydir . '/FTPConnection.class.php');
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -255,9 +255,9 @@ function action_browseserver()
 	// Might take some time.
 	@set_time_limit(600);
 
-	// Read packages.xml and parse into xmlArray. (the true tells it to trim things ;).)
+	// Read packages.xml and parse into Xml_Array. (the true tells it to trim things ;).)
 	require_once($librarydir . '/XmlArray.class.php');
-	$listing = new xmlArray(fetch_web_data($_GET['package']), true);
+	$listing = new Xml_Array(fetch_web_data($_GET['package']), true);
 
 	// Errm.... empty file?  Try the URL....
 	if (!$listing->exists('package-list'))

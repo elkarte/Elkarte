@@ -444,7 +444,7 @@ function loadInstalledPackages()
  * - expects the file to be a package in Packages/.
  * - returns a error string if the package-info is invalid.
  * - otherwise returns a basic array of id, version, filename, and similar information.
- * - an xmlArray is available in 'xml'.
+ * - an Xml_Array is available in 'xml'.
  *
  * @param string $gzfilename
  * @return array
@@ -480,9 +480,9 @@ function getPackageInfo($gzfilename)
 			return 'package_get_error_is_zero';
 	}
 
-	// Parse package-info.xml into an xmlArray.
+	// Parse package-info.xml into an Xml_Array.
 	require_once($librarydir . '/XmlArray.class.php');
-	$packageInfo = new xmlArray($packageInfo);
+	$packageInfo = new Xml_Array($packageInfo);
 
 	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
@@ -704,17 +704,17 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		// Load the file containing the ftp_connection class.
+		// Load the file containing the Ftp_Connection class.
 		require_once($librarydir . '/FTPConnection.class.php');
 
-		$package_ftp = new ftp_connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 	}
 
 	// Just got a submission did we?
 	if (empty($package_ftp) && isset($_POST['ftp_username']))
 	{
 		require_once($librarydir . '/FTPConnection.class.php');
-		$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
 		if ($ftp->error === false)
@@ -780,7 +780,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 			if (!isset($ftp))
 			{
 				require_once($librarydir . '/FTPConnection.class.php');
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -897,10 +897,10 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_SESSION['pack_ftp']))
 	{
-		// Load the file containing the ftp_connection class.
+		// Load the file containing the Ftp_Connection class.
 		require_once($librarydir . '/FTPConnection.class.php');
 
-		$package_ftp = new ftp_connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		if ($files === null)
 			return array();
@@ -939,7 +939,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		require_once($librarydir . '/FTPConnection.class.php');
-		$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
 		{
@@ -957,7 +957,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 		if (!isset($ftp))
 		{
 			require_once($librarydir . '/FTPConnection.class.php');
-			$ftp = new ftp_connection(null);
+			$ftp = new Ftp_Connection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
 			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -1021,13 +1021,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 /**
  * Parses the actions in package-info.xml file from packages.
  *
- * - package should be an xmlArray with package-info as its base.
+ * - package should be an Xml_Array with package-info as its base.
  * - testing_only should be true if the package should not actually be applied.
  * - method can be upgrade, install, or uninstall.  Its default is install.
  * - previous_version should be set to the previous installed version of this package, if any.
  * - does not handle failure terribly well; testing first is always better.
  *
- * @param xmlArray &$package
+ * @param Xml_Array &$package
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''
@@ -1900,7 +1900,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 	@set_time_limit(600);
 
 	require_once($librarydir . '/XmlArray.class.php');
-	$xml = new xmlArray(strtr($file, array("\r" => '')));
+	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
 
@@ -3047,11 +3047,11 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		return false;
 	elseif ($match[1] == 'ftp')
 	{
-		// Include the file containing the ftp_connection class.
+		// Include the file containing the Ftp_Connection class.
 		require_once($sourcedir . '/FTPConnection.class.php');
 
 		// Establish a connection and attempt to enable passive mode.
-		$ftp = new ftp_connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
 			return false;
 
@@ -3078,10 +3078,10 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	// More likely a standard HTTP URL, first try to use cURL if available
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
-		// Include the file containing the curl_fetch_web_data class.
+		// Include the file containing the Curl_Fetch_Webdata class.
 		require_once($sourcedir . '/CurlFetchWeb.class.php');
 
-		$fetch_data = new curl_fetch_web_data();
+		$fetch_data = new Curl_Fetch_Webdata();
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

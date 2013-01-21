@@ -17,7 +17,7 @@ if (!defined('ELKARTE'))
  * Calls minification classes to reduce size of css and js file saving bandwidth
  * Can creates a .gz file, be would require .htaccess or the like to use
  */
-class site_Combiner
+class Site_Combiner
 {
 	/**
 	 * Holds all the files contents that we have joined in to one

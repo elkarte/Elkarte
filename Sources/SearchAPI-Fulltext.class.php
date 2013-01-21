@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * SearchAPI-Fulltext.php, Fulltext API, used when an SQL fulltext index is used
  */
-class fulltext_search
+class Fulltext_Search
 {
 	/**
 	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.
@@ -61,7 +61,7 @@ class fulltext_search
 	protected $supported_databases = array('mysql');
 
 	/**
-	 * fulltext_search::__construct()
+	 * Fulltext_Search::__construct()
 	 *
 	 */
 	public function __construct()
@@ -80,7 +80,7 @@ class fulltext_search
 	}
 
 	/**
-	 * fulltext_search::supportsMethod()
+	 * Fulltext_Search::supportsMethod()
 	 *
 	 * Check whether the method can be performed by this API.
 	 *
@@ -106,7 +106,7 @@ class fulltext_search
 	}
 
 	/**
-	 * fulltext_search::_getMinWordLength()
+	 * Fulltext_Search::_getMinWordLength()
 	 *
 	 * What is the minimum word length full text supports?
 	 *
@@ -156,7 +156,7 @@ class fulltext_search
 	}
 
 	/**
-	 * fulltext_search::prepareIndexes()
+	 * Fulltext_Search::prepareIndexes()
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
@@ -200,7 +200,7 @@ class fulltext_search
 	}
 
 	/**
-	 * fulltext_search::indexedWordQuery()
+	 * Fulltext_Search::indexedWordQuery()
 	 *
 	 * Search for indexed words.
 	 *
