@@ -25,9 +25,9 @@ if (!defined('ELKARTE'))
  *  - $fetch_data = new Curl_Fetch_Webdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
  * Make the call
- *  - $fetch_data('http://www.simplemachines.org'); // fetch a page
- *  - $fetch_data('http://www.simplemachines.org', array('user' => 'name', 'password' => 'password')); // post to a page
- *  - $fetch_data('http://www.simplemachines.org', parameter1&parameter2&parameter3); // post to a page
+ *  - $fetch_data('http://www.adomain.org'); // fetch a page
+ *  - $fetch_data('http://www.adomain.org', array('user' => 'name', 'password' => 'password')); // post to a page
+ *  - $fetch_data('http://www.adomain.org', parameter1&parameter2&parameter3); // post to a page
  *
  * Get the data
  *  - $fetch_data->result('body'); // just the page content
