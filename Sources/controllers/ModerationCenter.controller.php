@@ -551,7 +551,7 @@ function ModBlockGroupRequests()
  */
 function action_reportedPosts()
 {
-	global $txt, $context, $scripturl, $modSettings, $user_info, $smcFunc;
+	global $txt, $context, $scripturl, $modSettings, $user_info, $smcFunc, $librarydir;
 
 	loadTemplate('ModerationCenter');
 
@@ -597,6 +597,7 @@ function action_reportedPosts()
 		);
 
 		// Time to update.
+		require_once($librarydir . '/Moderation.subs.php');
 		updateSettings(array('last_mod_report_action' => time()));
 		recountOpenReports();
 	}
@@ -623,6 +624,7 @@ function action_reportedPosts()
 			);
 
 			// Time to update.
+			require_once($librarydir . '/Moderation.subs.php');
 			updateSettings(array('last_mod_report_action' => time()));
 			recountOpenReports();
 		}
@@ -747,36 +749,6 @@ function ModerateGroups()
 
 	// Call the relevant function.
 	$subactions[$context['sub_action']]();
-}
-
-/**
- * How many open reports do we have?
- */
-function recountOpenReports()
-{
-	global $user_info, $context, $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_reported
-		WHERE ' . $user_info['mod_cache']['bq'] . '
-			AND closed = {int:not_closed}
-			AND ignore_all = {int:not_ignored}',
-		array(
-			'not_closed' => 0,
-			'not_ignored' => 0,
-		)
-	);
-	list ($open_reports) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	$_SESSION['rc'] = array(
-		'id' => $user_info['id'],
-		'time' => time(),
-		'reports' => $open_reports,
-	);
-
-	$context['open_mod_reports'] = $open_reports;
 }
 
 /**

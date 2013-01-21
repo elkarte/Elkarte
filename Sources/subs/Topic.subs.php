@@ -124,7 +124,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 			// Close reports that are being recycled.
-			require_once($sourcedir . '/controllers/ModerationCenter.controller.php');
+			require_once($librarydir . '/Moderation.subs.php');
 
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}log_reported
