@@ -24,10 +24,8 @@ if (!defined('ELKARTE'))
 
 /**
  * Allow the change or view of profiles...
- *
- * @param array $post_errors = array()
  */
-function ModifyProfile($post_errors = array())
+function action_modifyprofile()
 {
 	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
@@ -38,7 +36,6 @@ function ModifyProfile($post_errors = array())
 	loadTemplate('Profile');
 
 	require_once($librarydir . '/Menu.subs.php');
-
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
