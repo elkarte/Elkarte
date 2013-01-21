@@ -1919,7 +1919,7 @@ function ViewOperations()
  */
 function PackagePermissions()
 {
-	global $context, $txt, $modSettings, $boarddir, $sourcedir, $cachedir, $smcFunc, $package_ftp;
+	global $context, $txt, $modSettings, $boarddir, $sourcedir, $librarydir, $cachedir, $smcFunc, $package_ftp;
 
 	// Let's try and be good, yes?
 	checkSession('get');
@@ -1940,7 +1940,7 @@ function PackagePermissions()
 
 	if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 	{
-		require_once($sourcedir . '/Package.class.php');
+		require_once($librarydir . '/FTPConnection.class.php');
 		$ftp = new ftp_connection(null);
 		list ($username, $detect_path, $found_path) = $ftp->detect_path($boarddir);
 
