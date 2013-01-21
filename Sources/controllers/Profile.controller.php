@@ -89,7 +89,7 @@ function action_modifyprofile()
 				'summary' => array(
 					'label' => $txt['summary'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'summary',
+					'function' => 'action_summary',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'profile_view_any',
@@ -98,7 +98,7 @@ function action_modifyprofile()
 				'statistics' => array(
 					'label' => $txt['statPanel'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'statPanel',
+					'function' => 'action_statPanel',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'profile_view_any',
@@ -107,7 +107,7 @@ function action_modifyprofile()
 				'showposts' => array(
 					'label' => $txt['showPosts'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'showPosts',
+					'function' => 'action_showPosts',
 					'subsections' => array(
 						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
 						'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
@@ -122,7 +122,7 @@ function action_modifyprofile()
 				'showdrafts' => array(
 					'label' => $txt['drafts_show'],
 					'file' => 'Drafts.controller.php',
-					'function' => 'showProfileDrafts',
+					'function' => 'action_showProfileDrafts',
 					'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
 					'permission' => array(
 						'own' => 'profile_view_own',
@@ -132,7 +132,7 @@ function action_modifyprofile()
 				'permissions' => array(
 					'label' => $txt['showPermissions'],
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'showPermissions',
+					'function' => 'action_showPermissions',
 					'permission' => array(
 						'own' => 'manage_permissions',
 						'any' => 'manage_permissions',
@@ -157,7 +157,7 @@ function action_modifyprofile()
 					'label' => $txt['profile_view_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 					'file' => 'ProfileInfo.controller.php',
-					'function' => 'viewWarning',
+					'function' => 'action_viewWarning',
 					'permission' => array(
 						'own' => 'profile_view_own',
 						'any' => 'issue_warning',

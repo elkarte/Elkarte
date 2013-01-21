@@ -346,7 +346,7 @@ function showDrafts($member_id, $topic = false, $draft_type = 0)
  * @param int $memID
  * @param int $draft_type = 0
  */
-function showProfileDrafts($memID, $draft_type = 0)
+function action_showProfileDrafts($memID, $draft_type = 0)
 {
 	global $txt, $scripturl, $modSettings, $context, $smcFunc;
 
