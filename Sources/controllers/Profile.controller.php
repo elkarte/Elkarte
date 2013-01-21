@@ -174,7 +174,7 @@ function ModifyProfile($post_errors = array())
 				'account' => array(
 					'label' => $txt['account'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'account',
+					'function' => 'action_account',
 					'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
 					'sc' => 'post',
 					'token' => 'profile-ac%u',
@@ -187,7 +187,7 @@ function ModifyProfile($post_errors = array())
 				'forumprofile' => array(
 					'label' => $txt['forumprofile'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'forumProfile',
+					'function' => 'action_forumProfile',
 					'sc' => 'post',
 					'token' => 'profile-fp%u',
 					'permission' => array(
@@ -198,7 +198,7 @@ function ModifyProfile($post_errors = array())
 				'theme' => array(
 					'label' => $txt['theme'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'theme',
+					'function' => 'action_themepick',
 					'sc' => 'post',
 					'token' => 'profile-th%u',
 					'permission' => array(
@@ -209,7 +209,7 @@ function ModifyProfile($post_errors = array())
 				'authentication' => array(
 					'label' => $txt['authentication'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'authentication',
+					'function' => 'action_authentication',
 					'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
 					'sc' => 'post',
 					'token' => 'profile-au%u',
@@ -223,7 +223,7 @@ function ModifyProfile($post_errors = array())
 				'notification' => array(
 					'label' => $txt['notification'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'notification',
+					'function' => 'action_notification',
 					'sc' => 'post',
 					'token' => 'profile-nt%u',
 					'permission' => array(
@@ -247,7 +247,7 @@ function ModifyProfile($post_errors = array())
 				'ignoreboards' => array(
 					'label' => $txt['ignoreboards'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'ignoreboards',
+					'function' => 'action_ignoreboards',
 					'enabled' => !empty($modSettings['allow_ignore_boards']),
 					'sc' => 'post',
 					'token' => 'profile-ib%u',
@@ -259,7 +259,7 @@ function ModifyProfile($post_errors = array())
 				'lists' => array(
 					'label' => $txt['editBuddyIgnoreLists'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'editBuddyIgnoreLists',
+					'function' => 'action_editBuddyIgnoreLists',
 					'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 					'sc' => 'post',
 					'token' => 'profile-bl%u',
@@ -275,7 +275,7 @@ function ModifyProfile($post_errors = array())
 				'groupmembership' => array(
 					'label' => $txt['groupmembership'],
 					'file' => 'ProfileOptions.controller.php',
-					'function' => 'groupMembership',
+					'function' => 'action_groupMembership',
 					'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 					'sc' => 'request',
 					'token' => 'profile-gm%u',
@@ -580,7 +580,7 @@ function ModifyProfile($post_errors = array())
 		}
 		elseif ($current_area == 'groupmembership' && empty($post_errors))
 		{
-			$msg = groupMembership2($profile_vars, $post_errors, $memID);
+			$msg = action_groupMembership2($profile_vars, $post_errors, $memID);
 
 			// Whatever we've done, we have nothing else to do here...
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $memID) . ';area=groupmembership' . (!empty($msg) ? ';msg=' . $msg : ''));
@@ -593,8 +593,6 @@ function ModifyProfile($post_errors = array())
 		else
 		{
 			$force_redirect = true;
-			// Ensure we include this.
-			require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
 			saveProfileChanges($profile_vars, $post_errors, $memID);
 		}
 

@@ -492,7 +492,7 @@ function action_register2($verifiedOpenID = false)
 	// We'll do custom fields after as then we get to use the helper function!
 	if (!empty($_POST['customfield']))
 	{
-		require_once($sourcedir . '/controllers/ProfileOptions.controller.php');
+		require_once($librarydir . '/Profile.subs.php');
 		makeCustomFieldChanges($memberID, 'register');
 	}
 
