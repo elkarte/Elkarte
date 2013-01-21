@@ -394,6 +394,9 @@ em {
 .bbc_color a {
 	color: inherit;
 }
+.bbc_strong {
+	color: inherit;
+}
 .bbc_img {
 	border: 0;
 }
@@ -486,7 +489,8 @@ tr.catbg th a:link, tr.catbg th a:visited, tr.catbg2 td a:link, tr.catbg2 td a:v
 .catbg select {
 	height: 2em;
 	font-size: 0.9em;
-	padding: 0;
+	padding: 1px;
+	margin-top: -1px;
 }
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
@@ -610,11 +614,9 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 .birthday {
 	color: #920ac4;
 }
-
 .event {
 	color: #078907;
 }
-
 .holiday {
 	color: #000080;
 }
@@ -623,11 +625,9 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 .warn_mute {
 	color: red;
 }
-
 .warn_moderate {
 	color: #ffa500;
 }
-
 .warn_watch, .success {
 	color: green;
 }
@@ -654,7 +654,17 @@ a.moderation_link, a.moderation_link:visited {
 	margin: -1px 0 12px 0;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
-
+/* a simple full sourounding box */
+.simplebox {
+	padding: .5em 1em;
+	font-size: 0.9em;
+	line-height: 1.4em;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background: none;
+	margin: .5em 0 1em 0;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
 /* an informative style */
 .information {
 	background: #f0f6f0;
@@ -3302,6 +3312,7 @@ img.centericon {
 	width: 100%;
 	float: left;
 }
+
 /*Issue a warning*/
 #warn_body{
 	width: 80%;
@@ -3882,36 +3893,17 @@ span.hidelink {
 
 /* Experimental media screen additions. */
 /*--------------------------------------*/
-/* Drop cell(s) from the index on narrow screens. */
-@media screen and (max-width: 1220px) {
-	.table_list td.stats {
-		display: none;
-	}
-	.table_list td.lastpost p {
-		border-left: 1px solid #ccc;
-		padding: 1px 5px 2px 10px;
-		margin-top: 1px;
-	}
-	.table_grid td.stats, .table_grid th.stats {
-		display: none;
-	}
-	.table_grid td.lastpost p {
-		border-left: 1px solid #ccc;
-	}
-	.table_grid th.last_post {
-		width: 30%;
-	}
-}
-@media screen and (max-width: 360px) {
-	.table_list td.lastpost {
-		display: none;
-	}
-	.table_grid td.lastpost, .table_grid th.last_post {
+/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+@media screen and (min-width: 320px) and (max-width: 480px) {
+	.table_list td.stats, .table_list td.lastpost, .table_grid td.lastpost, .table_grid th.last_post, .table_grid td.stats, .table_grid th.stats {
 		display: none;
 	}
 	#wrapper, .frame {
-		min-width: 335px;
+		min-width: 300px;
 		width: 100% !important;
+	}
+	#main_content_section {
+		padding: 1px 2px 16px 3px;
 	}
 	.poster img.avatar {
 		width: 30px;
@@ -3926,6 +3918,32 @@ span.hidelink {
 	.post {
 		margin: 0 0 0 5px;
 	}
+}
+/* Tablets (landscape) */
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+}
+/* Tablets (portrait)  Drop the stats col replys/views and topics/messages */
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+	.table_list td.stats .table_grid td.stats, .table_grid th.stats {
+		display: none;
+	}
+	.table_list td.lastpost p {
+		border-left: 1px solid #ccc;
+		padding: 1px 5px 2px 10px;
+		margin-top: 1px;
+	}
+	.table_grid td.lastpost p {
+		border-left: 1px solid #ccc;
+	}
+	.table_grid th.last_post {
+		width: 30%;
+	}
+}
+/* Desktops and laptops */
+@media screen and (min-width: 1224px) {
+}
+/* Large screens */
+@media screen and (min-width: 1824px) {
 }
 
 /* General @todo stuff follows. Just added here temporarily, for convenience while trying stuff out. */
@@ -4004,7 +4022,7 @@ span.hidelink {
 .table_grid .catbg, .table_grid .catbg th, .table_grid .catbg th a {
 	font-size: 1em;
 }
-.generic_list_wrapper .information .additional_row{
+.generic_list_wrapper .information .additional_row {
 	border: none;
 }
 .generic_list_wrapper .information {

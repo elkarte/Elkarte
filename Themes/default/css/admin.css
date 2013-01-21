@@ -55,6 +55,7 @@ body.action_admin .navigate_section ul li a {
 	text-shadow: none;
 }
 #admin_main_section .cat_bar:first-child, #admin_main_section .cat_bar:first-child h3.catbg,
+#mod_main_section .cat_bar:first-child, #mod_main_section .cat_bar:first-child h3.catbg,
 #support_credits .cat_bar, #support_credits .cat_bar:first-child,
 #support_credits .cat_bar h3.catbg, #support_credits .cat_bar:first-child h3.catbg,
 #manage_maintenance .cat_bar, #manage_maintenance .cat_bar:first-child,
@@ -66,6 +67,7 @@ body.action_admin .navigate_section ul li a {
 	text-shadow: none;
 }
 #admin_main_section .cat_bar:first-child, #admin_main_section .cat_bar:first-child h3.catbg,
+#mod_main_section .cat_bar:first-child, #mod_main_section .cat_bar:first-child h3.catbg,
 #support_credits .cat_bar:first-child, #support_credits .cat_bar:first-child h3.catbg,
 #manage_maintenance .cat_bar:first-child, #manage_maintenance .cat_bar:first-child h3.catbg {
 	border: none;
@@ -119,7 +121,7 @@ body.action_admin .navigate_section ul li a {
 }
 
 /* A general admin wrapper class. */
-#admin_main_section, div.quick_tasks,
+#admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
 #core_features, #generate_reports_type,
 #groupForm, #mailqueue_stats, #manage_maintenance,
@@ -336,7 +338,7 @@ body#chrome  #quick_search .button_submit {
 }
 
 /* The welcome thingy. */
-#admincenter .roundframe {
+#admincenter .roundframe, #modcenter .roundframe {
 	background: none;
 	border: none;
 	box-shadow: none;
@@ -1023,6 +1025,32 @@ dl.themes_list dd {
 	display: block;
 	width: 100%;
 }
+#modcenter .content {
+	padding: 12px;
+}
+#admin_main_section {
+	margin: 12px 0 0 0;
+	padding: 8px 12px 4px 12px;
+}
+#mod_main_section .cat_bar {
+	background: none;
+}
+#mod_main_section .catbg, #mod_main_section .catbg a {
+	color: #444;
+	max-height: 1.5em;
+	overflow: hidden;
+}
+#mod_main_section .windowbg {
+	padding: 6px 0;
+	border: 1px solid #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0;
+	background: #fff url(../images/theme/upper_section.png) 0 -50px repeat-x;
+	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
+	height: 12em;
+	overflow: auto;
+}
 .modblock_left {
 	width: 49%;
 	float: left;
@@ -1038,6 +1066,7 @@ dl.themes_list dd {
 	height: 15em;
 	overflow: auto;
 }
+
 /* Moderation Notes */
 ul.moderation_notes {
 	margin: 0;
