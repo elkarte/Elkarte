@@ -1084,9 +1084,9 @@ function list_getNumHolidays()
 }
 
 /**
- * Remove a holdiay from the calendar
+ * Remove a holiday from the calendar.
  *
- * @param array $holiday_ids An array of
+ * @param array $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
 {
