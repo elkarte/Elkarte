@@ -47,7 +47,7 @@ function template_profile_below()
 }
 
 // This template displays users details without any option to edit them.
-function template_summary()
+function template_action_summary()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -332,7 +332,7 @@ function template_summary()
 }
 
 // Template for showing all the posts of the user, in chronological order.
-function template_showPosts()
+function template_action_showPosts()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -859,7 +859,7 @@ function template_trackIP()
 	template_show_list('track_user_list');
 }
 
-function template_showPermissions()
+function template_action_showPermissions()
 {
 	global $context, $settings, $options, $scripturl, $txt;
 
@@ -1015,7 +1015,7 @@ function template_showPermissions()
 }
 
 // Template for user statistics, showing graphs and the like.
-function template_statPanel()
+function template_action_statPanel()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -1696,7 +1696,7 @@ function template_profile_theme_settings()
 							</dd>';
 }
 
-function template_notification()
+function template_action_notification()
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
 
