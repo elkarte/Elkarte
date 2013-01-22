@@ -106,13 +106,13 @@ $oursite = 'http://www.elkarte.net/';
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
 $incontext['steps'] = array(
-	0 => array(1, $txt['install_step_welcome'], 'Welcome', 0),
-	1 => array(2, $txt['install_step_writable'], 'CheckFilesWritable', 10),
-	2 => array(3, $txt['install_step_databaseset'], 'DatabaseSettings', 15),
-	3 => array(4, $txt['install_step_forum'], 'ForumSettings', 40),
-	4 => array(5, $txt['install_step_databasechange'], 'DatabasePopulation', 15),
-	5 => array(6, $txt['install_step_admin'], 'AdminAccount', 20),
-	6 => array(7, $txt['install_step_delete'], 'DeleteInstall', 0),
+	0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
+	1 => array(2, $txt['install_step_writable'], 'action_checkFilesWritable', 10),
+	2 => array(3, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
+	3 => array(4, $txt['install_step_forum'], 'action_forumSettings', 40),
+	4 => array(5, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
+	5 => array(6, $txt['install_step_admin'], 'action_adminAccount', 20),
+	6 => array(7, $txt['install_step_delete'], 'action_deleteInstall', 0),
 );
 
 // Default title...
@@ -375,7 +375,7 @@ function installExit($fallThrough = false)
 	die();
 }
 
-function Welcome()
+function action_welcome()
 {
 	global $incontext, $txt, $databases, $installurl;
 
@@ -455,7 +455,7 @@ function Welcome()
 /**
  * Verify and try to make writable the files and folders that need to be.
  */
-function CheckFilesWritable()
+function action_checkFilesWritable()
 {
 	global $txt, $incontext;
 
@@ -652,7 +652,7 @@ function CheckFilesWritable()
 /**
  * Ask for database settings, verify and save them.
  */
-function DatabaseSettings()
+function action_databaseSettings()
 {
 	global $txt, $databases, $incontext, $smcFunc, $sourcedir;
 
@@ -865,7 +865,7 @@ function DatabaseSettings()
 /**
  * Basic forum type settings.
  */
-function ForumSettings()
+function action_forumSettings()
 {
 	global $txt, $incontext, $databases, $smcFunc, $db_connection, $db_type;
 
@@ -944,7 +944,7 @@ function ForumSettings()
 /**
  * Step one. Populate database.
  */
-function DatabasePopulation()
+function action_databasePopulation()
 {
 	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $sourcedir, $db_prefix, $incontext, $db_name, $boardurl;
 
@@ -1187,7 +1187,7 @@ function DatabasePopulation()
 /**
  * Ask for the administrator login information.
  */
-function AdminAccount()
+function action_adminAccount()
 {
 	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir;
 
@@ -1355,7 +1355,7 @@ function AdminAccount()
 /**
  * Final step, clean up and a complete message!
  */
-function DeleteInstall()
+function action_deleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
