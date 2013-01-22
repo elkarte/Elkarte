@@ -972,7 +972,7 @@ ALTER TABLE {$db_prefix}log_packages
 ADD db_changes text NOT NULL AFTER themes_installed;
 ---#
 
----# Changing URL to SMF package server...
+---# Changing URL to SMF (R) package server...
 UPDATE {$db_prefix}package_servers
 SET url = 'http://custom.simplemachines.org/packages/mods'
 WHERE url = 'http://mods.simplemachines.org';
@@ -1516,7 +1516,7 @@ VALUES
 	(0, 120, 1, 'd', 0, 'paid_subscriptions');
 ---#
 
----# Adding the simple machines scheduled task.
+---# Adding the simple machines (R) scheduled task.
 ---{
 // Randomise the time.
 $randomTime = 82800 + rand(0, 86399);
@@ -2042,7 +2042,7 @@ unset($_GET['m']);
 ---#
 
 /******************************************************************************/
---- Create a repository for the javascript files from Simple Machines...
+--- Create a repository for the javascript files from Simple Machines (R)...
 /******************************************************************************/
 
 ---# Creating repository table ...
@@ -2058,7 +2058,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
----# Add in the files to get from Simple Machines...
+---# Add in the files to get from Simple Machines (R)...
 INSERT IGNORE INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters)
 VALUES
@@ -2082,7 +2082,7 @@ SET filetype='text/javascript'
 WHERE id_file IN (1,2,3,4,5,6,7);
 ---#
 
----# Ensure that the files from Simple Machines get updated
+---# Ensure that the files from Simple Machines (R) get updated
 UPDATE {$db_prefix}scheduled_tasks
 SET next_time = UNIX_TIMESTAMP()
 WHERE id_task = 7

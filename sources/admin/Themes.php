@@ -1405,9 +1405,9 @@ function action_installtheme()
 	<!-- Theme name, used purely for aesthetics. -->
 	<name>' . $_REQUEST['copy'] . '</name>
 	<!-- Author: your email address or contact information. The name attribute is optional. -->
-	<author name="Simple Machines">info@simplemachines.org</author>
+	<author name="Your Name">info@youremailaddress.tld</author>
 	<!-- Website... where to get updates and more information. -->
-	<website>http://www.simplemachines.org/</website>
+	<website>http://www.yourdomain.tld/</website>
 	<!-- Template layers to use, defaults to "html,body". -->
 	<layers>' . (empty($theme_layers) ? 'html,body' : $theme_layers) . '</layers>
 	<!-- Templates to load on startup. Default is "index". -->

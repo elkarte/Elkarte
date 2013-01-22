@@ -318,7 +318,8 @@ function action_showfeed()
 		echo '
 </feed>';
 	}
-	elseif ($xml_format == 'rdf')
+	//@todo to not change much, rdf by default, maybe better use rss?
+	else //if ($xml_format == 'rdf')
 	{
 		echo '
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
@@ -344,18 +345,6 @@ function action_showfeed()
 		echo '
 </rdf:RDF>';
 	}
-	// Otherwise, we're using our proprietary formats - they give more data, though.
-	else
-	{
-		echo '
-<smf:xml-feed xmlns:smf="http://www.simplemachines.org/" xmlns="http://www.simplemachines.org/xml/', $_GET['sa'], '" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">';
-
-		// Dump out that associative array.  Indent properly.... and use the right names for the base elements.
-		dumpTags($xml, 1, $subActions[$_GET['sa']][1], $xml_format);
-
-		echo '
-</smf:xml-feed>';
-}
 
 	obExit(false);
 }
