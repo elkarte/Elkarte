@@ -220,7 +220,7 @@ function initialize_inputs()
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
-		deleteInstaller();
+		action_deleteInstaller();
 
 	// PHP 5 might cry if we don't do this now.
 	if (function_exists('date_default_timezone_set'))
@@ -1974,7 +1974,11 @@ function fixModSecurity()
 		return false;
 }
 
-function deleteInstaller()
+/**
+ * Delete the installer and its additional files.
+ * Called by ?delete
+ */
+function action_deleteInstaller()
 {
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
