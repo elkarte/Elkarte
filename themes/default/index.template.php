@@ -59,9 +59,6 @@ function template_init()
 	// The version this template/theme is for. This should probably be the version of the forum it was created for.
 	$settings['theme_version'] = '1.0';
 
-	// Set a setting that tells the theme that it can render the tabs.
-	$settings['use_tabs'] = true;
-
 	// Use plain buttons - as opposed to text buttons?
 	$settings['use_buttons'] = true;
 
