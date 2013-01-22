@@ -907,7 +907,7 @@ function action_editpoll2()
  */
 function action_removepoll()
 {
-	global $topic, $user_info, $smcFunc;
+	global $topic, $user_info, $smcFunc, $librarydir;
 
 	// Make sure the topic is not empty.
 	if (empty($topic))
@@ -936,6 +936,9 @@ function action_removepoll()
 
 		isAllowedTo('poll_remove_' . ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $user_info['id'] == $pollStarter) ? 'own' : 'any'));
 	}
+
+	// We need to work with them polls.
+	require_once($librarydir . '/Poll.subs.php');
 
 	// Retrieve the poll ID.
 	$pollID = associatedPoll($topic);
