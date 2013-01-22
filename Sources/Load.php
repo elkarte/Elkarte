@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $boarddir, $smcFunc, $txt, $db_character_set, $context, $sourcedir;
+	global $modSettings, $boarddir, $smcFunc, $txt, $db_character_set, $context, $sourcedir, $librarydir;
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
