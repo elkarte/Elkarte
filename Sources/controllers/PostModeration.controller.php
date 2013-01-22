@@ -31,9 +31,6 @@ function action_postmoderation()
 	loadLanguage('ModerationCenter');
 	loadTemplate('ModerationCenter');
 
-	// Probably need this...
-	require_once($sourcedir . '/controllers/ModerationCenter.controller.php');
-
 	// Allowed sub-actions, you know the drill by now!
 	$subactions = array(
 		'approve' => 'action_approve',
