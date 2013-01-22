@@ -316,7 +316,7 @@ function load_database()
 	global $smcFunc, $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user;
 
 	if (empty($sourcedir))
-		$sourcedir = dirname(__FILE__) . '/Sources';
+		$sourcedir = dirname(__FILE__) . '/sources';
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
@@ -768,7 +768,7 @@ function action_databaseSettings()
 		require(dirname(__FILE__) . '/Settings.php');
 
 		if (empty($sourcedir))
-			$sourcedir = dirname(__FILE__) . '/Sources';
+			$sourcedir = dirname(__FILE__) . '/sources';
 
 		// Better find the database file!
 		if (!file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
@@ -907,7 +907,7 @@ function action_forumSettings()
 		$vars = array(
 			'boardurl' => $_POST['boardurl'],
 			'boarddir' => addslashes(dirname(__FILE__)),
-			'sourcedir' => addslashes(dirname(__FILE__)) . '/Sources',
+			'sourcedir' => addslashes(dirname(__FILE__)) . '/sources',
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
