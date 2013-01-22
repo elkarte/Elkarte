@@ -1832,12 +1832,12 @@ VALUES ('ourVersion', '{$current_version}'),
 	('attachment_thumb_png', '1'),
 	('avatar_reencode', '1'),
 	('avatar_paranoid', '0'),
-	('enable_disregard', '0');
-	('badbehavior_enabled', '0');
-	('badbehavior_logging', '0');
-	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
-	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
-	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
+	('enable_disregard', '0'),
+	('badbehavior_enabled', '0'),
+	('badbehavior_logging', '0'),
+	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
+	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
+	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}'),
 	('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
 # --------------------------------------------------------
 
