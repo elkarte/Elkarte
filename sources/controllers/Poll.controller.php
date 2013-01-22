@@ -938,52 +938,13 @@ function action_removepoll()
 	}
 
 	// Retrieve the poll ID.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_poll
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($pollID) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$pollID = associatedPoll($topic);
 
-	// Remove all user logs for this poll.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_polls
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
-	// Remove all poll choices.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}poll_choices
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
-	// Remove the poll itself.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}polls
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
+	// Remove the poll!
+	removePoll($pollID);
+
 	// Finally set the topic poll ID back to 0!
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET id_poll = {int:no_poll}
-		WHERE id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-			'no_poll' => 0,
-		)
-	);
+	associatedPoll($topic, 0);
 
 	// A mod might have logged this (social network?), so let them remove, it too
 	call_integration_hook('integrate_poll_remove', array($pollID));
