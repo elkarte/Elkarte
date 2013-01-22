@@ -1572,7 +1572,7 @@ function action_cleanupMods()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// Work out the status.
-		if (!file_exists($boarddir . '/Packages/' . $row['filename']))
+		if (!file_exists($boarddir . '/packages/' . $row['filename']))
 		{
 			$status = 'Missing';
 			$status_color = 'red';
@@ -1590,7 +1590,7 @@ function action_cleanupMods()
 			'themes' => explode(',', $row['themes_installed']),
 			'name' => $row['name'],
 			'filename' => $row['filename'],
-			'missing_file' => file_exists($boarddir . '/Packages/' . $row['filename']) ? 0 : 1,
+			'missing_file' => file_exists($boarddir . '/packages/' . $row['filename']) ? 0 : 1,
 			'files' => array(),
 			'file_count' => 0,
 			'status' => $status,
@@ -1613,12 +1613,12 @@ function action_cleanupMods()
 	// Before we get started, don't report notice errors.
 	$oldErrorReporting = error_reporting(E_ALL ^ E_NOTICE);
 
-	if (!mktree($boarddir . '/Packages/temp', 0755))
+	if (!mktree($boarddir . '/packages/temp', 0755))
 	{
-		deltree($boarddir . '/Packages/temp', false);
-		if (!mktree($boarddir . '/Packages/temp', 0777))
+		deltree($boarddir . '/packages/temp', false);
+		if (!mktree($boarddir . '/packages/temp', 0777))
 		{
-			deltree($boarddir . '/Packages/temp', false);
+			deltree($boarddir . '/packages/temp', false);
 			// @todo Error here - plus chmod!
 		}
 	}
@@ -1655,10 +1655,10 @@ function action_cleanupMods()
 		if (isset($_POST['remove']))
 			$infoInstall = parsePackageInfo($packageInfo['xml'], true);
 
-		if (is_file($boarddir . '/Packages/' . $filename))
-			read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+		if (is_file($boarddir . '/packages/' . $filename))
+			read_tgz_file($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 		else
-			copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			copytree($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 
 		// Work out how we uninstall...
 		$files = array();
@@ -1669,7 +1669,7 @@ function action_cleanupMods()
 			// 2) Whether it could be installed on the new version.
 			if ($change['type'] == 'modification')
 			{
-				$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+				$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 				if ($change['boardmod'])
 					$results = parseBoardMod($contents, $test, $change['reverse'], $cur_theme_paths);
 				else
@@ -1702,10 +1702,10 @@ function action_cleanupMods()
 		if (isset($_POST['remove']) && !$test && isset($infoInstall))
 		{
 			// Need to extract again I'm afraid.
-			if (is_file($boarddir . '/Packages/' . $filename))
-				read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			if (is_file($boarddir . '/packages/' . $filename))
+				read_tgz_file($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 			else
-				copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+				copytree($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 
 			$errors = false;
 			$upcontext['packages'][$id]['result'] = 'Removed';
@@ -1713,7 +1713,7 @@ function action_cleanupMods()
 			{
 				if ($change['type'] == 'modification')
 				{
-					$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+					$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 					if ($change['boardmod'])
 						$results = parseBoardMod($contents, true, $change['reverse'], $cur_theme_paths);
 					else
@@ -1734,7 +1734,7 @@ function action_cleanupMods()
 				{
 					if ($change['type'] == 'modification')
 					{
-						$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+						$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 						if ($change['boardmod'])
 							$results = parseBoardMod($contents, false, $change['reverse'], $cur_theme_paths);
 						else
@@ -1772,8 +1772,8 @@ function action_cleanupMods()
 		}
 	}
 
-	if (file_exists($boarddir . '/Packages/temp'))
-		deltree($boarddir . '/Packages/temp');
+	if (file_exists($boarddir . '/packages/temp'))
+		deltree($boarddir . '/packages/temp');
 
 	// Removing/Reinstalling any packages?
 	if (isset($_POST['remove']))
@@ -1792,7 +1792,7 @@ function action_cleanupMods()
 				WHERE id_install IN (' . implode(',', $deletes) . ')');
 
 		// Ensure we don't lose our changes!
-		package_put_contents($boarddir . '/Packages/installed.list', time());
+		package_put_contents($boarddir . '/packages/installed.list', time());
 
 		$upcontext['sub_template'] = 'cleanup_done';
 		return false;
