@@ -416,7 +416,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, $smcFunc, $sourcedir;
+	global $modSettings, $user_info, $smcFunc, $librarydir;
 
 	$inserts = array();
 	$log_types = array(
@@ -477,7 +477,7 @@ function logActions($logs)
 			// Alright, if we get any result back, update open reports.
 			if ($smcFunc['db_num_rows']($request) > 0)
 			{
-				require_once($sourcedir . '/ModerationCenter.php');
+				require_once($librarydir . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}

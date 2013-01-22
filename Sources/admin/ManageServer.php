@@ -258,7 +258,7 @@ function ModifyDatabaseSettings($return_config = false)
  */
 function ModifyCookieSettings($return_config = false)
 {
-	global $context, $scripturl, $txt, $sourcedir, $modSettings, $cookiename, $user_settings, $boardurl;
+	global $context, $scripturl, $txt, $sourcedir, $librarydir, $modSettings, $cookiename, $user_settings, $boardurl;
 
 	// Define the variables we want to edit.
 	$config_vars = array(
@@ -299,7 +299,7 @@ function ModifyCookieSettings($return_config = false)
 		if ($cookiename != $_POST['cookiename'])
 		{
 			$original_session_id = $context['session_id'];
-			include_once($sourcedir . '/Subs-Auth.php');
+			include_once($librarydir . '/Auth.subs.php');
 
 			// Remove the old cookie.
 			setLoginCookie(-3600, 0);
@@ -746,7 +746,7 @@ function prepareDBSettingContext(&$config_vars)
 function saveSettings(&$config_vars)
 {
 	global $boarddir, $sc, $cookiename, $modSettings, $user_settings;
-	global $sourcedir, $context, $cachedir;
+	global $sourcedir, $librarydir, $context, $cachedir;
 
 	validateToken('admin-ssc');
 
@@ -819,7 +819,7 @@ function saveSettings(&$config_vars)
 	}
 
 	// Save the relevant settings in the Settings.php file.
-	require_once($sourcedir . '/Subs-Admin.php');
+	require_once($librarydir . '/Admin.subs.php');
 	updateSettingsFile($new_settings);
 
 	// Now loop through the remaining (database-based) settings.

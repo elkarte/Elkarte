@@ -85,7 +85,7 @@ function ManagePostSettings()
  */
 function SetCensor()
 {
-	global $txt, $modSettings, $context, $smcFunc, $sourcedir;
+	global $txt, $modSettings, $context, $smcFunc, $sourcedir, $librarydir;
 
 	if (!empty($_POST['save_censor']))
 	{
@@ -139,7 +139,7 @@ function SetCensor()
 
 	if (isset($_POST['censortest']))
 	{
-		require_once($sourcedir . '/Subs-Post.php');
+		require_once($librarydir . '/Post.subs.php');
 		$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES);
 		preparsecode($censorText);
 		$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));

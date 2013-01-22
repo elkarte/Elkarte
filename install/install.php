@@ -330,7 +330,7 @@ function load_database()
 	// Connect the database.
 	if (!$db_connection)
 	{
-		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist));
@@ -771,9 +771,9 @@ function DatabaseSettings()
 			$sourcedir = dirname(__FILE__) . '/Sources';
 
 		// Better find the database file!
-		if (!file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php'))
+		if (!file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
 		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Subs-Db-' . $db_type . '.php');
+			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
 			return false;
 		}
 
@@ -783,7 +783,7 @@ function DatabaseSettings()
 		if (empty($smcFunc))
 			$smcFunc = array();
 
-		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
@@ -926,7 +926,7 @@ function ForumSettings()
 		// UTF-8 requires a setting to override any language charset.
 		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
 		{
-			// our uft-8 check support on the db failed .... 
+			// our uft-8 check support on the db failed ....
 			$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
 			return false;
 		}
@@ -1359,7 +1359,7 @@ function DeleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $sourcedir, $librarydir, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1374,9 +1374,9 @@ function DeleteInstall()
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Subs.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Subs-Cache.php');
+	require_once($librarydir . '/Cache.subs.php');
 	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once($librarydir . '/Auth.subs.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))

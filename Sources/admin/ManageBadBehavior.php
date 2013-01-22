@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  */
 function action_badbehaviorlog()
 {
-	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $sourcedir, $smcFunc;
+	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $sourcedir, $librarydir, $smcFunc;
 
 	// Check for the administrative permission to do this.
 	isAllowedTo('admin_forum');
@@ -32,7 +32,7 @@ function action_badbehaviorlog()
 	loadTemplate('BadBehavior');
 
 	// Functions we will need
-	require_once($sourcedir . '/Subs-BadBehavior.php');
+	require_once($librarydir . '/BadBehavior.subs.php');
 
 	// You can filter by any of the following columns:
 	$filters = array(

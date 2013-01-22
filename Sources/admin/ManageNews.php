@@ -88,10 +88,10 @@ function ManageNews()
  */
 function EditNews()
 {
-	global $txt, $modSettings, $context, $sourcedir, $user_info, $scripturl;
+	global $txt, $modSettings, $context, $sourcedir, $librarydir, $user_info, $scripturl;
 	global $smcFunc;
 
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// The 'remove selected' button was pressed.
 	if (!empty($_POST['delete_selection']) && !empty($_POST['remove']))
@@ -135,7 +135,7 @@ function EditNews()
 	}
 
 	// We're going to want this for making our list.
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$context['page_title'] = $txt['admin_edit_news'];
 
@@ -433,7 +433,7 @@ function SelectMailingMembers()
  */
 function ComposeMailing()
 {
-	global $txt, $sourcedir, $context, $smcFunc, $scripturl, $modSettings;
+	global $txt, $sourcedir, $librarydir, $context, $smcFunc, $scripturl, $modSettings;
 
 	// Setup the template!
 	$context['page_title'] = $txt['admin_newsletters'];
@@ -443,7 +443,7 @@ function ComposeMailing()
 	$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}');
 
 	// Needed for the WYSIWYG editor.
-	require_once($sourcedir . '/Subs-Editor.php');
+	require_once($librarydir . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -462,7 +462,7 @@ function ComposeMailing()
 
 	if (isset($context['preview']))
 	{
-		require_once($sourcedir . '/Subs-Mail.php');
+		require_once($librarydir . '/Mail.subs.php');
 		$context['recipients']['members'] = !empty($_POST['members']) ? explode(',', $_POST['members']) : array();
 		$context['recipients']['exclude_members'] = !empty($_POST['exclude_members']) ? explode(',', $_POST['exclude_members']) : array();
 		$context['recipients']['groups'] = !empty($_POST['groups']) ? explode(',', $_POST['groups']) : array();
@@ -485,7 +485,7 @@ function ComposeMailing()
 		$toClean[] = 'exclude_members';
 	if (!empty($toClean))
 	{
-		require_once($sourcedir . '/Subs-Auth.php');
+		require_once($librarydir . '/Auth.subs.php');
 		foreach ($toClean as $type)
 		{
 			// Remove the quotes.
@@ -642,7 +642,7 @@ function SendMailing($clean_only = false)
 	}
 
 	// How many to send at once? Quantity depends on whether we are queueing or not.
-	// @todo Might need an interface? (used in Post.php too with different limits)
+	// @todo Might need an interface? (used in Post.controller.php too with different limits)
 	$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
 
 	// If by PM's I suggest we half the above number.
@@ -738,9 +738,9 @@ function SendMailing($clean_only = false)
 		return;
 
 	// Some functions we will need
-	require_once($sourcedir . '/Subs-Mail.php');
+	require_once($librarydir . '/Mail.subs.php');
 	if ($context['send_pm'])
-		require_once($sourcedir . '/Subs-PersonalMessage.php');
+		require_once($librarydir . '/PersonalMessage.subs.php');
 
 	// We are relying too much on writing to superglobals...
 	$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';

@@ -138,9 +138,9 @@ if (isset($_GET['ssi']))
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Subs-Cache.php');
+	require_once($librarydir . '/Cache.subs.php');
 	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	loadUserSettings();
 	loadPermissions();
@@ -815,9 +815,9 @@ function loadEssentialData()
 	// Get the database going!
 	if (empty($db_type))
 		$db_type = 'mysql';
-	if (file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php'))
+	if (file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
 	{
-		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
 		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
@@ -849,7 +849,7 @@ function loadEssentialData()
 	}
 	else
 	{
-		return throw_error('Cannot find ' . $sourcedir . '/Subs-Db-' . $db_type . '.php' . '. Please check you have uploaded all source files and have the correct paths set.');
+		return throw_error('Cannot find ' . $sourcedir . '/database/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
 	}
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
@@ -922,7 +922,7 @@ function WelcomeLogin()
 	// Check for some key files - one template, one language, and a new and an old source file.
 	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
 		&& @file_exists($sourcedir . '/QueryString.php')
-		&& @file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php')
+		&& @file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php')
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
 
 	// Need legacy scripts?
@@ -1938,7 +1938,7 @@ function cli_scheduled_fetchFiles()
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	foreach ($js_files as $ID_FILE => $file)
 	{

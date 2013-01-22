@@ -1037,7 +1037,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			$context[$list] = unserialize($modSettings[$list]);
 
 		if (!empty($modSettings[$list . '_desc']))
-			$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);	
+			$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);
 	}
 
 	// Build up our options array
@@ -1058,7 +1058,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			'',
 			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
-			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),	
+			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
 		array('title', 'badbehavior_whitelist_title'),
 			array('desc', 'badbehavior_wl_desc'),
 			array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
@@ -1100,7 +1100,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 	}
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
-	
+
 	// javascript vars for the "add more xyz" buttons in the callback forms
 	addInlineJavascript('
 	var sUrlParent = \'add_more_url_placeholder\';
@@ -1124,7 +1124,7 @@ function ModifyBadBehaviorSettings($return_config = false)
  */
 function ModifySignatureSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl;
+	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl, $librarydir;
 
 	$config_vars = array(
 			// Are signatures even enabled?
@@ -1322,7 +1322,7 @@ function ModifySignatureSettings($return_config = false)
 							if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 							{
 								// We'll mess up with images, who knows.
-								require_once($sourcedir . '/Subs-Attachments.php');
+								require_once($librarydir . '/Attachments.subs.php');
 
 								$sizes = url_image_size($matches[7][$key]);
 								if (is_array($sizes))
@@ -1502,7 +1502,7 @@ function pauseSignatureApplySettings()
 function ShowCustomProfiles()
 {
 	global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
-	global $modSettings, $sourcedir;
+	global $modSettings, $sourcedir, $librarydir;
 
 	$context['page_title'] = $txt['custom_profile_title'];
 	$context['sub_template'] = 'show_custom_profile';
@@ -1547,7 +1547,7 @@ function ShowCustomProfiles()
 
 	createToken('admin-scp');
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'standard_profile_fields',
@@ -2341,7 +2341,7 @@ function ModifyGeneralModSettings($return_config = false)
  */
 function list_integration_hooks()
 {
-	global $sourcedir, $scripturl, $context, $txt, $modSettings, $settings;
+	global $sourcedir, $librarydir, $scripturl, $context, $txt, $modSettings, $settings;
 
 	$context['filter_url'] = '';
 	$context['current_filter'] = '';
@@ -2509,7 +2509,7 @@ function list_integration_hooks()
 	}
 
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($list_options);
 
 	$context['page_title'] = $txt['hooks_title_list'];

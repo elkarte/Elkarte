@@ -323,7 +323,7 @@ function ViewSubscriptions()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -779,7 +779,7 @@ function ViewSubscribedUsers()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';

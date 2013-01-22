@@ -120,7 +120,7 @@ function EditSmileySettings($return_config = false)
 	global $modSettings, $context, $settings, $txt, $boarddir, $sourcedir, $scripturl;
 
 	// The directories...
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 
 	// Get the names of the smiley sets.
@@ -194,7 +194,7 @@ function EditSmileySettings($return_config = false)
 function EditSmileySets()
 {
 	global $modSettings, $context, $settings, $txt, $boarddir;
-	global $smcFunc, $scripturl, $sourcedir;
+	global $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Set the right tab to be selected.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
@@ -470,13 +470,13 @@ function EditSmileySets()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 }
 
 /**
  * Callback function for createList().
- * @todo to be moved to Subs-Smileys?
+ * @todo to be moved to Smileys.subs?
  *
  * @param $start
  * @param $items_per_page
@@ -523,7 +523,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 
 /**
  * Callback function for createList().
- * @todo to be moved to Subs-Smileys?
+ * @todo to be moved to Smileys.subs?
  */
 function list_getNumSmileySets()
 {
@@ -540,7 +540,7 @@ function AddSmiley()
 	global $modSettings, $context, $settings, $txt, $boarddir, $smcFunc;
 
 	// Get a list of all known smiley sets.
-	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 	$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -787,7 +787,7 @@ function AddSmiley()
 function EditSmileys()
 {
 	global $modSettings, $context, $settings, $txt, $boarddir;
-	global $smcFunc, $scripturl, $sourcedir;
+	global $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Force the correct tab to be displayed.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
@@ -1041,7 +1041,7 @@ function EditSmileys()
 						'value' => $txt['smileys_modify'],
 						'class' => 'centercol',
 					),
-					'data' => array(
+					'data' =>  array(
 						'sprintf' => array(
 							'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
@@ -1127,7 +1127,7 @@ function EditSmileys()
 				}',
 		);
 
-		require_once($sourcedir . '/Subs-List.php');
+		require_once($librarydir . '/List.subs.php');
 		createList($listOptions);
 
 		// The list is the only thing to show, so make it the main template.
@@ -1138,7 +1138,7 @@ function EditSmileys()
 	elseif ($context['sub_action'] == 'modifysmiley')
 	{
 		// Get a list of all known smiley sets.
-		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
+		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 		$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -1408,7 +1408,7 @@ function EditSmileyOrder()
  */
 function InstallSmileySet()
 {
-	global $sourcedir, $boarddir, $modSettings, $smcFunc, $scripturl, $context, $txt, $user_info;
+	global $sourcedir, $librarydir, $boarddir, $modSettings, $smcFunc, $scripturl, $context, $txt, $user_info;
 
 	isAllowedTo('manage_smileys');
 	checkSession('request');
@@ -1416,7 +1416,7 @@ function InstallSmileySet()
 	loadLanguage('Errors');
 	loadLanguage('Packages');
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Installing unless proven otherwise
 	$testing = false;
@@ -1533,7 +1533,7 @@ function InstallSmileySet()
 
 			if (!empty($action['parse_bbc']))
 			{
-				require_once($sourcedir . '/Subs-Post.php');
+				require_once($librarydir . '/Post.subs.php');
 				preparsecode($context[$type]);
 				$context[$type] = parse_bbc($context[$type]);
 			}
@@ -1712,7 +1712,7 @@ function ImportSmileys($smileyPath)
 function EditMessageIcons()
 {
 	global $user_info, $modSettings, $context, $settings, $txt;
-	global $boarddir, $smcFunc, $scripturl, $sourcedir;
+	global $boarddir, $smcFunc, $scripturl, $sourcedir, $librarydir;
 
 	// Get a list of icons.
 	$context['icons'] = array();
@@ -1952,7 +1952,7 @@ function EditMessageIcons()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// If we're adding/editing an icon we'll need a list of boards
@@ -1972,7 +1972,7 @@ function EditMessageIcons()
 			'use_permissions' => true,
 			'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 		);
-		require_once($sourcedir . '/Subs-MessageIndex.php');
+		require_once($librarydir . '/MessageIndex.subs.php');
 		$context['categories'] = getBoardList($boardListOptions);
 	}
 }

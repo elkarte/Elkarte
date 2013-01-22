@@ -85,11 +85,11 @@ function ManageBoards()
  */
 function ManageBoardsMain()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $sourcedir, $txt;
+	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $librarydir, $txt;
 
 	loadTemplate('ManageBoards');
 
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'move' && in_array($_REQUEST['move_to'], array('child', 'before', 'after', 'top')))
 	{
@@ -220,10 +220,10 @@ function ManageBoardsMain()
  */
 function EditCategory()
 {
-	global $txt, $context, $cat_tree, $boardList, $boards, $sourcedir;
+	global $txt, $context, $cat_tree, $boardList, $boards, $librarydir;
 
 	loadTemplate('ManageBoards');
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($librarydir . '/Boards.subs.php');
 	getBoardTree();
 
 	// id_cat must be a number.... if it exists.
@@ -311,12 +311,12 @@ function EditCategory()
  */
 function EditCategory2()
 {
-	global $sourcedir;
+	global $librarydir;
 
 	checkSession();
 	validateToken('admin-bc-' . $_REQUEST['cat']);
 
-	require_once($sourcedir . '/Subs-Categories.php');
+	require_once($librarydir . '/Categories.subs.php');
 
 	$_POST['cat'] = (int) $_POST['cat'];
 
@@ -376,10 +376,10 @@ function EditCategory2()
  */
 function EditBoard()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $sourcedir, $smcFunc, $modSettings;
+	global $txt, $context, $cat_tree, $boards, $boardList, $librarydir, $smcFunc, $modSettings;
 
 	loadTemplate('ManageBoards');
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($librarydir . '/Boards.subs.php');
 	getBoardTree();
 
 	// For editing the profile we'll need this.
@@ -592,13 +592,13 @@ function EditBoard()
  */
 function EditBoard2()
 {
-	global $txt, $sourcedir, $modSettings, $smcFunc, $context;
+	global $txt, $librarydir, $modSettings, $smcFunc, $context;
 
 	$_POST['boardid'] = (int) $_POST['boardid'];
 	checkSession();
 	validateToken('admin-be-' . $_REQUEST['boardid']);
 
-	require_once($sourcedir . '/Subs-Boards.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	// Mode: modify aka. don't delete.
 	if (isset($_POST['edit']) || isset($_POST['add']))

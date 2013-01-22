@@ -111,7 +111,7 @@ function EditSearchSettings($return_config = false)
 	call_integration_hook('integrate_modify_search_settings', array($config_vars));
 
 	// Perhaps the search method wants to add some settings?
-	require_once($sourcedir . '/Search.php');
+	require_once($sourcedir . '/controllers/Search.controller.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'searchSettings')))
 		call_user_func_array($searchAPI->searchSettings, array(&$config_vars));
@@ -714,14 +714,14 @@ function loadSearchAPIs()
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.php$~', $file, $matches))
+			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
 			{
 				// Check that this is definitely a valid API!
 				$fp = fopen($sourcedir . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '* SearchAPI-' . $matches[1] . '.php') !== false)
+				if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 				{
 					require_once($sourcedir . '/' . $file);
 

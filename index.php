@@ -55,9 +55,9 @@ require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Logging.php');
 require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/Subs-Cache.php');
+require_once($librarydir . '/Cache.subs.php');
 require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/Class-BrowserDetect.php');
+require_once($sourcedir . '/BrowserDetect.class.php');
 
 // If $maintenance is set specifically to 2, then we're upgrading or something.
 if (!empty($maintenance) && $maintenance == 2)
@@ -176,7 +176,7 @@ function smf_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once $sourcedir . '/Class-Dispatcher.php';
+	require_once $sourcedir . '/Dispatcher.class.php';
 	$dispatcher = new site_Dispatcher();
 	$dispatcher->dispatch();
 }

@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * This Plugin file contains all the functions that allow for Elkarte to inerface
+ * This Plugin file contains all the functions that allow for Elkarte to interface
  * with Bad Behavior.  Bad Behavior is
  * Copyright (C) 2005,2006,2007,2008,2009,2010,2011,2012 Michael Hampton
  * License: LGPLv3
@@ -18,7 +18,7 @@ if (!defined('ELKARTE'))
 
 define('BB2_CWD', dirname(__FILE__));
 
-// Calls inward to Bad Behavor itself.
+// Calls inward to Bad Behavior itself.
 require_once(BB2_CWD . '/bad-behavior/core.inc.php');
 
 /**
@@ -81,7 +81,8 @@ function bb2_db_query($query)
 {
 	global $smcFunc;
 
-	// First fix the horrors caused by bb's support of only my_sql, ok they are right its my horror :P
+	// First fix the horrors caused by bb's support of only mysql
+	// ok they are right its my horror :P
 	if (strpos('DATE_SUB', $query) !== false)
 		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE `date` < ' . bb2_db_date() - 7 * 86400;
 	if (strpos('@@session.wait_timeout', $query) !== false)

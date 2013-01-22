@@ -1102,12 +1102,12 @@ function AdminBoardRecount()
  */
 function VersionDetail()
 {
-	global $forum_version, $txt, $sourcedir, $context;
+	global $forum_version, $txt, $librarydir, $context;
 
 	isAllowedTo('admin_forum');
 
 	// Call the function that'll get all the version info we need.
-	require_once($sourcedir . '/Subs-Admin.php');
+	require_once($librarydir . '/Admin.subs.php');
 	$versionOptions = array(
 		'include_ssi' => true,
 		'include_subscriptions' => true,
@@ -1136,12 +1136,12 @@ function VersionDetail()
  */
 function MaintainReattributePosts()
 {
-	global $sourcedir, $context, $txt;
+	global $librarydir, $context, $txt;
 
 	checkSession();
 
 	// Find the member.
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once($librarydir . '/Auth.subs.php');
 	$members = findMembers($_POST['to']);
 
 	if (empty($members))
@@ -1154,7 +1154,7 @@ function MaintainReattributePosts()
 	$membername = $_POST['type'] == 'name' ? $_POST['from_name'] : '';
 
 	// Now call the reattribute function.
-	require_once($sourcedir . '/Subs-Members.php');
+	require_once($librarydir . '/Members.subs.php');
 	reattributePosts($memID, $email, $membername, !empty($_POST['posts']));
 
 	$context['maintenance_finished'] = $txt['maintain_reattribute_posts'];
@@ -1252,7 +1252,7 @@ function MaintainPurgeInactiveMembers()
 		}
 		$smcFunc['db_free_result']($request);
 
-		require_once($sourcedir . '/Subs-Members.php');
+		require_once($librarydir . '/Members.subs.php');
 		deleteMembers($members);
 	}
 
@@ -1270,7 +1270,7 @@ function MaintainRemoveOldPosts()
 	validateToken('admin-maint');
 
 	// Actually do what we're told!
-	require_once($sourcedir . '/RemoveTopic.php');
+	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
 	RemoveOldTopics2();
 }
 
@@ -1279,7 +1279,7 @@ function MaintainRemoveOldPosts()
  */
 function MaintainRemoveOldDrafts()
 {
-	global $sourcedir, $smcFunc;
+	global $librarydir, $smcFunc;
 
 	validateToken('admin-maint');
 
@@ -1302,7 +1302,7 @@ function MaintainRemoveOldDrafts()
 	// If we have old drafts, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($sourcedir . '/Subs-Drafts.php');
+		require_once($librarydir . '/Drafts.subs.php');
 		deleteDrafts($drafts, -1, false);
 	}
 }
@@ -1314,7 +1314,7 @@ function MaintainRemoveOldDrafts()
  */
 function MaintainMassMoveTopics()
 {
-	global $smcFunc, $sourcedir, $context, $txt;
+	global $smcFunc, $librarydir, $context, $txt;
 
 	// Only admins.
 	isAllowedTo('admin_forum');
@@ -1389,7 +1389,7 @@ function MaintainMassMoveTopics()
 			}
 
 			// Lets move them.
-			require_once($sourcedir . '/Subs-Topic.php');
+			require_once($librarydir . '/Topic.subs.php');
 			moveTopics($topics, $id_board_to);
 
 			// We've done at least ten more topics.
