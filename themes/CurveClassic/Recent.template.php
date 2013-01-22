@@ -102,7 +102,7 @@ function template_unread()
 		echo '
 			<div class="pagesection">';
 
-		if (!empty($context['recent_buttons']) && !empty($settings['use_tabs']))
+		if (!empty($context['recent_buttons']))
 			template_button_strip($context['recent_buttons'], 'right');
 
 		echo '
@@ -196,14 +196,6 @@ function template_unread()
 						</tr>';
 		}
 
-		if (empty($settings['use_tabs']) && !empty($context['recent_buttons']))
-			echo '
-						<tr class="catbg">
-							<td colspan="', $context['showCheckboxes'] ? '6' : '5', '" align="right">
-								', template_button_strip($context['recent_buttons'], 'top'), '
-							</td>
-						</tr>';
-
 		if (empty($context['topics']))
 			echo '
 					<tr style="display: none;"><td></td></tr>';
@@ -214,7 +206,7 @@ function template_unread()
 			</div>
 			<div class="pagesection" id="readbuttons">';
 
-		if (!empty($settings['use_tabs']) && !empty($context['recent_buttons']))
+		if (!empty($context['recent_buttons']))
 			template_button_strip($context['recent_buttons'], 'right');
 
 		echo '
@@ -270,7 +262,7 @@ function template_replies()
 		echo '
 			<div class="pagesection">';
 
-		if (!empty($context['recent_buttons']) && !empty($settings['use_tabs']))
+		if (!empty($context['recent_buttons']))
 			template_button_strip($context['recent_buttons'], 'right');
 
 		echo '
@@ -367,21 +359,13 @@ function template_replies()
 						</tr>';
 		}
 
-		if (empty($settings['use_tabs']) && !empty($context['recent_buttons']))
-			echo '
-						<tr class="catbg">
-							<td colspan="', $context['showCheckboxes'] ? '6' : '5', '" align="right">
-								', template_button_strip($context['recent_buttons'], 'top'), '
-							</td>
-						</tr>';
-
 		echo '
 					</tbody>
 				</table>
 			</div>
 			<div class="pagesection">';
 
-		if (!empty($settings['use_tabs']) && !empty($context['recent_buttons']))
+		if (!empty($context['recent_buttons']))
 			template_button_strip($context['recent_buttons'], 'right');
 
 		echo '

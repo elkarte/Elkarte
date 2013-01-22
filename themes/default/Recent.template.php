@@ -95,7 +95,7 @@ function template_unread()
 		echo '
 					<div class="pagesection">
 						', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
-						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($context['recent_buttons']) && !empty($settings['use_tabs']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
+						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
 					</div>';
 
 		if ($context['showCheckboxes'])
@@ -199,14 +199,6 @@ function template_unread()
 								</tr>';
 		}
 
-		if (empty($settings['use_tabs']) && !empty($context['recent_buttons']))
-			echo '
-								<tr class="catbg">
-									<td colspan="', $context['showCheckboxes'] ? '6' : '5', '" align="right">
-										', template_button_strip($context['recent_buttons'], 'top'), '
-									</td>
-								</tr>';
-
 		if (empty($context['topics']))
 			echo '
 								<tr style="display: none;"><td></td></tr>';
@@ -217,7 +209,7 @@ function template_unread()
 					</div>
 					<div class="pagesection">
 						', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($settings['use_tabs']) && !empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
+						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
 					</div>';
 
 		if ($context['showCheckboxes'])
@@ -264,7 +256,7 @@ function template_replies()
 		echo '
 					<div class="pagesection">
 						', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
-						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($context['recent_buttons']) && !empty($settings['use_tabs']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
+						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
 					</div>';
 
 		if ($context['showCheckboxes'])
@@ -364,21 +356,13 @@ function template_replies()
 								</tr>';
 		}
 
-		if (empty($settings['use_tabs']) && !empty($context['recent_buttons']))
-			echo '
-								<tr class="catbg">
-									<td colspan="', $context['showCheckboxes'] ? '6' : '5', '" align="right">
-										', template_button_strip($context['recent_buttons'], 'top'), '
-									</td>
-								</tr>';
-
 		echo '
 							</tbody>
 						</table>
 					</div>
 					<div class="pagesection">
 						', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-						<div class="pagelinks floatleft">', $context['page_index'], '</div>', (!empty($settings['use_tabs']) && !empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : ''), '
+						<div class="pagelinks floatleft">', $context['page_index'], '</div>', !empty($context['recent_buttons']) ? template_button_strip($context['recent_buttons'], 'right') : '', '
 					</div>';
 
 		if ($context['showCheckboxes'])

@@ -533,6 +533,12 @@ function action_credits($in_admin = false)
 	// Don't blink. Don't even blink. Blink and you're dead.
 	loadLanguage('Who');
 
+	$context[$context['admin_menu_name']]['tab_data'] = array(
+		'title' => $txt['support_credits_title'],
+		'help' => '',
+		'description' => '',
+	);
+
 	$context['credits'] = array(
 		array(
 			'pretext' => $txt['credits_intro'],
