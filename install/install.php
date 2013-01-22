@@ -468,7 +468,7 @@ function CheckFilesWritable()
 		'cache',
 		'Packages',
 		'Packages/installed.list',
-		'Smileys',
+		'smileys',
 		'Themes',
 		'agreement.txt',
 		'Settings.php',
