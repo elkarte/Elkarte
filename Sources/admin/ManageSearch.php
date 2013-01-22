@@ -111,7 +111,7 @@ function EditSearchSettings($return_config = false)
 	call_integration_hook('integrate_modify_search_settings', array($config_vars));
 
 	// Perhaps the search method wants to add some settings?
-	require_once($sourcedir . '/controllers/Search.controller.php');
+	require_once($librarydir . '/Search.subs.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'searchSettings')))
 		call_user_func_array($searchAPI->searchSettings, array(&$config_vars));

@@ -1265,13 +1265,13 @@ function MaintainPurgeInactiveMembers()
  */
 function MaintainRemoveOldPosts()
 {
-	global $sourcedir, $context, $txt;
+	global $librarydir, $context, $txt;
 
 	validateToken('admin-maint');
 
 	// Actually do what we're told!
-	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
-	RemoveOldTopics2();
+	require_once($librarydir . '/Topic.subs.php');
+	removeOldTopics();
 }
 
 /**
