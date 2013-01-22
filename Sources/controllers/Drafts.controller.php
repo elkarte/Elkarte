@@ -290,7 +290,8 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 }
 
 /**
- * Loads in a group of drafts for the user of a given type (0/posts, 1/pm's)
+ * Loads in a group of drafts for the user of a given type
+ * (0/posts, 1/pm's)
  * loads a specific draft for forum use if selected.
  * Used in the posting screens to allow draft selection
  * Will load a draft if selected is supplied via post
@@ -300,7 +301,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
  * @param int $draft_type
  * @return boolean
  */
-function showDrafts($member_id, $topic = false, $draft_type = 0)
+function action_showDrafts($member_id, $topic = false, $draft_type = 0)
 {
 	global $scripturl, $context, $txt, $modSettings;
 
@@ -464,7 +465,7 @@ function action_showProfileDrafts($memID, $draft_type = 0)
  *
  * @param int $memID = -1
  */
-function showPMDrafts($memID = -1)
+function action_showPMDrafts($memID = -1)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
 

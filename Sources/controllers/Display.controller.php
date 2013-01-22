@@ -1358,12 +1358,12 @@ function approved_attach_sort($a, $b)
  */
 function action_quickmod2()
 {
-	global $sourcedir, $topic, $board, $user_info, $smcFunc, $modSettings, $context;
+	global $librarydir, $topic, $board, $user_info, $smcFunc, $modSettings, $context;
 
 	// Check the session = get or post.
 	checkSession('request');
 
-	require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
+	require_once($librarydir . '/Messages.subs.php');
 
 	if (empty($_REQUEST['msgs']))
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);

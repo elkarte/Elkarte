@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
 /**
  * Show the list of topics in this board, along with any child boards.
  */
-function MessageIndex()
+function action_messageindex()
 {
 	global $txt, $scripturl, $board, $modSettings, $context;
 	global $options, $settings, $board_info, $user_info, $smcFunc, $sourcedir, $librarydir;

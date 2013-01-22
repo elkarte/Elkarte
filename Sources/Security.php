@@ -1382,3 +1382,57 @@ function loadBadBehavior()
 		}
 	}
 }
+
+/**
+ * This protects against brute force attacks on a member's password.
+ * Importantly, even if the password was right we DON'T TELL THEM!
+ *
+ * @param $id_member
+ * @param $password_flood_value = false
+ * @param $was_correct = false
+ */
+function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
+{
+	global $smcFunc, $cookiename, $sourcedir, $librarydir;
+
+	// As this is only brute protection, we allow 5 attempts every 10 seconds.
+
+	// Destroy any session or cookie data about this member, as they validated wrong.
+	require_once($librarydir . '/Auth.subs.php');
+	setLoginCookie(-3600, 0);
+
+	if (isset($_SESSION['login_' . $cookiename]))
+		unset($_SESSION['login_' . $cookiename]);
+
+	// We need a member!
+	if (!$id_member)
+	{
+		// Redirect back!
+		redirectexit();
+
+		// Probably not needed, but still make sure...
+		fatal_lang_error('no_access', false);
+	}
+
+	// Right, have we got a flood value?
+	if ($password_flood_value !== false)
+		@list ($time_stamp, $number_tries) = explode('|', $password_flood_value);
+
+	// Timestamp invalid or non-existent?
+	if (empty($number_tries) || $time_stamp < (time() - 10))
+	{
+		// If it wasn't *that* long ago, don't give them another five goes.
+		$number_tries = !empty($number_tries) && $time_stamp < (time() - 20) ? 2 : 0;
+		$time_stamp = time();
+	}
+
+	$number_tries++;
+
+	// Broken the law?
+	if ($number_tries > 5)
+		fatal_lang_error('login_threshold_brute_fail', 'critical');
+
+	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
+	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
+
+}

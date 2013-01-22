@@ -490,6 +490,7 @@ function action_deleteaccount2($memID)
 		{
 			// Include subs/Topic.subs.php - essential for this type of work!
 			require_once($librarydir . '/Topic.subs.php');
+			require_once($librarydir . '/Messages.subs.php');
 
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')
@@ -553,7 +554,7 @@ function action_deleteaccount2($memID)
 		deleteMembers($memID);
 
 		require_once($sourcedir . '/controllers/LogInOut.controller.php');
-		LogOut(true);
+		action_logout(true);
 
 		redirectexit();
 	}

@@ -92,7 +92,7 @@ class Site_Dispatcher
 			elseif (empty($topic))
 			{
 				$this->_file_name = $sourcedir . '/controllers/MessageIndex.controller.php';
-				$this->_function_name = 'MessageIndex';
+				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display
 			else
