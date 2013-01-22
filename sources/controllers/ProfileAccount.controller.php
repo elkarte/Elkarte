@@ -114,6 +114,8 @@ function action_issuewarning($memID)
 		elseif ($_POST['warning_level'] > $context['max_allowed'])
 			$_POST['warning_level'] = $context['max_allowed'];
 
+		require_once($librarydir . '/Moderation.subs.php');
+
 		// Do we actually have to issue them with a PM?
 		$id_notice = 0;
 		if (!empty($_POST['warn_notify']) && empty($issueErrors))
@@ -133,18 +135,8 @@ function action_issuewarning($memID)
 				);
 				sendpm(array('to' => array($memID), 'bcc' => array()), $_POST['warn_sub'], $_POST['warn_body'], false, $from);
 
-				// Log the notice!
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_member_notices',
-					array(
-						'subject' => 'string-255', 'body' => 'string-65534',
-					),
-					array(
-						$smcFunc['htmlspecialchars']($_POST['warn_sub']), $smcFunc['htmlspecialchars']($_POST['warn_body']),
-					),
-					array('id_notice')
-				);
-				$id_notice = $smcFunc['db_insert_id']('{db_prefix}log_member_notices', 'id_notice');
+				// Log the notice.
+				$id_notice = logWarningNotice($_POST['warn_sub'], $_POST['warn_body']);
 			}
 		}
 
@@ -159,18 +151,7 @@ function action_issuewarning($memID)
 		{
 			// Log what we've done!
 			if (!$context['user']['is_owner'])
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_comments',
-					array(
-						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int', 'recipient_name' => 'string-255',
-						'log_time' => 'int', 'id_notice' => 'int', 'counter' => 'int', 'body' => 'string-65534',
-					),
-					array(
-						$user_info['id'], $user_info['name'], 'warning', $memID, $cur_profile['real_name'],
-						time(), $id_notice, $level_change, $_POST['warn_reason'],
-					),
-					array('id_comment')
-				);
+				logWarning($memID, $cur_profile['real_name'], $id_notice, $level_change, $_POST['warn_reason']);
 
 			// Make the change.
 			updateMemberData($memID, array('warning' => $_POST['warning_level']));
@@ -452,32 +433,20 @@ function action_deleteaccount2($memID)
 
 	$old_profile = &$cur_profile;
 
-	// Too often, people remove/delete their own only account.
+	// This file is needed for our utility functions.
+	require_once($librarydir . '/Members.subs.php');
+
+	// Too often, people remove/delete their own only administrative account.
 	if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
 	{
 		// Are you allowed to administrate the forum, as they are?
 		isAllowedTo('admin_forum');
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member
-			FROM {db_prefix}members
-			WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
-				AND id_member != {int:selected_member}
-			LIMIT 1',
-			array(
-				'admin_group' => 1,
-				'selected_member' => $memID,
-			)
-		);
-		list ($another) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$another = isAnotherAdmin($memID);
 
 		if (empty($another))
 			fatal_lang_error('at_least_one_admin', 'critical');
 	}
-
-	// This file is needed for the deleteMembers function.
-	require_once($librarydir . '/Members.subs.php');
 
 	// Do you have permission to delete others profiles, or is that your profile you wanna delete?
 	if ($memID != $user_info['id'])
