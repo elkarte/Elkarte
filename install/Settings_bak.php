@@ -151,7 +151,7 @@ $cachedir = dirname(__FILE__) . '/cache';
  */
 $boarddir = dirname(__FILE__);
 /**
- * Path to the Sources directory.
+ * Path to the sources directory.
  * @var string
  */
 $sourcedir = dirname(__FILE__) . '/sources';
