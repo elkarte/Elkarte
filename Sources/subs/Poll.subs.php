@@ -89,3 +89,40 @@ function removePoll($pollID)
 		)
 	);
 }
+
+/**
+ * Reset votes for the poll.
+ *
+ * @param $pollID
+ */
+function resetVotes($pollID)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}polls
+		SET num_guest_voters = {int:no_votes}, reset_poll = {int:time}
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'no_votes' => 0,
+			'id_poll' => $pollID,
+			'time' => time(),
+		)
+	);
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}poll_choices
+		SET votes = {int:no_votes}
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'no_votes' => 0,
+			'id_poll' => $pollID,
+		)
+	);
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_polls
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $pollID,
+		)
+	);
+}

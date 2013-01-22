@@ -618,6 +618,9 @@ function action_editpoll2()
 	// Is this a new poll, or editing an existing?
 	$isEdit = isset($_REQUEST['add']) ? 0 : 1;
 
+	// Make sure we have our stuff.
+	require_once($librarydir . '/Poll.subs.php');
+
 	// Get the starter and the poll's ID - if it's an edit.
 	$request = $smcFunc['db_query']('', '
 		SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
@@ -837,7 +840,7 @@ function action_editpoll2()
 			);
 	}
 
-	// I'm sorry, but... well, no one was choosing you.  Poor options, I'll put you out of your misery.
+	// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
 	if (!empty($delete_options))
 	{
 		$smcFunc['db_query']('', '
@@ -862,34 +865,7 @@ function action_editpoll2()
 
 	// Shall I reset the vote count, sir?
 	if (isset($_POST['resetVoteCount']))
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}polls
-			SET num_guest_voters = {int:no_votes}, reset_poll = {int:time}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'no_votes' => 0,
-				'id_poll' => $bcinfo['id_poll'],
-				'time' => time(),
-			)
-		);
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}poll_choices
-			SET votes = {int:no_votes}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'no_votes' => 0,
-				'id_poll' => $bcinfo['id_poll'],
-			)
-		);
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_polls
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'id_poll' => $bcinfo['id_poll'],
-			)
-		);
-	}
+		resetVotes($bcinfo['id_poll']);
 
 	call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
 
