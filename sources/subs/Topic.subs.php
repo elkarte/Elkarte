@@ -1211,3 +1211,29 @@ function removeOldTopics()
 
 	redirectexit('action=admin;area=maintain;sa=topics;done=purgeold');
 }
+
+/**
+ * Retrieve all topics started by the given member.
+ *
+ * @param int $memberID
+ */
+function topicsStartedBy($memberID)
+{
+	global $smcFunc;
+
+	// Fetch all topics started by this user.
+	$request = $smcFunc['db_query']('', '
+		SELECT t.id_topic
+		FROM {db_prefix}topics AS t
+		WHERE t.id_member_started = {int:selected_member}',
+			array(
+				'selected_member' => $memberID,
+			)
+		);
+	$topicIDs = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$topicIDs[] = $row['id_topic'];
+	$smcFunc['db_free_result']($request);
+
+	return $topicIDs;
+}

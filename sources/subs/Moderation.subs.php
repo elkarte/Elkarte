@@ -49,3 +49,47 @@ function recountOpenReports()
 
 	$context['open_mod_reports'] = $open_reports;
 }
+
+/**
+ * Log a warning notice.
+ */
+function logWarningNotice($subject, $body)
+{
+	global $smcFunc;
+
+	// Log warning notice.
+	$smcFunc['db_insert']('',
+		'{db_prefix}log_member_notices',
+		array(
+			'subject' => 'string-255', 'body' => 'string-65534',
+		),
+		array(
+			$smcFunc['htmlspecialchars']($subject), $smcFunc['htmlspecialchars']($body),
+		),
+		array('id_notice')
+	);
+	$id_notice = $smcFunc['db_insert_id']('{db_prefix}log_member_notices', 'id_notice');
+
+	return $id_notice;
+}
+
+/**
+ * Log the warning being sent.
+ */
+function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
+{
+	global $smcFunc, $user_info;
+
+	$smcFunc['db_insert']('',
+		'{db_prefix}log_comments',
+		array(
+			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int', 'recipient_name' => 'string-255',
+			'log_time' => 'int', 'id_notice' => 'int', 'counter' => 'int', 'body' => 'string-65534',
+		),
+		array(
+			$user_info['id'], $user_info['name'], 'warning', $memberID, $real_name,
+			time(), $id_notice, $level_change, $warn_reason,
+		),
+		array('id_comment')
+	);
+}

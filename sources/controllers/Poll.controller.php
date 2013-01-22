@@ -316,27 +316,11 @@ function action_editpoll()
 	$context['start'] = (int) $_REQUEST['start'];
 	$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
 
-	// Check if a poll currently exists on this topic, and get the id, question and starter.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			t.id_member_started, p.id_poll, p.question, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-			m.subject, p.guest_vote, p.id_member AS poll_starter
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
+	$pollinfo = getPollInfo($topic);
 
-	// Assume the the topic exists, right?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	// Assume it all exists, right?
+	if (empty($pollinfo))
 		fatal_lang_error('no_board');
-	// Get the poll information.
-	$pollinfo = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// If we are adding a new poll - make sure that there isn't already a poll there.
 	if (!$context['is_edit'] && !empty($pollinfo['id_poll']))
@@ -618,6 +602,9 @@ function action_editpoll2()
 	// Is this a new poll, or editing an existing?
 	$isEdit = isset($_REQUEST['add']) ? 0 : 1;
 
+	// Make sure we have our stuff.
+	require_once($librarydir . '/Poll.subs.php');
+
 	// Get the starter and the poll's ID - if it's an edit.
 	$request = $smcFunc['db_query']('', '
 		SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
@@ -837,7 +824,7 @@ function action_editpoll2()
 			);
 	}
 
-	// I'm sorry, but... well, no one was choosing you.  Poor options, I'll put you out of your misery.
+	// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
 	if (!empty($delete_options))
 	{
 		$smcFunc['db_query']('', '
@@ -862,34 +849,7 @@ function action_editpoll2()
 
 	// Shall I reset the vote count, sir?
 	if (isset($_POST['resetVoteCount']))
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}polls
-			SET num_guest_voters = {int:no_votes}, reset_poll = {int:time}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'no_votes' => 0,
-				'id_poll' => $bcinfo['id_poll'],
-				'time' => time(),
-			)
-		);
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}poll_choices
-			SET votes = {int:no_votes}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'no_votes' => 0,
-				'id_poll' => $bcinfo['id_poll'],
-			)
-		);
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_polls
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'id_poll' => $bcinfo['id_poll'],
-			)
-		);
-	}
+		resetVotes($bcinfo['id_poll']);
 
 	call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
 
@@ -907,7 +867,7 @@ function action_editpoll2()
  */
 function action_removepoll()
 {
-	global $topic, $user_info, $smcFunc;
+	global $topic, $user_info, $smcFunc, $librarydir;
 
 	// Make sure the topic is not empty.
 	if (empty($topic))
@@ -937,53 +897,17 @@ function action_removepoll()
 		isAllowedTo('poll_remove_' . ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $user_info['id'] == $pollStarter) ? 'own' : 'any'));
 	}
 
-	// Retrieve the poll ID.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_poll
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($pollID) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// We need to work with them polls.
+	require_once($librarydir . '/Poll.subs.php');
 
-	// Remove all user logs for this poll.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_polls
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
-	// Remove all poll choices.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}poll_choices
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
-	// Remove the poll itself.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}polls
-		WHERE id_poll = {int:id_poll}',
-		array(
-			'id_poll' => $pollID,
-		)
-	);
+	// Retrieve the poll ID.
+	$pollID = associatedPoll($topic);
+
+	// Remove the poll!
+	removePoll($pollID);
+
 	// Finally set the topic poll ID back to 0!
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET id_poll = {int:no_poll}
-		WHERE id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-			'no_poll' => 0,
-		)
-	);
+	associatedPoll($topic, 0);
 
 	// A mod might have logged this (social network?), so let them remove, it too
 	call_integration_hook('integrate_poll_remove', array($pollID));

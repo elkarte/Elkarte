@@ -19,7 +19,8 @@ if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
- * Called from a mouse click, works out what we want to do with attachments and actions it.
+ * Called from a mouse click,
+ * works out what we want to do with attachments and actions it.
  * Accessed by ?action=attachapprove
  */
 function action_attachapprove()
