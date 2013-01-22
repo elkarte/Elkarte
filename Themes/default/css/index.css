@@ -2,9 +2,12 @@
 ------------------------------------------------------- */
 
 /* Normal, standard links. */
-a:link, a:visited {
+a:link {
 	color: #346;
 	text-decoration: none;
+}
+a:visited {
+	color: #346;
 }
 a:hover {
 	text-decoration: underline;

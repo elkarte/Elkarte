@@ -475,7 +475,7 @@ function template_info_center()
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'collapse_header_ic\',
 				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionVar: smf_session_var
 			},
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',

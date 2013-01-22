@@ -238,7 +238,7 @@ function bb2_read_settings()
 	}
 
 	// If they supplied a http:BL API Key lets see if it looks correct before we use it
-	$invalid_badbehavior_httpbl_key = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
+	$invalid_badbehavior_httpbl_key = empty($modSettings['badbehavior_httpbl_key']) || (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 	// Return the settings so BadBehavior can use them
 	return array(
