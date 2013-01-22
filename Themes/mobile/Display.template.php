@@ -1,7 +1,7 @@
 <?php
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -23,8 +23,8 @@ function template_main()
 		echo '
 			<ul data-role="listview" data-inset="true">
 				<li data-role="list-divider">
-					<h3 class="catbg">
-						<span class="ie6_header floatleft"><img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '</span>
+					<h3>
+						<span><img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '</span>
 					</h3>
 				</li>
 				<li>
@@ -62,7 +62,7 @@ function template_main()
 			// Show a warning if they are allowed more than one option.
 			if ($context['poll']['allowed_warning'])
 				echo '
-						<p class="smallpadding">', $context['poll']['allowed_warning'], '</p>';
+						<p>', $context['poll']['allowed_warning'], '</p>';
 
 			// Show each option with its button - a radio likely.
 			foreach ($context['poll']['options'] as $option)

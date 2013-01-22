@@ -1,7 +1,7 @@
 <?php
 /**
- * @name      Dialogo Forum
- * @copyright Dialogo Forum contributors
+ * @name      Elkarte Forum
+ * @copyright Elkarte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -160,7 +160,7 @@ function template_html_above()
 
 function template_body_above()
 {
-	global $context, $scripturl;
+	global $context, $scripturl, $txt;
 	
 	echo '
 	<div data-role="page" id="the-page">
