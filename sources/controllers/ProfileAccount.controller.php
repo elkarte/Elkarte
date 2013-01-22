@@ -464,19 +464,8 @@ function action_deleteaccount2($memID)
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')
 			{
-				// Fetch all topics started by this user within the time period.
-				$request = $smcFunc['db_query']('', '
-					SELECT t.id_topic
-					FROM {db_prefix}topics AS t
-					WHERE t.id_member_started = {int:selected_member}',
-					array(
-						'selected_member' => $memID,
-					)
-				);
-				$topicIDs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$topicIDs[] = $row['id_topic'];
-				$smcFunc['db_free_result']($request);
+				// Fetch all topics started by this user.
+				$topicIDs = topicsStartedBy($memID);
 
 				// Actually remove the topics.
 				// @todo This needs to check permissions, but we'll let it slide for now because of moderate_forum already being had.
