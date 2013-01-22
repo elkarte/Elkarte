@@ -3429,7 +3429,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="', $settings['default_theme_url'], 'Tthemes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
