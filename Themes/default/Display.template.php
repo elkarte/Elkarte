@@ -443,7 +443,7 @@ function template_main()
 								</div>
 
 								<h5 id="subject_', $message['id'], '">
-									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' - ', $message['subject'], '">', $message['subject'], '</a>';
+									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' ', $txt['on'], ': ', $message['time'], '">', $message['subject'], '</a>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'] && !empty($message['modified']['name']))

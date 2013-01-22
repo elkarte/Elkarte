@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  * An add-on files to handle custom actions will be called if they follow
  * any of these patterns.
  */
-class site_Dispatcher
+class Site_Dispatcher
 {
 	// file name to load
 	private $_file_name;
@@ -153,7 +153,7 @@ class site_Dispatcher
 			'post' => array('Post.controller.php', 'action_post'),
 			'post2' => array('Post.controller.php', 'action_post2'),
 			'printpage' => array('Topic.controller.php', 'action_printpage'), // done
-			'profile' => array('Profile.controller.php', 'ModifyProfile'),
+			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'quotefast' => array('Post.controller.php', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'action_quickmod2'),
@@ -179,7 +179,7 @@ class site_Dispatcher
 			'unread' => array('Recent.controller.php', 'action_unread'),
 			'unreadreplies' => array('Recent.controller.php', 'action_unread'),
 			'verificationcode' => array('Register.controller.php', 'action_verificationcode'),
-			'viewprofile' => array('Profile.controller.php', 'ModifyProfile'),
+			'viewprofile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'vote' => array('Poll.controller.php', 'action_vote'),
 			'viewquery' => array('ViewQuery.php', 'action_viewquery'),
 			'viewadminfile' => array('Admin.php', 'action_viewadminfile'),

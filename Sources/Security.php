@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $sourcedir, $user_info, $sc, $user_settings;
+	global $modSettings, $sourcedir, $librarydir, $user_info, $sc, $user_settings;
 
 	// We don't care if the option is off, because Guests should NEVER get past here.
 	is_not_guest();
@@ -52,7 +52,7 @@ function validateSession($type = 'admin')
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 		return;
 
-	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
 
 	// Hashed password, ahoy!
 	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 40)
@@ -87,7 +87,7 @@ function validateSession($type = 'admin')
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
-		require_once($sourcedir . '/subs/OpenID.subs.php');
+		require_once($librarydir . '/OpenID.subs.php');
 		openID_revalidate();
 
 		$_SESSION[$type . '_time'] = time();
@@ -178,7 +178,7 @@ function is_not_guest($message = '')
 function is_not_banned($forceCheck = false)
 {
 	global $txt, $modSettings, $context, $user_info;
-	global $sourcedir, $cookiename, $user_settings, $smcFunc;
+	global $sourcedir, $librarydir, $cookiename, $user_settings, $smcFunc;
 
 	// You cannot be banned if you are an admin - doesn't help if you log out.
 	if ($user_info['is_admin'])
@@ -311,7 +311,7 @@ function is_not_banned($forceCheck = false)
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))
 		{
-			require_once($sourcedir . '/subs/Auth.subs.php');
+			require_once($librarydir . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 			smf_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
 		}
@@ -351,7 +351,7 @@ function is_not_banned($forceCheck = false)
 		);
 
 		// A goodbye present.
-		require_once($sourcedir . '/subs/Auth.subs.php');
+		require_once($librarydir . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 
@@ -422,7 +422,7 @@ function is_not_banned($forceCheck = false)
  */
 function banPermissions()
 {
-	global $user_info, $sourcedir, $modSettings, $context;
+	global $user_info, $sourcedir, $librarydir, $modSettings, $context;
 
 	// Somehow they got here, at least take away all permissions...
 	if (isset($_SESSION['ban']['cannot_access']))
@@ -482,7 +482,7 @@ function banPermissions()
 		$user_info['mod_cache'] = $_SESSION['mc'];
 	else
 	{
-		require_once($sourcedir . '/subs/Auth.subs.php');
+		require_once($librarydir . '/Auth.subs.php');
 		rebuildModCache();
 	}
 
@@ -491,7 +491,7 @@ function banPermissions()
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
-		require_once($sourcedir . '/controllers/ModerationCenter.controller.php');
+		require_once($librarydir . '/Moderation.subs.php');
 		recountOpenReports();
 	}
 	else

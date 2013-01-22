@@ -836,7 +836,7 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc, $librarydir;
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -1001,7 +1001,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'b',
-				'before' => '<strong>',
+				'before' => '<strong class="bbc_strong">',
 				'after' => '</strong>',
 			),
 			array(
@@ -1695,7 +1695,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
 							// For images, we'll want this.
-							require_once($sourcedir . '/Subs-Attachments.php');
+							require_once($librarydir . '/Attachments.subs.php');
 							list ($width, $height) = url_image_size($imgtag);
 
 							if (!empty($modSettings['max_image_width']) && $width > $modSettings['max_image_width'])
@@ -3111,7 +3111,7 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Combine.class.php');
-			$combiner = new site_Combiner;
+			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
 			if (!empty($combine_name))
@@ -3194,7 +3194,7 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once($sourcedir . '/Combine.class.php');
-			$combiner = new site_Combiner;
+			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '

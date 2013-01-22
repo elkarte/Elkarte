@@ -44,9 +44,13 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Load the settings...
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
+// Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if (empty($librarydir) || !file_exists($librarydir))
+	$librarydir = $sourcedir . '/subs';
+if (empty($controllerdir) || !file_exists($controllerdir))
+	$controllerdir = $sourcedir . '/controllers';
 
 // And important includes.
 require_once($sourcedir . '/QueryString.php');
@@ -55,7 +59,7 @@ require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Logging.php');
 require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/subs/Cache.subs.php');
+require_once($librarydir . '/Cache.subs.php');
 require_once($sourcedir . '/Security.php');
 require_once($sourcedir . '/BrowserDetect.class.php');
 
@@ -177,6 +181,6 @@ function smf_main()
 
 	// What shall we do?
 	require_once $sourcedir . '/Dispatcher.class.php';
-	$dispatcher = new site_Dispatcher();
+	$dispatcher = new Site_Dispatcher();
 	$dispatcher->dispatch();
 }

@@ -563,7 +563,7 @@ function CheckFilesWritable()
 
 		if (isset($_POST['ftp_username']))
 		{
-			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
 			{
@@ -579,7 +579,7 @@ function CheckFilesWritable()
 		if (!isset($ftp) || $ftp->error !== false)
 		{
 			if (!isset($ftp))
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			// Save the error so we can mess with listing...
 			elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
 				$incontext['ftp_errors'][] = $ftp->last_message;
@@ -926,7 +926,7 @@ function ForumSettings()
 		// UTF-8 requires a setting to override any language charset.
 		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
 		{
-			// our uft-8 check support on the db failed .... 
+			// our uft-8 check support on the db failed ....
 			$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
 			return false;
 		}
@@ -1359,7 +1359,7 @@ function DeleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $sourcedir, $librarydir, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1374,9 +1374,9 @@ function DeleteInstall()
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Subs.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/subs/Cache.subs.php');
+	require_once($librarydir . '/Cache.subs.php');
 	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1507,7 +1507,7 @@ function DeleteInstall()
  *
  * Credit: http://www.faqs.org/rfcs/rfc959.html
  */
-class ftp_connection
+class Ftp_Connection
 {
 	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
@@ -1978,7 +1978,7 @@ function deleteInstaller()
 {
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
-		$ftp = new ftp_connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
 		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
 
 		$ftp->unlink('install.php');

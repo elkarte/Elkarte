@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function action_pm()
 {
-	global $txt, $scripturl, $sourcedir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
+	global $txt, $scripturl, $sourcedir, $librarydir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
 
 	// No guests!
 	is_not_guest();
@@ -40,7 +40,7 @@ function action_pm()
 	isAllowedTo('pm_read');
 
 	// This file contains the our PM functions such as mark, send, delete
-	require_once($sourcedir . '/subs/PersonalMessage.subs.php');
+	require_once($librarydir . '/PersonalMessage.subs.php');
 
 	loadLanguage('PersonalMessage+Drafts');
 
@@ -159,8 +159,8 @@ function action_pm()
 		'removeall' => 'action_removemessage',
 		'removeall2' => 'action_removemessage2',
 		'report' => 'action_reportmessage',
-		'search' => array('Search.php','MessageSearch'),
-		'search2' => array('Search.php','MessageSearch2'),
+		'search' => array('Search.controller.php','MessageSearch'),
+		'search2' => array('Search.controller.php','MessageSearch2'),
 		'send' => 'action_sendmessage',
 		'send2' => 'action_sendmessage2',
 		'settings' => 'action_messagesettings',
@@ -178,7 +178,7 @@ function action_pm()
 		// So it was set - let's go to that action.
 		if (is_array($subActions[$_REQUEST['sa']]))
 		{
-			require_once($sourcedir . '/' . $subActions[$_REQUEST['sa']][0]);
+			require_once($sourcedir . '/controllers/' . $subActions[$_REQUEST['sa']][0]);
 			$subActions[$_REQUEST['sa']][1]();
 		}
 		else
@@ -193,7 +193,7 @@ function action_pm()
  */
 function messageIndexBar($area)
 {
-	global $txt, $context, $scripturl, $sourcedir, $sc, $modSettings, $settings, $user_info, $options;
+	global $txt, $context, $scripturl, $sourcedir, $librarydir, $sc, $modSettings, $settings, $user_info, $options;
 
 	$pm_areas = array(
 		'folders' => array(
@@ -308,7 +308,7 @@ function messageIndexBar($area)
 		);
 	}
 
-	require_once($sourcedir . '/subs/Menu.subs.php');
+	require_once($librarydir . '/Menu.subs.php');
 
 	// What page is this, again?
 	$current_page = $scripturl . '?action=pm' . (!empty($_REQUEST['sa']) ? ';sa=' . $_REQUEST['sa'] : '') . (!empty($context['folder']) ? ';f=' . $context['folder'] : '') . (!empty($context['current_label_id']) ? ';l=' . $context['current_label_id'] : '');
@@ -934,7 +934,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
  */
 function action_sendmessage()
 {
-	global $txt, $sourcedir, $scripturl, $modSettings;
+	global $txt, $sourcedir, $librarydir, $controllerdir, $scripturl, $modSettings;
 	global $context, $options, $smcFunc, $language, $user_info;
 
 	isAllowedTo('pm_send');
@@ -1176,13 +1176,13 @@ function action_sendmessage()
 	// Generate a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_pm_save']))
 	{
-		require_once($sourcedir . '/controllers/Drafts.php');
+		require_once($controllerdir . '/Drafts.controller.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
 		showDrafts($user_info['id'], $pm_seed, 1);
 	}
 
 	// Needed for the WYSIWYG editor.
-	require_once($sourcedir . '/subs/Editor.subs.php');
+	require_once($librarydir . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -1245,7 +1245,7 @@ function action_messagedrafts()
 function messagePostError($error_types, $named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global $smcFunc, $user_info, $sourcedir;
+	global $smcFunc, $user_info, $sourcedir, $librarydir;
 
 	if (!isset($_REQUEST['xml']))
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
@@ -1376,7 +1376,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	}
 
 	// We need to load the editor once more.
-	require_once($sourcedir . '/subs/Editor.subs.php');
+	require_once($librarydir . '/Editor.subs.php');
 
 	// Create it...
 	$editorOptions = array(
@@ -1398,7 +1398,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 	if ($context['require_verification'] && !isset($_REQUEST['xml']))
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
@@ -1421,12 +1421,12 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
  */
 function action_sendmessage2()
 {
-	global $txt, $context, $sourcedir;
+	global $txt, $context, $sourcedir, $librarydir;
 	global $user_info, $modSettings, $scripturl, $smcFunc;
 
 	isAllowedTo('pm_send');
-	require_once($sourcedir . '/subs/Auth.subs.php');
-	require_once($sourcedir . '/subs/Post.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
+	require_once($librarydir . '/Post.subs.php');
 
 	// PM Drafts enabled and needed?
 	if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
@@ -1590,7 +1590,7 @@ function action_sendmessage2()
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 	{
-		require_once($sourcedir . '/subs/Editor.subs.php');
+		require_once($librarydir . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
@@ -2185,19 +2185,14 @@ function action_messagelabels()
 /**
  * Allows to edit Personal Message Settings.
  *
- * @uses Profile.php
- * @uses ProfileOptions.php
+ * @uses ProfileOptions controller. (@todo refactor this.)
  * @uses Profile template.
  * @uses Profile language file.
  */
 function action_messagesettings()
 {
-	global $txt, $user_settings, $user_info, $context, $sourcedir, $smcFunc;
+	global $txt, $user_settings, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
 	global $scripturl, $profile_vars, $cur_profile, $user_profile;
-
-	// Need this for the display.
-	require_once($sourcedir . '/Profile.php');
-	require_once($sourcedir . '/ProfileOptions.php');
 
 	// We want them to submit back to here.
 	$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';
@@ -2232,6 +2227,7 @@ function action_messagesettings()
 		$_POST = htmlspecialchars__recursive($_POST);
 
 		// Save the fields.
+		require_once($librarydir . '/Profile.subs.php');
 		saveProfileFields();
 
 		if (!empty($profile_vars))
@@ -2239,7 +2235,8 @@ function action_messagesettings()
 	}
 
 	// Load up the fields.
-	pmprefs($user_info['id']);
+	require_once($sourcedir . '/ProfileOptions.controller.php');
+	action_pmprefs($user_info['id']);
 }
 
 /**

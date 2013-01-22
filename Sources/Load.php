@@ -199,7 +199,7 @@ function reloadSettings()
 		$pre_includes = explode(',', $modSettings['integrate_pre_include']);
 		foreach ($pre_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir));
+			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$librarydir' => $librarydir));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -931,7 +931,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from,
 			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs';
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list';
 			break;
 		case 'minimal':
 			$select_columns = '
@@ -1215,7 +1215,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new browser_detector;
+	$detector = new Browser_Detector;
 	$detector->detectBrowser();
 }
 
@@ -1998,6 +1998,30 @@ function loadAdminClass($filename)
 	global $sourcedir;
 
 	require_once($sourcedir . '/admin/' . $filename);
+}
+
+/**
+ * Load a controller.
+ *
+ * @param string $filename
+ */
+function loadController($filename)
+{
+	global $controllerdir;
+
+	require_once($controllerdir . '/' . $filename);
+}
+
+/**
+ * Load a library.
+ *
+ * @param string $filename
+ */
+function loadLibrary($filename)
+{
+	global $librarydir;
+
+	require_once($librarydir . '/' . $filename);
 }
 
 /**

@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function action_calendar()
 {
-	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir;
+	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir, $librarydir;
 
 	// Permissions, permissions, permissions.
 	isAllowedTo('calendar_view');
@@ -64,7 +64,7 @@ function action_calendar()
 		$context['robot_no_index'] = true;
 
 	// Get the current day of month...
-	require_once($sourcedir . '/subs/Calendar.subs.php');
+	require_once($librarydir . '/Calendar.subs.php');
 	$today = getTodayInfo();
 
 	// If the month and year are not passed in, use today's date as a starting point.
@@ -169,14 +169,14 @@ function action_calendar()
  */
 function CalendarPost()
 {
-	global $context, $txt, $user_info, $sourcedir, $scripturl;
+	global $context, $txt, $user_info, $sourcedir, $librarydir, $scripturl;
 	global $modSettings, $topic, $smcFunc;
 
 	// Well - can they?
 	isAllowedTo('calendar_post');
 
 	// We need this for all kinds of useful functions.
-	require_once($sourcedir . '/subs/Calendar.subs.php');
+	require_once($librarydir . '/Calendar.subs.php');
 
 	// Cast this for safety...
 	if (isset($_REQUEST['eventid']))
@@ -287,7 +287,7 @@ function CalendarPost()
 			fatal_lang_error('cannot_post_new', 'permission');
 
 		// Load the list of boards and categories in the context.
-		require_once($sourcedir . '/subs/MessageIndex.subs.php');
+		require_once($librarydir . '/MessageIndex.subs.php');
 		$boardListOptions = array(
 			'included_boards' => in_array(0, $boards) ? null : $boards,
 			'not_redirection' => true,
@@ -341,7 +341,7 @@ function CalendarPost()
  */
 function action_ical()
 {
-	global $smcFunc, $sourcedir, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
+	global $smcFunc, $sourcedir, $librarydir, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 	// You can't export if the calendar export feature is off.
 	if (empty($modSettings['cal_export']))
@@ -352,7 +352,7 @@ function action_ical()
 		fatal_lang_error('no_access', false);
 
 	// This is kinda wanted.
-	require_once($sourcedir . '/subs/Calendar.subs.php');
+	require_once($librarydir . '/Calendar.subs.php');
 
 	// Load up the event in question and check it exists.
 	$event = getEventProperties($_REQUEST['eventid']);

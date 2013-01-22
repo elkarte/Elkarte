@@ -294,7 +294,7 @@ function un_preparsecode($message)
  */
 function fixTags(&$message)
 {
-	global $modSettings, $sourcedir;
+	global $modSettings, $librarydir;
 
 	// WARNING: Editing the below can cause large security holes in your forum.
 	// Edit only if you are sure you know what you are doing.
@@ -371,7 +371,7 @@ function fixTags(&$message)
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
 	{
 		// We'll need this for image processing
-		require_once($sourcedir . '/Subs-Attachments.php');
+		require_once($librarydir . '/Attachments.subs.php');
 
 		// Find all the img tags - with or without width and height.
 		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
@@ -622,7 +622,7 @@ function action_spellcheck()
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array())
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $smcFunc;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc;
 
 	// Can't do it if there's no topics.
 	if (empty($topics))
@@ -633,7 +633,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$topics = array($topics);
 
 	// Email functions will be helpful here
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	// Get the subject and body...
 	$result = $smcFunc['db_query']('', '
@@ -827,7 +827,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $txt, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -1120,13 +1120,13 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
 
 	// If there's a custom search index, it may need updating...
-	require_once($sourcedir . '/Search.php');
+	require_once($sourcedir . '/controllers/Search.controller.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'postCreated')))
 		$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
@@ -1170,7 +1170,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -1279,13 +1279,13 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
 
 	// If there's a custom search index, it needs to be modified...
-	require_once($sourcedir . '/Search.php');
+	require_once($sourcedir . '/controllers/Search.controller.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'postModified')))
 		$searchAPI->postModified($msgOptions, $topicOptions, $posterOptions);
@@ -1496,10 +1496,7 @@ function approvePosts($msgs, $approve = true)
 	if ($approve)
 	{
 		if (!empty($notification_topics))
-		{
-			require_once($sourcedir . '/controllers/Post.controller.php');
 			notifyMembersBoard($notification_topics);
-		}
 		if (!empty($notification_posts))
 			sendApprovalNotifications($notification_posts);
 
@@ -1585,14 +1582,14 @@ function approveTopics($topics, $approve = true)
 function sendApprovalNotifications(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $smcFunc;
+	global $modSettings, $sourcedir, $librarydir, $smcFunc;
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
 		return;
 
 	// Email ahoy
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	$topics = array();
 	$digest_insert = array();
@@ -1864,14 +1861,14 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $txt, $modSettings, $language, $scripturl, $user_info, $smcFunc;
+	global $txt, $modSettings, $language, $scripturl, $user_info, $smcFunc, $librarydir;
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
 		return;
 
 	// Needed to notify admins, or anyone
-	require_once($sourcedir . '/subs/Mail.subs.php');
+	require_once($librarydir . '/Mail.subs.php');
 
 	if ($member_name == null)
 	{
@@ -1952,4 +1949,162 @@ function adminNotify($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
+}
+
+/**
+ * Notifies members who have requested notification for new topics posted on a board of said posts.
+ *
+ * receives data on the topics to send out notifications to by the passed in array.
+ * only sends notifications to those who can *currently* see the topic (it doesn't matter if they could when they requested notification.)
+ * loads the Post language file multiple times for each language if the userLanguage setting is set.
+ * @param array &$topicData
+ */
+function notifyMembersBoard(&$topicData)
+{
+	global $txt, $scripturl, $language, $user_info;
+	global $modSettings, $librarydir, $board, $smcFunc, $context;
+
+	require_once($librarydir . '/Mail.subs.php');
+
+	// Do we have one or lots of topics?
+	if (isset($topicData['body']))
+		$topicData = array($topicData);
+
+	// Find out what boards we have... and clear out any rubbish!
+	$boards = array();
+	foreach ($topicData as $key => $topic)
+	{
+		if (!empty($topic['board']))
+			$boards[$topic['board']][] = $key;
+		else
+		{
+			unset($topic[$key]);
+			continue;
+		}
+
+		// Censor the subject and body...
+		censorText($topicData[$key]['subject']);
+		censorText($topicData[$key]['body']);
+
+		$topicData[$key]['subject'] = un_htmlspecialchars($topicData[$key]['subject']);
+		$topicData[$key]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$key]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+	}
+
+	// Just the board numbers.
+	$board_index = array_unique(array_keys($boards));
+
+	if (empty($board_index))
+		return;
+
+	// Yea, we need to add this to the digest queue.
+	$digest_insert = array();
+	foreach ($topicData as $id => $data)
+		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
+	$smcFunc['db_insert']('',
+		'{db_prefix}log_digest',
+		array(
+			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
+		),
+		$digest_insert,
+		array()
+	);
+
+	// Find the members with notification on for these boards.
+	$members = $smcFunc['db_query']('', '
+		SELECT
+			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile,
+			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups,
+			mem.id_post_group
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
+		WHERE ln.id_board IN ({array_int:board_list})
+			AND mem.id_member != {int:current_member}
+			AND mem.is_activated = {int:is_activated}
+			AND mem.notify_types != {int:notify_types}
+			AND mem.notify_regularity < {int:notify_regularity}
+		ORDER BY mem.lngfile',
+		array(
+			'current_member' => $user_info['id'],
+			'board_list' => $board_index,
+			'is_activated' => 1,
+			'notify_types' => 4,
+			'notify_regularity' => 2,
+		)
+	);
+	while ($rowmember = $smcFunc['db_fetch_assoc']($members))
+	{
+		if ($rowmember['id_group'] != 1)
+		{
+			$allowed = explode(',', $rowmember['member_groups']);
+			$rowmember['additional_groups'] = explode(',', $rowmember['additional_groups']);
+			$rowmember['additional_groups'][] = $rowmember['id_group'];
+			$rowmember['additional_groups'][] = $rowmember['id_post_group'];
+
+			if (count(array_intersect($allowed, $rowmember['additional_groups'])) == 0)
+				continue;
+		}
+
+		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
+
+		// Now loop through all the notifications to send for this board.
+		if (empty($boards[$rowmember['id_board']]))
+			continue;
+
+		$sentOnceAlready = 0;
+		foreach ($boards[$rowmember['id_board']] as $key)
+		{
+			// Don't notify the guy who started the topic!
+			// @todo In this case actually send them a "it's approved hooray" email :P
+			if ($topicData[$key]['poster'] == $rowmember['id_member'])
+				continue;
+
+			// Setup the string for adding the body to the message, if a user wants it.
+			$send_body = empty($modSettings['disallow_sendBody']) && !empty($rowmember['notify_send_body']);
+
+			$replacements = array(
+				'TOPICSUBJECT' => $topicData[$key]['subject'],
+				'TOPICLINK' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
+				'MESSAGE' => $topicData[$key]['body'],
+				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
+			);
+
+			if (!$send_body)
+				unset($replacements['MESSAGE']);
+
+			// Figure out which email to send off
+			$emailtype = '';
+
+			// Send only if once is off or it's on and it hasn't been sent.
+			if (!empty($rowmember['notify_regularity']) && !$sentOnceAlready && empty($rowmember['sent']))
+				$emailtype = 'notify_boards_once';
+			elseif (empty($rowmember['notify_regularity']))
+				$emailtype = 'notify_boards';
+
+			if (!empty($emailtype))
+			{
+				$emailtype .= $send_body ? '_body' : '';
+				$emaildata = loadEmailTemplate($emailtype, $replacements, $langloaded);
+				sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 3);
+			}
+
+			$sentOnceAlready = 1;
+		}
+	}
+	$smcFunc['db_free_result']($members);
+
+	loadLanguage('index', $user_info['language']);
+
+	// Sent!
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_notify
+		SET sent = {int:is_sent}
+		WHERE id_board IN ({array_int:board_list})
+			AND id_member != {int:current_member}',
+		array(
+			'current_member' => $user_info['id'],
+			'board_list' => $board_index,
+			'is_sent' => 1,
+		)
+	);
 }

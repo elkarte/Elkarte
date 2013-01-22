@@ -13,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * The xmlArray class is an xml parser.
+ * The Xml_Array class is an xml parser.
  *
  */
 
@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  * Reads in xml, allows you to access it simply.
  * Version 1.1.
  */
-class xmlArray
+class Xml_Array
 {
 	/**
 	 * holds xml parsed results
@@ -48,12 +48,12 @@ class xmlArray
 	/**
 	 * Constructor for the xml parser.
 	 * Example use:
-	 *  $xml = new xmlArray(file('data.xml'));
+	 *  $xml = new Xml_Array(file('data.xml'));
 	 *
 	 * @param string $data the xml data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
 	 * @param int $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
-	 * @param bool $is_clone default false. If is_clone is true, the  xmlArray is cloned from another - used internally only.
+	 * @param bool $is_clone default false. If is_clone is true, the  Xml_Array is cloned from another - used internally only.
 	 */
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
 	{
@@ -130,7 +130,7 @@ class xmlArray
 		return is_string($array) ? $array : $this->_fetch($array->array);
 	}
 
-	/** Get an element, returns a new xmlArray.
+	/** Get an element, returns a new Xml_Array.
 	 * It finds any elements that match the path specified.
 	 * It will always return a set if there is more than one of the element
 	 * or return_set is true.
@@ -138,7 +138,7 @@ class xmlArray
 	 *  $element = $xml->path('html/body');
 	 * @param $path string - the path to the element to get
 	 * @param $return_full bool - always return full result set
-	 * @return xmlArray, a new xmlArray.
+	 * @return Xml_Array, a new Xml_Array.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -191,7 +191,7 @@ class xmlArray
 		// Create the right type of class...
 		$newClass = get_class($this);
 
-		// Return a new xmlArray for the result.
+		// Return a new Xml_Array for the result.
 		return $array === false ? false : new $newClass($array, $this->trim, $this->debug_level, true);
 	}
 
@@ -257,13 +257,13 @@ class xmlArray
 	}
 
 	/**
-	 * Get an array of xmlArray's matching the specified path.
-	 * This differs from ->path(path, true) in that instead of an xmlArray
-	 * of elements, an array of xmlArray's is returned for use with foreach.
+	 * Get an array of Xml_Array's matching the specified path.
+	 * This differs from ->path(path, true) in that instead of an Xml_Array
+	 * of elements, an array of Xml_Array's is returned for use with foreach.
 	 * Example use:
 	 *  foreach ($xml->set('html/body/p') as $p)
 	 * @param $path string - the path to search for.
-	 * @return array, an array of xmlArray objects
+	 * @return array, an array of Xml_Array objects
 	 */
 	public function set($path)
 	{
@@ -280,7 +280,7 @@ class xmlArray
 			// Create the right type of class...
 			$newClass = get_class($this);
 
-			// Create a new xmlArray and stick it in the array.
+			// Create a new Xml_Array and stick it in the array.
 			$array[] = new $newClass($val, $this->trim, $this->debug_level, true);
 		}
 
@@ -288,7 +288,7 @@ class xmlArray
 	}
 
 	/**
-	 * Create an xml file from an xmlArray, the specified path if any.
+	 * Create an xml file from an Xml_Array, the specified path if any.
 	 * Example use:
 	 *  echo $this->create_xml();
 	 * @param string $path - the path to the element. (optional)

@@ -92,7 +92,7 @@ function RegCenter()
  */
 function AdminRegister()
 {
-	global $txt, $context, $sourcedir, $scripturl, $smcFunc;
+	global $txt, $context, $sourcedir, $librarydir, $scripturl, $smcFunc;
 
 	if (!empty($_POST['regSubmit']))
 	{
@@ -117,7 +117,7 @@ function AdminRegister()
 			'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
 		);
 
-		require_once($sourcedir . '/subs/Members.subs.php');
+		require_once($librarydir . '/Members.subs.php');
 		$memberID = registerMember($regOptions);
 		if (!empty($memberID))
 		{

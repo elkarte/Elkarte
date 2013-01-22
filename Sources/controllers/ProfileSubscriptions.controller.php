@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  *
  * @param int $memID
  */
-function subscriptions($memID)
+function action_subscriptions($memID)
 {
 	global $context, $txt, $sourcedir, $modSettings, $smcFunc, $scripturl;
 
@@ -287,7 +287,7 @@ function subscriptions($memID)
  */
 function action_activateaccount($memID)
 {
-	global $sourcedir, $context, $user_profile, $modSettings, $user_info;
+	global $sourcedir, $context, $user_profile, $modSettings, $user_info, $librarydir;
 
 	isAllowedTo('moderate_forum');
 
@@ -296,7 +296,7 @@ function action_activateaccount($memID)
 		// If we are approving the deletion of an account, we do something special ;)
 		if ($user_profile[$memID]['is_activated'] == 4)
 		{
-			require_once($sourcedir . '/subs/Members.subs.php');
+			require_once($librarydir . '/Members.subs.php');
 			deleteMembers($context['id_member']);
 			redirectexit();
 		}

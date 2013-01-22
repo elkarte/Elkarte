@@ -47,7 +47,7 @@ function template_profile_below()
 }
 
 // This template displays users details without any option to edit them.
-function template_summary()
+function template_action_summary()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -332,7 +332,7 @@ function template_summary()
 }
 
 // Template for showing all the posts of the user, in chronological order.
-function template_showPosts()
+function template_action_showPosts()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -419,15 +419,11 @@ function template_showPosts()
 	// No posts? Just end the table with a informative message.
 	if ((isset($context['attachments']) && empty($context['attachments'])) || (!isset($context['attachments']) && empty($context['posts'])))
 		echo '
-				<tr>
-					<td class="tborder windowbg2 padding centertext" colspan="4">
+				<div class="windowbg2">
+					<div class="content">
 						', isset($context['attachments']) ? $txt['show_attachments_none'] : ($context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none']), '
-					</td>
-				</tr>';
-
-		echo '
-			</tbody>
-		</table>';
+					</div>
+				</div>';
 
 	// Show more page numbers.
 	if (!empty($context['page_index']))
@@ -859,7 +855,7 @@ function template_trackIP()
 	template_show_list('track_user_list');
 }
 
-function template_showPermissions()
+function template_action_showPermissions()
 {
 	global $context, $settings, $options, $scripturl, $txt;
 
@@ -889,9 +885,11 @@ function template_showPermissions()
 				</div>
 				<div class="windowbg smalltext">
 					<div class="content">', $txt['showPermissions_restricted_boards_desc'], ':<br />';
+
 				foreach ($context['no_access_boards'] as $no_access_board)
 					echo '
 						<a href="', $scripturl, '?board=', $no_access_board['id'], '.0">', $no_access_board['name'], '</a>', $no_access_board['is_last'] ? '' : ', ';
+
 				echo '
 					</div>
 				</div>';
@@ -903,6 +901,7 @@ function template_showPermissions()
 					<div class="cat_bar">
 						<h3 class="catbg">', $txt['showPermissions_general'], '</h3>
 					</div>';
+
 		if (!empty($context['member']['permissions']['general']))
 		{
 			echo '
@@ -935,6 +934,7 @@ function template_showPermissions()
 								</td>
 							</tr>';
 			}
+
 			echo '
 						</tbody>
 					</table>
@@ -953,20 +953,22 @@ function template_showPermissions()
 							<a id="board_permissions"></a>', $txt['showPermissions_select'], ':
 							<select name="board" onchange="if (this.options[this.selectedIndex].value) this.form.submit();">
 								<option value="0"', $context['board'] == 0 ? ' selected="selected"' : '', '>', $txt['showPermissions_global'], '&nbsp;</option>';
-				if (!empty($context['boards']))
-					echo '
+
+		if (!empty($context['boards']))
+			echo '
 								<option value="" disabled="disabled">---------------------------</option>';
 
-				// Fill the box with any local permission boards.
-				foreach ($context['boards'] as $board)
-					echo '
+		// Fill the box with any local permission boards.
+		foreach ($context['boards'] as $board)
+			echo '
 								<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['name'], ' (', $board['profile_name'], ')</option>';
 
-				echo '
+		echo '
 							</select>
 						</h3>
 					</div>
 				</form>';
+
 		if (!empty($context['member']['permissions']['board']))
 		{
 			echo '
@@ -978,6 +980,7 @@ function template_showPermissions()
 						</tr>
 					</thead>
 					<tbody>';
+
 			foreach ($context['member']['permissions']['board'] as $permission)
 			{
 				echo '
@@ -997,10 +1000,12 @@ function template_showPermissions()
 					echo '
 								', $txt['showPermissions_given'], ': &nbsp;', implode(', ', $permission['groups']['allowed']);
 				}
+
 				echo '
 							</td>
 						</tr>';
 			}
+
 			echo '
 					</tbody>
 				</table>';
@@ -1008,6 +1013,7 @@ function template_showPermissions()
 		else
 			echo '
 			<p class="windowbg2 description">', $txt['showPermissions_none_board'], '</p>';
+
 	echo '
 			</div>
 		</div>';
@@ -1015,7 +1021,7 @@ function template_showPermissions()
 }
 
 // Template for user statistics, showing graphs and the like.
-function template_statPanel()
+function template_action_statPanel()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
@@ -1696,7 +1702,7 @@ function template_profile_theme_settings()
 							</dd>';
 }
 
-function template_notification()
+function template_action_notification()
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
 
@@ -2024,10 +2030,11 @@ function template_load_warning_variables()
 	global $modSettings, $context;
 
 	$context['warningBarWidth'] = 200;
+
 	// Setup the colors - this is a little messy for theming.
 	$context['colors'] = array(
 		0 => 'green',
-		$modSettings['warning_watch'] => 'darkgreen',
+		$modSettings['warning_watch'] => 'green',
 		$modSettings['warning_moderate'] => 'orange',
 		$modSettings['warning_mute'] => 'red',
 	);
@@ -2130,7 +2137,7 @@ function template_issueWarning()
 				}
 
 				// Get the position of the container.
-				contain = document.getElementById(\'warning_contain\');
+				contain = document.getElementById(\'warning_progress\');
 				position = 0;
 				while (contain != null)
 				{
@@ -2183,6 +2190,7 @@ function template_issueWarning()
 
 	echo '
 			document.getElementById(\'warning_progress\').style.backgroundColor = color;
+			document.getElementById(\'warning_progress\').style.backgroundImage = "none";
 
 			// Also set the right effect.
 			effectText = "";';
@@ -2272,12 +2280,12 @@ function template_issueWarning()
 					<dd>
 						<div id="warndiv1" style="display: none;">
 							<div>
-								<span class="floatleft" style="padding: 0 0.5em"><a href="#" onclick="changeWarnLevel(-5); return false;">[-]</a></span>
-								<div class="floatleft" id="warning_contain" style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background-color: white; padding: 1px; position: relative;" onmousedown="setWarningBarPos(event, true);" onmousemove="setWarningBarPos(event, true);" onclick="setWarningBarPos(event);">
-									<div id="warning_text" style="padding-top: 1pt; width: 100%; z-index: 2; color: black; position: absolute; text-align: center; font-weight: bold;">', $context['member']['warning'], '%</div>
-									<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background-color: ', $context['current_color'], ';">&nbsp;</div>
+								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(-5); return false;">[-]</a></span>
+								<div  class="floatleft progress_bar" style="width: ', $context['warningBarWidth'], 'px; margin:0" onmousedown="setWarningBarPos(event, true);" onmousemove="setWarningBarPos(event, true);" onclick="setWarningBarPos(event);">
+									<div id="warning_text" class="full_bar">', $context['member']['warning'], '%</div>
+									<div id="warning_progress" class="green_percent" style="width: ', $context['member']['warning'], '%;">&nbsp;</div>
 								</div>
-								<span class="floatleft" style="padding: 0 0.5em"><a href="#" onclick="changeWarnLevel(5); return false;">[+]</a></span>
+								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(5); return false;">[+]</a></span>
 								<div class="clear_left smalltext">', $txt['profile_warning_impact'], ': <span id="cur_level_div">', $context['level_effects'][$context['current_level']], '</span></div>
 							</div>
 							<input type="hidden" name="warning_level" id="warning_level" value="SAME" />
@@ -2285,6 +2293,7 @@ function template_issueWarning()
 						<div id="warndiv2">
 							<input type="text" name="warning_level_nojs" size="6" maxlength="4" value="', $context['member']['warning'], '" class="input_text" />&nbsp;', $txt['profile_warning_max'], '
 							<div class="smalltext">', $txt['profile_warning_impact'], ':<br />';
+
 	// For non-javascript give a better list.
 	foreach ($context['level_effects'] as $limit => $effect)
 		echo '
@@ -2817,7 +2826,6 @@ function template_profile_karma_modify()
 								(', $txt['total'], ': <span id="karmaTotal">', ($context['member']['karma']['good'] - $context['member']['karma']['bad']), '</span>)
 							</dd>';
 }
-
 
 // Select the time format!
 function template_profile_timeformat_modify()

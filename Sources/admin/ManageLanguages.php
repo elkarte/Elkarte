@@ -68,13 +68,13 @@ function ManageLanguages()
  */
 function AddLanguage()
 {
-	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl;
+	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl;
 
 	// Are we searching for new languages courtesy of Simple Machines?
 	if (!empty($_POST['smf_add_sub']))
 	{
 		// Need fetch_web_data.
-		require_once($sourcedir . '/subs/Package.subs.php');
+		require_once($librarydir . '/Package.subs.php');
 
 		$context['smf_search_term'] = htmlspecialchars(trim($_POST['smf_add']));
 
@@ -129,7 +129,7 @@ function AddLanguage()
 			),
 		);
 
-		require_once($sourcedir . '/subs/List.subs.php');
+		require_once($librarydir . '/List.subs.php');
 		createList($listOptions);
 
 		$context['default_list'] = 'smf_languages';
@@ -146,15 +146,15 @@ function AddLanguage()
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $librarydir, $smcFunc, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
 
 	// Load the class file and stick it into an array.
-	require_once($sourcedir . '/subs/XmlArray.class.php');
-	$language_list = new xmlArray(fetch_web_data($url), true);
+	require_once($librarydir . '/XmlArray.class.php');
+	$language_list = new Xml_Array(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))
@@ -200,10 +200,10 @@ function list_getLanguagesList()
  */
 function DownloadLanguage()
 {
-	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
+	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
 
 	loadLanguage('ManageSettings');
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	// Clearly we need to know what to request.
 	if (!isset($_GET['did']))
@@ -554,7 +554,7 @@ function DownloadLanguage()
 	if (!empty($modSettings['cache_enable']))
 		cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['default_list'] = 'lang_main_files_list';
@@ -567,7 +567,7 @@ function DownloadLanguage()
 function ModifyLanguages()
 {
 	global $txt, $context, $scripturl;
-	global $user_info, $smcFunc, $sourcedir, $language, $boarddir, $forum_version;
+	global $user_info, $smcFunc, $librarydir, $language, $boarddir, $forum_version;
 
 	// Setting a new default?
 	if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -577,7 +577,7 @@ function ModifyLanguages()
 
 		if ($_POST['def_language'] != $language)
 		{
-			require_once($sourcedir . '/subs/Admin.subs.php');
+			require_once($librarydir . '/Admin.subs.php');
 			updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
 			$language = $_POST['def_language'];
 		}
@@ -674,7 +674,7 @@ function ModifyLanguages()
 				'class' => 'smalltext alert',
 			);
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -827,7 +827,7 @@ function ModifyLanguageSettings($return_config = false)
  */
 function ModifyLanguage()
 {
-	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $sourcedir, $language;
+	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $librarydir, $language;
 
 	loadLanguage('ManageSettings');
 
@@ -920,7 +920,7 @@ function ModifyLanguage()
 		validateToken('admin-mlang');
 
 		// @todo Todo: FTP Controls?
-		require_once($sourcedir . '/subs/Package.subs.php');
+		require_once($librarydir . '/Package.subs.php');
 
 		// First, Make a backup?
 		if (!empty($modSettings['package_make_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['lang_id'] . '$$$'))
@@ -968,7 +968,7 @@ function ModifyLanguage()
 		// Sixth, if we deleted the default language, set us back to english?
 		if ($context['lang_id'] == $language)
 		{
-			require_once($sourcedir . '/subs/Admin.subs.php');
+			require_once($librarydir . '/Admin.subs.php');
 			$language = 'english';
 			updateSettingsFile(array('language' => '\'' . $language . '\''));
 		}

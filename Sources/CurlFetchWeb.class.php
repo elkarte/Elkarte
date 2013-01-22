@@ -19,10 +19,10 @@ if (!defined('ELKARTE'))
  *
  * Load class
  * Initiate as
- *  - $fetch_data = new cURL_fetch_web_data();
+ *  - $fetch_data = new Curl_Fetch_Webdata();
  *	- optionally pass an array of cURL options and redirect count
- *	- cURL_fetch_web_data(cURL options array, Max redirects);
- *  - $fetch_data = new cURL_fetch_web_data(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
+ *	- Curl_Fetch_Webdata(cURL options array, Max redirects);
+ *  - $fetch_data = new Curl_Fetch_Webdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
  * Make the call
  *  - $fetch_data('http://www.simplemachines.org'); // fetch a page
@@ -35,7 +35,7 @@ if (!defined('ELKARTE'))
  *  - $fetch_data->result_raw(); // show all results of all calls (in the event of a redirect)
  *  - $fetch_data->result_raw(x); // show all results of call x
  */
-class curl_fetch_web_data
+class Curl_Fetch_Webdata
 {
 	/**
 	 * Set the default items for this class

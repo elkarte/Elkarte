@@ -68,7 +68,7 @@ require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Logging.php');
 require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/subs/Cache.subs.php');
+require_once($librarydir . '/Cache.subs.php');
 require_once($sourcedir . '/Security.php');
 require_once($sourcedir . '/BrowserDetect.class.php');
 
@@ -159,7 +159,7 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	require_once($sourcedir . '/subs/Auth.subs.php');
+	require_once($librarydir . '/Auth.subs.php');
 	KickGuest();
 	obExit(null, true);
 }
@@ -954,9 +954,9 @@ function ssi_boardStats($output_method = 'echo')
 // Shows a list of online users:  YY Guests, ZZ Users and then a list...
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $sourcedir, $settings, $modSettings;
+	global $user_info, $txt, $sourcedir, $librarydir, $settings, $modSettings;
 
-	require_once($sourcedir . '/subs/MembersOnline.subs.php');
+	require_once($librarydir . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 	);
@@ -1365,7 +1365,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 // Takes care of voting - don't worry, this is done automatically.
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $librarydir, $modSettings;
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{
@@ -1462,7 +1462,7 @@ function ssi_pollVote()
 	{
 		$_COOKIE['guest_poll_vote'] = !empty($_COOKIE['guest_poll_vote']) ? ($_COOKIE['guest_poll_vote'] . ',' . $row['id_poll']) : $row['id_poll'];
 
-		require_once($sourcedir . '/subs/Auth.subs.php');
+		require_once($librarydir . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 	}

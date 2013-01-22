@@ -13,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * The xmlArray class is an xml parser.
+ * The Xml_Array class is an xml parser.
  *
  */
 
@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  *
  * http://www.faqs.org/rfcs/rfc959.html
  */
-class ftp_connection
+class Ftp_Connection
 {
 	/**
 	 * holds the connection response

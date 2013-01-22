@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning($memID)
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc, $sourcedir;
+	global $context, $cur_profile, $memberContext, $smcFunc, $librarydir;
 
 	// make sure the sub-template is set...
 	$context['sub_template'] = 'issueWarning';
@@ -125,7 +125,7 @@ function action_issuewarning($memID)
 			// Send the PM?
 			else
 			{
-				require_once($sourcedir . '/subs/PersonalMessage.subs.php');
+				require_once($librarydir . '/PersonalMessage.subs.php');
 				$from = array(
 					'id' => 0,
 					'name' => $context['forum_name'],
@@ -202,7 +202,7 @@ function action_issuewarning($memID)
 
 		if (!empty($_POST['warn_body']))
 		{
-			require_once($sourcedir . '/subs/Post.subs.php');
+			require_once($librarydir . '/Post.subs.php');
 
 			preparsecode($warning_body);
 			$warning_body = parse_bbc($warning_body, true);
@@ -229,7 +229,8 @@ function action_issuewarning($memID)
 	$context['page_title'] = $txt['profile_issue_warning'];
 
 	// Let's use a generic list to get all the current warnings
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
+	require_once($librarydir . '/Profile.subs.php');
 
 	// Work our the various levels.
 	$context['level_effects'] = array(
@@ -331,7 +332,7 @@ function action_issuewarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// Are they warning because of a message?
@@ -404,79 +405,7 @@ function action_issuewarning($memID)
 }
 
 /**
- * Get the number of warnings a user has.
- *
- * @param int $memID
- * @return int Total number of warnings for the user
- */
-function list_getUserWarningCount($memID)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_comments
-		WHERE id_recipient = {int:selected_member}
-			AND comment_type = {string:warning}',
-		array(
-			'selected_member' => $memID,
-			'warning' => 'warning',
-		)
-	);
-	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $total_warnings;
-}
-
-/**
- * Get the data about a users warnings.
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @param int $memID the member ID
- * @return array the preview warnings
- */
-function list_getUserWarnings($start, $items_per_page, $sort, $memID)
-{
-	global $smcFunc, $scripturl;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
-			lc.log_time, lc.body, lc.counter, lc.id_notice
-		FROM {db_prefix}log_comments AS lc
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-		WHERE lc.id_recipient = {int:selected_member}
-			AND lc.comment_type = {string:warning}
-		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
-			'selected_member' => $memID,
-			'warning' => 'warning',
-		)
-	);
-	$previous_warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$previous_warnings[] = array(
-			'issuer' => array(
-				'id' => $row['id_member'],
-				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
-			),
-			'time' => timeformat($row['log_time']),
-			'reason' => $row['body'],
-			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
-			'id_notice' => $row['id_notice'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $previous_warnings;
-}
-
-/**
- * Present a screen to make sure the user wants to be deleted
+ * Present a screen to make sure the user wants to be deleted.
  *
  * @param int $memID the member ID
  */
@@ -507,7 +436,7 @@ function action_deleteaccount($memID)
  */
 function action_deleteaccount2($memID)
 {
-	global $user_info, $sourcedir, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $sourcedir, $librarydir, $context, $cur_profile, $modSettings, $smcFunc;
 
 	// Try get more time...
 	@set_time_limit(600);
@@ -548,7 +477,7 @@ function action_deleteaccount2($memID)
 	}
 
 	// This file is needed for the deleteMembers function.
-	require_once($sourcedir . '/subs/Members.subs.php');
+	require_once($librarydir . '/Members.subs.php');
 
 	// Do you have permission to delete others profiles, or is that your profile you wanna delete?
 	if ($memID != $user_info['id'])
@@ -560,7 +489,7 @@ function action_deleteaccount2($memID)
 		if ($_POST['remove_type'] != 'none' && allowedTo('moderate_forum'))
 		{
 			// Include subs/Topic.subs.php - essential for this type of work!
-			require_once($sourcedir . '/subs/Topic.subs.php');
+			require_once($librarydir . '/Topic.subs.php');
 
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')

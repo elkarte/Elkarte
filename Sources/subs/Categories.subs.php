@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $librarydir, $smcFunc;
 
 	$catUpdates = array();
 	$catParameters = array();
@@ -81,7 +81,7 @@ function modifyCategory($category_id, $catOptions)
 				);
 
 		// If the category order changed, so did the board order.
-		require_once($sourcedir . '/subs/Boards.subs.php');
+		require_once($librarydir . '/Boards.subs.php');
 		reorderBoards();
 	}
 
@@ -186,9 +186,9 @@ function createCategory($catOptions)
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $sourcedir, $smcFunc, $cat_tree;
+	global $sourcedir, $librarydir, $smcFunc, $cat_tree;
 
-	require_once($sourcedir . '/subs/Boards.subs.php');
+	require_once($librarydir . '/Boards.subs.php');
 
 	getBoardTree();
 

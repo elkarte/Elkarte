@@ -138,9 +138,9 @@ if (isset($_GET['ssi']))
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/subs/Cache.subs.php');
+	require_once($librarydir . '/Cache.subs.php');
 	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	loadUserSettings();
 	loadPermissions();
@@ -229,9 +229,9 @@ if (!function_exists('md5_hmac'))
 }
 
 // http://www.faqs.org/rfcs/rfc959.html
-if (!class_exists('ftp_connection'))
+if (!class_exists('Ftp_Connection'))
 {
-	class ftp_connection
+	class Ftp_Connection
 	{
 		var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
@@ -1938,7 +1938,7 @@ function cli_scheduled_fetchFiles()
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
-	require_once($sourcedir . '/subs/Package.subs.php');
+	require_once($librarydir . '/Package.subs.php');
 
 	foreach ($js_files as $ID_FILE => $file)
 	{
@@ -3146,7 +3146,7 @@ function makeFilesWritable(&$files)
 
 		if (isset($upcontext['chmod']['username']))
 		{
-			$ftp = new ftp_connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
+			$ftp = new Ftp_Connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
 
 			if ($ftp->error === false)
 			{
@@ -3162,7 +3162,7 @@ function makeFilesWritable(&$files)
 		if (!isset($ftp) || $ftp->error !== false)
 		{
 			if (!isset($ftp))
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			// Save the error so we can mess with listing...
 			elseif ($ftp->error !== false && !isset($upcontext['chmod']['ftp_error']))
 				$upcontext['chmod']['ftp_error'] = $ftp->last_message === null ? '' : $ftp->last_message;

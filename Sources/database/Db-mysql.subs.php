@@ -467,7 +467,7 @@ function smf_db_transaction($type = 'commit', $connection = null)
  */
 function smf_db_error($db_string, $connection = null)
 {
-	global $txt, $context, $sourcedir, $webmaster_email, $modSettings;
+	global $txt, $context, $sourcedir, $librarydir, $webmaster_email, $modSettings;
 	global $forum_version, $db_connection, $db_last_error, $db_persist;
 	global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 	global $smcFunc;
@@ -545,8 +545,8 @@ function smf_db_error($db_string, $connection = null)
 		if (!empty($fix_tables))
 		{
 			// subs/Admin.subs.php for updateSettingsFile(), subs/Mail.subs.php for sendmail().
-			require_once($sourcedir . '/subs/Admin.subs.php');
-			require_once($sourcedir . '/subs/Mail.subs.php');
+			require_once($librarydir . '/Admin.subs.php');
+			require_once($librarydir . '/Mail.subs.php');
 
 			// Make a note of the REPAIR...
 			cache_put_data('db_last_error', time(), 600);

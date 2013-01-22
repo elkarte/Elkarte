@@ -71,7 +71,7 @@ function action_history($memID)
  */
 function action_trackactivity($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir;
+	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir;
 	global $user_profile, $context, $smcFunc;
 
 	// Verify if the user has sufficient permissions.
@@ -160,7 +160,7 @@ function action_trackactivity($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 	createList($listOptions);
 
 	// @todo cache this
@@ -438,7 +438,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 function action_trackip($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc;
+	global $context, $smcFunc, $librarydir;
 
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
@@ -487,7 +487,7 @@ function action_trackip($memID = 0)
 	ksort($context['ips']);
 
 	// Gonna want this for the list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// Start with the user messages.
 	$listOptions = array(
@@ -724,10 +724,10 @@ function action_trackip($memID = 0)
 function action_tracklogin($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc;
+	global $context, $smcFunc, $librarydir;
 
 	// Gonna want this for the list.
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	if ($memID == 0)
 		$context['base_url'] = $scripturl . '?action=trackip';
@@ -864,9 +864,9 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir, $context, $smcFunc;
+	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir, $context, $smcFunc;
 
-	require_once($sourcedir . '/subs/List.subs.php');
+	require_once($librarydir . '/List.subs.php');
 
 	// Get the names of any custom fields.
 	$request = $smcFunc['db_query']('', '

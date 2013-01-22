@@ -456,11 +456,11 @@ function template_modify_board()
 
 	if (!empty($context['board']['is_recycle']))
 		echo '
-					<div class="information">', $txt['mboards_redirect_disabled_recycle'], '</div>';
+					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '</div>';
 
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '
-					<div class="information">
+					<div class="infobox">
 						<strong>', $txt['mboards_redirect'],'</strong><br />
 						', $txt['mboards_redirect_disabled'], '
 					</div>';
@@ -543,7 +543,7 @@ function template_modify_board()
 					</div>';
 
 	if (!empty($context['board']['is_recycle']))
-		echo '<div class="information">', $txt['mboards_recycle_disabled_delete'], '</div>';
+		echo '<div class="simplebox">', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	echo '
 					<input type="hidden" name="rid" value="', $context['redirect_location'], '" />
