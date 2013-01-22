@@ -884,7 +884,7 @@ function action_post($post_errors = array())
 	if (!empty($context['drafts_save']))
 	{
 		require_once($sourcedir . '/controllers/Drafts.controller.php');
-		showDrafts($user_info['id'], $topic);
+		action_showDrafts($user_info['id'], $topic);
 	}
 
 	// Needed for the editor and message icons.
