@@ -2135,9 +2135,9 @@ CREATE INDEX {$db_prefix}themes_id_member ON {$db_prefix}themes (id_member);
 
 BEGIN TRANSACTION;
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'name', '{$default_theme_name}');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_url', '{$boardurl}/Themes/default');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'images_url', '{$boardurl}/Themes/default/images');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_dir', '{$boarddir}/Themes/default');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_url', '{$boardurl}/themes/default');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'images_url', '{$boardurl}/themes/default/images');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_dir', '{$boarddir}/themes/default');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_bbc', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_latest_member', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_modify', '1');

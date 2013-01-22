@@ -416,11 +416,11 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC
 		mysql_free_result($request);
 
 		if (!isset($babylon['theme_dir']))
-			$babylon['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/Themes/babylon';
+			$babylon['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/themes/babylon';
 		if (!isset($babylon['theme_url']))
-			$babylon['theme_url'] = $GLOBALS['boardurl'] . '/Themes/babylon';
+			$babylon['theme_url'] = $GLOBALS['boardurl'] . '/themes/babylon';
 		if (!isset($babylon['images_url']))
-			$babylon['images_url'] = $GLOBALS['boardurl'] . '/Themes/babylon/images';
+			$babylon['images_url'] = $GLOBALS['boardurl'] . '/themes/babylon/images';
 
 		// Get an available ID_THEME first...
 		$request = upgrade_query("
@@ -1118,8 +1118,8 @@ if (!$has_attachmentType_column)
 	$ID_MSG = array();
 	while ($row = mysql_fetch_assoc($request))
 	{
-		$clean_name = strtr($row['filename'], 'ŠŽšžŸÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåçèéêëìíîïñòóôõöøùúûüýÿ', 'SZszYAAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy');
-		$clean_name = strtr($clean_name, array('Þ' => 'TH', 'þ' => 'th', 'Ð' => 'DH', 'ð' => 'dh', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'Æ' => 'AE', 'æ' => 'ae', 'µ' => 'u'));
+		$clean_name = strtr($row['filename'], 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½', 'SZszYAAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy');
+		$clean_name = strtr($clean_name, array('ï¿½' => 'TH', 'ï¿½' => 'th', 'ï¿½' => 'DH', 'ï¿½' => 'dh', 'ï¿½' => 'ss', 'ï¿½' => 'OE', 'ï¿½' => 'oe', 'ï¿½' => 'AE', 'ï¿½' => 'ae', 'ï¿½' => 'u'));
 		$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
 		$enc_name = $row['ID_ATTACH'] . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
 		$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
@@ -1216,8 +1216,8 @@ while ($row = mysql_fetch_assoc($request))
 		$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
 	else
 	{
-		$clean_name = strtr($row['filename'], 'ŠŽšžŸÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåçèéêëìíîïñòóôõöøùúûüýÿ', 'SZszYAAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy');
-		$clean_name = strtr($clean_name, array('Þ' => 'TH', 'þ' => 'th', 'Ð' => 'DH', 'ð' => 'dh', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'Æ' => 'AE', 'æ' => 'ae', 'µ' => 'u'));
+		$clean_name = strtr($row['filename'], 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½', 'SZszYAAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy');
+		$clean_name = strtr($clean_name, array('ï¿½' => 'TH', 'ï¿½' => 'th', 'ï¿½' => 'DH', 'ï¿½' => 'dh', 'ï¿½' => 'ss', 'ï¿½' => 'OE', 'ï¿½' => 'oe', 'ï¿½' => 'AE', 'ï¿½' => 'ae', 'ï¿½' => 'u'));
 		$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
 		$enc_name = $row['ID_ATTACH'] . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
 		$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
