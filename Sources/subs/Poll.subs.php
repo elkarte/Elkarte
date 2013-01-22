@@ -126,3 +126,38 @@ function resetVotes($pollID)
 		)
 	);
 }
+
+/**
+ * Retrieve poll information.
+ *
+ * @param int $topicID the topic with an associated poll.
+ */
+function getPollInfo($topicID)
+{
+	global $smcFunc;
+
+	// Check if a poll currently exists on this topic, and get the id, question and starter.
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			t.id_member_started, p.id_poll, p.question, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
+			m.subject, p.guest_vote, p.id_member AS poll_starter
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topicID,
+		)
+	);
+
+	// The topic must exist
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return false;
+
+	// Get the poll information.
+	$pollinfo = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $pollinfo;
+}
