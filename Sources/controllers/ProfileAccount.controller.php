@@ -554,7 +554,7 @@ function action_deleteaccount2($memID)
 		deleteMembers($memID);
 
 		require_once($sourcedir . '/controllers/LogInOut.controller.php');
-		LogOut(true);
+		action_logout(true);
 
 		redirectexit();
 	}
