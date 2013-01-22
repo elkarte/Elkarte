@@ -243,10 +243,10 @@ function load_lang_file()
 	$incontext['detected_languages'] = array();
 
 	// Make sure the languages directory actually exists.
-	if (file_exists(dirname(__FILE__) . '/Themes/default/languages'))
+	if (file_exists(dirname(__FILE__) . '/themes/default/languages'))
 	{
 		// Find all the "Install" language files in the directory.
-		$dir = dir(dirname(__FILE__) . '/Themes/default/languages');
+		$dir = dir(dirname(__FILE__) . '/themes/default/languages');
 		while ($entry = $dir->read())
 		{
 			if (substr($entry, 0, 8) == 'Install.' && substr($entry, -4) == '.php')
@@ -274,7 +274,7 @@ function load_lang_file()
 
 		<p>This installer was unable to find the installer\'s language file or files.  They should be found under:</p>
 
-		<div style="margin: 1ex; font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/Themes/default/languages</div>
+		<div style="margin: 1ex; font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/themes/default/languages</div>
 
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
@@ -293,7 +293,7 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $GLOBALS['HTTP_GET_VARS']['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/Themes/default/languages/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
@@ -304,7 +304,7 @@ function load_lang_file()
 	}
 
 	// And now include the actual language file itself.
-	require_once(dirname(__FILE__) . '/Themes/default/languages/' . $_SESSION['installer_temp_lang']);
+	require_once(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
@@ -2005,7 +2005,7 @@ function action_deleteInstaller()
 	}
 
 	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
 	exit;
 }
 
