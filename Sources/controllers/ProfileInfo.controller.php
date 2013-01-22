@@ -324,7 +324,7 @@ function action_showPosts($memID)
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 		// We can be lazy, since removeMessage() will check the permissions for us.
-		require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
+		require_once($librarydir . '/Messages.subs.php');
 		removeMessage((int) $_GET['delete']);
 
 		// Add it to the mod log.

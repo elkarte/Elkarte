@@ -778,9 +778,9 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
-	require_once($librarydir . '/Topic.subs.php');
 	if ($current_view == 'topics')
 	{
+		require_once($librarydir . '/Topic.subs.php');
 		removeTopics($messages);
 		// and tell the world about it
 		foreach ($messages as $topic)
@@ -790,6 +790,7 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 	}
 	else
 	{
+		require_once($librarydir . '/Messages.subs.php');
 		foreach ($messages as $post)
 		{
 			removeMessage($post);
