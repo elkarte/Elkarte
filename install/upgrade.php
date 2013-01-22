@@ -63,13 +63,13 @@ $upcontext['inactive_timeout'] = 10;
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
 $upcontext['steps'] = array(
-	0 => array(1, 'Login', 'WelcomeLogin', 2),
-	1 => array(2, 'Upgrade Options', 'UpgradeOptions', 2),
-	2 => array(3, 'Backup', 'BackupDatabase', 10),
-	3 => array(4, 'Database Changes', 'DatabaseChanges', 70),
+	0 => array(1, 'Login', 'action_welcomeLogin', 2),
+	1 => array(2, 'Upgrade Options', 'action_upgradeOptions', 2),
+	2 => array(3, 'Backup', 'action_backupDatabase', 10),
+	3 => array(4, 'Database Changes', 'action_databaseChanges', 70),
 	// This is removed as it doesn't really work right at the moment.
-	//4 => array(5, 'Cleanup Mods', 'CleanupMods', 10),
-	4 => array(5, 'Delete Upgrade', 'DeleteUpgrade', 1),
+	//4 => array(5, 'Cleanup Mods', 'action_cleanupMods', 10),
+	4 => array(5, 'Delete Upgrade', 'action_deleteUpgrade', 1),
 );
 // Just to remember which one has files in it.
 $upcontext['database_step'] = 3;
@@ -912,7 +912,7 @@ function initialize_inputs()
 }
 
 // Step 0 - Let's welcome them in and ask them to login!
-function WelcomeLogin()
+function action_welcomeLogin()
 {
 	global $boarddir, $sourcedir, $db_prefix, $language, $modSettings, $cachedir, $upgradeurl, $upcontext, $disable_security;
 	global $smcFunc, $db_type, $databases, $txt;
@@ -1200,7 +1200,7 @@ function checkLogin()
 }
 
 // Step 1: Do the maintenance and backup.
-function UpgradeOptions()
+function action_upgradeOptions()
 {
 	global $db_prefix, $command_line, $modSettings, $is_debug, $smcFunc;
 	global $boarddir, $boardurl, $sourcedir, $maintenance, $mmessage, $cachedir, $upcontext, $db_type;
@@ -1298,7 +1298,7 @@ function UpgradeOptions()
 }
 
 // Backup the database - why not...
-function BackupDatabase()
+function action_backupDatabase()
 {
 	global $upcontext, $db_prefix, $command_line, $is_debug, $support_js, $file_steps, $smcFunc;
 
@@ -1393,7 +1393,7 @@ function backupTable($table)
 }
 
 // Step 2: Everything.
-function DatabaseChanges()
+function action_databaseChanges()
 {
 	global $db_prefix, $modSettings, $command_line, $smcFunc;
 	global $language, $boardurl, $sourcedir, $boarddir, $upcontext, $support_js, $db_type;
@@ -1485,7 +1485,7 @@ function DatabaseChanges()
 
 		// If this is the command line we can't do any more.
 		if ($command_line)
-			return DeleteUpgrade();
+			return action_deleteUpgrade();
 
 		return true;
 	}
@@ -1493,7 +1493,7 @@ function DatabaseChanges()
 }
 
 // Clean up any mods installed...
-function CleanupMods()
+function action_cleanupMods()
 {
 	global $db_prefix, $modSettings, $upcontext, $boarddir, $sourcedir, $settings, $smcFunc, $command_line;
 
@@ -1815,7 +1815,7 @@ function CleanupMods()
 
 
 // Delete the damn thing!
-function DeleteUpgrade()
+function action_deleteUpgrade()
 {
 	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $smcFunc, $db_type;
 
