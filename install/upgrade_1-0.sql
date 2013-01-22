@@ -22,15 +22,15 @@ CHANGE COLUMN value value text NOT NULL default '';
 INSERT IGNORE INTO {$db_prefix}themes
 	(ID_MEMBER, ID_THEME, variable, value)
 VALUES (0, 1, 'name', 'SMF Default Theme'),
-	(0, 1, 'theme_url', '{$boardurl}/Themes/default'),
-	(0, 1, 'images_url', '{$boardurl}/Themes/default/images'),
-	(0, 1, 'theme_dir', '{$sboarddir}/Themes/default'),
+	(0, 1, 'theme_url', '{$boardurl}/themes/default'),
+	(0, 1, 'images_url', '{$boardurl}/themes/default/images'),
+	(0, 1, 'theme_dir', '{$sboarddir}/themes/default'),
 	(0, 1, 'allow_no_censored', '0'),
 	(0, 1, 'additional_options_collapsable', '1'),
 	(0, 2, 'name', 'Classic YaBB SE Theme'),
-	(0, 2, 'theme_url', '{$boardurl}/Themes/classic'),
-	(0, 2, 'images_url', '{$boardurl}/Themes/classic/images'),
-	(0, 2, 'theme_dir', '{$sboarddir}/Themes/classic');
+	(0, 2, 'theme_url', '{$boardurl}/themes/classic'),
+	(0, 2, 'images_url', '{$boardurl}/themes/classic/images'),
+	(0, 2, 'theme_dir', '{$sboarddir}/themes/classic');
 ---#
 
 ---# Creating "collapsed_categories"...

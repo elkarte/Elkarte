@@ -1984,9 +1984,9 @@ CREATE TABLE {$db_prefix}themes (
 INSERT INTO {$db_prefix}themes
 	(id_theme, variable, value)
 VALUES (1, 'name', '{$default_theme_name}'),
-	(1, 'theme_url', '{$boardurl}/Themes/default'),
-	(1, 'images_url', '{$boardurl}/Themes/default/images'),
-	(1, 'theme_dir', '{$boarddir}/Themes/default'),
+	(1, 'theme_url', '{$boardurl}/themes/default'),
+	(1, 'images_url', '{$boardurl}/themes/default/images'),
+	(1, 'theme_dir', '{$boarddir}/themes/default'),
 	(1, 'show_bbc', '1'),
 	(1, 'show_latest_member', '1'),
 	(1, 'show_modify', '1'),

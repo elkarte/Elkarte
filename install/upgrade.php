@@ -582,8 +582,8 @@ if (isset($_GET['data']))
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
+	if (file_exists($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php'))
+		require_once($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php');
 }
 // Set the defaults.
 else
@@ -632,9 +632,9 @@ if (isset($modSettings['ourVersion']))
 
 if (!isset($modSettings['theme_url']))
 {
-	$modSettings['theme_dir'] = $boarddir . '/Themes/default';
-	$modSettings['theme_url'] = 'Themes/default';
-	$modSettings['images_url'] = 'Themes/default/images';
+	$modSettings['theme_dir'] = $boarddir . '/themes/default';
+	$modSettings['theme_url'] = 'themes/default';
+	$modSettings['images_url'] = 'themes/default/images';
 }
 if (!isset($settings['default_theme_url']))
 	$settings['default_theme_url'] = $modSettings['theme_url'];
@@ -920,7 +920,7 @@ function action_welcomeLogin()
 	$upcontext['sub_template'] = 'welcome_message';
 
 	// Check for some key files - one template, one language, and a new and an old source file.
-	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
+	$check = @file_exists($boarddir . '/themes/default/index.template.php')
 		&& @file_exists($sourcedir . '/QueryString.php')
 		&& @file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php')
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
@@ -935,7 +935,7 @@ function action_welcomeLogin()
 
 	if (!$check)
 		// Don't tell them what files exactly because it's a spot check - just like teachers don't tell which problems they are spot checking, that's dumb.
-		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the Themes, Sources, and other directories.');
+		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
@@ -970,11 +970,11 @@ function action_welcomeLogin()
 	if (!file_exists($cachedir_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($boarddir . '/themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ELKARTE will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($boarddir . '/themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -982,10 +982,10 @@ function action_welcomeLogin()
 	}
 
 	// This needs to exist!
-	if (!file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
+	if (!file_exists($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php'))
 		return throw_error('The upgrader could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	else
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php');
 
 	if (!makeFilesWritable($writable_files))
 		return false;
@@ -1164,15 +1164,15 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($boarddir . '/Themes/default/languages/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($boarddir . '/themes/default/languages/index.' . basename($user_language, '.lng') . '.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file($boarddir . '/themes/default/languages/index.' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
-				elseif (!file_exists($boarddir . '/Themes/default/languages/Install.' . basename($user_language, '.lng') . '.php'))
+				elseif (!file_exists($boarddir . '/themes/default/languages/Install.' . basename($user_language, '.lng') . '.php'))
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				else
 				{
@@ -1181,7 +1181,7 @@ function checkLogin()
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($boarddir . '/Themes/default/languages/Install.' . $user_language . '.php');
+					require_once($boarddir . '/themes/default/languages/Install.' . $user_language . '.php');
 				}
 			}
 
@@ -1233,7 +1233,7 @@ function action_upgradeOptions()
 	$changes = array();
 
 	// If we're overriding the language follow it through.
-	if (isset($_GET['lang']) && file_exists($boarddir . '/Themes/default/languages/index.' . $_GET['lang'] . '.php'))
+	if (isset($_GET['lang']) && file_exists($boarddir . '/themes/default/languages/index.' . $_GET['lang'] . '.php'))
 		$changes['language'] = '\'' . $_GET['lang'] . '\'';
 
 	if (!empty($_POST['maint']))
@@ -1572,7 +1572,7 @@ function action_cleanupMods()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// Work out the status.
-		if (!file_exists($boarddir . '/Packages/' . $row['filename']))
+		if (!file_exists($boarddir . '/packages/' . $row['filename']))
 		{
 			$status = 'Missing';
 			$status_color = 'red';
@@ -1590,7 +1590,7 @@ function action_cleanupMods()
 			'themes' => explode(',', $row['themes_installed']),
 			'name' => $row['name'],
 			'filename' => $row['filename'],
-			'missing_file' => file_exists($boarddir . '/Packages/' . $row['filename']) ? 0 : 1,
+			'missing_file' => file_exists($boarddir . '/packages/' . $row['filename']) ? 0 : 1,
 			'files' => array(),
 			'file_count' => 0,
 			'status' => $status,
@@ -1613,12 +1613,12 @@ function action_cleanupMods()
 	// Before we get started, don't report notice errors.
 	$oldErrorReporting = error_reporting(E_ALL ^ E_NOTICE);
 
-	if (!mktree($boarddir . '/Packages/temp', 0755))
+	if (!mktree($boarddir . '/packages/temp', 0755))
 	{
-		deltree($boarddir . '/Packages/temp', false);
-		if (!mktree($boarddir . '/Packages/temp', 0777))
+		deltree($boarddir . '/packages/temp', false);
+		if (!mktree($boarddir . '/packages/temp', 0777))
 		{
-			deltree($boarddir . '/Packages/temp', false);
+			deltree($boarddir . '/packages/temp', false);
 			// @todo Error here - plus chmod!
 		}
 	}
@@ -1655,10 +1655,10 @@ function action_cleanupMods()
 		if (isset($_POST['remove']))
 			$infoInstall = parsePackageInfo($packageInfo['xml'], true);
 
-		if (is_file($boarddir . '/Packages/' . $filename))
-			read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+		if (is_file($boarddir . '/packages/' . $filename))
+			read_tgz_file($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 		else
-			copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			copytree($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 
 		// Work out how we uninstall...
 		$files = array();
@@ -1669,7 +1669,7 @@ function action_cleanupMods()
 			// 2) Whether it could be installed on the new version.
 			if ($change['type'] == 'modification')
 			{
-				$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+				$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 				if ($change['boardmod'])
 					$results = parseBoardMod($contents, $test, $change['reverse'], $cur_theme_paths);
 				else
@@ -1702,10 +1702,10 @@ function action_cleanupMods()
 		if (isset($_POST['remove']) && !$test && isset($infoInstall))
 		{
 			// Need to extract again I'm afraid.
-			if (is_file($boarddir . '/Packages/' . $filename))
-				read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			if (is_file($boarddir . '/packages/' . $filename))
+				read_tgz_file($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 			else
-				copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+				copytree($boarddir . '/packages/' . $filename, $boarddir . '/packages/temp');
 
 			$errors = false;
 			$upcontext['packages'][$id]['result'] = 'Removed';
@@ -1713,7 +1713,7 @@ function action_cleanupMods()
 			{
 				if ($change['type'] == 'modification')
 				{
-					$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+					$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 					if ($change['boardmod'])
 						$results = parseBoardMod($contents, true, $change['reverse'], $cur_theme_paths);
 					else
@@ -1734,7 +1734,7 @@ function action_cleanupMods()
 				{
 					if ($change['type'] == 'modification')
 					{
-						$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+						$contents = @file_get_contents($boarddir . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 						if ($change['boardmod'])
 							$results = parseBoardMod($contents, false, $change['reverse'], $cur_theme_paths);
 						else
@@ -1772,8 +1772,8 @@ function action_cleanupMods()
 		}
 	}
 
-	if (file_exists($boarddir . '/Packages/temp'))
-		deltree($boarddir . '/Packages/temp');
+	if (file_exists($boarddir . '/packages/temp'))
+		deltree($boarddir . '/packages/temp');
 
 	// Removing/Reinstalling any packages?
 	if (isset($_POST['remove']))
@@ -1792,7 +1792,7 @@ function action_cleanupMods()
 				WHERE id_install IN (' . implode(',', $deletes) . ')');
 
 		// Ensure we don't lose our changes!
-		package_put_contents($boarddir . '/Packages/installed.list', time());
+		package_put_contents($boarddir . '/packages/installed.list', time());
 
 		$upcontext['sub_template'] = 'cleanup_done';
 		return false;
@@ -2933,7 +2933,7 @@ function cmdStep0()
 			$is_debug = true;
 		elseif ($arg == '--backup')
 			$_POST['backup'] = 1;
-		elseif ($arg == '--template' && (file_exists($boarddir . '/template.php') || file_exists($boarddir . '/template.html') && !file_exists($boarddir . '/Themes/converted')))
+		elseif ($arg == '--template' && (file_exists($boarddir . '/template.php') || file_exists($boarddir . '/template.html') && !file_exists($boarddir . '/themes/converted')))
 			$_GET['conv'] = 1;
 		elseif ($i != 0)
 		{
@@ -2957,7 +2957,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!empty($databases[$db_type]['alter_support']) && $smcFunc['db_query']('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 
-	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
+	$check = @file_exists($boarddir . '/themes/default/index.template.php')
 		&& @file_exists($sourcedir . '/QueryString.php')
 		&& @file_exists($sourcedir . '/ManageBoards.php');
 	if (!$check && !isset($modSettings['ourVersion']))
@@ -2990,12 +2990,12 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		fclose($fp);
 	}
 
-	// Make sure Themes is writable.
-	if (!is_writable($boarddir . '/Themes'))
-		@chmod($boarddir . '/Themes', 0777);
+	// Make sure themes is writable.
+	if (!is_writable($boarddir . '/themes'))
+		@chmod($boarddir . '/themes', 0777);
 
-	if (!is_writable($boarddir . '/Themes') && !isset($modSettings['ourVersion']))
-		print_error('Error: Unable to obtain write access to "Themes".');
+	if (!is_writable($boarddir . '/themes') && !isset($modSettings['ourVersion']))
+		print_error('Error: Unable to obtain write access to "themes".');
 
 	// Make sure cache directory exists and is writable!
 	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
@@ -3008,20 +3008,20 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($cachedir_temp))
 		print_error('Error: Unable to obtain write access to "cache".', true);
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($boarddir . '/themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
 		print_error('Error: Unable to find language files!', true);
 	else
 	{
-		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($boarddir . '/themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			print_error('Error: Language files out of date.', true);
-		if (!file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php'))
 			print_error('Error: Install language is missing for selected language.', true);
 
 		// Otherwise include it!
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($boarddir . '/themes/default/languages/Install.' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.
@@ -3260,7 +3260,7 @@ function deleteUpgrader()
 	}
 	closedir($dh);
 
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
 	exit;
 }
 
@@ -3429,7 +3429,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
@@ -4461,7 +4461,7 @@ function template_upgrade_complete()
 					theCheck.disabled = true;
 				}
 			// ]]></script>
-			<img src="', $boardurl, '/Themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
+			<img src="', $boardurl, '/themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
 			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />
