@@ -277,7 +277,7 @@ function load_lang_file()
 		<div style="margin: 1ex; font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/themes/default/languages</div>
 
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
-		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
+		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the themes folder.</p>
 
 		<p>If you continue to get this error message, feel free to <a href="http://www.elkarte.net/">look to us for support</a>.</p>
 	</div>
@@ -466,17 +466,17 @@ function action_checkFilesWritable()
 		'attachments',
 		'avatars',
 		'cache',
-		'Packages',
-		'Packages/installed.list',
+		'packages',
+		'packages/installed.list',
 		'smileys',
-		'Themes',
+		'themes',
 		'agreement.txt',
 		'Settings.php',
 		'Settings_bak.php',
 		'db_last_error.php'
 	);
 	foreach ($incontext['detected_languages'] as $lang => $temp)
-		$extra_files[] = 'Themes/default/languages/' . $lang;
+		$extra_files[] = 'themes/default/languages/' . $lang;
 
 	// With mod_security installed, we could attempt to fix it with .htaccess.
 	if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
@@ -2019,15 +2019,15 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/index.css?alp10" />
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/install.css?alp10" />
-		<script type="text/javascript" src="Themes/default/scripts/script.js"></script>
+		<link rel="stylesheet" type="text/css" href="themes/default/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="themes/default/css/install.css?alp10" />
+		<script type="text/javascript" src="themes/default/scripts/script.js"></script>
 	</head>
 	<body>
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+				<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 			</div>
 		</div>
 		<div id="wrapper">

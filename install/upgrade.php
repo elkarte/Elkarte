@@ -633,8 +633,8 @@ if (isset($modSettings['ourVersion']))
 if (!isset($modSettings['theme_url']))
 {
 	$modSettings['theme_dir'] = $boarddir . '/themes/default';
-	$modSettings['theme_url'] = 'Themes/default';
-	$modSettings['images_url'] = 'Themes/default/images';
+	$modSettings['theme_url'] = 'themes/default';
+	$modSettings['images_url'] = 'themes/default/images';
 }
 if (!isset($settings['default_theme_url']))
 	$settings['default_theme_url'] = $modSettings['theme_url'];
@@ -935,7 +935,7 @@ function action_welcomeLogin()
 
 	if (!$check)
 		// Don't tell them what files exactly because it's a spot check - just like teachers don't tell which problems they are spot checking, that's dumb.
-		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the Themes, Sources, and other directories.');
+		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
@@ -2990,12 +2990,12 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		fclose($fp);
 	}
 
-	// Make sure Themes is writable.
+	// Make sure themes is writable.
 	if (!is_writable($boarddir . '/themes'))
 		@chmod($boarddir . '/themes', 0777);
 
 	if (!is_writable($boarddir . '/themes') && !isset($modSettings['ourVersion']))
-		print_error('Error: Unable to obtain write access to "Themes".');
+		print_error('Error: Unable to obtain write access to "themes".');
 
 	// Make sure cache directory exists and is writable!
 	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
@@ -3429,7 +3429,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
