@@ -1178,7 +1178,7 @@ function action_sendmessage()
 	{
 		require_once($controllerdir . '/Drafts.controller.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-		showDrafts($user_info['id'], $pm_seed, 1);
+		action_showDrafts($user_info['id'], $pm_seed, 1);
 	}
 
 	// Needed for the WYSIWYG editor.
@@ -1232,7 +1232,7 @@ function action_messagedrafts()
 
 	// drafts is where the functions reside
 	require_once($sourcedir . '/controllers/Drafts.controller.php');
-	showPMDrafts($memID);
+	action_showPMDrafts($memID);
 }
 
 /**

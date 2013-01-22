@@ -1079,7 +1079,7 @@ function action_viewWatchedUsers()
 
 		if (!empty($toDelete))
 		{
-			require_once($sourcedir . '/controllers/RemoveTopic.controller.php');
+			require_once($librarydir . '/Messages.subs.php');
 			// If they don't have permission we'll let it error - either way no chance of a security slip here!
 			foreach ($toDelete as $did)
 				removeMessage($did);
