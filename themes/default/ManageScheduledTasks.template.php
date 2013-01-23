@@ -22,7 +22,7 @@ function template_view_scheduled_tasks()
 	// We completed some tasks?
 	if (!empty($context['tasks_were_run']))
 		echo '
-	<div id="task_completed">
+	<div id="task_completed" class="infobox">
 		', $txt['scheduled_tasks_were_run'], '
 	</div>';
 
