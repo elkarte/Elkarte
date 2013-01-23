@@ -424,16 +424,16 @@ body#chrome  #quick_search .button_submit {
 	padding: 0;
 	color: #111;
 }
-#smfAnnouncements dt {
+#ourAnnouncements dt {
 	padding: 4px 6px 2px 6px; 
 	border-top: 1px solid #bf6900;
 }
-#smfAnnouncements dt a {
+#ourAnnouncements dt a {
 	color: #bf6900;
 	font-weight: bold;
 	display: block;
 }
-#smfAnnouncements dd {
+#ourAnnouncements dd {
 	margin: 0;
 	padding: 6px 12px;
 	border-top: double #ddd;
@@ -857,19 +857,6 @@ dl.right dt {
 }
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
-}
-.maintenance_finished, #task_completed {
-	background: #B7FCA7 url(../images/warning_watch.png) 8px 50% no-repeat;
-	border: 1px solid green;
-	padding: 6px 30px;
-	margin-bottom: 1em;
-}
-#manage_maintenance .maintenance_finished {
-	background: #B7FCA7 url(../images/warning_watch.png) 8px 50% no-repeat;
-	border: 1px solid green;
-	border-radius: 4px 4px 0 0;
-	padding: 6px 30px;
-	margin: 0 0 6px 0;
 }
 
 /* Styles for the manage calendar section.

@@ -67,7 +67,7 @@ function template_latest_news()
 								</div>
 								<div class="windowbg">
 									<div class="content">
-										<div id="smfAnnouncements" class="smalltext">', $txt['mc_cannot_connect_sm'], '</div>
+										<div id="ourAnnouncements" class="smalltext">', $txt['mc_cannot_connect_sm'], '</div>
 									</div>
 								</div>';
 
@@ -78,7 +78,6 @@ function template_latest_news()
 								<script type="text/javascript"><!-- // --><![CDATA[
 									var oAdminIndex = new smf_AdminIndex({
 										sSelf: \'oAdminCenter\',
-
 										bLoadAnnouncements: true,
 										sAnnouncementTemplate: ', JavaScriptEscape('
 											<dl>
@@ -91,7 +90,7 @@ function template_latest_news()
 												%message%
 											</dd>
 										'), ',
-										sAnnouncementContainerId: \'smfAnnouncements\'
+										sAnnouncementContainerId: \'ourAnnouncements\'
 									});
 								// ]]></script>';
 
