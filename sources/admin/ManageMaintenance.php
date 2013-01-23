@@ -1118,6 +1118,10 @@ function VersionDetail()
 	// Add the new info to the template context.
 	$context += array(
 		'file_versions' => $version_info['file_versions'],
+		'file_versions_admin' => $version_info['file_versions_admin'],
+		'file_versions_controllers' => $version_info['file_versions_controllers'],
+		'file_versions_database' => $version_info['file_versions_database'],
+		'file_versions_subs' => $version_info['file_versions_subs'],
 		'default_template_versions' => $version_info['default_template_versions'],
 		'template_versions' => $version_info['template_versions'],
 		'default_language_versions' => $version_info['default_language_versions'],
