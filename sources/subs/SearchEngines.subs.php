@@ -23,7 +23,6 @@ if (!defined('ELKARTE'))
 /**
  * Do we think the current user is a spider?
  *
- * @todo Should this not be... you know... in a different file?
  * @return int
  */
 function spiderCheck()
@@ -101,8 +100,6 @@ function spiderCheck()
 
 /**
  * Log the spider presence online.
- *
- * @todo Different file?
  */
 function logSpider()
 {
@@ -164,7 +161,8 @@ function logSpider()
 }
 
 /**
- * This function takes any unprocessed hits and turns them into stats.
+ * This function takes any unprocessed hits
+ * and updates stats accordingly.
  */
 function consolidateSpiderStats()
 {
@@ -231,7 +229,7 @@ function consolidateSpiderStats()
 }
 
 /**
- * Recache spider names?
+ * Recache spider names.
  */
 function recacheSpiderNames()
 {
