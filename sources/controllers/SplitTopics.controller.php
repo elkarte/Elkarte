@@ -46,15 +46,15 @@ function action_splittopics()
 	require_once($librarydir . '/Post.subs.php');
 
 	$subActions = array(
-		'selectTopics' => 'SplitSelectTopics',
-		'execute' => 'SplitExecute',
-		'index' => 'SplitIndex',
-		'splitSelection' => 'SplitSelectionExecute',
+		'selectTopics' => 'action_splitSelectTopics',
+		'execute' => 'action_splitExecute',
+		'index' => 'action_splitIndex',
+		'splitSelection' => 'action_splitSelection',
 	);
 
 	// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
 	if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		SplitIndex();
+		action_splitIndex();
 	else
 		$subActions[$_REQUEST['sa']]();
 }
@@ -64,11 +64,11 @@ function action_splittopics()
  * is accessed with ?action=splittopics;sa=index.
  * default sub action for ?action=splittopics.
  * uses 'ask' sub template of the SplitTopics template.
- * redirects to SplitSelectTopics if the message given turns out to be
+ * redirects to action_splitSelectTopics if the message given turns out to be
  * the first message of a topic.
  * shows the user three ways to split the current topic.
  */
-function SplitIndex()
+function action_splitIndex()
 {
 	global $txt, $topic, $context, $smcFunc, $modSettings;
 
@@ -110,7 +110,7 @@ function SplitIndex()
 
 	// Check if this is the first message in the topic (if so, the first and second option won't be available)
 	if ($id_first_msg == $_GET['at'])
-		return SplitSelectTopics();
+		return action_splitSelectTopics();
 
 	// Basic template information....
 	$context['message'] = array(
@@ -128,10 +128,10 @@ function SplitIndex()
  * supports three ways of splitting:
  * (1) only one message is split off.
  * (2) all messages after and including a given message are split off.
- * (3) select topics to split (redirects to SplitSelectTopics()).
+ * (3) select topics to split (redirects to action_splitSelectTopics()).
  * uses splitTopic function to do the actual splitting.
  */
-function SplitExecute()
+function action_splitExecute()
 {
 	global $txt, $board, $topic, $context, $user_info, $smcFunc, $modSettings;
 
@@ -146,7 +146,7 @@ function SplitExecute()
 	if ($_POST['step2'] == 'selective')
 	{
 		$_REQUEST['subname'] = $_POST['subname'];
-		return SplitSelectTopics();
+		return action_splitSelectTopics();
 	}
 
 	$_POST['at'] = (int) $_POST['at'];
@@ -191,7 +191,7 @@ function SplitExecute()
  * shows two independent page indexes for both the selected and
  * not-selected messages (;topic=1.x;start2=y).
  */
-function SplitSelectTopics()
+function action_splitSelectTopics()
 {
 	global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $smcFunc, $options;
 
@@ -465,7 +465,7 @@ function SplitSelectTopics()
  * uses splitTopic function to do the actual splitting.
 
  */
-function SplitSelectionExecute()
+function action_splitSelection()
 {
 	global $txt, $board, $topic, $context, $user_info;
 

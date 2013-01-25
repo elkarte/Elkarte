@@ -28,21 +28,21 @@ if (!defined('ELKARTE'))
  * requires the merge_any permission.
  * is accessed with ?action=mergetopics.
  */
-function MergeTopics()
+function action_mergetopics()
 {
 	// Load the template....
 	loadTemplate('SplitTopics');
 
 	$subActions = array(
-		'done' => 'MergeDone',
-		'execute' => 'MergeExecute',
-		'index' => 'MergeIndex',
-		'options' => 'MergeExecute',
+		'done' => 'action_mergeDone',
+		'execute' => 'action_mergeExecute',
+		'index' => 'action_mergeIndex',
+		'options' => 'action_mergeExecute',
 	);
 
 	// ?action=mergetopics;sa=LETSBREAKIT won't work, sorry.
 	if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		MergeIndex();
+		action_mergeIndex();
 	else
 		$subActions[$_REQUEST['sa']]();
 }
@@ -54,7 +54,7 @@ function MergeTopics()
  * uses 'merge' sub template of the SplitTopics template.
  * allows to set a different target board.
  */
-function MergeIndex()
+function action_mergeIndex()
 {
 	global $txt, $board, $context, $smcFunc;
 	global $scripturl, $topic, $user_info, $modSettings;
@@ -205,7 +205,7 @@ function MergeIndex()
  * * redirects to ?action=mergetopics;sa=done.
  * @param array $topics = array()
  */
-function MergeExecute($topics = array())
+function action_mergeExecute($topics = array())
 {
 	global $user_info, $txt, $context, $scripturl, $sourcedir, $librarydir;
 	global $smcFunc, $language, $modSettings;
@@ -213,7 +213,7 @@ function MergeExecute($topics = array())
 	// Check the session.
 	checkSession('request');
 
-	// Handle URLs from MergeIndex.
+	// Handle URLs from action_mergeIndex.
 	if (!empty($_GET['from']) && !empty($_GET['to']))
 		$topics = array((int) $_GET['from'], (int) $_GET['to']);
 
@@ -320,7 +320,7 @@ function MergeExecute($topics = array())
 
 	$boards = array_values(array_unique($boards));
 
-	// The parameters of MergeExecute were set, so this must've been an internal call.
+	// The parameters of action_mergeExecute were set, so this must've been an internal call.
 	if (!empty($topics))
 	{
 		isAllowedTo('merge_any', $boards);
@@ -813,7 +813,7 @@ function MergeExecute($topics = array())
  * is accessed with ?action=mergetopics;sa=done.
  * uses 'merge_done' sub template of the SplitTopics template.
  */
-function MergeDone()
+function action_mergeDone()
 {
 	global $txt, $context;
 
