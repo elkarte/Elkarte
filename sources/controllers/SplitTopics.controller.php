@@ -70,52 +70,39 @@ function action_splittopics()
  */
 function action_splitIndex()
 {
-	global $txt, $topic, $context, $smcFunc, $modSettings;
+	global $txt, $topic, $context, $smcFunc, $modSettings, $librarydir;
 
 	// Validate "at".
 	if (empty($_GET['at']))
 		fatal_lang_error('numbers_one_to_nine', false);
-	$_GET['at'] = (int) $_GET['at'];
+	$splitAt = (int) $_GET['at'];
 
-	// Retrieve the subject and stuff of the specific topic/message.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.approved
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND m.approved = 1') . '
-			AND m.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-			'split_at' => $_GET['at'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('cant_find_messages');
-	list ($_REQUEST['subname'], $num_replies, $unapproved_posts, $id_first_msg, $approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// We deal with topics here.
+	require_once($librarydir . '/Topic.subs.php');
+
+	// Retrieve message info for the message at the split point.
+	$messageInfo = messageInfo($topic, $splitAt);
 
 	// If not approved validate they can see it.
-	if ($modSettings['postmod_active'] && !$approved)
+	if ($modSettings['postmod_active'] && !$messageInfo['approved'])
 		isAllowedTo('approve_posts');
 
 	// If this topic has unapproved posts, we need to count them too...
 	if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
-		$num_replies += $unapproved_posts - ($approved ? 0 : 1);
+		$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['approved'] ? 0 : 1);
 
 	// Check if there is more than one message in the topic.  (there should be.)
-	if ($num_replies < 1)
+	if ($messageInfo['num_replies'] < 1)
 		fatal_lang_error('topic_one_post', false);
 
 	// Check if this is the first message in the topic (if so, the first and second option won't be available)
-	if ($id_first_msg == $_GET['at'])
+	if ($messageInfo['id_first_msg'] == $splitAt)
 		return action_splitSelectTopics();
 
 	// Basic template information....
 	$context['message'] = array(
-		'id' => $_GET['at'],
-		'subject' => $_REQUEST['subname']
+		'id' => $splitAt,
+		'subject' => $messageInfo['subject']
 	);
 	$context['sub_template'] = 'ask';
 	$context['page_title'] = $txt['split'];
@@ -134,6 +121,7 @@ function action_splitIndex()
 function action_splitExecute()
 {
 	global $txt, $board, $topic, $context, $user_info, $smcFunc, $modSettings;
+	global $librarydir;
 
 	// Check the session to make sure they meant to do this.
 	checkSession();
@@ -149,29 +137,18 @@ function action_splitExecute()
 		return action_splitSelectTopics();
 	}
 
-	$_POST['at'] = (int) $_POST['at'];
+	// We work with them topics.
+	require_once($librarydir . '/Topic.subs.php');
+
+	$splitAt = (int) $_POST['at'];
 	$messagesToBeSplit = array();
 
+	// Fetch the message IDs of the topic that are at or after the message.
 	if ($_POST['step2'] == 'afterthis')
-	{
-		// Fetch the message IDs of the topic that are at or after the message.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_msg
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}
-				AND id_msg >= {int:split_at}',
-			array(
-				'current_topic' => $topic,
-				'split_at' => $_POST['at'],
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$messagesToBeSplit[] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
-	}
+		$messagesToBeSplit = messagesAfter($topic, $splitAt);
 	// Only the selected message has to be split. That should be easy.
 	elseif ($_POST['step2'] == 'onlythis')
-		$messagesToBeSplit[] = $_POST['at'];
+		$messagesToBeSplit[] = $splitAt;
 	// There's another action?!
 	else
 		fatal_lang_error('no_access', false);

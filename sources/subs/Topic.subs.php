@@ -1237,3 +1237,72 @@ function topicsStartedBy($memberID)
 
 	return $topicIDs;
 }
+
+/**
+ * Retrieve the messages of the given topic, that are at or after
+ * a message.
+ * Used by split topics actions.
+ */
+function messagesAfter($topic, $message)
+{
+	global $smcFunc;
+
+	// Fetch the message IDs of the topic that are at or after the message.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg >= {int:split_at}',
+		array(
+			'current_topic' => $topic,
+			'split_at' => $message,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$messages[] = $row['id_msg'];
+	$smcFunc['db_free_result']($request);
+
+	return $messages;
+}
+
+/**
+ * Retrieve a few data on a particular message.
+ *
+ * @param int $topic
+ * @param int $message
+ */
+function messageInfo($topic, $message)
+{
+	global $smcFunc, $modSettings;
+
+	// @todo isn't this a duplicate?
+
+	// Retrieve the subject and a few data of the specific message.
+	$request = $smcFunc['db_query']('', '
+		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.approved
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
+		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+			AND m.approved = 1') . '
+			AND m.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topic,
+			'split_at' => $message,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) == 0)
+		fatal_lang_error('cant_find_messages');
+	list ($subject, $num_replies, $unapproved_posts, $id_first_msg, $approved) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	$messageInfo = array(
+		'subject' => $subject,
+		'num_replies' => $num_replies,
+		'unapproved_posts' => $unapproved_posts,
+		'id_first_msg' => $id_first_msg,
+		'approved' => $approved
+	);
+
+	return $messageInfo;
+}
