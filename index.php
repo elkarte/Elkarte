@@ -180,7 +180,7 @@ function smf_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once ($sourcedir . '/Dispatcher.class.php');
+	require_once($sourcedir . '/Dispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
 	$dispatcher->dispatch();
 }

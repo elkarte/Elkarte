@@ -3201,5 +3201,5 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 if (!function_exists('smf_crc32'))
 {
 	global $librarydir;
-	require_once ($librarydir . '/Compat.subs.php');
+	require_once($librarydir . '/Compat.subs.php');
 }
