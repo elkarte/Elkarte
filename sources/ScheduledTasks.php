@@ -433,7 +433,8 @@ function scheduled_daily_maintenance()
 	// Do any spider stuff.
 	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		loadAdminClass ('ManageSearchEngines.php');
+		// We'll need this.
+		require_once($librarydir . '/SearchEngines.subs.php');
 		consolidateSpiderStats();
 	}
 
