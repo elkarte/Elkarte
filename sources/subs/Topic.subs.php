@@ -1277,7 +1277,7 @@ function messageInfo($topic, $message)
 
 	// @todo isn't this a duplicate?
 
-	// Retrieve the subject and a few data of the specific message.
+	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
 		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.approved
 		FROM {db_prefix}messages AS m
@@ -1305,4 +1305,57 @@ function messageInfo($topic, $message)
 	);
 
 	return $messageInfo;
+}
+
+/**
+ * Select a part of the messages in a topic.
+ *
+ * @param int $topic
+ * @param int $start
+ * @param int $per_page
+ * @param bool $only_approved
+ */
+function selectMessages($topic, $start, $per_page, $excluded_messages = array(), $only_approved = false)
+{
+	global $smcFunc, $modSettings;
+
+	// Get the messages and stick them into an array.
+	$request = $smcFunc['db_query']('', '
+		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.id_topic = {int:current_topic}' . (empty($excluded_messages) ? '' : '
+			AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$only_approved ? '' : '
+			AND approved = {int:is_approved}') . '
+		ORDER BY m.id_msg DESC
+		LIMIT {int:start}, {int:messages_per_page}',
+		array(
+			'current_topic' => $topic,
+			'no_split_msgs' => !empty($excluded_messages) ? $excluded_messages : array(),
+			'is_approved' => 1,
+			'start' => $start,
+			'messages_per_page' => $per_page,
+		)
+	);
+	$messages = array();
+	for ($counter = 0; $row = $smcFunc['db_fetch_assoc']($request); $counter ++)
+	{
+		censorText($row['subject']);
+		censorText($row['body']);
+
+		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+		$messages[$row['id_msg']] = array(
+			'id' => $row['id_msg'],
+			'alternate' => $counter % 2,
+			'subject' => $row['subject'],
+			'time' => timeformat($row['poster_time']),
+			'timestamp' => forum_time(true, $row['poster_time']),
+			'body' => $row['body'],
+			'poster' => $row['real_name'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $messages;
 }

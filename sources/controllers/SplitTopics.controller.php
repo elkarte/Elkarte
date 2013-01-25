@@ -181,6 +181,8 @@ function action_splitSelectTopics()
 	if (isset($_REQUEST['subname_enc']))
 		$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
 
+	require_once($librarydir . '/Topic.subs.php');
+
 	$context['not_selected'] = array(
 		'num_messages' => 0,
 		'start' => empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'],
@@ -320,85 +322,12 @@ function action_splitSelectTopics()
 	// ...and one of the selected topics.
 	$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
-	// Get the messages and stick them into an array.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
-			AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND approved = {int:is_approved}') . '
-		ORDER BY m.id_msg DESC
-		LIMIT {int:start}, {int:messages_per_page}',
-		array(
-			'current_topic' => $topic,
-			'no_split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
-			'is_approved' => 1,
-			'start' => $context['not_selected']['start'],
-			'messages_per_page' => $context['messages_per_page'],
-		)
-	);
-	$context['messages'] = array();
-	for ($counter = 0; $row = $smcFunc['db_fetch_assoc']($request); $counter ++)
-	{
-		censorText($row['subject']);
-		censorText($row['body']);
+	// Retrieve the unselected messages.
+	$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic], !$modSettings['postmod_active'] || allowedTo('approve_posts'));
 
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
-		$context['not_selected']['messages'][$row['id_msg']] = array(
-			'id' => $row['id_msg'],
-			'alternate' => $counter % 2,
-			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'body' => $row['body'],
-			'poster' => $row['real_name'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Now get the selected messages.
+	// Now retrieve the selected messages.
 	if (!empty($_SESSION['split_selection'][$topic]))
-	{
-		// Get the messages and stick them into an array.
-		$request = $smcFunc['db_query']('', '
-			SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name,  m.poster_time, m.body, m.id_msg, m.smileys_enabled
-			FROM {db_prefix}messages AS m
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE m.id_topic = {int:current_topic}
-				AND m.id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-				AND approved = {int:is_approved}') . '
-			ORDER BY m.id_msg DESC
-			LIMIT {int:start}, {int:messages_per_page}',
-			array(
-				'current_topic' => $topic,
-				'split_msgs' => $_SESSION['split_selection'][$topic],
-				'is_approved' => 1,
-				'start' => $context['selected']['start'],
-				'messages_per_page' => $context['messages_per_page'],
-			)
-		);
-		$context['messages'] = array();
-		for ($counter = 0; $row = $smcFunc['db_fetch_assoc']($request); $counter ++)
-		{
-			censorText($row['subject']);
-			censorText($row['body']);
-
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
-			$context['selected']['messages'][$row['id_msg']] = array(
-				'id' => $row['id_msg'],
-				'alternate' => $counter % 2,
-				'subject' => $row['subject'],
-				'time' => timeformat($row['poster_time']),
-				'timestamp' => forum_time(true, $row['poster_time']),
-				'body' => $row['body'],
-				'poster' => $row['real_name']
-			);
-		}
-		$smcFunc['db_free_result']($request);
-	}
+		$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], $_SESSION['split_selection'][$topic], !$modSettings['postmod_active'] || allowedTo('approve_posts'));
 
 	// The XMLhttp method only needs the stuff that changed, so let's compare.
 	if (isset($_REQUEST['xml']))
