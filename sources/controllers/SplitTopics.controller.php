@@ -13,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * Handle merging and splitting of topics
+ * Handle splitting of topics
  *
  * Original module by Mach8 - We'll never forget you.
  */
