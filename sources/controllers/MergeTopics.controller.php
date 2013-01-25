@@ -13,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * Handle merging and splitting of topics
+ * Handle merging of topics
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -24,14 +24,14 @@ if (!defined('ELKARTE'))
 /**
  * Merges two or more topics into one topic.
  * delegates to the other functions (based on the URL parameter sa).
- * loads the SplitTopics template.
+ * loads the MergeTopics template.
  * requires the merge_any permission.
  * is accessed with ?action=mergetopics.
  */
 function action_mergetopics()
 {
 	// Load the template....
-	loadTemplate('SplitTopics');
+	loadTemplate('MergeTopics');
 
 	$subActions = array(
 		'done' => 'action_mergeDone',
@@ -51,7 +51,7 @@ function action_mergetopics()
  * Allows to pick a topic to merge the current topic with.
  * is accessed with ?action=mergetopics;sa=index
  * default sub action for ?action=mergetopics.
- * uses 'merge' sub template of the SplitTopics template.
+ * uses 'merge' sub template of the MergeTopics template.
  * allows to set a different target board.
  */
 function action_mergeIndex()
@@ -195,7 +195,7 @@ function action_mergeIndex()
  * the merge options screen:
  * * shows topics to be merged and allows to set some merge options.
  * * is accessed by ?action=mergetopics;sa=options.and can also internally be called by action_quickmod().
- * * uses 'merge_extra_options' sub template of the SplitTopics template.
+ * * uses 'merge_extra_options' sub template of the MergeTopics template.
  *
  * the actual merge:
  * * is accessed with ?action=mergetopics;sa=execute.
@@ -324,7 +324,7 @@ function action_mergeExecute($topics = array())
 	if (!empty($topics))
 	{
 		isAllowedTo('merge_any', $boards);
-		loadTemplate('SplitTopics');
+		loadTemplate('MergeTopics');
 	}
 
 	// Get the boards a user is allowed to merge in.
@@ -811,7 +811,7 @@ function action_mergeExecute($topics = array())
 /**
  * Shows a 'merge completed' screen.
  * is accessed with ?action=mergetopics;sa=done.
- * uses 'merge_done' sub template of the SplitTopics template.
+ * uses 'merge_done' sub template of the MergeTopics template.
  */
 function action_mergeDone()
 {
