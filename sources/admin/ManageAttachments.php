@@ -1079,16 +1079,7 @@ function action_repair()
 	// Find parents which think they have thumbnails, but actually, don't.
 	if ($_GET['step'] <= 1)
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT MAX(id_attach)
-			FROM {db_prefix}attachments
-			WHERE id_thumb != {int:no_thumb}',
-			array(
-				'no_thumb' => 0,
-			)
-		);
-		list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$thumbnails = maxThumbnails();
 
 		for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 		{
