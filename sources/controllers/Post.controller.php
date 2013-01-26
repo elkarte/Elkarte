@@ -58,6 +58,7 @@ function action_post()
 		fatal_lang_error('no_board', false);
 
 	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(SUBSDIR . '/Messages.subs.php');
 
 	if (isset($_REQUEST['xml']))
 	{
@@ -71,18 +72,9 @@ function action_post()
 	// No message is complete without a topic.
 	if (empty($topic) && !empty($_REQUEST['msg']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_topic
-			FROM {db_prefix}messages
-			WHERE id_msg = {int:msg}',
-			array(
-				'msg' => (int) $_REQUEST['msg'],
-		));
-		if ($smcFunc['db_num_rows']($request) != 1)
+		$topic = associatedTopic((int) $_REQUEST['msg']);
+		if (empty($topic))
 			unset($_REQUEST['msg'], $_POST['msg'], $_GET['msg']);
-		else
-			list ($topic) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Check if it's locked. It isn't locked if no topic is specified.
@@ -1068,7 +1060,7 @@ function action_post2()
 	if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		processAttachments();
+		 processAttachments();
 	}
 
 	// If this isn't a new topic load the topic info that we need.
@@ -2304,7 +2296,7 @@ function action_jsmodify()
  * It is accessed via ?action=spellcheck.
  */
 function action_spellcheck()
-{
+			{
 	global $txt, $context, $smcFunc;
 
 	// A list of "words" we know about but pspell doesn't.
@@ -2370,10 +2362,10 @@ function action_spellcheck()
 
 			if (!empty($suggestions))
 				$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
-		}
+			}
 
 		$context['spell_js'] .= ']),';
-	}
+		}
 
 	// If words were found, take off the last comma.
 	if ($found_words)
