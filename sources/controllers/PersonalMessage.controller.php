@@ -178,7 +178,7 @@ function action_pm()
 		// So it was set - let's go to that action.
 		if (is_array($subActions[$_REQUEST['sa']]))
 		{
-			require_once($sourcedir . '/controllers/' . $subActions[$_REQUEST['sa']][0]);
+			require_once($controllerdir . '/' . $subActions[$_REQUEST['sa']][0]);
 			$subActions[$_REQUEST['sa']][1]();
 		}
 		else
@@ -1231,7 +1231,7 @@ function action_messagedrafts()
 	list ($memID) = $memberResult;
 
 	// drafts is where the functions reside
-	require_once($sourcedir . '/controllers/Drafts.controller.php');
+	require_once($controllerdir . '/Drafts.controller.php');
 	action_showPMDrafts($memID);
 }
 
@@ -1430,7 +1430,7 @@ function action_sendmessage2()
 
 	// PM Drafts enabled and needed?
 	if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-		require_once($sourcedir . '/controllers/Drafts.controller.php');
+		require_once($controllerdir . '/Drafts.controller.php');
 
 	loadLanguage('PersonalMessage', '', false);
 
