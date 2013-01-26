@@ -153,8 +153,8 @@
 						$('.sceditor-smileyPopup').animaDrag({
 							speed: 100,
 							interval: 120,
-							easing: null, 
-							cursor: 'move', 
+							easing: null,
+							cursor: 'move',
 							during: function(e) {
 								$(this).height(this.startheight);
 								$(this).width(this.startwidth);

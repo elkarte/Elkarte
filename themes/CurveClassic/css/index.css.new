@@ -913,7 +913,7 @@ table.table_grid thead tr.catbg th
 {
 	padding: 0.4em 0.8em;
 	cursor: default;
-} 
+}
 
 /* Common styles used to add corners to divisions.
 ------------------------------------------------------- */
@@ -2203,7 +2203,7 @@ ul.post_options li
 }
 #edit_poll dl.poll_options dd input
 {
-	margin-left: 0; 
+	margin-left: 0;
 }
 
 /* Styles for the recent messages section.
