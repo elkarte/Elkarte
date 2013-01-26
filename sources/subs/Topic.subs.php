@@ -933,7 +933,7 @@ function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapprov
 		ORDER BY' . (
 			$includeStickies ? '
 				t2.is_sticky,' :
-				 '') .
+				'') .
 			' t2.id_last_msg
 		LIMIT 1',
 		array(
@@ -1007,7 +1007,7 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 		ORDER BY' . (
 			$includeStickies ? '
 				t2.is_sticky DESC,' :
-				 '') .
+				'') .
 			' t2.id_last_msg DESC
 		LIMIT 1',
 		array(

@@ -614,12 +614,9 @@ function action_plushsearch2()
 	// *** Parse the search query
 	call_integration_hook('integrate_search_params', array($search_params));
 
-	/*
-	 * Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
-	 *
-	 * @todo Setting to add more here?
-	 * @todo Maybe only blacklist if they are the only word, or "any" is used?
-	 */
+	// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
+	// @todo Setting to add more here?
+	// @todo Maybe only blacklist if they are the only word, or "any" is used?
 	$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
 	call_integration_hook('integrate_search_blacklisted_words', array($blacklisted_words));
 
@@ -1945,10 +1942,8 @@ function MessageSearch2()
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
 		fatal_lang_error('loadavg_search_disabled', false);
 
-	/**
-	 * @todo For the moment force the folder to the inbox.
-	 * @todo Maybe set the inbox based on a cookie or theme setting?
-	 */
+	// @todo For the moment force the folder to the inbox.
+	// @todo Maybe set the inbox based on a cookie or theme setting?
 	$context['folder'] = 'inbox';
 
 	// Some useful general permissions.
