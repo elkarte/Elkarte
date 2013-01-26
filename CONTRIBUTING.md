@@ -36,3 +36,12 @@ Details about the rebase operation:
 
 Recommended reading for github pull requests workflow:
 [About Github workflow](http://qsapp.com/wiki/Github#Github_Contributor_Workflow)
+
+Code reviews
+===
+An important and very helpful part of the workflow is code reviews.
+The more eyes are on the code, on the PRs, the better: one can always spot something missed, a small detail, a serious bug, or start a conversation on the code that will help in the end reach a better solution for the software.
+Code reviews can be made from the github web interface, or by checking out of the code pulled in locally. You can also test the PRs. Please do, express your objections or approval, fix things or report them.
+
+* Quick commands on how to pull in PRs:
+https://gist.github.com/3342247
