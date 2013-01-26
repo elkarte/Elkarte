@@ -1631,21 +1631,11 @@ function scheduled_paid_subscriptions()
  */
 function scheduled_remove_temp_attachments()
 {
-	global $modSettings;
+	global $modSettings, SUBSDIR;
 
 	// We need to know where this thing is going.
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-
-		// Just use the current path for temp files.
-		$attach_dirs = $modSettings['attachmentUploadDir'];
-	}
-	else
-	{
-		$attach_dirs = array($modSettings['attachmentUploadDir']);
-	}
+	require_once(SUBSDIR . '/Attachment.subs.php');
+	$attach_dirs = attachmentPaths();
 
 	foreach ($attach_dirs as $attach_dir)
 	{
