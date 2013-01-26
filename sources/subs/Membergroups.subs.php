@@ -720,57 +720,13 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	if (!empty($group_ids))
 	{
 		if ($membergroup_type === 'post_count')
-		{
-			$query = $smcFunc['db_query']('', '
-				SELECT id_post_group AS id_group, COUNT(*) AS num_members
-				FROM {db_prefix}members
-				WHERE id_post_group IN ({array_int:group_list})
-				GROUP BY id_post_group',
-				array(
-					'group_list' => $group_ids,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($query))
-				$groups[$row['id_group']]['num_members'] += $row['num_members'];
-			$smcFunc['db_free_result']($query);
-		}
-
+			$groups_count = membersInGroups($group_ids);
 		else
-		{
-			$query = $smcFunc['db_query']('', '
-				SELECT id_group, COUNT(*) AS num_members
-				FROM {db_prefix}members
-				WHERE id_group IN ({array_int:group_list})
-				GROUP BY id_group',
-				array(
-					'group_list' => $group_ids,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($query))
-				$groups[$row['id_group']]['num_members'] += $row['num_members'];
-			$smcFunc['db_free_result']($query);
+			$groups_count = membersInGroups(array(), $group_ids, $include_hidden);
 
-			// Only do additional groups if we can moderate...
-			if ($include_hidden)
-			{
-				$query = $smcFunc['db_query']('', '
-					SELECT mg.id_group, COUNT(*) AS num_members
-					FROM {db_prefix}membergroups AS mg
-						INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
-							AND mem.id_group != mg.id_group
-							AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-					WHERE mg.id_group IN ({array_int:group_list})
-					GROUP BY mg.id_group',
-					array(
-						'group_list' => $group_ids,
-						'blank_string' => '',
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($query))
-					$groups[$row['id_group']]['num_members'] += $row['num_members'];
-				$smcFunc['db_free_result']($query);
-			}
-		}
+		// @todo not sure why += wouldn't = be enough?
+		foreach ($groups_count as $group_id => $num_members)
+			$groups[$group_id]['num_members'] += $num_members;
 
 		$query = $smcFunc['db_query']('', '
 			SELECT mods.id_group, mods.id_member, mem.member_name, mem.real_name
@@ -795,6 +751,85 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			$sort_array[] = $group['id_group'] != 3 ? (int) $group['num_members'] : -1;
 
 		array_multisort($sort_array, $sort_ascending ? SORT_ASC : SORT_DESC, SORT_REGULAR, $groups);
+	}
+
+	return $groups;
+}
+
+function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
+{
+	global $smcFunc;
+
+	$groups = array();
+
+	// If we have post groups, let's count the number of members...
+	if (!empty($postGroups))
+	{
+		$query = $smcFunc['db_query']('', '
+			SELECT id_post_group AS id_group, COUNT(*) AS member_count
+			FROM {db_prefix}members
+			WHERE id_post_group IN ({array_int:post_group_list})
+			GROUP BY id_post_group',
+			array(
+				'post_group_list' => $postGroups,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($query))
+			$groups[$row['id_group']] = $row['member_count'];
+		$smcFunc['db_free_result']($query);
+	}
+
+	if (!empty($normalGroups))
+	{
+		// Find people who are members of this group...
+		$query = $smcFunc['db_query']('', '
+			SELECT id_group, COUNT(*) AS member_count
+			FROM {db_prefix}members
+			WHERE id_group IN ({array_int:normal_group_list})
+			GROUP BY id_group',
+			array(
+				'normal_group_list' => $normalGroups,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($query))
+			$groups[$row['id_group']] = $row['member_count'];
+		$smcFunc['db_free_result']($query);
+
+		// Only do additional groups if we can moderate...
+		if ($include_hidden)
+		{
+			// Also do those who have it as an additional membergroup - this ones more yucky...
+			$query = $smcFunc['db_query']('', '
+				SELECT mg.id_group, COUNT(*) AS member_count
+				FROM {db_prefix}membergroups AS mg
+					INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
+						AND mem.id_group != mg.id_group
+						AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
+				WHERE mg.id_group IN ({array_int:normal_group_list})
+				GROUP BY mg.id_group',
+				array(
+					'normal_group_list' => $normalGroups,
+					'blank_string' => '',
+				)
+			);
+			while ($row = $smcFunc['db_fetch_assoc']($query))
+				$groups[$row['id_group']] = $row['member_count'];
+			$smcFunc['db_free_result']($query);
+		}
+	}
+
+	if ($include_moderators)
+	{
+		// Any moderators?
+		$request = $smcFunc['db_query']('', '
+			SELECT COUNT(DISTINCT id_member) AS num_distinct_mods
+			FROM {db_prefix}moderators
+			LIMIT 1',
+			array(
+			)
+		);
+		list ($groups[3]) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
 	}
 
 	return $groups;

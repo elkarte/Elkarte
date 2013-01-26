@@ -91,7 +91,9 @@ function ModifyPermissions()
  */
 function PermissionIndex()
 {
-	global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc, $librarydir;
+
+	require_once($librarydir . 'Membergroups.subs.php');
 
 	$context['page_title'] = $txt['permissions_title'];
 
@@ -214,56 +216,10 @@ function PermissionIndex()
 	$smcFunc['db_free_result']($query);
 
 	// Get the number of members in this post group.
-	if (!empty($postGroups))
-	{
-		$query = $smcFunc['db_query']('', '
-			SELECT id_post_group AS id_group, COUNT(*) AS num_members
-			FROM {db_prefix}members
-			WHERE id_post_group IN ({array_int:post_group_list})
-			GROUP BY id_post_group',
-			array(
-				'post_group_list' => $postGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-	}
-
-	if (!empty($normalGroups))
-	{
-		// First, the easy one!
-		$query = $smcFunc['db_query']('', '
-			SELECT id_group, COUNT(*) AS num_members
-			FROM {db_prefix}members
-			WHERE id_group IN ({array_int:normal_group_list})
-			GROUP BY id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-
-		// This one is slower, but it's okay... careful not to count twice!
-		$query = $smcFunc['db_query']('', '
-			SELECT mg.id_group, COUNT(*) AS num_members
-			FROM {db_prefix}membergroups AS mg
-				INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
-					AND mem.id_group != mg.id_group
-					AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-			WHERE mg.id_group IN ({array_int:normal_group_list})
-			GROUP BY mg.id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-				'blank_string' => '',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-	}
+	$groups = membersInGroups($postGroups, $normalGroups, true);
+	// @todo not sure why += wouldn't = be enough?
+	foreach ($groups as $id_group => $member_count)
+		$context['groups'][$id_group]['member_count'] += $member_count;
 
 	foreach ($context['groups'] as $id => $data)
 	{
