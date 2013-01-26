@@ -2905,7 +2905,7 @@ function template_rawdata()
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $settings, $user_info, $boarddir, $cachedir;
+	global $txt, $modSettings, $context, $settings, $user_info, $boarddir, $cachedir, $librarydir;
 
 	setupThemeContext();
 
@@ -2943,17 +2943,8 @@ function template_header()
 			}
 
 			// We are already checking so many files...just few more doesn't make any difference! :P
-			if (!empty($modSettings['currentAttachmentUploadDir']))
-			{
-				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = @unserialize($modSettings['attachmentUploadDir']);
-				$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-			}
-			else
-			{
-				$path = $modSettings['attachmentUploadDir'];
-				$id_folder_thumb = 1;
-			}
+			require_once($librarydir . '/Attachments.subs.php');
+			$path = getAttachmentPath();
 			secureDirectory($path, true);
 			secureDirectory($cachedir);
 
