@@ -254,7 +254,7 @@ function openID_removeAssociation($handle)
  */
 function action_openidreturn()
 {
-	global $smcFunc, $user_info, $user_profile, $sourcedir, $librarydir, $modSettings, $context, $sc, $user_settings;
+	global $smcFunc, $user_info, $user_profile, $sourcedir, $librarydir, $controllerdir, $modSettings, $context, $sc, $user_settings;
 
 	// Is OpenID even enabled?
 	if (empty($modSettings['enableOpenID']))
@@ -357,7 +357,7 @@ function action_openidreturn()
 		// Were we just verifying the registration state?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
-			require_once($sourcedir . '/controllers/Register.controller.php');
+			require_once($controllerdir . '/Register.controller.php');
 			return action_register2(true);
 		}
 		else
@@ -390,7 +390,7 @@ function action_openidreturn()
 			'openid_uri' => $openid_uri,
 		);
 
-		require_once($sourcedir . '/controllers/LogInOut.controller.php');
+		require_once($controllerdir . '/LogInOut.controller.php');
 
 		if (!checkActivation())
 			return;

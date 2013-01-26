@@ -417,7 +417,7 @@ function action_deleteaccount($memID)
  */
 function action_deleteaccount2($memID)
 {
-	global $user_info, $sourcedir, $librarydir, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $sourcedir, $librarydir, $controllerdir, $context, $cur_profile, $modSettings, $smcFunc;
 
 	// Try get more time...
 	@set_time_limit(600);
@@ -511,7 +511,7 @@ function action_deleteaccount2($memID)
 	{
 		deleteMembers($memID);
 
-		require_once($sourcedir . '/controllers/LogInOut.controller.php');
+		require_once($controllerdir . '/LogInOut.controller.php');
 		action_logout(true);
 
 		redirectexit();

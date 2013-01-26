@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
 function action_summary($memID)
 {
 	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
-	global $sourcedir, $librarydir, $scripturl, $smcFunc, $settings;
+	global $sourcedir, $librarydir, $controllerdir, $scripturl, $smcFunc, $settings;
 
 	// Attempt to load the member's profile data.
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
@@ -97,7 +97,7 @@ function action_summary($memID)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		include_once($sourcedir . '/controllers/Who.controller.php');
+		include_once($controllerdir . '/Who.controller.php');
 		$action = determineActions($user_profile[$memID]['url']);
 
 		if ($action !== false)

@@ -674,7 +674,7 @@ function action_messageindex()
  */
 function action_quickmod()
 {
-	global $sourcedir, $librarydir, $board, $user_info, $modSettings, $smcFunc, $context;
+	global $sourcedir, $librarydir, $controllerdir, $board, $user_info, $modSettings, $smcFunc, $context;
 
 	// Check the session = get or post.
 	checkSession('request');
@@ -752,7 +752,7 @@ function action_quickmod()
 			if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 				redirectexit($redirect_url);
 
-			require_once($sourcedir . '/controllers/SplitTopics.controller.php');
+			require_once($controllerdir . '/SplitTopics.controller.php');
 			return MergeExecute($_REQUEST['topics']);
 		}
 

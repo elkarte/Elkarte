@@ -551,7 +551,7 @@ function AdminMain()
 */
 function AdminHome()
 {
-	global $sourcedir, $librarydir, $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+	global $sourcedir, $librarydir,  $controllerdir, $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
 
 	// You have to be able to do at least one of the below to see this page.
 	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -565,7 +565,7 @@ function AdminHome()
 	}
 
 	// Load the credits stuff.
-	require_once($sourcedir . '/controllers/Who.controller.php');
+	require_once($controllerdir . '/Who.controller.php');
 	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.

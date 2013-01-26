@@ -116,13 +116,13 @@ function reloadSettings()
 			return $length === null ? implode(\'\', array_slice($ent_arr, $start)) : implode(\'\', array_slice($ent_arr, $start, $length));'),
 		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
 			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
-			global $sourcedir;
-			require_once($sourcedir . \'/subs/Charset.subs.php\');
+			global $librarydir;
+			require_once($librarydir . \'/Charset.subs.php\');
 			return utf8_strtolower($string);'),
 		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
 			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
-			global $sourcedir;
-			require_once($sourcedir . \'/subs/Charset.subs.php\');
+			global $librarydir;
+			require_once($librarydir . \'/Charset.subs.php\');
 			return utf8_strtoupper($string);'),
 		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
 			global $smcFunc;
@@ -753,7 +753,7 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $board, $board_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
 
 	if ($user_info['is_admin'])
 	{
@@ -855,7 +855,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($sourcedir . '/subs/Auth.subs.php');
+			require_once($librarydir . '/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -2370,7 +2370,7 @@ function censorText(&$text, $force = false)
 function template_include($filename, $once = false)
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-	global $user_info, $boardurl, $boarddir, $sourcedir;
+	global $user_info, $boardurl, $boarddir, $sourcedir, $librarydir;
 	global $maintenance, $mtitle, $mmessage;
 	static $templates = array();
 
@@ -2449,7 +2449,7 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($sourcedir . '/subs/Package.subs.php');
+			require_once($librarydir . '/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))
