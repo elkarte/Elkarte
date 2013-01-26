@@ -371,9 +371,8 @@ function ModifyCoreFeatures($return_config = false)
 					return array(\'spider_group\' => 0, \'show_spider_online\' => 0);
 			'),
 			'on_save' => create_function('', '
-				global $sourcedir, $modSettings;
-				loadAdminClass(\'ManageSearchEngines.php\');
-				recacheSpiderNames();
+				global $librarydir, $modSettings;
+				require_once($librarydir . \'/SearchEngines.subs.php\');
 			'),
 		),
 	);

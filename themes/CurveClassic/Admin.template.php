@@ -32,7 +32,7 @@ function template_admin()
 	echo '
 		<div id="admin_main_section">';
 
-	// Display the "live news" from simplemachines.org.
+	// Display the "live news"
 	echo '
 			<div id="live_news" class="floatleft">
 				<div class="cat_bar">
@@ -70,6 +70,7 @@ function template_admin()
 							<br />
 							<strong>', $txt['administrators'], ':</strong>
 							', implode(', ', $context['administrators']);
+
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
@@ -300,7 +301,7 @@ function template_credits()
 			function ourCurrentVersion()
 			{
 				var ourVer, yourVer;
-console.log("here");
+
 				if (!window.ourVersion)
 					return;
 
@@ -364,37 +365,206 @@ function template_view_versions()
 
 	// Now list all the source file versions, starting with the overall version (if all match!).
 	echo '
-					<tr>
-						<td class="windowbg">
-							<a href="#" id="Sources-link">', $txt['dvc_sources'], '</a>
-						</td>
-						<td class="windowbg">
-							<em id="yourSources">??</em>
-						</td>
-						<td class="windowbg">
-							<em id="ourSources">??</em>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+									<tr>
+										<td class="windowbg">
+											<a href="#" id="sources-link">', $txt['dvc_sources'], '</a>
+										</td>
+										<td class="windowbg">
+											<em id="yoursources">??</em>
+										</td>
+										<td class="windowbg">
+											<em id="oursources">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
-			<table id="Sources" width="100%" class="table_grid">
-			<tbody>';
+							<table id="sources" width="100%" class="table_grid">
+							<tbody>';
 
 	// Loop through every source file displaying its version - using javascript.
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
-				<tr>
-					<td class="windowbg2" width="50%" style="padding-left: 3ex;">
-						', $filename, '
-					</td>
-					<td class="windowbg2" width="25%">
-						<em id="yourSources', $filename, '">', $version, '</em>
-					</td>
-					<td class="windowbg2" width="25%">
-						<em id="ourSources', $filename, '">??</em>
-					</td>
-				</tr>';
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="yoursources', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="oursources', $filename, '">??</em>
+									</td>
+								</tr>';
+
+	// Done with sources
+	echo '
+							</tbody>
+							</table>';
+
+	// List all the admin file versions, starting with the overall version (if all match!).
+	echo '
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="youradmin">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ouradmin">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table id="admin" width="100%" class="table_grid">
+							<tbody>';
+
+	// Loop through every admin file displaying its version - using javascript.
+	foreach ($context['file_versions_admin'] as $filename => $version)
+		echo '
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="youradmin', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="ouradmin', $filename, '">??</em>
+									</td>
+								</tr>';
+
+	// Close the admin section
+	echo '
+							</tbody>
+							</table>';
+
+	// List all the controller file versions, starting with the overall version (if all match!).
+	echo '
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yourcontrollers">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ourcontrollers">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table id="controllers" width="100%" class="table_grid">
+							<tbody>';
+
+	// Loop through every controller file displaying its version - using javascript.
+	foreach ($context['file_versions_controllers'] as $filename => $version)
+		echo '
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="yourcontrollers', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="ourcontrollers', $filename, '">??</em>
+									</td>
+								</tr>';
+
+	// Close the controller section
+	echo '
+							</tbody>
+							</table>';
+
+	// List all the database file versions, starting with the overall version (if all match!).
+	echo '
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="database-link">', $txt['dvc_database'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yourdatabase">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="ourdatabase">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table id="database" width="100%" class="table_grid">
+							<tbody>';
+
+	// Loop through every database file displaying its version - using javascript.
+	foreach ($context['file_versions_database'] as $filename => $version)
+		echo '
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="yourdatabase', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="ourdatabase', $filename, '">??</em>
+									</td>
+								</tr>';
+
+	// Close the database section
+	echo '
+							</tbody>
+							</table>';
+
+	// List all the subs file versions, starting with the overall version (if all match!).
+	echo '
+							<table width="100%" class="table_grid">
+								<tbody>
+									<tr>
+										<td class="windowbg" width="50%">
+											<a href="#" id="subs-link">', $txt['dvc_subs'], '</a>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="yoursubs">??</em>
+										</td>
+										<td class="windowbg" width="25%">
+											<em id="oursubs">??</em>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table id="subs" width="100%" class="table_grid">
+							<tbody>';
+
+	// Loop through every subs file displaying its version - using javascript.
+	foreach ($context['file_versions_subs'] as $filename => $version)
+		echo '
+								<tr>
+									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										', $filename, '
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="yoursubs', $filename, '">', $version, '</em>
+									</td>
+									<td class="windowbg2" width="25%">
+										<em id="oursubs', $filename, '">??</em>
+									</td>
+								</tr>';
+
+	// Close the subs section
+	echo '
+							</tbody>
+							</table>';
 
 	// Default template files.
 	echo '
@@ -405,19 +575,19 @@ function template_view_versions()
 				<tbody>
 					<tr>
 						<td class="windowbg" width="50%">
-							<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
+							<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="yourDefault">??</em>
+							<em id="yourdefault">??</em>
 						</td>
 						<td class="windowbg" width="25%">
-							<em id="ourDefault">??</em>
+							<em id="ourdefault">??</em>
 						</td>
 					</tr>
 				</tbody>
 			</table>
 
-			<table id="Default" width="100%" class="table_grid">
+			<table id="default" width="100%" class="table_grid">
 				<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
@@ -427,10 +597,10 @@ function template_view_versions()
 							', $filename, '
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="yourDefault', $filename, '">', $version, '</em>
+							<em id="yourdefault', $filename, '">', $version, '</em>
 						</td>
 						<td class="windowbg2" width="25%">
-							<em id="ourDefault', $filename, '">??</em>
+							<em id="ourdefault', $filename, '">??</em>
 						</td>
 					</tr>';
 
@@ -538,7 +708,7 @@ function template_view_versions()
 				],
 				oSectionContainerIds: {
 					Sources: \'Sources\',
-					Default: \'Default\',
+					default: \'default\',
 					Languages: \'Languages\',
 					Templates: \'Templates\'
 				}

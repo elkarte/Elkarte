@@ -1,5 +1,6 @@
 <?php
 // Version: 1.0; Editor
+
 global $editortxt;
 
 $editortxt['Bold'] = 'Bold';

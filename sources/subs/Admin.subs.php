@@ -107,61 +107,70 @@ function getFileVersions(&$versionOptions)
 
 	$version_info = array(
 		'file_versions' => array(),
+		'file_versions_admin' => array(),
+		'file_versions_controllers' => array(),
+		'file_versions_database' => array(),
+		'file_versions_subs' => array(),
 		'default_template_versions' => array(),
 		'template_versions' => array(),
 		'default_language_versions' => array(),
 	);
 
+	// The comment looks rougly like... that.
+	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
+	$unknown_version = '??';
+
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists($boarddir . '/SSI.php'))
 	{
-		$fp = fopen($boarddir . '/SSI.php', 'rb');
-		$header = fread($fp, 4096);
-		fclose($fp);
-
-		// The comment looks rougly like... that.
-		if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
+		$header = file_get_contents($boarddir . '/SSI.php', NULL, NULL, 0, 768);
+		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['SSI.php'] = $match[1];
 		// Not found!  This is bad.
 		else
-			$version_info['file_versions']['SSI.php'] = '??';
+			$version_info['file_versions']['SSI.php'] = $unknown_version;
 	}
 
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']) && file_exists($boarddir . '/subscriptions.php'))
 	{
-		$fp = fopen($boarddir . '/subscriptions.php', 'rb');
-		$header = fread($fp, 4096);
-		fclose($fp);
-
-		// Found it?
-		if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
+		$header = file_get_contents($boarddir . '/subscriptions.php', NULL, NULL, 0, 768);
+		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['subscriptions.php'] = $match[1];
 		// If we haven't how do we all get paid?
 		else
-			$version_info['file_versions']['subscriptions.php'] = '??';
+			$version_info['file_versions']['subscriptions.php'] = $unknown_version;
 	}
 
-	// Load all the files in the Sources directory, except this file and the redirect.
-	$sources_dir = dir($sourcedir);
-	while ($entry = $sources_dir->read())
+	// Load all the files in the sources and its sub directorys
+	$directories = array(
+		'file_versions' => $sourcedir,
+		'file_versions_admin' => $sourcedir . '/admin',
+		'file_versions_controllers' => $sourcedir . '/controllers',
+		'file_versions_database' => $sourcedir . '/database',
+		'file_versions_subs' => $sourcedir . '/subs',
+		'file_versions_lib' => $sourcedir . '/lib'
+	);
+	foreach ($directories as $area => $dir)
 	{
-		if (substr($entry, -4) === '.php' && !is_dir($sourcedir . '/' . $entry) && $entry !== 'index.php')
+		$sources_dir = dir($dir);
+		while ($entry = $sources_dir->read())
 		{
-			// Read the first 4k from the file.... enough for the header.
-			$fp = fopen($sourcedir . '/' . $entry, 'rb');
-			$header = fread($fp, 4096);
-			fclose($fp);
+			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
+			{
+				// Read the first 4k from the file.... enough for the header.
+				$header = file_get_contents($dir . '/' . $entry, NULL, NULL, 0, 768);
 
-			// Look for the version comment in the file header.
-			if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
-				$version_info['file_versions'][$entry] = $match[1];
-			// It wasn't found, but the file was... show a '??'.
-			else
-				$version_info['file_versions'][$entry] = '??';
+				// Look for the version comment in the file header.
+				if (preg_match($version_regex, $header, $match))
+					$version_info[$area][$entry] = $match[1];
+				// It wasn't found, but the file was... show a $unknown_version.
+				else
+					$version_info[$area][$entry] = '??';
+			}
 		}
+		$sources_dir->close();
 	}
-	$sources_dir->close();
 
 	// Load all the files in the default template directory - and the current theme if applicable.
 	$directories = array('default_template_versions' => $settings['default_theme_dir']);
@@ -176,16 +185,14 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
 			{
 				// Read the first 768 bytes from the file.... enough for the header.
-				$fp = fopen($dirname . '/' . $entry, 'rb');
-				$header = fread($fp, 768);
-				fclose($fp);
+				$header = file_get_contents($dirname . '/' . $entry, NULL, NULL, 0, 768);
 
 				// Look for the version comment in the file header.
-				if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
+				if (preg_match($version_regex, $header, $match) == 1)
 					$version_info[$type][$entry] = $match[1];
 				// It wasn't found, but the file was... show a '??'.
 				else
-					$version_info[$type][$entry] = '??';
+					$version_info[$type][$entry] = $unknown_version;
 			}
 		}
 		$this_dir->close();
@@ -198,9 +205,7 @@ function getFileVersions(&$versionOptions)
 		if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($lang_dir . '/' . $entry))
 		{
 			// Read the first 768 bytes from the file.... enough for the header.
-			$fp = fopen($lang_dir . '/' . $entry, 'rb');
-			$header = fread($fp, 768);
-			fclose($fp);
+			$header = file_get_contents($lang_dir . '/' . $entry, NULL, NULL, 0, 768);
 
 			// Split the file name off into useful bits.
 			list ($name, $language) = explode('.', $entry);
@@ -210,7 +215,7 @@ function getFileVersions(&$versionOptions)
 				$version_info['default_language_versions'][$language][$name] = $match[1];
 			// It wasn't found, but the file was... show a '??'.
 			else
-				$version_info['default_language_versions'][$language][$name] = '??';
+				$version_info['default_language_versions'][$language][$name] = $unknown_version;
 		}
 	}
 	$this_dir->close();
@@ -219,6 +224,10 @@ function getFileVersions(&$versionOptions)
 	if (!empty($versionOptions['sort_results']))
 	{
 		ksort($version_info['file_versions']);
+		ksort($version_info['file_versions_admin']);
+		ksort($version_info['file_versions_controllers']);
+		ksort($version_info['file_versions_database']);
+		ksort($version_info['file_versions_subs']);
 		ksort($version_info['default_template_versions']);
 		ksort($version_info['template_versions']);
 		ksort($version_info['default_language_versions']);

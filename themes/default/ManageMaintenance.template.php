@@ -22,7 +22,7 @@ function template_maintain_database()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="maintenance_finished">
+			<div class="infobox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -122,7 +122,7 @@ function template_maintain_routine()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="maintenance_finished">
+			<div class="infobox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -261,7 +261,7 @@ function template_maintain_members()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 	echo '
-		<div class="maintenance_finished">
+		<div class="infobox">
 			', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 		</div>';
 
@@ -374,7 +374,7 @@ function template_maintain_topics()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="maintenance_finished">
+			<div class="infobox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -605,7 +605,7 @@ function template_convert_msgbody()
 				<hr class="hrcolor" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-				<input type="submit" name="do_conversion" value="', $txt['entity_convert_proceed'], '" class="button_submit" />
+				<input type="submit" name="do_conversion" value="', $txt['convert_proceed'], '" class="button_submit" />
 				</form>
 			</div>
 		</div>

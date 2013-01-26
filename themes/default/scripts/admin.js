@@ -206,27 +206,43 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 smf_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
-		Sources: '??',
-		Default: '??',
+		sources: '??',
+		admin: '??',
+		controllers: '??',
+		database: '??',
+		subs: '??',
+		default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
 	var oHighCurrent = {
-		Sources: '??',
-		Default: '??',
+		sources: '??',
+		admin: '??',
+		controllers: '??',
+		database: '??',
+		subs: '??',
+		default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
 	var oLowVersion = {
-		Sources: false,
-		Default: false,
+		sources: false,
+		admin: false,
+		controllers: false,
+		database: false,
+		subs: false,
+		default: false,
 		Languages: false,
 		Templates: false
 	};
 
 	var sSections = [
-		'Sources',
-		'Default',
+		'sources',
+		'admin',
+		'controllers',
+		'database',
+		'subs',
+		'default',
 		'Languages',
 		'Templates'
 	];
@@ -254,6 +270,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 	if (!('ourVersions' in window))
 		window.ourVersions = {};
 
+	// for each file in the detailed-version.js
 	for (var sFilename in window.ourVersions)
 	{
 		if (!document.getElementById('our' + sFilename))
@@ -263,16 +280,18 @@ smf_ViewVersions.prototype.determineVersions = function ()
 
 		var sCurVersionType;
 		for (var sVersionType in oLowVersion)
-			if (sFilename.substr(0, sVersionType.length) == sVersionType)
+			if (sFilename.substr(0, sVersionType.length) === sVersionType)
 			{
 				sCurVersionType = sVersionType;
 				break;
 			}
-
+		
+		// use compareVersion to determine which version is >< the other
 		if (typeof(sCurVersionType) != 'undefined')
 		{
 			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] == '??') && !oLowVersion[sCurVersionType])
 				oHighYour[sCurVersionType] = sYourVersion;
+			
 			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] == '??')
 				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
 
@@ -317,15 +336,36 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		}
 	}
 
-	setInnerHTML(document.getElementById('yourSources'), oLowVersion.Sources ? oLowVersion.Sources : oHighYour.Sources);
-	setInnerHTML(document.getElementById('ourSources'), oHighCurrent.Sources);
-	if (oLowVersion.Sources)
-		document.getElementById('yourSources').style.color = 'red';
+	// Set the column titles based on the files each contain
+	setInnerHTML(document.getElementById('yoursources'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
+	setInnerHTML(document.getElementById('oursources'), oHighCurrent.sources);
+	if (oLowVersion.sources)
+		document.getElementById('yoursources').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourDefault'), oLowVersion.Default ? oLowVersion.Default : oHighYour.Default);
-	setInnerHTML(document.getElementById('ourDefault'), oHighCurrent.Default);
-	if (oLowVersion.Default)
-		document.getElementById('yourDefault').style.color = 'red';
+	setInnerHTML(document.getElementById('youradmin'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
+	setInnerHTML(document.getElementById('ouradmin'), oHighCurrent.sources);
+	if (oLowVersion.sources)
+		document.getElementById('youradmin').style.color = 'red';
+
+	setInnerHTML(document.getElementById('yourcontrollers'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
+	setInnerHTML(document.getElementById('ourcontrollers'), oHighCurrent.sources);
+	if (oLowVersion.sources)
+		document.getElementById('yourcontrollers').style.color = 'red';
+
+	setInnerHTML(document.getElementById('yourdatabase'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
+	setInnerHTML(document.getElementById('ourdatabase'), oHighCurrent.sources);
+	if (oLowVersion.sources)
+		document.getElementById('yourdatabase').style.color = 'red';
+
+	setInnerHTML(document.getElementById('yoursubs'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
+	setInnerHTML(document.getElementById('oursubs'), oHighCurrent.sources);
+	if (oLowVersion.sources)
+		document.getElementById('yoursubs').style.color = 'red';
+
+	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.default ? oLowVersion.default : oHighYour.default);
+	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.default);
+	if (oLowVersion.default)
+		document.getElementById('yourdefault').style.color = 'red';
 
 	if (document.getElementById('Templates'))
 	{

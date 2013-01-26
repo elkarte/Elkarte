@@ -59,7 +59,7 @@ class Ftp_Connection
 	 * @param type $ftp_user
 	 * @param type $ftp_pass
 	 */
-	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
 		// Initialize variables.
 		$this->connection = 'no_connection';
@@ -79,7 +79,7 @@ class Ftp_Connection
 	 * @param type $ftp_pass
 	 * @return type
 	 */
-	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
 		if (strpos($ftp_server, 'ftp://') === 0)
 			$ftp_server = substr($ftp_server, 6);

@@ -291,7 +291,7 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		require_once ($this->_file_name);
+		require_once($this->_file_name);
 
 		if (!empty($this->_controller_name))
 		{

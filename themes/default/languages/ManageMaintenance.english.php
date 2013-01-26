@@ -179,11 +179,7 @@ $txt['exceeding_messages'] = 'The following messages are longer than 65535 chara
 $txt['exceeding_messages_morethan'] = 'And other %1$d';
 $txt['convert_to_text'] = 'No messages are longer than 65535 characters. You can safely proceed with the conversion without losing any part of the text.';
 $txt['convert_to_suggest_text'] = 'The messages body column in your database is currently set as MEDIUMTEXT, but the maximum allowed length set for the messages is lower than 65535 characters. You may free some space converting the column to TEXT.';
-
-$txt['entity_convert_title'] = 'Convert HTML-entities to UTF-8 characters';
-$txt['entity_convert_only_utf8'] = 'The database needs to be in UTF-8 format before HTML-entities can be converted to UTF-8';
-$txt['entity_convert_introduction'] = 'This function will convert all characters that are stored in the database as HTML-entities to UTF-8 characters. This is especially useful when you have just converted your forum from a character set like ISO-8859-1 while non-latin characters were used on the forum. The browser then sends all characters as HTML-entities. For example, the HTML-entity &amp;#945; represents the greek letter &#945; (alpha). Converting entities to UTF-8 will improve searching and sorting of text and reduce storage size.';
-$txt['entity_convert_proceed'] = 'Proceed';
+$txt['convert_proceed'] = 'Proceed';
 
 // Move topics out.
 $txt['move_topics_maintenance'] = 'Move Topics';

@@ -222,7 +222,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $sourcedir, $smcFunc;
+	global $modSettings, $user_settings, $sourcedir, $librarydir, $smcFunc;
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -390,8 +390,8 @@ function loadUserSettings()
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
 		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
 		{
-			loadAdminClass ('ManageSearchEngines.php');
-			$user_info['possibly_robot'] = SpiderCheck();
+			require_once($librarydir . '/SearchEngines.subs.php');
+			$user_info['possibly_robot'] = spiderCheck();
 		}
 		elseif (!empty($modSettings['spider_mode']))
 			$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;

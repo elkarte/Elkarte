@@ -2191,7 +2191,7 @@ function action_messagelabels()
  */
 function action_messagesettings()
 {
-	global $txt, $user_settings, $user_info, $context, $sourcedir, $librarydir, $smcFunc;
+	global $txt, $user_settings, $user_info, $context, $controllerdir, $librarydir, $smcFunc;
 	global $scripturl, $profile_vars, $cur_profile, $user_profile;
 
 	// We want them to submit back to here.

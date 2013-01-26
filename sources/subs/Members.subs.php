@@ -1386,3 +1386,29 @@ function generateValidationCode()
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
 }
+
+/**
+ * Find out if there is another admin than the given user.
+ *
+ * @param int $memberID ID of the member, to compare with.
+ */
+function isAnotherAdmin($memberID)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
+			AND id_member != {int:selected_member}
+		LIMIT 1',
+		array(
+			'admin_group' => 1,
+			'selected_member' => $memberID,
+		)
+	);
+	list ($another) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $another;
+}

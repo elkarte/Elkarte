@@ -9,7 +9,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
@@ -236,13 +236,13 @@ if (!class_exists('Ftp_Connection'))
 		var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
 		// Create a new FTP connection...
-		function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+		function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
 			if ($ftp_server !== null)
 				$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
 		}
 
-		function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+		function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
 			if (substr($ftp_server, 0, 6) == 'ftp://')
 				$ftp_server = substr($ftp_server, 6);
@@ -1943,7 +1943,7 @@ function cli_scheduled_fetchFiles()
 	foreach ($js_files as $ID_FILE => $file)
 	{
 		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.simplemachines.org' : '';
+		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.elkarte.net' : '';
 		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
 
 		// Get the file

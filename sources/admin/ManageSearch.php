@@ -92,7 +92,7 @@ function ManageSearch()
  */
 function EditSearchSettings($return_config = false)
 {
-	global $txt, $context, $scripturl, $sourcedir, $modSettings;
+	global $txt, $context, $scripturl, $librarydir, $modSettings;
 
 	// What are we editing anyway?
 	$config_vars = array(
