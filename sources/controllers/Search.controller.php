@@ -253,7 +253,7 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $sourcedir, $txt, $db_connection;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, $smcFunc, $librarydir;
+	global $excludedWords, $participants, $smcFunc, $librarydir, $controllerdir;
 
 	// if comming from the quick search box, and we want to search on members, well we need to do that ;)
 	if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
@@ -335,7 +335,7 @@ function action_plushsearch2()
 	// Are you allowed?
 	isAllowedTo('search_posts');
 
-	require_once($sourcedir . '/controllers/Display.controller.php');
+	require_once($controllerdir . '/Display.controller.php');
 	require_once($librarydir . '/Package.subs.php');
 	require_once($librarydir . '/Search.subs.php');
 

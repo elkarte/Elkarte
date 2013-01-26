@@ -387,7 +387,7 @@ function loadProfileFields($force_reload = false)
 			'log_change' => true,
 			'permission' => 'profile_identity',
 			'input_validate' => create_function('&$value', '
-				global $context, $old_profile, $context, $profile_vars, $sourcedir, $modSettings;
+				global $context, $old_profile, $context, $profile_vars, $librarydir, $modSettings;
 
 				if (strtolower($value) == strtolower($old_profile[\'email_address\']))
 					return false;
@@ -397,7 +397,7 @@ function loadProfileFields($force_reload = false)
 				// Do they need to revalidate? If so schedule the function!
 				if ($isValid === true && !empty($modSettings[\'send_validation_onChange\']) && !allowedTo(\'moderate_forum\'))
 				{
-					require_once($sourcedir . \'/subs/Members.subs.php\');
+					require_once($librarydir . \'/Members.subs.php\');
 					$profile_vars[\'validation_code\'] = generateValidationCode();
 					$profile_vars[\'is_activated\'] = 2;
 					$context[\'profile_execute_on_save\'][] = \'profileSendActivation\';
@@ -535,12 +535,12 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'prehtml' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? '<div class="alert">' . $txt['username_warning'] . '</div>' : '',
 			'input_validate' => create_function('&$value', '
-				global $sourcedir, $context, $user_info, $cur_profile;
+				global $librarydir, $context, $user_info, $cur_profile;
 
 				if (allowedTo(\'admin_forum\'))
 				{
 					// We\'ll need this...
-					require_once($sourcedir . \'/subs/Auth.subs.php\');
+					require_once($librarydir . \'/Auth.subs.php\');
 
 					// Maybe they are trying to change their password as well?
 					$resetPassword = true;
@@ -570,7 +570,7 @@ function loadProfileFields($force_reload = false)
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
 			'input_validate' => create_function('&$value', '
-				global $sourcedir, $user_info, $smcFunc, $cur_profile;
+				global $librarydir, $user_info, $smcFunc, $cur_profile;
 
 				// If we didn\'t try it then ignore it!
 				if ($value == \'\')
@@ -581,7 +581,7 @@ function loadProfileFields($force_reload = false)
 					return \'bad_new_password\';
 
 				// Let\'s get the validation function into play...
-				require_once($sourcedir . \'/subs/Auth.subs.php\');
+				require_once($librarydir . \'/Auth.subs.php\');
 				$passwordErrors = validatePassword($value, $cur_profile[\'member_name\'], array($cur_profile[\'real_name\'], $user_info[\'username\'], $user_info[\'name\'], $user_info[\'email\']));
 
 				// Were there errors?
@@ -667,7 +667,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $smcFunc, $sourcedir, $cur_profile;
+				global $context, $smcFunc, $librarydir, $cur_profile;
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
@@ -677,7 +677,7 @@ function loadProfileFields($force_reload = false)
 					return \'name_too_long\';
 				elseif ($cur_profile[\'real_name\'] != $value)
 				{
-					require_once($sourcedir . \'/subs/Members.subs.php\');
+					require_once($librarydir . \'/Members.subs.php\');
 					if (isReservedName($value, $context[\'id_member\']))
 						return \'name_taken\';
 				}

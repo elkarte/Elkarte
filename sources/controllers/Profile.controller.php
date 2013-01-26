@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function action_modifyprofile()
 {
-	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $user_profile, $cur_profile;
+	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $controllerdir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
 
 	// Don't reload this as we may have processed error strings.
@@ -478,7 +478,7 @@ function action_modifyprofile()
 
 	// File to include?
 	if (isset($profile_include_data['file']))
-		require_once($sourcedir . '/controllers/' . $profile_include_data['file']);
+		require_once($controllerdir . '/' . $profile_include_data['file']);
 
 	// Make sure that the area function does exist!
 	if (!isset($profile_include_data['function']) || !function_exists($profile_include_data['function']))

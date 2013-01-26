@@ -38,7 +38,7 @@ function action_post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
-	global $sourcedir, $librarydir, $options, $smcFunc, $language;
+	global $sourcedir, $librarydir, $controllerdir, $options, $smcFunc, $language;
 
 	loadLanguage('Post');
 
@@ -244,7 +244,7 @@ function action_post($post_errors = array())
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
 				// @todo this shouldn't call directly CalendarPost()
-				require_once($sourcedir . '/controllers/Calendar.controller.php');
+				require_once($controllerdir . '/Calendar.controller.php');
 				return CalendarPost();
 			}
 
@@ -883,7 +883,7 @@ function action_post($post_errors = array())
 	// Build a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_save']))
 	{
-		require_once($sourcedir . '/controllers/Drafts.controller.php');
+		require_once($controllerdir . '/Drafts.controller.php');
 		action_showDrafts($user_info['id'], $topic);
 	}
 
@@ -989,7 +989,7 @@ function action_post($post_errors = array())
  */
 function action_post2()
 {
-	global $board, $topic, $txt, $modSettings, $sourcedir, $librarydir, $context;
+	global $board, $topic, $txt, $modSettings, $sourcedir, $librarydir, $controllerdir, $context;
 	global $user_info, $board_info, $options, $smcFunc;
 
 	// Sneaking off, are we?
@@ -1037,7 +1037,7 @@ function action_post2()
 
 	// Drafts enabled and needed?
 	if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
-		require_once($sourcedir . '/controllers/Drafts.controller.php');
+		require_once($controllerdir . '/Drafts.controller.php');
 
 	// First check to see if they are trying to delete any current attachments.
 	if (isset($_POST['attach_del']))
