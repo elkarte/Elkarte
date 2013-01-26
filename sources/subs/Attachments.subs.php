@@ -1391,8 +1391,8 @@ function url_image_size($url)
 /**
  * The current attachments path:
  *  - $boarddir . '/attachments', if nothing is set yet.
- *  - if the forum is using multiple attachments directories, the current path
- *  - it is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
+ *  - if the forum is using multiple attachments directories,
+ *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
  */
 function getAttachmentPath()
@@ -1408,6 +1408,28 @@ function getAttachmentPath()
 		$attachmentDir = $modSettings['attachmentUploadDir'];
 
 	return is_array($attachmentDir) ? $attachmentDir[$modSettings['currentAttachmentUploadDir']] : $attachmentDir;
+}
+
+/**
+ * Return an array of attachments directories.
+ * @see getAttachmentPath()
+ */
+function attachmentPaths()
+{
+	global $modSettings, $boarddir;
+
+	if (empty($modSettings['attachmentUploadDir']))
+		return array($boarddir . '/attachments');
+	elseif (!empty($modSettings['currentAttachmentUploadDir']))
+	{
+		// we have more directories
+		if (!is_array($modSettings['attachmentUploadDir']))
+			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
+		return $modSettings['attachmentUploadDir'];
+	}
+	else
+		return array($modSettings['attachmentUploadDir']);
 }
 
 /**
