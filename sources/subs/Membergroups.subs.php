@@ -71,17 +71,9 @@ function deleteMembergroups($groups)
 		return false;
 
 	// Log the deletion.
-	$request = $smcFunc['db_query']('', '
-		SELECT group_name
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_list})',
-		array(
-			'group_list' => $groups,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	$groups_to_log = membergroupsById($groups, 0);
+	foreach ($groups_to_log as $key => $row)
 		logAction('delete_group', array('group' => $row['group_name']), 'admin');
-	$smcFunc['db_free_result']($request);
 
 	call_integration_hook('integrate_delete_membergroups', array($groups));
 
@@ -294,23 +286,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 
 	// Fetch a list of groups members cannot be assigned to explicitely, and the group names of the ones we want.
 	$implicitGroups = array(-1, 0, 3);
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name, min_posts
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_list})',
-		array(
-			'group_list' => $groups,
-		)
-	);
 	$group_names = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	$group_details = membergroupsById($groups, 0, true);
+	foreach ($group_details as $key => $row)
 	{
 		if ($row['min_posts'] != -1)
 			$implicitGroups[] = $row['id_group'];
 		else
 			$group_names[$row['id_group']] = $row['group_name'];
 	}
-	$smcFunc['db_free_result']($request);
 
 	// Now get rid of those groups.
 	$groups = array_diff($groups, $implicitGroups);
@@ -465,23 +449,12 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 
 	// Some groups just don't like explicitly having members.
 	$implicitGroups = array(-1, 0, 3);
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name, min_posts
-		FROM {db_prefix}membergroups
-		WHERE id_group = {int:current_group}',
-		array(
-			'current_group' => $group,
-		)
-	);
 	$group_names = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if ($row['min_posts'] != -1)
-			$implicitGroups[] = $row['id_group'];
-		else
-			$group_names[$row['id_group']] = $row['group_name'];
-	}
-	$smcFunc['db_free_result']($request);
+	$group_details = membergroupsById($group, 1, true);
+	if ($group_details['min_posts'] != -1)
+		$implicitGroups[] = $group_details['id_group'];
+	else
+		$group_names[$group_details['id_group']] = $group_details['group_name'];
 
 	// Sorry, you can't join an implicit group.
 	if (in_array($group, $implicitGroups) || empty($members))
@@ -493,21 +466,10 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	// ... and assign protected groups!
 	elseif (!allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT group_type
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT {int:limit}',
-			array(
-				'current_group' => $group,
-				'limit' => 1,
-			)
-		);
-		list ($is_protected) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$is_protected = membergroupsById($group);
 
 		// Is it protected?
-		if ($is_protected == 1)
+		if ($is_protected['group_type'] == 1)
 			return false;
 	}
 
@@ -756,6 +718,14 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	return $groups;
 }
 
+/**
+ * Count the number of members in specific groups
+ *
+ * @param array $postGroups an array of post-based groups id
+ * @param array $normalGroups an array of normal groups id
+ * @param bool $include_hidden if include hidden groups in the count (default false)
+ * @param bool $include_moderators if include board moderators too (default false)
+ */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
 	global $smcFunc;
@@ -833,4 +803,55 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 	}
 
 	return $groups;
+}
+
+/**
+ * Returns details of membergroups based on the id
+ *
+ * @param array/int $group_id the ID of the groups
+ * @param integer $limit the number of results returned (default 1, if null/false/0 returns all)
+ * @param array/string $detailed returns more fields (default false, returns: id_group, group_name, group_type, if true returns in addition to the previous: description, min_posts, online_color, max_messages, icons, hidden, id_parent)
+ * @param bool $assignable determine if the group is assignable or not and return that information
+ * @param bool $protected include protected groups
+ */
+function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+{
+	global $smcFunc;
+
+	if (!isset($group_id))
+		return false;
+
+	$group_ids = is_array($group_id) ? $group_id : array($group_id);
+
+	$groups = array();
+	$group_ids = array_map('intval', $group_ids);
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
+			description, min_posts, online_color, max_messages, icons, hidden, id_parent') . (!$assignable ? '' : '
+			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable
+			CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group') . '
+		FROM {db_prefix}membergroups
+		WHERE id_group IN ({array_int:group_ids})' . ($protected ? '' : '
+				AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
+		LIMIT {int:limit}'),
+		array(
+			'min_posts' => -1,
+			'group_ids' => $group_ids,
+			'limit' => $limit,
+			'is_protected' => 1,
+		)
+	);
+
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return $groups;
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$groups[$row['id_group']] = $row;
+	$smcFunc['db_free_result']($request);
+
+	if (is_array($group_id))
+		return $groups;
+	else
+		return $groups[$group_id];
 }

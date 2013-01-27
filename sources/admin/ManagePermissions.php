@@ -673,17 +673,11 @@ function ModifyMembergroup()
 
 	if ($context['group']['id'] > 0)
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT group_name, id_parent
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT 1',
-			array(
-				'current_group' => $context['group']['id'],
-			)
-		);
-		list ($context['group']['name'], $parent) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		require_once($librarydir . '/Membergroups.subs.php');
+
+		$group = membergroupsById($context['group']['id'], 1, true);
+		$context['group']['name'] = $group['group_name'];
+		$parent = $group['id_parent'];
 
 		// Cannot edit an inherited group!
 		if ($parent != -2)
@@ -798,7 +792,7 @@ function ModifyMembergroup()
  */
 function ModifyMembergroup2()
 {
-	global $modSettings, $smcFunc, $context;
+	global $modSettings, $smcFunc, $context, $librarydir;
 
 	checkSession();
 	validateToken('admin-mp');
@@ -817,17 +811,9 @@ function ModifyMembergroup2()
 		$parent = -2;
 	else
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT id_parent
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT 1',
-			array(
-				'current_group' => $_GET['group'],
-			)
-		);
-		list ($parent) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		require_once($librarydir . '/Membergroups.subs.php');
+		$group = membergroupsById($_GET['group'], 1, true);
+		$parent = $group['id_parent'];
 	}
 
 	if ($parent != -2)

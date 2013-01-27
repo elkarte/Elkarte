@@ -1105,6 +1105,8 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 
 	checkSession(isset($_GET['gid']) ? 'get' : 'post');
 
+	require_once($librarydir . '/Membergroups.subs.php');
+
 	$old_profile = &$user_profile[$memID];
 	$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 	$context['can_manage_protected'] = allowedTo('admin_forum');
@@ -1125,34 +1127,15 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// Protected groups too!
 	else
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT group_type
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT {int:limit}',
-			array(
-				'current_group' => $group_id,
-				'limit' => 1,
-			)
-		);
-		list ($is_protected) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$is_protected = membergroupsById($group_id);
 
-		if ($is_protected == 1)
+		if ($is_protected['group_type'] == 1)
 			isAllowedTo('admin_forum');
 	}
 
 	// What ever we are doing, we need to determine if changing primary is possible!
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_type, hidden, group_name
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({int:group_list}, {int:current_group})',
-		array(
-			'group_list' => $group_id,
-			'current_group' => $old_profile['id_group'],
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	$groups_details = membergroupsById(array($group_id, $old_profile['id_group']), 0, true);
+	foreach ($groups_details as $key => $row)
 	{
 		// Is this the new group?
 		if ($row['id_group'] == $group_id)
@@ -1186,7 +1169,6 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		if ((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0))
 			$canChangePrimary = false;
 	}
-	$smcFunc['db_free_result']($request);
 
 	// Didn't find the target?
 	if (!$foundTarget)
