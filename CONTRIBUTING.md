@@ -49,7 +49,9 @@ Code reviews can be made from the github web interface, or by checking out of th
 * Quick commands on how to pull in PRs:
 https://gist.github.com/3342247
 
-Coding Standards
+Developer Documentation
 ===
-Documentation: 
-[Coding standards](https://github.com/elkarte/Elkarte/wiki/Coding-Standards)
+Coding standards documentation: [Coding standards](https://github.com/elkarte/Elkarte/wiki/Coding-Standards)
+Architecture documentation: [Architecture](https://github.com/elkarte/Elkarte/wiki/Architecture)
+
+Each is work in progress as well, and welcome your contributions.
