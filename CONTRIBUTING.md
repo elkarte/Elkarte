@@ -43,7 +43,9 @@ Recommended reading for github pull requests workflow:
 Code Reviews
 ===
 An important and very helpful part of the workflow is code reviews.
+
 The more eyes are on the code, on the PRs, the better: one can always spot something missed, a small detail, a serious bug, or start a conversation on the code that will help in the end reach a better solution for the software.
+
 Code reviews can be made from the github web interface, or by checking out of the code pulled in locally. You can also test the PRs. Please do, express your objections or approval, fix things or report them.
 
 * Quick commands on how to pull in PRs:
@@ -52,6 +54,7 @@ https://gist.github.com/3342247
 Developer Documentation
 ===
 Coding standards documentation: [Coding standards](https://github.com/elkarte/Elkarte/wiki/Coding-Standards)
+
 Architecture documentation: [Architecture](https://github.com/elkarte/Elkarte/wiki/Architecture)
 
-Each is work in progress as well, and welcome your contributions.
+Each is work in progress, and welcomes your comments and corrections.
