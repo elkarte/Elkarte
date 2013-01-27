@@ -695,7 +695,7 @@ function template_view_versions()
 		</div>';
 
 	/* Below is the hefty javascript for this. Upon opening the page it checks the current file versions with ones
-	   held at simplemachines.org and works out if they are up to date.  If they aren't it colors that files number
+	   held at elkarte.net and works out if they are up to date.  If they aren't it colors that files number
 	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	   file categories. (sources, languages, and templates.) */
 	echo '
@@ -873,7 +873,7 @@ function template_show_settings()
 	{
 		if (!is_array($context['settings_message']))
 			$context['settings_message'] = array($context['settings_message']);
-		
+
 		echo '
 			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
 				<ul>

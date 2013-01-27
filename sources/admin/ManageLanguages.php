@@ -1289,9 +1289,7 @@ function cleanLangString($string, $to_display = true)
 				if (!empty($matches[1]))
 				{
 					// Come up with some pseudo thing to indicate this is a var.
-					/**
-					 * @todo Do better than this, please!
-					 */
+					// @todo Do better than this, please!
 					$new_string .= '{%' . $matches[1] . '%}';
 
 					// We're not going to reparse this.

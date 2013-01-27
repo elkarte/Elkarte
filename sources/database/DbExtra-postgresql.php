@@ -60,9 +60,7 @@ function smf_db_backup_table($table, $backup_table)
 			)
 		);
 
-	/**
-	 * @todo Should we create backups of sequences as well?
-	 */
+	// @todo Should we create backups of sequences as well?
 	$smcFunc['db_query']('', '
 		CREATE TABLE {raw:backup_table}
 		(

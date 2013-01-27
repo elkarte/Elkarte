@@ -13,7 +13,7 @@
  *
  * - will use the hoverintent plugin if available
  * - shows the tooltip in a div with the class defined in tooltipClass
- * - moves all selector titles to a hidden div and removes the title attribute to 
+ * - moves all selector titles to a hidden div and removes the title attribute to
  *   prevent any default browser actions
  * - attempts to keep the tooltip on screen
  *
@@ -192,16 +192,16 @@
  * instead of firing the onMouseOver event immediately, hoverIntent checks
  * to see if the user's mouse has slowed down (beneath the sensitivity
  * threshold) before firing the onMouseOver event.
- * 
+ *
  * hoverIntent r6 // 2011.02.26 // jQuery 1.5.1+
  * <http://cherne.net/brian/resources/jquery.hoverIntent.html>
- * 
- * hoverIntent is currently available for use in all personal or commercial 
+ *
+ * hoverIntent is currently available for use in all personal or commercial
  * projects under MIT license.
- * 
+ *
  * // basic usage (just like .hover) receives onMouseOver and onMouseOut functions
  * $("ul li").hoverIntent( showNav , hideNav );
- * 
+ *
  * // advanced usage receives configuration object only
  * $("ul li").hoverIntent({
  *	sensitivity: 7, // number = sensitivity threshold (must be 1 or higher)
@@ -210,7 +210,7 @@
  *	timeout: 0,   // number = milliseconds delay before onMouseOut function call
  *	out: hideNav    // function = onMouseOut callback (required)
  * });
- * 
+ *
  * @param  f  onMouseOver function || An object with configuration options
  * @param  g  onMouseOut function  || Nothing (use configuration options object)
  * @author    Brian Cherne brian(at)cherne(dot)net

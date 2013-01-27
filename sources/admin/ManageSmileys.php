@@ -2039,4 +2039,3 @@ function sortSmileyTable()
 	// Remove the sorting column.
 	$smcFunc['db_remove_column']('{db_prefix}smileys', 'temp_order');
 }
-

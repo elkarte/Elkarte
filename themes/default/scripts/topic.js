@@ -83,7 +83,7 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 	this.bMouseOnDiv = true;
 	this.iCurTopicId = topic_id;
 
-	// Get the topics current subject 
+	// Get the topics current subject
 	ajax_indicator(true);
 	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;xml", '', this.onDocReceived_modify_topic);
 }
@@ -189,7 +189,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 	this.set_hidden_topic_areas('');
 	this.bInEditMode = false;
 
-	// redo tips if they are on since we just pulled the rug out on this one 
+	// redo tips if they are on since we just pulled the rug out on this one
 	if ($.isFunction($.fn.SiteTooltip));
 		$('.preview').SiteTooltip().smf_tooltip_off;
 	
@@ -227,7 +227,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 	}
 }
 
-// A click event to signal the finish of the edit 
+// A click event to signal the finish of the edit
 QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
 {
 	if (this.bInEditMode && !this.bMouseOnDiv)
@@ -581,7 +581,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	}
 	else if (error)
 	{
-		var oErrordiv = document.getElementById('error_box'); 
+		var oErrordiv = document.getElementById('error_box');
 		setInnerHTML(oErrordiv, error.childNodes[0].nodeValue);
 		oErrordiv.style.display = '';
 		document.forms.quickModForm.message.style.border = error.getAttribute('in_body') == '1' ? this.opt.sErrorBorderStyle : '';

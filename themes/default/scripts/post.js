@@ -34,7 +34,7 @@ function previewControl()
 		bPost = false;
 
 		// call the needed preview function
-		switch(preview_area) 
+		switch(preview_area)
 		{
 			case 'pm':
 				previewPM();
@@ -168,7 +168,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		{
 			if ('value' in document.forms[form_name][numericFields[i]])
 				fields[fields.length] = numericFields[i] + '=' + parseInt(document.forms[form_name].elements[numericFields[i]].value);
-			else 
+			else
 			{
 				for (var j = 0, num = document.forms[form_name][numericFields[i]].length; j < num; j++)
 					fields[fields.length] = numericFields[i] + '=' + parseInt(document.forms[form_name].elements[numericFields[i]][j].value);
