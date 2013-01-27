@@ -308,7 +308,7 @@ function SelectMailingMembers()
 {
 	global $txt, $context, $modSettings, $smcFunc, $librarydir;
 
-	require_once($librarydir . '/Memebrgroups.subs.php');
+	require_once($librarydir . '/Membergroups.subs.php');
 
 	$context['page_title'] = $txt['admin_newsletters'];
 

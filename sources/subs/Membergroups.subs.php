@@ -813,7 +813,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($query))
-				$groups[$row['id_group']] = $row['member_count'];
+				$groups[$row['id_group']] += $row['member_count'];
 			$smcFunc['db_free_result']($query);
 		}
 	}
