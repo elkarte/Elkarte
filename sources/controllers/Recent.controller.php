@@ -782,8 +782,8 @@ function action_unread()
 			WHERE t.' . $query_this_board . (!empty($earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : '') . '
 				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-				 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+				($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+				($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 			array_merge($query_parameters, array(
 				'current_member' => $user_info['id'],
 				'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -838,8 +838,8 @@ function action_unread()
 			WHERE b.' . $query_this_board . '
 				AND t.id_last_msg >= {int:min_message}
 				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-				 ($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+				($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
+				($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 			ORDER BY {raw:sort}
 			LIMIT {int:offset}, {int:limit}',
 			array_merge($query_parameters, array(
@@ -864,8 +864,8 @@ function action_unread()
 				AND t.id_last_msg > {int:earliest_msg}' : (!$context['showing_all_topics'] && empty($_SESSION['first_login']) ? '
 				AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
 				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-				 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+				($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+				($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 			array_merge($query_parameters, array(
 				'current_member' => $user_info['id'],
 				'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -926,8 +926,8 @@ function action_unread()
 			WHERE t.' . $query_this_board . '
 				AND t.id_last_msg >= {int:min_message}
 				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
-				 ($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-				 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+				($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
+				($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 			ORDER BY {raw:order}
 			LIMIT {int:offset}, {int:limit}',
 			array_merge($query_parameters, array(
@@ -979,8 +979,8 @@ function action_unread()
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$_REQUEST['sort']]) ? $sortKey_joins[$_REQUEST['sort']] : '') . '
 				WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 					AND t.id_board = {int:current_board}' : '') .
-					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 				GROUP BY m.id_topic',
 				array(
 					'current_board' => $board,
@@ -1033,8 +1033,8 @@ function action_unread()
 				WHERE t.' . $query_this_board . '
 					AND m.id_member = {int:current_member}
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'is_approved' => 1,
@@ -1097,8 +1097,8 @@ function action_unread()
 				WHERE t.' . $query_this_board . '
 					AND t.id_last_msg >= {int:min_message}
 					AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
-					 ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					 ($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(

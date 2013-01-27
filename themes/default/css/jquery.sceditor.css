@@ -77,8 +77,8 @@ div.sceditor-dropdown {
 	font-size: 13px;
 	z-index: 6;
 }
-div.sceditor-dropdown form { 
-	margin: 0; 
+div.sceditor-dropdown form {
+	margin: 0;
 }
 div.sceditor-dropdown label {
 	display: block;
@@ -87,11 +87,11 @@ div.sceditor-dropdown label {
 	margin: .65em 0 .15em;
 }
 div.sceditor-dropdown .button {	
-	margin: .5em 0 0; 
+	margin: .5em 0 0;
 }
-.sceditor-pastetext textarea { 
-	border: 1px solid #bbb; 
-	width: 20em; 
+.sceditor-pastetext textarea {
+	border: 1px solid #bbb;
+	width: 20em;
 }
 div.sceditor-inserttable, div.sceditor-insertimage, div.sceditor-pastetext, div.sceditor-insertlink, div.sceditor-insertemail {
 	padding: 5px;
@@ -120,7 +120,7 @@ div.sceditor-smileyPopup {
 	border-bottom: 1px solid #aaa;
 	color: #222;
 }
-.sceditor-more:hover { 
+.sceditor-more:hover {
 	background: #fafafa;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
 	border: 1px solid #ccc;
@@ -141,11 +141,11 @@ div.sceditor-smileyPopup {
 	text-decoration: none;
 	color: #222;
 }
-.sceditor-fontsize-option:hover, .sceditor-font-option:hover { 
-	background: #eee; 
+.sceditor-fontsize-option:hover, .sceditor-font-option:hover {
+	background: #eee;
 }
 .sceditor-color-column {
-	float: left; 
+	float: left;
 }
 .sceditor-color-option {
 	display: block;
@@ -154,8 +154,8 @@ div.sceditor-smileyPopup {
 	width: 100px;
 	overflow: hidden;
 }
-.sceditor-color-option:hover { 
-	border: 1px solid #333; 
+.sceditor-color-option:hover {
+	border: 1px solid #333;
 }
 div.sceditor-toolbar {
 	overflow: hidden;
@@ -225,7 +225,7 @@ div.sceditor-row {
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) inset;
 }
 .sceditor-button-emoticon {
-	display:none; 
+	display:none;
 }
 .sceditor-popup-grip {
 	display: block;

@@ -11,7 +11,7 @@ h3.catbg #quick_search form input {
 	padding: 4px 3px 5px 3px;
 }
 h3.catbg #quick_search form select {
-	height: 2.2em; 
+	height: 2.2em;
 	line-height: 1.2em;
 	font-size: 0.9em;
 	margin: 0 0.2em 0 0;
@@ -541,7 +541,7 @@ h3.grid_header {
 	margin-bottom: 4px;
 }
 
-/* Styles for the Report generation 
+/* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
     min-height: 2em;

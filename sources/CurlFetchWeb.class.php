@@ -301,4 +301,3 @@ class Curl_Fetch_Webdata
 		return strlen($header);
 	}
 }
-

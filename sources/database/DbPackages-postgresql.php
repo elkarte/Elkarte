@@ -76,7 +76,7 @@ function db_packages_init()
  *  	- 'default' = Default value - do not set if no default required.
  *  	- 'null' => Can it be null (true or false) - if not set default will be false.
  *  	- 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
- *  		 it should begin counting.
+ *  		it should begin counting.
  *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
  *  	- 'name' => Index name (If left empty it will be generated).
  *  	- 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.

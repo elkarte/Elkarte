@@ -16,7 +16,7 @@
 
 $(document).ready(function() {
 	// menu drop downs
-	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
+	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1});
 
 	// Smooth scroll navigation
 	$('.topbottom').bind('click', function(event) {		

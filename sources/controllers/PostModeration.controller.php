@@ -27,7 +27,7 @@ function action_postmoderation()
 {
 	global $sourcedir;
 
-	 // @todo We'll shift these later bud.
+	// @todo We'll shift these later bud.
 	loadLanguage('ModerationCenter');
 	loadTemplate('ModerationCenter');
 
