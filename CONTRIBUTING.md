@@ -24,12 +24,15 @@ git checkout -b new_enhancement_name
 * Commit the desired changes to that branch. As many commits on 'new_enhancement' as you want.
   * Granular commits are not a problem.
   * Please try to add only commits related to the respective feature/fix to a branch.
-  * If you need to commit something unrelated, try to create another branch for that topic.
+  * If you need to commit something unrelated, create another branch for that topic.
 * Sign-off on your commits, to acknowledge your submission under the license of the project.
+  * See the DCO document from the top directory.
 * Send in a pull request (PR) from your _new_enhancement_name_ branch.
 * If the main repository has been updated in the meantime, you can pull the changes in your repository:
   * to pull in from master to your master branch: ``` git pull --rebase upstream master ``` (please replace 'upstream' to the name of your remote for the main repository)
-  * to merge after you have updated your master, to your _new_enhancement_name branch: ``` git rebase master ```
+  * to merge after you have updated your master, to your _new_enhancement_ branch:
+     *  ``` git rebase master ```
+     * alternatively: ``` git merge master ``` (this may create a merge commit by default)
 
 Details about the rebase operation:
 [git rebase] (http://www.kernel.org/pub/software/scm/git/docs/git-rebase.html)
