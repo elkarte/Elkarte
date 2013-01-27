@@ -13,7 +13,7 @@ Feel free to fork this repository and make your desired changes.
 Please see the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository:
 by signing off your contributions, you acknowledge that you can and do license your submissions under the license of the project.
 
-How to contribute:
+How to Contribute:
 ===
 * Fork the repository. If you are not used to using Github, please check out [fork a repository](http://help.github.com/fork-a-repo).
 * Branch your own repository. Example:
@@ -40,11 +40,21 @@ Details about the rebase operation:
 Recommended reading for github pull requests workflow:
 [About Github workflow](http://qsapp.com/wiki/Github#Github_Contributor_Workflow)
 
-Code reviews
+Code Reviews
 ===
 An important and very helpful part of the workflow is code reviews.
+
 The more eyes are on the code, on the PRs, the better: one can always spot something missed, a small detail, a serious bug, or start a conversation on the code that will help in the end reach a better solution for the software.
+
 Code reviews can be made from the github web interface, or by checking out of the code pulled in locally. You can also test the PRs. Please do, express your objections or approval, fix things or report them.
 
 * Quick commands on how to pull in PRs:
 https://gist.github.com/3342247
+
+Developer Documentation
+===
+Coding standards documentation: [Coding standards](https://github.com/elkarte/Elkarte/wiki/Coding-Standards)
+
+Architecture documentation: [Architecture](https://github.com/elkarte/Elkarte/wiki/Architecture)
+
+Each is work in progress, and welcomes your comments and corrections.
