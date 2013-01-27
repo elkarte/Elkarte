@@ -753,7 +753,7 @@ function action_quickmod()
 				redirectexit($redirect_url);
 
 			require_once($controllerdir . '/SplitTopics.controller.php');
-			return MergeExecute($_REQUEST['topics']);
+			return action_mergeExecute($_REQUEST['topics']);
 		}
 
 		// Just convert to the other method, to make it easier.
