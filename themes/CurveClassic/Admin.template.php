@@ -1422,27 +1422,32 @@ function template_core_features()
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
-		var token_name;
-		var token_value;
-		var feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), '
-		var feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), '
+		var token_name,
+			token_value,
+			feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), ',
+			feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), ';
+
 		$(document).ready(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
-			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'\'}).each(function () {
+			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'\'}).each(function() {
 				var sImageText = $(this).hasClass(\'on\') ? feature_on_text : feature_off_text;
 				$(this).attr({ title: sImageText, alt: sImageText });
 			});
 			$("#core_features_submit").css(\'display\', \'none\');
-			if (token_name == undefined)
+
+			if (!token_name)
 				token_name = $("#core_features_token").attr("name")
-			if (token_value == undefined)
+
+			if (!token_value)
 				token_value = $("#core_features_token").attr("value")
+
 			$(".core_features_img").click(function(){
-				var cc = $(this);
-				var cf = $(this).attr("id").substring(7);
-				var imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png");
-				var new_state = !$("#feature_" + cf).attr("checked");
-				var ajax_infobar = document.createElement(\'div\');
+				var cc = $(this),
+					cf = $(this).attr("id").substring(7),
+					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
+					new_state = !$("#feature_" + cf).attr("checked"),
+					ajax_infobar = document.createElement(\'div\');
+
 				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\'});
 				$("body").append(ajax_infobar);
 				$(ajax_infobar).slideUp();
@@ -1459,8 +1464,10 @@ function template_core_features()
 				$.ajax({
 					// The link we are accessing.
 					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
+
 					// The type of request.
 					type: "post",
+
 					// The type of data that is getting returned.
 					data: data,
 					error: function(error){
@@ -1468,12 +1475,12 @@ function template_core_features()
 					},
 
 					success: function(request){
-						if ($(request).find("errors").find("error").length != 0)
+						if ($(request).find("errors").find("error").length !== 0)
 						{
 							$(ajax_infobar).attr(\'class\', \'errorbox\');
 							$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
 						}
-						else if ($(request).find("smf").length != 0)
+						else if ($(request).find("smf").length !== 0)
 						{
 							$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
 							cc.attr({
@@ -1496,7 +1503,6 @@ function template_core_features()
 						{
 							$(ajax_infobar).attr(\'class\', \'errorbox\');
 							$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
-
 						}
 					}
 				});
@@ -1504,6 +1510,7 @@ function template_core_features()
 		});
 	// ]]></script>
 	<div id="admincenter">';
+
 	if ($context['is_new_install'])
 	{
 		echo '

@@ -20,7 +20,7 @@ $txt['badbehaviorlog_error_valid_explaination'] = 'HTTP Reason';
 $txt['badbehaviorlog_error_valid_log'] = 'Details';
 $txt['badbehaviorlog_log'] = 'BadBehavior Log';
 $txt['badbehaviorlog_desc'] = 'Below is a list of all the bad behavior entries that have been logged';
-$txt['badbehaviorlog_details'] = "Additonal Details";
+$txt['badbehaviorlog_details'] = "Additional Details";
 $txt['badbehaviorlog_no_entries_found'] = 'There are currently no bad behavior log entries.';
 
 $txt['badbehaviorlog_remove_selection'] = 'Remove Selection';
@@ -36,7 +36,7 @@ $txt['badbehaviorlog_clear_filter'] = 'Clear filter';
 $txt['badbehaviorlog_apply_filter_of_type'] = 'Apply filter of type';
 $txt['badbehaviorlog_apply_filter'] = 'Apply Filter';
 $txt['badbehaviorlog_applying_filter'] = 'Applying Filter';
-$txt['badbehaviorlog_filter_only_member'] = 'Only show the badbehavoir logs of this member';
+$txt['badbehaviorlog_filter_only_member'] = 'Only show the badbehavior logs of this member';
 $txt['badbehaviorlog_filter_only_ip'] = 'Only show the badbehavior logs of this IP address';
 $txt['badbehaviorlog_filter_only_session'] = 'Only show the badbehaviorlogs of this session';
 $txt['badbehaviorlog_filter_only_headers'] = 'Only show the badbehavior logs of this URL';
