@@ -34,6 +34,15 @@ $(document).ready(function() {
 
 	// find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
+
+	// Set a auto height so small code blocks collaspe, set a height for larger ones
+	// and let resize or overflow do its thing as normal
+	$('.bbc_code').each(function()
+	{
+		$(this).height("auto");
+		if ($(this).height() > 200)
+			$(this).css('height', '20em');
+	});
 });
 
 // The purpose of this code is to fix the height of overflow: auto blocks, because some browsers can't figure it out for themselves.
