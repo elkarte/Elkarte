@@ -29,7 +29,7 @@ function template_main()
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
-			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
+			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
 
 	// Is this topic also a poll?
 	if ($context['is_poll'])
@@ -209,7 +209,7 @@ function template_main()
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
 				<div class="', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
-					<a id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '', '
+					<a id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a name="new" id="new"></a>' : '') : '', '
 					<div class="post_wrapper">';
 
 		// Show information about the poster of this message.

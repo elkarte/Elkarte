@@ -89,15 +89,15 @@ ol.search_results li {
 	overflow: auto;
 	height: 12em;
 }
-#smfAnnouncements {
+#ourAnnouncements {
 	height: 16.5em;
 	padding: 0 0.5em;
 	overflow: auto;
 }
-#smfAnnouncements dt {
+#ourAnnouncements dt {
 	border-bottom: 1px dashed #000;
 }
-#smfAnnouncements dd {
+#ourAnnouncements dd {
 	padding: 0;
 	margin: 0 0 1em 1.5em;
 }

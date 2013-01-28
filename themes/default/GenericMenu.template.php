@@ -219,6 +219,9 @@ function template_generic_menu_tabs(&$menu_context)
 	// Handy shortcut.
 	$tab_context = &$menu_context['tab_data'];
 
+	if (empty($tab_context))
+		return;
+
 	echo '
 					<div class="cat_bar">
 						<h3 class="catbg">';
@@ -310,12 +313,14 @@ function template_generic_menu_tabs(&$menu_context)
 
 	// The admin tabs.
 	echo '
-					<div id="adm_submenus">
-						<ul class="dropmenu">';
+					<div id="adm_submenus">';
 
 	// Print out all the items in this tab (if any).
 	if (!empty($context['tabs']))
 	{
+		echo '
+						<ul class="dropmenu">';
+
 		foreach ($tab_context['tabs'] as $sa => $tab)
 		{
 			if (!empty($tab['disabled']))
@@ -334,11 +339,13 @@ function template_generic_menu_tabs(&$menu_context)
 								<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
 							</li>';
 		}
+
+		echo '
+						</ul>';
 	}
 
 	// the end of tabs
 	echo '
-						</ul>
 					</div>
 					<br class="clear" />';
 }
