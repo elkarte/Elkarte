@@ -1418,28 +1418,32 @@ function template_core_features()
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
-		var token_name;
-		var token_value;
-		var feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), '
-		var feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), '
+		var token_name,
+			token_value,
+			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
+			feature_off_text = ', JavaScriptEscape($txt['core_settings_switch_on']), ';
 
 		$(document).ready(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
-			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'\'}).each(function () {
+			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'\'}).each(function() {
 				var sImageText = $(this).hasClass(\'on\') ? feature_on_text : feature_off_text;
 				$(this).attr({ title: sImageText, alt: sImageText });
 			});
 			$("#core_features_submit").css(\'display\', \'none\');
-			if (token_name == undefined)
-				token_name = $("#core_features_token").attr("name")
-			if (token_value == undefined)
-				token_value = $("#core_features_token").attr("value")
+
+			if (!token_name)
+				token_name = $("#core_features_token").attr("name");
+
+			if (!token_value)
+				token_value = $("#core_features_token").attr("value");
+
 			$(".core_features_img").click(function(){
-				var cc = $(this);
-				var cf = $(this).attr("id").substring(7);
-				var imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png");
-				var new_state = !$("#feature_" + cf).attr("checked");
-				var ajax_infobar = document.createElement(\'div\');
+				var cc = $(this),
+					cf = $(this).attr("id").substring(7),
+					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
+					new_state = !$("#feature_" + cf).attr("checked"),
+					ajax_infobar = document.createElement(\'div\');
+
 				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\'});
 				$("body").append(ajax_infobar);
 				$(ajax_infobar).slideUp();
@@ -1448,6 +1452,7 @@ function template_core_features()
 				data = {save: "save", feature_id: cf};
 				data[$("#core_features_session").attr("name")] = $("#core_features_session").attr("value");
 				data[token_name] = token_value;
+
 				$(".core_features_status_box").each(function(){
 					data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
 				});
@@ -1456,8 +1461,10 @@ function template_core_features()
 				$.ajax({
 					// The link we are accessing.
 					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
+					
 					// The type of request.
 					type: "post",
+					
 					// The type of data that is getting returned.
 					data: data,
 					error: function(error){
@@ -1493,7 +1500,6 @@ function template_core_features()
 						{
 							$(ajax_infobar).attr(\'class\', \'errorbox\');
 							$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
-
 						}
 					}
 				});
@@ -1501,6 +1507,7 @@ function template_core_features()
 		});
 	// ]]></script>
 	<div id="admincenter">';
+
 	if ($context['is_new_install'])
 	{
 		echo '
@@ -1515,16 +1522,6 @@ function template_core_features()
 	}
 
 	echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">';
-
-	template_admin_quick_search();
-
-	echo $txt['core_settings_title'], '
-				</h3>
-
-			</div>
-			<p class="description">', $txt['core_settings_desc'], '</p>
 			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
@@ -1802,6 +1799,7 @@ function template_clean_cache_button_below()
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;
+
 	if ($context['user']['is_admin'])
 		echo '
 			<object id="quick_search">
