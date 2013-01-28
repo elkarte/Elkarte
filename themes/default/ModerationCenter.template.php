@@ -21,17 +21,6 @@ function template_moderation_center()
 	// Show a welcome message to the user.
 	echo '
 					<div id="modcenter">
-						<div id="section_header" class="cat_bar">
-							<h3 class="catbg">', $txt['moderation_center'], '</h3>
-						</div>
-						<div class="roundframe">
-							<div id="welcome">
-								<strong>', $txt['hello_guest'], ' ', $context['user']['name'], '!</strong>
-								<p>
-									', $txt['mc_description'], '
-								</p>
-							</div>
-						</div>
 						<div id="mod_main_section" >';
 
 	$alternate = true;
