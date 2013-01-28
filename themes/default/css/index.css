@@ -353,10 +353,7 @@ em {
 	padding: 3px 12px;
 	overflow: auto;
 	white-space: nowrap;
-	/* Show a scrollbar after about 6 lines. */
-	/* This is much better than the old max-height css.
-	height: 10em;*/
-	max-height: 20em;
+	height: 20em;
 	resize: vertical;
 }
 

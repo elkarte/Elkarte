@@ -853,13 +853,13 @@ INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Groundhog
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2010-11-25');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2011-11-24');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2012-11-22');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2013-11-21');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2014-11-20');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2013-11-28');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2014-11-27');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2015-11-26');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2016-11-24');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2017-11-23');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2018-11-22');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2019-11-21');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2019-11-28');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2020-11-26');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Memorial Day', '2010-05-31');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Memorial Day', '2011-05-30');
@@ -1820,7 +1820,7 @@ CREATE INDEX {$db_prefix}messages_related_ip ON {$db_prefix}messages (id_member,
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Elkarte', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #

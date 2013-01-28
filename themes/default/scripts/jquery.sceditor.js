@@ -445,11 +445,11 @@
 				$sourceEditor.bind("blur", base.updateOriginal);
 			}
 
+			if(base.opts.rtl === null)
+				base.opts.rtl = $sourceEditor.css('direction') === 'rtl';
+
 			if(base.opts.rtl)
-			{
-				$body.attr('dir', 'rtl');
-				$sourceEditor.attr('dir', 'rtl');
-			}
+				base.rtl(true);
 
 			if(base.opts.autoExpand)
 				$doc.bind("keyup", base.expandToContent);
@@ -466,9 +466,7 @@
 		 * @private
 		 */
 		initEvents = function() {
-			var	height = base.opts.height,
-				width  = base.opts.width,
-				$doc   = $(getWysiwygDoc());
+			var $doc = $(getWysiwygDoc());
 
 			$(document).click(handleDocumentClick);
 
@@ -476,16 +474,13 @@
 				.bind("reset", handleFormReset)
 				.submit(base.updateOriginal);
 
-			// if either width or height are % based, add the resize handler to
-			// update the editor when the window is resized
-			if((height && (height + "").indexOf("%") > -1) || (width && (width + "").indexOf("%") > -1))
-				$(window).resize(handleWindowResize);
+			$(window).bind('resize orientationChanged', handleWindowResize);
 
-			 $doc.find("body")
+			$doc.find("body")
 				.keypress(handleKeyPress)
 				.keyup(appendNewLine)
 				.bind("paste", handlePasteEvt)
-				.bind("keyup focus blur contextmenu mouseup click", checkSelectionChanged)
+				.bind($.sceditor.ie ? "selectionchange" : "keyup focus blur contextmenu mouseup touchend click", checkSelectionChanged)
 				.bind("keydown keyup keypress focus blur contextmenu", handleEvent);
 
 			$sourceEditor.bind("keydown keyup keypress focus blur contextmenu", handleEvent);
@@ -493,7 +488,7 @@
 			$doc
 				.keypress(handleKeyPress)
 				.mousedown(handleMouseDown)
-				.bind("focus blur contextmenu mouseup click", checkSelectionChanged)
+				.bind($.sceditor.ie ? "selectionchange" : "focus blur contextmenu mouseup click", checkSelectionChanged)
 				.bind("beforedeactivate keyup", saveRange)
 				.keyup(appendNewLine)
 				.focus(function() {
@@ -600,7 +595,8 @@
 				startHeight = 0,
 				origWidth   = $editorContainer.width(),
 				origHeight  = $editorContainer.height(),
-				dragging    = false;
+				dragging    = false,
+				rtl         = base.rtl();
 
 			minHeight = base.opts.resizeMinHeight || origHeight / 1.5;
 			maxHeight = base.opts.resizeMaxHeight || origHeight * 2.5;
@@ -608,8 +604,12 @@
 			maxWidth  = base.opts.resizeMaxWidth  || origWidth  * 1.25;
 
 			mouseMoveFunc = function (e) {
+				// iOS must use window.event
+				if(e.type === 'touchmove')
+					e = window.event;
+
 				var	newHeight = startHeight + (e.pageY - startY),
-					newWidth  = startWidth  + (e.pageX - startX);
+					newWidth  = rtl ? startWidth - (e.pageX - startX) : startWidth + (e.pageX - startX);
 
 				if(maxWidth > 0 && newWidth > maxWidth)
 					newWidth = maxWidth;
@@ -617,10 +617,10 @@
 				if(maxHeight > 0 && newHeight > maxHeight)
 					newHeight = maxHeight;
 
-				if (base.opts.resizeWidth && newWidth >= minWidth && (maxWidth < 0 || newWidth <= maxWidth))
+				if(base.opts.resizeWidth && newWidth >= minWidth && (maxWidth < 0 || newWidth <= maxWidth))
 					base.width(newWidth);
 
-				if (base.opts.resizeHeight && newHeight >= minHeight && (maxHeight < 0 || newHeight <= maxHeight))
+				if(base.opts.resizeHeight && newHeight >= minHeight && (maxHeight < 0 || newHeight <= maxHeight))
 					base.height(newHeight);
 
 				e.preventDefault();
@@ -631,18 +631,23 @@
 					return;
 
 				dragging = false;
-				$cover.hide();
 
+				$cover.hide();
 				$editorContainer.removeClass('resizing');
-				$(document).unbind('mousemove', mouseMoveFunc);
-				$(document).unbind('mouseup', mouseUpFunc);
+				$(document).unbind('touchmove mousemove', mouseMoveFunc);
+				$(document).unbind('touchend mouseup', mouseUpFunc);
+
 				e.preventDefault();
 			};
 
 			$editorContainer.append($grip);
 			$editorContainer.append($cover.hide());
 
-			$grip.mousedown(function (e) {
+			$grip.bind('touchstart mousedown', function (e) {
+				// iOS must use window.event
+				if(e.type === 'touchstart')
+					e = window.event;
+
 				startX      = e.pageX;
 				startY      = e.pageY;
 				startWidth  = $editorContainer.width();
@@ -651,8 +656,9 @@
 
 				$editorContainer.addClass('resizing');
 				$cover.show();
-				$(document).mousemove(mouseMoveFunc);
-				$(document).mouseup(mouseUpFunc);
+				$(document).bind('touchmove mousemove', mouseMoveFunc);
+				$(document).bind('touchend mouseup', mouseUpFunc);
+
 				e.preventDefault();
 			});
 		};
@@ -745,6 +751,42 @@
 		};
 
 		/**
+		 * Gets if the editor is in RTL mode
+		 *
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name rtl
+		 * @return {Boolean}
+		 */
+		/**
+		 * Sets if the editor is in RTL mode
+		 *
+		 * @param {boolean} rtl
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name rtl^2
+		 * @return {this}
+		 */
+		base.rtl = function(rtl) {
+			var dir = rtl ? 'rtl' : 'ltr';
+
+			if(typeof rtl !== 'boolean')
+				return $sourceEditor.attr('dir') === 'rtl';
+
+			$(getWysiwygDoc().body).attr('dir', dir);
+			$sourceEditor.attr('dir', dir);
+
+			$editorContainer
+				.removeClass('rtl')
+				.removeClass('ltr')
+				.addClass(dir);
+
+			return this;
+		};
+
+		/**
 		 * Updates the toolbar to disable/enable the appropriate buttons
 		 * @private
 		 */
@@ -780,24 +822,134 @@
 		 * @name width^2
 		 * @return {this}
 		 */
-		base.width = function (width) {
-			if(!width)
+		/**
+		 * Sets the width of the editor
+		 *
+		 * The saveWidth specifies if to save the width. The stored width can be
+		 * used for things like restoring from maximized state.
+		 *
+		 * @param {int}		height			Width in pixels
+		 * @param {boolean}	[saveWidth=true]	If to store the width
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name width^3
+		 * @return {this}
+		 */
+		base.width = function (width, saveWidth) {
+			if(!width && width !== 0)
 				return $editorContainer.width();
 
-			if(base.width() !== width)
+			base.dimensions(width, null, saveWidth);
+
+			return this;
+		};
+
+		/**
+		 * Returns an object with the properties width and height
+		 * which are the width and height of the editor in px.
+		 *
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name dimensions
+		 * @return {object}
+		 */
+		/**
+		 * <p>Sets the width and/or height of the editor.</p>
+		 *
+		 * <p>If width or height is not numeric it is ignored.</p>
+		 *
+		 * @param {int}	width	Width in px
+		 * @param {int}	height	Height in px
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name dimensions^2
+		 * @return {this}
+		 */
+		/**
+		 * <p>Sets the width and/or height of the editor.</p>
+		 *
+		 * <p>If width or height is not numeric it is ignored.</p>
+		 *
+		 * <p>The save argument specifies if to save the new sizes.
+		 * The saved sizes can be used for things like restoring from
+		 * maximized state. This should normally be left as true.</p>
+		 *
+		 * @param {int}		width		Width in px
+		 * @param {int}		height		Height in px
+		 * @param {boolean}	[save=true]	If to store the new sizes
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name dimensions^3
+		 * @return {this}
+		 */
+		base.dimensions = function(width, height, save) {
+			var	toolbarHeight,
+				updateheight = false;
+
+			// set undefined width/height to boolean false
+			width  = (!width && width !== 0) ? false : width;
+			height = (!height && height !== 0) ? false : height;
+
+			if(width === false && height === false)
+				return { width: base.width(), height: base.height() };
+
+			if(typeof $wysiwygEditor.data('outerWidthOffset') === "undefined")
+				base.updateStyleCache();
+
+			if(width !== false && width !== base.width())
 			{
-				$editorContainer.width(width);
-				width = $editorContainer.width();
+				if(save !== false)
+					base.opts.width = width;
 
-				// fix the height and width of the textarea/iframe
-				$wysiwygEditor.width(width);
-				$wysiwygEditor.width(width + (width - $wysiwygEditor.outerWidth(true)));
+				width = $editorContainer.width(width).width();
+				wysiwygEditor.style.width = width - $wysiwygEditor.data('outerWidthOffset') + 'px';
+				sourceEditor.style.width  = width - $sourceEditor.data('outerWidthOffset') + 'px';
 
-				$sourceEditor.width(width);
-				$sourceEditor.width(width + (width - $sourceEditor.outerWidth(true)));
+				// If the toolbar height has changed then wysiwyg and source editor heights will need to be updated
+				toolbarHeight = !base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0;
+				updateheight  = toolbarHeight !== (!base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0);
+				height        = height !== false ? height:  base.height();
+			}
+
+			if(height !== false && height !== base.height())
+			{
+				if(save !== false)
+					base.opts.height = height;
+
+				height  = $editorContainer.height(height).height();
+				height -= !base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0;
+				updateheight = true;
+			}
+
+			if(updateheight)
+			{
+				wysiwygEditor.style.height = height - $wysiwygEditor.data('outerHeightOffset') + 'px';
+				sourceEditor.style.height  = height - $sourceEditor.data('outerHeightOffset') + 'px';
 			}
 
 			return this;
+		};
+
+		/**
+		 * Updates the CSS styles cache. Shouldn't be needed unless changing the editors theme.
+		 *
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name updateStyleCache
+		 * @return {int}
+		 */
+		base.updateStyleCache = function() {
+			// caching these improves FF resize performance
+			$wysiwygEditor.data('outerWidthOffset', $wysiwygEditor.outerWidth(true) - $wysiwygEditor.width());
+			$sourceEditor.data('outerWidthOffset', $sourceEditor.outerWidth(true) - $sourceEditor.width());
+
+			$wysiwygEditor.data('outerHeightOffset', $wysiwygEditor.outerHeight(true) - $wysiwygEditor.height());
+			$sourceEditor.data('outerHeightOffset', $sourceEditor.outerHeight(true) - $sourceEditor.height());
 		};
 
 		/**
@@ -819,21 +971,61 @@
 		 * @name height^2
 		 * @return {this}
 		 */
-		base.height = function (height) {
-			if(!height)
+		/**
+		 * Sets the height of the editor
+		 *
+		 * The saveHeight specifies if to save the height. The stored height can be
+		 * used for things like restoring from maximized state.
+		 *
+		 * @param {int} height Height in px
+		 * @param {boolean} [saveHeight=true] If to store the height
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name height^3
+		 * @return {this}
+		 */
+		base.height = function (height, saveHeight) {
+			if(!height && height !== 0)
 				return $editorContainer.height();
 
-			if(base.height() !== height)
-			{
-				height -= !base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0;
+			base.dimensions(null, height, saveHeight);
 
-				// fix the height and width of the textarea/iframe
-				$wysiwygEditor.height(height);
-				$wysiwygEditor.height(height + (height - $wysiwygEditor.outerHeight(true)));
+			return this;
+		};
 
-				$sourceEditor.height(height);
-				$sourceEditor.height(height + (height - $sourceEditor.outerHeight(true)));
-			}
+		/**
+		 * Gets if the editor is maximised or not
+		 *
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name maximize
+		 * @return {boolean}
+		 */
+		/**
+		 * Sets if the editor is maximised or not
+		 *
+		 * @param {boolean} maximize If to maximise the editor
+		 * @since 1.4.1
+		 * @function
+		 * @memberOf jQuery.sceditor.prototype
+		 * @name maximize^2
+		 * @return {this}
+		 */
+		base.maximize = function(maximize) {
+			if(typeof maximize === 'undefined')
+				return $editorContainer.is('.sceditor-maximize');
+
+			maximize = !!maximize;
+
+			// IE 6 fix
+			if($.sceditor.ie < 7)
+				$('html, body').toggleClass('sceditor-maximize', maximize);
+
+			$editorContainer.toggleClass('sceditor-maximize', maximize);
+			base.width(maximize ? '100%' : base.opts.width, false);
+			base.height(maximize ? '100%' : base.opts.height, false);
 
 			return this;
 		};
@@ -910,10 +1102,10 @@
 		/**
 		 * Creates a menu item drop down
 		 *
-		 * @param HTMLElement	menuItem	The button to align the drop down with
-		 * @param string	dropDownName	Used for styling the dropown, will be a class sceditor-dropDownName
-		 * @param string	content		The HTML content of the dropdown
-		 * @param bool		ieUnselectable	If to add the unselectable attribute to all the contents elements. Stops IE from deselecting the text in the editor
+		 * @param {HTMLElement}	menuItem		The button to align the drop down with
+		 * @param {string}	dropDownName		Used for styling the dropown, will be a class sceditor-dropDownName
+		 * @param {string}	content			The HTML content of the dropdown
+		 * @param {bool}	[ieUnselectable=true]	If to add the unselectable attribute to all the contents elements. Stops IE from deselecting the text in the editor
 		 * @function
 		 * @name createDropDown
 		 * @memberOf jQuery.sceditor.prototype
@@ -1838,6 +2030,12 @@
 		 * @ignore
 		 */
 		handleWindowResize = function() {
+			if(base.maximize())
+			{
+				base.height('100%', false).width('100%', false);
+				return;
+			}
+
 			if(base.opts.height && base.opts.height.toString().indexOf("%") > -1)
 				base.height($editorContainer.parent().height() *
 					(parseFloat(base.opts.height) / 100));
@@ -3036,6 +3234,21 @@
 		},
 		// END_COMMAND
 
+		// START_COMMAND: Maximize
+		maximize: {
+			state: function() {
+				return this.maximize();
+			},
+			exec: function () {
+				this.maximize(!this.maximize());
+			},
+			txtExec: function () {
+				this.maximize(!this.maximize());
+			},
+			tooltip: "Maximize"
+		},
+		// END_COMMAND
+
 		// START_COMMAND: Source
 		source: {
 			exec: function () {
@@ -3797,7 +4010,7 @@
 				if(node.nodeType === 3 && $(node).parents('code, pre').length === 0 && nodeValue)
 				{
 					// new lines in text nodes are always ignored in normal handling
-					nodeValue = nodeValue.replace(/[\r\n]/, "");
+					nodeValue = nodeValue.replace(/[\r\n]+/, "");
 
 					//remove empty nodes
 					if(!nodeValue.length)
@@ -4230,7 +4443,7 @@
 		toolbar:	"bold,italic,underline,strike,subscript,superscript|left,center,right,justify|" +
 				"font,size,color,removeformat|cut,copy,paste,pastetext|bulletlist,orderedlist|" +
 				"table|code,quote|horizontalrule,image,email,link,unlink|emoticon,youtube,date,time|" +
-				"ltr,rtl|print,source",
+				"ltr,rtl|print,maximize,source",
 
 		/**
 		 * Stylesheet to include in the WYSIWYG editor. Will style the WYSIWYG elements
@@ -4410,6 +4623,8 @@
 
 		/**
 		 * If to set the editor to right-to-left mode.
+		 *
+		 * If set to null the direction will be automatically detected.
 		 * @type {Boolean}
 		 */
 		rtl: false,
