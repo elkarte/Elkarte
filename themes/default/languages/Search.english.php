@@ -93,7 +93,7 @@ $txt['search_predefined_small'] = 'Small sized index';
 $txt['search_predefined_moderate'] = 'Moderate sized index';
 $txt['search_predefined_large'] = 'Large sized index';
 $txt['search_create_index_continue'] = 'Continue';
-$txt['search_create_index_not_ready'] = 'SMF is currently creating a search index of your messages. To avoid overloading your server, the process has been temporarily paused. It should automatically continue in a few seconds. If it doesn\'t, please click continue below.';
+$txt['search_create_index_not_ready'] = 'Elkarte is currently creating a search index of your messages. To avoid overloading your server, the process has been temporarily paused. It should automatically continue in a few seconds. If it doesn\'t, please click continue below.';
 $txt['search_create_index_progress'] = 'Progress';
 $txt['search_create_index_done'] = 'Custom search index successfully created.';
 $txt['search_create_index_done_link'] = 'Continue';
@@ -115,7 +115,7 @@ $txt['spider_mode_note'] = 'Note higher level tracking increases server resource
 $txt['spider_mode_off'] = 'Disabled';
 $txt['spider_mode_standard'] = 'Standard';
 $txt['spider_mode_high'] = 'Moderate';
-$txt['spider_mode_vhigh'] = 'Agressive';
+$txt['spider_mode_vhigh'] = 'Aggressive';
 $txt['spider_settings_desc'] = 'You can change settings for spider tracking from this page. Note, if you wish to enable automatic pruning of the hit logs you can set this up <a href="%1$s">here</a>';
 
 $txt['spider_group'] = 'Apply restrictive permissions from group';
@@ -174,7 +174,7 @@ $txt['sphinxql_test_passed'] = 'All tests were successful, the system was able t
 $txt['sphinx_test_connect_failed'] = 'Unable to connect to the Sphinx daemon. Make sure it is running and configured properly. Sphinx search will not work until you fix the problem.';
 $txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
 $txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your Sources directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
-$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexs, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><tt>10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</tt>';
+$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><tt>10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</tt>';
 $txt['sphinx_index_data_path'] = 'Index data path:';
 $txt['sphinx_index_data_path_desc'] = 'This is the path that contains the search index files used by Sphinx.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Sphinx indexer and search daemon.';
 $txt['sphinx_log_file_path'] = 'Log file path:';
