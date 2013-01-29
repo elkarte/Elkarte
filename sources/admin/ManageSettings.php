@@ -283,12 +283,12 @@ function ModifyCoreFeatures($return_config = false)
 		'pm' => array(
 			'url' => 'action=admin;area=permissions;sa=postmod',
 			'setting_callback' => create_function('$value', '
-				global $librarydir;
+				global $controllerdir;
 
 				// Cant use warning post moderation if disabled!
 				if (!$value)
 				{
-					require_once($librarydir . \'/PostModeration.php\');
+					require_once($controllerdir . \'/PostModeration.controller.php\');
 					approveAllData();
 
 					return array(\'warning_moderate\' => 0);
