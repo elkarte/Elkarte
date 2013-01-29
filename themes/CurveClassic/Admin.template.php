@@ -709,7 +709,7 @@ function template_view_versions()
 				oSectionContainerIds: {
 					sources: \'sources\',
 					admin: \'admin\',
-					controllers: \'conrtollers\',
+					controllers: \'controllers\',
 					database: \'database\',
 					subs: \'subs\',
 					Default: \'Default\',
