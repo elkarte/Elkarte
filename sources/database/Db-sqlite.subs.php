@@ -140,6 +140,10 @@ function smf_db_replacement__callback($matches)
 
 	list ($values, $connection) = $db_callback;
 
+	// This should not happen, yet it does
+	if (!is_resource($connection))
+		display_db_error();
+
 	if ($matches[1] === 'db_prefix')
 		return $db_prefix;
 

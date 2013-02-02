@@ -344,13 +344,13 @@ function ViewFile()
 	isAllowedTo('admin_forum');
 
 	// Decode the file and get the line
-	$file = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, base64_decode($_REQUEST['file']));
+	$file = realpath(base64_decode($_REQUEST['file']));
 	$line = isset($_REQUEST['line']) ? (int) $_REQUEST['line'] : 0;
 
 	// Make sure things are normalized
-	$real_board = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $boarddir);
-	$real_source = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $sourcedir);
-	$real_cache = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $cachedir);
+	$real_board = realpath($boarddir);
+	$real_source = realpath($sourcedir);
+	$real_cache = realpath($cachedir);
 
 	// Make sure the file requested is one they are allowed to look at
 	$excluded = array('settings.php', 'settings_bak.php');
