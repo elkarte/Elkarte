@@ -86,7 +86,7 @@ function action_removetopic2()
  */
 function action_deletemsg()
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc;
+	global $user_info, $topic, $board, $modSettings, $smcFunc, $librarydir;
 
 	checkSession('get');
 

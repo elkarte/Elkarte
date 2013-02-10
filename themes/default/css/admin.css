@@ -425,7 +425,7 @@ body#chrome  #quick_search .button_submit {
 	color: #111;
 }
 #ourAnnouncements dt {
-	padding: 4px 6px 2px 6px; 
+	padding: 4px 6px 2px 6px;
 	border-top: 1px solid #bf6900;
 }
 #ourAnnouncements dt a {
@@ -1132,7 +1132,7 @@ h3.grid_header {
 	padding: 8px;
 }
 
-/* Styles for the Report generation 
+/* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
 	min-height: 2.4em;

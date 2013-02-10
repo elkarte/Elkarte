@@ -240,15 +240,32 @@
 			if(type === "open")
 			{
 				matches = val.match(/\[([^\]\s=]+)(?:([^\]]+))?\]/);
-				name    = lower(matches[1]);
 
-				if(matches[2] && (matches[2] = $.trim(matches[2])))
-					attrs = tokenizeAttrs(matches[2]);
+				// Make sure there was a match otherwise it must be content
+				if(matches)
+				{
+					name = lower(matches[1]);
+
+					if(matches[2] && (matches[2] = $.trim(matches[2])))
+						attrs = tokenizeAttrs(matches[2]);
+				}
+				else
+				{
+					type = 'content';
+					name = '#';
+				}
 			}
 			else if(type === "close")
 			{
 				matches = val.match(/\[\/([^\[\]]+)\]/);
-				name    = lower(matches[1]);
+
+				if(!matches)
+				{
+					type = 'content';
+					name = '#';
+				}
+				else
+					name = lower(matches[1]);
 			}
 			else if(type === "newline")
 				name = '#newline';
@@ -990,13 +1007,13 @@
 					{
 						if(token.attrs.defaultattr)
 						{
-							ret.push('=' + quote(token.attrs.defaultattr, quoteType));
+							ret.push('=' + quote(token.attrs.defaultattr, quoteType, 'defaultattr'));
 							delete token.attrs.defaultattr;
 						}
 
 						for(attr in token.attrs)
 							if(token.attrs.hasOwnProperty(attr))
-								ret.push(' ' + attr + '=' + quote(token.attrs[attr], quoteType));
+								ret.push(' ' + attr + '=' + quote(token.attrs[attr], quoteType, attr));
 					}
 					ret.push(']');
 
@@ -1036,15 +1053,16 @@
 		 *
 		 * @param {String} str
 		 * @param {$.sceditor.BBCodeParser.QuoteType} quoteType
+		 * @param {String} name
 		 * @return {String}
 		 * @private
 		 */
-		quote = function(str, quoteType) {
+		quote = function(str, quoteType, name) {
 			var	QuoteTypes  = $.sceditor.BBCodeParser.QuoteType,
 				needsQuotes = /\s|=/.test(str);
-// TODO:Add name to quoteType callback
+
 			if($.isFunction(quoteType))
-				return quoteType(str);
+				return quoteType(str, name);
 
 			if(quoteType === QuoteTypes.never || (quoteType === QuoteTypes.auto && !needsQuotes))
 				return str;
@@ -1088,6 +1106,7 @@
 	 * @since v1.4.0
 	 */
 	$.sceditor.BBCodeParser.QuoteType = {
+		/** @lends jQuery.sceditor.BBCodeParser.QuoteType */
 		/**
 		 * Always quote the attribute value
 		 * @type {Number}
@@ -1167,14 +1186,20 @@
 	};
 
 	/**
-	 * BBCode plugin for SCEditor
+	 * Deprecated, use $.sceditor.plugins.bbcode
 	 *
-	 * @param {Element} $element The textarea to be converted
-	 * @return {Object} options
 	 * @class sceditorBBCodePlugin
-	 * @name jQuery.sceditor.plugins.bbcode
+	 * @name jQuery.sceditor.sceditorBBCodePlugin
+	 * @deprecated
 	 */
 	$.sceditorBBCodePlugin =
+	/**
+	 * BBCode plugin for SCEditor
+	 *
+	 * @class bbcode
+	 * @name jQuery.sceditor.plugins.bbcode
+	 * @since 1.4.1
+	 */
 	$.sceditor.plugins.bbcode = function() {
 		var base = this;
 

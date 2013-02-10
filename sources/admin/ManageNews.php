@@ -986,4 +986,3 @@ function ModifyNewsSettings($return_config = false)
 
 	prepareDBSettingContext($config_vars);
 }
-

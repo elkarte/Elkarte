@@ -211,7 +211,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		default: '??',
+		Default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -221,7 +221,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		default: '??',
+		Default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -231,7 +231,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: false,
 		database: false,
 		subs: false,
-		default: false,
+		Default: false,
 		Languages: false,
 		Templates: false
 	};
@@ -242,7 +242,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		'controllers',
 		'database',
 		'subs',
-		'default',
+		'Default',
 		'Languages',
 		'Templates'
 	];
@@ -251,12 +251,12 @@ smf_ViewVersions.prototype.determineVersions = function ()
 	{
 		// Collapse all sections.
 		var oSection = document.getElementById(sSections[i]);
-		if (typeof(oSection) == 'object' && oSection != null)
+		if (typeof(oSection) === 'object' && oSection !== null)
 			oSection.style.display = 'none';
 
 		// Make all section links clickable.
 		var oSectionLink = document.getElementById(sSections[i] + '-link');
-		if (typeof(oSectionLink) == 'object' && oSectionLink != null)
+		if (typeof(oSectionLink) === 'object' && oSectionLink !== null)
 		{
 			oSectionLink.instanceRef = this;
 			oSectionLink.sSection = sSections[i];
@@ -287,12 +287,12 @@ smf_ViewVersions.prototype.determineVersions = function ()
 			}
 		
 		// use compareVersion to determine which version is >< the other
-		if (typeof(sCurVersionType) != 'undefined')
+		if (typeof(sCurVersionType) !== 'undefined')
 		{
-			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] == '??') && !oLowVersion[sCurVersionType])
+			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
 				oHighYour[sCurVersionType] = sYourVersion;
 			
-			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] == '??')
+			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] === '??')
 				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
 
 			if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
@@ -323,9 +323,9 @@ smf_ViewVersions.prototype.determineVersions = function ()
 			sYourVersion = getInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]));
 			setInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]), sYourVersion);
 
-			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages == '??') && !oLowVersion.Languages)
+			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
 				oHighYour.Languages = sYourVersion;
-			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages == '??')
+			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages === '??')
 				oHighCurrent.Languages = ourLanguageVersions[sFilename];
 
 			if (this.compareVersions(sYourVersion, ourLanguageVersions[sFilename]))
@@ -362,9 +362,9 @@ smf_ViewVersions.prototype.determineVersions = function ()
 	if (oLowVersion.sources)
 		document.getElementById('yoursubs').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.default ? oLowVersion.default : oHighYour.default);
-	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.default);
-	if (oLowVersion.default)
+	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.Default ? oLowVersion.Default : oHighYour.Default);
+	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.Default);
+	if (oLowVersion.Default)
 		document.getElementById('yourdefault').style.color = 'red';
 
 	if (document.getElementById('Templates'))

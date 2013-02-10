@@ -15,7 +15,7 @@
 
 $(document).ready(function() {
 	// menu drop downs
-	$('.dropmenu').superfish({delay : 600, speed: 250, sensitivity : 8, interval : 50, timeout : 1}); 
+	$('.dropmenu').superfish({delay : 600, speed: 250, sensitivity : 8, interval : 50, timeout : 1});
 
 	// tooltips
 	$('.preview').SiteTooltip();

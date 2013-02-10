@@ -575,7 +575,17 @@ function ModifyLanguages()
 		checkSession();
 		validateToken('admin-lang');
 
-		if ($_POST['def_language'] != $language)
+		$lang_exists = false;
+		foreach ($context['languages'] as $lang)
+		{
+			if ($_POST['def_language'] == $lang['filename'])
+			{
+				$lang_exists = true;
+				break;
+			}
+		}
+
+		if ($_POST['def_language'] != $language && $lang_exists)
 		{
 			require_once($librarydir . '/Admin.subs.php');
 			updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
@@ -1289,9 +1299,7 @@ function cleanLangString($string, $to_display = true)
 				if (!empty($matches[1]))
 				{
 					// Come up with some pseudo thing to indicate this is a var.
-					/**
-					 * @todo Do better than this, please!
-					 */
+					// @todo Do better than this, please!
 					$new_string .= '{%' . $matches[1] . '%}';
 
 					// We're not going to reparse this.

@@ -16,7 +16,7 @@
 
 $(document).ready(function() {
 	// menu drop downs
-	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1}); 
+	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1});
 
 	// Smooth scroll navigation
 	$('.topbottom').bind('click', function(event) {		
@@ -34,28 +34,16 @@ $(document).ready(function() {
 
 	// find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
-});
 
-// The purpose of this code is to fix the height of overflow: auto blocks, because some browsers can't figure it out for themselves.
-function smf_codeBoxFix()
-{
-	var codeFix = document.getElementsByTagName('code');
-	for (var i = codeFix.length - 1; i >= 0; i--)
+	// Set a auto height so small code blocks collaspe, set a height for larger ones
+	// and let resize or overflow do its thing as normal
+	$('.bbc_code').each(function()
 	{
-		if (is_webkit && codeFix[i].offsetHeight < 20)
-			codeFix[i].style.height = (codeFix[i].offsetHeight + 20) + 'px';
-
-		else if (is_ff && (codeFix[i].scrollWidth > codeFix[i].clientWidth || codeFix[i].clientWidth == 0))
-			codeFix[i].style.overflow = 'scroll';
-
-		else if ('currentStyle' in codeFix[i] && codeFix[i].currentStyle.overflow == 'auto' && (codeFix[i].currentStyle.height == '' || codeFix[i].currentStyle.height == 'auto') && (codeFix[i].scrollWidth > codeFix[i].clientWidth || codeFix[i].clientWidth == 0) && (codeFix[i].offsetHeight != 0))
-			codeFix[i].style.height = (codeFix[i].offsetHeight + 24) + 'px';
-	}
-}
-
-// Add a fix for code stuff?
-if (is_ie || is_webkit || is_ff)
-	addLoadEvent(smf_codeBoxFix);
+		$(this).height("auto");
+		if ($(this).height() > 200)
+			$(this).css('height', '20em');
+	});
+});
 
 // Toggles the element height and width styles of an image.
 function smc_toggleImageDimensions()

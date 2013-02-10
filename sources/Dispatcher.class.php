@@ -140,7 +140,7 @@ class Site_Dispatcher
 			'login2' => array('LogInOut.controller.php', 'action_login2'),
 			'logout' => array('LogInOut.controller.php', 'action_logout'),
 			'markasread' => array('Markasread.controller.php', 'markasread'),
-			'mergetopics' => array('SplitTopics.controller.php', 'MergeTopics'),
+			'mergetopics' => array('MergeTopics.controller.php', 'action_mergetopics'),
 			'memberlist' => array('Memberlist.controller.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.controller.php', 'action_modcenter'),
 			'karma' => array('Karma.controller.php', 'action_karma'),
@@ -170,7 +170,7 @@ class Site_Dispatcher
 			'search2' => array('Search.controller.php', 'action_plushsearch2'),
 			// 'sendtopic' => array('Emailuser.controller.php', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'action_suggest'),
-			'spellcheck' => array('Post.subs.php', 'action_spellcheck'),
+			'spellcheck' => array('Post.controller.php', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'action_stats'),
 			'sticky' => array('Topic.controller.php', 'action_sticky'), // done

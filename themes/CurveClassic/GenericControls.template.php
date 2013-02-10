@@ -147,8 +147,26 @@ function template_control_richedit_buttons($editor_id)
 
 	if ($context['show_spellchecking'])
 		echo '
-		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="oEditorHandle_', $editor_id, '.spellCheckStart();" class="button_submit" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>';
+		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			// Start up the spellchecker!
+			function spellCheckStart(fieldName)
+			{
+				if (!spellCheck)
+					return false
+
+				var sUniqueId = ', JavaScriptEscape($editor_id), ';,
+				$("#" + sUniqueId).data("sceditor").storeLastState();
+
+				// If we\'re in HTML mode we need to get the non-HTML text.
+				$("#" + sUniqueId).data("sceditor").setTextMode()
+
+				spellCheck(false, sUniqueId);
+
+				return true;
+			}
+		// ]]></script>';
 
 	if (!empty($context['drafts_save']))
 	{
