@@ -175,6 +175,15 @@ function action_modcenter($dont_call = false)
 	$context['moderation_menu_id'] = $context['max_menu_id'];
 	$context['moderation_menu_name'] = 'menu_data_' . $context['moderation_menu_id'];
 
+	// @todo: html in here is not good
+	$context[$context['moderation_menu_name']]['tab_data'] = array(
+		'title' => $txt['moderation_center'],
+		'help' => '',
+		'description' => '
+			<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
+			<br /><br />
+			' . $txt['mc_description']);
+
 	// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 	$context['admin_area'] = $mod_include_data['current_area'];
 
@@ -2026,6 +2035,11 @@ function action_moderationSettings()
 	loadTemplate('ModerationCenter');
 	$context['page_title'] = $txt['mc_settings'];
 	$context['sub_template'] = 'moderation_settings';
+	$context[$context['moderation_menu_name']]['tab_data'] = array(
+		'title' => $txt['mc_prefs_title'],
+		'help' => '',
+		'description' => $txt['mc_prefs_desc']
+	);
 
 	// What blocks can this user see?
 	$context['homepage_blocks'] = array(
