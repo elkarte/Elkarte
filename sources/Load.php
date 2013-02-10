@@ -873,7 +873,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $smcFunc, $context;
+	global $user_profile, $modSettings, $board_info, $smcFunc, $context, $librarydir;
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -992,17 +992,8 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	{
 		if (($row = cache_get_data('moderator_group_info', 480)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT group_name AS member_group, online_color AS member_group_color, icons
-				FROM {db_prefix}membergroups
-				WHERE id_group = {int:moderator_group}
-				LIMIT 1',
-				array(
-					'moderator_group' => 3,
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			require_once($librarydir . '/Membergroups.subs.php');
+			$row = membergroupsById(3, 1, true);
 
 			cache_put_data('moderator_group_info', $row, 480);
 		}
@@ -1011,13 +1002,13 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		{
 			// By popular demand, don't show admins or global moderators as moderators.
 			if ($user_profile[$id]['id_group'] != 1 && $user_profile[$id]['id_group'] != 2)
-				$user_profile[$id]['member_group'] = $row['member_group'];
+				$user_profile[$id]['member_group'] = $row['group_name'];
 
 			// If the Moderator group has no color or icons, but their group does... don't overwrite.
 			if (!empty($row['icons']))
 				$user_profile[$id]['icons'] = $row['icons'];
-			if (!empty($row['member_group_color']))
-				$user_profile[$id]['member_group_color'] = $row['member_group_color'];
+			if (!empty($row['online_color']))
+				$user_profile[$id]['member_group_color'] = $row['online_color'];
 		}
 	}
 

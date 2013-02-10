@@ -209,23 +209,18 @@ function action_groupmembers()
 	if (in_array($_REQUEST['group'], array(-1, 0, 3)))
 		fatal_lang_error('membergroup_does_not_exist', false);
 
+	require_once($librarydir . '/Membergroups.subs.php');
+
 	// Load up the group details.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group AS id, group_name AS name, CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable, hidden, online_color,
-			icons, description, CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group, group_type
-		FROM {db_prefix}membergroups
-		WHERE id_group = {int:id_group}
-		LIMIT 1',
-		array(
-			'min_posts' => -1,
-			'id_group' => $_REQUEST['group'],
-		)
-	);
+	$context['group'] = membergroupsById($_REQUEST['group'], 1, true, true);
+
 	// Doesn't exist?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if (empty($context['group']))
 		fatal_lang_error('membergroup_does_not_exist', false);
-	$context['group'] = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+
+	// @todo should we change id => id_group and name => name_group?
+	$context['group']['id'] = $context['group']['id_group'];
+	$context['group']['name'] = $context['group']['group_name'];
 
 	// Fix the membergroup icons.
 	$context['group']['icons'] = explode('#', $context['group']['icons']);
@@ -282,7 +277,6 @@ function action_groupmembers()
 		foreach ($_REQUEST['rem'] as $key => $group)
 			$_REQUEST['rem'][$key] = (int) $group;
 
-		require_once($librarydir . '/Membergroups.subs.php');
 		removeMembersFromGroups($_REQUEST['rem'], $_REQUEST['group'], true);
 	}
 	// Must be adding new members to the group...

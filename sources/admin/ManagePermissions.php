@@ -91,7 +91,9 @@ function ModifyPermissions()
  */
 function PermissionIndex()
 {
-	global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc, $librarydir;
+
+	require_once($librarydir . 'Membergroups.subs.php');
 
 	$context['page_title'] = $txt['permissions_title'];
 
@@ -214,56 +216,10 @@ function PermissionIndex()
 	$smcFunc['db_free_result']($query);
 
 	// Get the number of members in this post group.
-	if (!empty($postGroups))
-	{
-		$query = $smcFunc['db_query']('', '
-			SELECT id_post_group AS id_group, COUNT(*) AS num_members
-			FROM {db_prefix}members
-			WHERE id_post_group IN ({array_int:post_group_list})
-			GROUP BY id_post_group',
-			array(
-				'post_group_list' => $postGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-	}
-
-	if (!empty($normalGroups))
-	{
-		// First, the easy one!
-		$query = $smcFunc['db_query']('', '
-			SELECT id_group, COUNT(*) AS num_members
-			FROM {db_prefix}members
-			WHERE id_group IN ({array_int:normal_group_list})
-			GROUP BY id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-
-		// This one is slower, but it's okay... careful not to count twice!
-		$query = $smcFunc['db_query']('', '
-			SELECT mg.id_group, COUNT(*) AS num_members
-			FROM {db_prefix}membergroups AS mg
-				INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
-					AND mem.id_group != mg.id_group
-					AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-			WHERE mg.id_group IN ({array_int:normal_group_list})
-			GROUP BY mg.id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-				'blank_string' => '',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['num_members'] += $row['num_members'];
-		$smcFunc['db_free_result']($query);
-	}
+	$groups = membersInGroups($postGroups, $normalGroups, true);
+	// @todo not sure why += wouldn't = be enough?
+	foreach ($groups as $id_group => $member_count)
+		$context['groups'][$id_group]['member_count'] += $member_count;
 
 	foreach ($context['groups'] as $id => $data)
 	{
@@ -717,17 +673,11 @@ function ModifyMembergroup()
 
 	if ($context['group']['id'] > 0)
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT group_name, id_parent
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT 1',
-			array(
-				'current_group' => $context['group']['id'],
-			)
-		);
-		list ($context['group']['name'], $parent) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		require_once($librarydir . '/Membergroups.subs.php');
+
+		$group = membergroupsById($context['group']['id'], 1, true);
+		$context['group']['name'] = $group['group_name'];
+		$parent = $group['id_parent'];
 
 		// Cannot edit an inherited group!
 		if ($parent != -2)
@@ -842,7 +792,7 @@ function ModifyMembergroup()
  */
 function ModifyMembergroup2()
 {
-	global $modSettings, $smcFunc, $context;
+	global $modSettings, $smcFunc, $context, $librarydir;
 
 	checkSession();
 	validateToken('admin-mp');
@@ -861,17 +811,9 @@ function ModifyMembergroup2()
 		$parent = -2;
 	else
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT id_parent
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}
-			LIMIT 1',
-			array(
-				'current_group' => $_GET['group'],
-			)
-		);
-		list ($parent) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		require_once($librarydir . '/Membergroups.subs.php');
+		$group = membergroupsById($_GET['group'], 1, true);
+		$parent = $group['id_parent'];
 	}
 
 	if ($parent != -2)
