@@ -403,27 +403,6 @@ function template_unapproved_posts()
 	</div>';
 }
 
-// List all attachments awaiting approval.
-function template_unapproved_attachments()
-{
-	global $settings, $options, $context, $txt, $scripturl;
-
-	// Show all the attachments still oustanding.
-	echo '
-	<div id="modcenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['mc_unapproved_attachments'], '</h3>
-		</div>
-		<div class="information">
-			', $txt['mc_unapproved_attachments_desc'], '
-		</div>';
-
-	template_show_list('mc_unapproved_attach');
-
-	echo '
-	</div>';
-}
-
 function template_viewmodreport()
 {
 	global $context, $scripturl, $txt;

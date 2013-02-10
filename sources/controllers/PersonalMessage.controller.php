@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function action_pm()
 {
-	global $txt, $scripturl, $sourcedir, $librarydir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
+	global $txt, $scripturl, $controllerdir, $librarydir, $context, $user_info, $user_settings, $smcFunc, $modSettings;
 
 	// No guests!
 	is_not_guest();
@@ -1222,7 +1222,7 @@ function action_sendmessage()
  */
 function action_messagedrafts()
 {
-	global $sourcedir, $user_info;
+	global $user_info, $controllerdir;
 
 	// validate with loadMemberData()
 	$memberResult = loadMemberData($user_info['id'], false);

@@ -74,6 +74,9 @@ function action_grouplist()
 	global $txt, $context, $sourcedir, $librarydir, $scripturl, $user_info;
 
 	$context['page_title'] = $txt['viewing_groups'];
+		$context[$context['moderation_menu_name']]['tab_data'] = array(
+			'title' => $txt['mc_group_requests'],
+		);
 
 	// Making a list is not hard with this beauty.
 	require_once($librarydir . '/List.subs.php');
@@ -81,7 +84,6 @@ function action_grouplist()
 	// Use the standard templates for showing this.
 	$listOptions = array(
 		'id' => 'group_lists',
-		'title' => $context['page_title'],
 		'base_href' => $scripturl . '?action=moderate;area=viewgroups;sa=view',
 		'default_sort_col' => 'group',
 		'get_items' => array(
@@ -452,6 +454,9 @@ function action_grouprequests()
 	// Set up the template stuff...
 	$context['page_title'] = $txt['mc_group_requests'];
 	$context['sub_template'] = 'show_list';
+	$context[$context['moderation_menu_name']]['tab_data'] = array(
+		'title' => $txt['mc_group_requests'],
+	);
 
 	// Verify we can be here.
 	if ($user_info['mod_cache']['gq'] == '0=1')
@@ -639,7 +644,6 @@ function action_grouprequests()
 	// This is all the information required for a group listing.
 	$listOptions = array(
 		'id' => 'group_request_list',
-		'title' => $txt['mc_group_requests'],
 		'width' => '100%',
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'no_items_label' => $txt['mc_groupr_none_found'],
