@@ -61,11 +61,13 @@ function pre_announce()
  */
 function action_selectgroup()
 {
-	global $txt, $context, $topic, $board, $board_info, $smcFunc;
+	global $txt, $context, $topic, $board, $board_info, $smcFunc, $librarydir;
 
 	$groups = array_merge($board_info['groups'], array(1));
 	foreach ($groups as $id => $group)
 		$groups[$id] = (int) $group;
+
+	require_once($librarydir . '/Membergroups.subs.php');
 
 	$context['groups'] = array();
 	if (in_array(0, $groups))
@@ -100,17 +102,9 @@ function action_selectgroup()
 	$smcFunc['db_free_result']($request);
 
 	// Now get the membergroup names.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_list})',
-		array(
-			'group_list' => $groups,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context['groups'][$row['id_group']]['name'] = $row['group_name'];
-	$smcFunc['db_free_result']($request);
+	$groups_info = membergroupsById($groups, 0);
+	foreach ($groups_info as $id_group => $group_info)
+		$context['groups'][$id_group]['name'] = $group_info['group_name'];
 
 	// Get the subject of the topic we're about to announce.
 	$request = $smcFunc['db_query']('', '

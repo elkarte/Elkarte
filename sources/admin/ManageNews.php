@@ -306,7 +306,9 @@ function list_getNews()
  */
 function SelectMailingMembers()
 {
-	global $txt, $context, $modSettings, $smcFunc;
+	global $txt, $context, $modSettings, $smcFunc, $librarydir;
+
+	require_once($librarydir . '/Membergroups.subs.php');
 
 	$context['page_title'] = $txt['admin_newsletters'];
 
@@ -357,68 +359,10 @@ function SelectMailingMembers()
 	}
 	$smcFunc['db_free_result']($request);
 
-	// If we have post groups, let's count the number of members...
-	if (!empty($postGroups))
-	{
-		$query = $smcFunc['db_query']('', '
-			SELECT mem.id_post_group AS id_group, COUNT(*) AS member_count
-			FROM {db_prefix}members AS mem
-			WHERE mem.id_post_group IN ({array_int:post_group_list})
-			GROUP BY mem.id_post_group',
-			array(
-				'post_group_list' => $postGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['member_count'] += $row['member_count'];
-		$smcFunc['db_free_result']($query);
-	}
-
-	if (!empty($normalGroups))
-	{
-		// Find people who are members of this group...
-		$query = $smcFunc['db_query']('', '
-			SELECT id_group, COUNT(*) AS member_count
-			FROM {db_prefix}members
-			WHERE id_group IN ({array_int:normal_group_list})
-			GROUP BY id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['member_count'] += $row['member_count'];
-		$smcFunc['db_free_result']($query);
-
-		// Also do those who have it as an additional membergroup - this ones more yucky...
-		$query = $smcFunc['db_query']('', '
-			SELECT mg.id_group, COUNT(*) AS member_count
-			FROM {db_prefix}membergroups AS mg
-				INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
-					AND mem.id_group != mg.id_group
-					AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-			WHERE mg.id_group IN ({array_int:normal_group_list})
-			GROUP BY mg.id_group',
-			array(
-				'normal_group_list' => $normalGroups,
-				'blank_string' => '',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
-			$context['groups'][$row['id_group']]['member_count'] += $row['member_count'];
-		$smcFunc['db_free_result']($query);
-	}
-
-	// Any moderators?
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(DISTINCT id_member) AS num_distinct_mods
-		FROM {db_prefix}moderators
-		LIMIT 1',
-		array(
-		)
-	);
-	list ($context['groups'][3]['member_count']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$groups = membersInGroups($postGroups, $normalGroups, true, true);
+	// @todo not sure why += wouldn't = be enough?
+	foreach ($groups as $id_group => $member_count)
+		$context['groups'][$id_group]['member_count'] += $member_count;
 
 	$context['can_send_pm'] = allowedTo('pm_send');
 }
