@@ -387,15 +387,13 @@ function action_browse()
 	global $context, $txt, $scripturl, $options, $modSettings;
 	global $smcFunc;
 
-	$context['sub_template'] = 'browse';
-
 	// Attachments or avatars?
 	$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
 
 	// Set the options for the list component.
 	$listOptions = array(
-		'id' => 'file_list',
-		'title' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments'))],
+		'id' => 'attach_browse',
+		'title' => $txt['attachment_manager_browse_files'],
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=browse' . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
 		'default_sort_col' => 'name',
@@ -554,6 +552,26 @@ function action_browse()
 			),
 		),
 		'additional_rows' => array(
+			array(
+				'position' => 'selectors',
+				'value' => array(
+					array(
+						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse',
+						'selected' => $context['browse_type'] === 'attachments',
+						'text' => $txt['attachment_manager_attachments']
+					),
+					array(
+						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse;avatars',
+						'selected' => $context['browse_type'] === 'avatars',
+						'text' => $txt['attachment_manager_avatars']
+					),
+					array(
+						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse;thumbs',
+						'selected' => $context['browse_type'] === 'thumbs',
+						'text' => $txt['attachment_manager_thumbs']
+					),
+				),
+			),
 			array(
 				'position' => 'below_table_data',
 				'value' => '<input type="submit" name="remove_submit" class="button_submit" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['confirm_delete_attachments'] . '\');" />',
@@ -2042,7 +2060,6 @@ function action_attachpaths()
 	// Fix up our template.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'attachpaths';
 	$context['page_title'] = $txt['attach_path_manage'];
-	$context['sub_template'] = 'attachment_paths';
 }
 
 /**

@@ -281,9 +281,6 @@ function action_list()
 
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
-
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_list';
 }
 
 /**
@@ -1166,10 +1163,6 @@ function action_browse()
 	// Create the list.
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
-
-	// The list is the only thing to show, so make it the default sub template.
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_trigger_list';
 }
 
 /**
