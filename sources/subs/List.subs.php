@@ -239,7 +239,7 @@ function createList($listOptions)
 			if (empty($row))
 				continue;
 
-			// Supported row positions: top_of_list, after_title,
+			// Supported row positions: top_of_list, after_title, selectors,
 			// above_column_headers, below_table_data, bottom_of_list.
 			if (!isset($list_context['additional_rows'][$row['position']]))
 				$list_context['additional_rows'][$row['position']] = array();

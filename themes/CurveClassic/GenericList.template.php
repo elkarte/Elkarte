@@ -58,7 +58,7 @@ function template_show_list($list_id = null)
 	if (isset($cur_list['additional_rows']['top_of_list']))
 		template_additional_rows('top_of_list', $cur_list);
 
-	if ((!empty($cur_list['items_per_page']) && !empty($cur_list['page_index'])) || isset($cur_list['additional_rows']['above_column_headers']))
+	if ((!empty($cur_list['items_per_page']) && !empty($cur_list['page_index'])) || isset($cur_list['additional_rows']['above_column_headers']) || isset($cur_list['additional_rows']['selectors']))
 	{
 		echo '
 			<div class="flow_auto">';
@@ -70,12 +70,15 @@ function template_show_list($list_id = null)
 					<div class="pagesection">', $txt['pages'], ': ', $cur_list['page_index'], '</div>
 				</div>';
 
-		if (isset($cur_list['additional_rows']['above_column_headers']))
+		if (isset($cur_list['additional_rows']['above_column_headers']) || isset($cur_list['additional_rows']['selectors']))
 		{
 			echo '
 				<div class="floatright">';
 
-			template_additional_rows('above_column_headers', $cur_list);
+			if (isset($cur_list['additional_rows']['above_column_headers']))
+				template_additional_rows('above_column_headers', $cur_list);
+			if (isset($cur_list['additional_rows']['selectors']))
+				template_additional_rows('selectors', $cur_list);
 
 			echo '
 				</div>';
@@ -218,9 +221,28 @@ function template_additional_rows($row_position, $cur_list)
 {
 	global $context, $settings, $options;
 
-	foreach ($cur_list['additional_rows'][$row_position] as $row)
-		echo '
-			<div class="additional_row', empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>', $row['value'], '</div>';
+	if ($row_position == 'selectors')
+	{
+		foreach ($cur_list['additional_rows'][$row_position] as $rows)
+		{
+			echo '
+				<div class="additional_row', empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>';
+			$items = count($rows['value']);
+			$ci = 0;
+			foreach ($rows['value'] as $row)
+			{
+				$ci++;
+				echo '
+					<a href="', $row['url'], '">', $row['selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '', $row['text'], '</a>', $items !== $ci ? '&nbsp;|&nbsp;' : '';
+			}
+			echo '
+				</div>';
+		}
+	}
+	else
+		foreach ($cur_list['additional_rows'][$row_position] as $row)
+			echo '
+				<div class="additional_row', empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>', $row['value'], '</div>';
 }
 
 function template_create_list_menu($list_menu, $direction = 'top')
