@@ -42,6 +42,16 @@ function createList($listOptions)
 	$context[$listOptions['id']] = array();
 	$list_context = &$context[$listOptions['id']];
 
+	// Let's set some default that could be useful to avoid repetitions
+	if (function_exists('template_' . $listOptions['id']))
+		$context['sub_template'] = $listOptions['id'];
+	else
+	{
+		$context['sub_template'] = 'show_list';
+		if (!isset($context['default_list']))
+			$context['default_list'] = $listOptions['id'];
+	}
+
 	// Figure out the sort.
 	if (empty($listOptions['default_sort_col']))
 	{
