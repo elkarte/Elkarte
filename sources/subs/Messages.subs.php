@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
 
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {
-	global $smcFunc;
+	global $smcFunc, $modSettings;
 
 	if (empty($id_msg))
 		return false;
