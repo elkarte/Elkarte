@@ -93,7 +93,7 @@ function PermissionIndex()
 {
 	global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc, $librarydir;
 
-	require_once($librarydir . 'Membergroups.subs.php');
+	require_once($librarydir . '/Membergroups.subs.php');
 
 	$context['page_title'] = $txt['permissions_title'];
 
