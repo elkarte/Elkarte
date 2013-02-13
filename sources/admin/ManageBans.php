@@ -1381,8 +1381,6 @@ function action_log()
 	createList($listOptions);
 
 	$context['page_title'] = $txt['ban_log'];
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_log';
 }
 
 /**

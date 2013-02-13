@@ -557,7 +557,6 @@ function DownloadLanguage()
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
-	$context['default_list'] = 'lang_main_files_list';
 	createToken('admin-dlang');
 }
 
