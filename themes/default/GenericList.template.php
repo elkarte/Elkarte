@@ -205,8 +205,11 @@ function template_additional_rows($row_position, $cur_list)
 			foreach ($rows['value'] as $row)
 			{
 				$ci++;
+				if (!empty($row['url']))
 				echo '
-					<a href="', $row['url'], '">', $row['selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '', $row['text'], '</a>', $items !== $ci ? '&nbsp;|&nbsp;' : '';
+					<a href="', $row['url'], '">', $row['selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '';
+
+				echo $row['text'], !empty($row['url']) ? '</a>' : '', $items !== $ci ? '&nbsp;|&nbsp;' : '';
 			}
 			echo '
 				</div>';
