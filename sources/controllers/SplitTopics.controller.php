@@ -170,7 +170,8 @@ function action_splitExecute()
  */
 function action_splitSelectTopics()
 {
-	global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $smcFunc, $options;
+	global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
+	global $smcFunc, $librarydir;
 
 	$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 
