@@ -354,14 +354,16 @@ function updateSettingsFile($config_vars)
 	// Check before you act: if cache is enabled, we can do a simple write test
 	// to validate that we even write things on this filesystem.
 	if ((!defined(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
-		define('CACHEDIR', BOARDDIR . '/cache');
+		$tmp_cache = BOARDDIR . '/cache';
+	else
+		$tmp_cache = CACHEDIR;
 
-	$test_fp = @fopen(CACHEDIR . '/settings_update.tmp', "w+");
+	$test_fp = @fopen($tmp_cache . '/settings_update.tmp', "w+");
 	if ($test_fp)
 	{
 		fclose($test_fp);
-		$written_bytes = file_put_contents(CACHEDIR . '/settings_update.tmp', 'test', LOCK_EX);
-		@unlink(CACHEDIR . '/settings_update.tmp');
+		$written_bytes = file_put_contents($tmp_cache . '/settings_update.tmp', 'test', LOCK_EX);
+		@unlink($tmp_cache . '/settings_update.tmp');
 
 		if ($written_bytes !== 4)
 		{

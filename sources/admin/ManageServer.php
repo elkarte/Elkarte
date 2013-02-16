@@ -521,6 +521,11 @@ function prepareServerSettingsContext(&$config_vars)
 	global $context, $modSettings;
 
 	$context['config_vars'] = array();
+	$defines = array(
+		'boarddir',
+		'sourcedir',
+		'cachedir',
+	);
 	foreach ($config_vars as $identifier => $config_var)
 	{
 		if (!is_array($config_var) || !isset($config_var[1]))
@@ -547,7 +552,7 @@ function prepareServerSettingsContext(&$config_vars)
 				'size' => empty($config_var[4]) ? 0 : $config_var[4],
 				'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
 				'name' => $config_var[0],
-				'value' => $config_var[2] == 'file' ? htmlspecialchars($$varname) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]]) : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
+				'value' => $config_var[2] == 'file' ? (in_array($varname, $defines) ? constant(strtoupper($varname)): htmlspecialchars($$varname)) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]]) : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
 				'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
 				'invalid' => false,
 				'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,
@@ -779,10 +784,6 @@ function saveSettings(&$config_vars)
 		'webmaster_email',
 		'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
 		'cache_accelerator', 'cache_memcached',
-	);
-
-	$defines = array(
-		'boarddir', 'sourcedir', 'cachedir',
 	);
 
 	// All the numeric variables.

@@ -41,9 +41,29 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Get the forum's settings for database and file paths.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
-if ((empty(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
-	CACHEDIR = BOARDDIR . '/cache';
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make absolutely sure the new directories are defined.
+if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+	$cachedir = $boarddir . '/cache';
+if (empty($subsdir) || !file_exists($subsdir))
+	$subsdir = $sourcedir . '/subs';
+if (empty($controllerdir) || !file_exists($controllerdir))
+	$controllerdir = $sourcedir . '/controllers';
+
+// Time to forget about variables and go with constants!
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('SOURCEDIR', $sourcedir);
+DEFINE('SUBSDIR', $subsdir);
+DEFINE('CONTROLLERDIR', $controllerdir);
+unset($cachedir);
+unset($boarddir);
+unset($sourcedir);
+unset($subsdir);
+unset($controllerdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -56,10 +76,6 @@ $ssi_on_error_method = false;
 // Don't do john didley if the forum's been shut down competely.
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
-
-// Fix for using the current directory as a path.
-if (substr(SOURCEDIR, 0, 1) == '.' && substr(SOURCEDIR, 1, 1) != '.')
-	SOURCEDIR = dirname(__FILE__) . substr(SOURCEDIR, 1);
 
 // Load the important includes.
 require_once(SOURCEDIR . '/QueryString.php');

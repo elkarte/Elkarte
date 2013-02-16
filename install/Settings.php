@@ -141,7 +141,7 @@ $cache_memcached = '';
  * It is also recommended that you place this in /tmp/ if you are going to use this.
  * @var string
  */
-define('CACHEDIR', dirname(__FILE__) . '/cache');
+$cachedir = dirname(__FILE__) . '/cache';
 
 ########## Directories/Files ##########
 # Note: These directories do not have to be changed unless you move things.
@@ -149,22 +149,22 @@ define('CACHEDIR', dirname(__FILE__) . '/cache');
  * The absolute path to the forum's folder. (not just '.'!)
  * @var string
  */
-define('BOARDDIR', dirname(__FILE__));
+$boarddir = dirname(__FILE__);
 /**
  * Path to the sources directory.
  * @var string
  */
-define('SOURCEDIR', dirname(__FILE__) . '/sources');
+$sourcedir = dirname(__FILE__) . '/sources';
 /**
  * Path to the library directory.
  * @var string
  */
-define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
+$librarydir = dirname(__FILE__) . '/sources/subs';
 /**
  * Path to the controllers directory.
  * @var string
  */
-define('CONTROLLERDIR', dirname(__FILE__) . '/sources/controllers');
+$controllerdir = dirname(__FILE__) . '/sources/controllers';
 
 
 ########## Error-Catching ##########
@@ -185,9 +185,9 @@ if (file_exists(dirname(__FILE__) . '/install.php'))
 }
 
 # Make sure the paths are correct... at least try to fix them.
-if (!file_exists(BOARDDIR) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	define('BOARDDIR', dirname(__FILE__));
-if (!file_exists(SOURCEDIR) && file_exists(BOARDDIR . '/sources'))
-	define('SOURCEDIR', BOARDDIR . '/sources');
-if (!file_exists(CACHEDIR) && file_exists(BOARDDIR . '/cache'))
-	define('CACHEDIR', BOARDDIR . '/cache');
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
+	$cachedir = $boarddir . '/cache';
