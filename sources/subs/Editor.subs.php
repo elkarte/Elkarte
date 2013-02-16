@@ -148,7 +148,7 @@ function getMessageIcons($board_id)
 function create_control_richedit($editorOptions)
 {
 	global $txt, $modSettings, $options, $smcFunc;
-	global $context, $settings, $user_info, $sourcedir, $scripturl;
+	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
@@ -649,7 +649,7 @@ function create_control_richedit($editorOptions)
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
 	global $txt, $modSettings, $options, $smcFunc;
-	global $context, $settings, $user_info, $sourcedir, $scripturl;
+	global $context, $settings, $user_info, $scripturl;
 
 	// First verification means we need to set up some bits...
 	if (empty($context['controls']['verification']))
@@ -953,7 +953,7 @@ function bbc_to_html($text, $compat_mode = false)
  */
 function html_to_bbc($text)
 {
-	global $modSettings, $smcFunc, $sourcedir, $scripturl, $context;
+	global $modSettings, $smcFunc, $scripturl, $context;
 
 	// Replace newlines with spaces, as that's how browsers usually interpret them.
 	$text = preg_replace("~\s*[\r\n]+\s*~", ' ', $text);

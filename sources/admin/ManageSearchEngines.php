@@ -64,7 +64,7 @@ function SearchEngines()
  */
 function ManageSearchEngineSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc;
+	global $context, $txt, $modSettings, $scripturl, $smcFunc;
 
 	$config_vars = array(
 		// How much detail?
@@ -97,7 +97,7 @@ function ManageSearchEngineSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
-	require_once($librarydir . '/SearchEngines.subs.php');
+	require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 	// We need to load the groups for the spider group thingy.
 	$request = $smcFunc['db_query']('', '
@@ -150,10 +150,10 @@ function ManageSearchEngineSettings($return_config = false)
  */
 function ViewSpiders()
 {
-	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc;
+	global $context, $txt, $scripturl, $smcFunc;
 
 	// We'll need to do hard work here.
-	require_once($librarydir . '/SearchEngines.subs.php');
+	require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 	if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
 	{
@@ -314,7 +314,7 @@ function ViewSpiders()
 		),
 	);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -372,7 +372,7 @@ function list_getNumSpiders()
  */
 function EditSpider()
 {
-	global $context, $smcFunc, $txt, $librarydir;
+	global $context, $smcFunc, $txt;
 
 	// Some standard stuff.
 	$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
@@ -423,7 +423,7 @@ function EditSpider()
 			);
 
 		// Order by user agent length.
-		require_once($librarydir . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		sortSpiderTable();
 
 		cache_put_data('spider_search', null, 300);
@@ -469,7 +469,7 @@ function EditSpider()
  */
 function SpiderLogs()
 {
-	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc, $modSettings;
+	global $context, $txt, $scripturl, $smcFunc, $modSettings;
 
 	// Load the template and language just incase.
 	loadLanguage('Search');
@@ -561,7 +561,7 @@ function SpiderLogs()
 
 	createToken('admin-sl');
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// Now determine the actions of the URLs.
@@ -579,7 +579,7 @@ function SpiderLogs()
 		}
 
 		// Now stick in the new URLs.
-		require_once($controllerdir . '/Who.controller.php');
+		require_once(CONTROLLERDIR . '/Who.controller.php');
 		$urls = determineActions($urls, 'whospider_');
 		foreach ($urls as $k => $new_url)
 		{
@@ -646,10 +646,10 @@ function list_getNumSpiderLogs()
  */
 function SpiderStats()
 {
-	global $context, $txt, $sourcedir, $librarydir, $scripturl, $smcFunc;
+	global $context, $txt, $scripturl, $smcFunc;
 
 	// We'll need to do hard work here.
-	require_once($librarydir . '/SearchEngines.subs.php');
+	require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 	// Force an update of the stats every 60 seconds.
 	if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
@@ -811,7 +811,7 @@ function SpiderStats()
 
 	createToken('admin-ss');
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_spider_stats';

@@ -80,10 +80,10 @@ class Site_Combiner
 	 */
 	public function __construct()
 	{
-		global $cachedir, $boarddir, $boardurl, $settings;
+		global $boardurl, $settings;
 
 		// init
-		$this->_archive_dir = $cachedir;
+		$this->_archive_dir = CACHEDIR;
 		$this->_archive_url = $boardurl . '/cache';
 	}
 
@@ -95,7 +95,7 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		global $modSettings, $sourcedir;
+		global $modSettings;
 
 		// No files or missing directory then we are done
 		if (empty($files) || !file_exists($this->_archive_dir))
@@ -132,7 +132,7 @@ class Site_Combiner
 			$this->_combineFiles();
 
 			// minify it to save some space
-			require_once($sourcedir . '/lib/jsminplus.php');
+			require_once(SOURCEDIR . '/lib/jsminplus.php');
 			$this->_minified_cache = JSMinPlus::minify($this->_cache);
 
 			// and save them for future users
@@ -150,7 +150,7 @@ class Site_Combiner
 	 */
 	public function site_css_combine($files)
 	{
-		global $settings, $sourcedir, $boardurl;
+		global $settings, $boardurl;
 
 		// No files or missing dir then we are done
 		if (empty($files) || !file_exists($this->_archive_dir))
@@ -184,7 +184,7 @@ class Site_Combiner
 			$this->_combineFiles('css');
 
 			// CSSmin it to save some space
-			require_once($sourcedir . '/lib/cssmin.php');
+			require_once(SOURCEDIR . '/lib/cssmin.php');
 			$compressor = new CSSmin($this->_cache);
 			$this->_minified_cache = $compressor->run($this->_cache);
 

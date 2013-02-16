@@ -177,7 +177,7 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $sourcedir, $cat_tree, $boards, $boardList, $modSettings, $smcFunc;
+	global $cat_tree, $boards, $boardList, $modSettings, $smcFunc;
 
 	// Get some basic information about all boards and categories.
 	getBoardTree();
@@ -570,7 +570,7 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $sourcedir, $librarydir, $boards, $smcFunc;
+	global $boards, $smcFunc;
 
 	// No boards to delete? Return!
 	if (empty($boards_to_remove))
@@ -619,7 +619,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		$topics[] = $row['id_topic'];
 	$smcFunc['db_free_result']($request);
 
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 	removeTopics($topics, false);
 
 	// Delete the board's logs.

@@ -43,12 +43,12 @@ class Site_Dispatcher
 	 */
 	public function __construct()
 	{
-		global $board, $topic, $sourcedir, $controllerdir, $librarydir, $modSettings, $settings, $user_info, $maintenance;
+		global $board, $topic, $modSettings, $settings, $user_info, $maintenance;
 
 		// default action of the forum: board index
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
-			'file' => $controllerdir . '/BoardIndex.controller.php',
+			'file' => CONTROLLERDIR . '/BoardIndex.controller.php',
 			'function' => 'action_boardindex'
 		);
 
@@ -58,20 +58,20 @@ class Site_Dispatcher
 			// You can only login
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
-				$this->_file_name = $controllerdir . '/LogInOut.controller.php';
+				$this->_file_name = CONTROLLERDIR . '/LogInOut.controller.php';
 				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
 			{
-				$this->_file_name = $librarydir . '/Auth.subs.php';
+				$this->_file_name = SUBSDIR . '/Auth.subs.php';
 				$this->_function_name = 'InMaintenance';
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
-			$this->_file_name = $librarydir . '/Auth.subs.php';
+			$this->_file_name = SUBSDIR . '/Auth.subs.php';
 			$this->_function_name = 'KickGuest';
 		}
 		elseif (empty($_GET['action']))
@@ -91,13 +91,13 @@ class Site_Dispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_file_name = $controllerdir . '/MessageIndex.controller.php';
+				$this->_file_name = CONTROLLERDIR . '/MessageIndex.controller.php';
 				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display
 			else
 			{
-				$this->_file_name = $controllerdir . '/Display.controller.php';
+				$this->_file_name = CONTROLLERDIR . '/Display.controller.php';
 				$this->_function_name = 'Display';
 			}
 		}
@@ -197,7 +197,7 @@ class Site_Dispatcher
 		if (isset($actionArray[$_GET['action']]))
 		{
 			// admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? $sourcedir . '/admin' : $controllerdir;
+			$path = in_array($_GET['action'], $adminActions) ? SOURCEDIR . '/admin' : CONTROLLERDIR;
 
 			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
@@ -227,9 +227,9 @@ class Site_Dispatcher
 		{
 			// i.e. action=help => Help.controller.php...
 			// if the function name fits the pattern, that'd be 'show'...
-			if (file_exists($controllerdir . '/' . ucfirst($_GET['action']) . '.php'))
+			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php'))
 			{
-				$this->_file_name = $controllerdir . '/' . ucfirst($_GET['action']) . '.php';
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php';
 
 				// procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
@@ -244,9 +244,9 @@ class Site_Dispatcher
 			// action=drafts => Drafts.controller.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
 			// ... if it ain't there yet, no problem.
-			elseif (file_exists($controllerdir . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = $controllerdir . '/' . ucfirst($_GET['action'] . '.controller.php');
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action'] . '.controller.php');
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
@@ -256,9 +256,9 @@ class Site_Dispatcher
 			// or... an add-on can do just this!
 			// action=gallery => Gallery-Controller.php
 			// sa=upload => action_upload()
-			elseif (file_exists($sourcedir . '/' . ucfirst($_GET['action']) . '-Controller.php'))
+			elseif (file_exists(SOURCEDIR . '/' . ucfirst($_GET['action']) . '-Controller.php'))
 			{
-				$this->_file_name = $sourcedir . '/' . ucfirst($_GET['action']) . '-Controller.php';
+				$this->_file_name = SOURCEDIR . '/' . ucfirst($_GET['action']) . '-Controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
@@ -274,7 +274,7 @@ class Site_Dispatcher
 			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				$this->_file_name = $controllerdir . '/Themes.php';
+				$this->_file_name = CONTROLLERDIR . '/Themes.php';
 				$this->_function_name = 'WrapAction';
 			}
 			else
@@ -311,7 +311,7 @@ class Site_Dispatcher
 			{
 				// things went pretty bad, huh?
 				// board index :P
-				require_once($controllerdir . '/BoardIndex.controller.php');
+				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
 				return 'action_boardindex';
 			}
 		}

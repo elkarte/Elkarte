@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $boarddir, $smcFunc, $txt, $db_character_set, $context, $sourcedir, $librarydir;
+	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
@@ -116,13 +116,11 @@ function reloadSettings()
 			return $length === null ? implode(\'\', array_slice($ent_arr, $start)) : implode(\'\', array_slice($ent_arr, $start, $length));'),
 		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
 			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
-			global $librarydir;
-			require_once($librarydir . \'/Charset.subs.php\');
+			require_once(SUBSDIR . \'/Charset.subs.php\');
 			return utf8_strtolower($string);'),
 		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
 			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
-			global $librarydir;
-			require_once($librarydir . \'/Charset.subs.php\');
+			require_once(SUBSDIR . \'/Charset.subs.php\');
 			return utf8_strtoupper($string);'),
 		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
 			global $smcFunc;
@@ -199,7 +197,7 @@ function reloadSettings()
 		$pre_includes = explode(',', $modSettings['integrate_pre_include']);
 		foreach ($pre_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$librarydir' => $librarydir));
+			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, 'SUBSDIR' => SUBSDIR));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -222,7 +220,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $user_settings, $smcFunc;
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -390,7 +388,7 @@ function loadUserSettings()
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
 		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
 		{
-			require_once($librarydir . '/SearchEngines.subs.php');
+			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			$user_info['possibly_robot'] = spiderCheck();
 		}
 		elseif (!empty($modSettings['spider_mode']))
@@ -753,7 +751,7 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $user_info, $board, $board_info, $modSettings, $smcFunc;
 
 	if ($user_info['is_admin'])
 	{
@@ -855,7 +853,7 @@ function loadPermissions()
 	{
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
-			require_once($librarydir . '/Auth.subs.php');
+			require_once(SUBSDIR . '/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
@@ -873,7 +871,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $smcFunc, $context, $librarydir;
+	global $user_profile, $modSettings, $board_info, $smcFunc, $context;
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -992,7 +990,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	{
 		if (($row = cache_get_data('moderator_group_info', 480)) == null)
 		{
-			require_once($librarydir . '/Membergroups.subs.php');
+			require_once(SUBSDIR . '/Membergroups.subs.php');
 			$row = membergroupsById(3, 1, true);
 
 			cache_put_data('moderator_group_info', $row, 480);
@@ -1232,9 +1230,9 @@ function isBrowser($browser)
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	global $user_info, $user_settings, $board_info, $sc, $boarddir;
+	global $user_info, $user_settings, $board_info, $sc;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings, $language;
-	global $context, $settings, $options, $sourcedir, $ssi_theme, $smcFunc;
+	global $context, $settings, $options, $ssi_theme, $smcFunc;
 
 	// The theme was specified by parameter.
 	if (!empty($id_theme))
@@ -1646,7 +1644,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			require_once($sourcedir . '/ScheduledTasks.php');
+			require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -1676,7 +1674,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$theme_includes = explode(',', $modSettings['integrate_theme_include']);
 		foreach ($theme_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
+			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -1703,7 +1701,7 @@ function loadTheme($id_theme = 0, $initialize = true)
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	global $context, $settings, $txt, $scripturl, $boarddir, $db_show_debug;
+	global $context, $settings, $txt, $scripturl, $db_show_debug;
 	static $default_loaded;
 
 	if (!is_array($style_sheets))
@@ -1755,9 +1753,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 			call_user_func('template_' . $template_name . '_init');
 	}
 	// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-	elseif (!file_exists($settings['default_theme_dir']) && file_exists($boarddir . '/Themes/default'))
+	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/Themes/default'))
 	{
-		$settings['default_theme_dir'] = $boarddir . '/Themes/default';
+		$settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['template_dirs'][] = $settings['default_theme_dir'];
 
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
@@ -1983,9 +1981,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  */
 function loadAdminClass($filename)
 {
-	global $sourcedir;
-
-	require_once($sourcedir . '/admin/' . $filename);
+	require_once(SOURCEDIR . '/admin/' . $filename);
 }
 
 /**
@@ -1995,9 +1991,7 @@ function loadAdminClass($filename)
  */
 function loadController($filename)
 {
-	global $controllerdir;
-
-	require_once($controllerdir . '/' . $filename);
+	require_once(CONTROLLERDIR . '/' . $filename);
 }
 
 /**
@@ -2007,9 +2001,7 @@ function loadController($filename)
  */
 function loadLibrary($filename)
 {
-	global $librarydir;
-
-	require_once($librarydir . '/' . $filename);
+	require_once(SUBSDIR . '/' . $filename);
 }
 
 /**
@@ -2058,7 +2050,7 @@ function addInlineJavascript($javascript, $defer = false)
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
 	global $user_info, $language, $settings, $context, $modSettings;
-	global $db_show_debug, $sourcedir, $txt;
+	global $db_show_debug, $txt;
 	static $already_loaded = array();
 
 	// Default to the user's language.
@@ -2075,7 +2067,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
 	{
-		require_once($sourcedir . '/ScheduledTasks.php');
+		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
 	}
 
@@ -2361,7 +2353,7 @@ function censorText(&$text, $force = false)
 function template_include($filename, $once = false)
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-	global $user_info, $boardurl, $boarddir, $sourcedir, $librarydir;
+	global $user_info, $boardurl;
 	global $maintenance, $mtitle, $mmessage;
 	static $templates = array();
 
@@ -2440,9 +2432,9 @@ function template_include($filename, $once = false)
 </html>';
 		else
 		{
-			require_once($librarydir . '/Package.subs.php');
+			require_once(SUBSDIR . '/Package.subs.php');
 
-			$error = fetch_web_data($boardurl . strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
+			$error = fetch_web_data($boardurl . strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors'))
 				$error = $php_errormsg;
 
@@ -2453,13 +2445,13 @@ function template_include($filename, $once = false)
 	</head>
 	<body>
 		<h3>', $txt['template_parse_error'], '</h3>
-		', sprintf($txt['template_parse_error_details'], strtr($filename, array($boarddir => '', strtr($boarddir, '\\', '/') => '')));
+		', sprintf($txt['template_parse_error_details'], strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
 
 			if (!empty($error))
 				echo '
 		<hr />
 
-		<div style="margin: 0 20px;"><tt>', strtr(strtr($error, array('<strong>' . $boarddir => '<strong>...', '<strong>' . strtr($boarddir, '\\', '/') => '<strong>...')), '\\', '/'), '</tt></div>';
+		<div style="margin: 0 20px;"><tt>', strtr(strtr($error, array('<strong>' . BOARDDIR => '<strong>...', '<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...')), '\\', '/'), '</tt></div>';
 
 			// I know, I know... this is VERY COMPLICATED.  Still, it's good.
 			if (preg_match('~ <strong>(\d+)</strong><br( /)?' . '>$~i', $error, $match) != 0)
@@ -2552,14 +2544,14 @@ function template_include($filename, $once = false)
 function loadDatabase()
 {
 	global $db_persist, $db_connection, $db_server, $db_user, $db_passwd;
-	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $sourcedir, $db_prefix;
+	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
 	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
+	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
 	// Load the file for the database.
-	require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
+	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))

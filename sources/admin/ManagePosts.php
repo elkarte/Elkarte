@@ -85,7 +85,7 @@ function ManagePostSettings()
  */
 function SetCensor()
 {
-	global $txt, $modSettings, $context, $smcFunc, $sourcedir, $librarydir;
+	global $txt, $modSettings, $context, $smcFunc;
 
 	if (!empty($_POST['save_censor']))
 	{
@@ -139,7 +139,7 @@ function SetCensor()
 
 	if (isset($_POST['censortest']))
 	{
-		require_once($librarydir . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES);
 		preparsecode($censorText);
 		$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
@@ -180,7 +180,7 @@ function SetCensor()
  */
 function ModifyPostSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $db_prefix, $db_type;
+	global $context, $txt, $modSettings, $scripturl, $smcFunc, $db_prefix, $db_type;
 
 	// All the settings...
 	$config_vars = array(
@@ -264,7 +264,7 @@ function ModifyPostSettings($return_config = false)
  */
 function ModifyBBCSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $helptxt, $scripturl, $sourcedir;
+	global $context, $txt, $modSettings, $helptxt, $scripturl;
 
 	$config_vars = array(
 			// Main tweaks
@@ -331,7 +331,7 @@ function ModifyBBCSettings($return_config = false)
  */
 function ModifyTopicSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $sourcedir, $scripturl;
+	global $context, $txt, $modSettings, $scripturl;
 
 	// Here are all the topic settings.
 	$config_vars = array(

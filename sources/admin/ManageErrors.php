@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function ViewErrorLog()
 {
-	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $boarddir, $sourcedir, $themedir, $smcFunc;
+	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $themedir, $smcFunc;
 
 	// Viewing contents of a file?
 	if (isset($_GET['file']))
@@ -338,7 +338,7 @@ function deleteErrors()
  */
 function ViewFile()
 {
-	global $context, $txt, $boarddir, $sourcedir, $cachedir;
+	global $context, $txt;
 
 	// Check for the administrative permission to do this.
 	isAllowedTo('admin_forum');
@@ -348,9 +348,9 @@ function ViewFile()
 	$line = isset($_REQUEST['line']) ? (int) $_REQUEST['line'] : 0;
 
 	// Make sure things are normalized
-	$real_board = realpath($boarddir);
-	$real_source = realpath($sourcedir);
-	$real_cache = realpath($cachedir);
+	$real_board = realpath(BOARDDIR);
+	$real_source = realpath(SOURCEDIR);
+	$real_cache = realpath(CACHEDIR);
 
 	// Make sure the file requested is one they are allowed to look at
 	$excluded = array('settings.php', 'settings_bak.php');

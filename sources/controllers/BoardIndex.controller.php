@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function action_boardindex()
 {
-	global $txt, $user_info, $sourcedir, $librarydir, $modSettings, $context, $settings, $scripturl;
+	global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
 	loadTemplate('BoardIndex');
 
@@ -41,7 +41,7 @@ function action_boardindex()
 		$context['robot_no_index'] = true;
 
 	// Retrieve the categories and boards.
-	require_once($librarydir . '/BoardIndex.subs.php');
+	require_once(SUBSDIR . '/BoardIndex.subs.php');
 	$boardIndexOptions = array(
 		'include_categories' => true,
 		'base_level' => 0,
@@ -52,7 +52,7 @@ function action_boardindex()
 	$context['categories'] = getBoardIndex($boardIndexOptions);
 
 	// Get the user online list.
-	require_once($librarydir . '/MembersOnline.subs.php');
+	require_once(SUBSDIR . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 		'sort' => 'log_time',
@@ -123,7 +123,7 @@ function action_boardindex()
  */
 function action_collapse()
 {
-	global $user_info, $sourcedir, $librarydir, $context;
+	global $user_info, $context;
 
 	// Just in case, no need, no need.
 	$context['robot_no_index'] = true;
@@ -137,7 +137,7 @@ function action_collapse()
 	if (in_array($_REQUEST['sa'], array('expand', 'collapse', 'toggle')) && isset($_REQUEST['c']))
 	{
 		// And collapse/expand/toggle the category.
-		require_once($librarydir . '/Categories.subs.php');
+		require_once(SUBSDIR . '/Categories.subs.php');
 		collapseCategories(array((int) $_REQUEST['c']), $_REQUEST['sa'], array($user_info['id']));
 	}
 

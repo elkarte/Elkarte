@@ -312,11 +312,11 @@ function load_lang_file()
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $db_character_set, $sourcedir, $language;
+	global $db_prefix, $db_connection, $db_character_set, $language;
 	global $smcFunc, $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user;
 
-	if (empty($sourcedir))
-		$sourcedir = dirname(__FILE__) . '/sources';
+	if (!defined(SOURCEDIR))
+		define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
@@ -330,7 +330,7 @@ function load_database()
 	// Connect the database.
 	if (!$db_connection)
 	{
-		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
+		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist));
@@ -654,7 +654,7 @@ function action_checkFilesWritable()
  */
 function action_databaseSettings()
 {
-	global $txt, $databases, $incontext, $smcFunc, $sourcedir;
+	global $txt, $databases, $incontext, $smcFunc;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
@@ -767,11 +767,11 @@ function action_databaseSettings()
 		// Make sure it works.
 		require(dirname(__FILE__) . '/Settings.php');
 
-		if (empty($sourcedir))
-			$sourcedir = dirname(__FILE__) . '/sources';
+		if (!defined(SOURCEDIR))
+			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
-		if (!file_exists($sourcedir . '/database/Db-' . $db_type . '.subs.php'))
+		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		{
 			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
 			return false;
@@ -783,7 +783,7 @@ function action_databaseSettings()
 		if (empty($smcFunc))
 			$smcFunc = array();
 
-		require_once($sourcedir . '/database/Db-' . $db_type . '.subs.php');
+		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
@@ -946,7 +946,7 @@ function action_forumSettings()
  */
 function action_databasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $sourcedir, $db_prefix, $incontext, $db_name, $boardurl;
+	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];
@@ -995,7 +995,7 @@ function action_databasePopulation()
 
 	$replaces = array(
 		'{$db_prefix}' => $db_prefix,
-		'{$boarddir}' => $smcFunc['db_escape_string'](dirname(__FILE__)),
+		'{BOARDDIR}' => $smcFunc['db_escape_string'](dirname(__FILE__)),
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
@@ -1189,7 +1189,7 @@ function action_databasePopulation()
  */
 function action_adminAccount()
 {
-	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir;
+	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd;
 
 	$incontext['sub_template'] = 'admin_account';
 	$incontext['page_title'] = $txt['user_settings'];
@@ -1252,7 +1252,7 @@ function action_adminAccount()
 			return false;
 		}
 
-		if (!file_exists($sourcedir . '/Subs.php'))
+		if (!file_exists(SOURCEDIR . '/Subs.php'))
 		{
 			$incontext['error'] = $txt['error_subs_missing'];
 			return false;
@@ -1359,7 +1359,7 @@ function action_deleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $sourcedir, $librarydir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1370,13 +1370,13 @@ function action_deleteInstall()
 
 	chdir(dirname(__FILE__));
 
-	require_once($sourcedir . '/Errors.php');
-	require_once($sourcedir . '/Logging.php');
-	require_once($sourcedir . '/Subs.php');
-	require_once($sourcedir . '/Load.php');
-	require_once($librarydir . '/Cache.subs.php');
-	require_once($sourcedir . '/Security.php');
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SOURCEDIR . '/Errors.php');
+	require_once(SOURCEDIR . '/Logging.php');
+	require_once(SOURCEDIR . '/Subs.php');
+	require_once(SOURCEDIR . '/Load.php');
+	require_once(SUBSDIR . '/Cache.subs.php');
+	require_once(SOURCEDIR . '/Security.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1473,7 +1473,7 @@ function action_deleteInstall()
 	$smcFunc['db_free_result']($request);
 
 	// Now is the perfect time to fetch the SM files.
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))

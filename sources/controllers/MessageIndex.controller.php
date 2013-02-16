@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 function action_messageindex()
 {
 	global $txt, $scripturl, $board, $modSettings, $context;
-	global $options, $settings, $board_info, $user_info, $smcFunc, $sourcedir, $librarydir;
+	global $options, $settings, $board_info, $user_info, $smcFunc;
 
 	// If this is a redirection board head off.
 	if ($board_info['redirect'])
@@ -209,7 +209,7 @@ function action_messageindex()
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 	$context['can_approve_posts'] = allowedTo('approve_posts');
 
-	require_once($librarydir . '/BoardIndex.subs.php');
+	require_once(SUBSDIR . '/BoardIndex.subs.php');
 	$boardIndexOptions = array(
 		'include_categories' => false,
 		'base_level' => $board_info['child_level'] + 1,
@@ -674,13 +674,13 @@ function action_messageindex()
  */
 function action_quickmod()
 {
-	global $sourcedir, $librarydir, $controllerdir, $board, $user_info, $modSettings, $smcFunc, $context;
+	global $board, $user_info, $modSettings, $smcFunc, $context;
 
 	// Check the session = get or post.
 	checkSession('request');
 
 	// Some help we may need
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Lets go straight to the restore area.
 	if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
@@ -690,7 +690,7 @@ function action_quickmod()
 		$_SESSION['topicseen_cache'] = array();
 
 	// This is going to be needed to send off the notifications and for updateLastMessages().
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Remember the last board they moved things to.
 	if (isset($_REQUEST['move_to']))
@@ -752,7 +752,7 @@ function action_quickmod()
 			if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 				redirectexit($redirect_url);
 
-			require_once($controllerdir . '/SplitTopics.controller.php');
+			require_once(CONTROLLERDIR . '/SplitTopics.controller.php');
 			return action_mergeExecute($_REQUEST['topics']);
 		}
 

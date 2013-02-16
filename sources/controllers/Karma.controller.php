@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function action_karma()
 {
-	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context, $sourcedir, $librarydir;
+	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context;
 
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))
@@ -42,7 +42,7 @@ function action_karma()
 	checkSession('get');
 
 	// we hold karma here.
-	require_once($librarydir . '/Karma.subs.php');
+	require_once(SUBSDIR . '/Karma.subs.php');
 
 	// If you don't have enough posts, tough luck.
 	// @todo Should this be dropped in favor of post group permissions?

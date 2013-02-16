@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function action_splittopics()
 {
-	global $topic, $sourcedir, $librarydir;
+	global $topic;
 
 	// And... which topic were you splitting, again?
 	if (empty($topic))
@@ -42,8 +42,8 @@ function action_splittopics()
 	// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('SplitTopics');
-	require_once($librarydir . '/Boards.subs.php');
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$subActions = array(
 		'selectTopics' => 'action_splitSelectTopics',
@@ -70,7 +70,7 @@ function action_splittopics()
  */
 function action_splitIndex()
 {
-	global $txt, $topic, $context, $smcFunc, $modSettings, $librarydir;
+	global $txt, $topic, $context, $smcFunc, $modSettings;
 
 	// Validate "at".
 	if (empty($_GET['at']))
@@ -78,7 +78,7 @@ function action_splitIndex()
 	$splitAt = (int) $_GET['at'];
 
 	// We deal with topics here.
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Retrieve message info for the message at the split point.
 	$messageInfo = messageInfo($topic, $splitAt);
@@ -121,7 +121,6 @@ function action_splitIndex()
 function action_splitExecute()
 {
 	global $txt, $board, $topic, $context, $user_info, $smcFunc, $modSettings;
-	global $librarydir;
 
 	// Check the session to make sure they meant to do this.
 	checkSession();
@@ -138,7 +137,7 @@ function action_splitExecute()
 	}
 
 	// We work with them topics.
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	$splitAt = (int) $_POST['at'];
 	$messagesToBeSplit = array();
@@ -171,7 +170,7 @@ function action_splitExecute()
 function action_splitSelectTopics()
 {
 	global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-	global $smcFunc, $librarydir;
+	global $smcFunc;
 
 	$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 
@@ -182,7 +181,7 @@ function action_splitSelectTopics()
 	if (isset($_REQUEST['subname_enc']))
 		$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
 
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	$context['not_selected'] = array(
 		'num_messages' => 0,
@@ -408,7 +407,7 @@ function action_splitSelection()
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $librarydir;
+	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt;
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -675,7 +674,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
-		require_once($librarydir . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
@@ -691,7 +690,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	require_once($librarydir . '/Search.subs.php');
+	require_once(SUBSDIR . '/Search.subs.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'topicSplit')))
 		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);

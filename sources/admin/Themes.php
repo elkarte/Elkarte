@@ -115,7 +115,7 @@ function action_thememain()
  */
 function action_admintheme()
 {
-	global $context, $boarddir, $modSettings, $smcFunc;
+	global $context, $modSettings, $smcFunc;
 
 	loadLanguage('Admin');
 	isAllowedTo('admin_forum');
@@ -150,11 +150,11 @@ function action_admintheme()
 		$smcFunc['db_free_result']($request);
 
 		// Can we create a new theme?
-		$context['can_create_new'] = is_writable($boarddir . '/Themes');
-		$context['new_theme_dir'] = substr(realpath($boarddir . '/Themes/default'), 0, -7);
+		$context['can_create_new'] = is_writable(BOARDDIR . '/Themes');
+		$context['new_theme_dir'] = substr(realpath(BOARDDIR . '/Themes/default'), 0, -7);
 
 		// Look for a non existent theme directory. (ie theme87.)
-		$theme_dir = $boarddir . '/Themes/theme';
+		$theme_dir = BOARDDIR . '/Themes/theme';
 		$i = 1;
 		while (file_exists($theme_dir . $i))
 			$i++;
@@ -195,7 +195,7 @@ function action_admintheme()
  */
 function action_themelist()
 {
-	global $context, $boarddir, $boardurl, $smcFunc;
+	global $context, $boardurl, $smcFunc;
 
 	loadLanguage('Admin');
 	isAllowedTo('admin_forum');
@@ -306,7 +306,7 @@ function action_themelist()
 		$context['themes'][$i]['valid_path'] = file_exists($context['themes'][$i]['theme_dir']) && is_dir($context['themes'][$i]['theme_dir']);
 	}
 
-	$context['reset_dir'] = realpath($boarddir . '/Themes');
+	$context['reset_dir'] = realpath(BOARDDIR . '/Themes');
 	$context['reset_url'] = $boardurl . '/Themes';
 
 	$context['sub_template'] = 'list_themes';
@@ -702,7 +702,7 @@ function SetThemeOptions()
  */
 function SetThemeSettings()
 {
-	global $txt, $context, $settings, $modSettings, $sourcedir, $smcFunc;
+	global $txt, $context, $settings, $modSettings, $smcFunc;
 
 	if (empty($_GET['th']) && empty($_GET['id']))
 		return action_admintheme();
@@ -1290,14 +1290,14 @@ function action_picktheme()
  */
 function action_installtheme()
 {
-	global $librarydir, $boarddir, $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
+	global $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
 
 	checkSession('request');
 
 	isAllowedTo('admin_forum');
 	checkSession('request');
 
-	require_once($librarydir . '/Package.subs.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	loadTemplate('Themes');
 
@@ -1331,7 +1331,7 @@ function action_installtheme()
 
 	if ((!empty($_FILES['theme_gz']) && (!isset($_FILES['theme_gz']['error']) || $_FILES['theme_gz']['error'] != 4)) || !empty($_REQUEST['theme_gz']))
 		$method = 'upload';
-	elseif (isset($_REQUEST['theme_dir']) && rtrim(realpath($_REQUEST['theme_dir']), '/\\') != realpath($boarddir . '/Themes') && file_exists($_REQUEST['theme_dir']))
+	elseif (isset($_REQUEST['theme_dir']) && rtrim(realpath($_REQUEST['theme_dir']), '/\\') != realpath(BOARDDIR . '/Themes') && file_exists($_REQUEST['theme_dir']))
 		$method = 'path';
 	else
 		$method = 'copy';
@@ -1339,10 +1339,10 @@ function action_installtheme()
 	if (!empty($_REQUEST['copy']) && $method == 'copy')
 	{
 		// Hopefully the themes directory is writable, or we might have a problem.
-		if (!is_writable($boarddir . '/Themes'))
+		if (!is_writable(BOARDDIR . '/Themes'))
 			fatal_lang_error('theme_install_write_error', 'critical');
 
-		$theme_dir = $boarddir . '/Themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $_REQUEST['copy']);
+		$theme_dir = BOARDDIR . '/Themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $_REQUEST['copy']);
 
 		umask(0);
 		mkdir($theme_dir, 0777);
@@ -1435,7 +1435,7 @@ function action_installtheme()
 	elseif ($method = 'upload')
 	{
 		// Hopefully the themes directory is writable, or we might have a problem.
-		if (!is_writable($boarddir . '/Themes'))
+		if (!is_writable(BOARDDIR . '/Themes'))
 			fatal_lang_error('theme_install_write_error', 'critical');
 
 		// This happens when the admin session is gone and the user has to login again
@@ -1445,17 +1445,17 @@ function action_installtheme()
 		// Set the default settings...
 		$theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $_REQUEST['theme_gz']), '.');
 		$theme_name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $theme_name);
-		$theme_dir = $boarddir . '/Themes/' . $theme_name;
+		$theme_dir = BOARDDIR . '/Themes/' . $theme_name;
 
 		if (isset($_FILES['theme_gz']) && is_uploaded_file($_FILES['theme_gz']['tmp_name']) && (ini_get('open_basedir') != '' || file_exists($_FILES['theme_gz']['tmp_name'])))
-			$extracted = read_tgz_file($_FILES['theme_gz']['tmp_name'], $boarddir . '/Themes/' . $theme_name, false, true);
+			$extracted = read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/Themes/' . $theme_name, false, true);
 		elseif (isset($_REQUEST['theme_gz']))
 		{
 			// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
 			if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['theme_gz']) == 0 || strpos($_REQUEST['theme_gz'], 'dlattach') !== false)
 				fatal_lang_error('not_on_simplemachines');
 
-			$extracted = read_tgz_file($_REQUEST['theme_gz'], $boarddir . '/Themes/' . $theme_name, false, true);
+			$extracted = read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/Themes/' . $theme_name, false, true);
 		}
 		else
 			redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
@@ -1476,7 +1476,7 @@ function action_installtheme()
 		{
 			$theme_info = file_get_contents($theme_dir . '/theme_info.xml');
 			// Parse theme-info.xml into an Xml_Array.
-			require_once($librarydir . '/XmlArray.class.php');
+			require_once(SUBSDIR . '/XmlArray.class.php');
 			$theme_info_xml = new Xml_Array($theme_info);
 			// @todo Error message of some sort?
 			if (!$theme_info_xml->exists('theme-info[0]'))
@@ -1597,7 +1597,7 @@ function action_installtheme()
  */
 function WrapAction()
 {
-	global $context, $settings, $sourcedir;
+	global $context, $settings;
 
 	// Load any necessary template(s)?
 	if (isset($settings['catch_action']['template']))
@@ -1615,7 +1615,7 @@ function WrapAction()
 	if (isset($settings['catch_action']['function']))
 	{
 		if (isset($settings['catch_action']['filename']))
-			template_include($sourcedir . '/' . $settings['catch_action']['filename'], true);
+			template_include(SOURCEDIR . '/' . $settings['catch_action']['filename'], true);
 
 		$settings['catch_action']['function']();
 	}
@@ -1714,7 +1714,7 @@ function action_jsoption()
  */
 function action_edittheme()
 {
-	global $context, $settings, $scripturl, $boarddir, $smcFunc;
+	global $context, $settings, $scripturl, $smcFunc;
 
 	// @todo Should this be removed?
 	if (isset($_REQUEST['preview']))
@@ -1940,7 +1940,7 @@ function action_edittheme()
 	}
 
 	$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
-	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array($boarddir => '...'));
+	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
 	$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
 
 	if (substr($_REQUEST['filename'], -4) == '.css')
