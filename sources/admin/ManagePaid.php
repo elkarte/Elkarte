@@ -192,7 +192,7 @@ function ModifySubscriptionSettings($return_config = false)
  */
 function ViewSubscriptions()
 {
-	global $context, $txt, $modSettings, $smcFunc, $sourcedir, $scripturl;
+	global $context, $txt, $modSettings, $smcFunc, $sourcedir, $scripturl, $librarydir;
 
 	// Not made the settings yet?
 	if (empty($modSettings['paid_currency_symbol']))
