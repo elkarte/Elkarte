@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
  */
 function ModifyDraftSettings($return_config = false)
 {
-	global $context, $txt, $sourcedir, $scripturl;
+	global $context, $txt, $scripturl;
 
 	isAllowedTo('admin_forum');
 	loadLanguage('Drafts');

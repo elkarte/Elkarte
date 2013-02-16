@@ -15,11 +15,9 @@
 if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
-global $librarydir;
-
 // language and helper functions
 loadLanguage('Drafts');
-require_once($librarydir . '/Drafts.subs.php');
+require_once(SUBSDIR . '/Drafts.subs.php');
 
 /**
  * Saves a post draft in the user_drafts table

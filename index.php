@@ -45,23 +45,23 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 require_once(dirname(__FILE__) . '/Settings.php');
 
 // Make absolutely sure the new directories are defined.
-if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
-	$cachedir = $boarddir . '/cache';
-if (empty($librarydir) || !file_exists($librarydir))
-	$librarydir = $sourcedir . '/subs';
-if (empty($controllerdir) || !file_exists($controllerdir))
-	$controllerdir = $sourcedir . '/controllers';
+if ((!defined(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+	define('CACHEDIR', BOARDDIR . '/cache');
+if (!defined(SUBSDIR) || !file_exists(SUBSDIR))
+	define('SUBSDIR', SOURCEDIR . '/subs');
+if (!defined(CONTROLLERDIR) || !file_exists(CONTROLLERDIR))
+	define('CONTROLLERDIR', SOURCEDIR . '/controllers');
 
 // And important includes.
-require_once($sourcedir . '/QueryString.php');
-require_once($sourcedir . '/Session.php');
-require_once($sourcedir . '/Subs.php');
-require_once($sourcedir . '/Errors.php');
-require_once($sourcedir . '/Logging.php');
-require_once($sourcedir . '/Load.php');
-require_once($librarydir . '/Cache.subs.php');
-require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/BrowserDetect.class.php');
+require_once(SOURCEDIR . '/QueryString.php');
+require_once(SOURCEDIR . '/Session.php');
+require_once(SOURCEDIR . '/Subs.php');
+require_once(SOURCEDIR . '/Errors.php');
+require_once(SOURCEDIR . '/Logging.php');
+require_once(SOURCEDIR . '/Load.php');
+require_once(SUBSDIR . '/Cache.subs.php');
+require_once(SOURCEDIR . '/Security.php');
+require_once(SOURCEDIR . '/BrowserDetect.class.php');
 
 // If $maintenance is set specifically to 2, then we're upgrading or something.
 if (!empty($maintenance) && $maintenance == 2)
@@ -87,7 +87,7 @@ if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
 {
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 	AutoTask();
 }
 
@@ -129,7 +129,7 @@ obExit(null, null, true);
  */
 function smf_main()
 {
-	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;
+	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -180,7 +180,7 @@ function smf_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once($sourcedir . '/Dispatcher.class.php');
+	require_once(SOURCEDIR . '/Dispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
 	$dispatcher->dispatch();
 }

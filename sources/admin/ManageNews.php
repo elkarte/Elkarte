@@ -88,10 +88,10 @@ function ManageNews()
  */
 function EditNews()
 {
-	global $txt, $modSettings, $context, $sourcedir, $librarydir, $user_info, $scripturl;
+	global $txt, $modSettings, $context, $user_info, $scripturl;
 	global $smcFunc;
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// The 'remove selected' button was pressed.
 	if (!empty($_POST['delete_selection']) && !empty($_POST['remove']))
@@ -135,7 +135,7 @@ function EditNews()
 	}
 
 	// We're going to want this for making our list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	$context['page_title'] = $txt['admin_edit_news'];
 
@@ -306,9 +306,9 @@ function list_getNews()
  */
 function SelectMailingMembers()
 {
-	global $txt, $context, $modSettings, $smcFunc, $librarydir;
+	global $txt, $context, $modSettings, $smcFunc;
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	$context['page_title'] = $txt['admin_newsletters'];
 
@@ -377,7 +377,7 @@ function SelectMailingMembers()
  */
 function ComposeMailing()
 {
-	global $txt, $sourcedir, $librarydir, $context, $smcFunc, $scripturl, $modSettings;
+	global $txt, $context, $smcFunc, $scripturl, $modSettings;
 
 	// Setup the template!
 	$context['page_title'] = $txt['admin_newsletters'];
@@ -387,7 +387,7 @@ function ComposeMailing()
 	$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}');
 
 	// Needed for the WYSIWYG editor.
-	require_once($librarydir . '/Editor.subs.php');
+	require_once(SUBSDIR . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -406,7 +406,7 @@ function ComposeMailing()
 
 	if (isset($context['preview']))
 	{
-		require_once($librarydir . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Mail.subs.php');
 		$context['recipients']['members'] = !empty($_POST['members']) ? explode(',', $_POST['members']) : array();
 		$context['recipients']['exclude_members'] = !empty($_POST['exclude_members']) ? explode(',', $_POST['exclude_members']) : array();
 		$context['recipients']['groups'] = !empty($_POST['groups']) ? explode(',', $_POST['groups']) : array();
@@ -429,7 +429,7 @@ function ComposeMailing()
 		$toClean[] = 'exclude_members';
 	if (!empty($toClean))
 	{
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		foreach ($toClean as $type)
 		{
 			// Remove the quotes.
@@ -576,7 +576,7 @@ function ComposeMailing()
  */
 function SendMailing($clean_only = false)
 {
-	global $txt, $sourcedir, $context, $smcFunc;
+	global $txt, $context, $smcFunc;
 	global $scripturl, $modSettings, $user_info;
 
 	if (isset($_POST['preview']))
@@ -682,9 +682,9 @@ function SendMailing($clean_only = false)
 		return;
 
 	// Some functions we will need
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 	if ($context['send_pm'])
-		require_once($librarydir . '/PersonalMessage.subs.php');
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 	// We are relying too much on writing to superglobals...
 	$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';
@@ -938,7 +938,7 @@ function SendMailing($clean_only = false)
  */
 function ModifyNewsSettings($return_config = false)
 {
-	global $context, $sourcedir, $modSettings, $txt, $scripturl;
+	global $context, $modSettings, $txt, $scripturl;
 
 	$config_vars = array(
 		array('title', 'settings'),

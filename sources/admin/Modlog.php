@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function action_modlog()
 {
-	global $txt, $modSettings, $context, $scripturl, $sourcedir, $librarydir, $user_info, $smcFunc, $settings;
+	global $txt, $modSettings, $context, $scripturl, $user_info, $smcFunc, $settings;
 
 	// Are we looking at the moderation log or the administration log.
 	$context['log_type'] = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'adminlog' ? 3 : 1;
@@ -155,7 +155,7 @@ function action_modlog()
 		}
 	}
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// This is all the information required for a watched user listing.
 	$listOptions = array(

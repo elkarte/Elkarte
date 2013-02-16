@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function action_editBuddyIgnoreLists($memID)
 {
-	global $sourcedir, $context, $txt, $scripturl, $modSettings, $user_profile;
+	global $context, $txt, $scripturl, $modSettings, $user_profile;
 
 	// Do a quick check to ensure people aren't getting here illegally!
 	if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
@@ -306,10 +306,10 @@ function action_editIgnoreList($memID)
  */
 function action_account($memID)
 {
-	global $context, $txt, $librarydir;
+	global $context, $txt;
 
 	// be sure we have this
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -336,10 +336,10 @@ function action_account($memID)
  */
 function action_forumProfile($memID)
 {
-	global $context, $user_profile, $user_info, $txt, $modSettings, $librarydir;
+	global $context, $user_profile, $user_info, $txt, $modSettings;
 
 	// make sure we have this
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -367,9 +367,9 @@ function action_forumProfile($memID)
  */
 function action_pmprefs($memID)
 {
-	global $sourcedir, $context, $txt, $scripturl, $librarydir;
+	global $context, $txt, $scripturl;
 
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
@@ -391,9 +391,9 @@ function action_pmprefs($memID)
  */
 function action_themepick($memID)
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc, $librarydir;
+	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
 
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -420,7 +420,7 @@ function action_themepick($memID)
  */
 function action_authentication($memID, $saving = false)
 {
-	global $context, $cur_profile, $sourcedir, $librarydir, $txt, $post_errors, $modSettings;
+	global $context, $cur_profile, $txt, $post_errors, $modSettings;
 
 	loadLanguage('Login');
 
@@ -439,7 +439,7 @@ function action_authentication($memID, $saving = false)
 			// Is it valid?
 			else
 			{
-				require_once($librarydir . '/Auth.subs.php');
+				require_once(SUBSDIR . '/Auth.subs.php');
 				$passwordErrors = validatePassword($_POST['passwrd1'], $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 				// Were there errors?
@@ -471,7 +471,7 @@ function action_authentication($memID, $saving = false)
 		// Not right yet!
 		elseif ($_POST['authenticate'] == 'openid' && !empty($_POST['openid_identifier']))
 		{
-			require_once($librarydir . '/OpenID.subs.php');
+			require_once(SUBSDIR . '/OpenID.subs.php');
 			$_POST['openid_identifier'] = openID_canonize($_POST['openid_identifier']);
 
 			if (openid_member_exists($_POST['openid_identifier']))
@@ -504,10 +504,10 @@ function action_authentication($memID, $saving = false)
  */
 function action_notification($memID)
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $sourcedir, $librarydir, $settings;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $settings;
 
 	// Gonna want this for the list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// Fine, start with the board list.
 	$listOptions = array(
@@ -1095,7 +1095,7 @@ function action_groupMembership($memID)
  */
 function action_groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $sourcedir, $librarydir, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
+	global $user_info, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
 
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
@@ -1105,7 +1105,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 
 	checkSession(isset($_GET['gid']) ? 'get' : 'post');
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	$old_profile = &$user_profile[$memID];
 	$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
@@ -1226,7 +1226,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		);
 
 		// Send an email to all group moderators etc.
-		require_once($librarydir . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Do we have any group moderators?
 		$request = $smcFunc['db_query']('', '
@@ -1245,7 +1245,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		// Otherwise this is the backup!
 		if (empty($moderators))
 		{
-			require_once($librarydir . '/Members.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			$moderators = membersAllowedTo('manage_membergroups');
 		}
 

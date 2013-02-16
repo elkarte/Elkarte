@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function AdminMain()
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $sourcedir, $librarydir, $options, $smcFunc, $boarddir;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options, $smcFunc;
 
 	// Load the language and templates....
 	loadLanguage('Admin');
@@ -39,7 +39,7 @@ function AdminMain()
 	// No indexing evil stuff.
 	$context['robot_no_index'] = true;
 
-	require_once($librarydir . '/Menu.subs.php');
+	require_once(SUBSDIR . '/Menu.subs.php');
 
 	// Some preferences.
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
@@ -490,7 +490,7 @@ function AdminMain()
 		$admin_includes = explode(',', $modSettings['integrate_admin_include']);
 		foreach ($admin_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
+			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -551,13 +551,13 @@ function AdminMain()
 */
 function AdminHome()
 {
-	global $sourcedir, $librarydir,  $controllerdir, $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+	global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
 
 	// You have to be able to do at least one of the below to see this page.
 	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 	// Find all of this forum's administrators...
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 	{
 		// Add a 'more'-link if there are more than 32.
@@ -565,7 +565,7 @@ function AdminHome()
 	}
 
 	// Load the credits stuff.
-	require_once($controllerdir . '/Who.controller.php');
+	require_once(CONTROLLERDIR . '/Who.controller.php');
 	action_credits(true);
 
 	// This makes it easier to get the latest news with your time format.
@@ -573,7 +573,7 @@ function AdminHome()
 	$context['forum_version'] = $forum_version;
 
 	// Get a list of current server versions.
-	require_once($librarydir . '/Admin.subs.php');
+	require_once(SUBSDIR . '/Admin.subs.php');
 	$checkFor = array(
 		'gd',
 		'imagick',
@@ -719,7 +719,7 @@ if (!(\'smfForum_sessionvar\' in window))
  */
 function AdminSearch()
 {
-	global $txt, $context, $smcFunc, $sourcedir, $librarydir;
+	global $txt, $context, $smcFunc;
 
 	isAllowedTo('admin_forum');
 
@@ -742,7 +742,7 @@ function AdminSearch()
 		$context['admin_preferences']['sb'] = $context['search_type'];
 
 		// Update the preferences.
-		require_once($librarydir . '/Admin.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 		updateAdminPreferences();
 	}
 
@@ -757,7 +757,7 @@ function AdminSearch()
  */
 function AdminSearchInternal()
 {
-	global $context, $txt, $helptxt, $scripturl, $sourcedir;
+	global $context, $txt, $helptxt, $scripturl;
 
 	// Try to get some more memory.
 	setMemoryLimit('128M');
@@ -900,7 +900,7 @@ function AdminSearchInternal()
  */
 function AdminSearchMember()
 {
-	global $context, $sourcedir;
+	global $context;
 
 	loadAdminClass ('ManageMembers.php');
 	$_REQUEST['sa'] = 'query';
@@ -917,7 +917,7 @@ function AdminSearchMember()
  */
 function AdminSearchOM()
 {
-	global $context, $sourcedir, $librarydir;
+	global $context;
 
 	$context['doc_apiurl'] = 'https://github.com/elkarte/Elkarte/wiki/api.php';
 	$context['doc_scripturl'] = 'https://github.com/elkarte/Elkarte/wiki/';
@@ -933,7 +933,7 @@ function AdminSearchOM()
 	$postVars = implode('+', $postVars);
 
 	// Get the results from the doc site.
-	require_once($librarydir . '/Package.subs.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 	// Demo URL:
 	// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
@@ -946,7 +946,7 @@ function AdminSearchOM()
 
 	// Otherwise we simply walk through the XML and stick it in context for display.
 	$context['search_results'] = array();
-	require_once($librarydir . '/XmlArray.class.php');
+	require_once(SUBSDIR . '/XmlArray.class.php');
 
 	// Get the results loaded into an array for processing!
 	$results = new Xml_Array($search_results, false);
@@ -975,7 +975,7 @@ function AdminSearchOM()
  */
 function AdminLogs()
 {
-	global $sourcedir, $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	// These are the logs they can load.
 	$log_functions = array(

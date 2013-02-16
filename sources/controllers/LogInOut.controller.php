@@ -79,10 +79,10 @@ function action_login()
 function action_login2()
 {
 	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
-	global $cookiename, $maintenance, $modSettings, $context, $sc, $sourcedir, $librarydir;
+	global $cookiename, $maintenance, $modSettings, $context, $sc;
 
 	// Load cookie authentication stuff.
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	if (isset($_GET['sa']) && $_GET['sa'] == 'salt' && !$user_info['is_guest'])
 	{
@@ -176,7 +176,7 @@ function action_login2()
 
 	if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 	{
-		require_once($librarydir . '/OpenID.subs.php');
+		require_once(SUBSDIR . '/OpenID.subs.php');
 		if (($open_id = openID_validate($_POST['openid_identifier'])) !== 'no_data')
 			return $open_id;
 	}
@@ -358,7 +358,7 @@ function action_login2()
 		// ELKARTE's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0)
 		{
-			require_once($librarydir . '/Compat.subs.php');
+			require_once(SUBSDIR . '/Compat.subs.php');
 			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 		}
 
@@ -472,10 +472,10 @@ function checkActivation()
 function DoLogin()
 {
 	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
-	global $cookiename, $maintenance, $modSettings, $context, $sourcedir, $librarydir;
+	global $cookiename, $maintenance, $modSettings, $context;
 
 	// Load cookie authentication stuff.
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Call login integration functions.
 	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
@@ -570,13 +570,13 @@ function DoLogin()
  */
 function action_logout($internal = false, $redirect = true)
 {
-	global $sourcedir, $librarydir, $user_info, $user_settings, $context, $modSettings, $smcFunc;
+	global $user_info, $user_settings, $context, $modSettings, $smcFunc;
 
 	// Make sure they aren't being auto-logged out.
 	if (!$internal)
 		checkSession('get');
 
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	if (isset($_SESSION['pack_ftp']))
 		$_SESSION['pack_ftp'] = null;

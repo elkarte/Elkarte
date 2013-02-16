@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
-	global $modSettings, $sourcedir;
+	global $modSettings;
 
 	// @todo Why are we doing this if caching is disabled?
 
@@ -48,7 +48,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
 	*/
 	if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < $level || !is_array($cache_block = cache_get_data($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 	{
-		require_once($sourcedir . '/' . $file);
+		require_once(SOURCEDIR . '/' . $file);
 		$cache_block = call_user_func_array($function, $params);
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= $level)
@@ -85,8 +85,8 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	global $boardurl, $sourcedir, $modSettings, $memcached;
-	global $cache_hits, $cache_count, $db_show_debug, $cachedir;
+	global $boardurl, $modSettings, $memcached;
+	global $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
 	if (empty($cache_enable))
@@ -177,15 +177,15 @@ function cache_put_data($key, $value, $ttl = 120)
 		default:
 			// Otherwise custom cache?
 			if ($value === null)
-				@unlink($cachedir . '/data_' . $key . '.php');
+				@unlink(CACHEDIR . '/data_' . $key . '.php');
 			else
 			{
 				$cache_data = '<' . '?' . 'php if (!defined(\'ELKARTE\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
-				if (file_put_contents($cachedir . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
-					@unlink($cachedir . '/data_' . $key . '.php');
+				if (file_put_contents(CACHEDIR . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
+					@unlink(CACHEDIR . '/data_' . $key . '.php');
 			}
 			break;
 	}
@@ -208,8 +208,8 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	global $boardurl, $sourcedir, $modSettings, $memcached;
-	global $cache_hits, $cache_count, $db_show_debug, $cachedir;
+	global $boardurl, $modSettings, $memcached;
+	global $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
 	if (empty($cache_enable))
@@ -270,13 +270,13 @@ function cache_get_data($key, $ttl = 120)
 			break;
 		default:
 			// Otherwise it's Elkarte data!
-			if (file_exists($cachedir . '/data_' . $key . '.php') && filesize($cachedir . '/data_' . $key . '.php') > 10)
+			if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
 			{
 				// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution
-				@include($cachedir . '/data_' . $key . '.php');
+				@include(CACHEDIR . '/data_' . $key . '.php');
 				if (!empty($expired) && isset($value))
 				{
-					@unlink($cachedir . '/data_' . $key . '.php');
+					@unlink(CACHEDIR . '/data_' . $key . '.php');
 					unset($value);
 				}
 			}
@@ -349,7 +349,7 @@ function get_memcached_server($level = 3)
  */
 function clean_cache($type = '')
 {
-	global $cachedir, $sourcedir, $cache_accelerator, $modSettings, $memcached;
+	global $cache_accelerator, $modSettings, $memcached;
 
 	switch ($cache_accelerator)
 	{
@@ -430,15 +430,15 @@ function clean_cache($type = '')
 			break;
 		default:
 			// No directory = no game.
-			if (!is_dir($cachedir))
+			if (!is_dir(CACHEDIR))
 				return;
 
 			// Remove the files in our own disk cache, if any
-			$dh = opendir($cachedir);
+			$dh = opendir(CACHEDIR);
 			while ($file = readdir($dh))
 			{
 				if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-					@unlink($cachedir . '/' . $file);
+					@unlink(CACHEDIR . '/' . $file);
 			}
 			closedir($dh);
 			break;
@@ -446,7 +446,7 @@ function clean_cache($type = '')
 
 	// Invalidate cache, to be sure!
 	// ... as long as Load.php can be modified, anyway.
-	@touch($sourcedir . '/' . 'Load.php');
+	@touch(SOURCEDIR . '/' . 'Load.php');
 	clearstatcache();
 }
 
@@ -458,12 +458,12 @@ function clean_cache($type = '')
  */
 function cache_get_key($key)
 {
-	global $boardurl, $sourcedir, $cache_accelerator;
+	global $boardurl, $cache_accelerator;
 	static $key_prefix;
 
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime($sourcedir . '/Load.php')) . '-ELKARTE-';
+		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELKARTE-';
 
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }

@@ -39,7 +39,7 @@ if (!defined('ELKARTE'))
  */
 function deleteMembers($users, $check_not_admin = false)
 {
-	global $sourcedir, $librarydir, $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info, $smcFunc;
 
 	// Try give us a while to sort this out...
 	@set_time_limit(600);
@@ -319,7 +319,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete personal messages.
-	require_once($librarydir . '/PersonalMessage.subs.php');
+	require_once(SUBSDIR . '/PersonalMessage.subs.php');
 	deleteMessages(null, null, $users);
 
 	$smcFunc['db_query']('', '
@@ -342,7 +342,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete avatar.
-	require_once($librarydir . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	removeAttachments(array('id_member' => $users));
 
 	// It's over, no more moderation for you.
@@ -414,7 +414,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 	updateStats('member');
 
-	require_once($sourcedir . '/Logging.php');
+	require_once(SOURCEDIR . '/Logging.php');
 	logActions($log_changes);
 }
 
@@ -434,14 +434,14 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $return_errors = false)
 {
-	global $scripturl, $txt, $modSettings, $context, $librarydir;
+	global $scripturl, $txt, $modSettings, $context;
 	global $user_info, $options, $settings, $smcFunc;
 
 	loadLanguage('Login');
 
 	// We'll need some external functions.
-	require_once($librarydir . '/Auth.subs.php');
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
 	$reg_errors = array();
@@ -791,7 +791,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		}
 
 		// Send admin their notification.
-		require_once($librarydir . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		adminNotify('standard', $memberID, $regOptions['username']);
 	}
 	// Need to activate their account - or fall under COPPA.
@@ -836,7 +836,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 		// Admin gets informed here...
-		require_once($librarydir . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		adminNotify('approval', $memberID, $regOptions['username']);
 	}
 

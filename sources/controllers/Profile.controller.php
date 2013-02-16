@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function action_modifyprofile()
 {
-	global $txt, $scripturl, $user_info, $context, $sourcedir, $librarydir, $controllerdir, $user_profile, $cur_profile;
+	global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
 
 	// Don't reload this as we may have processed error strings.
@@ -35,7 +35,7 @@ function action_modifyprofile()
 		loadLanguage('Profile+Drafts');
 	loadTemplate('Profile');
 
-	require_once($librarydir . '/Menu.subs.php');
+	require_once(SUBSDIR . '/Menu.subs.php');
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
@@ -478,7 +478,7 @@ function action_modifyprofile()
 
 	// File to include?
 	if (isset($profile_include_data['file']))
-		require_once($controllerdir . '/' . $profile_include_data['file']);
+		require_once(CONTROLLERDIR . '/' . $profile_include_data['file']);
 
 	// Make sure that the area function does exist!
 	if (!isset($profile_include_data['function']) || !function_exists($profile_include_data['function']))
@@ -518,7 +518,7 @@ function action_modifyprofile()
 	$post_errors = array();
 	$profile_vars = array();
 
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	// Right - are we saving - if so let's save the old data first.
 	if ($context['completed_save'])
@@ -532,7 +532,7 @@ function action_modifyprofile()
 			// If we're using OpenID try to revalidate.
 			if (!empty($user_settings['openid_uri']))
 			{
-				require_once($librarydir . '/OpenID.subs.php');
+				require_once(SUBSDIR . '/OpenID.subs.php');
 				openID_revalidate();
 			}
 			else
@@ -626,7 +626,7 @@ function action_modifyprofile()
 			if (!empty($context['log_changes']) && !empty($modSettings['modlog_enabled']))
 			{
 				$log_changes = array();
-				require_once($sourcedir . '/Logging.php');
+				require_once(SOURCEDIR . '/Logging.php');
 				foreach ($context['log_changes'] as $k => $v)
 					$log_changes[] = array(
 						'action' => $k,

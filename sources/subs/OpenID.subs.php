@@ -35,7 +35,7 @@ if (!defined('ELKARTE'))
  */
 function openID_validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 {
-	global $sourcedir, $scripturl, $boardurl, $modSettings;
+	global $scripturl, $boardurl, $modSettings;
 
 	$openid_url = openID_canonize($openid_uri);
 
@@ -254,7 +254,7 @@ function openID_removeAssociation($handle)
  */
 function action_openidreturn()
 {
-	global $smcFunc, $user_info, $user_profile, $sourcedir, $librarydir, $controllerdir, $modSettings, $context, $sc, $user_settings;
+	global $smcFunc, $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
 
 	// Is OpenID even enabled?
 	if (empty($modSettings['enableOpenID']))
@@ -357,7 +357,7 @@ function action_openidreturn()
 		// Were we just verifying the registration state?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
-			require_once($controllerdir . '/Register.controller.php');
+			require_once(CONTROLLERDIR . '/Register.controller.php');
 			return action_register2(true);
 		}
 		else
@@ -368,7 +368,7 @@ function action_openidreturn()
 		$_SESSION['openid_revalidate_time'] = time();
 
 		// Restore the get data.
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		$_SESSION['openid']['saved_data'][$_GET['t']]['get']['openid_restore_post'] = $_GET['t'];
 		$query_string = construct_query_string($_SESSION['openid']['saved_data'][$_GET['t']]['get']);
 
@@ -390,7 +390,7 @@ function action_openidreturn()
 			'openid_uri' => $openid_uri,
 		);
 
-		require_once($controllerdir . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
 
 		if (!checkActivation())
 			return;
@@ -547,9 +547,7 @@ function openid_generate_private_key()
  */
 function openID_getServerInfo($openid_url)
 {
-	global $sourcedir, $librarydir;
-
-	require_once($librarydir . '/Package.subs.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	// Get the html and parse it for the openid variable which will tell us where to go.
 	$webdata = fetch_web_data($openid_url);

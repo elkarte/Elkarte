@@ -145,7 +145,7 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $sourcedir, $librarydir, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $modSettings, $user_info, $smcFunc, $context;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -249,7 +249,7 @@ function removeMessage($message, $decreasePostCount = true)
 	);
 	if ($smcFunc['db_affected_rows']() != 0)
 	{
-		require_once($librarydir . '/Moderation.subs.php');
+		require_once(SUBSDIR . '/Moderation.subs.php');
 		updateSettings(array('last_mod_report_action' => time()));
 		recountOpenReports();
 	}
@@ -286,7 +286,7 @@ function removeMessage($message, $decreasePostCount = true)
 			fatal_lang_error('delFirstPost', false);
 
 		// This needs to be included for topic functions
-		require_once($librarydir . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		removeTopics($row['id_topic']);
 		return true;
@@ -439,7 +439,7 @@ function removeMessage($message, $decreasePostCount = true)
 			// Mark recycled topic as read.
 			if (!$user_info['is_guest'])
 			{
-				require_once($librarydir . '/Topic.subs.php');
+				require_once(SUBSDIR . '/Topic.subs.php');
 				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 			}
 
@@ -548,7 +548,7 @@ function removeMessage($message, $decreasePostCount = true)
 		}
 
 		// Delete attachment(s) if they exist.
-		require_once($librarydir . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		$attachmentQuery = array(
 			'attachment_type' => 0,
 			'id_msg' => $message,
@@ -567,7 +567,7 @@ function removeMessage($message, $decreasePostCount = true)
 	));
 
 	// And now to update the last message of each board we messed with.
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 	if ($recycle)
 		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
 	else

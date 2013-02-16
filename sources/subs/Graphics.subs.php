@@ -203,8 +203,6 @@ function imageMemoryCheck($sizes)
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
 {
-	global $sourcedir, $librarydir;
-
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
 		return false;
@@ -217,7 +215,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		'15' => 'wbmp'
 	);
 
-	require_once($librarydir . '/Package.subs.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	// Get the image file, we have to work with something after all
 	$fp_destination = fopen($destination, 'wb');

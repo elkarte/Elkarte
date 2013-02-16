@@ -92,7 +92,7 @@ function RegCenter()
  */
 function AdminRegister()
 {
-	global $txt, $context, $sourcedir, $librarydir, $scripturl, $smcFunc;
+	global $txt, $context, $scripturl, $smcFunc;
 
 	if (!empty($_POST['regSubmit']))
 	{
@@ -117,7 +117,7 @@ function AdminRegister()
 			'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
 		);
 
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		$memberID = registerMember($regOptions);
 		if (!empty($memberID))
 		{
@@ -178,7 +178,7 @@ function AdminRegister()
 function EditAgreement()
 {
 	// I hereby agree not to be a lazy bum.
-	global $txt, $boarddir, $context, $modSettings, $smcFunc, $settings;
+	global $txt, $context, $modSettings, $smcFunc, $settings;
 
 	// By default we look at agreement.txt.
 	$context['current_agreement'] = '';
@@ -194,7 +194,7 @@ function EditAgreement()
 	// Try to figure out if we have more agreements.
 	foreach ($context['languages'] as $lang)
 	{
-		if (file_exists($boarddir . '/agreement.' . $lang['filename'] . '.txt'))
+		if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
 		{
 			$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
 			// Are we editing this?
@@ -209,15 +209,15 @@ function EditAgreement()
 		validateToken('admin-rega');
 
 		// Off it goes to the agreement file.
-		$fp = fopen($boarddir . '/agreement' . $context['current_agreement'] . '.txt', 'w');
+		$fp = fopen(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt', 'w');
 		fwrite($fp, str_replace("\r", '', $_POST['agreement']));
 		fclose($fp);
 
 		updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement'])));
 	}
 
-	$context['agreement'] = file_exists($boarddir . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents($boarddir . '/agreement' . $context['current_agreement'] . '.txt')) : '';
-	$context['warning'] = is_writable($boarddir . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
+	$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt')) : '';
+	$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
 	$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 
 	$context['sub_template'] = 'edit_agreement';
@@ -277,7 +277,7 @@ function SetReserved()
  */
 function ModifyRegistrationSettings($return_config = false)
 {
-	global $txt, $context, $scripturl, $modSettings, $sourcedir;
+	global $txt, $context, $scripturl, $modSettings;
 
 	// This is really quite wanting.
 	loadAdminClass ('ManageServer.php');

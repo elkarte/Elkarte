@@ -100,7 +100,7 @@ function getServerVersions($checkFor)
  */
 function getFileVersions(&$versionOptions)
 {
-	global $boarddir, $sourcedir, $settings;
+	global $settings;
 
 	// Default place to find the languages would be the default theme dir.
 	$lang_dir = $settings['default_theme_dir'] . '/languages';
@@ -121,9 +121,9 @@ function getFileVersions(&$versionOptions)
 	$unknown_version = '??';
 
 	// Find the version in SSI.php's file header.
-	if (!empty($versionOptions['include_ssi']) && file_exists($boarddir . '/SSI.php'))
+	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
 	{
-		$header = file_get_contents($boarddir . '/SSI.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/SSI.php', NULL, NULL, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['SSI.php'] = $match[1];
 		// Not found!  This is bad.
@@ -132,9 +132,9 @@ function getFileVersions(&$versionOptions)
 	}
 
 	// Do the paid subscriptions handler?
-	if (!empty($versionOptions['include_subscriptions']) && file_exists($boarddir . '/subscriptions.php'))
+	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 	{
-		$header = file_get_contents($boarddir . '/subscriptions.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/subscriptions.php', NULL, NULL, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['subscriptions.php'] = $match[1];
 		// If we haven't how do we all get paid?
@@ -144,12 +144,12 @@ function getFileVersions(&$versionOptions)
 
 	// Load all the files in the sources and its sub directorys
 	$directories = array(
-		'file_versions' => $sourcedir,
-		'file_versions_admin' => $sourcedir . '/admin',
-		'file_versions_controllers' => $sourcedir . '/controllers',
-		'file_versions_database' => $sourcedir . '/database',
-		'file_versions_subs' => $sourcedir . '/subs',
-		'file_versions_lib' => $sourcedir . '/lib'
+		'file_versions' => SOURCEDIR,
+		'file_versions_admin' => SOURCEDIR . '/admin',
+		'file_versions_controllers' => SOURCEDIR . '/controllers',
+		'file_versions_database' => SOURCEDIR . '/database',
+		'file_versions_subs' => SOURCEDIR . '/subs',
+		'file_versions_lib' => SOURCEDIR . '/lib'
 	);
 	foreach ($directories as $area => $dir)
 	{
@@ -260,7 +260,7 @@ function getFileVersions(&$versionOptions)
  */
 function updateSettingsFile($config_vars)
 {
-	global $boarddir, $cachedir, $context;
+	global $context;
 
 	// Updating the db_last_error, then don't mess around with Settings.php
 	if (count($config_vars) === 1 && isset($config_vars['db_last_error']))
@@ -270,10 +270,10 @@ function updateSettingsFile($config_vars)
 	}
 
 	// When was Settings.php last changed?
-	$last_settings_change = filemtime($boarddir . '/Settings.php');
+	$last_settings_change = filemtime(BOARDDIR . '/Settings.php');
 
 	// Load the settings file.
-	$settingsArray = trim(file_get_contents($boarddir . '/Settings.php'));
+	$settingsArray = trim(file_get_contents(BOARDDIR . '/Settings.php'));
 
 	// Break it up based on \r or \n, and then clean out extra characters.
 	if (strpos($settingsArray, "\n") !== false)
@@ -353,15 +353,15 @@ function updateSettingsFile($config_vars)
 	//
 	// Check before you act: if cache is enabled, we can do a simple write test
 	// to validate that we even write things on this filesystem.
-	if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
-		$cachedir = $boarddir . '/cache';
+	if ((!defined(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+		define('CACHEDIR', BOARDDIR . '/cache');
 
-	$test_fp = @fopen($cachedir . '/settings_update.tmp', "w+");
+	$test_fp = @fopen(CACHEDIR . '/settings_update.tmp', "w+");
 	if ($test_fp)
 	{
 		fclose($test_fp);
-		$written_bytes = file_put_contents($cachedir . '/settings_update.tmp', 'test', LOCK_EX);
-		@unlink($cachedir . '/settings_update.tmp');
+		$written_bytes = file_put_contents(CACHEDIR . '/settings_update.tmp', 'test', LOCK_EX);
+		@unlink(CACHEDIR . '/settings_update.tmp');
 
 		if ($written_bytes !== 4)
 		{
@@ -373,16 +373,16 @@ function updateSettingsFile($config_vars)
 
 	// Protect me from what I want! :P
 	clearstatcache();
-	if (filemtime($boarddir . '/Settings.php') === $last_settings_change)
+	if (filemtime(BOARDDIR . '/Settings.php') === $last_settings_change)
 	{
 		// save the old before we do anything
-		$file = $boarddir . '/Settings.php';
-		$settings_backup_fail = !@is_writable($boarddir . '/Settings_bak.php') || !@copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
-		$settings_backup_fail = !$settings_backup_fail ? (!file_exists($boarddir . '/Settings_bak.php') || filesize($boarddir . '/Settings_bak.php') === 0) : $settings_backup_fail;
+		$file = BOARDDIR . '/Settings.php';
+		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+		$settings_backup_fail = !$settings_backup_fail ? (!file_exists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
 
 		// write out the new
 		$write_settings = implode('', $settingsArray);
-		$written_bytes = file_put_contents($boarddir . '/Settings.php', $write_settings, LOCK_EX);
+		$written_bytes = file_put_contents(BOARDDIR . '/Settings.php', $write_settings, LOCK_EX);
 
 		// survey says ...
 		if ($written_bytes !== strlen($write_settings) && !$settings_backup_fail)
@@ -390,8 +390,8 @@ function updateSettingsFile($config_vars)
 			// Well this is not good at all, lets see if we can save this
 			$context['settings_message'] = 'settings_error';
 
-			if (file_exists($boarddir . '/Settings_bak.php'))
-				@copy($boarddir . '/Settings_bak.php', $boarddir . '/Settings.php');
+			if (file_exists(BOARDDIR . '/Settings_bak.php'))
+				@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 		}
 	}
 }
@@ -406,11 +406,9 @@ function updateSettingsFile($config_vars)
  */
 function updateDbLastError($time)
 {
-	global $boarddir;
-
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents($boarddir . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
-	@touch($boarddir . '/' . 'Settings.php');
+	file_put_contents(BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
+	@touch(BOARDDIR . '/' . 'Settings.php');
 }
 
 /**
@@ -462,10 +460,10 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global $smcFunc, $sourcedir, $librarydir, $language, $modSettings;
+	global $smcFunc, $language, $modSettings;
 
 	// We certainly want this.
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
 	$request = $smcFunc['db_query']('', '

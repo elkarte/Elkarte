@@ -28,16 +28,16 @@ if (!defined('ELKARTE'))
  */
 function action_removetopic2()
 {
-	global $user_info, $topic, $board, $librarydir, $smcFunc, $context, $modSettings;
+	global $user_info, $topic, $board, $smcFunc, $context, $modSettings;
 
 	// Make sure they aren't being lead around by someone. (:@)
 	checkSession('get');
 
 	// This file needs to be included for sendNotifications().
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// This needs to be included for all the topic db functions
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Trying to fool us around, are we?
 	if (empty($topic))
@@ -86,7 +86,7 @@ function action_removetopic2()
  */
 function action_deletemsg()
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $librarydir;
+	global $user_info, $topic, $board, $modSettings, $smcFunc;
 
 	checkSession('get');
 
@@ -134,7 +134,7 @@ function action_deletemsg()
 		isAllowedTo('delete_any');
 
 	// If the full topic was removed go back to the board.
-	require_once($librarydir . '/Messages.subs.php');
+	require_once(SUBSDIR . '/Messages.subs.php');
 	$full_topic = removeMessage($_REQUEST['msg']);
 
 	if (allowedTo('delete_any') && (!allowedTo('delete_own') || $poster != $user_info['id']))
@@ -158,7 +158,7 @@ function action_deletemsg()
  */
 function action_restoretopic()
 {
-	global $context, $smcFunc, $modSettings, $librarydir;
+	global $context, $smcFunc, $modSettings;
 
 	// Check session.
 	checkSession('get');
@@ -171,7 +171,7 @@ function action_restoretopic()
 	isAllowedTo('move_any', $modSettings['recycle_board']);
 
 	// We need this file.
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	$unfound_messages = array();
 	$topics_to_restore = array();
@@ -396,7 +396,7 @@ function action_restoretopic()
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $smcFunc, $modSettings, $librarydir;
+	global $context, $smcFunc, $modSettings;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
@@ -526,7 +526,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$topic_exists = true;
 	if ($smcFunc['db_num_rows']($request) == 0)
 	{
-		require_once($librarydir . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
@@ -616,7 +616,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	);
 
 	// Need it to update some stats.
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Update stats.
 	updateStats('topic');

@@ -52,7 +52,7 @@ function action_reminder()
  */
 function action_picktype()
 {
-	global $context, $txt, $scripturl, $sourcedir, $librarydir, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
+	global $context, $txt, $scripturl, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
 
 	checkSession();
 	validateToken('remind');
@@ -128,10 +128,10 @@ function action_picktype()
 	if (empty($row['secret_question']) || (isset($_POST['reminder_type']) && $_POST['reminder_type'] == 'email'))
 	{
 		// Randomly generate a new password, with only alpha numeric characters that is a max length of 10 chars.
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		$password = generateValidationCode();
 
-		require_once($librarydir . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Mail.subs.php');
 		$replacements = array(
 			'REALNAME' => $row['real_name'],
 			'REMINDLINK' => $scripturl . '?action=reminder;sa=setpassword;u=' . $row['id_member'] . ';code=' . $password,
@@ -202,7 +202,7 @@ function action_setpassword()
  */
 function action_setpassword2()
 {
-	global $context, $txt, $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $context, $txt, $modSettings, $smcFunc;
 
 	checkSession();
 	validateToken('remind-sp');
@@ -243,7 +243,7 @@ function action_setpassword2()
 	$smcFunc['db_free_result']($request);
 
 	// Is the password actually valid?
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	$passwordError = validatePassword($_POST['passwrd1'], $username, array($email));
 
 	// What - it's not?
@@ -332,7 +332,7 @@ function SecretAnswerInput()
  */
 function action_secret2()
 {
-	global $txt, $context, $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $txt, $context, $modSettings, $smcFunc;
 
 	checkSession();
 	validateToken('remind-sai');
@@ -383,7 +383,7 @@ function action_secret2()
 		fatal_lang_error('passwords_dont_match', false);
 
 	// Make sure they have a strong enough password.
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	$passwordError = validatePassword($_POST['passwrd1'], $row['member_name'], array($row['email_address']));
 
 	// Invalid?

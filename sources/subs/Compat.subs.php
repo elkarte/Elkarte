@@ -158,7 +158,6 @@ if (!function_exists('smf_crc32'))
  */
 function loadOldClassFile($filename)
 {
-	global $sourcedir;
 	static $files_included = array();
 
 	// Check if it was included before.
@@ -185,5 +184,5 @@ function loadOldClassFile($filename)
 		'$1function ',
 		'$1function ',
 		'$1function ',
-	), rtrim(file_get_contents($sourcedir . '/' . $filename))));
+	), rtrim(file_get_contents(SOURCEDIR . '/' . $filename))));
 }

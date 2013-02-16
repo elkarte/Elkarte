@@ -73,7 +73,7 @@ if (!defined('ELKARTE'))
  */
 function ModifySettings()
 {
-	global $context, $txt, $scripturl, $boarddir;
+	global $context, $txt, $scripturl;
 
 	// This is just to keep the database password more secure.
 	isAllowedTo('admin_forum');
@@ -115,8 +115,8 @@ function ModifySettings()
 	if ($_REQUEST['sa'] != 'cache')
 	{
 		// Warn the user if the backup of Settings.php failed.
-		$settings_not_writable = !is_writable($boarddir . '/Settings.php');
-		$settings_backup_fail = !@is_writable($boarddir . '/Settings_bak.php') || !@copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 		if ($settings_not_writable)
 			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['settings_not_writable'] . '</strong></div><br />';
@@ -201,7 +201,7 @@ function ModifyGeneralSettings($return_config = false)
  */
 function ModifyDatabaseSettings($return_config = false)
 {
-	global $scripturl, $context, $settings, $txt, $boarddir;
+	global $scripturl, $context, $settings, $txt;
 
 	/* If you're writing a mod, it's a bad idea to add things here....
 		For each option:
@@ -258,7 +258,7 @@ function ModifyDatabaseSettings($return_config = false)
  */
 function ModifyCookieSettings($return_config = false)
 {
-	global $context, $scripturl, $txt, $sourcedir, $librarydir, $modSettings, $cookiename, $user_settings, $boardurl;
+	global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
 	// Define the variables we want to edit.
 	$config_vars = array(
@@ -299,7 +299,7 @@ function ModifyCookieSettings($return_config = false)
 		if ($cookiename != $_POST['cookiename'])
 		{
 			$original_session_id = $context['session_id'];
-			include_once($librarydir . '/Auth.subs.php');
+			include_once(SUBSDIR . '/Auth.subs.php');
 
 			// Remove the old cookie.
 			setLoginCookie(-3600, 0);
@@ -584,7 +584,7 @@ function prepareServerSettingsContext(&$config_vars)
  */
 function prepareDBSettingContext(&$config_vars)
 {
-	global $txt, $helptxt, $context, $modSettings, $sourcedir;
+	global $txt, $helptxt, $context, $modSettings;
 
 	loadLanguage('Help');
 
@@ -745,8 +745,8 @@ function prepareDBSettingContext(&$config_vars)
  */
 function saveSettings(&$config_vars)
 {
-	global $boarddir, $sc, $cookiename, $modSettings, $user_settings;
-	global $sourcedir, $librarydir, $context, $cachedir;
+	global $sc, $cookiename, $modSettings, $user_settings;
+	global $context;
 
 	validateToken('admin-ssc');
 
@@ -778,8 +778,11 @@ function saveSettings(&$config_vars)
 		'cookiename',
 		'webmaster_email',
 		'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
-		'boarddir', 'sourcedir',
-		'cachedir', 'cache_accelerator', 'cache_memcached',
+		'cache_accelerator', 'cache_memcached',
+	);
+
+	$defines = array(
+		'boarddir', 'sourcedir', 'cachedir',
 	);
 
 	// All the numeric variables.
@@ -819,7 +822,7 @@ function saveSettings(&$config_vars)
 	}
 
 	// Save the relevant settings in the Settings.php file.
-	require_once($librarydir . '/Admin.subs.php');
+	require_once(SUBSDIR . '/Admin.subs.php');
 	updateSettingsFile($new_settings);
 
 	// Now loop through the remaining (database-based) settings.
@@ -846,7 +849,7 @@ function saveSettings(&$config_vars)
  */
 function saveDBSettings(&$config_vars)
 {
-	global $sourcedir, $context;
+	global $context;
 
 	validateToken('admin-dbsc');
 

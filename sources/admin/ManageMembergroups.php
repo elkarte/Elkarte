@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 */
 function ModifyMembergroups()
 {
-	global $context, $txt, $scripturl, $sourcedir;
+	global $context, $txt, $scripturl;
 
 	$subActions = array(
 		'add' => array('AddMembergroup', 'manage_membergroups'),
@@ -51,7 +51,7 @@ function ModifyMembergroups()
 
 	// Is it elsewhere?
 	if (isset($subActions[$_REQUEST['sa']][2]))
-		require_once($sourcedir . '/' . $subActions[$_REQUEST['sa']][2]);
+		require_once(SOURCEDIR . '/' . $subActions[$_REQUEST['sa']][2]);
 
 	// Do the permission check, you might not be allowed her.
 	isAllowedTo($subActions[$_REQUEST['sa']][1]);
@@ -82,7 +82,7 @@ function ModifyMembergroups()
  */
 function MembergroupIndex()
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $librarydir, $user_info;
+	global $txt, $scripturl, $context, $settings, $smcFunc, $user_info;
 
 	$context['page_title'] = $txt['membergroups_title'];
 
@@ -93,7 +93,7 @@ function MembergroupIndex()
 		'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : ''),
 		'default_sort_col' => 'name',
 		'get_items' => array(
-			'file' => $librarydir . '/Membergroups.subs.php',
+			'file' => SUBSDIR . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -196,7 +196,7 @@ function MembergroupIndex()
 		),
 	);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// The second list shows the post count based groups.
@@ -210,7 +210,7 @@ function MembergroupIndex()
 			'desc' => 'desc2',
 		),
 		'get_items' => array(
-			'file' => $librarydir . '/Membergroups.subs.php',
+			'file' => SUBSDIR . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'post_count',
@@ -322,7 +322,7 @@ function MembergroupIndex()
  */
 function AddMembergroup()
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, $smcFunc;
 
 	// A form was submitted, we can start adding.
 	if (isset($_POST['group_name']) && trim($_POST['group_name']) != '')
@@ -382,7 +382,7 @@ function AddMembergroup()
 			// Are you a powerful admin?
 			if (!allowedTo('admin_forum'))
 			{
-				require_once($librarydir . '/Membergroups.subs.php');
+				require_once(SUBSDIR . '/Membergroups.subs.php');
 				$copy_type = membergroupsById($copy_id);
 
 				// Protected groups are... well, protected!
@@ -442,7 +442,7 @@ function AddMembergroup()
 			// Also get some membergroup information if we're copying and not copying from guests...
 			if ($copy_id > 0 && $_POST['perm_type'] == 'copy')
 			{
-				require_once($librarydir . '/Membergroups.subs.php');
+				require_once(SUBSDIR . '/Membergroups.subs.php');
 				$group_info = membergroupsById($copy_id, 1, true);
 
 				// ...and update the new membergroup with it.
@@ -610,11 +610,9 @@ function AddMembergroup()
  */
 function DeleteMembergroup()
 {
-	global $librarydir;
-
 	checkSession('get');
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 	deleteMembergroups((int) $_REQUEST['group']);
 
 	// Go back to the membergroup index.
@@ -633,14 +631,14 @@ function DeleteMembergroup()
  */
 function EditMembergroup()
 {
-	global $context, $txt, $librarydir, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) && $_REQUEST['group'] > 0 ? (int) $_REQUEST['group'] : 0;
 
 	if (!empty($modSettings['deny_boards_access']))
 		loadLanguage('ManagePermissions');
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	// Make sure this group is editable.
 	if (!empty($_REQUEST['group']))
@@ -1088,7 +1086,7 @@ function EditMembergroup()
  */
 function ModifyMembergroupsettings()
 {
-	global $context, $sourcedir, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	$context['sub_template'] = 'show_settings';
 	$context['page_title'] = $txt['membergroups_settings'];
