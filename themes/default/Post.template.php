@@ -37,11 +37,6 @@ function template_main()
 	echo '
 			};';
 
-	// If we are making a calendar event we want to ensure we show the current days in a month etc... this is done here.
-	if ($context['make_event'])
-		echo '
-			var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];';
-
 	// End of the javascript
 	echo '
 		// ]]></script>';
