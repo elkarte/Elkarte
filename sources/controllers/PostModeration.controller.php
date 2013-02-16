@@ -25,8 +25,6 @@ if (!defined('ELKARTE'))
  */
 function action_postmoderation()
 {
-	global $sourcedir;
-
 	// @todo We'll shift these later bud.
 	loadLanguage('ModerationCenter');
 	loadTemplate('ModerationCenter');
@@ -311,7 +309,7 @@ function action_unapproved()
  */
 function action_unapproved_attachments()
 {
-	global $txt, $scripturl, $context, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings;
+	global $txt, $scripturl, $context, $user_info, $smcFunc, $modSettings;
 
 	$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -347,7 +345,7 @@ function action_unapproved_attachments()
 		checkSession('request');
 
 		// This will be handy.
-		require_once($librarydir . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Confirm the attachments are eligible for changing!
 		$request = $smcFunc['db_query']('', '
@@ -381,7 +379,7 @@ function action_unapproved_attachments()
 		}
 	}
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'mc_unapproved_attach',
@@ -645,13 +643,13 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function action_approve()
 {
-	global $user_info, $topic, $board, $sourcedir, $librarydir, $smcFunc;
+	global $user_info, $topic, $board, $smcFunc;
 
 	checkSession('get');
 
 	$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	isAllowedTo('approve_posts');
 
@@ -698,9 +696,7 @@ function action_approve()
  */
 function approveMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir, $librarydir;
-
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 	if ($current_view == 'topics')
 	{
 		approveTopics($messages);
@@ -726,7 +722,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc, $librarydir;
+	global $smcFunc;
 
 	// Start with messages and topics.
 	$request = $smcFunc['db_query']('', '
@@ -744,7 +740,7 @@ function approveAllData()
 
 	if (!empty($msgs))
 	{
-		require_once($librarydir . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
 	}
 
@@ -764,7 +760,7 @@ function approveAllData()
 
 	if (!empty($attaches))
 	{
-		require_once($librarydir . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		approveAttachments($attaches);
 	}
 }
@@ -778,13 +774,13 @@ function approveAllData()
  */
 function removeMessages($messages, $messageDetails, $current_view = 'replies')
 {
-	global $sourcedir, $librarydir, $modSettings;
+	global $modSettings;
 
 	// @todo something's not right, removeMessage() does check permissions,
 	// removeTopics() doesn't
 	if ($current_view == 'topics')
 	{
-		require_once($librarydir . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 		removeTopics($messages);
 		// and tell the world about it
 		foreach ($messages as $topic)
@@ -794,7 +790,7 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 	}
 	else
 	{
-		require_once($librarydir . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		foreach ($messages as $post)
 		{
 			removeMessage($post);

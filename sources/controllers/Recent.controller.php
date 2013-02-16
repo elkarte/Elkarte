@@ -80,7 +80,7 @@ function getLastPost()
  */
 function action_recent()
 {
-	global $txt, $scripturl, $user_info, $context, $modSettings, $sourcedir, $board, $smcFunc;
+	global $txt, $scripturl, $user_info, $context, $modSettings, $board, $smcFunc;
 
 	loadTemplate('Recent');
 	$context['page_title'] = $txt['recent_posts'];
@@ -425,7 +425,7 @@ function action_recent()
  */
 function action_unread()
 {
-	global $board, $txt, $scripturl, $sourcedir, $librarydir;
+	global $board, $txt, $scripturl;
 	global $user_info, $context, $settings, $modSettings, $smcFunc, $options;
 
 	// Guests can't have unread things, we don't know anything about them.
@@ -812,7 +812,7 @@ function action_unread()
 		if ($num_topics == 0)
 		{
 			// Mark the boards as read if there are no unread topics!
-			require_once($librarydir . '/Boards.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			markBoardsRead(empty($boards) ? $board : $boards);
 
 			$context['topics'] = array();
@@ -898,7 +898,7 @@ function action_unread()
 			if ($context['showing_all_topics'])
 			{
 				// Since there are no unread topics, mark the boards as read!
-				require_once($librarydir . '/Boards.subs.php');
+				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead(empty($boards) ? $board : $boards);
 			}
 

@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function action_subscriptions($memID)
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc, $scripturl;
+	global $context, $txt, $modSettings, $smcFunc, $scripturl;
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');
@@ -287,7 +287,7 @@ function action_subscriptions($memID)
  */
 function action_activateaccount($memID)
 {
-	global $sourcedir, $context, $user_profile, $modSettings, $user_info, $librarydir;
+	global $context, $user_profile, $modSettings, $user_info;
 
 	isAllowedTo('moderate_forum');
 
@@ -296,7 +296,7 @@ function action_activateaccount($memID)
 		// If we are approving the deletion of an account, we do something special ;)
 		if ($user_profile[$memID]['is_activated'] == 4)
 		{
-			require_once($librarydir . '/Members.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($context['id_member']);
 			redirectexit();
 		}
@@ -308,7 +308,7 @@ function action_activateaccount($memID)
 		updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
 
 		// Log what we did?
-		require_once($sourcedir . '/Logging.php');
+		require_once(SOURCEDIR . '/Logging.php');
 		logAction('approve_member', array('member' => $memID), 'admin');
 
 		// If we are doing approval, update the stats for the member just in case.

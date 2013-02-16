@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function deleteMembergroups($groups)
 {
-	global $sourcedir, $smcFunc, $modSettings;
+	global $smcFunc, $modSettings;
 
 	// Make sure it's an array.
 	if (!is_array($groups))
@@ -209,7 +209,7 @@ function deleteMembergroups($groups)
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
-	global $smcFunc, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings;
 
 	// You're getting nowhere without this permission, unless of course you are the group's moderator.
 	if (!$permissionCheckDone)
@@ -392,7 +392,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
 	{
-		require_once($sourcedir . '/Logging.php');
+		require_once(SOURCEDIR . '/Logging.php');
 		foreach ($log_inserts as $extra)
 			logAction('removed_from_group', $extra, 'admin');
 	}
@@ -426,7 +426,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $smcFunc, $modSettings, $sourcedir;
+	global $smcFunc, $modSettings;
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -531,7 +531,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 
 	// Log the data.
 	$log_inserts = array();
-	require_once($sourcedir . '/Logging.php');
+	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
 		logAction('added_to_group', array('group' => $group_names[$group], 'member' => $member), 'admin');
 

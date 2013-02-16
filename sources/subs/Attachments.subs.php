@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
 
 function automanage_attachments_check_directory()
 {
-	global $boarddir, $modSettings, $context;
+	global $modSettings, $context;
 
 	// Not pretty, but since we don't want folders created for every post. It'll do unless a better solution can be found.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin')
@@ -78,7 +78,7 @@ function automanage_attachments_check_directory()
 			$modSettings['last_attachments_directory'][$base_dir] = 0;
 	}
 
-	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : $boarddir);
+	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
 	//Just to be sure: I don't want directory separators at the end
 	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
 	$basedirectory = rtrim($basedirectory, $sep);
@@ -134,7 +134,7 @@ function automanage_attachments_check_directory()
  */
 function automanage_attachments_create_directory($updir)
 {
-	global $modSettings, $initial_error, $context, $boarddir;
+	global $modSettings, $initial_error, $context;
 
 	$tree = get_directory_tree_elements($updir);
 	$count = count($tree);
@@ -143,7 +143,7 @@ function automanage_attachments_create_directory($updir)
 	if ($directory === false)
 	{
 		// Maybe it's just the folder name
-		$tree = get_directory_tree_elements($boarddir . DIRECTORY_SEPARATOR . $updir);
+		$tree = get_directory_tree_elements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
 		$count = count($tree);
 
 		$directory = attachments_init_dir($tree, $count);
@@ -220,12 +220,12 @@ function automanage_attachments_create_directory($updir)
  */
 function automanage_attachments_by_space()
 {
-	global $modSettings, $boarddir, $context;
+	global $modSettings, $context;
 
 	if (!isset($modSettings['automanage_attachments']) || (!empty($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] != 1))
 		return;
 
-	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : $boarddir);
+	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
 
 	// Just to be sure: I don't want directory separators at the end
 	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
@@ -511,7 +511,7 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $context, $smcFunc;
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if ( empty($_SESSION['temp_attachments'][$attachID]))
@@ -551,7 +551,7 @@ function attachmentChecks($attachID)
 	$size = @getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	if (isset($validImageTypes[$size[2]]))
 	{
-		require_once($librarydir . '/Graphics.subs.php');
+		require_once(SUBSDIR . '/Graphics.subs.php');
 		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
@@ -599,7 +599,7 @@ function attachmentChecks($attachID)
 		if (empty($modSettings['attachment_full_notified']) && !empty($modSettings['attachmentDirSizeLimit']) && $modSettings['attachmentDirSizeLimit'] > 4000 && $context['dir_size'] > ($modSettings['attachmentDirSizeLimit'] - 2000) * 1024
 			|| (!empty($modSettings['attachmentDirFileLimit']) && $modSettings['attachmentDirFileLimit'] * .95 < $context['dir_files'] && $modSettings['attachmentDirFileLimit'] > 500))
 		{
-			require_once($librarydir . '/Admin.subs.php');
+			require_once(SUBSDIR . '/Admin.subs.php');
 			emailAdmins('admin_attachments_full');
 			updateSettings(array('attachment_full_notified' => 1));
 		}
@@ -691,10 +691,10 @@ function attachmentChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $sourcedir, $librarydir, $smcFunc, $context;
-	global $txt, $boarddir;
+	global $modSettings, $smcFunc, $context;
+	global $txt;
 
-	require_once($librarydir . '/Graphics.subs.php');
+	require_once(SUBSDIR . '/Graphics.subs.php');
 
 	// These are the only valid image types.
 	$validImageTypes = array(
@@ -1214,7 +1214,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1250,7 +1250,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
 
 	// Resize it.
-	require_once($librarydir . '/Graphics.subs.php');
+	require_once(SUBSDIR . '/Graphics.subs.php');
 	if (!empty($modSettings['avatar_download_png']))
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
  	else
@@ -1316,8 +1316,6 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  */
 function url_image_size($url)
 {
-	global $sourcedir, $librarydir;
-
 	// Make sure it is a proper URL.
 	$url = str_replace(' ', '%20', $url);
 
@@ -1362,7 +1360,7 @@ function url_image_size($url)
 				// This probably means allow_url_fopen is off, let's try GD.
 				if ($size === false && function_exists('imagecreatefromstring'))
 				{
-					include_once($librarydir . '/Package.subs.php');
+					include_once(SUBSDIR . '/Package.subs.php');
 
 					// It's going to hate us for doing this, but another request...
 					$image = @imagecreatefromstring(fetch_web_data($url));
@@ -1390,18 +1388,18 @@ function url_image_size($url)
 
 /**
  * The current attachments path:
- *  - $boarddir . '/attachments', if nothing is set yet.
+ *  - BOARDDIR . '/attachments', if nothing is set yet.
  *  - if the forum is using multiple attachments directories, the current path
  *  - it is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
  */
 function getAttachmentPath()
 {
-	global $modSettings, $boarddir;
+	global $modSettings;
 
 	// Make sure this thing exists and it is unserialized
 	if (empty($modSettings['attachmentUploadDir']))
-		$attachmentDir = $boarddir . '/attachments';
+		$attachmentDir = BOARDDIR . '/attachments';
 	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
 		$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
 	else
@@ -1560,14 +1558,14 @@ function getAvatarCount()
  */
 function getAttachmentDirs()
 {
-	global $modSettings, $boarddir;
+	global $modSettings;
 
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 		$attach_dirs = unserialize($modSettings['attachmentUploadDir']);
 	elseif (!empty($modSettings['attachmentUploadDir']))
 		$attach_dirs = array($modSettings['attachmentUploadDir']);
 	else
-		$attach_dirs = array($boarddir . '/attachments');
+		$attach_dirs = array(BOARDDIR . '/attachments');
 
 	return $attach_dirs;
 }

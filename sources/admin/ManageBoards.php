@@ -85,11 +85,11 @@ function ManageBoards()
  */
 function ManageBoardsMain()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $librarydir, $txt;
+	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $txt;
 
 	loadTemplate('ManageBoards');
 
-	require_once($librarydir . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 
 	if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'move' && in_array($_REQUEST['move_to'], array('child', 'before', 'after', 'top')))
 	{
@@ -220,10 +220,10 @@ function ManageBoardsMain()
  */
 function EditCategory()
 {
-	global $txt, $context, $cat_tree, $boardList, $boards, $librarydir;
+	global $txt, $context, $cat_tree, $boardList, $boards;
 
 	loadTemplate('ManageBoards');
-	require_once($librarydir . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 	getBoardTree();
 
 	// id_cat must be a number.... if it exists.
@@ -311,12 +311,10 @@ function EditCategory()
  */
 function EditCategory2()
 {
-	global $librarydir;
-
 	checkSession();
 	validateToken('admin-bc-' . $_REQUEST['cat']);
 
-	require_once($librarydir . '/Categories.subs.php');
+	require_once(SUBSDIR . '/Categories.subs.php');
 
 	$_POST['cat'] = (int) $_POST['cat'];
 
@@ -376,10 +374,10 @@ function EditCategory2()
  */
 function EditBoard()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $librarydir, $smcFunc, $modSettings;
+	global $txt, $context, $cat_tree, $boards, $boardList, $smcFunc, $modSettings;
 
 	loadTemplate('ManageBoards');
-	require_once($librarydir . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 	getBoardTree();
 
 	// For editing the profile we'll need this.
@@ -592,13 +590,13 @@ function EditBoard()
  */
 function EditBoard2()
 {
-	global $txt, $librarydir, $modSettings, $smcFunc, $context;
+	global $txt, $modSettings, $smcFunc, $context;
 
 	$_POST['boardid'] = (int) $_POST['boardid'];
 	checkSession();
 	validateToken('admin-be-' . $_REQUEST['boardid']);
 
-	require_once($librarydir . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 
 	// Mode: modify aka. don't delete.
 	if (isset($_POST['edit']) || isset($_POST['add']))
@@ -736,7 +734,7 @@ function EditBoard2()
  */
 function EditBoardSettings($return_config = false)
 {
-	global $context, $txt, $sourcedir, $modSettings, $scripturl, $smcFunc;
+	global $context, $txt, $modSettings, $scripturl, $smcFunc;
 
 	// Load the boards list - for the recycle bin!
 	$recycle_boards = array('');

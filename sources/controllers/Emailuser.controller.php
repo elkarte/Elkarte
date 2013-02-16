@@ -53,7 +53,7 @@ function action_emailuser()
  */
 function action_sendtopic()
 {
-	global $topic, $txt, $context, $scripturl, $sourcedir, $librarydir, $smcFunc, $modSettings;
+	global $topic, $txt, $context, $scripturl, $smcFunc, $modSettings;
 
 	// Check permissions...
 	isAllowedTo('send_topic');
@@ -99,7 +99,7 @@ function action_sendtopic()
 	spamProtection('sendtopic');
 
 	// This is needed for sendmail().
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Trim the names..
 	$_POST['y_name'] = trim($_POST['y_name']);
@@ -156,7 +156,7 @@ function action_sendtopic()
  */
 function action_email()
 {
-	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl, $sourcedir, $librarydir;
+	global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl;
 
 	// Can the user even see this information?
 	if ($user_info['is_guest'] && !empty($modSettings['guest_hideContacts']))
@@ -224,7 +224,7 @@ function action_email()
 	// Are we actually sending it?
 	if (isset($_POST['send']) && isset($_POST['email_body']))
 	{
-		require_once($librarydir . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Mail.subs.php');
 
 		checkSession();
 
@@ -289,7 +289,7 @@ function action_email()
  */
 function action_reporttm()
 {
-	global $txt, $topic, $sourcedir, $librarydir, $modSettings, $user_info, $context, $smcFunc;
+	global $txt, $topic, $modSettings, $user_info, $context, $smcFunc;
 
 	$context['robot_no_index'] = true;
 
@@ -329,7 +329,7 @@ function action_reporttm()
 	$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
 	if ($context['require_verification'])
 	{
-		require_once($librarydir . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'report',
 		);
@@ -385,7 +385,7 @@ function action_reporttm()
  */
 function action_reporttm2()
 {
-	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $sourcedir, $librarydir, $language, $context, $smcFunc;
+	global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, $smcFunc;
 
 	// You must have the proper permissions!
 	isAllowedTo('report_any');
@@ -393,7 +393,7 @@ function action_reporttm2()
 	// Make sure they aren't spamming.
 	spamProtection('reporttm');
 
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// No errors, yet.
 	$post_errors = array();
@@ -427,7 +427,7 @@ function action_reporttm2()
 	// Could they get the right verification code?
 	if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
 	{
-		require_once($librarydir . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'report',
 		);
@@ -473,7 +473,7 @@ function action_reporttm2()
 	$subject = un_htmlspecialchars($message['subject']);
 
 	// Get a list of members with the moderate_board permission.
-	require_once($librarydir . '/Members.subs.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 	$moderators = membersAllowedTo('moderate_board', $board);
 
 	$request = $smcFunc['db_query']('', '

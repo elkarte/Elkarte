@@ -61,13 +61,13 @@ function pre_announce()
  */
 function action_selectgroup()
 {
-	global $txt, $context, $topic, $board, $board_info, $smcFunc, $librarydir;
+	global $txt, $context, $topic, $board, $board_info, $smcFunc;
 
 	$groups = array_merge($board_info['groups'], array(1));
 	foreach ($groups as $id => $group)
 		$groups[$id] = (int) $group;
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	$context['groups'] = array();
 	if (in_array(0, $groups))
@@ -139,7 +139,7 @@ function action_selectgroup()
 function action_send()
 {
 	global $topic, $board, $board_info, $context, $modSettings;
-	global $language, $scripturl, $txt, $user_info, $librarydir, $smcFunc;
+	global $language, $scripturl, $txt, $user_info, $smcFunc;
 
 	checkSession();
 
@@ -176,7 +176,7 @@ function action_send()
 	$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($message, false, $id_msg), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 
 	// We need this in order to be able send emails.
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Select the email addresses for this batch.
 	$request = $smcFunc['db_query']('', '

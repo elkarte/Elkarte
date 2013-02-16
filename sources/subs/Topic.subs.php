@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
 {
-	global $sourcedir, $librarydir, $modSettings, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	// Nothing to do?
 	if (empty($topics))
@@ -120,11 +120,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 
 			// Move the topics to the recycle board.
-			require_once($librarydir . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Topic.subs.php');
 			moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 			// Close reports that are being recycled.
-			require_once($librarydir . '/Moderation.subs.php');
+			require_once(SUBSDIR . '/Moderation.subs.php');
 
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}log_reported
@@ -254,7 +254,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s), if they exist.
-	require_once($librarydir . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -353,7 +353,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		'calendar_updated' => time(),
 	));
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 	$updates = array();
 	foreach ($adjustBoards as $stats)
 		$updates[] = $stats['id_board'];
@@ -372,7 +372,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopics($topics, $toBoard)
 {
-	global $user_info, $modSettings, $smcFunc, $librarydir;
+	global $user_info, $modSettings, $smcFunc;
 
 	// Empty array?
 	if (empty($topics))
@@ -661,7 +661,7 @@ function moveTopics($topics, $toBoard)
 		foreach ($topics as $topic_id)
 			cache_put_data('topic_board-' . $topic_id, null, 120);
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$updates = array_keys($fromBoards);
 	$updates[] = $toBoard;

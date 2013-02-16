@@ -102,7 +102,7 @@ function Ban()
 function action_list()
 {
 	global $txt, $context, $ban_request, $ban_counts, $scripturl;
-	global $user_info, $smcFunc, $sourcedir, $librarydir;
+	global $user_info, $smcFunc;
 
 	// User pressed the 'remove selection button'.
 	if (!empty($_POST['removeBans']) && !empty($_POST['remove']) && is_array($_POST['remove']))
@@ -291,7 +291,7 @@ function action_list()
 		),
 	);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -1134,7 +1134,7 @@ function action_edittrigger()
 function action_browse()
 {
 	global $modSettings, $context, $scripturl, $smcFunc, $txt;
-	global $sourcedir, $librarydir, $settings;
+	global $settings;
 
 	if (!empty($_POST['remove_triggers']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 	{
@@ -1325,7 +1325,7 @@ function action_browse()
 	}
 
 	// Create the list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// The list is the only thing to show, so make it the default sub template.
@@ -1416,7 +1416,7 @@ function list_getNumBanTriggers($trigger_type)
  */
 function action_log()
 {
-	global $scripturl, $context, $smcFunc, $sourcedir, $librarydir, $txt;
+	global $scripturl, $context, $smcFunc, $txt;
 	global $context;
 
 	// Delete one or more entries.
@@ -1559,7 +1559,7 @@ function action_log()
 
 	createToken('admin-bl');
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['page_title'] = $txt['ban_log'];

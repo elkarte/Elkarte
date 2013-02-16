@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function action_groups()
 {
-	global $context, $txt, $scripturl, $sourcedir, $controllerdir, $user_info;
+	global $context, $txt, $scripturl, $user_info;
 
 	// The sub-actions that we can do. Format "Function Name, Mod Bar Index if appropriate".
 	$subActions = array(
@@ -47,7 +47,7 @@ function action_groups()
 	// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
 	if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 	{
-		require_once($controllerdir . '/ModerationCenter.controller.php');
+		require_once(CONTROLLERDIR . '/ModerationCenter.controller.php');
 		$_GET['area'] = $_REQUEST['sa'] == 'requests' ? 'groups' : 'viewgroups';
 		action_modcenter(true);
 	}
@@ -71,7 +71,7 @@ function action_groups()
  */
 function action_grouplist()
 {
-	global $txt, $context, $sourcedir, $librarydir, $scripturl, $user_info;
+	global $txt, $context, $scripturl, $user_info;
 
 	$context['page_title'] = $txt['viewing_groups'];
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -79,7 +79,7 @@ function action_grouplist()
 		);
 
 	// Making a list is not hard with this beauty.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// Use the standard templates for showing this.
 	$listOptions = array(
@@ -87,7 +87,7 @@ function action_grouplist()
 		'base_href' => $scripturl . '?action=moderate;area=viewgroups;sa=view',
 		'default_sort_col' => 'group',
 		'get_items' => array(
-			'file' => $librarydir . '/Membergroups.subs.php',
+			'file' => SUBSDIR . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -201,7 +201,7 @@ function action_grouplist()
  */
 function action_groupmembers()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $librarydir, $user_info, $settings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $user_info, $settings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
@@ -209,7 +209,7 @@ function action_groupmembers()
 	if (in_array($_REQUEST['group'], array(-1, 0, 3)))
 		fatal_lang_error('membergroup_does_not_exist', false);
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	// Load up the group details.
 	$context['group'] = membergroupsById($_REQUEST['group'], 1, true, true);
@@ -344,7 +344,7 @@ function action_groupmembers()
 		// Do the updates...
 		if (!empty($members))
 		{
-			require_once($librarydir . '/Membergroups.subs.php');
+			require_once(SUBSDIR . '/Membergroups.subs.php');
 			addMembersToGroup($members, $_REQUEST['group'], isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
 		}
 	}
@@ -443,7 +443,7 @@ function action_groupmembers()
  */
 function action_grouprequests()
 {
-	global $txt, $context, $scripturl, $user_info, $sourcedir, $librarydir, $smcFunc, $modSettings, $language;
+	global $txt, $context, $scripturl, $user_info, $smcFunc, $modSettings, $language;
 
 	// Set up the template stuff...
 	$context['page_title'] = $txt['mc_group_requests'];
@@ -565,7 +565,7 @@ function action_grouprequests()
 
 			if (!empty($email_details))
 			{
-				require_once($librarydir . '/Mail.subs.php');
+				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// They are being approved?
 				if ($_POST['req_action'] == 'approve')
@@ -633,7 +633,7 @@ function action_grouprequests()
 	}
 
 	// We're going to want this for making our list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// This is all the information required for a group listing.
 	$listOptions = array(

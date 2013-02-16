@@ -388,10 +388,10 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global $boarddir, $smcFunc;
+	global $smcFunc;
 
 	// First, check that the database is valid, installed.list is still king.
-	$install_file = implode('', file($boarddir . '/Packages/installed.list'));
+	$install_file = implode('', file(BOARDDIR . '/Packages/installed.list'));
 	if (trim($install_file) == '')
 	{
 		$smcFunc['db_query']('', '
@@ -451,20 +451,20 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global $boarddir, $librarydir, $smcFunc;
+	global $smcFunc;
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
 	else
 	{
-		if (!file_exists($boarddir . '/Packages/' . $gzfilename))
+		if (!file_exists(BOARDDIR . '/Packages/' . $gzfilename))
 			return 'package_get_error_not_found';
 
-		if (is_file($boarddir . '/Packages/' . $gzfilename))
-			$packageInfo = read_tgz_file($boarddir . '/Packages/' . $gzfilename, '*/package-info.xml', true);
-		elseif (file_exists($boarddir . '/Packages/' . $gzfilename . '/package-info.xml'))
-			$packageInfo = file_get_contents($boarddir . '/Packages/' . $gzfilename . '/package-info.xml');
+		if (is_file(BOARDDIR . '/Packages/' . $gzfilename))
+			$packageInfo = read_tgz_file(BOARDDIR . '/Packages/' . $gzfilename, '*/package-info.xml', true);
+		elseif (file_exists(BOARDDIR . '/Packages/' . $gzfilename . '/package-info.xml'))
+			$packageInfo = file_get_contents(BOARDDIR . '/Packages/' . $gzfilename . '/package-info.xml');
 		else
 			return 'package_get_error_missing_xml';
 	}
@@ -473,7 +473,7 @@ function getPackageInfo($gzfilename)
 	if (empty($packageInfo))
 	{
 		// Perhaps they are trying to install a theme, lets tell them nicely this is the wrong function
-		$packageInfo = read_tgz_file($boarddir . '/Packages/' . $gzfilename, '*/theme_info.xml', true);
+		$packageInfo = read_tgz_file(BOARDDIR . '/Packages/' . $gzfilename, '*/theme_info.xml', true);
 		if (!empty($packageInfo))
 			return 'package_get_error_is_theme';
 		else
@@ -481,7 +481,7 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an Xml_Array.
-	require_once($librarydir . '/XmlArray.class.php');
+	require_once(SUBSDIR . '/XmlArray.class.php');
 	$packageInfo = new Xml_Array($packageInfo);
 
 	// @todo Error message of some sort?
@@ -511,7 +511,7 @@ function getPackageInfo($gzfilename)
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
-	global $context, $modSettings, $package_ftp, $boarddir, $txt, $sourcedir, $librarydir, $scripturl;
+	global $context, $modSettings, $package_ftp, $txt, $scripturl;
 
 	// If we're restoring the status of existing files prepare the data.
 	if ($restore_write_status && isset($_SESSION['pack_ftp']) && !empty($_SESSION['pack_ftp']['original_perms']))
@@ -682,7 +682,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once($librarydir . '/List.subs.php');
+		require_once(SUBSDIR . '/List.subs.php');
 		createList($listOptions);
 
 		// If we just restored permissions then whereever we are, we are now done and dusted.
@@ -705,7 +705,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
 		// Load the file containing the Ftp_Connection class.
-		require_once($librarydir . '/FTPConnection.class.php');
+		require_once(SUBSDIR . '/FTPConnection.class.php');
 
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 	}
@@ -713,7 +713,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if (empty($package_ftp) && isset($_POST['ftp_username']))
 	{
-		require_once($librarydir . '/FTPConnection.class.php');
+		require_once(SUBSDIR . '/FTPConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
@@ -728,12 +728,12 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 
 			if (!in_array($_POST['ftp_path'], array('', '/')))
 			{
-				$ftp_root = strtr($boarddir, array($_POST['ftp_path'] => ''));
+				$ftp_root = strtr(BOARDDIR, array($_POST['ftp_path'] => ''));
 				if (substr($ftp_root, -1) == '/' && ($_POST['ftp_path'] == '' || substr($_POST['ftp_path'], 0, 1) == '/'))
 					$ftp_root = substr($ftp_root, 0, -1);
 			}
 			else
-				$ftp_root = $boarddir;
+				$ftp_root = BOARDDIR;
 
 			$_SESSION['pack_ftp'] = array(
 				'server' => $_POST['ftp_server'],
@@ -779,13 +779,13 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				require_once($librarydir . '/FTPConnection.class.php');
+				require_once(SUBSDIR . '/FTPConnection.class.php');
 				$ftp = new Ftp_Connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
 
-			list ($username, $detect_path, $found_path) = $ftp->detect_path($boarddir);
+			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
 			if ($found_path)
 				$_POST['ftp_path'] = $detect_path;
@@ -831,7 +831,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {
-	global $context, $modSettings, $package_ftp, $boarddir, $txt, $sourcedir, $librarydir;
+	global $context, $modSettings, $package_ftp, $txt;
 
 	// Try to make them writable the manual way.
 	if ($files !== null)
@@ -898,7 +898,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_SESSION['pack_ftp']))
 	{
 		// Load the file containing the Ftp_Connection class.
-		require_once($librarydir . '/FTPConnection.class.php');
+		require_once(SUBSDIR . '/FTPConnection.class.php');
 
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
@@ -938,7 +938,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_POST['ftp_username']))
 	{
-		require_once($librarydir . '/FTPConnection.class.php');
+		require_once(SUBSDIR . '/FTPConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
@@ -956,13 +956,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			require_once($librarydir . '/FTPConnection.class.php');
+			require_once(SUBSDIR . '/FTPConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
 			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
 
-		list ($username, $detect_path, $found_path) = $ftp->detect_path($boarddir);
+		list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
 		if ($found_path)
 			$_POST['ftp_path'] = $detect_path;
@@ -993,12 +993,12 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!in_array($_POST['ftp_path'], array('', '/')))
 		{
-			$ftp_root = strtr($boarddir, array($_POST['ftp_path'] => ''));
+			$ftp_root = strtr(BOARDDIR, array($_POST['ftp_path'] => ''));
 			if (substr($ftp_root, -1) == '/' && ($_POST['ftp_path'] == '' || $_POST['ftp_path'][0] == '/'))
 				$ftp_root = substr($ftp_root, 0, -1);
 		}
 		else
-			$ftp_root = $boarddir;
+			$ftp_root = BOARDDIR;
 
 		$_SESSION['pack_ftp'] = array(
 			'server' => $_POST['ftp_server'],
@@ -1035,7 +1035,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	global $boarddir, $forum_version, $context, $temp_path, $language;
+	global $forum_version, $context, $temp_path, $language;
 
 	// Mayday!  That action doesn't exist!!
 	if (empty($packageXML) || !$packageXML->exists($method))
@@ -1092,7 +1092,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 	$return = array();
 
 	$temp_auto = 0;
-	$temp_path = $boarddir . '/Packages/temp/' . (isset($context['base_path']) ? $context['base_path'] : '');
+	$temp_path = BOARDDIR . '/Packages/temp/' . (isset($context['base_path']) ? $context['base_path'] : '');
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
@@ -1629,17 +1629,17 @@ function compareVersions($version1, $version2)
  */
 function parse_path($path)
 {
-	global $modSettings, $boarddir, $sourcedir, $settings, $temp_path;
+	global $modSettings, $settings, $temp_path;
 
 	$dirs = array(
 		'\\' => '/',
-		'$boarddir' => $boarddir,
-		'$sourcedir' => $sourcedir,
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
 		'$avatardir' => $modSettings['avatar_directory'],
 		'$avatars_dir' => $modSettings['avatar_directory'],
 		'$themedir' => $settings['default_theme_dir'],
 		'$imagesdir' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
-		'$themes_dir' => $boarddir . '/Themes',
+		'$themes_dir' => BOARDDIR . '/Themes',
 		'$languagedir' => $settings['default_theme_dir'] . '/languages',
 		'$languages_dir' => $settings['default_theme_dir'] . '/languages',
 		'$smileysdir' => $modSettings['smileys_dir'],
@@ -1895,11 +1895,11 @@ function listtree($path, $sub_path = '')
  */
 function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
 {
-	global $boarddir, $sourcedir, $librarydir, $settings, $txt, $modSettings, $package_ftp;
+	global $settings, $txt, $modSettings, $package_ftp;
 
 	@set_time_limit(600);
 
-	require_once($librarydir . '/XmlArray.class.php');
+	require_once(SUBSDIR . '/XmlArray.class.php');
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
@@ -1934,7 +1934,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// If this filename is relative, if so take a guess at what it should be.
 			$real_filename = $filename;
 			if (strpos($filename, 'Themes') === 0)
-				$real_filename = $boarddir . '/' . $filename;
+				$real_filename = BOARDDIR . '/' . $filename;
 
 			if (strpos($real_filename, $theme['theme_dir']) === 0)
 			{
@@ -1987,7 +1987,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			{
 				trigger_error('parseModification(): The filename \'' . $working_file . '\' is not a full path!', E_USER_WARNING);
 
-				$working_file = $boarddir . '/' . $working_file;
+				$working_file = BOARDDIR . '/' . $working_file;
 			}
 
 			// Doesn't exist - give an error or what?
@@ -2278,7 +2278,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
  */
 function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
 {
-	global $boarddir, $sourcedir, $settings, $txt, $modSettings;
+	global $settings, $txt, $modSettings;
 
 	@set_time_limit(600);
 	$file = strtr($file, array("\r" => ''));
@@ -2331,7 +2331,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 		{
 			// If this filename is relative, if so take a guess at what it should be.
 			if (strpos($filename, 'Themes') === 0)
-				$filename = $boarddir . '/' . $filename;
+				$filename = BOARDDIR . '/' . $filename;
 
 			if (strpos($filename, $theme['theme_dir']) === 0)
 				$template_changes[$id][$counter] = substr($filename, strlen($theme['theme_dir']) + 1);
@@ -2423,12 +2423,12 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 			{
 				trigger_error('parseBoardMod(): The filename \'' . $working_file . '\' is not a full path!', E_USER_WARNING);
 
-				$working_file = $boarddir . '/' . $working_file;
+				$working_file = BOARDDIR . '/' . $working_file;
 			}
 
 			if (!file_exists($working_file))
 			{
-				$places_to_check = array($boarddir, $sourcedir, $settings['default_theme_dir'], $settings['default_theme_dir'] . '/languages');
+				$places_to_check = array(BOARDDIR, SOURCEDIR, $settings['default_theme_dir'], $settings['default_theme_dir'] . '/languages');
 
 				foreach ($places_to_check as $place)
 					if (file_exists($place . '/' . $working_file))
@@ -2894,22 +2894,22 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global $sourcedir, $boarddir, $smcFunc;
+	global $smcFunc;
 
 	$files = array();
 
 	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php');
 	foreach ($base_files as $file)
 	{
-		if (file_exists($boarddir . '/' . $file))
-			$files[realpath($boarddir . '/' . $file)] = array(
-				empty($_REQUEST['use_full_paths']) ? $file : $boarddir . '/' . $file,
-				stat($boarddir . '/' . $file)
+		if (file_exists(BOARDDIR . '/' . $file))
+			$files[realpath(BOARDDIR . '/' . $file)] = array(
+				empty($_REQUEST['use_full_paths']) ? $file : BOARDDIR . '/' . $file,
+				stat(BOARDDIR . '/' . $file)
 			);
 	}
 
 	$dirs = array(
-		$sourcedir => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr($sourcedir . '/', '\\', '/')
+		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
 	$request = $smcFunc['db_query']('', '
@@ -2955,11 +2955,11 @@ function package_create_backup($id = 'backup')
 		$listing->close();
 	}
 
-	if (!file_exists($boarddir . '/Packages/backups'))
-		mktree($boarddir . '/Packages/backups', 0777);
-	if (!is_writable($boarddir . '/Packages/backups'))
-		package_chmod($boarddir . '/Packages/backups');
-	$output_file = $boarddir . '/Packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+	if (!file_exists(BOARDDIR . '/Packages/backups'))
+		mktree(BOARDDIR . '/Packages/backups', 0777);
+	if (!is_writable(BOARDDIR . '/Packages/backups'))
+		package_chmod(BOARDDIR . '/Packages/backups');
+	$output_file = BOARDDIR . '/Packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
 
 	if (file_exists($output_file . $output_ext))
@@ -3037,7 +3037,7 @@ function package_create_backup($id = 'backup')
  */
 function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 0)
 {
-	global $webmaster_email, $sourcedir;
+	global $webmaster_email;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
 
 	preg_match('~^(http|ftp)(s)?://([^/:]+)(:(\d+))?(.+)$~', $url, $match);
@@ -3048,7 +3048,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] == 'ftp')
 	{
 		// Include the file containing the Ftp_Connection class.
-		require_once($sourcedir . '/FTPConnection.class.php');
+		require_once(SOURCEDIR . '/FTPConnection.class.php');
 
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
@@ -3079,7 +3079,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
 		// Include the file containing the Curl_Fetch_Webdata class.
-		require_once($sourcedir . '/CurlFetchWeb.class.php');
+		require_once(SOURCEDIR . '/CurlFetchWeb.class.php');
 
 		$fetch_data = new Curl_Fetch_Webdata();
 		$fetch_data->get_url_data($url, $post_data);
@@ -3200,6 +3200,5 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 
 if (!function_exists('smf_crc32'))
 {
-	global $librarydir;
-	require_once($librarydir . '/Compat.subs.php');
+	require_once(SUBSDIR . '/Compat.subs.php');
 }
