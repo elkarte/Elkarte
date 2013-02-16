@@ -228,12 +228,6 @@ function template_modify_user_subscription()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
-	// Some quickly stolen javascript from Post, could do with being more efficient :)
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-			var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-		// ]]></script>';
-
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $context['sub_id'], ';lid=', $context['log_id'], '" method="post">
