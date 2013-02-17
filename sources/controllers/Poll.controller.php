@@ -308,6 +308,8 @@ function action_editpoll()
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
 
+	require_once(SUBSDIR . '/Poll.subs.php');
+
 	loadLanguage('Post');
 	loadTemplate('Poll');
 	loadJavascriptFile('post.js', array(), 'post_scripts');
