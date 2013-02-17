@@ -58,7 +58,7 @@ DEFINE('BOARDDIR', $boarddir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
 DEFINE('CONTROLLERDIR', $controllerdir);
-unset($cachedir, $$boarddir, $sourcedir, $subsdir, $controllerdir);
+unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 // And important includes.
 require_once(SOURCEDIR . '/QueryString.php');
