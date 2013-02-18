@@ -59,11 +59,7 @@ DEFINE('BOARDDIR', $boarddir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
 DEFINE('CONTROLLERDIR', $controllerdir);
-unset($cachedir);
-unset($boarddir);
-unset($sourcedir);
-unset($subsdir);
-unset($controllerdir);
+unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
