@@ -28,6 +28,7 @@ if (!defined('ELKARTE'))
  * - Chrome Versions: 1 ... 18 ...
  * - IE Versions: 4, 5, 5.5, 6, 7, 8, 9, 10 ... mobile and Mac
  * - Nokia
+ * - Basic mobile and tablet (ipad, andoid and tablet PC)
  */
 class Browser_Detector
 {
@@ -233,7 +234,8 @@ class Browser_Detector
 			$this->_is_mobile = true;
 
 		// iPad and droid tablets get a tablet flag
-		if ($this->_browsers['is_ipad'] || ($this->_browsers['is_android'] && strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') === false))
+		$this->_browsers['is_android_tablet'] = $this->_browsers['is_android'] && strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') === false;
+		if ($this->_browsers['is_ipad'] || $this->_browsers['is_android_tablet'])
 			$this->_is_tablet = true;
 
 		$this->_browsers['is_safari'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Safari') !== false && !$this->_browsers['is_chrome'] && !$this->_browsers['is_iphone'];
@@ -296,7 +298,7 @@ class Browser_Detector
 		// Tablets as well, someone may win one
 		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Tablet PC') !== false)
 		{
-			$this->_browsers['is_ie_tablet'] = true;
+			$this->_browsers['is_tablet_pc'] = true;
 			$this->_is_tablet = true;
 		}
 
