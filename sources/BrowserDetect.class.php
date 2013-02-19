@@ -46,6 +46,13 @@ class Browser_Detector
 	private $_is_mobile = null;
 
 	/**
+	 * Holds if the detected device may be a tablet
+	 *
+	 * @var type
+	 */
+	private $_is_tablet = null;
+
+	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *  - determines the user agent (browser) as best it can.
 	 */
@@ -56,6 +63,7 @@ class Browser_Detector
 		// Init
 		$this->_browsers = array();
 		$this->_is_mobile = false;
+		$this->_is_tablet = false;
 
 		// Initialize some values we'll set differently if necessary...
 		$this->_browsers['needs_size_fix'] = false;
@@ -217,15 +225,18 @@ class Browser_Detector
 			'is_blackberry' => stripos($_SERVER['HTTP_USER_AGENT'], 'BlackBerry') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'PlayBook') !== false,
 			'is_android' => strpos($_SERVER['HTTP_USER_AGENT'], 'Android') !== false,
 			'is_nokia' => strpos($_SERVER['HTTP_USER_AGENT'], 'SymbianOS') !== false,
+			'is_ipad' => strpos($_SERVER['HTTP_USER_AGENT'], 'iPad') !== false,
 		);
 
 		// blackberry, playbook, iphone, nokia, android and ipods set a mobile flag
 		if ($this->_browsers['is_iphone'] || $this->_browsers['is_blackberry'] || $this->_browsers['is_android'] || $this->_browsers['is_nokia'])
 			$this->_is_mobile = true;
 
-		// @todo what to do with the blaPad? ... for now leave it detected as Safari ...
+		// iPad and droid tablets get a tablet flag
+		if ($this->_browsers['is_ipad'] || ($this->_browsers['is_android'] && strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') === false))
+			$this->_is_tablet = true;
+
 		$this->_browsers['is_safari'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Safari') !== false && !$this->_browsers['is_chrome'] && !$this->_browsers['is_iphone'];
-		$this->_browsers['is_ipad'] = strpos($_SERVER['HTTP_USER_AGENT'], 'iPad') !== false;
 
 		// if Chrome, get the major version
 		if ($this->_browsers['is_chrome'])
@@ -282,6 +293,13 @@ class Browser_Detector
 			$this->_is_mobile = true;
 		}
 
+		// Tablets as well, someone may win one
+		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Tablet PC') !== false)
+		{
+			$this->_browsers['is_ie_tablet'] = true;
+			$this->_is_tablet = true;
+		}
+
 		// And some throwbacks to a bygone era, deposited here like cholesterol in your arteries
 		$this->_browsers += array(
 			'is_ie4' => !empty($this->_browsers['is_ie4']) && !$this->_browsers['is_web_tv'],
@@ -334,17 +352,15 @@ class Browser_Detector
 	{
 		global $context;
 
-		if ($this->_is_mobile)
+		if (($this->_is_mobile) && !($this->_is_tablet))
 			$context['browser_body_id'] = 'mobile';
+		elseif ($this->_is_tablet)
+			$context['browser_body_id'] = 'tablet';
 		else
 		{
 			// add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
 			$browser_priority = array(
-				'is_ie6' => 'ie6',
-				'is_ie7' => 'ie7',
 				'is_ie8' => 'ie8',
-				'is_ie9' => 'ie9',
-				'is_ie10' => 'ie10',
 				'is_ie' => 'ie',
 				'is_firefox' => 'firefox',
 				'is_chrome' => 'chrome',
