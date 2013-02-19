@@ -352,7 +352,7 @@ class Browser_Detector
 	{
 		global $context;
 
-		if (($this->_is_mobile) && !($this->_is_tablet))
+		if ($this->_is_mobile && !$this->_is_tablet)
 			$context['browser_body_id'] = 'mobile';
 		elseif ($this->_is_tablet)
 			$context['browser_body_id'] = 'tablet';
