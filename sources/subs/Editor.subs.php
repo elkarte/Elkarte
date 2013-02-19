@@ -1677,10 +1677,7 @@ function convert_urls($text)
 				elseif (substr($href, 0, 7) == 'mailto:')
 				{
 					$tag_type = 'email';
-					if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
-						$href = substr($href, 7);
-					else
-						$href = '';
+					$href = substr($href, 7);
 				}
 
 				// No http(s), so attempt to fix this potential relative URL.
