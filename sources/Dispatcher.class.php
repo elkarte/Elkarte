@@ -225,11 +225,12 @@ class Site_Dispatcher
 		// add-ons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
-			// i.e. action=help => Help.controller.php...
-			// if the function name fits the pattern, that'd be 'show'...
-			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php'))
+			// action=drafts => Drafts.controller.php
+			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
+			// ... if it ain't there yet, no problem.
+			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php';
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 
 				// procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
@@ -241,24 +242,12 @@ class Site_Dispatcher
 				else
 					$this->_function_name = 'action_' . $_GET['action'];
 			}
-			// action=drafts => Drafts.controller.php
-			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
-			// ... if it ain't there yet, no problem.
-			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
-			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action'] . '.controller.php');
-				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
-				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
-					$this->_function_name = 'action_' . $_GET['sa'];
-				else
-					$this->_function_name = 'action_index';
-			}
 			// or... an add-on can do just this!
 			// action=gallery => Gallery-Controller.php
 			// sa=upload => action_upload()
-			elseif (file_exists(SOURCEDIR . '/' . ucfirst($_GET['action']) . '-Controller.php'))
+			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '-Controller.php'))
 			{
-				$this->_file_name = SOURCEDIR . '/' . ucfirst($_GET['action']) . '-Controller.php';
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '-Controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
@@ -274,7 +263,7 @@ class Site_Dispatcher
 			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				$this->_file_name = CONTROLLERDIR . '/Themes.php';
+				$this->_file_name = SOURCEDIR . '/admin/Themes.php';
 				$this->_function_name = 'WrapAction';
 			}
 			else
