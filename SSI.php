@@ -59,6 +59,7 @@ DEFINE('BOARDDIR', $boarddir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
 DEFINE('CONTROLLERDIR', $controllerdir);
+DEFINE('ADMINDIR', $controllerdir);
 unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);

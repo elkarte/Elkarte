@@ -210,7 +210,7 @@ function ModifyPostSettings($return_config = false)
 		return $config_vars;
 
 	// We'll want this for our easy save.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Setup the template.
 	$context['page_title'] = $txt['manageposts_settings'];
@@ -285,7 +285,7 @@ function ModifyBBCSettings($return_config = false)
 		return $config_vars;
 
 	// Setup the template.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 	$context['sub_template'] = 'show_settings';
 	$context['page_title'] = $txt['manageposts_bbc_settings_title'];
 
@@ -362,7 +362,7 @@ function ModifyTopicSettings($return_config = false)
 		return $config_vars;
 
 	// Get the settings template ready.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Setup the template.
 	$context['page_title'] = $txt['manageposts_topic_settings'];

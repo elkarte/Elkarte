@@ -58,6 +58,7 @@ DEFINE('BOARDDIR', $boarddir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
 DEFINE('CONTROLLERDIR', $controllerdir);
+DEFINE('ADMINDIR', $controllerdir);
 unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 // And important includes.

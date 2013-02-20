@@ -276,7 +276,7 @@ function is_not_banned($forceCheck = false)
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			loadAdminClass ('ManageBans.php');
+			require_once(ADMINDIR . '/ManageBans.php');
 			updateBanMembers();
 		}
 	}

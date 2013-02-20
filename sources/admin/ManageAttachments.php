@@ -199,8 +199,8 @@ function action_attachments($return_config = false)
 		return $config_vars;
 
 	// These are very likely to come in handy! (i.e. without them we're doomed!)
-	loadAdminClass ('ManagePermissions.php');
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving settings?
 	if (isset($_GET['save']))
@@ -329,7 +329,7 @@ function action_avatars($return_config = false)
 		return $config_vars;
 
 	// We need this file for the settings template.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving avatar settings?
 	if (isset($_GET['save']))
