@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  * - Chrome Versions: 1 ... 18 ...
  * - IE Versions: 4, 5, 5.5, 6, 7, 8, 9, 10 ... mobile and Mac
  * - Nokia
- * - Basic mobile and tablet (ipad, andoid and tablet PC)
+ * - Basic mobile and tablet (ipad, android and tablet PC)
  */
 class Browser_Detector
 {
