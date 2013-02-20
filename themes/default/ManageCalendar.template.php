@@ -17,7 +17,7 @@
 // Editing or adding holidays.
 function template_edit_holiday()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Show a form for all the holiday information.
 	echo '

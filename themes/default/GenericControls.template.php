@@ -222,7 +222,7 @@ function template_control_richedit_buttons($editor_id)
 // What's this, verification?!
 function template_control_verification($verify_id, $display_type = 'all', $reset = false)
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $settings, $txt, $modSettings;
 
 	$verify_context = &$context['controls']['verification'][$verify_id];
 

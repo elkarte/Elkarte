@@ -43,7 +43,7 @@
  */
 function template_init()
 {
-	global $context, $settings, $options, $txt;
+	global $settings;
 
 	/* Use images from default theme when using templates from the default theme?
 		if this is 'always', images from the default theme will be used.
@@ -80,7 +80,7 @@ function template_init()
  */
 function template_html_above()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -352,7 +352,7 @@ function template_body_above()
 
 function template_body_below()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 			</div>
@@ -388,8 +388,6 @@ function template_body_below()
 
 function template_html_below()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
-
 	// load in any javascipt that could be defered to the end of the page
 	template_javascript(true);
 

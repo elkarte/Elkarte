@@ -17,7 +17,7 @@
 // Template for the database maintenance tasks.
 function template_maintain_database()
 {
-	global $context, $settings, $options, $txt, $scripturl, $db_type, $modSettings;
+	global $context, $settings, $txt, $scripturl, $db_type, $modSettings;
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
@@ -113,7 +113,7 @@ function template_maintain_database()
 // Template for the routine maintenance tasks.
 function template_maintain_routine()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// Starts off with general maintenance procedures.
 	echo '
@@ -202,7 +202,7 @@ function template_maintain_routine()
 // Template for the member maintenance tasks.
 function template_maintain_members()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
@@ -541,7 +541,7 @@ function template_maintain_topics()
 // Simple template for showing results of our optimization...
 function template_optimize()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="manage_maintenance">
