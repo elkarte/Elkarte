@@ -16,7 +16,7 @@
 
 function template_moderation_center()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $context;
 
 	// Show a welcome message to the user.
 	echo '
@@ -46,7 +46,7 @@ function template_moderation_center()
 
 function template_latest_news()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -88,7 +88,7 @@ function template_latest_news()
 // Show all the group requests the user can see.
 function template_group_requests_block()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -122,7 +122,7 @@ function template_group_requests_block()
 // A block to show the current top reported posts.
 function template_reported_posts_block()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -155,7 +155,7 @@ function template_reported_posts_block()
 
 function template_watched_users()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 						<div class="cat_bar">
@@ -189,7 +189,7 @@ function template_watched_users()
 // Little section for making... notes.
 function template_notes()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
@@ -229,7 +229,7 @@ function template_notes()
 
 function template_reported_posts()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
@@ -525,7 +525,7 @@ function template_user_watch_post_callback($post)
 // Moderation settings
 function template_moderation_settings()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 	<div id="modcenter">
@@ -595,7 +595,7 @@ function template_moderation_settings()
 // Show a notice sent to a user.
 function template_show_notice()
 {
-	global $txt, $settings, $options, $context;
+	global $txt, $settings, $context;
 
 	// We do all the HTML for this one!
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -632,7 +632,7 @@ function template_show_notice()
 // Add or edit a warning template.
 function template_warn_template()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="modcenter">

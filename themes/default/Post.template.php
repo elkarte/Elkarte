@@ -628,7 +628,7 @@ function template_main()
 // The template for the spellchecker.
 function template_spellcheck()
 {
-	global $context, $settings, $options, $txt;
+	global $context, $settings, $txt;
 
 	// The style information that makes the spellchecker look... like the forum hopefully!
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -703,7 +703,7 @@ function template_spellcheck()
 
 function template_quotefast()
 {
-	global $context, $settings, $options, $txt;
+	global $context, $settings, $txt;
 
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>

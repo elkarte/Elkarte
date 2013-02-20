@@ -16,7 +16,7 @@
 
 function template_ask()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="split_topics">
@@ -55,7 +55,7 @@ function template_ask()
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="split_topics">
@@ -83,7 +83,7 @@ function template_main()
 
 function template_select()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="split_topics">

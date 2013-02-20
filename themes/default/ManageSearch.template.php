@@ -16,7 +16,7 @@
 
 function template_modify_weights()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -94,7 +94,7 @@ function template_modify_weights()
 
 function template_select_search_method()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -225,7 +225,7 @@ function template_select_search_method()
 
 function template_create_index()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -258,7 +258,7 @@ function template_create_index()
 
 function template_create_index_progress()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" name="autoSubmit" method="post" accept-charset="UTF-8">
@@ -294,7 +294,7 @@ function template_create_index_progress()
 
 function template_create_index_done()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 	echo '
 	<div id="admincenter">
 		<div class="cat_bar">
@@ -314,7 +314,7 @@ function template_create_index_done()
 // Add or edit a search engine spider.
 function template_spider_edit()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=editspiders;sid=', $context['spider']['id'], '" method="post" accept-charset="UTF-8">

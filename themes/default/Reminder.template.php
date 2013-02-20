@@ -16,7 +16,7 @@
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<br />
@@ -42,7 +42,7 @@ function template_main()
 
 function template_reminder_pick()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<br />
@@ -74,7 +74,7 @@ function template_reminder_pick()
 
 function template_sent()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 		<br />
@@ -88,7 +88,7 @@ function template_sent()
 
 function template_set_password()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/register.js"></script>
@@ -137,7 +137,7 @@ function template_set_password()
 
 function template_ask()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/register.js"></script>
