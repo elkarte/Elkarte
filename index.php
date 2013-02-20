@@ -53,12 +53,12 @@ if (empty($controllerdir) || !file_exists($controllerdir))
 	$controllerdir = $sourcedir . '/controllers';
 
 // Time to forget about variables and go with constants!
-DEFINE('CACHEDIR', $cachedir);
+DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('CONTROLLERDIR', $controllerdir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
-DEFINE('CONTROLLERDIR', $controllerdir);
-DEFINE('ADMINDIR', $controllerdir);
 unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 // And important includes.
