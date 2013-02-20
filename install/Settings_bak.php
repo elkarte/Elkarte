@@ -159,12 +159,17 @@ $sourcedir = dirname(__FILE__) . '/sources';
  * Path to the library directory.
  * @var string
  */
-$librarydir = dirname(__FILE__) . '/sources/subs';
+$subsdir = dirname(__FILE__) . '/sources/subs';
 /**
  * Path to the controllers directory.
  * @var string
  */
 $controllerdir = dirname(__FILE__) . '/sources/controllers';
+/**
+ * Path to the admin directory.
+ * @var string
+ */
+$admindir = dirname(__FILE__) . '/sources/admin';
 
 
 ########## Error-Catching ##########

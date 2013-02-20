@@ -52,15 +52,17 @@ if (empty($subsdir) || !file_exists($subsdir))
 	$subsdir = $sourcedir . '/subs';
 if (empty($controllerdir) || !file_exists($controllerdir))
 	$controllerdir = $sourcedir . '/controllers';
+if (empty($admindir) || !file_exists($admindir))
+	$admindir = $sourcedir . '/admin';
 
 // Time to forget about variables and go with constants!
-DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('ADMINDIR', $admindir);
 DEFINE('BOARDDIR', $boarddir);
 DEFINE('CACHEDIR', $cachedir);
 DEFINE('CONTROLLERDIR', $controllerdir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('SUBSDIR', $subsdir);
-unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
+unset($admindir, $boarddir, $cachedir, $controllerdir, $sourcedir, $subsdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.

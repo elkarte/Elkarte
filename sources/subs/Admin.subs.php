@@ -353,7 +353,7 @@ function updateSettingsFile($config_vars)
 	//
 	// Check before you act: if cache is enabled, we can do a simple write test
 	// to validate that we even write things on this filesystem.
-	if ((!defined(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+	if ((!defined('CACHEDIR') || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
 		$tmp_cache = BOARDDIR . '/cache';
 	else
 		$tmp_cache = CACHEDIR;

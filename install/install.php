@@ -315,7 +315,7 @@ function load_database()
 	global $db_prefix, $db_connection, $db_character_set, $language;
 	global $smcFunc, $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user;
 
-	if (!defined(SOURCEDIR))
+	if (!defined('SOURCEDIR'))
 		define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 	// Need this to check whether we need the database password.
@@ -767,7 +767,7 @@ function action_databaseSettings()
 		// Make sure it works.
 		require(dirname(__FILE__) . '/Settings.php');
 
-		if (!defined(SOURCEDIR))
+		if (!defined('SOURCEDIR'))
 			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
@@ -911,6 +911,9 @@ function action_forumSettings()
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
+			'subsdir' => addslashes(dirname(__FILE__)) . '/sources/subs',
+			'admindir' => addslashes(dirname(__FILE__)) . '/sources/admin',
+			'controllerdir' => addslashes(dirname(__FILE__)) . '/sources/controllers',
 		);
 
 		// Must save!
