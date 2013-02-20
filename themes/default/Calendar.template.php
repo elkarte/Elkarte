@@ -17,7 +17,7 @@
 // The main calendar - January, for example.
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
 		<div id="calendar">
@@ -61,7 +61,7 @@ function template_main()
 // Template for posting a calendar event.
 function template_event_post()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// Start the javascript for drop down boxes...
 	echo '
@@ -209,7 +209,7 @@ function template_event_post()
 // Display a monthly calendar grid.
 function template_show_month_grid($grid_name)
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings, $smcFunc;
+	global $context, $settings, $txt, $scripturl, $modSettings, $smcFunc;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;
@@ -382,7 +382,7 @@ function template_show_month_grid($grid_name)
 // Or show a weekly one?
 function template_show_week_grid($grid_name)
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;

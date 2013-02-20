@@ -19,7 +19,7 @@
  */
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="move_topic" class="lower_padding">

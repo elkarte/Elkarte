@@ -16,7 +16,7 @@
 
 function template_merge_done()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 		<div id="merge_topics">
@@ -43,7 +43,7 @@ function template_merge_done()
 
 function template_merge()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 		<div id="merge_topics">
@@ -134,7 +134,7 @@ function template_merge()
 
 function template_merge_extra_options()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="merge_topics">
