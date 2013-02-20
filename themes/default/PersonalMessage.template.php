@@ -1673,7 +1673,7 @@ function template_add_rule()
 // Template for showing all the PM drafts of the user.
 function template_showPMDrafts()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 		<div class="cat_bar">
