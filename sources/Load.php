@@ -1985,26 +1985,6 @@ function loadAdminClass($filename)
 }
 
 /**
- * Load a controller.
- *
- * @param string $filename
- */
-function loadController($filename)
-{
-	require_once(CONTROLLERDIR . '/' . $filename);
-}
-
-/**
- * Load a library.
- *
- * @param string $filename
- */
-function loadLibrary($filename)
-{
-	require_once(SUBSDIR . '/' . $filename);
-}
-
-/**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  * Cleaner and easier (for modders) than to use the function below.
  *
