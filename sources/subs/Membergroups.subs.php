@@ -810,7 +810,9 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *
  * @param array/int $group_id the ID of the groups
  * @param integer $limit the number of results returned (default 1, if null/false/0 returns all)
- * @param array/string $detailed returns more fields (default false, returns: id_group, group_name, group_type, if true returns in addition to the previous: description, min_posts, online_color, max_messages, icons, hidden, id_parent)
+ * @param array/string $detailed returns more fields default false, 
+ *  - false returns: id_group, group_name, group_type, 
+ *  - true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent
  * @param bool $assignable determine if the group is assignable or not and return that information
  * @param bool $protected include protected groups
  */
@@ -828,12 +830,12 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
-			description, min_posts, online_color, max_messages, icons, hidden, id_parent') . (!$assignable ? '' : '
-			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable
+			description, min_posts, online_color, max_messages, icons, hidden, id_parent') . (!$assignable ? '' : ',
+			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable,
 			CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group') . '
 		FROM {db_prefix}membergroups
 		WHERE id_group IN ({array_int:group_ids})' . ($protected ? '' : '
-				AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
+			AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
 		LIMIT {int:limit}'),
 		array(
 			'min_posts' => -1,

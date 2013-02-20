@@ -943,8 +943,8 @@ function bbc_to_html($text, $compat_mode = false)
 
 /**
  * !!!Compatibility!!!
- * This is no more needed, but to avoid break mods let's keep it
- * Run it it shouldn't even hurt either, so let's not bother remove it
+ *
+ * This is not directly required any longer, but left for mod usage
  *
  * The harder one - wysiwyg to BBC!
  *
@@ -1630,6 +1630,26 @@ function html_to_bbc($text)
 	if (connection_aborted() && $context['server']['is_apache'])
 		@apache_reset_timeout();
 
+	// Take care of any urls in the text
+	$text = convert_urls($text);
+
+	$text = strip_tags($text);
+
+	// Some tags often end up as just dummy tags - remove those.
+	$text = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $text);
+
+	// Fix up entities.
+	$text = preg_replace('~&#38;~i', '&#38;#38;', $text);
+
+	$text = legalise_bbc($text);
+
+	return $text;
+}
+
+function convert_urls($text)
+{
+	global $modSettings;
+
 	// What about URL's - the pain in the ass of the tag world.
 	while (preg_match('~<a\s+([^<>]*)>([^<>]*)</a>~i', $text, $matches) === 1)
 	{
@@ -1683,33 +1703,22 @@ function html_to_bbc($text)
 		$tag = '';
 		if ($href != '')
 		{
-			if ($matches[2] == $href)
+			if ($matches[2] == $href && $tag_type != 'email')
+				$tag = '[' . $tag_type . ']' . $href . '[/' . $tag_type . ']' . "\n";
+			elseif ($matches[2] == $href)
 				$tag = '[' . $tag_type . ']' . $href . '[/' . $tag_type . ']';
 			else
-				$tag = '[' . $tag_type . '=' . $href . ']' . $matches[2] . '[/' . $tag_type . ']';
+				$tag = '[' . $tag_type . '=' . $href . ']' . $matches[2] . '[/' . $tag_type . ']' . "\n";
 		}
 
 		// Replace the tag
 		$text = substr($text, 0, $start_pos) . $tag . substr($text, $end_pos);
 	}
 
-	$text = strip_tags($text);
-
-	// Some tags often end up as just dummy tags - remove those.
-	$text = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $text);
-
-	// Fix up entities.
-	$text = preg_replace('~&#38;~i', '&#38;#38;', $text);
-
-	$text = legalise_bbc($text);
-
 	return $text;
 }
 
 /**
- * !!!Compatibility!!!
- * This is no more needed, but to avoid break mods let's keep it
- *
  * Returns an array of attributes associated with a tag.
  *
  * @param string $text
@@ -1721,6 +1730,7 @@ function fetchTagAttributes($text)
 	$key = $value = '';
 	$strpos = 0;
 	$tag_state = 0; // 0 = key, 1 = attribute with no string, 2 = attribute with string
+
 	for ($i = 0; $i < strlen($text); $i++)
 	{
 		// We're either moving from the key to the attribute or we're in a string and this is fine.
