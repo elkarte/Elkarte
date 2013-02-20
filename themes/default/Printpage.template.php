@@ -125,7 +125,7 @@ function template_print_above()
 
 function template_main()
 {
-	global $context, $options, $txt, $scripturl, $topic;
+	global $context, $txt, $scripturl, $topic;
 
 	if (!empty($context['poll']))
 	{
@@ -133,10 +133,10 @@ function template_main()
 			<div id="poll_data">', $txt['poll'], '
 				<div class="question">', $txt['poll_question'], ': <strong>', $context['poll']['question'], '</strong>';
 
-		$options = 1;
+		$print_options = 1;
 		foreach ($context['poll']['options'] as $option)
 			echo '
-					<div class="', $option['voted_this'] ? 'voted' : '', '">', $txt['option'], ' ', $options++, ': <strong>', $option['option'], '</strong>
+					<div class="', $option['voted_this'] ? 'voted' : '', '">', $txt['option'], ' ', $print_options++, ': <strong>', $option['option'], '</strong>
 						', $context['allow_poll_view'] ? $txt['votes'] . ': ' . $option['votes'] . '' : '', '
 					</div>';
 
