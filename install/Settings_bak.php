@@ -190,5 +190,5 @@ if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
-if (!file_exists($extdir) && file_exists($sourcedir . '/lib'))
-	$extdir = $sourcedir . '/lib';
+if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
