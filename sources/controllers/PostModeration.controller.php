@@ -496,7 +496,14 @@ function action_unapproved_attachments()
 	createToken('mod-ap');
 	createList($listOptions);
 
-	$context['sub_template'] = 'unapproved_attachments';
+	$context['sub_template'] = 'show_list';
+	$context['default_list'] = 'mc_unapproved_attach';
+
+	$context[$context['moderation_menu_name']]['tab_data'] = array(
+		'title' => $txt['mc_unapproved_attachments'],
+		'help' => '',
+		'description' => $txt['mc_unapproved_attachments_desc']
+	);
 }
 
 /**
