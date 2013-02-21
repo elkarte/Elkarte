@@ -47,21 +47,18 @@ require_once(dirname(__FILE__) . '/Settings.php');
 // Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
-if (empty($subsdir) || !file_exists($subsdir))
-	$subsdir = $sourcedir . '/subs';
-if (empty($controllerdir) || !file_exists($controllerdir))
-	$controllerdir = $sourcedir . '/controllers';
-if (empty($admindir) || !file_exists($admindir))
-	$admindir = $sourcedir . '/admin';
 
 // Time to forget about variables and go with constants!
-DEFINE('ADMINDIR', $admindir);
 DEFINE('BOARDDIR', $boarddir);
 DEFINE('CACHEDIR', $cachedir);
-DEFINE('CONTROLLERDIR', $controllerdir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
-DEFINE('SUBSDIR', $subsdir);
-unset($admindir, $boarddir, $cachedir, $controllerdir, $sourcedir, $subsdir);
+
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
+unset($boarddir, $cachedir, $sourcedir);
 
 // And important includes.
 require_once(SOURCEDIR . '/QueryString.php');
