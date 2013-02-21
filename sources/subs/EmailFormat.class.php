@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * Takes an email body and attempts to re-flow/format it for posting.  It attempts
+ * Takes an email body and attempts to re-flow/format it for posting.  It will
  * as best it can to undo the 78/80 character email wrap
  */
 
@@ -81,7 +81,7 @@ class Email_Format
 	 * tuning value (fudge) used to decide if a line is short
 	 * change with care
 	 */
-	private $_short_line = 33;
+	private $_maillist_short_line = 33;
 
 	/**
 	 * tuning delta value (fudge) to help indicate the last line in a paragraph
@@ -162,9 +162,9 @@ class Email_Format
 	/**
 	 * Goes through the message array and only inserts line feeds (breaks) where
 	 * they are needed, allowing all other text to flow in one line.
-	 * 
-	 * Insets breaks at blank lines, around bbc quote/code/list, text lists, and
-	 * signature lines and end of paragraphs ... all assuming it can figure or 
+	 *
+	 * Insets breaks at blank lines, around bbc quote/code/list, text lists,
+	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 *
 	 * @param string $real_name
@@ -192,7 +192,7 @@ class Email_Format
 			// Blank line, if its not two in a row and not the start of a bbc code then insert a newline
 			if ($this->_body_array[$i]['content'] === '')
 			{
-				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_short_line))
+				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
 					$this->_body_array[$i]['content'] = "\n";
 			}
 			// Lists like a. a) 1. 1)
@@ -202,13 +202,13 @@ class Email_Format
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
 			// Signature line start as defined in the ACP, i.e. best, regards, thanks
-			elseif ((!$this->_found_sig && !empty($modSettings['email_sig_keys']) && (preg_match('~^(' . $modSettings['email_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_short_line))) || (($this->_body_array[$i]['content'] === $real_name) && !$this->_found_sig))
+			elseif ((!$this->_found_sig && !empty($modSettings['email_maillist_sig_keys']) && (preg_match('~^(' . $modSettings['email_maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line))) || (($this->_body_array[$i]['content'] === $real_name) && !$this->_found_sig))
 			{
 				$this->_body_array[$i]['content'] = "\n\n\n" . $this->_body_array[$i]['content'];
 				$this->_found_sig = true;
 			}
 			// Message stuff which should not be here any longer (as defined in the ACP) i.e. To: From: Subject:
-			elseif (!empty($modSettings['email_leftover_remove']) && preg_match('~^((\[b\]){0,2}(' . $modSettings['email_leftover_remove'] . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
+			elseif (!empty($modSettings['email_maillist_leftover_remove']) && preg_match('~^((\[b\]){0,2}(' . $modSettings['email_maillist_leftover_remove'] . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
 			{
 				if ($this->_in_quote)
 					$this->_body_array[$i]['content'] = "\n";
@@ -231,7 +231,7 @@ class Email_Format
 					$para_check = 1;
 
 				// If this line is longer than the line above it and that line ended in a period then this should be a new paragraph
-				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
+				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
 				{
 					if (((substr($this->_body_array[$i - 1]['content'], -1) === '.') && ($para_check < $this->_para_check)) || (substr($this->_body_array[$i - 1]['content'], -1) !== '.'))
 						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
@@ -281,7 +281,7 @@ class Email_Format
 		$this->_body = preg_replace('~(?:^|\s),(\w+)\b~', ', $1', $this->_body);
 
 		// Punctuation missing a space like about.This ... should be about. This or about,this should be about, this
-		// ... did no one go to school? OK it probably is from our parser :P ... 
+		// ... did no one go to school? OK it probably is from our parser :P ...
 		// Look for a word boundary, any number of word characters, a single lower case, a period a single uppercase
 		// any number of word characters and a boundary
 		$this->_body = preg_replace('~(\b\w+[a-z])\.([A-Z]\w+)\b~', '$1. $2', $this->_body);
@@ -304,7 +304,7 @@ class Email_Format
 		// Avoid double encoding later on
 		$this->_body = htmlspecialchars_decode($this->_body, ENT_QUOTES);
 
-		// Convert other characters like MS "smart" quotes both uf8 
+		// Convert other characters like MS "smart" quotes both uf8
 		$this->_body = strtr($this->_body, array("\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '--',	"\xe2\x80\xa6" => '...'));
 
 		// and its 1252 variants
