@@ -15,12 +15,7 @@
  *
  * This, as you have probably guessed, is the crux for all functions.
  * Everything should start here, so all the setup and security is done
- * properly.  The most interesting part of this file is the action array in
- * the smf_main() function.  It is formatted as so:
- * 'action-in-url' => array('Source-File.php', 'FunctionToCall'),
- *
- * Then, you can access the FunctionToCall() function from Source-File.php
- * with the URL index.php?action=action-in-url.  Relatively simple, no?
+ * properly.
  *
  */
 
