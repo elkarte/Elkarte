@@ -19,7 +19,7 @@
  */
 function template_admin()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Welcome message for the admin.
 	echo '
@@ -165,7 +165,7 @@ function template_admin()
  */
 function template_credits()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	// Show the user version information from their server.
 	echo '
@@ -323,7 +323,7 @@ function template_credits()
  */
 function template_view_versions()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 					<div id="admincenter">
@@ -720,7 +720,7 @@ function template_view_versions()
 // Form for stopping people using naughty words, etc.
 function template_edit_censored()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// First section is for adding/removing words from the censored list.
 	echo '
@@ -798,7 +798,7 @@ function template_edit_censored()
 // Maintenance is a lovely thing, isn't it?
 function template_not_done()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -1345,7 +1345,7 @@ function template_edit_profile_field()
 // Results page for an admin search.
 function template_admin_search_results()
 {
-	global $context, $txt, $settings, $options, $scripturl;
+	global $context, $txt, $settings, $scripturl;
 
 	echo '
 					<div id="section_header" class="cat_bar">
@@ -1414,7 +1414,7 @@ function template_admin_search_results()
 // Turn on and off certain key features.
 function template_core_features()
 {
-	global $context, $txt, $settings, $options, $scripturl;
+	global $context, $txt, $settings, $scripturl;
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[

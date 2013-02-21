@@ -22,10 +22,10 @@ define('ELKARTE', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
-global $boardurl, $boarddir, $sourcedir, $webmaster_email, $cookiename;
+global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $db_connection, $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
-global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd, $cachedir;
+global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
@@ -41,9 +41,25 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Get the forum's settings for database and file paths.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if (empty($subsdir) || !file_exists($subsdir))
+	$subsdir = $sourcedir . '/subs';
+if (empty($controllerdir) || !file_exists($controllerdir))
+	$controllerdir = $sourcedir . '/controllers';
+
+// Time to forget about variables and go with constants!
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('SOURCEDIR', $sourcedir);
+DEFINE('SUBSDIR', $subsdir);
+DEFINE('CONTROLLERDIR', $controllerdir);
+unset($cachedir, $boarddir, $sourcedir, $subsdir, $controllerdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -57,20 +73,16 @@ $ssi_on_error_method = false;
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 
-// Fix for using the current directory as a path.
-if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
-	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
-
 // Load the important includes.
-require_once($sourcedir . '/QueryString.php');
-require_once($sourcedir . '/Session.php');
-require_once($sourcedir . '/Subs.php');
-require_once($sourcedir . '/Errors.php');
-require_once($sourcedir . '/Logging.php');
-require_once($sourcedir . '/Load.php');
-require_once($librarydir . '/Cache.subs.php');
-require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/BrowserDetect.class.php');
+require_once(SOURCEDIR . '/QueryString.php');
+require_once(SOURCEDIR . '/Session.php');
+require_once(SOURCEDIR . '/Subs.php');
+require_once(SOURCEDIR . '/Errors.php');
+require_once(SOURCEDIR . '/Logging.php');
+require_once(SOURCEDIR . '/Load.php');
+require_once(SUBSDIR . '/Cache.subs.php');
+require_once(SOURCEDIR . '/Security.php');
+require_once(SOURCEDIR . '/BrowserDetect.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();
@@ -159,7 +171,7 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	KickGuest();
 	obExit(null, true);
 }
@@ -954,9 +966,9 @@ function ssi_boardStats($output_method = 'echo')
 // Shows a list of online users:  YY Guests, ZZ Users and then a list...
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $sourcedir, $librarydir, $settings, $modSettings;
+	global $user_info, $txt, $settings, $modSettings;
 
-	require_once($librarydir . '/MembersOnline.subs.php');
+	require_once(SUBSDIR . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 	);
@@ -1365,7 +1377,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 // Takes care of voting - don't worry, this is done automatically.
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $librarydir, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $smcFunc, $modSettings;
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{
@@ -1462,7 +1474,7 @@ function ssi_pollVote()
 	{
 		$_COOKIE['guest_poll_vote'] = !empty($_COOKIE['guest_poll_vote']) ? ($_COOKIE['guest_poll_vote'] . ',' . $row['id_poll']) : $row['id_poll'];
 
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 	}
@@ -1883,7 +1895,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 // Check the passed id_member/password.  If $is_username is true, treats $id as a username.
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
 {
-	global $db_prefix, $sourcedir, $smcFunc;
+	global $db_prefix, $smcFunc;
 
 	// If $id is null, this was most likely called from a query string and should do nothing.
 	if ($id === null)

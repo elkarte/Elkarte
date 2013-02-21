@@ -17,35 +17,7 @@
 // Editing or adding holidays.
 function template_edit_holiday()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
-
-	// Start with javascript for getting the calendar dates right.
-	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-			function generateDays()
-			{
-				var days = 0, selected = 0;
-				var dayElement = document.getElementById("day"), yearElement = document.getElementById("year"), monthElement = document.getElementById("month");
-
-				monthLength[1] = 28;
-				if (yearElement.options[yearElement.selectedIndex].value % 4 == 0)
-					monthLength[1] = 29;
-
-				selected = dayElement.selectedIndex;
-				while (dayElement.options.length)
-					dayElement.options[0] = null;
-
-				days = monthLength[monthElement.value - 1];
-
-				for (i = 1; i <= days; i++)
-					dayElement.options[dayElement.length] = new Option(i, i);
-
-				if (selected < days)
-					dayElement.selectedIndex = selected;
-			}
-		// ]]></script>';
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Show a form for all the holiday information.
 	echo '

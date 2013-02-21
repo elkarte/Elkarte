@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning($memID)
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc, $librarydir;
+	global $context, $cur_profile, $memberContext, $smcFunc;
 
 	// make sure the sub-template is set...
 	$context['sub_template'] = 'issueWarning';
@@ -114,7 +114,7 @@ function action_issuewarning($memID)
 		elseif ($_POST['warning_level'] > $context['max_allowed'])
 			$_POST['warning_level'] = $context['max_allowed'];
 
-		require_once($librarydir . '/Moderation.subs.php');
+		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Do we actually have to issue them with a PM?
 		$id_notice = 0;
@@ -127,7 +127,7 @@ function action_issuewarning($memID)
 			// Send the PM?
 			else
 			{
-				require_once($librarydir . '/PersonalMessage.subs.php');
+				require_once(SUBSDIR . '/PersonalMessage.subs.php');
 				$from = array(
 					'id' => 0,
 					'name' => $context['forum_name'],
@@ -183,7 +183,7 @@ function action_issuewarning($memID)
 
 		if (!empty($_POST['warn_body']))
 		{
-			require_once($librarydir . '/Post.subs.php');
+			require_once(SUBSDIR . '/Post.subs.php');
 
 			preparsecode($warning_body);
 			$warning_body = parse_bbc($warning_body, true);
@@ -210,8 +210,8 @@ function action_issuewarning($memID)
 	$context['page_title'] = $txt['profile_issue_warning'];
 
 	// Let's use a generic list to get all the current warnings
-	require_once($librarydir . '/List.subs.php');
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	// Work our the various levels.
 	$context['level_effects'] = array(
@@ -313,7 +313,7 @@ function action_issuewarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// Are they warning because of a message?
@@ -417,7 +417,7 @@ function action_deleteaccount($memID)
  */
 function action_deleteaccount2($memID)
 {
-	global $user_info, $sourcedir, $librarydir, $controllerdir, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $context, $cur_profile, $modSettings, $smcFunc;
 
 	// Try get more time...
 	@set_time_limit(600);
@@ -434,7 +434,7 @@ function action_deleteaccount2($memID)
 	$old_profile = &$cur_profile;
 
 	// This file is needed for our utility functions.
-	require_once($librarydir . '/Members.subs.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 
 	// Too often, people remove/delete their own only administrative account.
 	if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
@@ -458,8 +458,8 @@ function action_deleteaccount2($memID)
 		if ($_POST['remove_type'] != 'none' && allowedTo('moderate_forum'))
 		{
 			// Include subs/Topic.subs.php - essential for this type of work!
-			require_once($librarydir . '/Topic.subs.php');
-			require_once($librarydir . '/Messages.subs.php');
+			require_once(SUBSDIR . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// First off we delete any topics the member has started - if they wanted topics being done.
 			if ($_POST['remove_type'] == 'topics')
@@ -511,7 +511,7 @@ function action_deleteaccount2($memID)
 	{
 		deleteMembers($memID);
 
-		require_once($controllerdir . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
 		action_logout(true);
 
 		redirectexit();

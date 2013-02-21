@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function action_managemail()
 {
-	global $context, $txt, $scripturl, $modSettings, $sourcedir;
+	global $context, $txt, $scripturl, $modSettings;
 
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
@@ -71,7 +71,6 @@ function action_managemail()
 function action_browsemail()
 {
 	global $scripturl, $context, $modSettings, $txt, $smcFunc;
-	global $librarydir;
 
 	// First, are we deleting something from the queue?
 	if (isset($_REQUEST['delete']))
@@ -209,7 +208,7 @@ function action_browsemail()
 		),
 	);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	loadTemplate('ManageMail');
@@ -376,12 +375,12 @@ function ModifyMailSettings($return_config = false)
  */
 function action_clear()
 {
-	global $sourcedir, $smcFunc;
+	global $smcFunc;
 
 	checkSession('get');
 
 	// This is certainly needed!
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// If we don't yet have the total to clear, find it.
 	if (!isset($_GET['te']))

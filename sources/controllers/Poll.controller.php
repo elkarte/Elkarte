@@ -34,7 +34,7 @@ if (!defined('ELKARTE'))
  */
 function action_vote()
 {
-	global $topic, $txt, $user_info, $smcFunc, $sourcedir, $librarydir, $modSettings;
+	global $topic, $txt, $user_info, $smcFunc, $modSettings;
 
 	// Make sure you can vote.
 	isAllowedTo('poll_vote');
@@ -214,7 +214,7 @@ function action_vote()
 			)
 		);
 
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 	}
@@ -303,10 +303,12 @@ function action_lockvoting()
  */
 function action_editpoll()
 {
-	global $txt, $user_info, $context, $topic, $board, $smcFunc, $sourcedir, $librarydir, $scripturl;
+	global $txt, $user_info, $context, $topic, $board, $smcFunc, $scripturl;
 
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
+
+	require_once(SUBSDIR . '/Poll.subs.php');
 
 	loadLanguage('Post');
 	loadTemplate('Poll');
@@ -337,7 +339,7 @@ function action_editpoll()
 	$context['can_moderate_poll'] = isset($_REQUEST['add']) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 	// Do we enable guest voting?
-	require_once($librarydir . '/Members.subs.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 	$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
 
 	// Want to make sure before you actually submit?  Must be a lot of options, or something.
@@ -583,7 +585,7 @@ function action_editpoll()
 function action_editpoll2()
 {
 	global $txt, $topic, $board, $context;
-	global $modSettings, $user_info, $smcFunc, $sourcedir, $librarydir;
+	global $modSettings, $user_info, $smcFunc;
 
 	// Sneaking off, are we?
 	if (empty($_POST))
@@ -603,7 +605,7 @@ function action_editpoll2()
 	$isEdit = isset($_REQUEST['add']) ? 0 : 1;
 
 	// Make sure we have our stuff.
-	require_once($librarydir . '/Poll.subs.php');
+	require_once(SUBSDIR . '/Poll.subs.php');
 
 	// Get the starter and the poll's ID - if it's an edit.
 	$request = $smcFunc['db_query']('', '
@@ -686,7 +688,7 @@ function action_editpoll2()
 	// Make sure guests are actually allowed to vote generally.
 	if ($_POST['poll_guest_vote'])
 	{
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		$allowedGroups = groupsAllowedTo('poll_vote', $board);
 		if (!in_array(-1, $allowedGroups['allowed']))
 			$_POST['poll_guest_vote'] = 0;
@@ -867,7 +869,7 @@ function action_editpoll2()
  */
 function action_removepoll()
 {
-	global $topic, $user_info, $smcFunc, $librarydir;
+	global $topic, $user_info, $smcFunc;
 
 	// Make sure the topic is not empty.
 	if (empty($topic))
@@ -898,7 +900,7 @@ function action_removepoll()
 	}
 
 	// We need to work with them polls.
-	require_once($librarydir . '/Poll.subs.php');
+	require_once(SUBSDIR . '/Poll.subs.php');
 
 	// Retrieve the poll ID.
 	$pollID = associatedPoll($topic);

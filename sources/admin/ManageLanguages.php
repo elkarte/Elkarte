@@ -68,13 +68,13 @@ function ManageLanguages()
  */
 function AddLanguage()
 {
-	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl;
+	global $context, $forum_version, $txt, $smcFunc, $scripturl;
 
 	// Are we searching for new languages courtesy of Simple Machines (R)?
 	if (!empty($_POST['smf_add_sub']))
 	{
 		// Need fetch_web_data.
-		require_once($librarydir . '/Package.subs.php');
+		require_once(SUBSDIR . '/Package.subs.php');
 
 		$context['smf_search_term'] = htmlspecialchars(trim($_POST['smf_add']));
 
@@ -129,7 +129,7 @@ function AddLanguage()
 			),
 		);
 
-		require_once($librarydir . '/List.subs.php');
+		require_once(SUBSDIR . '/List.subs.php');
 		createList($listOptions);
 
 		$context['default_list'] = 'smf_languages';
@@ -146,14 +146,14 @@ function AddLanguage()
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $librarydir, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $smcFunc, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
 
 	// Load the class file and stick it into an array.
-	require_once($librarydir . '/XmlArray.class.php');
+	require_once(SUBSDIR . '/XmlArray.class.php');
 	$language_list = new Xml_Array(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
@@ -200,10 +200,10 @@ function list_getLanguagesList()
  */
 function DownloadLanguage()
 {
-	global $context, $librarydir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
+	global $context, $forum_version, $txt, $smcFunc, $scripturl, $modSettings;
 
 	loadLanguage('ManageSettings');
-	require_once($librarydir . '/Package.subs.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	// Clearly we need to know what to request.
 	if (!isset($_GET['did']))
@@ -230,7 +230,7 @@ function DownloadLanguage()
 			if (strpos($file, '..') !== false || (strpos($file, 'Themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
 				fatal_error($txt['languages_download_illegal_paths']);
 
-			$chmod_files[] = $boarddir . '/' . $file;
+			$chmod_files[] = BOARDDIR . '/' . $file;
 			$install_files[] = $file;
 		}
 
@@ -245,7 +245,7 @@ function DownloadLanguage()
 		elseif (!empty($install_files))
 		{
 			// @todo retrieve the language pack per naming pattern from our sites
-			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
+			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
 			// Make sure the files aren't stuck in the cache.
 			package_flush_cache();
 			$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -280,7 +280,7 @@ function DownloadLanguage()
 		// Basic data.
 		$context_data = array(
 			'name' => $filename,
-			'destination' => $boarddir . '/' . $file['filename'],
+			'destination' => BOARDDIR . '/' . $file['filename'],
 			'generaldest' => $file['filename'],
 			'size' => $file['size'],
 			// Does chmod status allow the copy?
@@ -292,19 +292,19 @@ function DownloadLanguage()
 		);
 
 		// Does the file exist, is it different and can we overwrite?
-		if (file_exists($boarddir . '/' . $file['filename']))
+		if (file_exists(BOARDDIR . '/' . $file['filename']))
 		{
-			if (is_writable($boarddir . '/' . $file['filename']))
+			if (is_writable(BOARDDIR . '/' . $file['filename']))
 				$context_data['writable'] = true;
 
 			// Finally, do we actually think the content has changed?
-			if ($file['size'] == filesize($boarddir . '/' . $file['filename']) && $file['md5'] == md5_file($boarddir . '/' . $file['filename']))
+			if ($file['size'] == filesize(BOARDDIR . '/' . $file['filename']) && $file['md5'] == md5_file(BOARDDIR . '/' . $file['filename']))
 			{
 				$context_data['exists'] = 'same';
 				$context_data['default_copy'] = false;
 			}
 			// Attempt to discover newline character differences.
-			elseif ($file['md5'] == md5(preg_replace("~[\r]?\n~", "\r\n", file_get_contents($boarddir . '/' . $file['filename']))))
+			elseif ($file['md5'] == md5(preg_replace("~[\r]?\n~", "\r\n", file_get_contents(BOARDDIR . '/' . $file['filename']))))
 			{
 				$context_data['exists'] = 'same';
 				$context_data['default_copy'] = false;
@@ -316,7 +316,7 @@ function DownloadLanguage()
 		else
 		{
 			// Can we at least stick it in the directory...
-			if (is_writable($boarddir . '/' . $dirname))
+			if (is_writable(BOARDDIR . '/' . $dirname))
 				$context_data['writable'] = true;
 		}
 
@@ -336,10 +336,10 @@ function DownloadLanguage()
 				$context_data['version'] = $match[1];
 
 			// Now does the old file exist - if so what is it's version?
-			if (file_exists($boarddir . '/' . $file['filename']))
+			if (file_exists(BOARDDIR . '/' . $file['filename']))
 			{
 				// OK - what is the current version?
-				$fp = fopen($boarddir . '/' . $file['filename'], 'rb');
+				$fp = fopen(BOARDDIR . '/' . $file['filename'], 'rb');
 				$header = fread($fp, 768);
 				fclose($fp);
 
@@ -554,7 +554,7 @@ function DownloadLanguage()
 	if (!empty($modSettings['cache_enable']))
 		cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['default_list'] = 'lang_main_files_list';
@@ -567,7 +567,7 @@ function DownloadLanguage()
 function ModifyLanguages()
 {
 	global $txt, $context, $scripturl;
-	global $user_info, $smcFunc, $librarydir, $language, $boarddir, $forum_version;
+	global $user_info, $smcFunc, $language, $forum_version;
 
 	// Setting a new default?
 	if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -575,9 +575,19 @@ function ModifyLanguages()
 		checkSession();
 		validateToken('admin-lang');
 
-		if ($_POST['def_language'] != $language)
+		$lang_exists = false;
+		foreach ($context['languages'] as $lang)
 		{
-			require_once($librarydir . '/Admin.subs.php');
+			if ($_POST['def_language'] == $lang['filename'])
+			{
+				$lang_exists = true;
+				break;
+			}
+		}
+
+		if ($_POST['def_language'] != $language && $lang_exists)
+		{
+			require_once(SUBSDIR . '/Admin.subs.php');
 			updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
 			$language = $_POST['def_language'];
 		}
@@ -655,7 +665,7 @@ function ModifyLanguages()
 		'additional_rows' => array(
 			array(
 				'position' => 'bottom_of_list',
-				'value' => '<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" /><input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable($boarddir . '/Settings.php') ? '' : ' disabled="disabled"') . ' class="button_submit" />',
+				'value' => '<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" /><input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' class="button_submit" />',
 			),
 		),
 		// For highlighting the default.
@@ -667,14 +677,14 @@ function ModifyLanguages()
 	);
 
 	// Display a warning if we cannot edit the default setting.
-	if (!is_writable($boarddir . '/Settings.php'))
+	if (!is_writable(BOARDDIR . '/Settings.php'))
 		$listOptions['additional_rows'][] = array(
 				'position' => 'after_title',
 				'value' => $txt['language_settings_writable'],
 				'class' => 'smalltext alert',
 			);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -768,14 +778,14 @@ function list_getLanguages()
  */
 function ModifyLanguageSettings($return_config = false)
 {
-	global $scripturl, $context, $txt, $boarddir, $settings, $smcFunc, $sourcedir;
+	global $scripturl, $context, $txt, $settings, $smcFunc;
 
 	// We'll want to save them someday.
 	loadAdminClass ('ManageServer.php');
 
 	// Warn the user if the backup of Settings.php failed.
-	$settings_not_writable = !is_writable($boarddir . '/Settings.php');
-	$settings_backup_fail = !@is_writable($boarddir . '/Settings_bak.php') || !@copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
+	$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+	$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 	/* If you're writing a mod, it's a bad idea to add things here....
 	For each option:
@@ -827,7 +837,7 @@ function ModifyLanguageSettings($return_config = false)
  */
 function ModifyLanguage()
 {
-	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $librarydir, $language;
+	global $settings, $context, $smcFunc, $txt, $modSettings, $language;
 
 	loadLanguage('ManageSettings');
 
@@ -920,7 +930,7 @@ function ModifyLanguage()
 		validateToken('admin-mlang');
 
 		// @todo Todo: FTP Controls?
-		require_once($librarydir . '/Package.subs.php');
+		require_once(SUBSDIR . '/Package.subs.php');
 
 		// First, Make a backup?
 		if (!empty($modSettings['package_make_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['lang_id'] . '$$$'))
@@ -942,8 +952,8 @@ function ModifyLanguage()
 		}
 
 		// Third, the agreement file.
-		if (file_exists($boarddir . '/agreement.' . $context['lang_id'] . '.txt'))
-			unlink($boarddir . '/agreement.' . $context['lang_id'] . '.txt');
+		if (file_exists(BOARDDIR . '/agreement.' . $context['lang_id'] . '.txt'))
+			unlink(BOARDDIR . '/agreement.' . $context['lang_id'] . '.txt');
 
 		// Fourth, a related images folder?
 		foreach ($images_dirs as $curPath)
@@ -968,7 +978,7 @@ function ModifyLanguage()
 		// Sixth, if we deleted the default language, set us back to english?
 		if ($context['lang_id'] == $language)
 		{
-			require_once($librarydir . '/Admin.subs.php');
+			require_once(SUBSDIR . '/Admin.subs.php');
 			$language = 'english';
 			updateSettingsFile(array('language' => '\'' . $language . '\''));
 		}

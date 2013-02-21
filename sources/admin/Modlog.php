@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function action_modlog()
 {
-	global $txt, $modSettings, $context, $scripturl, $sourcedir, $librarydir, $user_info, $smcFunc, $settings;
+	global $txt, $modSettings, $context, $scripturl, $user_info, $smcFunc, $settings;
 
 	// Are we looking at the moderation log or the administration log.
 	$context['log_type'] = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'adminlog' ? 3 : 1;
@@ -155,12 +155,11 @@ function action_modlog()
 		}
 	}
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// This is all the information required for a watched user listing.
 	$listOptions = array(
 		'id' => 'moderation_log_list',
-		'title' => '<a href="' . $scripturl . '?action=quickhelp;help=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a> ' . $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log'],
 		'width' => '100%',
 		'items_per_page' => $context['displaypage'],
 		'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
@@ -279,12 +278,6 @@ function action_modlog()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'after_title',
-				'value' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log_desc'],
-
-				'style' => 'padding: 1ex 2ex;',
-			),
-			array(
 				'position' => 'below_table_data',
 				'value' => '
 					' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
@@ -305,6 +298,12 @@ function action_modlog()
 
 	$context['sub_template'] = 'show_list';
 	$context['default_list'] = 'moderation_log_list';
+
+	$context[$context['moderation_menu_name']]['tab_data'] = array(
+		'title' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log'],
+		'help' => $context['log_type'] == 3 ? 'adminlog' : 'modlog',
+		'description' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin' : 'moderation') . '_log_desc']
+	);
 }
 
 /**

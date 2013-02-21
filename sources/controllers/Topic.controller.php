@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 */
 function action_lock()
 {
-	global $topic, $user_info, $sourcedir, $librarydir, $board, $smcFunc;
+	global $topic, $user_info, $board, $smcFunc;
 
 	// Just quit if there's no topic to lock.
 	if (empty($topic))
@@ -42,7 +42,7 @@ function action_lock()
 	checkSession('get');
 
 	// Get subs/Post.subs.php for sendNotifications.
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Find out who started the topic - in case User Topic Locking is enabled.
 	$request = $smcFunc['db_query']('', '
@@ -110,7 +110,7 @@ function action_lock()
  */
 function action_sticky()
 {
-	global $modSettings, $topic, $board, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $topic, $board, $smcFunc;
 
 	// Make sure the user can sticky it, and they are stickying *something*.
 	isAllowedTo('make_sticky');
@@ -126,7 +126,7 @@ function action_sticky()
 	checkSession('get');
 
 	// We need subs/Post.subs.php for the sendNotifications() function.
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Is this topic already stickied, or no?
 	$request = $smcFunc['db_query']('', '

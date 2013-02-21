@@ -56,10 +56,10 @@ function action_xmlhttp()
  */
 function action_jumpto()
 {
-	global $user_info, $context, $smcFunc, $sourcedir, $librarydir;
+	global $user_info, $context, $smcFunc;
 
 	// Find the boards/cateogories they can see.
-	require_once($librarydir . '/MessageIndex.subs.php');
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	$boardListOptions = array(
 		'use_permissions' => true,
 		'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
@@ -79,9 +79,9 @@ function action_jumpto()
 
 function action_messageicons()
 {
-	global $context, $sourcedir, $librarydir, $board;
+	global $context, $board;
 
-	require_once($librarydir . '/Editor.subs.php');
+	require_once(SUBSDIR . '/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
 
 	$context['sub_template'] = 'message_icons';
@@ -89,7 +89,7 @@ function action_messageicons()
 
 function action_corefeatures()
 {
-	global $context, $smcFunc, $sourcedir, $modSettings, $txt, $boarddir, $settings;
+	global $context, $smcFunc, $modSettings, $txt, $settings;
 
 	$context['xml_data'] = array();
 	// Just in case, maybe we don't need it
@@ -101,7 +101,7 @@ function action_corefeatures()
 		$admin_includes = explode(',', $modSettings['integrate_admin_include']);
 		foreach ($admin_includes as $include)
 		{
-			$include = strtr(trim($include), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
+			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
 			if (file_exists($include))
 				require_once($include);
 		}
@@ -208,9 +208,9 @@ function action_previews()
 
 function newspreview()
 {
-	global $context, $sourcedir, $librarydir, $smcFunc;
+	global $context, $smcFunc;
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$errors = array();
 	$news = !isset($_POST['news'])? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
@@ -236,9 +236,9 @@ function newspreview()
 }
 function newsletterpreview()
 {
-	global $context, $sourcedir, $librarydir, $smcFunc, $txt;
+	global $context, $smcFunc, $txt;
 
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 	loadLanguage('Errors');
 
 	$context['post_error']['messages'] = array();
@@ -257,9 +257,9 @@ function newsletterpreview()
 
 function sig_preview()
 {
-	global $context, $librarydir, $smcFunc, $txt, $user_info;
+	global $context, $smcFunc, $txt, $user_info;
 
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 	loadLanguage('Profile');
 	loadLanguage('Errors');
 
@@ -337,9 +337,9 @@ function sig_preview()
 
 function warning_preview()
 {
-	global $context, $sourcedir, $librarydir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $smcFunc, $txt, $user_info, $scripturl, $mbname;
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
 	loadLanguage('ModerationCenter');
 

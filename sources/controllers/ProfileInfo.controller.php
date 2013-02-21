@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
 function action_summary($memID)
 {
 	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
-	global $sourcedir, $librarydir, $controllerdir, $scripturl, $smcFunc, $settings;
+	global $scripturl, $smcFunc, $settings;
 
 	// Attempt to load the member's profile data.
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
@@ -47,6 +47,12 @@ function action_summary($memID)
 
 	// Are there things we don't show?
 	$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+
+	// Menu tab
+	$context[$context['profile_menu_name']]['tab_data'] = array(
+		'title' => $txt['summary'],
+		'icon' => 'profile_hd.png'
+	);
 
 	// See if they have broken any warning levels...
 	list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -97,7 +103,7 @@ function action_summary($memID)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		include_once($controllerdir . '/Who.controller.php');
+		include_once(CONTROLLERDIR . '/Who.controller.php');
 		$action = determineActions($user_profile[$memID]['url']);
 
 		if ($action !== false)
@@ -249,7 +255,7 @@ function action_summary($memID)
 	}
 
 	// To finish this off, custom profile fields.
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 	loadCustomFields($memID);
 }
 
@@ -262,7 +268,7 @@ function action_summary($memID)
 function action_showPosts($memID)
 {
 	global $txt, $user_info, $scripturl, $modSettings;
-	global $context, $user_profile, $sourcedir, $smcFunc, $board;
+	global $context, $user_profile, $smcFunc, $board;
 
 	// Some initial context.
 	$context['start'] = (int) $_REQUEST['start'];
@@ -324,7 +330,7 @@ function action_showPosts($memID)
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 		// We can be lazy, since removeMessage() will check the permissions for us.
-		require_once($librarydir . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		removeMessage((int) $_GET['delete']);
 
 		// Add it to the mod log.
@@ -593,7 +599,7 @@ function action_showPosts($memID)
 function action_showAttachments($memID)
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile, $sourcedir, $librarydir, $smcFunc;
+	global $context, $user_profile, $smcFunc;
 
 	// OBEY permissions!
 	$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -602,7 +608,7 @@ function action_showAttachments($memID)
 	if (empty($boardsAllowed))
 		$boardsAllowed = array(-1);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// This is all the information required to list attachments.
 	$listOptions = array(
@@ -808,13 +814,13 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function action_showDisregarded($memID)
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $sourcedir, $librarydir, $smcFunc;
+	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $smcFunc;
 
 	// Only the owner can see the list (if the function is enabled of course)
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
 		return;
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// And here they are: the topics you don't like
 	$listOptions = array(
@@ -1033,6 +1039,12 @@ function action_statPanel($memID)
 	$context['time_logged_in'] = ($timeDays > 0 ? $timeDays . $txt['totalTimeLogged2'] : '') . ($timeHours > 0 ? $timeHours . $txt['totalTimeLogged3'] : '') . floor(($user_profile[$memID]['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged4'];
 	$context['num_posts'] = comma_format($user_profile[$memID]['posts']);
 
+	// Menu tab
+	$context[$context['profile_menu_name']]['tab_data'] = array(
+		'title' => $txt['statPanel_generalStats'] . ' - ' . $context['member']['name'],
+		'icon' => 'stats_info_hd.png'
+	);
+
 	// Number of topics started.
 	$result = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1212,7 +1224,7 @@ function action_statPanel($memID)
 function action_showPermissions($memID)
 {
 	global $scripturl, $txt, $board, $modSettings;
-	global $user_profile, $context, $user_info, $sourcedir, $smcFunc;
+	global $user_profile, $context, $user_info, $smcFunc;
 
 	// Verify if the user has sufficient permissions.
 	isAllowedTo('manage_permissions');
@@ -1393,7 +1405,7 @@ function action_showPermissions($memID)
  */
 function action_viewWarning($memID)
 {
-	global $modSettings, $context, $librarydir, $txt, $scripturl;
+	global $modSettings, $context, $txt, $scripturl;
 
 	// Firstly, can we actually even be here?
 	if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
@@ -1406,8 +1418,8 @@ function action_viewWarning($memID)
 
 	// Let's use a generic list to get all the current warnings
 	// and use the issue warnings grab-a-granny thing.
-	require_once($librarydir . '/List.subs.php');
-	require_once($librarydir . '/Profile.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
 	$listOptions = array(
 		'id' => 'view_warnings',

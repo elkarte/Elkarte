@@ -15,11 +15,9 @@
 if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
-global $librarydir;
-
 // language and helper functions
 loadLanguage('Drafts');
-require_once($librarydir . '/Drafts.subs.php');
+require_once(SUBSDIR . '/Drafts.subs.php');
 
 /**
  * Saves a post draft in the user_drafts table
@@ -454,6 +452,12 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 	// If the drafts were retrieved in reverse order, get them right again.
 	if ($reverse)
 		$context['drafts'] = array_reverse($context['drafts'], true);
+
+	// Menu tab
+	$context[$context['profile_menu_name']]['tab_data'] = array(
+		'title' => $txt['drafts_show'] . ' - ' . $context['member']['name'],
+		'icon' => 'message_sm.png'
+	);
 
 	$context['sub_template'] = 'showDrafts';
 }

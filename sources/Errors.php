@@ -361,6 +361,10 @@ function display_db_error()
 	global $mbname, $modSettings, $maintenance;
 	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $smcFunc;
 
+	// Just check we're not in any buffers, just in case.
+	while (@ob_get_level() > 0)
+		@ob_end_clean();
+
 	set_fatal_error_headers();
 
 	// For our purposes, we're gonna want this on if at all possible.

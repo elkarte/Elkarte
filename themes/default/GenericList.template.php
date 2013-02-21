@@ -16,7 +16,7 @@
 
 function template_show_list($list_id = null)
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Get a shortcut to the current list.
 	$list_id = $list_id === null ? $context['default_list'] : $list_id;
@@ -189,7 +189,7 @@ function template_show_list($list_id = null)
 
 function template_additional_rows($row_position, $cur_list)
 {
-	global $context, $settings, $options;
+	global $context, $settings;
 
 	foreach ($cur_list['additional_rows'][$row_position] as $row)
 		echo '

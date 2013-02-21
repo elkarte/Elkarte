@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  */
 function setLoginCookie($cookie_length, $id, $password = '')
 {
-	global $cookiename, $boardurl, $modSettings, $sourcedir;
+	global $cookiename, $boardurl, $modSettings;
 
 	// If changing state force them to re-address some permission caching.
 	$_SESSION['mc']['time'] = 0;
@@ -92,7 +92,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	if (!isset($_SESSION['login_' . $cookiename]) || $_SESSION['login_' . $cookiename] !== $data)
 	{
 		// We need to meddle with the session.
-		require_once($sourcedir . '/Session.php');
+		require_once(SOURCEDIR . '/Session.php');
 
 		// Backup and remove the old session.
 		$oldSessionData = $_SESSION;
@@ -415,11 +415,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $sourcedir, $librarydir, $modSettings, $smcFunc, $language;
+	global $modSettings, $smcFunc, $language;
 
 	// Language... and a required file.
 	loadLanguage('Login');
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get some important details.
 	$request = $smcFunc['db_query']('', '
@@ -478,7 +478,7 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $sourcedir, $librarydir, $txt, $smcFunc, $user_info;
+	global $txt, $smcFunc, $user_info;
 
 	$errors = array();
 
@@ -499,7 +499,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
 
 	if ($check_reserved_name)
 	{
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($username, $memID, false))
 			$errors[] = array('done', '(' . htmlspecialchars($username) . ') ' . $txt['name_in_use']);
 	}

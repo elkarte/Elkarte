@@ -294,7 +294,7 @@ function un_preparsecode($message)
  */
 function fixTags(&$message)
 {
-	global $modSettings, $librarydir;
+	global $modSettings;
 
 	// WARNING: Editing the below can cause large security holes in your forum.
 	// Edit only if you are sure you know what you are doing.
@@ -371,7 +371,7 @@ function fixTags(&$message)
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
 	{
 		// We'll need this for image processing
-		require_once($librarydir . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Find all the img tags - with or without width and height.
 		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
@@ -515,96 +515,6 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
 }
 
 /**
- * Spell checks the post for typos ;).
- * It uses the pspell library, which MUST be installed.
- * It has problems with internationalization.
- * It is accessed via ?action=spellcheck.
- */
-function action_spellcheck()
-{
-	global $txt, $context, $smcFunc;
-
-	// A list of "words" we know about but pspell doesn't.
-	$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
-
-	loadLanguage('Post');
-	loadTemplate('Post');
-
-	// Okay, this looks funny, but it actually fixes a weird bug.
-	ob_start();
-	$old = error_reporting(0);
-
-	// See, first, some windows machines don't load pspell properly on the first try.  Dumb, but this is a workaround.
-	pspell_new('en');
-
-	// Next, the dictionary in question may not exist. So, we try it... but...
-	$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-	// Most people don't have anything but English installed... So we use English as a last resort.
-	if (!$pspell_link)
-		$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-	error_reporting($old);
-	ob_end_clean();
-
-	if (!isset($_POST['spellstring']) || !$pspell_link)
-		die;
-
-	// Construct a bit of Javascript code.
-	$context['spell_js'] = '
-		var txt = {"done": "' . $txt['spellcheck_done'] . '"};
-		var mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ';
-		var misps = Array(';
-
-	// Get all the words (Javascript already separated them).
-	$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));
-
-	$found_words = false;
-	for ($i = 0, $n = count($alphas); $i < $n; $i++)
-	{
-		// Words are sent like 'word|offset_begin|offset_end'.
-		$check_word = explode('|', $alphas[$i]);
-
-		// If the word is a known word, or spelled right...
-		if (in_array($smcFunc['strtolower']($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
-			continue;
-
-		// Find the word, and move up the "last occurance" to here.
-		$found_words = true;
-
-		// Add on the javascript for this misspelling.
-		$context['spell_js'] .= '
-			new misp("' . strtr($check_word[0], array('\\' => '\\\\', '"' => '\\"', '<' => '', '&gt;' => '')) . '", ' . (int) $check_word[1] . ', ' . (int) $check_word[2] . ', [';
-
-		// If there are suggestions, add them in...
-		$suggestions = pspell_suggest($pspell_link, $check_word[0]);
-		if (!empty($suggestions))
-		{
-			// But first check they aren't going to be censored - no naughty words!
-			foreach ($suggestions as $k => $word)
-				if ($suggestions[$k] != censorText($word))
-					unset($suggestions[$k]);
-
-			if (!empty($suggestions))
-				$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
-		}
-
-		$context['spell_js'] .= ']),';
-	}
-
-	// If words were found, take off the last comma.
-	if ($found_words)
-		$context['spell_js'] = substr($context['spell_js'], 0, -1);
-
-	$context['spell_js'] .= '
-		);';
-
-	// And instruct the template system to just show the spellcheck sub template.
-	$context['template_layers'] = array();
-	$context['sub_template'] = 'spellcheck';
-}
-
-/**
  * Sends a notification to members who have elected to receive emails
  * when things happen to a topic, such as replies are posted.
  * The function automatically finds the subject and its board, and
@@ -622,7 +532,7 @@ function action_spellcheck()
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array())
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	// Can't do it if there's no topics.
 	if (empty($topics))
@@ -633,7 +543,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$topics = array($topics);
 
 	// Email functions will be helpful here
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get the subject and body...
 	$result = $smcFunc['db_query']('', '
@@ -827,7 +737,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $user_info, $txt, $modSettings, $smcFunc;
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -1120,13 +1030,13 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($librarydir . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Topic.subs.php');
 			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
 
 	// If there's a custom search index, it may need updating...
-	require_once($librarydir . '/Search.subs.php');
+	require_once(SUBSDIR . '/Search.subs.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'postCreated')))
 		$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
@@ -1170,7 +1080,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $user_info, $modSettings, $smcFunc;
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -1279,13 +1189,13 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once($librarydir . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Topic.subs.php');
 			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
 
 	// If there's a custom search index, it needs to be modified...
-	require_once($librarydir . '/Search.subs.php');
+	require_once(SUBSDIR . '/Search.subs.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'postModified')))
 		$searchAPI->postModified($msgOptions, $topicOptions, $posterOptions);
@@ -1322,7 +1232,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global $sourcedir, $smcFunc;
+	global $smcFunc;
 
 	if (!is_array($msgs))
 		$msgs = array($msgs);
@@ -1582,14 +1492,14 @@ function approveTopics($topics, $approve = true)
 function sendApprovalNotifications(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $sourcedir, $librarydir, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
 		return;
 
 	// Email ahoy
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	$topics = array();
 	$digest_insert = array();
@@ -1861,14 +1771,14 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $txt, $modSettings, $language, $scripturl, $user_info, $smcFunc, $librarydir;
+	global $txt, $modSettings, $language, $scripturl, $user_info, $smcFunc;
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
 		return;
 
 	// Needed to notify admins, or anyone
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	if ($member_name == null)
 	{
@@ -1962,9 +1872,9 @@ function adminNotify($type, $memberID, $member_name = null)
 function notifyMembersBoard(&$topicData)
 {
 	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $librarydir, $board, $smcFunc, $context;
+	global $modSettings, $board, $smcFunc, $context;
 
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))

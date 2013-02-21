@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 function Display()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings;
-	global $options, $librarydir, $user_info, $board_info, $topic, $board;
+	global $options, $user_info, $board_info, $topic, $board;
 	global $attachments, $messages_request, $topicinfo, $language, $smcFunc;
 
 	// What are you gonna display if these are empty?!
@@ -44,7 +44,7 @@ function Display()
 	loadTemplate('Display');
 
 	// And the topic functions
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -275,7 +275,7 @@ function Display()
 	$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	if ($context['require_verification'])
 	{
-		require_once($librarydir . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -657,7 +657,6 @@ function Display()
 		// 4. you've waited long enough for the poll to expire. (whether hide_results is 1 or 2.)
 		$context['allow_poll_view'] = allowedTo('moderate_board') || $pollinfo['hide_results'] == 0 || ($pollinfo['hide_results'] == 1 && $context['poll']['has_voted']) || $context['poll']['is_expired'];
 		$context['poll']['show_results'] = $context['allow_poll_view'] && (isset($_REQUEST['viewresults']) || isset($_REQUEST['viewResults']));
-		$context['show_view_results_button'] = $context['allow_vote'] && (!$context['allow_poll_view'] || !$context['poll']['show_results'] || !$context['poll']['has_voted']);
 
 		// You're allowed to change your vote if:
 		// 1. the poll did not expire, and
@@ -704,7 +703,7 @@ function Display()
 		// Build the poll moderation button array.
 		$context['poll_buttons'] = array(
 			'vote' => array('test' => 'allow_return_vote', 'text' => 'poll_return_vote', 'image' => 'poll_options.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start']),
-			'results' => array('test' => 'show_view_results_button', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
+			'results' => array('test' => 'allow_poll_view', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
 			'change_vote' => array('test' => 'allow_change_vote', 'text' => 'poll_change_vote', 'image' => 'poll_change_vote.png', 'lang' => true, 'url' => $scripturl . '?action=vote;topic=' . $context['current_topic'] . '.' . $context['start'] . ';poll=' . $context['poll']['id'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'lock' => array('test' => 'allow_lock_poll', 'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'), 'image' => 'poll_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lockvoting;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'edit' => array('test' => 'allow_edit_poll', 'text' => 'poll_edit', 'image' => 'poll_edit.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;topic=' . $context['current_topic'] . '.' . $context['start']),
@@ -975,7 +974,7 @@ function Display()
 		if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
 		{
 			// Needed for the editor and message icons.
-			require_once($librarydir . '/Editor.subs.php');
+			require_once(SUBSDIR . '/Editor.subs.php');
 
 			// Now create the editor.
 			$editorOptions = array(
@@ -1186,7 +1185,7 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $librarydir, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic, $smcFunc;
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
@@ -1227,7 +1226,7 @@ function loadAttachmentContext($id_msg)
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
-					require_once($librarydir . '/Graphics.subs.php');
+					require_once(SUBSDIR . '/Graphics.subs.php');
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 					{
 						// So what folder are we putting this image in?
@@ -1281,7 +1280,7 @@ function loadAttachmentContext($id_msg)
 							// Do we need to remove an old thumbnail?
 							if (!empty($old_id_thumb))
 							{
-								require_once($librarydir . '/Attachments.subs.php');
+								require_once(SUBSDIR . '/Attachments.subs.php');
 								removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 							}
 						}
@@ -1358,12 +1357,12 @@ function approved_attach_sort($a, $b)
  */
 function action_quickmod2()
 {
-	global $librarydir, $topic, $board, $user_info, $smcFunc, $modSettings, $context;
+	global $topic, $board, $user_info, $smcFunc, $modSettings, $context;
 
 	// Check the session = get or post.
 	checkSession('request');
 
-	require_once($librarydir . '/Messages.subs.php');
+	require_once(SUBSDIR . '/Messages.subs.php');
 
 	if (empty($_REQUEST['msgs']))
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);

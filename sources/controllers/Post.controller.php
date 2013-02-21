@@ -38,7 +38,7 @@ function action_post($post_errors = array())
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
-	global $sourcedir, $librarydir, $controllerdir, $options, $smcFunc, $language;
+	global $options, $smcFunc, $language;
 
 	loadLanguage('Post');
 
@@ -54,7 +54,7 @@ function action_post($post_errors = array())
 	if (empty($board) && !$context['make_event'])
 		fatal_lang_error('no_board', false);
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	if (isset($_REQUEST['xml']))
 	{
@@ -197,7 +197,7 @@ function action_post($post_errors = array())
 			isAllowedTo('poll_add_any');
 		$context['can_moderate_poll'] = true;
 
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.
@@ -244,7 +244,7 @@ function action_post($post_errors = array())
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
 				// @todo this shouldn't call directly CalendarPost()
-				require_once($controllerdir . '/Calendar.controller.php');
+				require_once(CONTROLLERDIR . '/Calendar.controller.php');
 				return CalendarPost();
 			}
 
@@ -302,7 +302,7 @@ function action_post($post_errors = array())
 				fatal_lang_error('cannot_post_new', 'user');
 
 			// Load a list of boards for this event in the context.
-			require_once($librarydir . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
@@ -487,7 +487,7 @@ function action_post($post_errors = array())
 			if ($context['preview_message'] === '')
 				$post_errors[] = 'no_message';
 			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
-				$post_errors[] = 'long_message';
+				$post_errors[] = array('long_message', array($modSettings['max_messageLength']));
 
 			// Protect any CDATA blocks.
 			if (isset($_REQUEST['xml']))
@@ -507,7 +507,7 @@ function action_post($post_errors = array())
 		// Previewing an edit?
 		if (isset($_REQUEST['msg']) && !empty($topic))
 		{
-			require_once($librarydir . '/Messages.subs.php');
+			require_once(SUBSDIR . '/Messages.subs.php');
 			// Get the existing message.
 			$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 			// The message they were trying to edit was most likely deleted.
@@ -527,7 +527,7 @@ function action_post($post_errors = array())
 	{
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-		require_once($librarydir . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		// Get the existing message.
 		$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
 		// The message they were trying to edit was most likely deleted.
@@ -791,7 +791,7 @@ function action_post($post_errors = array())
 	$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	if ($context['require_verification'])
 	{
-		require_once($librarydir . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -883,12 +883,12 @@ function action_post($post_errors = array())
 	// Build a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_save']))
 	{
-		require_once($controllerdir . '/Drafts.controller.php');
+		require_once(CONTROLLERDIR . '/Drafts.controller.php');
 		action_showDrafts($user_info['id'], $topic);
 	}
 
 	// Needed for the editor and message icons.
-	require_once($librarydir . '/Editor.subs.php');
+	require_once(SUBSDIR . '/Editor.subs.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -989,7 +989,7 @@ function action_post($post_errors = array())
  */
 function action_post2()
 {
-	global $board, $topic, $txt, $modSettings, $sourcedir, $librarydir, $controllerdir, $context;
+	global $board, $topic, $txt, $modSettings, $context;
 	global $user_info, $board_info, $options, $smcFunc;
 
 	// Sneaking off, are we?
@@ -1023,7 +1023,7 @@ function action_post2()
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 	{
-		require_once($librarydir . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
@@ -1032,12 +1032,12 @@ function action_post2()
 			$post_errors = array_merge($post_errors, $context['require_verification']);
 	}
 
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Post');
 
 	// Drafts enabled and needed?
 	if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
-		require_once($controllerdir . '/Drafts.controller.php');
+		require_once(CONTROLLERDIR . '/Drafts.controller.php');
 
 	// First check to see if they are trying to delete any current attachments.
 	if (isset($_POST['attach_del']))
@@ -1062,7 +1062,7 @@ function action_post2()
 
 		if (!empty($_REQUEST['msg']))
 		{
-			require_once($librarydir . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$attachmentQuery = array(
 				'attachment_type' => 0,
 				'id_msg' => (int) $_REQUEST['msg'],
@@ -1076,7 +1076,7 @@ function action_post2()
 	$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 	if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 	{
-		require_once($librarydir . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		processAttachments();
 	}
 
@@ -1409,7 +1409,7 @@ function action_post2()
 	if ($posterIsGuest)
 	{
 		// If user is a guest, make sure the chosen name isn't taken.
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($row['poster_name']) || $_POST['guestname'] != $row['poster_name']))
 			$post_errors[] = 'bad_name';
 	}
@@ -1471,7 +1471,7 @@ function action_post2()
 		// Make sure guests are actually allowed to vote generally.
 		if ($_POST['poll_guest_vote'])
 		{
-			require_once($librarydir . '/Members.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 			if (!in_array(-1, $allowedVoteGroups['allowed']))
 				$_POST['poll_guest_vote'] = 0;
@@ -1672,7 +1672,7 @@ function action_post2()
 	// Editing or posting an event?
 	if (isset($_POST['calendar']) && (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1))
 	{
-		require_once($librarydir . '/Calendar.subs.php');
+		require_once(SUBSDIR . '/Calendar.subs.php');
 
 		// Make sure they can link an event to this post.
 		canLinkEvent();
@@ -1693,7 +1693,7 @@ function action_post2()
 		$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 		// Validate the post...
-		require_once($librarydir . '/Calendar.subs.php');
+		require_once(SUBSDIR . '/Calendar.subs.php');
 		validateEventPost();
 
 		// If you're not allowed to edit any events, you have to be the poster.
@@ -1959,7 +1959,7 @@ function getTopic()
 function action_quotefast()
 {
 	global $modSettings, $user_info, $txt, $settings, $context;
-	global $librarydir, $smcFunc;
+	global $smcFunc;
 
 	loadLanguage('Post');
 	if (!isset($_REQUEST['xml']))
@@ -1968,7 +1968,7 @@ function action_quotefast()
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 	}
 
-	include_once($librarydir . '/Post.subs.php');
+	include_once(SUBSDIR . '/Post.subs.php');
 
 	$moderate_boards = boardsAllowedTo('moderate_board');
 
@@ -2063,7 +2063,7 @@ function action_quotefast()
  */
 function action_jsmodify()
 {
-	global $sourcedir, $librarydir, $modSettings, $board, $topic, $txt;
+	global $modSettings, $board, $topic, $txt;
 	global $user_info, $context, $smcFunc, $language;
 
 	// We have to have a topic!
@@ -2071,7 +2071,7 @@ function action_jsmodify()
 		obExit(false);
 
 	checkSession('get');
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Assume the first message if no message ID was given.
 	$request = $smcFunc['db_query']('', '
@@ -2317,4 +2317,94 @@ function action_jsmodify()
 	}
 	else
 		obExit(false);
+}
+
+/**
+ * Spell checks the post for typos ;).
+ * It uses the pspell library, which MUST be installed.
+ * It has problems with internationalization.
+ * It is accessed via ?action=spellcheck.
+ */
+function action_spellcheck()
+{
+	global $txt, $context, $smcFunc;
+
+	// A list of "words" we know about but pspell doesn't.
+	$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
+
+	loadLanguage('Post');
+	loadTemplate('Post');
+
+	// Okay, this looks funny, but it actually fixes a weird bug.
+	ob_start();
+	$old = error_reporting(0);
+
+	// See, first, some windows machines don't load pspell properly on the first try.  Dumb, but this is a workaround.
+	pspell_new('en');
+
+	// Next, the dictionary in question may not exist. So, we try it... but...
+	$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+
+	// Most people don't have anything but English installed... So we use English as a last resort.
+	if (!$pspell_link)
+		$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+
+	error_reporting($old);
+	ob_end_clean();
+
+	if (!isset($_POST['spellstring']) || !$pspell_link)
+		die;
+
+	// Construct a bit of Javascript code.
+	$context['spell_js'] = '
+		var txt = {"done": "' . $txt['spellcheck_done'] . '"};
+		var mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ';
+		var misps = Array(';
+
+	// Get all the words (Javascript already separated them).
+	$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));
+
+	$found_words = false;
+	for ($i = 0, $n = count($alphas); $i < $n; $i++)
+	{
+		// Words are sent like 'word|offset_begin|offset_end'.
+		$check_word = explode('|', $alphas[$i]);
+
+		// If the word is a known word, or spelled right...
+		if (in_array($smcFunc['strtolower']($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
+			continue;
+
+		// Find the word, and move up the "last occurance" to here.
+		$found_words = true;
+
+		// Add on the javascript for this misspelling.
+		$context['spell_js'] .= '
+			new misp("' . strtr($check_word[0], array('\\' => '\\\\', '"' => '\\"', '<' => '', '&gt;' => '')) . '", ' . (int) $check_word[1] . ', ' . (int) $check_word[2] . ', [';
+
+		// If there are suggestions, add them in...
+		$suggestions = pspell_suggest($pspell_link, $check_word[0]);
+		if (!empty($suggestions))
+		{
+			// But first check they aren't going to be censored - no naughty words!
+			foreach ($suggestions as $k => $word)
+				if ($suggestions[$k] != censorText($word))
+					unset($suggestions[$k]);
+
+			if (!empty($suggestions))
+				$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
+		}
+
+		$context['spell_js'] .= ']),';
+	}
+
+	// If words were found, take off the last comma.
+	if ($found_words)
+		$context['spell_js'] = substr($context['spell_js'], 0, -1);
+
+	$context['spell_js'] .= '
+		);';
+
+	// And instruct the template system to just show the spellcheck sub template.
+	$context['template_layers'] = array();
+	$context['sub_template'] = 'spellcheck';
 }

@@ -92,7 +92,7 @@ function ManageSearch()
  */
 function EditSearchSettings($return_config = false)
 {
-	global $txt, $context, $scripturl, $librarydir, $modSettings;
+	global $txt, $context, $scripturl, $modSettings;
 
 	// What are we editing anyway?
 	$config_vars = array(
@@ -111,7 +111,7 @@ function EditSearchSettings($return_config = false)
 	call_integration_hook('integrate_modify_search_settings', array($config_vars));
 
 	// Perhaps the search method wants to add some settings?
-	require_once($librarydir . '/Search.subs.php');
+	require_once(SUBSDIR . '/Search.subs.php');
 	$searchAPI = findSearchAPI();
 	if (is_callable(array($searchAPI, 'searchSettings')))
 		call_user_func_array($searchAPI->searchSettings, array(&$config_vars));
@@ -707,23 +707,23 @@ function CreateMessageIndex()
  */
 function loadSearchAPIs()
 {
-	global $sourcedir, $txt;
+	global $txt;
 
 	$apis = array();
-	if ($dh = opendir($sourcedir))
+	if ($dh = opendir(SOURCEDIR))
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file($sourcedir . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
+			if (is_file(SOURCEDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
 			{
 				// Check that this is definitely a valid API!
-				$fp = fopen($sourcedir . '/' . $file, 'rb');
+				$fp = fopen(SOURCEDIR . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
 				if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 				{
-					require_once($sourcedir . '/' . $file);
+					require_once(SOURCEDIR . '/' . $file);
 
 					$index_name = strtolower($matches[1]);
 					$search_class_name = $index_name . '_search';
@@ -809,7 +809,7 @@ function detectFulltextIndex()
  */
 function EditSphinxSettings()
 {
-	global $txt, $context, $modSettings, $sourcedir;
+	global $txt, $context, $modSettings;
 
 	// saving the settings
 	if (isset($_POST['save']))
@@ -844,9 +844,9 @@ function EditSphinxSettings()
 		// try to connect via Sphinx API?
 		if ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index']))
 		{
-			if (@file_exists($sourcedir . '/sphinxapi.php'))
+			if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
 			{
-				include_once($sourcedir . '/sphinxapi.php');
+				include_once(SOURCEDIR . '/sphinxapi.php');
 				$mySphinx = new SphinxClient();
 				$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 				$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results']);

@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 {
-	global $context, $txt, $sourcedir;
+	global $context, $txt;
 
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
@@ -244,7 +244,7 @@ function ModifyCoreFeatures($return_config = false)
 				'drafts_show_saved_enabled' => 2,
 			),
 			'setting_callback' => create_function('$value', '
-				global $smcFunc, $sourcedir;
+				global $smcFunc;
 
 				// Set the correct disabled value for the scheduled task.
 				$smcFunc[\'db_query\'](\'\', \'
@@ -283,12 +283,11 @@ function ModifyCoreFeatures($return_config = false)
 		'pm' => array(
 			'url' => 'action=admin;area=permissions;sa=postmod',
 			'setting_callback' => create_function('$value', '
-				global $controllerdir;
 
 				// Cant use warning post moderation if disabled!
 				if (!$value)
 				{
-					require_once($controllerdir . \'/PostModeration.controller.php\');
+					require_once(CONTROLLERDIR . \'/PostModeration.controller.php\');
 					approveAllData();
 
 					return array(\'warning_moderate\' => 0);
@@ -304,7 +303,7 @@ function ModifyCoreFeatures($return_config = false)
 				'paid_enabled' => 1,
 			),
 			'setting_callback' => create_function('$value', '
-				global $smcFunc, $sourcedir;
+				global $smcFunc;
 
 				// Set the correct disabled value for scheduled task.
 				$smcFunc[\'db_query\'](\'\', \'
@@ -320,7 +319,7 @@ function ModifyCoreFeatures($return_config = false)
 				// Should we calculate next trigger?
 				if ($value)
 				{
-					require_once($sourcedir . \'/ScheduledTasks.php\');
+					require_once(SOURCEDIR . \'/ScheduledTasks.php\');
 					CalculateNextTrigger(\'paid_subscriptions\');
 				}
 			'),
@@ -371,8 +370,8 @@ function ModifyCoreFeatures($return_config = false)
 					return array(\'spider_group\' => 0, \'show_spider_online\' => 0);
 			'),
 			'on_save' => create_function('', '
-				global $librarydir, $modSettings;
-				require_once($librarydir . \'/SearchEngines.subs.php\');
+				global $modSettings;
+				require_once(SUBSDIR . \'/SearchEngines.subs.php\');
 			'),
 		),
 	);
@@ -1128,7 +1127,7 @@ function ModifyBadBehaviorSettings($return_config = false)
  */
 function ModifySignatureSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl, $librarydir;
+	global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl;
 
 	$config_vars = array(
 			// Are signatures even enabled?
@@ -1326,7 +1325,7 @@ function ModifySignatureSettings($return_config = false)
 							if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 							{
 								// We'll mess up with images, who knows.
-								require_once($librarydir . '/Attachments.subs.php');
+								require_once(SUBSDIR . '/Attachments.subs.php');
 
 								$sizes = url_image_size($matches[7][$key]);
 								if (is_array($sizes))
@@ -1506,7 +1505,7 @@ function pauseSignatureApplySettings()
 function ShowCustomProfiles()
 {
 	global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
-	global $modSettings, $sourcedir, $librarydir;
+	global $modSettings;
 
 	$context['page_title'] = $txt['custom_profile_title'];
 	$context['sub_template'] = 'show_custom_profile';
@@ -1551,7 +1550,7 @@ function ShowCustomProfiles()
 
 	createToken('admin-scp');
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	$listOptions = array(
 		'id' => 'standard_profile_fields',
@@ -2214,7 +2213,7 @@ function EditCustomProfiles()
  */
 function ModifyPruningSettings($return_config = false)
 {
-	global $txt, $scripturl, $sourcedir, $context, $settings, $sc, $modSettings;
+	global $txt, $scripturl, $context, $settings, $sc, $modSettings;
 
 	// Make sure we understand what's going on.
 	loadLanguage('ManageSettings');
@@ -2345,7 +2344,7 @@ function ModifyGeneralModSettings($return_config = false)
  */
 function list_integration_hooks()
 {
-	global $sourcedir, $librarydir, $scripturl, $context, $txt, $modSettings, $settings;
+	global $scripturl, $context, $txt, $modSettings, $settings;
 
 	$context['filter_url'] = '';
 	$context['current_filter'] = '';
@@ -2513,7 +2512,7 @@ function list_integration_hooks()
 	}
 
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($list_options);
 
 	$context['page_title'] = $txt['hooks_title_list'];
@@ -2561,12 +2560,12 @@ function get_files_recursive($dir_path)
  */
 function get_integration_hooks_data($start, $per_page, $sort)
 {
-	global $boarddir, $sourcedir, $settings, $txt, $context, $scripturl, $modSettings;
+	global $settings, $txt, $context, $scripturl, $modSettings;
 
 	$hooks = $temp_hooks = get_integration_hooks();
 	$hooks_data = $temp_data = $hook_status = array();
 
-	$files = get_files_recursive($sourcedir);
+	$files = get_files_recursive(SOURCEDIR);
 	if (!empty($files))
 	{
 		foreach ($files as $file)
@@ -2594,7 +2593,7 @@ function get_integration_hooks_data($start, $per_page, $sort)
 
 						if (substr($hook, -8) === '_include')
 						{
-							$hook_status[$hook][$function]['exists'] = file_exists(strtr(trim($function), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir'])));
+							$hook_status[$hook][$function]['exists'] = file_exists(strtr(trim($function), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir'])));
 							// I need to know if there is at least one function called in this file.
 							$temp_data['include'][basename($function)] = array('hook' => $hook, 'function' => $function);
 							unset($temp_hooks[$hook][$function_o]);
@@ -2689,7 +2688,7 @@ function get_integration_hooks_data($start, $per_page, $sort)
 					'hook_name' => $hook,
 					'function_name' => $function,
 					'real_function' => $exploded[0],
-					'included_file' => isset($exploded[1]) ? strtr(trim($exploded[1]), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir'])) : '',
+					'included_file' => isset($exploded[1]) ? strtr(trim($exploded[1]), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir'])) : '',
 					'file_name' => (isset($hook_status[$hook][$function]['in_file']) ? $hook_status[$hook][$function]['in_file'] : ''),
 					'hook_exists' => $hook_exists,
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',

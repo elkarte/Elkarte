@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $smcFunc, $sourcedir;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $smcFunc;
 
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
@@ -165,33 +165,31 @@ function writeLog($force = false)
  */
 function logLastDatabaseError()
 {
-	global $boarddir;
-
 	// Make a note of the last modified time in case someone does this before us
-	$last_db_error_change = @filemtime($boarddir . '/db_last_error.php');
+	$last_db_error_change = @filemtime(BOARDDIR . '/db_last_error.php');
 
 	// save the old file before we do anything
-	$file = $boarddir . '/db_last_error.php';
-	$dberror_backup_fail = !@is_writable($boarddir . '/db_last_error_bak.php') || !@copy($file, $boarddir . '/db_last_error_bak.php');
-	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists($boarddir . '/db_last_error_bak.php') || filesize($boarddir . '/db_last_error_bak.php') === 0) : $dberror_backup_fail;
+	$file = BOARDDIR . '/db_last_error.php';
+	$dberror_backup_fail = !@is_writable(BOARDDIR . '/db_last_error_bak.php') || !@copy($file, BOARDDIR . '/db_last_error_bak.php');
+	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists(BOARDDIR . '/db_last_error_bak.php') || filesize(BOARDDIR . '/db_last_error_bak.php') === 0) : $dberror_backup_fail;
 
 	clearstatcache();
-	if (filemtime($boarddir . '/db_last_error.php') === $last_db_error_change)
+	if (filemtime(BOARDDIR . '/db_last_error.php') === $last_db_error_change)
 	{
 		// Write the change
 		$write_db_change =  '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
-		$written_bytes = file_put_contents($boarddir . '/db_last_error.php', $write_db_change, LOCK_EX);
+		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.php', $write_db_change, LOCK_EX);
 
 		// survey says ...
 		if ($written_bytes !== strlen($write_db_change) && !$dberror_backup_fail)
 		{
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
 			// Copy the file back and run for your life!
-			@copy($boarddir . '/db_last_error_bak.php', $boarddir . '/db_last_error.php');
+			@copy(BOARDDIR . '/db_last_error_bak.php', BOARDDIR . '/db_last_error.php');
 		}
 		else
 		{
-			@touch($boarddir . '/' . 'Settings.php');
+			@touch(BOARDDIR . '/' . 'Settings.php');
 			return true;
 		}
 	}
@@ -205,7 +203,7 @@ function logLastDatabaseError()
  */
 function displayDebug()
 {
-	global $context, $scripturl, $boarddir, $modSettings, $boarddir;
+	global $context, $scripturl, $modSettings;
 	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt;
 
 	// Add to Settings.php if you want to show the debugging information.
@@ -225,7 +223,7 @@ function displayDebug()
 	{
 		if (file_exists($files[$i]))
 			$total_size += filesize($files[$i]);
-		$files[$i] = strtr($files[$i], array($boarddir => '.'));
+		$files[$i] = strtr($files[$i], array(BOARDDIR => '.'));
 	}
 
 	$warnings = 0;
@@ -304,7 +302,7 @@ function displayDebug()
 
 			// Make the filenames look a bit better.
 			if (isset($qq['f']))
-				$qq['f'] = preg_replace('~^' . preg_quote($boarddir, '~') . '~', '...', $qq['f']);
+				$qq['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $qq['f']);
 
 			echo '
 	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r")))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
@@ -416,7 +414,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, $smcFunc, $librarydir;
+	global $modSettings, $user_info, $smcFunc;
 
 	$inserts = array();
 	$log_types = array(
@@ -477,7 +475,7 @@ function logActions($logs)
 			// Alright, if we get any result back, update open reports.
 			if ($smcFunc['db_num_rows']($request) > 0)
 			{
-				require_once($librarydir . '/Moderation.subs.php');
+				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}

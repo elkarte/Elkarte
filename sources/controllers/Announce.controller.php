@@ -67,6 +67,8 @@ function action_selectgroup()
 	foreach ($groups as $id => $group)
 		$groups[$id] = (int) $group;
 
+	require_once(SUBSDIR . '/Membergroups.subs.php');
+
 	$context['groups'] = array();
 	if (in_array(0, $groups))
 	{
@@ -100,17 +102,9 @@ function action_selectgroup()
 	$smcFunc['db_free_result']($request);
 
 	// Now get the membergroup names.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_list})',
-		array(
-			'group_list' => $groups,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context['groups'][$row['id_group']]['name'] = $row['group_name'];
-	$smcFunc['db_free_result']($request);
+	$groups_info = membergroupsById($groups, 0);
+	foreach ($groups_info as $id_group => $group_info)
+		$context['groups'][$id_group]['name'] = $group_info['group_name'];
 
 	// Get the subject of the topic we're about to announce.
 	$request = $smcFunc['db_query']('', '
@@ -145,7 +139,7 @@ function action_selectgroup()
 function action_send()
 {
 	global $topic, $board, $board_info, $context, $modSettings;
-	global $language, $scripturl, $txt, $user_info, $librarydir, $smcFunc;
+	global $language, $scripturl, $txt, $user_info, $smcFunc;
 
 	checkSession();
 
@@ -182,7 +176,7 @@ function action_send()
 	$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($message, false, $id_msg), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 
 	// We need this in order to be able send emails.
-	require_once($librarydir . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Select the email addresses for this batch.
 	$request = $smcFunc['db_query']('', '

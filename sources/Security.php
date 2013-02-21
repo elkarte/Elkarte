@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $sourcedir, $librarydir, $user_info, $sc, $user_settings;
+	global $modSettings, $user_info, $sc, $user_settings;
 
 	// We don't care if the option is off, because Guests should NEVER get past here.
 	is_not_guest();
@@ -52,7 +52,7 @@ function validateSession($type = 'admin')
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 		return;
 
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Hashed password, ahoy!
 	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 40)
@@ -87,7 +87,7 @@ function validateSession($type = 'admin')
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
-		require_once($librarydir . '/OpenID.subs.php');
+		require_once(SUBSDIR . '/OpenID.subs.php');
 		openID_revalidate();
 
 		$_SESSION[$type . '_time'] = time();
@@ -178,7 +178,7 @@ function is_not_guest($message = '')
 function is_not_banned($forceCheck = false)
 {
 	global $txt, $modSettings, $context, $user_info;
-	global $sourcedir, $librarydir, $controllerdir, $cookiename, $user_settings, $smcFunc;
+	global $cookiename, $user_settings, $smcFunc;
 
 	// You cannot be banned if you are an admin - doesn't help if you log out.
 	if ($user_info['is_admin'])
@@ -311,7 +311,7 @@ function is_not_banned($forceCheck = false)
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))
 		{
-			require_once($librarydir . '/Auth.subs.php');
+			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 			smf_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
 		}
@@ -351,7 +351,7 @@ function is_not_banned($forceCheck = false)
 		);
 
 		// A goodbye present.
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		smf_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 
@@ -405,7 +405,7 @@ function is_not_banned($forceCheck = false)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		require_once($controllerdir . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
 		Logout(true, false);
 
 		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
@@ -422,7 +422,7 @@ function is_not_banned($forceCheck = false)
  */
 function banPermissions()
 {
-	global $user_info, $sourcedir, $librarydir, $modSettings, $context;
+	global $user_info, $modSettings, $context;
 
 	// Somehow they got here, at least take away all permissions...
 	if (isset($_SESSION['ban']['cannot_access']))
@@ -482,7 +482,7 @@ function banPermissions()
 		$user_info['mod_cache'] = $_SESSION['mc'];
 	else
 	{
-		require_once($librarydir . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		rebuildModCache();
 	}
 
@@ -491,7 +491,7 @@ function banPermissions()
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
-		require_once($librarydir . '/Moderation.subs.php');
+		require_once(SUBSDIR . '/Moderation.subs.php');
 		recountOpenReports();
 	}
 	else
@@ -1353,14 +1353,14 @@ function constructBanQueryIP($fullip)
  */
 function loadBadBehavior()
 {
-	global $modSettings, $user_info, $context, $sourcedir, $bb2_results;
+	global $modSettings, $user_info, $context, $bb2_results;
 
 	$bb_run = false;
 
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
-		require_once($sourcedir . '/lib/bad-behavior/badbehavior-plugin.php');
+		require_once(SOURCEDIR . '/lib/bad-behavior/badbehavior-plugin.php');
 		$bb_run = true;
 
 		// We may want to give some folks a hallway pass
@@ -1393,12 +1393,12 @@ function loadBadBehavior()
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
-	global $smcFunc, $cookiename, $sourcedir, $librarydir;
+	global $smcFunc, $cookiename;
 
 	// As this is only brute protection, we allow 5 attempts every 10 seconds.
 
 	// Destroy any session or cookie data about this member, as they validated wrong.
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	setLoginCookie(-3600, 0);
 
 	if (isset($_SESSION['login_' . $cookiename]))

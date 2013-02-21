@@ -92,9 +92,9 @@ function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix
  */
 function db_extend ($type = 'extra')
 {
-	global $sourcedir, $db_type;
+	global $db_type;
 
-	require_once($sourcedir . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
+	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
 	$initFunc = 'db_' . $type . '_init';
 	$initFunc();
 }
@@ -127,6 +127,10 @@ function smf_db_replacement__callback($matches)
 	global $db_callback, $user_info, $db_prefix;
 
 	list ($values, $connection) = $db_callback;
+
+	// Connection gone?
+	if (!is_resource($connection))
+		display_db_error();
 
 	if ($matches[1] === 'db_prefix')
 		return $db_prefix;
@@ -560,7 +564,7 @@ function smf_db_transaction($type = 'commit', $connection = null)
  */
 function smf_db_error($db_string, $connection = null)
 {
-	global $txt, $context, $sourcedir, $webmaster_email, $modSettings;
+	global $txt, $context, $webmaster_email, $modSettings;
 	global $forum_version, $db_connection, $db_last_error, $db_persist;
 	global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 	global $smcFunc;

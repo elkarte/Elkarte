@@ -406,14 +406,14 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
-	global $modSettings, $smcFunc, $sourcedir, $librarydir;
+	global $modSettings, $smcFunc;
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
 
 	// Needed for our email and post functions
-	require_once($librarydir . '/Mail.subs.php');
-	require_once($librarydir . '/Post.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$onBehalf = $from !== null;
 

@@ -280,8 +280,6 @@ function MaintainTopics()
  */
 function MaintainFindFixErrors()
 {
-	global $sourcedir;
-
 	// Honestly, this should be done in the sub function.
 	validateToken('admin-maint');
 
@@ -364,7 +362,7 @@ function MaintainEmptyUnimportantLogs()
 function ConvertMsgBody()
 {
 	global $scripturl, $context, $txt, $language, $db_character_set, $db_type;
-	global $modSettings, $user_info, $sourcedir, $smcFunc, $db_prefix, $time_start;
+	global $modSettings, $user_info, $smcFunc, $db_prefix, $time_start;
 
 	// Show me your badge!
 	isAllowedTo('admin_forum');
@@ -504,7 +502,7 @@ function ConvertMsgBody()
  */
 function OptimizeTables()
 {
-	global $db_type, $db_name, $db_prefix, $txt, $context, $scripturl, $sourcedir, $smcFunc;
+	global $db_type, $db_name, $db_prefix, $txt, $context, $scripturl, $smcFunc;
 
 	isAllowedTo('admin_forum');
 
@@ -557,7 +555,7 @@ function OptimizeTables()
 	$context['num_tables_optimized'] = count($context['optimized_tables']);
 
 	// Check that we don't auto optimise again too soon!
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 	CalculateNextTrigger('auto_optimize', true);
 }
 
@@ -579,7 +577,7 @@ function OptimizeTables()
  */
 function AdminBoardRecount()
 {
-	global $txt, $context, $scripturl, $modSettings, $sourcedir;
+	global $txt, $context, $scripturl, $modSettings;
 	global $time_start, $smcFunc;
 
 	isAllowedTo('admin_forum');
@@ -1083,7 +1081,7 @@ function AdminBoardRecount()
 	updateStats('topic');
 
 	// Finally, update the latest event times.
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 	CalculateNextTrigger();
 
 	redirectexit('action=admin;area=maintain;sa=routine;done=recount');
@@ -1102,12 +1100,12 @@ function AdminBoardRecount()
  */
 function VersionDetail()
 {
-	global $forum_version, $txt, $librarydir, $context;
+	global $forum_version, $txt, $context;
 
 	isAllowedTo('admin_forum');
 
 	// Call the function that'll get all the version info we need.
-	require_once($librarydir . '/Admin.subs.php');
+	require_once(SUBSDIR . '/Admin.subs.php');
 	$versionOptions = array(
 		'include_ssi' => true,
 		'include_subscriptions' => true,
@@ -1140,12 +1138,12 @@ function VersionDetail()
  */
 function MaintainReattributePosts()
 {
-	global $librarydir, $context, $txt;
+	global $context, $txt;
 
 	checkSession();
 
 	// Find the member.
-	require_once($librarydir . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	$members = findMembers($_POST['to']);
 
 	if (empty($members))
@@ -1158,7 +1156,7 @@ function MaintainReattributePosts()
 	$membername = $_POST['type'] == 'name' ? $_POST['from_name'] : '';
 
 	// Now call the reattribute function.
-	require_once($librarydir . '/Members.subs.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 	reattributePosts($memID, $email, $membername, !empty($_POST['posts']));
 
 	$context['maintenance_finished'] = $txt['maintain_reattribute_posts'];
@@ -1169,11 +1167,9 @@ function MaintainReattributePosts()
  */
 function MaintainDownloadBackup()
 {
-	global $sourcedir;
-
 	validateToken('admin-maint');
 
-	require_once($sourcedir . '/DumpDatabase.php');
+	require_once(SOURCEDIR . '/DumpDatabase.php');
 	DumpDatabase2();
 }
 
@@ -1183,7 +1179,7 @@ function MaintainDownloadBackup()
  */
 function MaintainPurgeInactiveMembers()
 {
-	global $sourcedir, $context, $smcFunc, $txt;
+	global $context, $smcFunc, $txt;
 
 	$_POST['maxdays'] = empty($_POST['maxdays']) ? 0 : (int) $_POST['maxdays'];
 	if (!empty($_POST['groups']) && $_POST['maxdays'] > 0)
@@ -1256,7 +1252,7 @@ function MaintainPurgeInactiveMembers()
 		}
 		$smcFunc['db_free_result']($request);
 
-		require_once($librarydir . '/Members.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		deleteMembers($members);
 	}
 
@@ -1269,12 +1265,12 @@ function MaintainPurgeInactiveMembers()
  */
 function MaintainRemoveOldPosts()
 {
-	global $librarydir, $context, $txt;
+	global $context, $txt;
 
 	validateToken('admin-maint');
 
 	// Actually do what we're told!
-	require_once($librarydir . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 	removeOldTopics();
 }
 
@@ -1283,7 +1279,7 @@ function MaintainRemoveOldPosts()
  */
 function MaintainRemoveOldDrafts()
 {
-	global $librarydir, $smcFunc;
+	global $smcFunc;
 
 	validateToken('admin-maint');
 
@@ -1306,7 +1302,7 @@ function MaintainRemoveOldDrafts()
 	// If we have old drafts, remove them
 	if (count($drafts) > 0)
 	{
-		require_once($librarydir . '/Drafts.subs.php');
+		require_once(SUBSDIR . '/Drafts.subs.php');
 		deleteDrafts($drafts, -1, false);
 	}
 }
@@ -1318,7 +1314,7 @@ function MaintainRemoveOldDrafts()
  */
 function MaintainMassMoveTopics()
 {
-	global $smcFunc, $librarydir, $context, $txt;
+	global $smcFunc, $context, $txt;
 
 	// Only admins.
 	isAllowedTo('admin_forum');
@@ -1393,7 +1389,7 @@ function MaintainMassMoveTopics()
 			}
 
 			// Lets move them.
-			require_once($librarydir . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Topic.subs.php');
 			moveTopics($topics, $id_board_to);
 
 			// We've done at least ten more topics.

@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function action_attachapprove()
 {
-	global $smcFunc, $librarydir;
+	global $smcFunc;
 
 	// Security is our primary concern...
 	checkSession('get');
@@ -97,7 +97,7 @@ function action_attachapprove()
 		fatal_lang_error('no_access', false);
 
 	// Finally, we are there. Follow through!
-	require_once($librarydir . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	if ($is_approve)
 	{
 		// Checked and deemed worthy.

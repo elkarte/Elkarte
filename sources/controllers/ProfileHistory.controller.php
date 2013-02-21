@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  */
 function action_history($memID)
 {
-	global $sourcedir, $context, $txt, $scripturl, $modSettings, $user_profile;
+	global $context, $txt, $scripturl, $modSettings, $user_profile;
 
 	$subActions = array(
 		'activity' => array('action_trackactivity', $txt['trackActivity']),
@@ -39,7 +39,7 @@ function action_history($memID)
 
 	// @todo what is $types? it is never set so this will never be true
 	if (isset($types[$context['history_area']][1]))
-		require_once($sourcedir . '/' . $types[$context['history_area']][1]);
+		require_once(SOURCEDIR . '/' . $types[$context['history_area']][1]);
 
 	// Create the tabs for the template.
 	$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -71,7 +71,7 @@ function action_history($memID)
  */
 function action_trackactivity($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir;
+	global $scripturl, $txt, $modSettings;
 	global $user_profile, $context, $smcFunc;
 
 	// Verify if the user has sufficient permissions.
@@ -160,7 +160,7 @@ function action_trackactivity($memID)
 	);
 
 	// Create the list for viewing.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// @todo cache this
@@ -437,8 +437,8 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
  */
 function action_trackip($memID = 0)
 {
-	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc, $librarydir;
+	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
+	global $context, $smcFunc;
 
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
@@ -487,7 +487,7 @@ function action_trackip($memID = 0)
 	ksort($context['ips']);
 
 	// Gonna want this for the list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// Start with the user messages.
 	$listOptions = array(
@@ -723,11 +723,11 @@ function action_trackip($memID = 0)
  */
 function action_tracklogin($memID = 0)
 {
-	global $user_profile, $scripturl, $txt, $user_info, $modSettings, $sourcedir;
-	global $context, $smcFunc, $librarydir;
+	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
+	global $context, $smcFunc;
 
 	// Gonna want this for the list.
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	if ($memID == 0)
 		$context['base_url'] = $scripturl . '?action=trackip';
@@ -864,9 +864,9 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $sourcedir, $librarydir, $context, $smcFunc;
+	global $scripturl, $txt, $modSettings, $context, $smcFunc;
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 
 	// Get the names of any custom fields.
 	$request = $smcFunc['db_query']('', '

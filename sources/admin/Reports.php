@@ -140,7 +140,7 @@ function ReportsMain()
  */
 function BoardReport()
 {
-	global $context, $txt, $sourcedir, $smcFunc, $modSettings;
+	global $context, $txt, $smcFunc, $modSettings;
 
 	// Load the permission profiles.
 	loadAdminClass ('ManagePermissions.php');
@@ -674,9 +674,9 @@ function GroupPermissionsReport()
  */
 function StaffReport()
 {
-	global $sourcedir, $librarydir, $context, $txt, $smcFunc;
+	global $context, $txt, $smcFunc;
 
-	require_once($librarydir . '/Members.subs.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 
 	// Fetch all the board names.
 	$request = $smcFunc['db_query']('', '

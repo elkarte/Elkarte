@@ -47,7 +47,7 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $sourcedir, $modSettings, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	switch ($type)
 	{
@@ -836,7 +836,7 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc, $librarydir;
+	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -1695,7 +1695,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
 							// For images, we'll want this.
-							require_once($librarydir . '/Attachments.subs.php');
+							require_once(SUBSDIR . '/Attachments.subs.php');
 							list ($width, $height) = url_image_size($imgtag);
 
 							if (!empty($modSettings['max_image_width']) && $width > $modSettings['max_image_width'])
@@ -2905,7 +2905,7 @@ function template_rawdata()
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $settings, $user_info, $boarddir, $cachedir;
+	global $txt, $modSettings, $context, $settings, $user_info;
 
 	setupThemeContext();
 
@@ -2938,7 +2938,7 @@ function template_header()
 			$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
 			foreach ($securityFiles as $i => $securityFile)
 			{
-				if (!file_exists($boarddir . '/' . $securityFile))
+				if (!file_exists(BOARDDIR . '/' . $securityFile))
 					unset($securityFiles[$i]);
 			}
 
@@ -2955,13 +2955,13 @@ function template_header()
 				$id_folder_thumb = 1;
 			}
 			secureDirectory($path, true);
-			secureDirectory($cachedir);
+			secureDirectory(CACHEDIR);
 
 			// If agreement is enabled, at least the english version shall exists
 			if ($modSettings['requireAgreement'])
-				$agreement = !file_exists($boarddir . '/agreement.txt');
+				$agreement = !file_exists(BOARDDIR . '/agreement.txt');
 
-			if (!empty($securityFiles) || (!empty($modSettings['cache_enable']) && !is_writable($cachedir)) || !empty($agreement))
+			if (!empty($securityFiles) || (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR)) || !empty($agreement))
 			{
 				echo '
 		<div class="errorbox">
@@ -2979,7 +2979,7 @@ function template_header()
 				', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
 				}
 
-				if (!empty($modSettings['cache_enable']) && !is_writable($cachedir))
+				if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 					echo '
 				<strong>', $txt['cache_writable'], '</strong><br />';
 
@@ -3077,7 +3077,7 @@ function template_footer()
  */
 function template_javascript($do_defered = false)
 {
-	global $context, $modSettings, $settings, $sourcedir;
+	global $context, $modSettings, $settings;
 
 	// First up, load jquery
 	if (isset($modSettings['jquery_source']) && !$do_defered)
@@ -3110,7 +3110,7 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Combine.class.php');
+			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -3183,7 +3183,7 @@ function template_javascript($do_defered = false)
  */
 function template_css()
 {
-	global $context, $sourcedir, $modSettings;
+	global $context, $modSettings;
 
 	// Use this hook to work with CSS files pre output
 	call_integration_hook('pre_css_output');
@@ -3193,7 +3193,7 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once($sourcedir . '/Combine.class.php');
+			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner;
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
@@ -3816,7 +3816,7 @@ function smf_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	global $modSettings, $settings, $boarddir, $sourcedir, $db_show_debug, $context;
+	global $modSettings, $settings, $db_show_debug, $context;
 
 	if ($db_show_debug === true)
 		$context['debug']['hooks'][] = $hook;
@@ -3837,9 +3837,9 @@ function call_integration_hook($hook, $parameters = array())
 			{
 				list($func, $file) = explode(':', $call[1]);
 				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir));
+					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
-					$absPath = strtr(trim($file), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
+					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
 				if (file_exists($absPath))
 					require_once($absPath);
 				$call = array($call[0], $func);
@@ -3852,9 +3852,9 @@ function call_integration_hook($hook, $parameters = array())
 			{
 				list($func, $file) = explode(':', $function);
 				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir));
+					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
-					$absPath = strtr(trim($file), array('$boarddir' => $boarddir, '$sourcedir' => $sourcedir, '$themedir' => $settings['theme_dir']));
+					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
 				if (file_exists($absPath))
 					require_once($absPath);
 				$call = $func;

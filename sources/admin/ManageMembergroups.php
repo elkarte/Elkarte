@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
 */
 function ModifyMembergroups()
 {
-	global $context, $txt, $scripturl, $sourcedir;
+	global $context, $txt, $scripturl;
 
 	$subActions = array(
 		'add' => array('AddMembergroup', 'manage_membergroups'),
@@ -51,7 +51,7 @@ function ModifyMembergroups()
 
 	// Is it elsewhere?
 	if (isset($subActions[$_REQUEST['sa']][2]))
-		require_once($sourcedir . '/' . $subActions[$_REQUEST['sa']][2]);
+		require_once(SOURCEDIR . '/' . $subActions[$_REQUEST['sa']][2]);
 
 	// Do the permission check, you might not be allowed her.
 	isAllowedTo($subActions[$_REQUEST['sa']][1]);
@@ -82,7 +82,7 @@ function ModifyMembergroups()
  */
 function MembergroupIndex()
 {
-	global $txt, $scripturl, $context, $settings, $smcFunc, $librarydir, $user_info;
+	global $txt, $scripturl, $context, $settings, $smcFunc, $user_info;
 
 	$context['page_title'] = $txt['membergroups_title'];
 
@@ -93,7 +93,7 @@ function MembergroupIndex()
 		'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : ''),
 		'default_sort_col' => 'name',
 		'get_items' => array(
-			'file' => $librarydir . '/Membergroups.subs.php',
+			'file' => SUBSDIR . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'regular',
@@ -196,7 +196,7 @@ function MembergroupIndex()
 		),
 	);
 
-	require_once($librarydir . '/List.subs.php');
+	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// The second list shows the post count based groups.
@@ -210,7 +210,7 @@ function MembergroupIndex()
 			'desc' => 'desc2',
 		),
 		'get_items' => array(
-			'file' => $librarydir . '/Membergroups.subs.php',
+			'file' => SUBSDIR . '/Membergroups.subs.php',
 			'function' => 'list_getMembergroups',
 			'params' => array(
 				'post_count',
@@ -322,7 +322,7 @@ function MembergroupIndex()
  */
 function AddMembergroup()
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, $smcFunc;
 
 	// A form was submitted, we can start adding.
 	if (isset($_POST['group_name']) && trim($_POST['group_name']) != '')
@@ -382,21 +382,11 @@ function AddMembergroup()
 			// Are you a powerful admin?
 			if (!allowedTo('admin_forum'))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT group_type
-					FROM {db_prefix}membergroups
-					WHERE id_group = {int:copy_from}
-					LIMIT {int:limit}',
-					array(
-						'copy_from' => $copy_id,
-						'limit' => 1,
-					)
-				);
-				list ($copy_type) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				$copy_type = membergroupsById($copy_id);
 
 				// Protected groups are... well, protected!
-				if ($copy_type == 1)
+				if ($copy_type['group_type'] == 1)
 					fatal_lang_error('membergroup_does_not_exist');
 			}
 
@@ -452,17 +442,8 @@ function AddMembergroup()
 			// Also get some membergroup information if we're copying and not copying from guests...
 			if ($copy_id > 0 && $_POST['perm_type'] == 'copy')
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT online_color, max_messages, icons
-					FROM {db_prefix}membergroups
-					WHERE id_group = {int:copy_from}
-					LIMIT 1',
-					array(
-						'copy_from' => $copy_id,
-					)
-				);
-				$group_info = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				$group_info = membergroupsById($copy_id, 1, true);
 
 				// ...and update the new membergroup with it.
 				$smcFunc['db_query']('', '
@@ -629,11 +610,9 @@ function AddMembergroup()
  */
 function DeleteMembergroup()
 {
-	global $librarydir;
-
 	checkSession('get');
 
-	require_once($librarydir . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 	deleteMembergroups((int) $_REQUEST['group']);
 
 	// Go back to the membergroup index.
@@ -652,35 +631,21 @@ function DeleteMembergroup()
  */
 function EditMembergroup()
 {
-	global $context, $txt, $librarydir, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, $smcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) && $_REQUEST['group'] > 0 ? (int) $_REQUEST['group'] : 0;
 
 	if (!empty($modSettings['deny_boards_access']))
 		loadLanguage('ManagePermissions');
 
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	// Make sure this group is editable.
 	if (!empty($_REQUEST['group']))
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:current_group}' . (allowedTo('admin_forum') ? '' : '
-				AND group_type != {int:is_protected}') . '
-			LIMIT {int:limit}',
-			array(
-				'current_group' => $_REQUEST['group'],
-				'is_protected' => 1,
-				'limit' => 1,
-			)
-		);
-		list ($_REQUEST['group']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-	}
+		$groups = membergroupsById($_REQUEST['group'], 1, false, false, allowedTo('admin_forum'));
 
 	// Now, do we have a valid id?
-	if (empty($_REQUEST['group']))
+	if (empty($groups['id_group']))
 		fatal_lang_error('membergroup_does_not_exist', false);
 
 	// The delete this membergroup button was pressed.
@@ -689,8 +654,7 @@ function EditMembergroup()
 		checkSession();
 		validateToken('admin-mmg');
 
-		require_once($librarydir . '/Membergroups.subs.php');
-		deleteMembergroups($_REQUEST['group']);
+		deleteMembergroups($groups['id_group']);
 
 		redirectexit('action=admin;area=membergroups;');
 	}
@@ -704,28 +668,17 @@ function EditMembergroup()
 		// Can they really inherit from this group?
 		if (isset($_POST['group_inherit']) && $_POST['group_inherit'] != -2 && !allowedTo('admin_forum'))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT group_type
-				FROM {db_prefix}membergroups
-				WHERE id_group = {int:inherit_from}
-				LIMIT {int:limit}',
-				array(
-					'inherit_from' => $_POST['group_inherit'],
-					'limit' => 1,
-				)
-			);
-			list ($inherit_type) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$inherit_type = membergroupsById((int) $_POST['group_inherit']);
 		}
 
 		// Set variables to their proper value.
 		$_POST['max_messages'] = isset($_POST['max_messages']) ? (int) $_POST['max_messages'] : 0;
-		$_POST['min_posts'] = isset($_POST['min_posts']) && isset($_POST['group_type']) && $_POST['group_type'] == -1 && $_REQUEST['group'] > 3 ? abs($_POST['min_posts']) : ($_REQUEST['group'] == 4 ? 0 : -1);
+		$_POST['min_posts'] = isset($_POST['min_posts']) && isset($_POST['group_type']) && $_POST['group_type'] == -1 && $groups['id_group'] > 3 ? abs($_POST['min_posts']) : ($groups['id_group'] == 4 ? 0 : -1);
 		$_POST['icons'] = (empty($_POST['icon_count']) || $_POST['icon_count'] < 0) ? '' : min((int) $_POST['icon_count'], 99) . '#' . $_POST['icon_image'];
-		$_POST['group_desc'] = isset($_POST['group_desc']) && ($_REQUEST['group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
+		$_POST['group_desc'] = isset($_POST['group_desc']) && ($groups['id_group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
 		$_POST['group_type'] = !isset($_POST['group_type']) || $_POST['group_type'] < 0 || $_POST['group_type'] > 3 || ($_POST['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : (int) $_POST['group_type'];
-		$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $_REQUEST['group'] == 3 ? 0 : (int) $_POST['group_hidden'];
-		$_POST['group_inherit'] = $_REQUEST['group'] > 1 && $_REQUEST['group'] != 3 && (empty($inherit_type) || $inherit_type != 1) ? (int) $_POST['group_inherit'] : -2;
+		$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $groups['id_group'] == 3 ? 0 : (int) $_POST['group_hidden'];
+		$_POST['group_inherit'] = $groups['id_group'] > 1 && $groups['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? (int) $_POST['group_inherit'] : -2;
 
 		//@todo Don't set online_color for the Moderators group?
 
@@ -743,7 +696,7 @@ function EditMembergroup()
 				'group_type' => $_POST['group_type'],
 				'group_hidden' => $_POST['group_hidden'],
 				'group_inherit' => $_POST['group_inherit'],
-				'current_group' => (int) $_REQUEST['group'],
+				'current_group' => $groups['id_group'],
 				'group_name' => $smcFunc['htmlspecialchars']($_POST['group_name']),
 				'online_color' => $_POST['online_color'],
 				'icons' => $_POST['icons'],
@@ -751,10 +704,10 @@ function EditMembergroup()
 			)
 		);
 
-		call_integration_hook('integrate_save_membergroup', array((int) $_REQUEST['group']));
+		call_integration_hook('integrate_save_membergroup', array($groups['id_group']));
 
 		// Time to update the boards this membergroup has access to.
-		if ($_REQUEST['group'] == 2 || $_REQUEST['group'] > 3)
+		if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 		{
 			$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
 			$changed_boards['allow'] = array();
@@ -772,7 +725,7 @@ function EditMembergroup()
 					WHERE FIND_IN_SET({string:current_group}, {raw:column}) != 0' . (empty($changed_boards[$board_action]) ? '' : '
 						AND id_board NOT IN ({array_int:board_access_list})'),
 					array(
-						'current_group' => (int) $_REQUEST['group'],
+						'current_group' => $groups['id_group'],
 						'board_access_list' => $changed_boards[$board_action],
 						'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
 					)
@@ -784,7 +737,7 @@ function EditMembergroup()
 						WHERE id_board = {int:current_board}',
 						array(
 							'current_board' => $row['id_board'],
-							'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($_REQUEST['group']))),
+							'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($groups['id_group']))),
 							'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
 						)
 					);
@@ -800,9 +753,9 @@ function EditMembergroup()
 						array(
 							'board_list' => $changed_boards[$board_action],
 							'blank_string' => '',
-							'current_group' => (int) $_REQUEST['group'],
-							'group_id_string' => (string) (int) $_REQUEST['group'],
-							'comma_group' => ',' . $_REQUEST['group'],
+							'current_group' => $groups['id_group'],
+							'group_id_string' => (string) $groups['id_group'],
+							'comma_group' => ',' . $groups['id_group'],
 							'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
 						)
 					);
@@ -818,7 +771,7 @@ function EditMembergroup()
 				WHERE id_group = {int:current_group}',
 				array(
 					'regular_member' => 0,
-					'current_group' => (int) $_REQUEST['group'],
+					'current_group' => $groups['id_group'],
 				)
 			);
 
@@ -827,7 +780,7 @@ function EditMembergroup()
 				FROM {db_prefix}members
 				WHERE FIND_IN_SET({string:current_group}, additional_groups) != 0',
 				array(
-					'current_group' => (int) $_REQUEST['group'],
+					'current_group' => $groups['id_group'],
 				)
 			);
 			$updates = array();
@@ -836,9 +789,9 @@ function EditMembergroup()
 			$smcFunc['db_free_result']($request);
 
 			foreach ($updates as $additional_groups => $memberArray)
-				updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), array((int) $_REQUEST['group'])))));
+				updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), array($groups['id_group'])))));
 		}
-		elseif ($_REQUEST['group'] != 3)
+		elseif ($groups['id_group'] != 3)
 		{
 			// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
 			if ($_POST['group_hidden'] == 2)
@@ -849,7 +802,7 @@ function EditMembergroup()
 					WHERE id_group = {int:current_group}
 						AND FIND_IN_SET({int:current_group}, additional_groups) = 0',
 					array(
-						'current_group' => (int) $_REQUEST['group'],
+						'current_group' => $groups['id_group'],
 					)
 				);
 				$updates = array();
@@ -858,7 +811,7 @@ function EditMembergroup()
 				$smcFunc['db_free_result']($request);
 
 				foreach ($updates as $additional_groups => $memberArray)
-					updateMemberData($memberArray, array('additional_groups' => implode(',', array_merge(explode(',', $additional_groups), array((int) $_REQUEST['group'])))));
+					updateMemberData($memberArray, array('additional_groups' => implode(',', array_merge(explode(',', $additional_groups), array($groups['id_group'])))));
 
 				$smcFunc['db_query']('', '
 					UPDATE {db_prefix}members
@@ -866,7 +819,7 @@ function EditMembergroup()
 					WHERE id_group = {int:current_group}',
 					array(
 						'regular_member' => 0,
-						'current_group' => $_REQUEST['group'],
+						'current_group' => $groups['id_group'],
 					)
 				);
 			}
@@ -901,10 +854,10 @@ function EditMembergroup()
 			DELETE FROM {db_prefix}group_moderators
 			WHERE id_group = {int:current_group}',
 			array(
-				'current_group' => $_REQUEST['group'],
+				'current_group' => $groups['id_group'],
 			)
 		);
-		if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $_REQUEST['group'] != 3)
+		if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $groups['id_group'] != 3)
 		{
 			// Get all the usernames from the string
 			if (!empty($moderator_string))
@@ -968,7 +921,7 @@ function EditMembergroup()
 			{
 				$mod_insert = array();
 				foreach ($group_moderators as $moderator)
-					$mod_insert[] = array($_REQUEST['group'], $moderator);
+					$mod_insert[] = array($groups['id_group'], $moderator);
 
 				$smcFunc['db_insert']('insert',
 					'{db_prefix}group_moderators',
@@ -993,24 +946,14 @@ function EditMembergroup()
 	}
 
 	// Fetch the current group information.
-	$request = $smcFunc['db_query']('', '
-		SELECT group_name, description, min_posts, online_color, max_messages, icons, group_type, hidden, id_parent
-		FROM {db_prefix}membergroups
-		WHERE id_group = {int:current_group}
-		LIMIT 1',
-		array(
-			'current_group' => (int) $_REQUEST['group'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	$row = membergroupsById($groups['id_group'], 1, true);
+	if (empty($row))
 		fatal_lang_error('membergroup_does_not_exist', false);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	$row['icons'] = explode('#', $row['icons']);
 
 	$context['group'] = array(
-		'id' => $_REQUEST['group'],
+		'id' => $groups['id_group'],
 		'name' => $row['group_name'],
 		'description' => htmlspecialchars($row['description']),
 		'editable_name' => $row['group_name'],
@@ -1023,8 +966,8 @@ function EditMembergroup()
 		'type' => $row['min_posts'] != -1 ? 0 : $row['group_type'],
 		'hidden' => $row['min_posts'] == -1 ? $row['hidden'] : 0,
 		'inherited_from' => $row['id_parent'],
-		'allow_post_group' => $_REQUEST['group'] == 2 || $_REQUEST['group'] > 4,
-		'allow_delete' => $_REQUEST['group'] == 2 || $_REQUEST['group'] > 4,
+		'allow_post_group' => $groups['id_group'] == 2 || $groups['id_group'] > 4,
+		'allow_delete' => $groups['id_group'] == 2 || $groups['id_group'] > 4,
 		'allow_protected' => allowedTo('admin_forum'),
 	);
 
@@ -1035,7 +978,7 @@ function EditMembergroup()
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
 		WHERE mods.id_group = {int:current_group}',
 		array(
-			'current_group' => $_REQUEST['group'],
+			'current_group' => $groups['id_group'],
 		)
 	);
 	$context['group']['moderators'] = array();
@@ -1050,7 +993,7 @@ function EditMembergroup()
 
 	// Get a list of boards this membergroup is allowed to see.
 	$context['boards'] = array();
-	if ($_REQUEST['group'] == 2 || $_REQUEST['group'] > 3)
+	if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT b.id_cat, c.name as cat_name, b.id_board, b.name, b.child_level,
@@ -1059,7 +1002,7 @@ function EditMembergroup()
 				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
 			ORDER BY board_order',
 			array(
-				'current_group' => (int) $_REQUEST['group'],
+				'current_group' => $groups['id_group'],
 			)
 		);
 		$context['categories'] = array();
@@ -1114,7 +1057,7 @@ function EditMembergroup()
 			AND id_group NOT IN (1, 3)
 			AND id_parent = {int:not_inherited}',
 		array(
-			'current_group' => (int) $_REQUEST['group'],
+			'current_group' => $groups['id_group'],
 			'min_posts' => -1,
 			'not_inherited' => -2,
 			'is_protected' => 1,
@@ -1143,7 +1086,7 @@ function EditMembergroup()
  */
 function ModifyMembergroupsettings()
 {
-	global $context, $sourcedir, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	$context['sub_template'] = 'show_settings';
 	$context['page_title'] = $txt['membergroups_settings'];
