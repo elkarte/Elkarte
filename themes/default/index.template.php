@@ -87,7 +87,7 @@ function template_html_above()
 <html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>';
 
-	// Tell IE to render the page in standards not compatabilty mode. really for ie >= 8
+	// Tell IE to render the page in standards not compatibility mode. really for ie >= 8
 	// Note if this is not in the first 4k, its ignored, thats why its here
 	if (isBrowser('ie'))
 		echo '
