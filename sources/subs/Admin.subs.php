@@ -145,11 +145,11 @@ function getFileVersions(&$versionOptions)
 	// Load all the files in the sources and its sub directorys
 	$directories = array(
 		'file_versions' => SOURCEDIR,
-		'file_versions_admin' => SOURCEDIR . '/admin',
-		'file_versions_controllers' => SOURCEDIR . '/controllers',
+		'file_versions_admin' => ADMINDIR,
+		'file_versions_controllers' => CONTROLLERDIR,
 		'file_versions_database' => SOURCEDIR . '/database',
-		'file_versions_subs' => SOURCEDIR . '/subs',
-		'file_versions_lib' => SOURCEDIR . '/lib'
+		'file_versions_subs' => SUBSDIR,
+		'file_versions_lib' => EXTDIR
 	);
 	foreach ($directories as $area => $dir)
 	{

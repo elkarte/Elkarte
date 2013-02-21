@@ -1360,7 +1360,7 @@ function loadBadBehavior()
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
-		require_once(SOURCEDIR . '/lib/bad-behavior/badbehavior-plugin.php');
+		require_once(EXTDIR . '/bad-behavior/badbehavior-plugin.php');
 		$bb_run = true;
 
 		// We may want to give some folks a hallway pass
