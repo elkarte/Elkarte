@@ -36,7 +36,7 @@ if (!defined('ELKARTE'))
  * - $email_message->headers // All the headers in an array
  * - $email_message->body // The decoded / translated message
  * - $email_message->raw_message // The entire message w/headers as read
- * - $email_message->plain_body // The plain text version of the mesasge
+ * - $email_message->plain_body // The plain text version of the message
  * - $email_message->attachments // Any attachments with key = filename
  *
  * Optional functions
@@ -80,7 +80,7 @@ class Email_Parse
 	public $headers = array();
 
 	/**
-	 * full secutiry key
+	 * full security key
 	 */
 	public $message_key_id = null;
 
@@ -117,12 +117,12 @@ class Email_Parse
 	/**
 	 * holds each boundary section of the message
 	 */
-	private $_mp_section = array();
+	private $_boundary_section = array();
 
 	/**
 	 * the total number of boundary sections
 	 */
-	private $_mp_section_count = null;
+	private $_boundary_section_count = null;
 
 	/**
 	 * the message header block
@@ -144,7 +144,7 @@ class Email_Parse
 			if (empty($_POST['pbe_cron']))
 				isAllowedTo(array('admin_forum', 'approve_emails'));
 
-			// read the file from the failed log table
+			// Read in the file from the failed log table
 			if (isset($_POST['item']))
 				$this->raw_message = $this->_query_load_email($_POST['item']);
 			// @todo debugging file used for testing
@@ -177,7 +177,7 @@ class Email_Parse
 		$request = $smcFunc['db_query']('', '
 			SELECT message
 			FROM {db_prefix}postby_emails_error
-			WHERE id = {int:id}
+			WHERE id_email = {int:id}
 			LIMIT 1',
 			array(
 				'id' => $id
@@ -248,7 +248,7 @@ class Email_Parse
 		// Remove windows style \r's
 		$this->_header_block = str_replace("\r\n", "\n", $this->_header_block);
 
-		// Combine multi-line headers to make processing easy
+		// unfolding multi-line headers, a CRLF immediately followed by a LWSP-char is equivalent to the LWSP-char
 		$this->_header_block = preg_replace("~\n(\t| )+~", ' ', $this->_header_block);
 
 		// Build the array of headers
@@ -264,7 +264,7 @@ class Email_Parse
 				continue;
 
 			// The header key (standardized) and value
-			$header_value = substr($header, $pos);
+			$header_value = substr($header, $pos + 1);
 			$header_key = strtolower(trim($header_key));
 
 			// Decode and add it in to our headers array
@@ -320,7 +320,7 @@ class Email_Parse
 	 * headers['x-parameters'][charset] = iso-8859-1
 	 *
 	 * If parameters are found, sets the primary value to the given key and the additional
-	 * values are placed to our catch all x-parameters key. Done this
+	 * values are placed to our catch all x-parameters key. Done this way to prevent
 	 * overwriting a primary header key with a secondary one
 	 *
 	 * @param string $value
@@ -421,13 +421,13 @@ class Email_Parse
 				$this->_boundary_split($this->headers['x-parameters']['content-type']['boundary'], $html);
 
 				// Some multi-part messages ... are singletons :P
-				if ($this->_mp_section_count === 1)
+				if ($this->_boundary_section_count === 1)
 				{
-					$this->body = $this->_mp_section[0]->body;
-					$this->headers['x-parameters'] = $this->_mp_section[0]->headers['x-parameters'];
+					$this->body = $this->_boundary_section[0]->body;
+					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
 				}
 				// We found multiple sections, lets go through each
-				elseif ($this->_mp_section_count > 1)
+				elseif ($this->_boundary_section_count > 1)
 				{
 					$html_ids = array();
 					$text_ids = array();
@@ -436,35 +436,35 @@ class Email_Parse
 					$bypass = array('application/pgp-encrypted', 'application/pgp-signature', 'application/pgp-keys');
 
 					// Go through each boundary section
-					for ($i = 0; $i < $this->_mp_section_count; $i++)
+					for ($i = 0; $i < $this->_boundary_section_count; $i++)
 					{
 						// Stuff we can't or don't want to process
-						if (in_array($this->_mp_section[$i]->headers['content-type'], $bypass))
+						if (in_array($this->_boundary_section[$i]->headers['content-type'], $bypass))
 							continue;
 						// HTML sections
-						elseif ($this->_mp_section[$i]->headers['content-type'] === 'text/html')
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/html')
 							$html_ids[] = $i;
 						// Plain section
-						elseif ($this->_mp_section[$i]->headers['content-type'] === 'text/plain')
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
 							$text_ids[] = $i;
 
 						// Attachments, we love em
-						if ($this->_mp_section[$i]->headers['content-disposition'] === 'attachment' || $this->_mp_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_mp_section[$i]->headers['content-id']))
+						if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
 						{
 							// Get the attachments file name
-							if (isset($this->_mp_section[$i]->headers['x-parameters']['content-disposition']['filename']))
-								$file_name = $this->_mp_section[$i]->headers['x-parameters']['content-disposition']['filename'];
-							elseif (isset($this->_mp_section[$i]->headers['x-parameters']['content-type']['name']))
-								$file_name = $this->_mp_section[$i]->headers['x-parameters']['content-type']['name'];
+							if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
+								$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename'];
+							elseif (isset($this->_boundary_section[$i]->headers['x-parameters']['content-type']['name']))
+								$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-type']['name'];
 							else
 								continue;
 
 							// Load the attachment data
-							$this->attachments[$file_name] = $this->_mp_section[$i]->body;
+							$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
 
 							// Inline attachments are a bit more complicated.
-							if (isset($this->_mp_section[$i]->headers['content-id']) && $this->_mp_section[$i]->headers['content-disposition'] === 'inline')
-								$this->inline_files[$file_name] = trim($this->_mp_section[$i]->headers['content-id'], ' <>');
+							if (isset($this->_boundary_section[$i]->headers['content-id']) && $this->_boundary_section[$i]->headers['content-disposition'] === 'inline')
+								$this->inline_files[$file_name] = trim($this->_boundary_section[$i]->headers['content-id'], ' <>');
 						}
 					}
 
@@ -472,13 +472,13 @@ class Email_Parse
 					if (!empty($text_ids))
 					{
 						foreach ($text_ids as $id)
-							$this->plain_body .= $this->_mp_section[$id]->body;
+							$this->plain_body .= $this->_boundary_section[$id]->body;
 					}
 					elseif (!empty($html_ids))
 					{
 						// This should never run as emails should always have a plain text section to be valid, still ...
 						foreach ($html_ids as $id)
-							$this->plain_body .= $this->_mp_section[$id]->body;
+							$this->plain_body .= $this->_boundary_section[$id]->body;
 
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
 						$this->plain_body = str_ireplace(array('<br />', '<br>', '</p>', '</div>'), "\n", $this->plain_body);
@@ -498,22 +498,22 @@ class Email_Parse
 						// For all the chosen sections
 						foreach ($text_ids as $id)
 						{
-							$this->body .= $this->_mp_section[$id]->body;
+							$this->body .= $this->_boundary_section[$id]->body;
 
 							// A section may have its own attachments if it had is own unique boundary sections
 							// so we need to check and add them in as needed
-							foreach ($this->_mp_section[$id]->attachments as $key => $value)
+							foreach ($this->_boundary_section[$id]->attachments as $key => $value)
 								$this->attachments[$key] = $value;
-							foreach ($this->_mp_section[$id]->inline_files as $key => $value)
+							foreach ($this->_boundary_section[$id]->inline_files as $key => $value)
 								$this->inline_files[$key] = $value;
 						}
 						$this->body = $this->_decode_body($this->body);
 
 						// Return the right set of x-parameters and content type for the body we are returning
-						if (isset($this->_mp_section[$text_ids[0]]->headers['x-parameters']))
-							$this->headers['x-parameters'] = $this->_mp_section[$text_ids[0]]->headers['x-parameters'];
+						if (isset($this->_boundary_section[$text_ids[0]]->headers['x-parameters']))
+							$this->headers['x-parameters'] = $this->_boundary_section[$text_ids[0]]->headers['x-parameters'];
 
-						$this->headers['content-type'] = $this->_mp_section[$text_ids[0]]->headers['content-type'];
+						$this->headers['content-type'] = $this->_boundary_section[$text_ids[0]]->headers['content-type'];
 					}
 				}
 				break;
@@ -528,11 +528,12 @@ class Email_Parse
 	 * Split up multipart messages and process each section separately
 	 * as its own email object
 	 *
+	 * @param string $boundary
 	 * @param boolean $html, flag to indicate html content
 	 */
 	private function _boundary_split($boundary, $html)
 	{
-		$this->_mp_section_count = 0;
+		$this->_boundary_section_count = 0;
 
 		// Split this message up on its boundary sections
 		$parts = explode('--' . $boundary, $this->body);
@@ -545,10 +546,10 @@ class Email_Parse
 				continue;
 
 			// Parse this section just like its was a separate email
-			$this->_mp_section[$this->_mp_section_count] = new Email_Parse;
-			$this->_mp_section[$this->_mp_section_count]->read_email($html, $part);
+			$this->_boundary_section[$this->_boundary_section_count] = new Email_Parse;
+			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
 
-			$this->_mp_section_count++;
+			$this->_boundary_section_count++;
 		}
 	}
 
@@ -556,14 +557,15 @@ class Email_Parse
 	 * Converts a header string to ascii/UTF8
      *
 	 * Headers, mostly subject and names may be encoded as quoted printable or base64
-	 * to allow for non ascii characters in those fields.  This encoding is separate
-	 * from the message body encoding and must be determined since this
-     * encoding is not specified by the headers themselves
+	 * to allow for non ascii characters in those fields. This encoding is separate
+	 * from the message body encoding and must be determined since this encoding is
+	 * not directly specified by the headers themselves
 	 *
 	 * @param string $val
+	 * @param bool strict
 	 * @return string
 	 */
-	private function _decode_header($val)
+	private function _decode_header($val, $strict = false)
 	{
 		// Check if this header even needs to be decoded.
 		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
@@ -571,25 +573,37 @@ class Email_Parse
 
 		// If iconv mime is available just use it and be done
 		if (function_exists('iconv_mime_decode'))
-			return iconv_mime_decode($val, 2, 'UTF-8');
+			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
 
-		// The RFC 2047 standard for an encoded header value is a sequence of characters that
+		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
 		// begins with "=?", ends with "?=", and has two "?"s in between. After the first question mark
 		// is the name of the character encoding being used; after the second question mark
 		// is the manner in which it's being encoded into plain ASCII (Q=quoted printable, B=base64);
 		// and after the third question mark is the text itself.
 		// Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
 		$matches = array();
-		if (preg_match_all('~(.*?)(=\?([^?]+)\?(Q|B)\?([^?]*)\?=)([^=]*)~i', $val, $matches))
+		if (preg_match_all('~(.*?)(=\?([^?]+)\?(Q|B)\?([^?]*)\?=)([^=\(]*)~i', $val, $matches))
 		{
+			$decoded = '';
 			for ($i = 0, $num = count($matches[4]); $i < $num; $i++)
 			{
-				// [1]header, [2]=? to ?=, [3]its character set, [4]Q or B, [5]the encoded text [6] trailing text
-				$header = $matches[1][$i];
+				// [1]leading text, [2]=? to ?=, [3]character set, [4]Q or B, [5]the encoded text [6]trailing text
+				$leading_text = $matches[1][$i];
 				$encoded_charset = $matches[3][$i];
 				$encoded_type = strtolower($matches[4][$i]);
 				$encoded_text = $matches[5][$i];
 				$trailing_text = $matches[6][$i];
+
+				if ($strict)
+				{
+					// Technically the encoded word can only be by itself or in a cname
+					$check = trim($leading_text);
+					if ($i === 0 && !empty($check) && $check[0] !== '(')
+					{
+						$decoded .= $matches[0][$i];
+						continue;
+					}
+				}
 
 				// Decode and convert our string
 				if ($encoded_type === 'q')
@@ -601,11 +615,13 @@ class Email_Parse
 				if (!empty($encoded_text))
 					$decoded_text .= $trailing_text;
 
-				// Add back in the header to the now decoded value
-				if (!empty($header))
-					$decoded_text = $header . $decoded_text;
+				// Add back in the leading text to the now decoded value
+				if (!empty($leading_text))
+					$decoded_text = $leading_text . $decoded_text;
+
+				$decoded .= $decoded_text;
 			}
-			$val = $decoded_text;
+			$val = $decoded;
 		}
 		return trim($val);
 	}
@@ -613,7 +629,7 @@ class Email_Parse
 	/**
 	 * Checks the body text to see if it may need to be further decoded
      *
-	 * Sadly whats in the body text is not allways what the header claims, or the
+	 * Sadly whats in the body text is not always what the header claims, or the
 	 * header is just wrong.  Copy/paste in to email from other apps etc.
 	 * This does an extra check for quoted printable DNA and if found decodes the
 	 * message as such.
@@ -708,7 +724,7 @@ class Email_Parse
 	 */
 	public function load_key($key = '')
 	{
-		$regex_key = '~(([a-z0-9]{32})\-(p|t|m)(\d+))~i';
+		$regex_key = '~([a-z0-9]{32}\-(p|t|m)(\d+))~i';
 		$match = array();
 		$found_key = false;
 
@@ -756,9 +772,9 @@ class Email_Parse
 		// Load the key details so they can be accessed
 		if (!empty($match[1]))
 		{
-			$this->message_key_id = $match[2];
-			$this->message_type = $match[3];
-			$this->message_id = (int) $match[4];
+			$this->message_key_id = $match[1];
+			$this->message_type = $match[2];
+			$this->message_id = (int) $match[3];
 			return $match[1];
 		}
 
@@ -775,6 +791,9 @@ class Email_Parse
 	public function load_address()
 	{
 		$this->email = array();
+		$this->email['to'] = array();
+		$this->email['from'] = array();
+		$this->email['cc'] = array();
 
 		// Fetch the "From" email and if possibly the senders common name
 		if (isset($this->headers['from']))
@@ -787,17 +806,25 @@ class Email_Parse
 		// Fetch the "To" email and if possible the recipients common name
 		if (isset($this->headers['to']))
 		{
-			$this->_parse_address($this->headers['to']);
-			$this->email['to'] = $this->_email_address;
-			$this->email['to_name'] = $this->_email_name;
+			$to_addresses = explode(',', $this->headers['to']);
+			for ($i = 0, $num = count($to_addresses); $i < $num; $i++)
+			{
+				$this->_parse_address($to_addresses[$i]);
+				$this->email['to'][$i] = $this->_email_address;
+				$this->email['to_name'][$i] = $this->_email_name;
+			}
 		}
 
 		// Fetch the "cc" address if there is one and once again the real name as well
-		if (!empty($this->headers['cc']))
+		if (isset($this->headers['cc']))
 		{
-			$this->_parse_address($this->headers['cc']);
-			$this->email['cc'] = $this->_email_address;
-			$this->email['cc_name'] = $this->_email_name;
+			$cc_addresses = explode(',', $this->headers['cc']);
+			for ($i = 0, $num = count($cc_addresses); $i < $num; $i++)
+			{
+				$this->_parse_address($cc_addresses[$i]);
+				$this->email['cc'][$i] = $this->_email_address;
+				$this->email['cc_name'][$i] = $this->_email_name;
+			}
 		}
 
 		return $this->email;
@@ -814,7 +841,7 @@ class Email_Parse
 	{
 		$this->ip = false;
 
-		// The sending IP can be useful in spam prevention, so lets find it
+		// The sending IP can be useful in spam prevention and making a post
 		if (isset($this->headers['x-posted-by']))
 			$this->ip = $this->_parse_ip($this->headers['x-posted-by']);
 		elseif (isset($this->headers['x-originating-ip']))
@@ -874,6 +901,7 @@ class Email_Parse
 
 	/**
 	 * Take an email address and parse out the email address and email name
+	 * @param type $val
 	 */
 	private function _parse_address($val)
 	{
@@ -882,8 +910,9 @@ class Email_Parse
 
 		if (preg_match('~(.*?)<(.*?)>~', $val, $matches))
 		{
-			// The email address
-			$this->_email_address = trim($matches[2]);
+			// The email address, remove spaces and (comments)
+			$this->_email_address = trim(str_replace(' ', '', $matches[2]));
+			$this->_email_address = preg_replace('~\(.*?\)~', '', $this->_email_address);
 
 			// Perhaps a common name as well "name:" <email>
 			if (!empty($matches[1]))
@@ -904,7 +933,8 @@ class Email_Parse
 		else
 		{
 			// Just an sad lonely email address, so we use it as is
-			$this->_email_address = trim($val);
+			$this->_email_address = trim(str_replace(' ', '', $val));
+			$this->_email_address = preg_replace('~\(.*?\)~', '', $this->_email_address);
 			$this->_email_name = substr($this->_email_address, 0, strpos($this->_email_address, '@'));
 		}
 	}
