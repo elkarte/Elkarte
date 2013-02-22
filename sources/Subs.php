@@ -3623,6 +3623,11 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
 						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
