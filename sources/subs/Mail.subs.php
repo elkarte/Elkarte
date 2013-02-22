@@ -703,6 +703,37 @@ function server_parse($message, $socket, $response)
 }
 
 /**
+ * Adds the unique security key in to an email
+ * - adds the key in to (each) message body section
+ * - safety net for clients that strip out the message-id and in-reply-to headers
+ *
+ * @param string $message
+ * @param string $unq_head
+ * @param string $encoded_unq_head
+ * @param bool $line_break
+ */
+function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
+{
+	// append the key to the bottom of each message section, plain, html, encoded, etc
+	$message = preg_replace('~^(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
+	$message = preg_replace('~(Content-Type: text/plain;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1$2{$line_break}{$line_break}[{$unq_head}]{$line_break}$3", $message);
+	$message = preg_replace('~(Content-Type: text/html;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1$2<br /><br />[{$unq_head}]<br />$3", $message);
+
+	// base64 the harder one to insert our key
+	// Find the sections, un-do the chunk_split, add in the new key, and re chunky it
+	if (preg_match('~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', $message, $match))
+	{
+		// un-chunk, add in our encoded key header, and re chunk, all so we match RFC 2045 semantics.
+		$encoded_message = str_replace($line_break, '', $match[2]);
+		$encoded_message .= $encoded_unq_head;
+		$encoded_message = chunk_split($encoded_message, 76, $line_break);
+		$message = str_replace($match[2], $encoded_message, $message);
+	}
+
+	return $message;
+}
+
+/**
  * Load a template from EmailTemplates language file.
  *
  * @param string $template
