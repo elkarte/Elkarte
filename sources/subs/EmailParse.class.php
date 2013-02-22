@@ -728,45 +728,50 @@ class Email_Parse
 		$match = array();
 		$found_key = false;
 
-		// Check our reply_to_msg_id based on in-reply-to and references, the key *should* be there.
-		if (empty($this->headers['in-reply-to']) || preg_match($regex_key, $this->headers['in-reply-to'], $match) === 0)
+		if (!empty($key))
+			preg_match($regex_key, $key, $match);
+		else
 		{
-			// Check if references are set, sometimes email clients thread from there
-			if (!empty($this->headers['references']))
+			// Check our reply_to_msg_id based on in-reply-to and references, the key *should* be there.
+			if (empty($this->headers['in-reply-to']) || preg_match($regex_key, $this->headers['in-reply-to'], $match) === 0)
 			{
-				// Maybe our security key is in the references
-				$refs = explode(' ', $this->headers['references']);
-				foreach ($refs as $ref)
+				// Check if references are set, sometimes email clients thread from there
+				if (!empty($this->headers['references']))
 				{
-					if (preg_match($regex_key, $ref, $match))
+					// Maybe our security key is in the references
+					$refs = explode(' ', $this->headers['references']);
+					foreach ($refs as $ref)
 					{
-						// Found the key in the ref, set the in-reply-to
-						$this->headers['in-reply-to'] = $match[1];
-						$found_key = true;
-						break;
+						if (preg_match($regex_key, $ref, $match))
+						{
+							// Found the key in the ref, set the in-reply-to
+							$this->headers['in-reply-to'] = $match[1];
+							$found_key = true;
+							break;
+						}
 					}
 				}
 			}
-		}
-		else
-			$found_key = true;
+			else
+				$found_key = true;
 
-		// Nada ... Lets look a bit deeper
-		if (!$found_key)
-		{
-			// Not found in the headers, so lets search the body for the [key]
-			// as we insert that on outbound email just for this
-			$regex_key = '~\[([a-z0-9]{32}\-(p|t|m)(\d+))\]~i';
+			// Nada ... Lets look a bit deeper
+			if (!$found_key)
+			{
+				// Not found in the headers, so lets search the body for the [key]
+				// as we insert that on outbound email just for this
+				$regex_key = '~\[([a-z0-9]{32}\-(p|t|m)(\d+))\]~i';
 
-			// Check the message body
-			if (preg_match($regex_key, $this->body, $match) === 1)
-				$this->headers['in-reply-to'] = $match[1];
-			// Grrr ... check everything!
-			elseif (preg_match($regex_key, $this->raw_message, $match) === 1)
-				$this->headers['in-reply-to'] = $match[1];
-			// Force feeding
-			elseif (!empty($key))
-				$this->headers['in-reply-to'] = $key;
+				// Check the message body
+				if (preg_match($regex_key, $this->body, $match) === 1)
+					$this->headers['in-reply-to'] = $match[1];
+				// Grrr ... check everything!
+				elseif (preg_match($regex_key, $this->raw_message, $match) === 1)
+					$this->headers['in-reply-to'] = $match[1];
+				// Force feeding
+				elseif (!empty($key))
+					$this->headers['in-reply-to'] = $key;
+			}
 		}
 
 		// Load the key details so they can be accessed
