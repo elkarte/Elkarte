@@ -23,6 +23,29 @@ if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
+ * Write an email to disk instead of sending it off
+ * @todo remove this for beta, just for testing !!!
+ * @param mixed $topicData
+ * @return
+ */
+function mail_todisk($to, $subject, $message, $headers)
+{
+	global $scripturl, $txt;
+
+	$myFile = md5($scripturl . microtime() . rand()) . 'test11File.txt';
+	$fh = fopen($myFile, 'w');
+	fwrite($fh, $txt['to'] . ' ' . $to);
+	fwrite($fh, "\r\n");
+	fwrite($fh, $txt['subject'] . ': ' . $subject);
+	fwrite($fh, "\r\n");
+	fwrite($fh, $headers);
+	fwrite($fh, "\r\n\r\n");
+	fwrite($fh, $message);
+	fclose($fh);
+	return true;
+}
+
+/**
  * This function sends an email to the specified recipient(s).
  * It uses the mail_type settings and webmaster_email variable.
  *
