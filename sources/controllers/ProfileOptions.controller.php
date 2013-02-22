@@ -526,16 +526,17 @@ function action_notification()
 				'header' => array(
 					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 					'style' => 'width: 4%;',
-					'class' => 'centertext',
+					'class' => 'centercol',
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" />',
+						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" %2$s />',
 						'params' => array(
 							'id' => false,
+							'checked' => false,
 						),
+					'class' => 'centercol',
 					),
-					'class' => 'centertext',
 				),
 			),
 		),
@@ -553,8 +554,12 @@ function action_notification()
 		'additional_rows' => array(
 			array(
 				'position' => 'bottom_of_list',
-				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_update'] . '" class="button_submit" />',
-				'align' => 'right',
+				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="button_submit" />',
+			),
+			array(
+				'position' => 'after_title',
+				'value' => list_getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
+				'class' => 'windowbg2',
 			),
 		),
 	);
@@ -788,6 +793,29 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	return $notification_topics;
 }
 
+function list_getBoardNotificationsCount($memID)
+{
+	global $smcFunc, $user_info;
+
+	// All the boards that you have notification enabled
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+			AND {query_see_board}',
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $memID,
+		)
+	);
+	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $totalNotifications;
+}
+
 /**
  * Callback for createList() in action_notification()
  *
@@ -799,8 +827,9 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info;
+	global $smcFunc, $txt, $scripturl, $user_info, $modSettings;
 
+	// All the boards that you have notification enabled
 	$request = $smcFunc['db_query']('', '
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
@@ -814,14 +843,43 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'selected_member' => $memID,
 		)
 	);
+
 	$notification_boards = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$notification_boards[] = array(
+			'id' => $row['id_board'],
+			'name' =>  $row['name'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' .'<strong>' . $row['name'] . '</strong></a>',
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => 'checked="checked"',
+		);
+	$smcFunc['db_free_result']($request);
+
+	// and all the boards that you can see but don't have notify turned on for
+	$request = $smcFunc['db_query']('', '
+		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE {query_see_board}
+			AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+		ORDER BY ' . $sort,
+		array(
+			'selected_member' => $memID,
+			'current_member' => $user_info['id'],
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
 			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-			'new' => $row['board_read'] < $row['id_msg_updated']
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => '',
 		);
 	$smcFunc['db_free_result']($request);
 
