@@ -57,19 +57,21 @@ function mail_todisk($to, $subject, $message, $headers)
  * @param bool $send_html = false, whether or not the message is HTML vs. plain text
  * @param int $priority = 3
  * @param bool $hotmail_fix = null
- * @param $is_private
- * @return boolean, whether ot not the email was sent properly.
+ * @param bool $is_private
+ * @param string $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
+ * @param int $reference - The parent topic id for use in a References header
+ * @return boolean, whether or not the email was accepted properly.
  */
-function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false)
+function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global $smcFunc;
+	global $smcFunc, $boardurl;
 
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
-	$line_break = $context['server']['is_windows'] || !$use_sendmail ? "\r\n" : "\n";
+	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
 
 	// So far so good.
 	$mail_result = true;
@@ -93,7 +95,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Call this function recursively for the hotmail addresses.
 		if (!empty($hotmail_to))
-			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_id, $send_html, $priority, true, $is_private);
+			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_id, $send_html, $priority, true, $is_private, $from_wrapper, $reference);
 
 		// The remaining addresses no longer need the fix.
 		$hotmail_fix = false;
@@ -105,6 +107,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Get rid of entities.
 	$subject = un_htmlspecialchars($subject);
+
 	// Make the message use the proper line breaks.
 	$message = str_replace(array("\r", "\n"), array('', $line_break), $message);
 
@@ -119,15 +122,39 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	list (, $from_name) = mimespecialchars(addcslashes($from !== null ? $from : $context['forum_name'], '<>()\'\\"'), true, $hotmail_fix, $line_break);
 	list (, $subject) = mimespecialchars($subject, true, $hotmail_fix, $line_break);
 
-	// Construct the mail headers...
-	$headers = 'From: "' . $from_name . '" <' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . '>' . $line_break;
-	$headers .= $from !== null ? 'Reply-To: <' . $from . '>' . $line_break : '';
-	$headers .= 'Return-Path: ' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . $line_break;
-	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
+	// Construct the from / replyTo mail headers, based on if we showing a users name
+	if ($from_wrapper != null)
+	{
+		$headers = 'From: ' . $from_name . ' <' . $from_wrapper . '>' . $line_break;
+		$headers .= 'Reply-To: "' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . '" <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>' . $line_break;
+		if ($reference !== null)
+			$headers .= 'References: <' . $reference . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">" . $line_break;
+	}
+	else
+	{
+		// Standard Elkarte headers
+		$headers = 'From: ' . $from_name . ' <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>' . $line_break;
+		$headers .= ($from !== null && strpos($from, '@') !== false) ? 'Reply-To: <' . $from . '>' . $line_break : '';
+	}
 
-	if ($message_id !== null && empty($modSettings['mail_no_message_id']))
-		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
+	// Return path, date, mailer
+	$headers .= 'Return-Path: ' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . $line_break;
+	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELKARTE' . $line_break;
+
+	// Using the maillist functions?
+	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null &&$message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
+	if ($maillist)
+	{
+		// Lets try to avoid auto replies
+		$headers .= 'X-Auto-Response-Suppress: All' . $line_break;
+		$headers .= 'Auto-Submitted: auto-generated' . $line_break;
+
+		// Indicate its a list server to avoid spam tagging and to help client filters
+		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])). '>' . $line_break;
+		$headers .= 'List-Unsubscribe: <' . $boardurl . '/index.php?action=profile;area=notification>' . $line_break;
+		$headers .= 'List-Owner: <mailto:' . (!empty($modSettings['maillist_sitename_help']) ? $modSettings['maillist_sitename_help'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '> (' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . ')' . $line_break;
+	}
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
@@ -181,8 +208,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Are we using the mail queue, if so this is where we butt in...
 	if (!empty($modSettings['mail_queue']) && $priority != 0)
-		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private);
-
+		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
 	// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
 	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_limit']))
 	{
@@ -204,13 +230,42 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			$message = strtr($message, array("\r" => ''));
 			$headers = strtr($headers, array("\r" => ''));
 		}
+		$sent = array();
+		$need_break = substr($headers, -1) === "\n" || substr($headers, -1) === "\r" ? false : true;
 
-		foreach ($to_array as $to)
+		foreach ($to_array as $key => $to)
 		{
-			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers))
+			$unq_id = '';
+			$unq_head = '';
+
+			// If we are using the post by email functions, then we generate "reply to mail" security keys
+			if ($maillist)
+			{
+				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
+				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+			}
+			elseif (empty($modSettings['mail_no_message_id']))
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+
+			// @todo remove before beta
+			// sending or saving for debug?
+			$mail_function = (empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
+			if (!$mail_function(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
 			{
 				log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;
+			}
+			else
+			{
+				// keep our post via email log
+				if (!empty($unq_head))
+					$sent[] = array($unq_head, time(), $to);
+
+				// track total emails sent
+				if (!empty($modSettings['trackStats']))
+					trackStats(array('email' => '+'));
 			}
 
 			// Wait, wait, I'm still sending here!
@@ -218,9 +273,26 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
 		}
+
+		// Log each email that we sent so they can be replied to
+		if (!empty($sent))
+		{
+			$smcFunc['db_insert']('ignore',
+				'{db_prefix}postby_emails',
+				array(
+					'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
+				),
+				$sent,
+				array('id_email')
+			);
+		}
 	}
 	else
-		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers);
+		// SMTP protocol it is
+		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $message_id, $line_break, $mime_boundary);
+
+	// Clear out the stat cache.
+	trackStats();
 
 	// Everything go smoothly?
 	return $mail_result;
