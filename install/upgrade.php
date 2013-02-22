@@ -3051,7 +3051,7 @@ function throw_error($message)
 // Check files are writable - make them writable if necessary...
 function makeFilesWritable(&$files)
 {
-	global $upcontext, ;
+	global $upcontext;
 
 	if (empty($files))
 		return true;
