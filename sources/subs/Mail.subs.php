@@ -313,7 +313,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @param $is_private
  * @return boolean
  */
-function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false)
+function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
 	global $context, $modSettings, $smcFunc;
 
@@ -334,7 +334,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 			'{db_prefix}mail_queue',
 			array(
 				'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
-				'headers' => 'string-65534', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int',
+				'headers' => 'string-65534', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int', 'message_id' => 'string-255',
 			),
 			$cur_insert,
 			array('id_mail')
@@ -380,7 +380,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 				'{db_prefix}mail_queue',
 				array(
 					'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
-					'headers' => 'string-65534', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int',
+					'headers' => 'string-65534', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int', 'message_id' => 'string-255',
 				),
 				$cur_insert,
 				array('id_mail')
@@ -392,7 +392,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		}
 
 		// Now add the current insert to the array...
-		$cur_insert[] = array(time(), (string) $to, (string) $message, (string) $subject, (string) $headers, ($send_html ? 1 : 0), $priority, (int) $is_private);
+		$cur_insert[] = array(time(), (string) $to, (string) $message, (string) $subject, (string) $headers, ($send_html ? 1 : 0), $priority, (int) $is_private, (string) $message_id);
 		$cur_insert_len += $this_insert_len;
 	}
 
@@ -465,7 +465,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 		return array($charset, preg_replace('~([\x80-\x{10FFFF}])~eu', '$entityConvert(\'\1\')', $string), '7bit');
 	}
 
-	// We don't need to mess with the subject line if no special characters were in it..
+	// We don't need to mess with the line if no special characters were in it..
 	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
 	{
 		// Base64 encode.
