@@ -866,7 +866,7 @@ function pbe_email_attachments($pbe, $email_message)
 /**
  * Used when a email attempts to start a new topic
  *  - Load the board id that a given email address is assigned
- *  - Returns the board number the new topic post should go
+ *  - Returns the board number in which the new topic should go
  *
  * @param object $email_address
  * @param boolean $check
@@ -913,6 +913,29 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	global $txt;
 
 	loadLanguage('Maillist');
+	
+	// Check on some things needed by parse_bbc as autotask does not load em
+	// @todo still needed?
+	if (!isset($context['browser']))
+	{
+		include_once(SOURCEDIR . '/Load.php');
+		detectBrowser();
+	}
+
+	// Server?
+	if (!isset($context['server']))
+	{
+		$context['server'] = array(
+			'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
+			'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
+			'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
+			'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
+			'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
+			'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
+			'is_windows' => strpos(PHP_OS, 'WIN') === 0,
+			'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+		);
+	}
 
 	// Clean it up.
 	censorText($message);
@@ -924,9 +947,10 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = preg_replace('~(\[quote\s?\])~sU', "'<blockquote>'", $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
-	// Make sure some block-ish tags have an extra break
-	$message = preg_replace('~(\[center\])(.*?)(\[/center\])~', "<br />$2<br />", $message);
-	$message = preg_replace('~(?<!^)(\[hr\])~s', "<br />$1<br />", $message);
+	// Make sure some block-ish tags have an extra break so the text looks better
+	$message = preg_replace('~\[center\](.*?)\[/center\]~', "<br />$1<br />", $message);
+	$message = preg_replace('~(?<!^)(\[hr\])(?!\s)~', "<br />$1<br />", $message);
+	$message = preg_replace('~(\[/list\](?!\s\s))~', "$1<br />", $message);
 
 	// Prevent img tags from getting linked
 	$message = preg_replace('~\[img\](.*?)\[/img\]~is', '&lt;img src="\\1">', $message);
@@ -976,7 +1000,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 
 	// Convert this to text (markdown)
 	require_once(SOURCEDIR . '/lib/markdownify/markdownify_extra.php');
-	$mark_down = new Markdownify_Extra(true, false, false);
+	$mark_down = new Markdownify_Extra(true, empty($table_content) ? 78 : 996, false);
 	$message = $mark_down->parseString($message);
 
 	// Remove non breakable spaces that were converted to utf8
@@ -1182,7 +1206,7 @@ function query_user_keys($email)
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$keys = $row;
+		$keys[] = $row;
 	$smcFunc['db_free_result']($request);
 
 	return $keys;
@@ -1416,7 +1440,7 @@ function query_load_board_details($board_id, $pbe)
 
 	// To post a NEW Topic, we need certain board details
 	$request = $smcFunc['db_query']('', '
-		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme
+		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
 		FROM {db_prefix}boards as b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
 		array(
