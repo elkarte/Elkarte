@@ -1269,24 +1269,58 @@ function makeNotificationChanges($memID)
 	global $smcFunc;
 
 	// Update the boards they are being notified on.
-	if (isset($_POST['edit_notify_boards']) && !empty($_POST['notify_boards']))
+	if (isset($_POST['edit_notify_boards']))
 	{
-		// Make sure only integers are deleted.
+		if (!isset($_POST['notify_boards']))
+			$_POST['notify_boards'] = array();
+
+		// Make sure only integers are added/deleted.
 		foreach ($_POST['notify_boards'] as $index => $id)
 			$_POST['notify_boards'][$index] = (int) $id;
 
-		// id_board = 0 is reserved for topic notifications.
-		$_POST['notify_boards'] = array_diff($_POST['notify_boards'], array(0));
+		// id_board = 0 is reserved for topic notifications only
+		$notification_wanted = array();
+		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_board IN ({array_int:board_list})
-				AND id_member = {int:selected_member}',
+		// Gather up any any existing board notifications.
+		$request = $smcFunc['db_query']('', '
+			SELECT id_board
+			FROM {db_prefix}log_notify
+			WHERE id_member = {int:selected_member}',
 			array(
-				'board_list' => $_POST['notify_boards'],
 				'selected_member' => $memID,
 			)
 		);
+		$notification_current = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$notification_current[] = $row['id_board'];
+		$smcFunc['db_free_result']($request);
+
+		// And remove what they no longer want
+		$notification_deletes = array_diff($notification_current, $notification_wanted);
+		if (!empty($notification_deletes))
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}log_notify
+				WHERE id_board IN ({array_int:board_list})
+					AND id_member = {int:selected_member}',
+				array(
+					'board_list' =>$notification_deletes,
+					'selected_member' => $memID,
+				)
+			);
+
+		// Now add in what they do want
+		$notification_inserts = array();
+		foreach ($notification_wanted as $id)
+			$notification_inserts[] = array($memID, $id);
+
+		if (!empty($notification_inserts));
+			$smcFunc['db_insert']('ignore',
+				'{db_prefix}log_notify',
+				array('id_member' => 'int', 'id_board' => 'int'),
+				$notification_inserts,
+				array('id_member', 'id_board')
+			);
 	}
 
 	// We are editing topic notifications......
