@@ -1080,14 +1080,22 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (empty($ids))
 		return false;
 
-	if (!empty($modSettings['mail_type']) && $modSettings['smtp_host'] != '')
-		require_once(SUBSDIR . '/Post.subs.php');
-
 	// Send each email, yea!
+	require_once(SOURCEDIR . '/Subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
+	$sent = array();
 	$failed_emails = array();
+
+	// Use sendmail or SMTP
+	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
+
+	// Line breaks need to be \r\n only in windows or for SMTP.
+	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+
 	foreach ($emails as $key => $email)
 	{
-		if (empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '')
+		// Use the right mail resource
+		if ($use_sendmail)
 		{
 			$email['subject'] = strtr($email['subject'], array("\r" => '', "\n" => ''));
 			if (!empty($modSettings['mail_strip_carriage']))
@@ -1095,9 +1103,33 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				$email['body'] = strtr($email['body'], array("\r" => ''));
 				$email['headers'] = strtr($email['headers'], array("\r" => ''));
 			}
+			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
+
+			// Create our unique reply to email header, priority 3 and below only (4 = digest, 5 = newsletter)
+			$unq_id = '';
+			$unq_head = '';
+			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && $email['priority'] < 4 && empty($modSettings['mail_no_message_id']))
+			{
+				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
+				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
+			}
+			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
-			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers']);
+// @todo remove before beta
+$mail_function = (empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
+			$result = $mail_function(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
+
+			// if it sent, keep a record so we can save it in our allowed to reply log
+			if (!empty($unq_head) && $result)
+				$sent[] = array($unq_head, time(), $email['to']);
+
+			// track total emails sent
+			if ($result && !empty($modSettings['trackStats']))
+				trackStats(array('email' => '+'));
 
 			// Try to stop a timeout, this would be bad...
 			@set_time_limit(300);
@@ -1105,11 +1137,25 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
 			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['time_sent']);
+	// Clear out the stat cache.
+	trackStats();
+
+	// Log each email.
+	if (!empty($sent))
+	{
+		$smcFunc['db_insert']('ignore',
+			'{db_prefix}postby_emails',
+			array(
+				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
+			),
+			$sent,
+			array('id_email')
+		);
 	}
 
 	// Any emails that didn't send?
@@ -1134,7 +1180,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 					'next_mail_send' => time() + 60,
 					'mail_next_send' => 'mail_next_send',
 					'last_send' => $modSettings['mail_next_send'],
-			));
+				)
+			);
 
 		// Add our email back to the queue, manually.
 		$smcFunc['db_insert']('insert',
@@ -1155,7 +1202,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			array(
 				'zero' => '0',
 				'mail_failed_attempts' => 'mail_failed_attempts',
-		));
+			)
+		);
 
 	// Had something to send...
 	return true;
