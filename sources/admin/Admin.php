@@ -62,6 +62,21 @@ function AdminMain()
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_support',
 				),
+				'maillist' => array(
+					'label' => $txt['mail_center'],
+					'file' => 'ManageMaillist.php',
+					'function' => 'action_managemaillist',
+					'icon' => 'mail.png',
+					'class' => 'admin_img_mail',
+					'permission' => array('approve_emails', 'admin_forum'),
+					'enabled' => in_array('pe', $context['admin_features']),
+					'subsections' => array(
+						'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
+						'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
+						'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
+						'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
+					),
+				),
 				'news' => array(
 					'label' => $txt['news_title'],
 					'file' => 'ManageNews.php',
