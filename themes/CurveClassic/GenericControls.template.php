@@ -179,7 +179,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_draft\',
@@ -206,7 +206,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_pm_draft\',
