@@ -3820,10 +3820,43 @@ function setupMenuContext()
 	if (isset($context['menu_buttons'][$current_action]))
 		$context['menu_buttons'][$current_action]['active_button'] = true;
 
+	// Update the PM menu item if they have unread messages
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
 		$context['menu_buttons']['pm']['title'] .= ' [<strong>' . $context['user']['unread_messages'] . '</strong>]';
+	}
+
+	// Update the Moderation menu items with action item totals
+	if ($context['allow_moderation_center'])
+	{
+		// Get the numbers for the menu ...
+		require_once(SUBSDIR . '/Moderation.subs.php');
+		$mod_count = loadModeratorMenuCounts();
+
+		if (!empty($mod_count['total']))
+		{
+			$context['menu_buttons']['moderate']['alttitle'] = $context['menu_buttons']['moderate']['title'] . ' [' . $mod_count['total'] . ']';
+			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? ' [<strong>' . $mod_count['total'] . '</strong>]' : '';
+
+			if (!empty($mod_count['postmod']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= ' [<strong>' . $mod_count['postmod'] . '</strong>]';
+			}
+
+			if (!empty($mod_count['attachments']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= ' [<strong>' . $mod_count['attachments'] . '</strong>]';
+			}
+
+			if (!empty($mod_count['reports']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['reports']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] . ' [' . $mod_count['reports'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= ' [<strong>' . $mod_count['reports'] . '</strong>]';
+			}
+		}
 	}
 }
 
