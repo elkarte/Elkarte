@@ -526,7 +526,7 @@ function pbe_fix_client_quotes($body)
 	global $txt;
 
 	// Define some common quote markers (from the original messages)
-	// @todo ACP for this ... not sure really since this is really damage repair
+	// @todo ACP for this? ... not sure really since this is really damage repair
 	$regex = array();
 
 	// On mon, jan 12, 2004 at 10:10 AM, Joe Blow wrote: [quote]
@@ -657,9 +657,9 @@ function pbe_emailError($error, $email_message)
 	$subject = ($subject === '') ? $txt['no_subject'] : $subject;
 
 	// Start off with what we know about the security key, even if its nothing
-	$message_key = $email_message->message_key_id;
-	$message_type = $email_message->message_type;
-	$message_id = $email_message->message_id;
+	$message_key = (string) $email_message->message_key_id;
+	$message_type = (string) $email_message->message_type;
+	$message_id = (int) $email_message->message_id;
 	$board_id = -1;
 
 	// First up is the old, wrong email address, lets see who this should have come from if its not a new topic request
@@ -670,6 +670,22 @@ function pbe_emailError($error, $email_message)
 		{
 			// Valid key so show who should have sent this key in, email aggravaters :P often mess this up
 			$email_message->email['from'] = $email_message->email['from'] . ' => ' . $key_owner;
+
+			// Since we have a valid key set those details as well
+			$message_key = $email_message->message_key_id;
+			$message_type = $email_message->message_type;
+			$message_id = $email_message->message_id;
+		}
+	}
+	
+	// A valid key but it was not sent to this user ... but we got it from a valid user
+	if ($error === 'error_key_sender_match')
+	{
+		$key_owner = query_key_owner($email_message->message_key_id);
+		if (!empty($key_owner))
+		{
+			// Valid key so show who should have sent this key in
+			$email_message->email['from'] = $key_owner . ' => ' . $email_message->email['from'];
 
 			// Since we have a valid key set those details as well
 			$message_key = $email_message->message_key_id;
@@ -693,33 +709,34 @@ function pbe_emailError($error, $email_message)
 		// While we have keys to look at see if we can match up this lost message on subjects
 		foreach ($user_keys as $user_key)
 		{
-			preg_match('~([a-z0-9]{32})\-(p|t|m)(\d+)~i', $user_key['id_email'], $match);
-			$key = $match[0];
-			$type = $match[2];
-			$message = $match[3];
-
-			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-			if ((!empty($message_type) && $message_type === $type) || empty($message_type))
+			if (preg_match('~([a-z0-9]{32})\-(p|t|m)(\d+)~', $user_key['id_email'], $match))
 			{
-				// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
-				if (query_load_subject($message, $type, $email_message->email['from']) === $email_message->subject)
+				$key = $match[0];
+				$type = $match[2];
+				$message = $match[3];
+
+				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
+				if ((!empty($message_type) && $message_type === $type) || empty($message_type))
 				{
-					// This email has a subject that matches the subject of a message that was sent to them
-					$message_key = $key;
-					$message_id = $message;
-					$message_type = $type;
-					continue;
+					// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
+					if (query_load_subject($message, $type, $email_message->email['from']) === $email_message->subject)
+					{
+						// This email has a subject that matches the subject of a message that was sent to them
+						$message_key = $key;
+						$message_id = $message;
+						$message_type = $type;
+						continue;
+					}
 				}
 			}
 		}
 	}
 
-	// If we have enough to find the board id
+	// Maybe we have enough to find the board id where this was going
 	if (!empty($message_id) && $message_type !== 'p')
 		$board_id = query_load_board($message_id);
 
-	// Log the error so the moderators can take a look ....
-	// Note, some small risk since an email (with attachments) can be mas grande than our mediumtext
+	// Log the error so the moderators can take a look, helps keep them sharp
 	$id = isset($_POST['item']) ? (int) $_POST['item'] : 0;
 	$smcFunc['db_insert'](isset($_POST['item']) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
