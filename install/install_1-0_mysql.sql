@@ -789,6 +789,8 @@ CREATE TABLE {$db_prefix}log_activity (
   posts smallint(5) unsigned NOT NULL default '0',
   registers smallint(5) unsigned NOT NULL default '0',
   most_on smallint(5) unsigned NOT NULL default '0',
+  pm smallint(5) unsigned NOT NULL default '0',
+  email smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY (date),
   KEY most_on (most_on)
 ) ENGINE=MyISAM;
@@ -1178,6 +1180,7 @@ CREATE TABLE {$db_prefix}mail_queue (
   send_html tinyint(3) NOT NULL default '0',
   priority tinyint(3) NOT NULL default '1',
   private tinyint(1) NOT NULL default '0',
+  message_id int(10) NOT NULL default '0',
   PRIMARY KEY  (id_mail),
   KEY time_sent (time_sent),
   KEY mail_priority (priority, id_mail)
@@ -1638,8 +1641,9 @@ VALUES
 	(10, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
 	(11, 0, 120, 1, 'd', 1, 'remove_temp_attachments'),
 	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
-	(13, 0, 240, 1, 'd', 1, 'remove_old_drafts');
-	
+	(13, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
+	(14, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
+
 # --------------------------------------------------------
 
 #
@@ -2099,4 +2103,43 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 	PRIMARY KEY (id),
 	INDEX ip (ip),
 	INDEX user_agent (user_agent)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails`
+#
+CREATE TABLE smf_postby_emails (
+	id_email varchar(50) NOT NULL,
+	time_sent int(10) NOT NULL default '0',
+	email_to varchar(50) NOT NULL,
+	PRIMARY KEY (id_email)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails_error`
+#
+CREATE TABLE smf_postby_emails_error (
+	id_email int(10) NOT NULL auto_increment,
+	error varchar(255) NOT NULL default '',
+	data_id varchar(255) NOT NULL default '0',
+	subject varchar(255) NOT NULL default '',
+	id_message int(10) NOT NULL default '0',
+	id_board smallint(5) NOT NULL default '0',
+	email_from varchar(50) NOT NULL default '',
+	message_type char(10) NOT NULL default '',
+	message mediumtext NOT NULL default '',
+	PRIMARY KEY (id_email),
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails_filters`
+#
+CREATE TABLE smf_postby_emails_filters (
+	id_filter int(10) NOT NULL auto_increment,
+	filter_style char(5) NOT NULL default '',
+	filter_type varchar(255) NOT NULL default '',
+	filter_to varchar(255) NOT NULL default '',
+	filter_from varchar(255) NOT NULL default '',
+	filter_name varchar(255) NOT NULL default '',
+	PRIMARY KEY (id_filter),
 ) ENGINE=MyISAM;

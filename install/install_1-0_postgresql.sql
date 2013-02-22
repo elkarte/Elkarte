@@ -1015,6 +1015,8 @@ CREATE TABLE {$db_prefix}log_activity (
   posts smallint NOT NULL default '0',
   registers smallint NOT NULL default '0',
   most_on smallint NOT NULL default '0',
+  pm smallint NOT NULL default '0',
+  email smallint NOT NULL default '0',
   PRIMARY KEY (date)
 );
 
@@ -1555,6 +1557,7 @@ CREATE TABLE {$db_prefix}mail_queue (
   send_html smallint NOT NULL default '0',
   priority smallint NOT NULL default '1',
   private smallint NOT NULL default '0',
+  message_id int NOT NULL default '0',
   PRIMARY KEY (id_mail)
 );
 
@@ -2129,7 +2132,8 @@ INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_r
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (10, 0, 120, 1, 'd', 1, 'paid_subscriptions');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (11, 0, 120, 1, 'd', 1, 'remove_temp_attachments');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (12, 0, 180, 1, 'd', 1, 'remove_topic_redirect');
-INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 1, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 0, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (14, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
 
 # --------------------------------------------------------
 
@@ -2589,12 +2593,12 @@ CREATE SEQUENCE {$db_prefix}user_drafts_seq;
 
 CREATE TABLE {$db_prefix}user_drafts (
   id_draft int default nextval('{$db_prefix}user_drafts_seq'),
-  id_topic int unsigned NOT NULL default '0',
-  id_board smallint unsigned NOT NULL default '0',
-  id_reply int unsigned NOT NULL default '0',
+  id_topic int NOT NULL default '0',
+  id_board smallint NOT NULL default '0',
+  id_reply int NOT NULL default '0',
   type smallint NOT NULL default '0',
-  poster_time int unsigned NOT NULL default '0',
-  id_member int unsigned NOT NULL default '0',
+  poster_time int NOT NULL default '0',
+  id_member int NOT NULL default '0',
   subject varchar(255) NOT NULL default '',
   smileys_enabled smallint NOT NULL default '1',
   body text NOT NULL,
@@ -2614,6 +2618,12 @@ CREATE UNIQUE INDEX {$db_prefix}id_member ON {$db_prefix}user_drafts (id_member,
 # --------------------------------------------------------
 
 #
+# Sequence for table `log_badbehavior`
+#
+
+CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
+
+#
 # Table structure for table `log_badbehavior`
 #
 
@@ -2628,10 +2638,10 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 	user_agent varchar(255) NOT NULL,
 	request_entity varchar(255) NOT NULL,
 	valid varchar(255) NOT NULL,
-	id_member int unsigned NOT NULL,
+	id_member int NOT NULL,
 	session char(64) NOT NULL default '',
 	PRIMARY KEY (id)
-)
+);
 
 #
 # Indexes for table `log_badbehavior`
@@ -2639,3 +2649,63 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 
 CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
 CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
+
+#
+# Sequence for table `postby_emails`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_seq;
+
+#
+# Table structure for table `postby_emails`
+#
+
+CREATE TABLE {$db_prefix}postby_emails (
+	id_email varchar(50) NOT NULL,
+	time_sent int NOT NULL,
+	email_to varchar(50) NOT NULL,
+	PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_error`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+
+#
+# Table structure for table `postby_emails_error`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_error
+	id_email int default nextval('{$db_prefix}postby_emails_error'),
+	error varchar(255) NOT NULL default '',
+	data_id varchar(255) NOT NULL default '0',
+	subject varchar(255) NOT NULL default '',
+	id_message int NOT NULL default '0',
+	id_board smallint(5) NOT NULL default '0',
+	email_from varchar(50) NOT NULL default '',
+	message_type char(10) NOT NULL default '',
+	message text NOT NULL default '',
+	PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_filter`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_filter_seq;
+
+#
+# Table structure for table `postby_emails_filter`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_filter
+	id_filter int default nextval('{$db_prefix}postby_emails_filter'),
+	filter_style char(5) NOT NULL default '',
+	filter_type varchar(255) NOT NULL default '',
+	filter_to varchar(255) NOT NULL default '',
+	filter_from varchar(255) NOT NULL default '',
+	filter_name varchar(255) NOT NULL default '',
+	PRIMARY KEY (id_filter),
+);
