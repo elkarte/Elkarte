@@ -3904,6 +3904,12 @@ function setupMenuContext()
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
 			}
 
+			if (!empty($mod_count['emailmod']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= ' [<strong>' . $mod_count['emailmod'] . '</strong>]';
+			}
+
 			if (!empty($mod_count['attachments']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
