@@ -25,8 +25,12 @@ if (!defined('ELKARTE'))
 /**
  * Write an email to disk instead of sending it off
  * @todo remove this for beta, just for testing !!!
- * @param mixed $topicData
- * @return
+ *
+ * @param string $to
+ * @param string $subject
+ * @param string $message
+ * @param string $headers
+ * @return boolean
  */
 function mail_todisk($to, $subject, $message, $headers)
 {
@@ -34,7 +38,7 @@ function mail_todisk($to, $subject, $message, $headers)
 
 	$myFile = md5($scripturl . microtime() . rand()) . 'test11File.txt';
 	$fh = fopen($myFile, 'w');
-	fwrite($fh, $txt['to'] . ' ' . $to);
+	fwrite($fh, trim($txt['to'], ':') . ': ' . $to);
 	fwrite($fh, "\r\n");
 	fwrite($fh, $txt['subject'] . ': ' . $subject);
 	fwrite($fh, "\r\n");
@@ -251,9 +255,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
-			// @todo remove before beta
-			// sending or saving for debug?
-			$mail_function = (empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
+// @todo remove before beta
+// sending or saving for debug?
+$mail_function = (!empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
 			if (!$mail_function(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
 			{
 				log_error(sprintf($txt['mail_send_unable'], $to));
