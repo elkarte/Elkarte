@@ -8,7 +8,7 @@
  * @version 1.0 Alpha
  */
 
-if (!defined('DIALOGO'))
+if (!defined('ELKARTE'))
 	die('Hacking attempt...');
 
 /**
