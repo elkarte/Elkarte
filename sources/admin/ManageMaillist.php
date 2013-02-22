@@ -235,14 +235,14 @@ function action_unapproved_email()
 		'additional_rows' => array(
 			array(
 				'position' => 'top_of_list',
-				'value' => isset($_SESSION['email_error']) ? '<div class="errorbox">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
+				'value' => isset($_SESSION['email_error']) ? '<div class="' . (isset($_SESSION['email_error_type']) ? 'infobox' : 'errorbox') . '">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
 				'class' => 'windowbg2',
 			),
 		),
 	);
 
 	// Clear any errors
-	unset($_SESSION['email_error']);
+	unset($_SESSION['email_error'], $_SESSION['email_error_type']);
 
 	// Set the context values for the template
 	$context['page_title'] = $txt['emailerror_title'];
@@ -386,11 +386,15 @@ function action_approve_email()
 				if ($text === true)
 				{
 					maillist_delete_entry($id);
-
+					
 					// flush the cache
 					cache_put_data('num_menu_errors', null, 900);
+				
+					$_SESSION['email_error'] = $txt['approved'];
+					$_SESSION['email_error_type'] = 1;
 				}
-				$_SESSION['email_error'] = $txt['approved'];
+				else
+					$_SESSION['email_error'] = $txt['error_approved'];
 			}
 			else
 				$_SESSION['email_error'] = $txt['cant_approve'];
