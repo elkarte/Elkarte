@@ -370,9 +370,9 @@ function action_approve_email()
 				$data = $temp_email[0]['body'];
 
 				// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process
-				if ($temp_email[0]['error_code'] == 'error_not_find_member')
+				if (in_array($temp_email[0]['error_code'], array('error_not_find_member', 'error_key_sender_match')))
 				{
-					// did we actually find a potential correct name?
+					// did we actually find a potential correct name, if so we post from the valid member
 					$check_emails = explode('=>', $temp_email[0]['from']);
 					if (isset($check_emails[1]))
 						$data = str_ireplace('From: ' . trim($check_emails[0]), 'From: ' . trim($check_emails[1]), $data);
