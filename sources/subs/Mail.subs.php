@@ -119,8 +119,10 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$message = preg_replace('~(' . preg_quote($scripturl, '~') . '(?:[?/][\w\-_%\.,\?&;=#]+)?)~', '<a href="$1">$1</a>', $message);
 	}
 
-	list (, $from_name) = mimespecialchars(addcslashes($from !== null ? $from : $context['forum_name'], '<>()\'\\"'), true, $hotmail_fix, $line_break);
+	list (, $from_name, $from_encoding) = mimespecialchars(addcslashes($from !== null ? $from : (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']), '<>()\'\\"'), true, $hotmail_fix, $line_break);
 	list (, $subject) = mimespecialchars($subject, true, $hotmail_fix, $line_break);
+	if ($from_encoding !== 'base64')
+		$from_name = '"' . $from_name . '"';
 
 	// Construct the from / replyTo mail headers, based on if we showing a users name
 	if ($from_wrapper != null)
