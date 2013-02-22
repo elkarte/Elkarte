@@ -963,7 +963,7 @@ function scheduled_weekly_digest()
  */
 function ReduceMailQueue($number = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $context, $webmaster_email, $scripturl;
 
 	// Are we intending another script to be sending out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
@@ -980,6 +980,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// By default move the next sending on by 10 seconds, and require an affected row.
 	if (!$override_limit)
 	{
+		// Set our delay based on our per min limit (mail_limit)
 		$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_limit']) && $modSettings['mail_limit'] < 5 ? 10 : 5);
 
 		$smcFunc['db_query']('', '
@@ -1001,25 +1002,26 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// If we're not overriding how many are we allow to send?
 	if (!$override_limit && !empty($modSettings['mail_limit']))
 	{
-		list ($mt, $mn) = @explode('|', $modSettings['mail_recent']);
+		// See if we have quota left to send another group this minute or if we have to wait
+		list ($mail_time, $mail_number) = @explode('|', $modSettings['mail_recent']);
 
 		// Nothing worth noting...
-		if (empty($mn) || $mt < time() - 60)
+		if (empty($mail_number) || $mail_time < time() - 60)
 		{
-			$mt = time();
-			$mn = $number;
+			$mail_time = time();
+			$mail_number = $number;
 		}
 		// Otherwise we have a few more we can spend?
-		elseif ($mn < $modSettings['mail_limit'])
+		elseif ($mail_number < $modSettings['mail_limit'])
 		{
-			$mn += $number;
+			$mail_number += $number;
 		}
 		// No more I'm afraid, return!
 		else
 			return false;
 
 		// Reflect that we're about to send some, do it now to be safe.
-		updateSettings(array('mail_recent' => $mt . '|' . $mn));
+		updateSettings(array('mail_recent' => $mail_time . '|' . $mail_number));
 	}
 
 	// Now we know how many we're sending, let's send them.
