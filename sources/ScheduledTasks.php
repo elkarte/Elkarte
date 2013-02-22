@@ -549,7 +549,7 @@ function scheduled_daily_digest()
 	// We'll want this...
 	require_once(SUBSDIR . '/Mail.subs.php');
 	loadEssentialThemeData();
-	
+
 	// If the maillist function is on then so is the enhanced digest
 	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
 	if ($maillist)
@@ -761,7 +761,7 @@ function scheduled_daily_digest()
 			'split' => $txt['digest_mod_act_split'],
 			'bye' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '') . "\n" . $boardurl,
 			'preview' => $txt['digest_preview'],
-			'see_full' => $txt['digest_see_full'],			
+			'see_full' => $txt['digest_see_full'],
 			'reply_preview' => $txt['digest_reply_preview'],
 			'unread_reply_link' => $txt['digest_unread_reply_link'],
 			);
@@ -1122,7 +1122,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
 // @todo remove before beta
-$mail_function = (empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
+$mail_function = (!empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
 			$result = $mail_function(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
 
 			// if it sent, keep a record so we can save it in our allowed to reply log
@@ -1905,7 +1905,7 @@ function scheduled_remove_old_drafts()
  * If we can't run this via cron, run it as a task instead
  * Fetch emails from an imap box and process them
  */
-function scheduled_pbeIMAP()
+function scheduled_maillist_fetch_IMAP()
 {
 	// Only should be run if the user can't set up a proper cron job and can not pipe emails
 	require_once(BOARDDIR . '/email_imap_cron.php');
