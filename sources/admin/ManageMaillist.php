@@ -1061,6 +1061,7 @@ function action_settings($return_config = false)
 		array('title', 'maillist_outbound'),
 		array('desc', 'maillist_outbound_desc'),
 		array('check', 'maillist_group_mode'),
+		array('check', 'maillist_digest_enabled'),
 		array('text', 'maillist_sitename', 40, 'subtext' => $txt['maillist_sitename_desc'], 'postinput' => $txt['maillist_sitename_post']),
 		array('text', 'maillist_sitename_address', 40, 'subtext' => $txt['maillist_sitename_address_desc'], 'postinput' => $txt['maillist_sitename_address_post']),
 		array('text', 'maillist_mail_from', 40, 'subtext' => $txt['maillist_mail_from_desc'], 'postinput' => $txt['maillist_mail_from_post']),
