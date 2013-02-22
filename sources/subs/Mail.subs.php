@@ -743,11 +743,15 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
 {
-	global $txt, $mbname, $scripturl, $settings, $user_info;
+	global $txt, $mbname, $scripturl, $settings, $user_info, $boardurl, $modSettings;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
+	{
 		loadLanguage('EmailTemplates', $lang);
+		if (!empty($modSettings['maillist_enabled']))
+			loadLanguage('MaillistTemplates', $lang);
+	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
 		fatal_lang_error('email_no_template', 'template', array($template));
@@ -760,6 +764,9 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// Add in the default replacements.
 	$replacements += array(
 		'FORUMNAME' => $mbname,
+		'FORUMNAMESHORT' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
+		'EMAILREGARDS' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
+		'FORUMURL' => $boardurl,
 		'SCRIPTURL' => $scripturl,
 		'THEMEURL' => $settings['theme_url'],
 		'IMAGESURL' => $settings['images_url'],
