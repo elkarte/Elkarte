@@ -1943,3 +1943,15 @@ function scheduled_remove_old_drafts()
 
 	return true;
 }
+
+/**
+ * If we can't run this via cron, run it as a task instead
+ * Fetch emails from an imap box and process them
+ */
+function scheduled_pbeIMAP()
+{
+	// Only should be run if the user can't set up a proper cron job and can not pipe emails
+	require_once(BOARDDIR . '/email_imap_cron.php');
+
+	return true;
+}
