@@ -1290,6 +1290,7 @@ class Markdownify
 						{
 							$split = preg_split('#^(.{0,' . ($this->bodyWidth - $lineLen) . '})\b#', $putLine, 2, PREG_SPLIT_OFFSET_CAPTURE | PREG_SPLIT_DELIM_CAPTURE);
 							$this->output .= rtrim($split[1][0]) . "\n" . $this->indent . $this->wordwrap(ltrim($split[2][0]), $this->bodyWidth, "\n" . $this->indent, false);
+							$this->output = rtrim($this->output, $this->indent);
 						}
 					}
 					$this->output = substr($this->output, 0, -1);
