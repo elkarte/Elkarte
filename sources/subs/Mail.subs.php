@@ -495,11 +495,12 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
  * @param string $subject email subject
  * @param string $message email message
  * @param string $headers
+ * @param string $message_id
  * @return boolean whether it sent or not.
  */
-function smtp_mail($mail_to_array, $subject, $message, $headers)
+function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = null)
 {
-	global $modSettings, $webmaster_email, $txt;
+	global $modSettings, $webmaster_email, $txt, $scripturl;
 
 	$modSettings['smtp_host'] = trim($modSettings['smtp_host']);
 
@@ -542,7 +543,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers)
 		}
 	}
 
-	// Wait for a response of 220, without "-" continuer.
+	// Wait for a response of 220, without "-" continue.
 	if (!server_parse(null, $socket, '220'))
 		return false;
 
@@ -575,10 +576,32 @@ function smtp_mail($mail_to_array, $subject, $message, $headers)
 	// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
 	$message = strtr($message, array("\r\n" . '.' => "\r\n" . '..'));
 
+	$sent = array();
+	$need_break = substr($headers, -1) === "\n" || substr($headers, -1) === "\r" ? false : true;
+	$real_headers = $headers;
+	$line_break = "\r\n";
+
 	// !! Theoretically, we should be able to just loop the RCPT TO.
 	$mail_to_array = array_values($mail_to_array);
 	foreach ($mail_to_array as $i => $mail_to)
 	{
+		// the keys are must unique for every mail you see
+		$unq_id = '';
+		$unq_head = '';
+
+		// Using the post by email functions, and not a digest (priority 4)
+		// then generate "reply to mail" keys and place them in the message
+		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
+		{
+			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
+			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
+			$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+		}
+
+		// Fix up the headers for this email!
+		$headers = $real_headers . $unq_id;
+
 		// Reset the connection to send another email.
 		if ($i != 0)
 		{
@@ -587,29 +610,53 @@ function smtp_mail($mail_to_array, $subject, $message, $headers)
 		}
 
 		// From, to, and then start the data...
-		if (!server_parse('MAIL FROM: <' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . '>', $socket, '250'))
+		if (!server_parse('MAIL FROM: <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>', $socket, '250'))
 			return false;
 		if (!server_parse('RCPT TO: <' . $mail_to . '>', $socket, '250'))
 			return false;
 		if (!server_parse('DATA', $socket, '354'))
 			return false;
-		fputs($socket, 'Subject: ' . $subject . "\r\n");
+		fputs($socket, 'Subject: ' . $subject . $line_break);
 		if (strlen($mail_to) > 0)
-			fputs($socket, 'To: <' . $mail_to . '>' . "\r\n");
-		fputs($socket, $headers . "\r\n\r\n");
-		fputs($socket, $message . "\r\n");
+			fputs($socket, 'To: <' . $mail_to . '>' . $line_break);
+		fputs($socket, $headers . $line_break . $line_break);
+		fputs($socket, $message . $line_break);
 
 		// Send a ., or in other words "end of data".
 		if (!server_parse('.', $socket, '250'))
 			return false;
+
+		// track the number of emails sent
+		if (!empty($modSettings['trackStats']))
+			trackStats(array('email' => '+'));
+
+
+		// Keep our post via email log
+		if (!empty($unq_head))
+			$sent[] = array($unq_head, time(), $mail_to);
 
 		// Almost done, almost done... don't stop me just yet!
 		@set_time_limit(300);
 		if (function_exists('apache_reset_timeout'))
 			@apache_reset_timeout();
 	}
-	fputs($socket, 'QUIT' . "\r\n");
+
+	// say our goodbyes
+	fputs($socket, 'QUIT' . $line_break);
 	fclose($socket);
+
+	// Log each email
+	if (!empty($sent))
+	{
+		$smcFunc['db_insert']('ignore',
+			'{db_prefix}postby_emails',
+			array(
+				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
+			),
+			$sent,
+			array('id_email')
+		);
+	}
 
 	return true;
 }
