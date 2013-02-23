@@ -767,15 +767,15 @@ function shorten_subject($subject, $len)
 /**
  * Shorten a string of text
  *
- * - shortens a text string so that it is approximaly a certain length or under
+ * - shortens a text string so that it is approximately a certain length or under
  * - attempts to break the string on the first word boundary after the allowed length
- * - if resulting length is > len plus buffer then it is truncated to lenght plus an ellipsis.
+ * - if resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
  * - respects internationalization characters and entities as one character.
  * - returns the shortened string.
  *
  * @param string $text
  * @param int $len 
- * @param int $buffer maximum lenght overflow to allow cutting on a word boundary
+ * @param int $buffer maximum length overflow to allow cutting on a word boundary
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {

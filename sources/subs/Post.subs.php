@@ -902,7 +902,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  * Checks if a user has the correct access to get notifications
  * - validates they have proper group access to a board 
  * - if using the maillist, checks if they should get a reply-able message
- * 		- not mutted
+ * 		- not muted
  * 		- has postby_email permission on the board
  * 
  * Returns false if they do not have the proper group access to a board
