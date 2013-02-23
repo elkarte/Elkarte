@@ -466,12 +466,12 @@ function template_add_language()
 		';
 
 	// Had some results?
-	if (!empty($context['smf_languages']))
+	if (!empty($context['languages']))
 	{
 		echo '
 			<div class="information">', $txt['add_language_elkarte_found'], '</div>';
 
-		template_show_list('smf_languages');
+		template_show_list('languages');
 	}
 
 	echo '
