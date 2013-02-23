@@ -458,6 +458,8 @@ $txt['attachment_transfer_no_dir'] = 'Either the source directory or one of the 
 $txt['attachment_transfer_same_dir'] = 'You cannot select the same directory as both the source and target.';
 $txt['attachment_transfer_progress'] = 'Please wait. Transfer in progress.';
 
+$txt['avatar_settings'] = 'General avatar settings';
+$txt['avatar_default'] = 'Enable a default avatar for all users without their own avatar';
 $txt['mods_cat_avatars'] = 'Avatars';
 $txt['avatar_directory'] = 'Avatars directory';
 $txt['avatar_url'] = 'Avatars URL';

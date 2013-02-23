@@ -220,7 +220,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $smcFunc;
+	global $modSettings, $user_settings, $smcFunc, $settings;
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -278,6 +278,9 @@ function loadUserSettings()
 			$user_settings = $smcFunc['db_fetch_assoc']($request);
 			$smcFunc['db_free_result']($request);
 
+			if(!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
+				$user_settings['avatar'] = $settings['images_url'] . '/default_avatar.png';
+			
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
 		}
@@ -1149,6 +1152,17 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
+
+	if(!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	{
+		// Change the avatar's URL
+		$memberContext[$user]['avatar'] = array(
+			'name' => '',
+			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
+			'href' => $settings['images_url'] . '/default_avatar.png',
+			'url' => 'http://'
+		);
+	}
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))

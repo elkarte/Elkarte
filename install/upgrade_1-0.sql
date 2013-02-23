@@ -1876,6 +1876,7 @@ VALUES
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
+	('avatar_default', '1'),
 	('avatar_allow_server_stored', '1'),
 	('avatar_check_size', '0'),
 	('avatar_action_too_large', 'option_user_resize'),

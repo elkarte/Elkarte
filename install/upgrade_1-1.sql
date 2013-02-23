@@ -254,6 +254,7 @@ VALUES ('edit_disable_time', '0'),
 	('attachmentThumbnails', '1'),
 	('attachmentThumbWidth', '150'),
 	('attachmentThumbHeight', '150'),
+	('avatar_default', '1'),
 	('max_pm_recipients', '10');
 
 ---{
