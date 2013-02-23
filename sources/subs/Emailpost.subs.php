@@ -677,7 +677,7 @@ function pbe_emailError($error, $email_message)
 			$message_id = $email_message->message_id;
 		}
 	}
-	
+
 	// A valid key but it was not sent to this user ... but we got it from a valid user
 	if ($error === 'error_key_sender_match')
 	{
@@ -913,7 +913,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	global $txt;
 
 	loadLanguage('Maillist');
-	
+
 	// Check on some things needed by parse_bbc as autotask does not load em
 	// @todo still needed?
 	if (!isset($context['browser']))

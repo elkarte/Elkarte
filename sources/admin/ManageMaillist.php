@@ -386,10 +386,10 @@ function action_approve_email()
 				if ($text === true)
 				{
 					maillist_delete_entry($id);
-					
+
 					// flush the cache
 					cache_put_data('num_menu_errors', null, 900);
-				
+
 					$_SESSION['email_error'] = $txt['approved'];
 					$_SESSION['email_error_type'] = 1;
 				}
