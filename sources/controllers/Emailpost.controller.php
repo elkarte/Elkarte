@@ -132,11 +132,11 @@ function pbe_main($data = null, $force = false, $key = null)
 	}
 
 	// Allow for new topics to be started via a email subject change
-	if ($modSettings['maillist_newtopic_change'])
+	if (!empty($modSettings['maillist_newtopic_change']))
 	{
 		$subject = str_replace($pbe['response_prefix'], '', pbe_clean_email_subject($email_message->subject));
 		$current_subject = str_replace($pbe['response_prefix'], '', $topic_info['subject']);
-		
+
 		// If it does not match, then we go to make a new topic instead
 		if (trim($subject) != trim($current_subject))
 		{
@@ -155,7 +155,7 @@ function pbe_main($data = null, $force = false, $key = null)
 	if (!empty($result))
 	{
 		// We have now posted or PM'ed .. lets do some database maintenance cause maintenance is fun :'(
-		//query_key_maintenance($email_message);
+		query_key_maintenance($email_message);
 
 		// Update this user so the log shows they were/are active, no luking in the email ether
 		query_update_member_stats($pbe, $email_message, $topic_info);
@@ -243,7 +243,7 @@ function pbe_topic($data = null, $force = false)
 
 	// Account for any moderation they may be under
 	pbe_check_moderation($pbe);
-	
+
 	// Create the topic, send notifications
 	return pbe_create_topic($pbe, $email_message, $board_info);
 }
@@ -391,7 +391,7 @@ function pbe_create_pm($pbe, $email_message)
 }
 
 /**
- * Called by 
+ * Called by
  *	- pbe_topic to create a new topic
  *  - pbe_main to create a new topic via a subject change
  * Checks posting permissions, but requires email validation checks are complete
@@ -400,7 +400,7 @@ function pbe_create_pm($pbe, $email_message)
  *  - Calls sendNotifications to announce the new post
  *  - Calls query_update_member_stats to show they did something
  * Requires pbe and email_message to be populated.
- * 
+ *
  * @param type $pbe
  * @param type $email_message
  * @param type $board_info
@@ -416,7 +416,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	// We have the board info, and their permissions - do they have a right to start a new topic?
 	$becomesApproved = true;
 	if (!$pbe['user_info']['is_admin'])
-	{	
+	{
 		if (!in_array('postby_email', $pbe['user_info']['permissions']))
 			return pbe_emailError('error_permission', $email_message);
 		elseif ($modSettings['postmod_active'] && in_array('post_unapproved_topics', $pbe['user_info']['permissions']) && (!in_array('post_new', $pbe['user_info']['permissions'])))
