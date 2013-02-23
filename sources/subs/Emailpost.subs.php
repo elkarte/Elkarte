@@ -1629,11 +1629,11 @@ function query_key_maintenance($email_message)
 {
 	global $modSettings, $smcFunc;
 
-	$days = (!empty($modSettings['email_maillist_key_active'])) ? $modSettings['email_maillist_key_active'] : 21;
+	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
 	$delete_old = time() - ($days * 24 * 60 * 60);
 
 	// Consume the database key that was just used .. one reply per key
-	// (but lets let PM's slide, they often seems to be re re re replied to)
+	// but we let PM's slide, they often seem to be re re re replied to
 	if ($email_message->message_type !== 'p')
 	{
 		$request = $smcFunc['db_query']('', '

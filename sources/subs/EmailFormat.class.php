@@ -202,13 +202,13 @@ class Email_Format
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
 			// Signature line start as defined in the ACP, i.e. best, regards, thanks
-			elseif ((!$this->_found_sig && !empty($modSettings['email_maillist_sig_keys']) && (preg_match('~^(' . $modSettings['email_maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line))) || (($this->_body_array[$i]['content'] === $real_name) && !$this->_found_sig))
+			elseif ((!$this->_found_sig && !empty($modSettings['maillist_sig_keys']) && (preg_match('~^(' . $modSettings['maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line))) || (($this->_body_array[$i]['content'] === $real_name) && !$this->_found_sig))
 			{
 				$this->_body_array[$i]['content'] = "\n\n\n" . $this->_body_array[$i]['content'];
 				$this->_found_sig = true;
 			}
 			// Message stuff which should not be here any longer (as defined in the ACP) i.e. To: From: Subject:
-			elseif (!empty($modSettings['email_maillist_leftover_remove']) && preg_match('~^((\[b\]){0,2}(' . $modSettings['email_maillist_leftover_remove'] . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
+			elseif (!empty($modSettings['maillist_leftover_remove']) && preg_match('~^((\[b\]){0,2}(' . $modSettings['maillist_leftover_remove'] . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
 			{
 				if ($this->_in_quote)
 					$this->_body_array[$i]['content'] = "\n";
