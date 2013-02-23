@@ -223,6 +223,10 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 240, 1, 'd', 0, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks
+	(next_time, time_offset, time_regularity, time_unit, disabled, task)
+VALUES
+	(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
 ---#
 
 /******************************************************************************/
@@ -390,4 +394,59 @@ ALTER TABLE `{$db_prefix}members`
 	DROP `aim`,
 	DROP `yim`,
 	DROP `msn`;
+---#
+
+/******************************************************************************/
+--- Adding support for Maillist
+/******************************************************************************/
+---# Creating postby_emails table
+CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails (
+	id_email varchar(50) NOT NULL,
+	time_sent int NOT NULL default '0',
+	email_to varchar(50) NOT NULL,
+	PRIMARY KEY (id_email)
+) ENGINE=MyISAM{$db_collation};
+---#
+
+---# Creating postby_emails_error table
+CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
+	id_email int NOT NULL auto_increment,
+	error varchar(255) NOT NULL default '',
+	data_id varchar(255) NOT NULL default '0',
+	subject varchar(255) NOT NULL default '',
+	id_message int NOT NULL default '0',
+	id_board smallint NOT NULL default '0',
+	email_from varchar(50) NOT NULL default '',
+	message_type char(10) NOT NULL default '',
+	message mediumtext NOT NULL default '',
+	PRIMARY KEY (id_email),
+) ENGINE=MyISAM{$db_collation};
+---#
+
+---# Creating postby_emails_filters table
+CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
+	id_filter int NOT NULL auto_increment,
+	filter_style char(5) NOT NULL default '',
+	filter_type varchar(255) NOT NULL default '',
+	filter_to varchar(255) NOT NULL default '',
+	filter_from varchar(255) NOT NULL default '',
+	filter_name varchar(255) NOT NULL default '',
+	PRIMARY KEY (id_filter),
+) ENGINE=MyISAM{$db_collation};
+---#
+
+---# Adding new columns to log_activity...
+ALTER TABLE {$db_prefix}log_activity
+ADD COLUMN pm smallint unsigned NOT NULL DEFAULT '0';
+ADD COLUMN email smallint unsigned NOT NULL DEFAULT '0';
+---#
+
+---# Adding new columns to mail_queue...
+ALTER TABLE {$db_prefix}mail_queue
+ADD COLUMN message_id int  NOT NULL DEFAULT '0';
+---#
+
+---# Updating board prfoiles...
+INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
+INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 ---#
