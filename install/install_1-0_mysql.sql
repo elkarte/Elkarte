@@ -2142,7 +2142,7 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 #
 # Table structure for table `postby_emails`
 #
-CREATE TABLE smf_postby_emails (
+CREATE TABLE {$db_prefix}postby_emails (
 	id_email varchar(50) NOT NULL,
 	time_sent int(10) NOT NULL default '0',
 	email_to varchar(50) NOT NULL,
@@ -2152,7 +2152,7 @@ CREATE TABLE smf_postby_emails (
 #
 # Table structure for table `postby_emails_error`
 #
-CREATE TABLE smf_postby_emails_error (
+CREATE TABLE {$db_prefix}postby_emails_error (
 	id_email int(10) NOT NULL auto_increment,
 	error varchar(255) NOT NULL default '',
 	data_id varchar(255) NOT NULL default '0',
@@ -2168,7 +2168,7 @@ CREATE TABLE smf_postby_emails_error (
 #
 # Table structure for table `postby_emails_filters`
 #
-CREATE TABLE smf_postby_emails_filters (
+CREATE TABLE {$db_prefix}postby_emails_filters (
 	id_filter int(10) NOT NULL auto_increment,
 	filter_style char(5) NOT NULL default '',
 	filter_type varchar(255) NOT NULL default '',
