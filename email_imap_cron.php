@@ -41,9 +41,9 @@ function postbyemail_imap()
 
 	// values used for the connections
 	// @todo add ssl and tls connections?
-	$hostname = !empty($modSettings['email_maillist_imap_host']) ? $modSettings['email_maillist_imap_host'] : '';
-	$username = !empty($modSettings['email_maillist_imap_uid']) ? $modSettings['email_maillist_imap_uid'] : '';
-	$password = !empty($modSettings['email_maillist_imap_pass']) ? $modSettings['email_maillist_imap_pass'] : '';
+	$hostname = !empty($modSettings['maillist_imap_host']) ? $modSettings['maillist_imap_host'] : '';
+	$username = !empty($modSettings['maillist_imap_uid']) ? $modSettings['maillist_imap_uid'] : '';
+	$password = !empty($modSettings['maillist_imap_pass']) ? $modSettings['maillist_imap_pass'] : '';
 
 	// try to connect
 	$inbox = @imap_open($hostname, $username, $password);
@@ -80,7 +80,7 @@ function postbyemail_imap()
 				$result = pbe_main($email);
 
 				// mark it for deletion?
-				if (!empty($modSettings['email_maillist_imap_delete']))
+				if (!empty($modSettings['maillist_imap_delete']))
 				{
 					maillist_imap_delete($inbox, $email_number);
 					imap_expunge($inbox);
