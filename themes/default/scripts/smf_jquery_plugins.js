@@ -42,16 +42,16 @@
 			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + htmlspecialchars(this.title) + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
-		
+
 		// determine where we are going to place the tooltip, while trying to keep it on screen
 		var positionTooltip = function(event)
 		{
 			var iPosx = 0,
 				iPosy = 0;
-			
+
 			if (!event)
 				event = window.event;
-				
+
 			if (event.pageX || event.pageY)
 			{
 				iPosx = event.pageX;
@@ -62,7 +62,7 @@
 				iPosx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 				iPosy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 			}
-			
+
 			// Position of the tooltip top left corner and its size
 			var oPosition = {
 				x: iPosx + oSettings.positionLeft,
@@ -93,27 +93,27 @@
 			{
 				oPosition.y = oPosition.y - (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
 			}
-			
+
 			// finally set the position we determined
 			$('#' + oSettings.tooltipID).css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
 		};
-		
+
 		// used to show a tooltip
 		var showTooltip = function(){
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).show();
 		};
-		
+
 		// used to hide a tooltip
 		var hideTooltip = function(){
 			$('#' + oSettings.tooltipID).fadeOut('slow').trigger("unload").remove();
 		};
-		
+
 		// used to keep html encoded
 		function htmlspecialchars(string)
 		{
 			return $('<span>').text(string).html();
 		}
-		
+
 		// for all of the elements that match the selector on the page, lets set up some actions
 		return this.each(function()
 		{
@@ -133,7 +133,7 @@
 				// plain old hover it is
 				$(this).hover(site_tooltip_on, site_tooltip_off);
 			}
-			
+
 			// create the on tip action
 			function site_tooltip_on(event)
 			{
@@ -142,32 +142,32 @@
 				{
 					// create a ID'ed div with our style class that holds the tooltip info, hidden for now
 					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" style="display:none;"></div></div>');
-					
+
 					// load information in to our newly created div
 					var tt = $('#' + oSettings.tooltipID);
 					var ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
-					
+
 					if (oSettings.tooltipContent === 'html')
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
 					else
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
-					
+
 					// show then position or it may postion off screen
 					tt.show();
 					showTooltip();
 					positionTooltip(event);
 				}
-			
+
 				return false;
 			}
-			
+
 			// create the Bye bye tip
 			function site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
 			}
-			
+
 			// create the tip move with the cursor
 			if (oSettings.followMouse)
 			{
@@ -176,7 +176,7 @@
 					return false;
 				});
 			}
-			
+
 			// clear the tip on a click
 			$(this).bind("click", function(){
 				hideTooltip(this);
@@ -197,7 +197,7 @@
  * <http://cherne.net/brian/resources/jquery.hoverIntent.html>
  *
  * hoverIntent is currently available for use in all personal or commercial
- * projects under MIT license.
+ * project under MIT license.
  *
  * // basic usage (just like .hover) receives onMouseOver and onMouseOut functions
  * $("ul li").hoverIntent( showNav , hideNav );
@@ -213,11 +213,12 @@
  *
  * @param  f  onMouseOver function || An object with configuration options
  * @param  g  onMouseOut function  || Nothing (use configuration options object)
+ * @param  filter support for event delegation.
  * @author    Brian Cherne brian(at)cherne(dot)net
  */
 ;(function($) {
 	'use strict';
-	$.fn.hoverIntent = function (f, g) {
+	$.fn.hoverIntent = function (f, g, filter) {
 		// default configuration options
 		var cfg = {
 			sensitivity: 8,
@@ -243,7 +244,7 @@
 		// A private function for comparing current and previous mouse position
 		var compare = function (ev, ob) {
 			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-			
+
 			// compare mouse positions to see if they've crossed the threshold
 			if((Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity)
 			{
@@ -316,13 +317,19 @@
 		};
 
 		// bind the function to the two event listeners
-		return this.bind('mouseenter', handleHover).bind('mouseleave', handleHover);
+		if(filter)
+			return $(this).on({
+				'mouseenter': handleHover,
+				'mouseleave': handleHover
+			}, filter);
+		else
+			return this.bind('mouseenter', handleHover).bind('mouseleave', handleHover);
 	};
 })(jQuery);
 
 /**
- * Superfish v1.4.8 - jQuery menu widget
- * Copyright (c) 2008 Joel Birch
+ * Superfish v1.5.8 - jQuery menu widget
+ * Copyright (c) 2013 Joel Birch
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -330,7 +337,9 @@
  * CHANGELOG: http://users.tpg.com.au/j_birch/plugins/superfish/changelog.txt
  *
  * PLEASE READ THE FOLLOWING BEFORE PLAYING AROUND WITH ANYTHING
- * This is Derivative code for use in Elkarte, code has been tweaked to give responsive menus without compromising a11y.
+ * This is Derivative code for use in Elkarte
+ *
+ * Code has been tweaked to give responsive menus without compromising a11y.
  * If contemplating changes, testing for full functionality is essential or a11y will be degraded.
  * Since a11y is the whole point of this system, degradation is not at all desirable regardless of personal preferences.
  * If you do not understand the a11y advantages of this system, please ask before making changes.
@@ -341,66 +350,113 @@
  * 3/ There should be a delay before the drop menus close on mouseout, for people with less than perfect tracking ability.
  * 4/ The drop menus must remain fully accessible via keyboard navigation (eg: the Tab key).
  */
+
 ;(function($){
 	'use strict';
-	$.fn.superfish = function(op){
+	$.fn.superfish = function(op) {
 		var sf = $.fn.superfish,
 			c = sf.c,
-			over = function(){
+			over = function(e) {
 				var $this = $(this),
 					menu = getMenu($this);
 
 				clearTimeout(menu.sfTimer);
 				$this.showSuperfishUl().siblings().hideSuperfishUl();
 			},
-			out = function(){
+			out = function(e) {
 				var $this = $(this),
 					menu = getMenu($this),
 					o = sf.op;
 
-				clearTimeout(menu.sfTimer);
-				menu.sfTimer = setTimeout(function(){
+				var close = function() {
+					o.retainPath = ($.inArray($this[0], o.$path) > -1);
 					$this.hideSuperfishUl();
-				},o.delay);
-			},
-			getMenu = function($menu){
-				var menu = $menu.closest(['ul.', c.menuClass].join(''))[0];
-
-				sf.op = sf.o[menu.serial];
-				return menu;
-			};
-
-		return this.each(function() {
-			var s = this.serial = sf.o.length,
-				o = $.extend({}, sf.defaults, op),
-				h = $.extend({}, sf.hoverdefaults, {over: over, out: out}, op),
-				$this = $(this),
-				lis = $this.find("li ul").parent(),
-				a_li = $this.find('a').parent('li');
-
-			// make sure passed in element actually has submenus
-			if (lis.length !== 0)
-			{
-				sf.o[s] = sf.op = o;
-				if($.fn.hoverIntent && !o.disableHI)
+					if (o.$path.length && $this.parents('li.' + o.hoverClass).length < 1)
+					{
+						o.onIdle.call();
+						$.proxy(over, o.$path, e)();
+					}
+				};
+				if (e.type !== 'mouseleave' && e.type !== 'focusout')
 				{
-					lis['hoverIntent'](over, out).hideSuperfishUl();
+					close();
 				}
 				else
 				{
-					lis['hover'](h).hideSuperfishUl();
+					clearTimeout(menu.sfTimer);
+					menu.sfTimer = setTimeout(close, o.delay);
 				}
-			}
+			},
+			getMenu = function($child) {
+				var menu = $child.closest('.' + c.menuClass)[0];
+				sf.op = sf.o[menu.serial];
+				return menu;
+			},
+			applyHandlers = function($menu) {
+				var targets = 'li:has(ul)';
+				if (!sf.op.useClick)
+				{
+					if ($.fn.hoverIntent && !sf.op.disableHI)
+					{
+						$menu.hoverIntent(over, out, targets);
+					}
+					else
+					{
+						$menu
+							.on('mouseenter', targets, over)
+							.on('mouseleave', targets, out);
+					}
+				}
 
-			// add focus/blur events to the links
-			a_li.each(function() {
-				var li = $(this);
-				li.focus(function(){over.call(li);}).blur(function(){out.call(li);});
+				$menu
+					.on('focusin', targets, over)
+					.on('focusout', targets, out)
+					.on('click', 'a', clickHandler)
+					.on('touchstart', 'a', touchHandler);
+			},
+			touchHandler = function() {
+				var $this = $(this);
+
+				if (!$this.next('ul').is(':visible'))
+				{
+					$(this).data('follow', false);
+				}
+			},
+			clickHandler = function(e) {
+				var $a = $(this),
+					$submenu = $a.next('ul'),
+					follow = ($a.data('follow') === false) ? false : true;
+
+				if ($submenu.length && (sf.op.useClick || !follow))
+				{
+					e.preventDefault();
+
+					if (!$submenu.is(':visible'))
+					{
+						$.proxy(over, $a.parent(), e)();
+					}
+					else if (sf.op.useClick && follow)
+					{
+						$.proxy(out,$a.parent(), e)();
+					}
+				}
+			};
+
+		return this.addClass(c.menuClass).each(function() {
+			var s = this.serial = sf.o.length,
+			    o = $.extend({}, sf.defaults,op),
+				$this = $(this),
+				liHasUl = $this.find("li ul").parent();
+
+			o.$path = $this.find('li.' + o.pathClass).slice(0, o.pathLevels).each(function() {
+				$(this).addClass(o.hoverClass + ' ' + c.bcClass)
+					.filter('li:has(ul)').removeClass(o.pathClass);
 			});
+			sf.o[s] = sf.op = o;
+
+			applyHandlers($this);
+			liHasUl.not('.' + c.bcClass).hideSuperfishUl();
 			o.onInit.call(this);
-		}).each(function() {
-			var menuClasses = [c.menuClass];
-			$(this).addClass(menuClasses.join(' '));
 		});
 	};
 
@@ -408,35 +464,45 @@
 	sf.o = [];
 	sf.op = {};
 	sf.c = {
-		bcClass		: 'sf-breadcrumb',
-		menuClass	: 'sf-js-enabled',
-		anchorClass	: 'sf-with-ul'
+		bcClass     : 'sf-breadcrumb',
+		menuClass   : 'sf-js-enabled',
+		anchorClass : 'sf-with-ul'
 	};
 	sf.defaults = {
 		hoverClass	: 'sfhover',
+		pathClass	: 'overideThisToUse',
+		pathLevels	: 1,
 		delay		: 600,
 		animation	: {opacity:'show', height:'show', width:'show'},
-		speed		: 150,
-		disableHI	: false, // Leave as false. true disables hoverIntent detection (not good).
-		onInit		: function(){}
+		speed		: '150',
+		disableHI	: true,		// true disables hoverIntent detection
+		useClick	: false,
+		onInit		: function(){}, // callback functions
+		onIdle		: function(){}
 	};
-	sf.hoverdefaults = {
-		sensitivity	: 8,
-		interval	: 50,
-		timeout		: 1
-	};
+
 	$.fn.extend({
-		hideSuperfishUl : function(){
-			var o = sf.op;
+		hideSuperfishUl : function() {
+			var o = sf.op,
+				$this = this;
 
 			$(['li.', o.hoverClass].join(''), this).add(this).removeClass(o.hoverClass).find('>ul').hide();
+			if (sf.op.useClick)
+			{
+				$this.children('a').data('follow', false);
+			}
+
 			return this;
 		},
-		showSuperfishUl : function(){
+		showSuperfishUl : function() {
 			var o = sf.op,
+				$this = this,
 				$ul = this.addClass(o.hoverClass).find('>ul:hidden').css('opacity', 1);
-			
-			$ul.animate(o.animation, o.speed);
+
+			$ul.stop().animate(o.animation, o.speed, function() {
+				$this.children('a').data('follow', true);
+			});
+
 			return this;
 		}
 	});
