@@ -123,7 +123,7 @@ function EditSearchSettings($return_config = false)
 	$context['sub_template'] = 'show_settings';
 
 	// We'll need this for the settings.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// A form was submitted.
 	if (isset($_REQUEST['save']))

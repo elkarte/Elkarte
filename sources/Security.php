@@ -276,7 +276,7 @@ function is_not_banned($forceCheck = false)
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			loadAdminClass ('ManageBans.php');
+			require_once(ADMINDIR . '/ManageBans.php');
 			updateBanMembers();
 		}
 	}
@@ -1360,7 +1360,7 @@ function loadBadBehavior()
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
-		require_once(SOURCEDIR . '/lib/bad-behavior/badbehavior-plugin.php');
+		require_once(EXTDIR . '/bad-behavior/badbehavior-plugin.php');
 		$bb_run = true;
 
 		// We may want to give some folks a hallway pass

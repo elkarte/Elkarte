@@ -159,13 +159,12 @@ $sourcedir = dirname(__FILE__) . '/sources';
  * Path to the library directory.
  * @var string
  */
-$librarydir = dirname(__FILE__) . '/sources/subs';
+$extdir = dirname(__FILE__) . '/sources/lib';
 /**
  * Path to the controllers directory.
  * @var string
  */
-$controllerdir = dirname(__FILE__) . '/sources/controllers';
-
+$languagedir = dirname(__FILE__) . '/themes/default/languages';
 
 ########## Error-Catching ##########
 # Note: You shouldn't touch these settings.
@@ -191,3 +190,5 @@ if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';

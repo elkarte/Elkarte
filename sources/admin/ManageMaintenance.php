@@ -283,7 +283,7 @@ function MaintainFindFixErrors()
 	// Honestly, this should be done in the sub function.
 	validateToken('admin-maint');
 
-	loadAdminClass('RepairBoards.php');
+	require_once(ADMINDIR . '/RepairBoards.php');
 	action_repairboards();
 }
 

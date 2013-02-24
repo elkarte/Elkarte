@@ -145,11 +145,11 @@ function getFileVersions(&$versionOptions)
 	// Load all the files in the sources and its sub directorys
 	$directories = array(
 		'file_versions' => SOURCEDIR,
-		'file_versions_admin' => SOURCEDIR . '/admin',
-		'file_versions_controllers' => SOURCEDIR . '/controllers',
+		'file_versions_admin' => ADMINDIR,
+		'file_versions_controllers' => CONTROLLERDIR,
 		'file_versions_database' => SOURCEDIR . '/database',
-		'file_versions_subs' => SOURCEDIR . '/subs',
-		'file_versions_lib' => SOURCEDIR . '/lib'
+		'file_versions_subs' => SUBSDIR,
+		'file_versions_lib' => EXTDIR
 	);
 	foreach ($directories as $area => $dir)
 	{
@@ -353,7 +353,7 @@ function updateSettingsFile($config_vars)
 	//
 	// Check before you act: if cache is enabled, we can do a simple write test
 	// to validate that we even write things on this filesystem.
-	if ((!defined(CACHEDIR) || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+	if ((!defined('CACHEDIR') || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
 		$tmp_cache = BOARDDIR . '/cache';
 	else
 		$tmp_cache = CACHEDIR;

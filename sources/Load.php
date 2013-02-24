@@ -1989,16 +1989,6 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 }
 
 /**
- * Load an admin controller from the admin area.
- *
- * @param string $filename
- */
-function loadAdminClass($filename)
-{
-	require_once(SOURCEDIR . '/admin/' . $filename);
-}
-
-/**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  * Cleaner and easier (for modders) than to use the function below.
  *

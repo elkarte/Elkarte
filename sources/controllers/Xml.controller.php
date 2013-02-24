@@ -115,7 +115,7 @@ function action_corefeatures()
 		$validation = validateSession();
 		if (empty($validation))
 		{
-			loadAdminClass ('ManageSettings.php');
+			require_once(ADMINDIR . '/ManageSettings.php');
 			$result = ModifyCoreFeatures();
 
 			if (empty($result))
