@@ -487,7 +487,7 @@ function action_post($post_errors = array())
 			if ($context['preview_message'] === '')
 				$post_errors[] = 'no_message';
 			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
-				$post_errors[] = 'long_message';
+				$post_errors[] = array('long_message', array($modSettings['max_messageLength']));
 
 			// Protect any CDATA blocks.
 			if (isset($_REQUEST['xml']))

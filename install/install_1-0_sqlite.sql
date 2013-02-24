@@ -1893,6 +1893,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('autoLinkUrls', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('banLastUpdated', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_dir', '{BOARDDIR}/smileys');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_url', '{$boardurl}/smileys');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_default', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_directory', '{BOARDDIR}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_url', '{$boardurl}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_external', '65');

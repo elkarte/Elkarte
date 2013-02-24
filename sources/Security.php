@@ -313,7 +313,7 @@ function is_not_banned($forceCheck = false)
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-			smf_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
+			elk_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
 		}
 	}
 
@@ -353,7 +353,7 @@ function is_not_banned($forceCheck = false)
 		// A goodbye present.
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-		smf_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
+		elk_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 
 		// Don't scare anyone, now.
 		$_GET['action'] = '';

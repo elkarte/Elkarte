@@ -16,7 +16,7 @@
 
 function template_permission_index()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Not allowed to edit?
 	if (!$context['can_modify'])
@@ -271,7 +271,7 @@ function template_permission_index()
 
 function template_by_board()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -372,7 +372,7 @@ function template_by_board()
 // Edit permission profiles (predefined).
 function template_edit_profiles()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admin_form_wrapper">
@@ -471,7 +471,7 @@ function template_edit_profiles()
 
 function template_modify_group()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Cannot be edited?
 	if (!$context['profile']['can_modify'])
@@ -573,7 +573,7 @@ function template_modify_group()
 // A javascript enabled clean permissions view.
 function template_modify_group_simple($type)
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Simple only has one column so we only need bother ourself with that one.
 	$permission_data = &$context['permissions'][$type]['columns'][0];
@@ -839,7 +839,7 @@ function template_modify_group_simple($type)
 // The SMF 1.x way of looking at permissions.
 function template_modify_group_classic($type)
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	$permission_type = &$context['permissions'][$type];
 	$disable_field = $context['profile']['can_modify'] ? '' : 'disabled="disabled" ';
@@ -1000,7 +1000,7 @@ function template_modify_group_classic($type)
 
 function template_inline_permissions()
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $settings, $txt, $modSettings;
 
 	echo '
 		<fieldset id="', $context['current_permission'], '">
@@ -1070,7 +1070,7 @@ function template_inline_permissions()
 // Edit post moderation permissions.
 function template_postmod_permissions()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admin_form_wrapper">

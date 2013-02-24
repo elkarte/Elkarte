@@ -22,13 +22,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
-		<div>
-			<div>
-				<div>
-					<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" rows="" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width: ', $editor_context['width'], ';height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '">', $editor_context['value'], '</textarea>
-				</div>
-				<div id="', $editor_id, '_resizer" class="richedit_resize"></div>
-			</div>
+		<div id="outer_container">
+			<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" rows="" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width: ', $editor_context['width'], ';height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '">', $editor_context['value'], '</textarea>
 		</div>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script type="text/javascript"><!-- // --><![CDATA[
@@ -183,7 +178,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_draft\',
@@ -210,7 +205,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_pm_draft\',
@@ -227,7 +222,7 @@ function template_control_richedit_buttons($editor_id)
 // What's this, verification?!
 function template_control_verification($verify_id, $display_type = 'all', $reset = false)
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $settings, $txt, $modSettings;
 
 	$verify_context = &$context['controls']['verification'][$verify_id];
 

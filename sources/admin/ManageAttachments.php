@@ -286,6 +286,8 @@ function action_avatars($return_config = false)
 	$context['valid_custom_avatar_dir'] = empty($modSettings['custom_avatar_enabled']) || (!empty($modSettings['custom_avatar_dir']) && is_dir($modSettings['custom_avatar_dir']) && is_writable($modSettings['custom_avatar_dir']));
 
 	$config_vars = array(
+		array('title', 'avatar_settings'),
+			array('check', 'avatar_default'),
 		// Server stored avatars!
 		array('title', 'avatar_server_stored'),
 			array('warning', empty($testImg) ? 'avatar_img_enc_warning' : ''),

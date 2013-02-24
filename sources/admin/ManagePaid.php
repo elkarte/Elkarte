@@ -1777,7 +1777,7 @@ function loadPaymentGateways()
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file(SOURCEDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.php$~', $file, $matches))
+			if (is_file(SOURCEDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
 			{
 				// Check this is definitely a valid gateway!
 				$fp = fopen(SOURCEDIR . '/' . $file, 'rb');

@@ -17,7 +17,7 @@
 // Template for the profile side bar - goes before any other profile template.
 function template_profile_above()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
@@ -49,7 +49,7 @@ function template_profile_below()
 // This template displays users details without any option to edit them.
 function template_action_summary()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// Display the basic information about the user
 	echo '
@@ -329,7 +329,7 @@ function template_action_summary()
 // Template for showing all the posts of the user, in chronological order.
 function template_action_showPosts()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 		<div class="cat_bar">
@@ -431,7 +431,7 @@ function template_action_showPosts()
 // Template for showing all the drafts of the user.
 function template_showDrafts()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 		<div class="pagesection" style="margin-bottom: 0;">
@@ -494,7 +494,7 @@ function template_showDrafts()
 // Template for showing all the buddies of the current user.
 function template_editBuddies()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
@@ -601,7 +601,7 @@ function template_editBuddies()
 // Template for showing the ignore list of the current user.
 function template_editIgnoreList()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
@@ -697,7 +697,7 @@ function template_editIgnoreList()
 // This template shows an admin information on a users IP addresses used and errors attributed to them.
 function template_trackActivity()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	// The first table shows IP information about the user.
 	echo '
@@ -756,7 +756,7 @@ function template_trackActivity()
 // The template for trackIP, allowing the admin to see where/who a certain IP has been used.
 function template_trackIP()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	// This function always defaults to the last IP used by a member but can be set to track any IP.
 	// The first table in the template gives an input box to allow the admin to enter another IP to track.
@@ -845,7 +845,7 @@ function template_trackIP()
 
 function template_action_showPermissions()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 		<div class="cat_bar">
@@ -1011,7 +1011,7 @@ function template_action_showPermissions()
 // Template for user statistics, showing graphs and the like.
 function template_action_statPanel()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// First, show a few text statistics such as post/topic count.
 	echo '
@@ -1169,7 +1169,7 @@ function template_action_statPanel()
 // Template for editing profile options.
 function template_edit_options()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// The main header!
 	echo '
@@ -1414,7 +1414,7 @@ function template_edit_options()
 // Personal Message settings.
 function template_profile_pm_settings()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 								<dt>
@@ -1498,7 +1498,7 @@ function template_profile_pm_settings()
 // Template for showing theme settings. Note: template_options() actually adds the theme specific options.
 function template_profile_theme_settings()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	echo '
 							<dt>
@@ -1521,6 +1521,13 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[use_sidebar_menu]" value="0" />
 								<input type="checkbox" name="default_options[use_sidebar_menu]" id="use_sidebar_menu" value="1"', !empty($context['member']['options']['use_sidebar_menu']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="use_click_menu">', $txt['use_click_menu'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[use_click_menu]" value="0" />
+								<input type="checkbox" name="default_options[use_click_menu]" id="use_click_menu" value="1"', !empty($context['member']['options']['use_click_menu']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
 								<label for="show_no_avatars">', $txt['show_no_avatars'], '</label>
@@ -1686,7 +1693,7 @@ function template_profile_theme_settings()
 
 function template_action_notification()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// The main containing header.
 	echo '
@@ -1780,7 +1787,7 @@ function template_action_notification()
 // Template for choosing group membership.
 function template_groupMembership()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// The main containing header.
 	echo '
@@ -2087,7 +2094,7 @@ function template_viewWarning()
 // Show a lovely interface for issuing warnings.
 function template_issueWarning()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	template_load_warning_variables();
 
@@ -2415,7 +2422,7 @@ function template_issueWarning()
 // Template to show for deleting a users account - now with added delete post capability!
 function template_deleteAccount()
 {
-	global $context, $settings, $options, $scripturl, $txt, $scripturl;
+	global $context, $settings, $scripturl, $txt, $scripturl;
 
 	// The main containing header.
 	echo '
@@ -2504,7 +2511,7 @@ function template_deleteAccount()
 // Template for the password box/save button stuck at the bottom of every profile page.
 function template_profile_save()
 {
-	global $context, $settings, $options, $txt;
+	global $context, $settings, $txt;
 
 	echo '
 
@@ -2883,7 +2890,7 @@ function template_profile_smiley_pick()
 // Change the way you login to the forum.
 function template_authentication_method()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// The main header!
 	echo '

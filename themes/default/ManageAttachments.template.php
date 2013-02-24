@@ -39,7 +39,7 @@ function template_avatar_settings_below()
 
 function template_browse()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div id="manage_attachments">
@@ -61,7 +61,7 @@ function template_browse()
 
 function template_maintenance()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="manage_attachments">

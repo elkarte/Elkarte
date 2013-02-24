@@ -51,6 +51,10 @@ function action_modcenter($dont_call = false)
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 	$context['robot_no_index'] = true;
 
+	// Moderation counts for things that this moderator can take care of
+	require_once(SUBSDIR . '/Moderation.subs.php');
+	$mod_counts = loadModeratorMenuCounts();
+
 	// This is the menu structure - refer to subs/Menu.subs.php for the details.
 	$moderation_areas = array(
 		'main' => array(
@@ -96,11 +100,11 @@ function action_modcenter($dont_call = false)
 			),
 		),
 		'posts' => array(
-			'title' => $txt['mc_posts'],
+			'title' => $txt['mc_posts'] . (!empty($mod_counts['total']) ? ' [' . $mod_counts['total'] . ']' : ''),
 			'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
 			'areas' => array(
 				'postmod' => array(
-					'label' => $txt['mc_unapproved_posts'],
+					'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'controllers/PostModeration.controller.php',
 					'function' => 'action_postmoderation',
@@ -111,18 +115,18 @@ function action_modcenter($dont_call = false)
 					),
 				),
 				'attachmod' => array(
-					'label' => $txt['mc_unapproved_attachments'],
+					'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'controllers/PostModeration.controller.php',
 					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 				),
 				'reports' => array(
-					'label' => $txt['mc_reported_posts'],
+					'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
 					'enabled' => $context['can_moderate_boards'],
 					'function' => 'action_reportedPosts',
 					'subsections' => array(
-						'open' => array($txt['mc_reportedp_active']),
+						'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
 						'closed' => array($txt['mc_reportedp_closed']),
 					),
 				),
@@ -164,6 +168,7 @@ function action_modcenter($dont_call = false)
 		'action' => 'moderate',
 		'disable_url_session_check' => true,
 	);
+
 	$mod_include_data = createMenu($moderation_areas, $menuOptions);
 	unset($moderation_areas);
 
@@ -192,11 +197,13 @@ function action_modcenter($dont_call = false)
 		'url' => $scripturl . '?action=moderate',
 		'name' => $txt['moderation_center'],
 	);
+
 	if (isset($mod_include_data['current_area']) && $mod_include_data['current_area'] != 'index')
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'],
 			'name' => $mod_include_data['label'],
 		);
+
 	if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] != $mod_include_data['label'])
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
@@ -218,7 +225,7 @@ function action_modcenter($dont_call = false)
  */
 function action_moderationHome()
 {
-	global $txt, $context, $scripturl, $modSettings, $user_info, $user_settings;
+	global $txt, $context, $user_settings;
 
 	loadTemplate('ModerationCenter');
 	loadJavascriptFile('admin.js', array(), 'admin_scripts');
@@ -559,7 +566,7 @@ function ModBlockGroupRequests()
  */
 function action_reportedPosts()
 {
-	global $txt, $context, $scripturl, $modSettings, $user_info, $smcFunc;
+	global $txt, $context, $scripturl, $user_info, $smcFunc;
 
 	loadTemplate('ModerationCenter');
 
@@ -736,7 +743,7 @@ function action_reportedPosts()
  */
 function ModerateGroups()
 {
-	global $txt, $context, $scripturl, $modSettings, $user_info;
+	global $context, $user_info;
 
 	// You need to be allowed to moderate groups...
 	if ($user_info['mod_cache']['gq'] == '0=1')
@@ -1055,7 +1062,7 @@ function action_showNotice()
  */
 function action_viewWatchedUsers()
 {
-	global $smcFunc, $modSettings, $context, $txt, $scripturl, $user_info;
+	global $modSettings, $context, $txt, $scripturl;
 
 	// Some important context!
 	$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1295,8 +1302,7 @@ function list_getWatchedUserCount($approve_query)
  */
 function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 {
-	global $smcFunc, $txt, $scripturl, $modSettings, $user_info, $context;
-
+	global $smcFunc, $txt, $modSettings, $user_info;
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, real_name, last_login, posts, warning
 		FROM {db_prefix}members
@@ -1394,7 +1400,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
  */
 function list_getWatchedUserPostsCount($approve_query)
 {
-	global $smcFunc, $modSettings, $user_info;
+	global $smcFunc, $modSettings;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1425,7 +1431,7 @@ function list_getWatchedUserPostsCount($approve_query)
  */
 function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
-	global $smcFunc, $txt, $scripturl, $modSettings, $user_info;
+	global $smcFunc, $scripturl, $modSettings;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
@@ -1498,7 +1504,7 @@ function action_viewWarnings()
  */
 function action_viewWarningLog()
 {
-	global $smcFunc, $modSettings, $context, $txt, $scripturl;
+	global $modSettings, $context, $txt, $scripturl;
 
 	// Setup context as always.
 	$context['page_title'] = $txt['mc_warning_log_title'];
@@ -1600,7 +1606,7 @@ function action_viewWarningLog()
  */
 function list_getWarningCount()
 {
-	global $smcFunc, $modSettings;
+	global $smcFunc;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1625,7 +1631,7 @@ function list_getWarningCount()
  */
 function list_getWarnings($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt, $scripturl, $modSettings, $user_info;
+	global $smcFunc, $scripturl;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
@@ -1815,7 +1821,7 @@ function action_viewWarningTemplates()
   */
 function list_getWarningTemplateCount()
 {
-	global $smcFunc, $modSettings, $user_info;
+	global $smcFunc, $user_info;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1843,7 +1849,7 @@ function list_getWarningTemplateCount()
  */
 function list_getWarningTemplates($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt, $scripturl, $modSettings, $user_info;
+	global $smcFunc, $scripturl, $user_info;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
@@ -2029,7 +2035,7 @@ function action_modifyWarningTemplate()
  */
 function action_moderationSettings()
 {
-	global $context, $smcFunc, $txt, $scripturl, $user_settings, $user_info;
+	global $context, $txt, $user_settings, $user_info;
 
 	// Some useful context stuff.
 	loadTemplate('ModerationCenter');

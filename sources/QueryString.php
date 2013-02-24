@@ -81,9 +81,11 @@ function cleanRequest()
 		// Was this redirected? If so, get the REDIRECT_QUERY_STRING.
 		// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
 		$_SERVER['QUERY_STRING'] = substr($_SERVER['QUERY_STRING'], 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING'];
+		// some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
+		if(strpos($_SERVER['QUERY_STRING'], 'activate') !== false || strpos($_SERVER['QUERY_STRING'], 'reminder') !== false)
+			$_SERVER['QUERY_STRING'] = urldecode($_SERVER['QUERY_STRING']);
 
 		// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
-		// @todo smflib
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 		// Magic quotes still applies with parse_str - so clean it up.
@@ -609,7 +611,6 @@ function ob_sessrewrite($buffer)
 		return $buffer;
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().  This doesn't work below PHP 4.3.0, because it makes the output buffer bigger.
-	// @todo smflib
 	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
 		$buffer = preg_replace('/"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
 	// Debugging templates, are we?

@@ -19,7 +19,7 @@
  */
 function template_download_language()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// Actually finished?
 	if (!empty($context['install_complete']))
@@ -237,7 +237,7 @@ function template_download_language()
  */
 function template_modify_language_entries()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -428,7 +428,7 @@ function template_modify_language_entries()
  */
 function template_add_language()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -462,12 +462,12 @@ function template_add_language()
 		';
 
 	// Had some results?
-	if (!empty($context['smf_languages']))
+	if (!empty($context['languages']))
 	{
 		echo '
 			<div class="information">', $txt['add_language_elkarte_found'], '</div>';
 
-		template_show_list('smf_languages');
+		template_show_list('languages');
 	}
 
 	echo '

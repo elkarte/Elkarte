@@ -16,7 +16,7 @@
 
 function template_moderation_center()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $context;
 
 	// Show a welcome message to the user.
 	echo '
@@ -46,7 +46,7 @@ function template_moderation_center()
 
 function template_latest_news()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -88,7 +88,7 @@ function template_latest_news()
 // Show all the group requests the user can see.
 function template_group_requests_block()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -122,7 +122,7 @@ function template_group_requests_block()
 // A block to show the current top reported posts.
 function template_reported_posts_block()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 								<div class="cat_bar">
@@ -155,7 +155,7 @@ function template_reported_posts_block()
 
 function template_watched_users()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 						<div class="cat_bar">
@@ -189,7 +189,7 @@ function template_watched_users()
 // Little section for making... notes.
 function template_notes()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
@@ -229,7 +229,7 @@ function template_notes()
 
 function template_reported_posts()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
@@ -237,27 +237,25 @@ function template_reported_posts()
 							<h3 class="catbg">
 								', $context['view_closed'] ? $txt['mc_reportedp_closed'] : $txt['mc_reportedp_active'], '
 							</h3>
-						</div>
-						<div class="pagesection">
-							<div class="pagelinks">', $context['page_index'], '</div>
 						</div>';
 
-	// Make the buttons.
-	$close_button = create_button('close.png', $context['view_closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close', $context['view_closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close', 'class="centericon"');
-	$details_button = create_button('details.png', 'mc_reportedp_details', 'mc_reportedp_details', 'class="centericon"');
-	$ignore_button = create_button('ignore.png', 'mc_reportedp_ignore', 'mc_reportedp_ignore', 'class="centericon"');
-	$unignore_button = create_button('ignore.png', 'mc_reportedp_unignore', 'mc_reportedp_unignore', 'class="centericon"');
+	if (!empty($context['reports']))
+		echo '
+						<div class="pagesection floatleft">
+							', $context['page_index'], '
+						</div>';
 
 	foreach ($context['reports'] as $report)
 	{
 		echo '
-						<div class="generic_list_wrapper ', $report['alternate'] ? 'windowbg' : 'windowbg2', '">
-							<div class="content">
-								<h5>
-									<strong><a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>
-								</h5>
-								<div class="smalltext">
-									', $txt['mc_reportedp_last_reported'], ': ', $report['last_updated'], '&nbsp;-&nbsp;';
+						<div class="topic clear">
+							<div class="', $report['alternate'] ? 'windowbg' : 'windowbg2', ' core_posts">
+								<div class="content">
+									<h5>
+										<strong><a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>
+									</h5>
+									<div class="smalltext">
+										', $txt['mc_reportedp_last_reported'], ': ', $report['last_updated'], '&nbsp;-&nbsp;';
 
 		// Prepare the comments...
 		$comments = array();
@@ -265,17 +263,26 @@ function template_reported_posts()
 			$comments[$comment['member']['id']] = $comment['member']['link'];
 
 		echo '
-									', $txt['mc_reportedp_reported_by'], ': ', implode(', ', $comments), '
+										', $txt['mc_reportedp_reported_by'], ': ', implode(', ', $comments), '
+									</div>
+									<hr />
+									', $report['body'], '
+
+									<ul class="quickbuttons">
+										<li>
+											<a href="', $report['report_href'], '" class="details_button">', $txt['mc_reportedp_details'], '</a>
+										</li>
+										<li>
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+										</li>
+										<li>
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+										</li>
+										<li class="inline_mod_check">'
+											, !$context['view_closed'] ? '<input type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
+										</li>
+									</ul>
 								</div>
-								<hr />
-								', $report['body'], '
-								<br />
-								<ul class="quickbuttons">
-									<li><a href="', $report['report_href'], '">', $details_button, '</a></li>
-									<li><a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', '>', $report['ignore'] ? $unignore_button : $ignore_button, '</a></li>
-									<li><a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '">', $close_button, '</a></li>
-									<li>', !$context['view_closed'] ? '<input type="checkbox" name="close[]" value="' . $report['id'] . '" class="input_check" />' : '', '</li>
-								</ul>
 							</div>
 						</div>';
 	}
@@ -288,14 +295,18 @@ function template_reported_posts()
 								<p class="centertext">', $txt['mc_reportedp_none_found'], '</p>
 							</div>
 						</div>';
-
-	echo '
+	else
+		echo '
 						<div class="pagesection">
-							<div class="pagelinks floatleft">', $context['page_index'], '</div>
+							<div class="floatleft">
+								<div class="pagelinks">', $context['page_index'], '</div>
+							</div>
 							<div class="floatright">
 								', !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : '', '
 							</div>
-						</div>
+						</div>';
+
+	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</form>';
 }
@@ -514,7 +525,7 @@ function template_user_watch_post_callback($post)
 // Moderation settings
 function template_moderation_settings()
 {
-	global $settings, $options, $context, $txt, $scripturl;
+	global $settings, $context, $txt, $scripturl;
 
 	echo '
 	<div id="modcenter">
@@ -584,7 +595,7 @@ function template_moderation_settings()
 // Show a notice sent to a user.
 function template_show_notice()
 {
-	global $txt, $settings, $options, $context;
+	global $txt, $settings, $context;
 
 	// We do all the HTML for this one!
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -621,7 +632,7 @@ function template_show_notice()
 // Add or edit a warning template.
 function template_warn_template()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="modcenter">
