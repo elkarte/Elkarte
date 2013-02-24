@@ -30,6 +30,13 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---}
 ---#
 
+---# Adding new settings ...
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('avatar_default', '0');
+---#
+
 /******************************************************************************/
 --- Updating legacy attachments...
 /******************************************************************************/
