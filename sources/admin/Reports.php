@@ -143,7 +143,7 @@ function BoardReport()
 	global $context, $txt, $smcFunc, $modSettings;
 
 	// Load the permission profiles.
-	loadAdminClass ('ManagePermissions.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
 	loadLanguage('ManagePermissions');
 	loadPermissionProfiles();
 

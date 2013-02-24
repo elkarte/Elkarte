@@ -38,7 +38,7 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	loadLanguage('ManageSettings');
 
 	// Will need the utility functions from here.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	$context['sub_template'] = 'show_settings';
 
@@ -2243,7 +2243,7 @@ function ModifyPruningSettings($return_config = false)
 		return $config_vars;
 
 	// We'll need this in a bit.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving?
 	if (isset($_GET['save']))
