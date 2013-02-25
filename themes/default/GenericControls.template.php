@@ -151,7 +151,7 @@ function template_control_richedit_buttons($editor_id)
 				if (!spellCheck)
 					return false
 
-				var sUniqueId = ', JavaScriptEscape($editor_id), ';,
+				var sUniqueId = ', JavaScriptEscape($editor_id), ';
 				$("#" + sUniqueId).data("sceditor").storeLastState();
 
 				// If we\'re in HTML mode we need to get the non-HTML text.
