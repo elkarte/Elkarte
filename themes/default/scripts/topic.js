@@ -320,10 +320,12 @@ function QuickModify(oOptions)
 	this.bInEditMode = false;
 	this.sCurMessageId = '';
 	this.oCurMessageDiv = null;
+	this.oCurInfoDiv = null;
 	this.oCurSubjectDiv = null;
 	this.oMsgIcon = null
 	this.sMessageBuffer = '';
 	this.sSubjectBuffer = '';
+	this.sInfoBuffer = '';
 	this.bXmlHttpCapable = this.isXmlHttpCapable();
 	this.aAccessKeys = new Array();
 
@@ -429,15 +431,31 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// Actually create the content, with a bodge for disappearing dollar signs.
 	setInnerHTML(this.oCurMessageDiv, this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText).replace(/\{&dollarfix;\$\}/g, '$'));
 
-	// Replace the subject part.
-	this.oCurSubjectDiv = document.getElementById('subject_' + this.sCurMessageId.substr(4));
-	this.sSubjectBuffer = getInnerHTML(this.oCurSubjectDiv);
+	// Save and hide the existing subject div
+	if (this.opt.sIDSubject !== null)
+	{
+		this.oCurSubjectDiv = document.getElementById(this.opt.sIDSubject + this.sCurMessageId.substr(4));
+		if (this.oCurSubjectDiv !== null)
+		{
+			this.oCurSubjectDiv.style.display = 'none';
+			this.sSubjectBuffer = getInnerHTML(this.oCurSubjectDiv);
+		}
+	}
 
+	// Save the info div, then open an input field on it
 	sSubjectText = XMLDoc.getElementsByTagName('subject')[0].childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
-	setInnerHTML(this.oCurSubjectDiv, this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$'));
+	if (this.opt.sIDInfo !== null)
+	{
+		this.oCurInfoDiv = document.getElementById(this.opt.sIDInfo + this.sCurMessageId.substr(4));
+		if (this.oCurInfoDiv !== null)
+		{
+			this.sInfoBuffer = getInnerHTML(this.oCurInfoDiv);
+			setInnerHTML(this.oCurInfoDiv, this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$'));
+		}
+	}
 
 	// position the editor in the window
-	location.hash = '#subject_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
+	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
 
 	return true;
 }
@@ -449,10 +467,15 @@ QuickModify.prototype.modifyCancel = function ()
 	if (this.oCurMessageDiv)
 	{
 		setInnerHTML(this.oCurMessageDiv, this.sMessageBuffer);
+		setInnerHTML(this.oCurInfoDiv, this.sInfoBuffer);
 		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);
+		if (this.oCurSubjectDiv !== null)
+		{
+			this.oCurSubjectDiv.style.display = '';
+		}
 	}
 
-	// Hide the message icon if we are doign that
+	// Hide the message icon if we are doing that
 	if (this.opt.sIconHide)
 	{
 		var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
@@ -557,20 +580,20 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText.replace(/\$/g, '{&dollarfix;$}')).replace(/\{&dollarfix;\$\}/g,'$');
 		setInnerHTML(this.oCurMessageDiv, this.sMessageBuffer);
 
-		// Show new subject.
+		// Show new subject div, update in case it changed
 		var oSubject = message.getElementsByTagName('subject')[0];
 		var sSubjectText = oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
-		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g,'$');
+		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
 		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);
+		this.oCurSubjectDiv.style.display = '';
 
-		// If this is the first message, also update the topic subject.
-		if (oSubject.getAttribute('is_first') == '1')
-			setInnerHTML(document.getElementById('top_subject'), this.opt.sTemplateTopSubject.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$'));
+		// Restore the info bar div
+		setInnerHTML(this.oCurInfoDiv, this.sInfoBuffer);
 
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
 			setInnerHTML(document.getElementById('modified_' + this.sCurMessageId.substr(4)), message.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
-		
+
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
 		{
