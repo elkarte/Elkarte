@@ -35,6 +35,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					plugins: "bbcode",
+					enablePasteFiltering: true,
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
