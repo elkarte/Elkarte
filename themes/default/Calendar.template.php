@@ -758,7 +758,7 @@ function template_thetime()
 	global $context, $scripturl;
 
 	echo '
-<table cellpadding="0" cellspacing="0" border="1" align="center">
+<table class="table_collapse" border="1" align="center">
 	<caption>The time you requested</caption>';
 	$alt = false;
 	foreach ($context['clockicons'] as $t => $v)

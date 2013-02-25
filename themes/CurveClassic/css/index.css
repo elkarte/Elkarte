@@ -1575,7 +1575,7 @@ table.table_list tbody.content td.stats {
 }
 table.table_list tbody.content td.lastpost {
 	line-height: 1.3em;
-	width: 24%;	
+	width: 24%;
 	font-size: 0.9em;
 	min-width: 27em;
 }
@@ -2742,7 +2742,7 @@ dl {
 	width: 35%;
 	float: left;
 	margin: 0 0 3px 0;
-	padding: 0;
+	padding: 0 1em;
 	font-weight: bold;
 	clear: both;
 }

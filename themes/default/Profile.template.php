@@ -810,7 +810,7 @@ function template_trackIP()
 	else
 	{
 		echo '
-		<table class="table_grid" cellspacing="0" width="100%">
+		<table class="table_grid" width="100%">
 			<thead>
 				<tr class="catbg">
 					<th class="first_th" scope="col">', $txt['ip_address'], '</th>
@@ -893,7 +893,7 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['general']))
 		{
 			echo '
-					<table class="table_grid" width="100%" cellspacing="0">
+					<table class="table_grid" width="100%" >
 						<thead>
 							<tr class="titlebg">
 								<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>
@@ -960,7 +960,7 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['board']))
 		{
 			echo '
-				<table class="table_grid" width="100%" cellspacing="0">
+				<table class="table_grid" width="100%" >
 					<thead>
 						<tr class="titlebg">
 							<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>

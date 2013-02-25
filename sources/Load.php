@@ -1647,6 +1647,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
+		'use_click_menu' => (!empty($options['use_click_menu']) ? 'true' : 'false'),
 	);
 
 	// Queue our Javascript
