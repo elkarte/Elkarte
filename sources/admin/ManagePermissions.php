@@ -219,7 +219,12 @@ function PermissionIndex()
 	$groups = membersInGroups($postGroups, $normalGroups, true);
 	// @todo not sure why += wouldn't = be enough?
 	foreach ($groups as $id_group => $member_count)
-		$context['groups'][$id_group]['member_count'] += $member_count;
+	{
+		if (isset($context['groups'][$id_group]['member_count']))
+			$context['groups'][$id_group]['member_count'] += $member_count;
+		else
+			$context['groups'][$id_group]['member_count'] = $member_count;
+	}
 
 	foreach ($context['groups'] as $id => $data)
 	{
