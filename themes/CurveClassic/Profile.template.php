@@ -2737,6 +2737,13 @@ function template_profile_block_summary()
 	global $settings, $txt, $context, $modSettings, $scripturl;
 
 	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">
+				<img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="icon"/>&nbsp;', $txt['summary'], ' - ', $context['member']['name'], '
+			</h3>
+		</div>';
+
+	echo '
 		<div class="windowbg">
 			<div class="content">
 				<div id="basicinfo">
@@ -2815,6 +2822,20 @@ function template_profile_block_summary()
 function template_profile_block_user_info()
 {
 	global $settings, $txt, $context, $scripturl, $modSettings;
+
+	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">
+				<img src="', $settings['images_url'], '/stats_info.png" alt="" class="icon"/>&nbsp;';
+				if ($context['user']['is_owner']) 
+					echo '
+					<a href="', $scripturl ,'?action=profile;area=forumprofile;u=', $context['member']['id'], '">' , $txt['profile_user_info'] , '</a>'; 
+				else
+					echo 
+					$txt['profile_user_info'];
+				echo '
+			</h3>
+		</div>';
 
 	echo '
 		<div class="windowbg">
@@ -3236,7 +3257,7 @@ function template_profile_block_buddies()
 		</div>
 
 		<div class="windowbg">
-			<div class="content flow_auto" ', (isset($div_height) ? 'style="height: ' . $div_height . 'px"' : ''), '>
+			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px"' : ''), '>
 				<table class="profile_attachments">';
 
 	// now show them all
