@@ -165,6 +165,11 @@ $extdir = dirname(__FILE__) . '/sources/lib';
  * @var string
  */
 $languagedir = dirname(__FILE__) . '/themes/default/languages';
+/**
+ * Path to the subs directory.
+ * @var string
+ */
+$subsdir = dirname(__FILE__) . '/sources/subs';
 
 ########## Error-Catching ##########
 # Note: You shouldn't touch these settings.
@@ -188,6 +193,8 @@ if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt')
 	$boarddir = dirname(__FILE__);
 if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
+if (!file_exists($subsdir) && file_exists($sourcedir . '/subs'))
+	$subsdir = $sourcedir . '/subs';
 if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
 if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
