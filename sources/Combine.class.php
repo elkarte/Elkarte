@@ -132,7 +132,7 @@ class Site_Combiner
 			$this->_combineFiles();
 
 			// minify it to save some space
-			require_once(SOURCEDIR . '/lib/jsminplus.php');
+			require_once(EXTDIR . '/jsminplus.php');
 			$this->_minified_cache = JSMinPlus::minify($this->_cache);
 
 			// and save them for future users
@@ -184,7 +184,7 @@ class Site_Combiner
 			$this->_combineFiles('css');
 
 			// CSSmin it to save some space
-			require_once(SOURCEDIR . '/lib/cssmin.php');
+			require_once(EXTDIR . '/cssmin.php');
 			$compressor = new CSSmin($this->_cache);
 			$this->_minified_cache = $compressor->run($this->_cache);
 

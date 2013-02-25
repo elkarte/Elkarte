@@ -199,8 +199,8 @@ function action_attachments($return_config = false)
 		return $config_vars;
 
 	// These are very likely to come in handy! (i.e. without them we're doomed!)
-	loadAdminClass ('ManagePermissions.php');
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving settings?
 	if (isset($_GET['save']))
@@ -286,6 +286,8 @@ function action_avatars($return_config = false)
 	$context['valid_custom_avatar_dir'] = empty($modSettings['custom_avatar_enabled']) || (!empty($modSettings['custom_avatar_dir']) && is_dir($modSettings['custom_avatar_dir']) && is_writable($modSettings['custom_avatar_dir']));
 
 	$config_vars = array(
+		array('title', 'avatar_settings'),
+			array('check', 'avatar_default'),
 		// Server stored avatars!
 		array('title', 'avatar_server_stored'),
 			array('warning', empty($testImg) ? 'avatar_img_enc_warning' : ''),
@@ -304,6 +306,16 @@ function action_avatars($return_config = false)
 					'option_html_resize' => $txt['option_html_resize'],
 					'option_js_resize' => $txt['option_js_resize'],
 					'option_download_and_resize' => $txt['option_download_and_resize'],
+				),
+			),
+		array('title','gravatar'),
+			array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
+			array('select', 'gravatar_rating', 
+				array(
+					'g' => 'g',
+					'pg' => 'pg',
+					'r' => 'r',
+					'x' => 'x',
 				),
 			),
 		// Uploadable avatars?
@@ -329,7 +341,7 @@ function action_avatars($return_config = false)
 		return $config_vars;
 
 	// We need this file for the settings template.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving avatar settings?
 	if (isset($_GET['save']))

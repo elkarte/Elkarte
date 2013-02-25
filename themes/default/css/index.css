@@ -462,7 +462,7 @@ a img {
 
 .titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td {
 	color: #444;
-	font-size: 1.1em;
+	font-size: 1em;
 	font-weight: bold;
 	background: #c5cfd9 url(../images/theme/bars.png) 0 -340px repeat-x;
 }
@@ -677,6 +677,7 @@ p.para2 {
 }
 /* AJAX notification bar
 ------------------------------------------------------- */
+
 #ajax_in_progress {
 	background: url(../images/theme/loadingbar.png) repeat-x;
 	color: #f96f00;
@@ -701,6 +702,7 @@ p.para2 {
 
 /* Lists with settings use these a lot.
 ------------------------------------------------------- */
+
 dl.settings {
 	clear: right;
 	overflow: auto;
@@ -748,6 +750,7 @@ dl.settings dt a img {
 
 /* Styles for rounded headers.
 ------------------------------------------------------- */
+
 h3.catbg, h3.catbg2, h3.titlebg, h4.titlebg, h4.catbg {
 	overflow: hidden;
 	font-size: 1.1em;
@@ -861,6 +864,10 @@ table.table_grid {
 table.table_grid td {
 	padding: 3px;
 }
+table.table_collapse  {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
 
 /* GenericList */
 .additional_row {
@@ -884,6 +891,7 @@ img.sort {
 
 /* Used for sections that need somewhat larger corners.
 ----------------------------------------------------------- */ /* @todo */
+
 .roundframe {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	margin: 2px 0 0 0;
@@ -902,6 +910,7 @@ img.sort {
 
 /* The main content area.
 ------------------------------------------------------- */
+
 .content {
 	padding: 6px 15px;
 	margin: 0;
@@ -913,6 +922,7 @@ img.sort {
 
 /* Styles used by the auto suggest control.
 ------------------------------------------------------- */
+
 .auto_suggest_div {
 	position: absolute;
 	visibility: hidden;
@@ -934,6 +944,7 @@ img.sort {
 
 /* Styles for the standard dropdown menus.
 ------------------------------------------------------- */
+
 #main_menu {
 	margin: 0;
 	padding: 0;
@@ -1138,6 +1149,7 @@ img.sort {
 
 /* Styles for sidebar menus.
 ------------------------------------------------------- */
+
 #main_container {
 	position: relative;
 }
@@ -1301,6 +1313,7 @@ img.sort {
 
 /* Styles for the general looks of the theme.
 ------------------------------------------------------- */
+
 /* Do all these here to save repetition. */
 #header, #header .frame, #top_section, #upper_wrap, #upper_section, #upper_section .user,
 #upper_section .news, .navigate_section, #content_section, #main_content_section,
@@ -1615,6 +1628,7 @@ ul li.greeting {
 
 /* Styles for the board index and child boards tables.
 ------------------------------------------------------- */
+
 .table_list {
 	width: 100%;
 	border-spacing: 0;
@@ -1749,6 +1763,7 @@ ul li.greeting {
 
 /* Styles for the info center on the board index.
 ---------------------------------------------------- */
+
 #info_center {
 	clear: both;
 	margin: 0;
@@ -1821,6 +1836,7 @@ img.new_posts {
 
 /* Styles for the message (topic) index.
 ---------------------------------------------------- */
+
 div.table_frame .table_list {
 	border-collapse: collapse;
 	margin: 2px 0;
@@ -1897,6 +1913,7 @@ select.qaction, input.qaction {
 
 /* Styles for the display template (topic view).
 ---------------------------------------------------- */
+
 /* Events */
 .linked_events {
 	padding: 12px 0;
@@ -2178,6 +2195,18 @@ div#pollmoderation {
 .postarea, .moderatorbar {
 	margin: 0 0 0 175px;
 }
+.post_subject {
+    color: #555;
+    display: block;
+    float: right;
+    font-size: 0.9em;
+    max-width: 15em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+	line-height: 1.5em;
+	padding-right: 1em;
+}
 .postarea div.flow_hidden {
 	width: 100%;
 }
@@ -2192,25 +2221,28 @@ div#pollmoderation {
 	padding: 0 3px 0 3px;
 }
 .keyinfo h5 {
+    color: #555;
 	padding: 1px 0 5px 0;
 	line-height: 1.5em;
 	font-size: 0.9em;
+	font-weight: normal;
 }
 .keyinfo h5 a, .keyinfo h5 a strong {
 	color: #ad6825;
+	font-weight: normal;
 }
 .keyinfo h5 a.floatright {
 	padding: 0 12px 0 0; /* Deprecated? */
 }
 .keyinfo h5 .modified {
-	float: right;
-	color: #333;
+	float: left;
+	color: #777;
 	font-weight: normal;
-	padding: 2px 4px 0 4px;
+	padding: 2em 0 0 1.5em;
 }
 .inner {
 	padding: 7px 8px 2px 2px;
-	margin: 0 8x 0 0;
+	margin: 0 8px 0 0;
 	border-top: 1px solid #bfbfbf;
 	box-shadow: 0 1px 0 #fff inset;
 	min-height: 85px;
@@ -2238,8 +2270,7 @@ img.smiley {
 /* The quick buttons */
 div.quickbuttons_wrap {
 	padding: 2px 0;
-	width: 100%;
-	float: left;
+	margin: 0 0 0 175px;
 }
 ul.quickbuttons {
 	margin: 11px 0 0 0;
@@ -2247,9 +2278,10 @@ ul.quickbuttons {
 	clear: right;
 	float: right;
 	text-align: right;
+	width: 100%;
 }
 ul.quickbuttons li {
-	float: left;
+	float: right;
 	display: inline;
 	margin: 0;
 	font-size: 0.9em;
@@ -2288,7 +2320,7 @@ ul.quickbuttons li a.reply_button {
 	background: url(../images/theme/quickbuttons.png) no-repeat 1px -144px;
 }
 ul.quickbuttons li a.reply_all_button {
-	background: url(../images/theme/quickbuttons.png) no-repeat 1px -144x;
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -144px;
 }
 ul.quickbuttons li a.notify_button {
 	background: url(../images/theme/quickbuttons.png) no-repeat 1px -168px;
@@ -2418,7 +2450,18 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons ul li:hover a:focus, .quickbuttons ul li.sfhover a:focus {
 	margin: 0;
 }
-
+.quickbuttons li.modified, .quickbuttons li.modified:hover
+{
+	float: left;
+	color: #777;
+	background: none repeat scroll 0 0 transparent;
+	box-shadow: none;
+	border: none;
+    display: block;
+    left: 2px;
+    position: relative;
+    top: 0.65em;
+}
 /* Separator of posts. More useful in the print stylesheet. */
 #forumposts .post_separator {
 	display: none;
@@ -2452,6 +2495,7 @@ ul.quickbuttons li.inline_mod_check {
 
 /* Styles for the quick reply area.
 ----------------------------------------------------*/
+
 #quickreplybox {
 	clear: both;
 }
@@ -2473,6 +2517,7 @@ ul.quickbuttons li.inline_mod_check {
 
 /* Styles for edit post section
 ---------------------------------------------------- */
+
 form#postmodify .roundframe {
 	padding: 12px 12%;
 }
@@ -2591,6 +2636,7 @@ ul.post_options li {
 
 /* Styles for edit event section
 ---------------------------------------------------- */
+
 #post_event .roundframe {
 	padding: 12px 12%;
 	overflow: auto;
@@ -2755,6 +2801,7 @@ ul.split_messages div.post {
 
 /* Styles for the merge topic section.
 ---------------------------------------------------- */
+
 ul.merge_topics li {
 	list-style-type: none;
 }
@@ -2773,6 +2820,7 @@ fieldset.merge_options {
 
 /* Styles for the login areas.
 ------------------------------------------------------- */
+
 .login {
 	width: 540px;
 	margin: 0 auto;
@@ -2842,6 +2890,7 @@ dl.register_form dd {
 
 /* Styles for maintenance mode.
 ------------------------------------------------------- */
+
 #maintenance_mode {
 	width: 75%;
 	min-width: 520px;
@@ -2888,6 +2937,7 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 
 /* Styles for generic tables.
 ------------------------------------------------------- */
+
 .topic_table table {
 	width: 100%;
 }
@@ -2914,7 +2964,7 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 
 .errorfile_table {
 	background: #f0f4f7;
-	border-spacing: 3;
+	border-spacing: 3px;
 	border-collapse: collapse;
 }
 .errorfile_table td.current {
@@ -3330,6 +3380,7 @@ img.centericon {
 
 /* Styles for the statistics center.
 ------------------------------------------------- */
+
 #statistics {
 	padding: 6px 0;
 }
@@ -3525,6 +3576,7 @@ dl.addrules dt.floatleft {
 
 /* Styles for the calendar section.
 ------------------------------------------------- */
+
 #calendar {
 	overflow: hidden;
 }
@@ -3662,6 +3714,7 @@ span.hidelink {
 
 /* Styles for the memberlist section.
 ------------------------------------------------- */
+
 #mlist_search {
 	margin: auto;
 	width: 500px;
@@ -3674,6 +3727,7 @@ span.hidelink {
 
 /* Styles for the basic search section.
 ------------------------------------------------- */
+
 #simple_search p {
 	padding: 6px;
 	margin: 0;
@@ -3693,6 +3747,7 @@ span.hidelink {
 
 /* Styles for the advanced search section.
 ------------------------------------------------- */
+
 #searchform fieldset {
 	text-align: left;
 	padding: 0;
@@ -3724,6 +3779,7 @@ span.hidelink {
 
 /* Styles for the search results page.
 ------------------------------------------------- */
+
 .topic_table td blockquote, .topic_table td .quoteheader {
 	margin: 6px;
 }
@@ -3767,6 +3823,7 @@ span.hidelink {
 
 /* Styles for print media.
 ------------------------------------------------------- */
+
 @media print {
 	#headerarea
 	{
@@ -3781,6 +3838,7 @@ span.hidelink {
 
 /* Styles for the tooltips
 ------------------------------------------------------- */
+
 .tooltip {
 	position: absolute;
 	z-index: 999;
@@ -3797,6 +3855,7 @@ span.hidelink {
 
 /* Styles for popup windows
 ------------------------------------------------------- */
+
 .popup_container
 {
 	display: none;
@@ -3861,6 +3920,7 @@ span.hidelink {
 
 /* Styles for the progress bar
 -------------------------------------------------- */
+
 .progress_bar {
 	height: 15pt;
 	border: 1px solid black;
@@ -4022,7 +4082,7 @@ span.hidelink {
 .generic_list_wrapper .titlebg {
 	background: none;
 	border-bottom: 1px solid #aaa;
-	font-size: 1.1em;
+	font-size: 1em;
 }
 .generic_list_wrapper .additional_row {
 	margin: 0;

@@ -37,7 +37,7 @@ function template_main()
 
 	echo '
 		<div id="mlist" class="tborder topic_table">
-			<table class="table_grid" cellspacing="0" width="100%">
+			<table class="table_grid" width="100%">
 			<thead>
 				<tr class="catbg">';
 

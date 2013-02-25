@@ -102,7 +102,7 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
+	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_smf_js']))
 		echo '
 					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
@@ -996,7 +996,7 @@ function template_show_settings()
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
 					echo '
-							<textarea rows="', ($config_var['size'] ? $config_var['size'] : 4), '" cols="30" ', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+							<textarea rows="', ($config_var['size'] ? $config_var['size'] : 4), '" cols="40" ', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
 					theme_inline_permissions($config_var['name']);
@@ -1437,7 +1437,7 @@ function template_core_features()
 			if (!token_value)
 				token_value = $("#core_features_token").attr("value");
 
-			$(".core_features_img").click(function(){
+			$(".core_features_img").click(function() {
 				var cc = $(this),
 					cf = $(this).attr("id").substring(7),
 					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
@@ -1450,28 +1450,28 @@ function template_core_features()
 				$("#feature_" + cf).attr("checked", new_state);
 
 				data = {save: "save", feature_id: cf};
-				data[$("#core_features_session").attr("name")] = $("#core_features_session").attr("value");
+				data[$("#core_features_session").attr("name")] = $("#core_features_session").val();
 				data[token_name] = token_value;
 
-				$(".core_features_status_box").each(function(){
+				$(".core_features_status_box").each(function() {
 					data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
 				});
 
 				// Launch AJAX request.
 				$.ajax({
 					// The link we are accessing.
-					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
+					url: smf_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
 					
 					// The type of request.
 					type: "post",
 					
 					// The type of data that is getting returned.
 					data: data,
-					error: function(error){
+					error: function(error) {
 							$(ajax_infobar).html(error).slideDown(\'fast\');
 					},
 
-					success: function(request){
+					success: function(request) {
 						if ($(request).find("errors").find("error").length != 0)
 						{
 							$(ajax_infobar).attr(\'class\', \'errorbox\');

@@ -922,7 +922,7 @@ function action_modReport()
 	$smcFunc['db_free_result']($request);
 
 	// What have the other moderators done to this message?
-	loadAdminClass('Modlog.php');
+	require_once(ADMINDIR . '/Modlog.php');
 	require_once(SUBSDIR . '/List.subs.php');
 	loadLanguage('Modlog');
 

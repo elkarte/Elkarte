@@ -28,6 +28,14 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---}
 ---#
 
+---# Adding new settings ...
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('avatar_default', '0'),
+	('gravatar_rating', 'g');
+---#
+
 /******************************************************************************/
 --- Updating legacy attachments...
 /******************************************************************************/
@@ -378,6 +386,33 @@ ALTER TABLE `{$db_prefix}members`
 	DROP `aim`,
 	DROP `yim`,
 	DROP `msn`;
+---#
+
+---# Adding gravatar permissions...
+---{
+// Don't do this twice!
+if (@$modSettings['ourVersion'] < '1.0')
+{
+	// Try find people who probably can use remote avatars.
+	$request = upgrade_query("
+		SELECT id_group, add_deny, permission
+		FROM {$db_prefix}permissions
+		WHERE permission = 'profile_remote_avatar'");
+	$inserts = array();
+	while ($row = mysql_fetch_assoc($request))
+	{
+		$inserts[] = "($row[id_group], 'profile_gravatar', $row[add_deny])";
+	}
+	mysql_free_result($request);
+
+	if (!empty($inserts))
+		upgrade_query("
+			INSERT IGNORE INTO {$db_prefix}permissions
+				(id_group, permission, add_deny)
+			VALUES
+				" . implode(',', $inserts));
+}
+---}
 ---#
 
 /******************************************************************************/

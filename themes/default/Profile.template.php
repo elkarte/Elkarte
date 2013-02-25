@@ -810,7 +810,7 @@ function template_trackIP()
 	else
 	{
 		echo '
-		<table class="table_grid" cellspacing="0" width="100%">
+		<table class="table_grid" width="100%">
 			<thead>
 				<tr class="catbg">
 					<th class="first_th" scope="col">', $txt['ip_address'], '</th>
@@ -893,7 +893,7 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['general']))
 		{
 			echo '
-					<table class="table_grid" width="100%" cellspacing="0">
+					<table class="table_grid" width="100%" >
 						<thead>
 							<tr class="titlebg">
 								<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>
@@ -960,7 +960,7 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['board']))
 		{
 			echo '
-				<table class="table_grid" width="100%" cellspacing="0">
+				<table class="table_grid" width="100%" >
 					<thead>
 						<tr class="titlebg">
 							<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>
@@ -1521,6 +1521,13 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[use_sidebar_menu]" value="0" />
 								<input type="checkbox" name="default_options[use_sidebar_menu]" id="use_sidebar_menu" value="1"', !empty($context['member']['options']['use_sidebar_menu']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="use_click_menu">', $txt['use_click_menu'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[use_click_menu]" value="0" />
+								<input type="checkbox" name="default_options[use_click_menu]" id="use_click_menu" value="1"', !empty($context['member']['options']['use_click_menu']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
 								<label for="show_no_avatars">', $txt['show_no_avatars'], '</label>
@@ -2703,6 +2710,7 @@ function template_profile_avatar_select()
 								<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_none" value="none"' . ($context['member']['avatar']['choice'] == 'none' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_none"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['no_avatar'] . '</label><br />
 								', !empty($context['member']['avatar']['allow_server_stored']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_server_stored" value="server_stored"' . ($context['member']['avatar']['choice'] == 'server_stored' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_server_stored"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['choose_avatar_gallery'] . '</label><br />' : '', '
 								', !empty($context['member']['avatar']['allow_external']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_external" value="external"' . ($context['member']['avatar']['choice'] == 'external' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_external"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['my_own_pic'] . '</label><br />' : '', '
+								', !empty($context['member']['avatar']['allow_gravatar']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_gravatar" value="gravatar"' . ($context['member']['avatar']['choice'] == 'gravatar' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_gravatar"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['gravatar'] . '</label><br />' : '', '
 								', !empty($context['member']['avatar']['allow_upload']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_upload" value="upload"' . ($context['member']['avatar']['choice'] == 'upload' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_upload"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['avatar_will_upload'] . '</label>' : '', '
 							</dt>
 							<dd>';
@@ -2755,6 +2763,15 @@ function template_profile_avatar_select()
 								</div>';
 	}
 
+	// If the user is allowed to use a Gravatar.
+	if (!empty($context['member']['avatar']['allow_gravatar']))
+	{
+		echo '
+								<div id="avatar_gravatar">
+									<input type="checkbox" name="gravatar_all" id="gravatar_all" value="1" class="check" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'gravatar\');" class="input_file"/>
+									<br /><br /><img src='. $context['member']['avatar']['href'] .'" alt="" />
+								</div>';						
+	}
 	// If the user is able to upload avatars to the server show them an upload box.
 	if (!empty($context['member']['avatar']['allow_upload']))
 	{
@@ -2769,6 +2786,7 @@ function template_profile_avatar_select()
 								<script type="text/javascript"><!-- // --><![CDATA[
 									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "' . ($context['member']['avatar']['choice'] == 'server_stored' ? '' : 'none') . '";' : '', '
 									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "' . ($context['member']['avatar']['choice'] == 'external' ? '' : 'none') . '";' : '', '
+									', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "' . (($context['member']['avatar']['choice'] == 'gravatar' || (empty($context['member']['avatar']['allow_gravatar']))) ? '' : 'none') . '";' : '', '
 									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "' . ($context['member']['avatar']['choice'] == 'upload' ? '' : 'none') . '";' : '', '
 
 									function swap_avatar(type)
@@ -2778,21 +2796,31 @@ function template_profile_avatar_select()
 											case "avatar_choice_server_stored":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
 												break;
 											case "avatar_choice_external":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+												break;
+											case "avatar_choice_gravatar":
+												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "";' : '', '
 												break;
 											case "avatar_choice_upload":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "";' : '', '
 												break;
 											case "avatar_choice_none":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '												
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
 												break;
 										}

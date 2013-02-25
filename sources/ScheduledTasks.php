@@ -1761,7 +1761,7 @@ function scheduled_paid_subscriptions()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		loadAdminClass ('ManagePaid.php');
+		require_once(ADMINDIR . '/ManagePaid.php');
 		removeSubscription($row['id_subscribe'], $row['id_member']);
 	}
 	$smcFunc['db_free_result']($request);

@@ -1588,6 +1588,7 @@ function profileLoadAvatarData()
 		'allow_server_stored' => allowedTo('profile_server_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
 		'allow_upload' => allowedTo('profile_upload_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
 		'allow_external' => allowedTo('profile_remote_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
+		'allow_gravatar' => allowedTo('profile_gravatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
 	);
 
 	if ($cur_profile['avatar'] == '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
@@ -1604,6 +1605,12 @@ function profileLoadAvatarData()
 			'choice' => 'external',
 			'server_pic' => 'blank.png',
 			'external' => $cur_profile['avatar']
+		);
+	elseif ($cur_profile['avatar'] == 'gravatar' && $context['member']['avatar']['allow_gravatar'])
+		$context['member']['avatar'] += array(
+			'choice' => 'gravatar',
+			'server_pic' => 'blank.png',
+			'external' => 'http://'
 		);
 	elseif ($cur_profile['avatar'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']) && $context['member']['avatar']['allow_server_stored'])
 		$context['member']['avatar'] += array(
@@ -1979,6 +1986,10 @@ function profileSaveAvatarData(&$value)
 
 		// Get rid of their old avatar. (if uploaded.)
 		removeAttachments(array('id_member' => $memID));
+	}
+	elseif ($value == 'gravatar' && allowedTo('profile_gavatar'))
+	{
+		$profile_vars['avatar'] = 'gravatar';
 	}
 	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && empty($modSettings['avatar_download_external']))
 	{
