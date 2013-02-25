@@ -28,7 +28,7 @@ function template_badbehavior_log()
 					', $context['page_index'], '
 				</div>
 			</div>
-			<table border="0" cellspacing="1" class="table_grid" id="error_log">';
+			<table class="table_grid" id="error_log">';
 
 	if ($context['has_filter'])
 		echo '
