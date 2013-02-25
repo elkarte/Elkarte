@@ -105,6 +105,23 @@ class error_context
 	}
 
 	/**
+	 * Remove an error from the list
+	 *
+	 * @param string error code
+	 */
+	public function removeError($error)
+	{
+		if (!empty($error))
+		{
+			if (is_array($error))
+				$error = $error[0];
+			foreach ($this->_errors as $severity => $errors)
+				if (in_array($error, $errors))
+					unset($this->_errors[$severity][$error]);
+		}
+	}
+
+	/**
 	 * Return an array of errors of a certain severity.
 	 * @todo is it needed at all?
 	 *
