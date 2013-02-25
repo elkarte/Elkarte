@@ -190,7 +190,7 @@ function template_main()
 		}
 
 		echo '
-		<table class="table_grid" cellspacing="0">
+		<table class="table_grid">
 			<thead>
 				<tr class="catbg">';
 

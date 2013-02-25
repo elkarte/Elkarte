@@ -108,7 +108,7 @@ function template_unread()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 					<div class="tborder topic_table" id="unread">
-						<table class="table_grid" cellspacing="0">
+						<table class="table_grid" >
 							<thead>
 								<tr class="catbg">
 									<th scope="col" class="first_th" width="8%" colspan="1">&nbsp;</th>
@@ -269,7 +269,7 @@ function template_replies()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 					<div class="tborder topic_table" id="unread">
-						<table class="table_grid" cellspacing="0">
+						<table class="table_grid" >
 							<thead>
 								<tr class="catbg">
 									<th scope="col" class="first_th" width="8%" colspan="1">&nbsp;</th>

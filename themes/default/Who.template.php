@@ -43,7 +43,7 @@ function template_main()
 						</noscript>
 					</div>
 				</div>
-				<table class="table_grid" cellspacing="0">
+				<table class="table_grid" >
 					<thead>
 						<tr class="catbg">
 							<th scope="col" class="lefttext first_th" width="40%"><a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>
