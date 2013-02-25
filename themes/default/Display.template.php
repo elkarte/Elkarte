@@ -222,10 +222,7 @@ function template_main()
 		// Show a link to the member's profile.
 		echo '
 										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-											<span class="name">', $message['member']['name'], '</span>';
-
-
-			echo '
+											<span class="name">', $message['member']['name'], '</span>
 										</a>
 									</h4>';
 
@@ -438,19 +435,12 @@ function template_main()
 						</div>
 						<div class="postarea">
 							<div class="keyinfo">
-								<div id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
+								<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
+								<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
 									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
-								</div>
-
-								<h5 id="subject_', $message['id'], '">
-									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', ' ', $txt['on'], ': ', $message['time'], '">', $message['subject'], '</a>';
-
-		// Show "Last Edit: Time by Person" if this post was edited.
-		if ($settings['show_modify'] && !empty($message['modified']['name']))
-			echo '
-									<span class="smalltext modified" id="modified_', $message['id'], '">
-										', $message['modified']['last_edit_text'], '
-									</span>';
+								</span>
+								<h5 id="info_', $message['id'], '">
+									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) . ' - ' . $txt['on'] . ': ' : '', '</a>', $message['time'];
 
 		echo '
 								</h5>
@@ -560,22 +550,20 @@ function template_main()
 		// Show the quickbuttons, for various operations on posts.
 		if ($message['can_approve'] || $context['can_reply'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
 			echo '
+						<div class="quickbuttons_wrap">
 						<ul class="quickbuttons">';
 
-		// Can they reply? Have they turned on quick reply?
-		if ($context['can_quote'] && !empty($options['display_quick_reply']))
+		// Show "Last Edit: Time by Person" if this post was edited.
+		if ($settings['show_modify'] && !empty($message['modified']['last_edit_text']))
 			echo '
-							<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="quote_button">', $txt['quote'], '</a></li>';
+							<li class="modified" id="modified_', $message['id'], '">
+								', $message['modified']['last_edit_text'], '
+							</li>';
 
-		// So... quick reply is off, but they *can* reply?
-		elseif ($context['can_quote'])
+		// Show a checkbox for quick moderation?
+		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-							<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a></li>';
-
-		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
-		if ($message['can_modify'])
-			echo '
-							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+							<li class="inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'])
@@ -620,14 +608,25 @@ function template_main()
 								</ul>
 							</li>';
 
-		// Show a checkbox for quick moderation?
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
+		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
+		if ($message['can_modify'])
 			echo '
-							<li class="inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+
+
+		// Can they reply? Have they turned on quick reply?
+		if ($context['can_quote'] && !empty($options['display_quick_reply']))
+			echo '
+							<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="quote_button">', $txt['quote'], '</a></li>';
+		// So... quick reply is off, but they *can* reply?
+		elseif ($context['can_quote'])
+			echo '
+							<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a></li>';
 
 		if ($message['can_approve'] || $context['can_reply'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
 			echo '
-						</ul>';
+						</ul>
+						</div>';
 
 		echo '
 						<div class="moderatorbar">';
@@ -869,6 +868,8 @@ function template_main()
 							sIconHide: \'xx.png\',
 							sScriptUrl: smf_scripturl,
 							sClassName: \'quick_edit\',
+							sIDSubject: \'post_subject_\',
+							sIDInfo: \'info_\',
 							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 							iTopicId: ', $context['current_topic'], ',
 							sTemplateBodyEdit: ', JavaScriptEscape('
@@ -884,8 +885,9 @@ function template_main()
 								</div>'), ',
 							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
 							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
-							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
+							sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
 							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
+							sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
 							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
 							sFormRemoveAccessKeys: \'postmodify\'' : '', '
 						});
