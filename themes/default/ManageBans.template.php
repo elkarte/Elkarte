@@ -178,13 +178,15 @@ function template_ban_edit()
 		echo '
 			<br />
 			<form action="', $scripturl, '?action=admin;area=ban;sa=edit" method="post" accept-charset="UTF-8" style="padding: 0px;margin: 0px;" onsubmit="return confirm(\'', $txt['ban_remove_selected_triggers_confirm'], '\');">
-				<table class="table_grid" width="100%">
+				<table class="table_grid">
 					<thead>
 						<tr class="catbg">
-							<th scope="col" class="first_th" width="65%" align="left">', $txt['ban_banned_entity'], '</th>
-							<th scope="col" width="15%" align="center">', $txt['ban_hits'], '</th>
-							<th scope="col" width="15%" align="center">', $txt['ban_actions'], '</th>
-							<th scope="col" class="last_th" width="5%" align="center"><input type="checkbox" onclick="invertAll(this, this.form, \'ban_items\');" class="input_check" /></th>
+							<th scope="col" class="first_th" style="width:65%;text-align:left">', $txt['ban_banned_entity'], '</th>
+							<th scope="col" style="width:15%;text-align:center">', $txt['ban_hits'], '</th>
+							<th scope="col" style="width:15%;text-align:center">', $txt['ban_actions'], '</th>
+							<th scope="col" class="last_th" style="width:5%;text-align:center">
+								<input type="checkbox" onclick="invertAll(this, this.form, \'ban_items\');" class="input_check" />
+							</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -200,7 +202,7 @@ function template_ban_edit()
 			foreach ($context['ban_items'] as $ban_item)
 			{
 				echo '
-						<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" align="left">
+						<tr class="lefttext ', $alternate ? 'windowbg' : 'windowbg2', '">
 							<td>';
 				if ($ban_item['type'] == 'ip')
 					echo '		<strong>', $txt['ip'], ':</strong>&nbsp;', $ban_item['ip'];
@@ -212,9 +214,13 @@ function template_ban_edit()
 					echo '		<strong>', $txt['username'], ':</strong>&nbsp;', $ban_item['user']['link'];
 				echo '
 							</td>
-							<td align="center">', $ban_item['hits'], '</td>
-							<td align="center"><a href="', $scripturl, '?action=admin;area=ban;sa=edittrigger;bg=', $context['ban']['id'], ';bi=', $ban_item['id'], '">', $txt['ban_edit_trigger'], '</a></td>
-							<td align="center"><input type="checkbox" name="ban_items[]" value="', $ban_item['id'], '" class="input_check" /></td>
+							<td class="centertext">', $ban_item['hits'], '</td>
+							<td class="centertext">
+								<a href="', $scripturl, '?action=admin;area=ban;sa=edittrigger;bg=', $context['ban']['id'], ';bi=', $ban_item['id'], '">', $txt['ban_edit_trigger'], '</a>
+							</td>
+							<td class="centertext">
+								<input type="checkbox" name="ban_items[]" value="', $ban_item['id'], '" class="input_check" />
+							</td>
 						</tr>';
 				$alternate = !$alternate;
 			}

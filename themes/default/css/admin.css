@@ -230,6 +230,10 @@ div.quick_tasks {
 .action_admin .table_grid tr:nth-child(odd) td {
 	background: #f8f8f8;
 }
+.action_admin .table_grid .windowbg3 tr:nth-child(odd) td, .action_admin .table_grid .windowbg3 tr:nth-child(even) td {
+	color: #222;
+	background: #cacdd3;
+}
 
 /* Newsletters screen.
 ---------------------------------------------*/
