@@ -102,7 +102,7 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
+	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_smf_js']))
 		echo '
 					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
