@@ -308,6 +308,16 @@ function action_avatars($return_config = false)
 					'option_download_and_resize' => $txt['option_download_and_resize'],
 				),
 			),
+		array('title','gravatar'),
+			array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
+			array('select', 'gravatar_rating', 
+				array(
+					'g' => 'g',
+					'pg' => 'pg',
+					'r' => 'r',
+					'x' => 'x',
+				),
+			),
 		// Uploadable avatars?
 		array('title', 'avatar_upload'),
 			array('permissions', 'profile_upload_avatar', 0, $txt['avatar_upload_groups']),
