@@ -1368,6 +1368,9 @@ function action_deleteInstall()
 
 	require(dirname(__FILE__) . '/Settings.php');
 	load_database();
+	
+	if (!defined('SUBSDIR'))
+		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
 
 	chdir(dirname(__FILE__));
 
