@@ -2539,19 +2539,19 @@ function loadDatabase()
 		db_fix_prefix($db_prefix, $db_name);
 }
 /**
- * Determine the user's avatar type and return the determined information as an array
+ * Determine the user's avatar type and return the information as an array
  *  
  * @param array $profile
  * @param type $max_avatar_width
  * @param type $max_avatar_height
  * @return array $avatar
  */
-function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
+function determineAvatar($profile, $max_avatar_width, $max_avatar_heigh)
 {
 	global $modSettings, $scripturl, $settings;
 
 	// uploaded avatar?
-	if ($profile['id_attach'] > 0)
+	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2566,13 +2566,27 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" "' . $max_avatar_width . $max_avatar_height . 'alt="" />',
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" ' . $max_avatar_width . $max_avatar_height . ' alt="" border="0" />',
 			'href' => $profile['avatar'],
-			'url' => 'http://',
+			'url' => $profile['avatar'],
 		);
 	}
 
-	// maybe an avatar from the gallery?
+	// Gravatar instead?
+	elseif (!empty($profile['avatar']) && $profile['avatar'] == 'gravatar')
+	{
+		// Gravatars URL.
+		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
+		
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
+			'href' => $gravatar_url,
+			'url' => $gravatar_url,
+		);
+	}
+
+	// an avatar from the gallery?
 	elseif (!empty($profile['avatar']) && !stristr($profile['avatar'], 'http://'))
 	{
 		$avatar = array(
@@ -2583,7 +2597,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 		);
 	}
 
-	// no custon avatar found yet,maybe a default avatar?
+	// no custon avatar found yet, maybe a default avatar?
 	elseif (($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		$avatar = array(
@@ -2593,6 +2607,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 			'url' => 'http://',
 		);	
 	}
+	//finally ...
 	else
 		$avatar = array(
 			'name' => '',
