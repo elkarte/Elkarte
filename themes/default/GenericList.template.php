@@ -237,11 +237,11 @@ function template_create_list_menu($list_menu, $direction = 'top')
 	if (!isset($list_menu['style']) || isset($list_menu['style']) && $list_menu['style'] == 'tabs')
 	{
 		echo '
-		<table cellpadding="0" cellspacing="0" style="margin-', $list_menu['position'], ': 10px; width: 100%;">
+		<table class="table_collapse" style="margin-', $list_menu['position'], ': 10px; width: 100%;">
 			<tr>', $list_menu['position'] == 'right' ? '
 				<td>&nbsp;</td>' : '', '
 				<td align="', $list_menu['position'], '">
-					<table cellspacing="0" cellpadding="0">
+					<table class="table_collapse">
 						<tr>
 							<td class="', $direction == 'top' ? 'mirror' : 'main', 'tab_', $first, '">&nbsp;</td>';
 
@@ -277,11 +277,11 @@ function template_create_list_menu($list_menu, $direction = 'top')
 			$links[] = '<a href="' . $link['href'] . '">' . $link['label'] . '</a>';
 
 		echo '
-		<table cellpadding="0" cellspacing="0" style="margin-', $list_menu['position'], ': 10px; width: 100%;">
+		<table class="table_collapse" style="margin-', $list_menu['position'], ': 10px; width: 100%;">
 			<tr>', $list_menu['position'] == 'right' ? '
 				<td>&nbsp;</td>' : '', '
 				<td align="', $list_menu['position'], '">
-					<table cellspacing="0" cellpadding="0">
+					<table class="table_collapse">
 						<tr>
 							<td class="', $direction == 'top' ? 'mirror' : 'main', 'tab_', $first, '">&nbsp;</td>
 							<td class="', $direction == 'top' ? 'mirror' : 'main', 'tab_back">', implode(' &nbsp;|&nbsp; ', $links), '</td>

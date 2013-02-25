@@ -861,6 +861,10 @@ table.table_grid {
 table.table_grid td {
 	padding: 3px;
 }
+table.table_collapse  {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
 
 /* GenericList */
 .additional_row {
