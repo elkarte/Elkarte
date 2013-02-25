@@ -2573,7 +2573,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	}
 
 	// Gravatar instead?
-	elseif (!empty($profile['avatar']) && $profile['avatar'] == 'gravatar')
+	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
 		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
