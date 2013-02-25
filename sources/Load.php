@@ -1112,12 +1112,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'location' => $profile['location'],
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
-			'avatar' => array(
-				'name' => $profile['avatar'],
-				'image' => $profile['avatar'] == '' ? ($profile['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename']) . '" alt="" />' : '') : (stristr($profile['avatar'], 'http://') ? '<img class="avatar" src="' . $profile['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($profile['avatar']) . '" alt="" />'),
-				'href' => $profile['avatar'] == '' ? ($profile['id_attach'] > 0 ? (empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename']) : '') : (stristr($profile['avatar'], 'http://') ? $profile['avatar'] : $modSettings['avatar_url'] . '/' . $profile['avatar']),
-				'url' => $profile['avatar'] == '' ? '' : (stristr($profile['avatar'], 'http://') ? $profile['avatar'] : $modSettings['avatar_url'] . '/' . $profile['avatar'])
-			),
+			'avatar' => determineAvatar($profile, $avatar_width, $avatar_height),
 			'last_login' => empty($profile['last_login']) ? $txt['never'] : timeformat($profile['last_login']),
 			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
 			'karma' => array(
@@ -1152,17 +1147,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
-
-	if(!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
-	{
-		// Change the avatar's URL
-		$memberContext[$user]['avatar'] = array(
-			'name' => '',
-			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
-			'href' => $settings['images_url'] . '/default_avatar.png',
-			'url' => 'http://'
-		);
-	}
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
@@ -2553,4 +2537,84 @@ function loadDatabase()
 	// If in SSI mode fix up the prefix.
 	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
+}
+/**
+ * Determine the user's avatar type and return the information as an array
+ *  
+ * @param array $profile
+ * @param type $max_avatar_width
+ * @param type $max_avatar_height
+ * @return array $avatar
+ */
+function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
+{
+	global $modSettings, $scripturl, $settings;
+
+	// uploaded avatar?
+	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar" alt="" />',
+			'href' => $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar',
+			'url' => '',
+		);
+	}
+
+	// remote avatar?
+	elseif (stristr($profile['avatar'], 'http://'))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" ' . $max_avatar_width . $max_avatar_height . ' alt="" border="0" />',
+			'href' => $profile['avatar'],
+			'url' => $profile['avatar'],
+		);
+	}
+
+	// Gravatar instead?
+	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
+	{
+		// Gravatars URL.
+		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
+		
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
+			'href' => $gravatar_url,
+			'url' => $gravatar_url,
+		);
+	}
+
+	// an avatar from the gallery?
+	elseif (!empty($profile['avatar']) && !stristr($profile['avatar'], 'http://'))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'], 
+			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
+		);
+	}
+
+	// no custon avatar found yet, maybe a default avatar?
+	elseif (($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	{
+		$avatar = array(
+			'name' => '',
+			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
+			'href' => $settings['images_url'] . '/default_avatar.png',
+			'url' => 'http://',
+		);	
+	}
+	//finally ...
+	else
+		$avatar = array(
+			'name' => '',
+			'image' => '',
+			'href' => '',
+			'url' => ''
+		);
+
+	return $avatar;
 }
