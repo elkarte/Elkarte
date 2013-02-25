@@ -298,7 +298,8 @@ function action_reporttm()
 
 	// No errors, yet.
 	$report_errors = error_context::context('report', 1);
-
+	$context['report_error'] = $report_errors->prepareErrors();
+	$context['error_type'] = $report_errors->getErrorType() == 0 ? 'minor' : 'serious';
 	// If they're posting, it should be processed by action_reporttm2.
 	if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && !$report_errors->hasErrors())
 		action_reporttm2();
