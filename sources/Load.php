@@ -2546,7 +2546,7 @@ function loadDatabase()
  * @param type $max_avatar_height
  * @return array $avatar
  */
-function determineAvatar($profile, $max_avatar_width, $max_avatar_heigh)
+function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 {
 	global $modSettings, $scripturl, $settings;
 
