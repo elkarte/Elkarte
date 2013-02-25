@@ -37,6 +37,7 @@ $txt['latest_posts'] = 'Latest posts of: ';
 $txt['additional_info'] = 'Additional Information';
 $txt['avatar_by_url'] = 'Specify your own avatar by URL. (e.g.: <em>http://www.mypage.com/mypic.png</em>)';
 $txt['my_own_pic'] = 'Specify avatar by URL';
+$txt['gravatar'] = 'Gravatar';
 $txt['date_format'] = 'The format here will be used to show dates throughout this forum.';
 $txt['time_format'] = 'Time Format';
 $txt['display_name_desc'] = 'This is the displayed name that people will see.';
