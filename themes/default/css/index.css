@@ -2178,6 +2178,18 @@ div#pollmoderation {
 .postarea, .moderatorbar {
 	margin: 0 0 0 175px;
 }
+.post_subject {
+    color: #555;
+    display: block;
+    float: right;
+    font-size: 0.9em;
+    max-width: 15em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+	line-height: 1.5em;
+	padding-right: 1em;
+}
 .postarea div.flow_hidden {
 	width: 100%;
 }
@@ -2192,25 +2204,28 @@ div#pollmoderation {
 	padding: 0 3px 0 3px;
 }
 .keyinfo h5 {
+    color: #555;
 	padding: 1px 0 5px 0;
 	line-height: 1.5em;
 	font-size: 0.9em;
+	font-weight: normal;
 }
 .keyinfo h5 a, .keyinfo h5 a strong {
 	color: #ad6825;
+	font-weight: normal;
 }
 .keyinfo h5 a.floatright {
 	padding: 0 12px 0 0; /* Deprecated? */
 }
 .keyinfo h5 .modified {
-	float: right;
-	color: #333;
+	float: left;
+	color: #777;
 	font-weight: normal;
-	padding: 2px 4px 0 4px;
+	padding: 2em 0 0 1.5em;
 }
 .inner {
 	padding: 7px 8px 2px 2px;
-	margin: 0 8x 0 0;
+	margin: 0 8px 0 0;
 	border-top: 1px solid #bfbfbf;
 	box-shadow: 0 1px 0 #fff inset;
 	min-height: 85px;
@@ -2238,8 +2253,7 @@ img.smiley {
 /* The quick buttons */
 div.quickbuttons_wrap {
 	padding: 2px 0;
-	width: 100%;
-	float: left;
+	margin: 0 0 0 175px;
 }
 ul.quickbuttons {
 	margin: 11px 0 0 0;
@@ -2247,9 +2261,10 @@ ul.quickbuttons {
 	clear: right;
 	float: right;
 	text-align: right;
+	width: 100%;
 }
 ul.quickbuttons li {
-	float: left;
+	float: right;
 	display: inline;
 	margin: 0;
 	font-size: 0.9em;
@@ -2418,7 +2433,18 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons ul li:hover a:focus, .quickbuttons ul li.sfhover a:focus {
 	margin: 0;
 }
-
+.quickbuttons li.modified, .quickbuttons li.modified:hover
+{
+	float: left;
+	color: #777;
+	background: none repeat scroll 0 0 transparent;
+	box-shadow: none;
+	border: none;
+    display: block;
+    left: 2px;
+    position: relative;
+    top: 0.65em;
+}
 /* Separator of posts. More useful in the print stylesheet. */
 #forumposts .post_separator {
 	display: none;
