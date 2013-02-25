@@ -516,7 +516,7 @@ function template_group_members()
 			</div>
 			<br />
 			<div class="pagesection">', $context['page_index'], '</div>
-			<table width="100%" class="table_grid">
+			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th"><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['name'], $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>';
@@ -531,7 +531,7 @@ function template_group_members()
 						<th ', empty($context['group']['assignable']) ? ' class="last_th" colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <img src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '','</a></th>';
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th class="last_th" width="4%" align="center"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th class="last_th" style="width:4%;text-align:center"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
 	echo '
 					</tr>
 				</thead>
@@ -540,7 +540,7 @@ function template_group_members()
 	if (empty($context['members']))
 		echo '
 					<tr class="windowbg2">
-						<td colspan="6" align="center">', $txt['membergroups_members_no_members'], '</td>
+						<td colspan="6" class="centertext">', $txt['membergroups_members_no_members'], '</td>
 					</tr>';
 
 	$alternate = false;
@@ -553,7 +553,7 @@ function template_group_members()
 		if ($context['can_send_email'])
 		{
 			echo '
-						<td', $member['show_email'] == 'no_through_forum' && $settings['use_image_buttons'] ? ' align="center"' : '', '>';
+						<td', $member['show_email'] == 'no_through_forum' && $settings['use_image_buttons'] ? ' class="centertext"' : '', '>';
 
 			// Is it totally hidden?
 			if ($member['show_email'] == 'no')
@@ -581,7 +581,9 @@ function template_group_members()
 						<td', empty($context['group']['assignable']) ? ' colspan="2"' : '', '>', $member['posts'], '</td>';
 		if (!empty($context['group']['assignable']))
 			echo '
-						<td align="center" width="4%"><input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/></td>';
+						<td style="width:4%;text-align:center">
+							<input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
+						</td>';
 		echo '
 					</tr>';
 	}
