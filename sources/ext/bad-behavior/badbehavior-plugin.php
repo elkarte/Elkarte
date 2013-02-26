@@ -14,7 +14,7 @@
  *
  */
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 define('BB2_CWD', dirname(__FILE__));
 

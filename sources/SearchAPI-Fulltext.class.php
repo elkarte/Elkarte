@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * SearchAPI-Fulltext.php, Fulltext API, used when an SQL fulltext index is used
