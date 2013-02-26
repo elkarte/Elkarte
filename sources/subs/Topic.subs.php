@@ -932,6 +932,19 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 	return topicPointer($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
 
+/**
+ * Advance topic pointer.
+ * (in either direction)
+ * This function is used by previousTopic() and nextTopic()
+ * The boolean parameter $next determines direction.
+ *
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param bool $next = true whether to increase or decrease the pointer
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
+ */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
 	global $smcFunc;
