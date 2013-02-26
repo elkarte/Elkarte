@@ -820,6 +820,7 @@ function action_post()
 		'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
 		'title' => $txt['error_while_submitting'],
 	);
+
 	$context['attachment_error'] = array(
 		'errors' => $attach_errors->prepareErrors(),
 		'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
@@ -892,6 +893,51 @@ function action_post()
 		'preview_type' => 2,
 	);
 	create_control_richedit($editorOptions);
+
+	addInlineJavascript('
+	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
+	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
+
+	var subject_err = new errorbox_handler({
+		self: \'subject_err\',
+		error_box_id: \'post_error\',
+		error_checks: [{
+			code: \'no_subject\',
+			function: function(box_value) {
+				if (box_value.length == 0)
+					return true;
+				else
+					return false;
+			}
+		}],
+		check_id: "post_subject"
+	});
+	
+	var body_err = new errorbox_handler({
+		self: \'body_err\',
+		error_box_id: \'post_error\',
+		error_checks: [{
+			code: \'no_message\',
+			function: function(box_value) {
+				if (box_value.length == 0)
+					return true;
+				else
+					return false;
+			}
+		}],
+		editor_id: \'' . $editorOptions['id'] . '\',
+		editor: ' . JavaScriptEscape('
+		function () {
+			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
+			var editor_val = \'\';
+			if(editor.inSourceMode())
+				editor_val = editor.getText();
+			else
+				editor_val  = editor.getText();
+
+			return editor_val;
+		};') . '
+	});', true);
 
 	// Store the ID.
 	$context['post_box_name'] = $editorOptions['id'];

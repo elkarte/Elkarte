@@ -361,7 +361,7 @@ function action_reporttm()
 					return false;
 			}
 		}],
-		error_checking: "report_comment"
+		check_id: "report_comment"
 	});', true);
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
