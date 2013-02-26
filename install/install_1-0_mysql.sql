@@ -1660,7 +1660,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
-VALUES ('ourVersion', '{$current_version}'),
+VALUES ('elkVersion', '{$current_version}'),
 	('news', '{$default_news}'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),

@@ -1802,7 +1802,7 @@ CREATE TABLE {$db_prefix}settings (
 #
 
 BEGIN TRANSACTION;
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ourVersion', '{$current_version}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');

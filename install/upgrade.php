@@ -570,11 +570,11 @@ if (!class_exists('Ftp_Connection'))
 }
 
 // Don't do security check if on Yabbse
-if (!isset($modSettings['ourVersion']))
+if (!isset($modSettings['elkVersion']))
 	$disable_security = true;
 
 // Does this exist?
-if (isset($modSettings['ourVersion']))
+if (isset($modSettings['elkVersion']))
 {
 	$request = $smcFunc['db_query']('', '
 		SELECT variable, value
@@ -607,7 +607,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -924,11 +924,11 @@ function action_welcomeLogin()
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
 
 	// Need legacy scripts?
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.1)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.0)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.0)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 1.1)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	if (!$check)
@@ -968,7 +968,7 @@ function action_welcomeLogin()
 	if (!file_exists($CACHEDIR_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ELKARTE will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
@@ -1109,8 +1109,8 @@ function checkLogin()
 			$support_js = 0;
 
 		// Note down the version we are coming from.
-		if (!empty($modSettings['ourVersion']) && empty($upcontext['user']['version']))
-			$upcontext['user']['version'] = $modSettings['ourVersion'];
+		if (!empty($modSettings['elkVersion']) && empty($upcontext['user']['version']))
+			$upcontext['user']['version'] = $modSettings['elkVersion'];
 
 		// Didn't get anywhere?
 		if ((empty($sha_passwd) || $password != $sha_passwd) && empty($upcontext['username_incorrect']) && !$disable_security)
@@ -1421,9 +1421,9 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['ourVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
 				$upcontext['file_count']++;
-			elseif (!isset($modSettings['ourVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['ourVersion'] < $file[1]))
+			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['elkVersion'] < $file[1]))
 				$upcontext['file_count']++;
 		}
 	}
@@ -1441,7 +1441,7 @@ function action_databaseChanges()
 			$upcontext['cur_file_num']++;
 			$upcontext['cur_file_name'] = $file[0];
 			// Do we actually need to do this still?
-			if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1])
 			{
 				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
 				if ($nextFile)
@@ -1450,11 +1450,11 @@ function action_databaseChanges()
 					$smcFunc['db_insert']('replace',
 						$db_prefix . 'settings',
 						array('variable' => 'string', 'value' => 'string'),
-						array('ourVersion', $file[2]),
+						array('elkVersion', $file[2]),
 						array('variable')
 					);
 
-					$modSettings['ourVersion'] = $file[2];
+					$modSettings['elkVersion'] = $file[2];
 				}
 
 				// If this is XML we only do this stuff once.
@@ -2956,7 +2956,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/ManageBoards.php');
-	if (!$check && !isset($modSettings['ourVersion']))
+	if (!$check && !isset($modSettings['elkVersion']))
 		print_error('Error: Some files are missing or out-of-date.', true);
 
 	// Do a quick version spot check.
@@ -2990,7 +2990,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($modSettings['theme_dir']))
 		@chmod($modSettings['theme_dir'], 0777);
 
-	if (!is_writable($modSettings['theme_dir']) && !isset($modSettings['ourVersion']))
+	if (!is_writable($modSettings['theme_dir']) && !isset($modSettings['elkVersion']))
 		print_error('Error: Unable to obtain write access to "themes".');
 
 	// Make sure cache directory exists and is writable!
@@ -3004,7 +3004,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($CACHEDIR_temp))
 		print_error('Error: Unable to obtain write access to "cache".', true);
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		print_error('Error: Unable to find language files!', true);
 	else
 	{
@@ -3798,7 +3798,7 @@ function template_upgrade_options()
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
 						<td width="100%">
-							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['ourVersion']) ? '' : ' (recommended!)', '
+							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
 					<tr valign="top">

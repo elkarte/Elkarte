@@ -68,7 +68,7 @@ smf_AdminIndex.prototype.setAnnouncements = function ()
 
 smf_AdminIndex.prototype.showCurrentVersion = function ()
 {
-	if (!('ourVersion' in window))
+	if (!('elkVersion' in window))
 		return;
 
 	var oSmfVersionContainer = document.getElementById(this.opt.sOurVersionContainerId);
