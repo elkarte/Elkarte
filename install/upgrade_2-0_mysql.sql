@@ -972,12 +972,6 @@ ALTER TABLE {$db_prefix}log_packages
 ADD db_changes text NOT NULL AFTER themes_installed;
 ---#
 
----# Changing URL to Elk package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'https://github.com/elkarte/addons/tree/master/packages'
-WHERE url = 'http://custom.simplemachines.org/packages/mods';
----#
-
 /******************************************************************************/
 --- Creating mail queue functionality.
 /******************************************************************************/

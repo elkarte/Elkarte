@@ -472,16 +472,6 @@ $smcFunc['db_alter_table']('{db_prefix}calendar_holidays', array(
 ---#
 
 /******************************************************************************/
---- Making changes to the package manager.
-/******************************************************************************/
-
----# Changing URL to Elk package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'https://github.com/elkarte/addons/tree/master/packages'
-WHERE url = 'http://custom.simplemachines.org/packages/mods';
----#
-
-/******************************************************************************/
 --- Adding new indexes to the topics table.
 /******************************************************************************/
 

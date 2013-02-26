@@ -373,3 +373,13 @@ if (@$modSettings['elkVersion'] < '1.0')
 }
 ---}
 ---#
+
+/******************************************************************************/
+--- Updating URLs information.
+/******************************************************************************/
+
+---# Changing URL to Elk package server...
+UPDATE {$db_prefix}package_servers
+SET url = 'https://github.com/elkarte/addons/tree/master/packages'
+WHERE url = 'http://custom.simplemachines.org/packages/mods';
+---#
