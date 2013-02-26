@@ -92,19 +92,51 @@ function errorbox_handler(oOptions)
 	this.opt = oOptions;
 	this.error_box = null;
 	this.oErrorHandle = window;
+	this.eval = false;
 	this.init();
 }
 
 errorbox_handler.prototype.init = function ()
 {
-	this.checks_on = document.getElementById(this.opt.error_checking);
+	
+	if (this.opt.check_id != undefined)
+		this.checks_on = $(document.getElementById(this.opt.check_id));
+	else if (this.opt.selector != undefined)
+		this.checks_on = this.opt.selector;
+	else if (this.opt.editor != undefined)
+	{
+		this.checks_on = eval(this.opt.editor);
+		this.eval = true;
+	}
+
 	this.oErrorHandle.instanceRef = this;
 
 	if (this.error_box == null)
 		this.error_box = $(document.getElementById(this.opt.error_box_id));
 
-	this.checks_on.setAttribute('onblur', this.opt.self + '.checkErrors()');
-	this.checks_on.setAttribute('onkeyup', this.opt.self + '.checkErrors()');
+	if (this.eval === false)
+	{
+		this.checks_on.attr('onblur', this.opt.self + '.checkErrors()');
+		this.checks_on.attr('onkeyup', this.opt.self + '.checkErrors()');
+	}
+	else
+	{
+		var current_error_handler = this.opt.self;
+		$(document).ready(function () {
+			var current_error = eval(current_error_handler);
+			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'keyup', function () {
+				current_error.checkErrors();
+			});
+		});
+	}
+}
+
+errorbox_handler.prototype.boxVal = function ()
+{
+	if (this.eval === false)
+		return this.checks_on.val();
+	else
+		return this.checks_on();
 }
 
 errorbox_handler.prototype.checkErrors = function ()
@@ -115,7 +147,7 @@ errorbox_handler.prototype.checkErrors = function ()
 		for (var i = 0; i < this.opt.error_checks.length; i++)
 		{
 			var $elem = $(document.getElementById(this.opt.error_box_id + "_" + this.opt.error_checks[i].code));
-			if (this.opt.error_checks[i].function(this.checks_on.value))
+			if (this.opt.error_checks[i].function(this.boxVal()))
 				this.addError($elem, this.opt.error_checks[i].code);
 			else
 				this.removeError($elem, this.opt.error_checks[i].code);
@@ -124,23 +156,26 @@ errorbox_handler.prototype.checkErrors = function ()
 		this.error_box.attr("class", "errorbox");
 	}
 	if (this.error_box.find("li").length == 0)
-		this.error_box.hide();
+		this.error_box.slideUp();
 	else
-		this.error_box.show();
+		this.error_box.slideDown();
 }
 
 errorbox_handler.prototype.addError = function (error_elem, error_code)
 {
 	if (error_elem.length == 0)
 	{
-		if ($.trim(this.error_box.html()) == '')
+		if ($.trim(this.error_box.children("#" + this.opt.error_box_id + "_list").html()) == '')
 			this.error_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
-		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
+		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
+		$(document.getElementById(this.opt.error_box_id + "_" + error_code)).slideDown();
 	}
 }
 
 errorbox_handler.prototype.removeError = function (error_elem, error_code)
 {
 	if (error_elem.length != 0)
-		error_elem.remove();
+		error_elem.slideUp(function() {
+			error_elem.remove();
+		});
 }
