@@ -879,7 +879,6 @@ function checkSubmitOnce($action, $is_fatal = true)
 	// Check whether the submitted number can be found in the session.
 	elseif ($action == 'check')
 	{
-	return true;
 		if (!isset($_REQUEST['seqnum']))
 			return true;
 		elseif (!in_array($_REQUEST['seqnum'], $_SESSION['forms']))
