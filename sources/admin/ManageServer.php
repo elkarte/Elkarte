@@ -60,7 +60,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects

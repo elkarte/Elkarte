@@ -35,7 +35,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Subaction handler - manages the action and delegates control to the proper

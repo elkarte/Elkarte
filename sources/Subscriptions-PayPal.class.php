@@ -19,7 +19,7 @@
 // ELKARTE Payment Gateway: paypal
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Class for returning available form data for this gateway
