@@ -375,6 +375,11 @@ function installExit($fallThrough = false)
 	die();
 }
 
+/**
+ * Welcome screen.
+ * It makes a few basic checks for compatibility
+ * and informs the user if there are problems.
+ */
 function action_welcome()
 {
 	global $incontext, $txt, $databases, $installurl;
@@ -1368,7 +1373,7 @@ function action_deleteInstall()
 
 	require(dirname(__FILE__) . '/Settings.php');
 	load_database();
-	
+
 	if (!defined('SUBSDIR'))
 		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
 
