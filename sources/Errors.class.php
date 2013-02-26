@@ -159,7 +159,7 @@ class error_context
 	 */
 	public function hasError($errors)
 	{
-		if (empty($error))
+		if (empty($errors))
 			return false;
 		else
 		{
