@@ -1631,7 +1631,7 @@ function scheduled_paid_subscriptions()
  */
 function scheduled_remove_temp_attachments()
 {
-	global $modSettings, SUBSDIR;
+	global $modSettings;
 
 	// We need to know where this thing is going.
 	require_once(SUBSDIR . '/Attachment.subs.php');
