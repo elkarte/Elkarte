@@ -10,7 +10,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Main email posting controller, reads, parses, checks and posts an email message or PM
