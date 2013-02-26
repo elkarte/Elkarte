@@ -15,6 +15,21 @@
 
 (function($) {
 	var extensionMethods = {
+		addEvent: function(id, event, func) {
+			var current_event = event;
+			$('#' + id).parent().on(event, 'textarea', func);
+
+			var oIframe = $('#' + id).parent().find('iframe')[0],
+				oIframeWindow = oIframe.contentWindow;
+
+			if (oIframeWindow !== null && oIframeWindow.document)
+			{
+				var oIframeDoc = oIframeWindow.document;
+				var oIframeBody = oIframeDoc.body;
+
+				$(oIframeBody).on(event, func);
+			}
+		},
 		InsertText: function(text, bClear) {
 			var bIsSource = this.inSourceMode();
 
