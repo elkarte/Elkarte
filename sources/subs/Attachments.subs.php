@@ -1774,3 +1774,45 @@ function attachment_filesize($attach_id, $filesize = null)
 		);
 	}
 }
+
+/**
+ * Set or retrieve the ID of the folder where an attachment is stored on disk.
+ *
+ * @param int $attach_id
+ * @param int $folder_id = null
+ */
+function attachment_folder($attach_id, $folder_id = null)
+{
+	global $smcFunc;
+
+	if ($folder_id === null)
+	{
+		$result = $smcFunc['db_query']('', '
+			SELECT id_folder
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'id_attach' => $attach_id,
+			)
+		);
+		if (!empty($result))
+		{
+			list($folder_id) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+			return $folder_id;
+		}
+		return false;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET id_folder = {int:new_folder}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'new_folder' => $folder_id,
+				'id_attach' => $attach_id,
+			)
+		);
+	}
+}
