@@ -280,7 +280,7 @@ function loadUserSettings()
 
 			if(!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
 				$user_settings['avatar'] = $settings['images_url'] . '/default_avatar.png';
-			
+
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
 		}
@@ -1693,7 +1693,7 @@ function loadTheme($id_theme = 0, $initialize = true)
  */
 function loadEssentialThemeData()
 {
-	global $settings, $modSettings, $smcFunc, $mbname, $context, SOURCEDIR;
+	global $settings, $modSettings, $smcFunc, $mbname, $context;
 
 	// Get all the default theme variables.
 	$result = $smcFunc['db_query']('', '
@@ -2591,7 +2591,7 @@ function loadDatabase()
 }
 /**
  * Determine the user's avatar type and return the information as an array
- *  
+ *
  * @param array $profile
  * @param type $max_avatar_width
  * @param type $max_avatar_height
@@ -2628,7 +2628,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		// Gravatars URL.
 		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
-		
+
 		$avatar = array(
 			'name' => $profile['avatar'],
 			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
@@ -2643,7 +2643,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 		$avatar = array(
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
-			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'], 
+			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
 	}
@@ -2656,7 +2656,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
-		);	
+		);
 	}
 	//finally ...
 	else
