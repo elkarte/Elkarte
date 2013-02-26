@@ -11,7 +11,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Class to parse and email in to its header and body parts for use in posting

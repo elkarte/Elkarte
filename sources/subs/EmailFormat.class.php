@@ -12,7 +12,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Attempts, though an outrageous set of assumptions, to reflow an email message

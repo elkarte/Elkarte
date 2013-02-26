@@ -11,7 +11,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * If html this will convert basic html tags to bbc tags
@@ -132,7 +132,7 @@ function pbe_email_to_bbc($text, $html)
 			$text = $text_save;
 
 		// Convert this (markup) text to html
-		require_once(SOURCEDIR . '/lib/markdown/markdown.php');
+		require_once(EXTDIR . '/markdown/markdown.php');
 
 		// Fix textual quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
@@ -999,7 +999,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(SOURCEDIR . '/lib/markdownify/markdownify_extra.php');
+	require_once(EXTDIR . '/markdownify/markdownify_extra.php');
 	$mark_down = new Markdownify_Extra(true, empty($table_content) ? 78 : 996, false);
 	$message = $mark_down->parseString($message);
 
