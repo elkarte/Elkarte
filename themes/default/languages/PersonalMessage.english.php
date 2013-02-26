@@ -44,7 +44,7 @@ $txt['pm_read'] = 'Read';
 $txt['pm_replied'] = 'Replied To';
 
 // Message Pruning.
-$txt['pm_prune'] = 'Prune Messages';
+$txt['pm_prune'] = 'Prune messages';
 $txt['pm_prune_desc1'] = 'Delete all personal messages older than';
 $txt['pm_prune_desc2'] = 'days.';
 $txt['pm_prune_warning'] = 'Are you sure you wish to prune your personal messages?';
@@ -132,7 +132,7 @@ $txt['pm_visual_verification_desc'] = 'Please enter the code in the image above 
 $txt['pm_settings'] = 'Change settings';
 $txt['pm_change_view'] = 'Change view';
 
-$txt['pm_manage_rules'] = 'Manage Rules';
+$txt['pm_manage_rules'] = 'Manage rules';
 $txt['pm_manage_rules_desc'] = 'Message rules allow you to automatically sort incoming messages dependant on a set of criteria you define. Below are all the rules you currently have setup. To edit a rule simply click the rule name.';
 $txt['pm_rules_none'] = 'You have not yet setup any message rules.';
 $txt['pm_rule_title'] = 'Rule';
@@ -140,8 +140,8 @@ $txt['pm_add_rule'] = 'Add new rule';
 $txt['pm_apply_rules'] = 'Apply rules now';
 // Use entities in the below string.
 $txt['pm_js_apply_rules_confirm'] = 'Are you sure you wish to apply the current rules to all personal messages?';
-$txt['pm_edit_rule'] = 'Edit Rule';
-$txt['pm_rule_save'] = 'Save Rule';
+$txt['pm_edit_rule'] = 'Edit rule';
+$txt['pm_rule_save'] = 'Save rule';
 $txt['pm_delete_selected_rule'] = 'Delete selected rules';
 // Use entities in the below string.
 $txt['pm_js_delete_rule_confirm'] = 'Are you sure you wish to delete the selected rules?';

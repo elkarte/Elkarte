@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.

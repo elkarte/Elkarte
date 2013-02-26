@@ -22,7 +22,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Attempt to start the session, unless it already has been.
