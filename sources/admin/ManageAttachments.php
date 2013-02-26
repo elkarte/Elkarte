@@ -310,7 +310,7 @@ function action_avatars($return_config = false)
 			),
 		array('title','gravatar'),
 			array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
-			array('select', 'gravatar_rating', 
+			array('select', 'gravatar_rating',
 				array(
 					'g' => 'g',
 					'pg' => 'pg',
@@ -998,6 +998,9 @@ function action_repair()
 		}
 	}
 
+	// We will work hard with attachments.
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	// All the valid problems are here:
 	$context['repair_errors'] = array(
 		'missing_thumbnail_parent' => 0,
@@ -1235,17 +1238,7 @@ function action_repair()
 
 					// Fix it here?
 					if ($fix_errors && in_array('file_wrong_size', $to_fix))
-					{
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}attachments
-							SET size = {int:filesize}
-							WHERE id_attach = {int:id_attach}',
-							array(
-								'filesize' => filesize($filename),
-								'id_attach' => $row['id_attach'],
-							)
-						);
-					}
+						attachment_filesize($row['id_attach'], filesize($filename));
 				}
 			}
 
