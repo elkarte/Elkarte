@@ -78,7 +78,7 @@ function Display()
 		{
 			$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
 			$includeStickies = !empty($modSettings['enableStickyTopics']);
-			$topic = $_REQUEST['prev_next'] === 'prev' ? getPreviousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : getNextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
+			$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
 			$context['current_topic'] = $topic;
 		}
 
