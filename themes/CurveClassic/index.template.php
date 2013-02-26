@@ -35,8 +35,6 @@
 	The menu sub template should display all the relevant buttons the user
 	wants and or needs.
 
-	For more information on the templating system, please see the site at:
-	http://www.simplemachines.org/
 */
 
 /**
