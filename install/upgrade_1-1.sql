@@ -869,7 +869,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}package_servers (
 INSERT IGNORE INTO {$db_prefix}package_servers
 	(id_server, name, url)
 VALUES
-	(1, 'Simple Machines (R) Third-party Mod Site', 'http://mods.simplemachines.org');
+	(1, 'ElkArte Third-party Add-ons Site', 'http://mods.simplemachines.org');
 ---#
 
 /******************************************************************************/

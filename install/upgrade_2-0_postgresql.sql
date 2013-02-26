@@ -510,10 +510,10 @@ else
 --- Making changes to the package manager.
 /******************************************************************************/
 
----# Changing URL to SMF (R) package server...
+---# Changing URL to Elk package server...
 UPDATE {$db_prefix}package_servers
-SET url = 'http://custom.simplemachines.org/packages/mods'
-WHERE url = 'http://mods.simplemachines.org';
+SET url = 'https://github.com/elkarte/addons/tree/master/packages'
+WHERE url = 'http://custom.simplemachines.org/packages/mods';
 ---#
 
 /******************************************************************************/
