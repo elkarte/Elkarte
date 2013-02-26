@@ -1552,7 +1552,7 @@ function action_post2()
 			// No errors, then try to create the attachment
 			if (empty($attachment['errors']))
 			{
-				// Load the attachmentOptions array with the data needed to create an attachement
+				// Load the attachmentOptions array with the data needed to create an attachment
 				$attachmentOptions = array(
 					'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
 					'poster' => $user_info['id'],
