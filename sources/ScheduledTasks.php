@@ -1193,7 +1193,7 @@ function next_time($regularity, $unit, $offset)
 }
 
 /**
- * This retieves data (e.g. last version of ELKARTE)
+ * This retrieves data (e.g. last version of ELKARTE)
  */
 function scheduled_fetchFiles()
 {
@@ -1260,7 +1260,8 @@ function scheduled_fetchFiles()
 }
 
 /**
- * Happy birthday!!
+ * Schedule birthday emails.
+ * (aka "Happy birthday!!")
  */
 function scheduled_birthdayemails()
 {
