@@ -121,7 +121,7 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 }
 
 // Pre-dispatch
-smf_main();
+elk_main();
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -130,7 +130,7 @@ obExit(null, null, true);
  * The main dispatcher.
  * This delegates to each area.
  */
-function smf_main()
+function elk_main()
 {
 	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
 
