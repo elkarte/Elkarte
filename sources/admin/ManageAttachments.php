@@ -1254,24 +1254,7 @@ function action_repair()
 
 			// Do we need to delete what we have?
 			if ($fix_errors && !empty($to_remove))
-			{
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}attachments
-					WHERE id_attach IN ({array_int:to_remove})',
-					array(
-						'to_remove' => $to_remove,
-					)
-				);
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}attachments
-					SET id_thumb = {int:no_thumb}
-					WHERE id_thumb IN ({array_int:to_remove})',
-					array(
-						'to_remove' => $to_remove,
-						'no_thumb' => 0,
-					)
-				);
-			}
+				removeOrphanAttachments($to_remove);
 
 			pauseAttachmentMaintenance($to_fix, $thumbnails);
 		}
