@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * View a summary.
@@ -1234,7 +1234,7 @@ function action_showPermissions($memID)
 	loadTemplate('ManageMembers');
 
 	// Load all the permission profiles.
-	loadAdminClass ('ManagePermissions.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
 	loadPermissionProfiles();
 
 	$context['member']['id'] = $memID;

@@ -16,10 +16,10 @@
 
 $(document).ready(function() {
 	// menu drop downs
-	$('.dropmenu, ul.quickbuttons').superfish({delay : 600, speed: 200, sensitivity : 8, interval : 50, timeout : 1});
+	$('ul.dropmenu, ul.quickbuttons').superfish({useClick: use_click_menu, delay : 600, speed: 200});
 
 	// Smooth scroll navigation
-	$('.topbottom').bind('click', function(event) {		
+	$('.topbottom').bind('click', function(event) {
 		event.preventDefault();
 
 		// Position to the id pagetop or pagebot

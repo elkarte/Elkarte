@@ -190,7 +190,7 @@ function template_main()
 		}
 
 		echo '
-		<table class="table_grid" cellspacing="0">
+		<table class="table_grid">
 			<thead>
 				<tr class="catbg">';
 
@@ -198,34 +198,34 @@ function template_main()
 		if (!empty($context['topics']))
 		{
 			echo '
-					<th scope="col" class="first_th" width="4%">&nbsp;</th>
+					<th scope="col" class="first_th" style="width:4%">&nbsp;</th>
 					<th scope="col" class="lefttext subject">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
-					<th scope="col" class="stats" width="14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
+					<th scope="col" class="stats" style="width:14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
 				echo '
-					<th scope="col" class="lefttext last_th" width="22%">', $context['topics_headers']['last_post'], '</th>';
+					<th scope="col" class="lefttext last_th" style="width:22%">', $context['topics_headers']['last_post'], '</th>';
 			else
 				echo '
-					<th scope="col" class="lefttext last_post" width="22%">', $context['topics_headers']['last_post'], '</th>';
+					<th scope="col" class="lefttext last_post" style="width:22%">', $context['topics_headers']['last_post'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 				echo '
-					<th scope="col" class="last_th" width="24"><input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" /></th>';
+					<th scope="col" class="last_th" style="width:24"><input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" /></th>';
 
 			// If it's on in "image" mode, don't show anything but the column.
 			elseif (!empty($context['can_quick_mod']))
 				echo '
-					<th class="last_th" width="4%">&nbsp;</th>';
+					<th class="last_th" style="width:4%">&nbsp;</th>';
 		}
 		// No topics.... just say, "sorry bub".
 		else
 			echo '
-					<th scope="col" class="first_th" width="8%">&nbsp;</th>
+					<th scope="col" class="first_th" style="width:8%">&nbsp;</th>
 					<th colspan="3"><strong>', $txt['msg_alert_none'], '</strong></th>
-					<th scope="col" class="last_th" width="8%">&nbsp;</th>';
+					<th scope="col" class="last_th" style="width:8%">&nbsp;</th>';
 
 		echo '
 				</tr>
@@ -305,7 +305,7 @@ function template_main()
 			if (!empty($context['can_quick_mod']))
 			{
 				echo '
-					<td class="', $color_class, ' moderation" align="center">';
+					<td class="', $color_class, ' moderation centertext" >';
 
 				if ($options['display_quick_mod'] == 1)
 					echo '
@@ -341,7 +341,7 @@ function template_main()
 		{
 			echo '
 				<tr class="titlebg">
-					<td colspan="6" align="right">
+					<td colspan="', !empty($context['can_quick_mod']) ? '5' : '4', '" class="righttext">
 						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 							<option value="">--------</option>';
 

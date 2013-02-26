@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * SearchAPI-Standard.php, Standard non full index, non custom index search
@@ -35,7 +35,7 @@ class Standard_Search
 	 *
 	 * @var type
 	 */
-	public $min_smf_version = 'ELKARTE 1.0 Alpha';
+	public $min_elk_version = 'ELKARTE 1.0 Alpha';
 
 	/**
 	 * Standard search is supported by default.

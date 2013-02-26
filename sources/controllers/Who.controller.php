@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Who's online, and what are they doing?
@@ -580,10 +580,12 @@ function action_credits($in_admin = false)
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_mods}
 				AND credits != {string:empty}
+				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
 				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
 			array(
 				'installed_mods' => 1,
-				'patch_name' => 'smf_patch',
+				'old_patch_name' => 'smf_patch',
+				'patch_name' => 'elk_patch',
 				'empty' => '',
 			)
 		);

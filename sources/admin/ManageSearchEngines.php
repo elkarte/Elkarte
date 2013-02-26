@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Entry point for this section.
@@ -119,7 +119,7 @@ function ManageSearchEngineSettings($return_config = false)
 		$_POST['spider_group'] = 0;
 
 	// We'll want this for our easy save.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Setup the template.
 	$context['page_title'] = $txt['settings'];

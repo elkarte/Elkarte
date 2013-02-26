@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The main admin handling function.
@@ -534,7 +534,7 @@ function AdminMain()
 
 	// Now - finally - call the right place!
 	if (isset($admin_include_data['file']))
-		loadAdminClass($admin_include_data['file']);
+		require_once(ADMINDIR . '/' . $admin_include_data['file']);
 
 	$admin_include_data['function']();
 }
@@ -814,7 +814,7 @@ function AdminSearchInternal()
 	loadLanguage(implode('+', $language_files));
 
 	foreach ($include_files as $file)
-		loadAdminClass($file . '.php');
+		require_once(ADMINDIR . '/' . $file . '.php');
 
 	/* This is the huge array that defines everything... it's a huge array of items formatted as follows:
 		0 = Language index (Can be array of indexes) to search through for this setting.
@@ -902,7 +902,7 @@ function AdminSearchMember()
 {
 	global $context;
 
-	loadAdminClass ('ManageMembers.php');
+	require_once(ADMINDIR . '/ManageMembers.php');
 	$_REQUEST['sa'] = 'query';
 
 	$_POST['membername'] = un_htmlspecialchars($context['search_term']);
@@ -1030,7 +1030,7 @@ function AdminLogs()
 		),
 	);
 
-	loadAdminClass($log_functions[$sub_action][0]);
+	require_once(ADMINDIR . '/' . $log_functions[$sub_action][0]);
 	$log_functions[$sub_action][1]();
 }
 

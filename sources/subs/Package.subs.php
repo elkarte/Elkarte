@@ -21,7 +21,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.

@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Check if the user is who he/she says he is
@@ -276,7 +276,7 @@ function is_not_banned($forceCheck = false)
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			loadAdminClass ('ManageBans.php');
+			require_once(ADMINDIR . '/ManageBans.php');
 			updateBanMembers();
 		}
 	}
@@ -313,7 +313,7 @@ function is_not_banned($forceCheck = false)
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-			smf_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
+			elk_setcookie($cookiename . '_', '', time() - 3600, $cookie_url[1], $cookie_url[0], false, false);
 		}
 	}
 
@@ -353,7 +353,7 @@ function is_not_banned($forceCheck = false)
 		// A goodbye present.
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-		smf_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
+		elk_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 
 		// Don't scare anyone, now.
 		$_GET['action'] = '';
@@ -1360,7 +1360,7 @@ function loadBadBehavior()
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
-		require_once(SOURCEDIR . '/lib/bad-behavior/badbehavior-plugin.php');
+		require_once(EXTDIR . '/bad-behavior/badbehavior-plugin.php');
 		$bb_run = true;
 
 		// We may want to give some folks a hallway pass

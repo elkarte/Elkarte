@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Put this user in the online log.
@@ -46,7 +46,7 @@ function writeLog($force = false)
 	// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
 	if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		loadAdminClass ('ManageSearchEngines.php');
+		require_once(ADMINDIR . '/ManageSearchEngines.php');
 		logSpider();
 	}
 

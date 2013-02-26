@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 
 /**
@@ -371,7 +371,7 @@ function AddMembergroup()
 		if ($_POST['perm_type'] == 'predefined')
 		{
 			// Set default permission level.
-			loadAdminClass ('ManagePermissions.php');
+			require_once(ADMINDIR . '/ManagePermissions.php');
 			setPermissionLevel($_POST['level'], $id_group, 'null');
 		}
 		// Copy or inherit the permissions!
@@ -391,7 +391,7 @@ function AddMembergroup()
 			}
 
 			// Don't allow copying of a real priviledged person!
-			loadAdminClass ('ManagePermissions.php');
+			require_once(ADMINDIR . '/ManagePermissions.php');
 			loadIllegalPermissions();
 
 			$request = $smcFunc['db_query']('', '
@@ -844,7 +844,7 @@ function EditMembergroup()
 		// Do we need to set inherited permissions?
 		if ($_POST['group_inherit'] != -2 && $_POST['group_inherit'] != $_POST['old_inherit'])
 		{
-			loadAdminClass ('ManagePermissions.php');
+			require_once(ADMINDIR . '/ManagePermissions.php');
 			updateChildPermissions($_POST['group_inherit']);
 		}
 
@@ -1092,7 +1092,7 @@ function ModifyMembergroupsettings()
 	$context['page_title'] = $txt['membergroups_settings'];
 
 	// Needed for the settings functions.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Don't allow assignment of guests.
 	$context['permissions_excluded'] = array(-1);

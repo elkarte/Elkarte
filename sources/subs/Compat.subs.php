@@ -20,7 +20,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Define the old SMF sha1 function.
@@ -149,40 +149,4 @@ if (!function_exists('smf_crc32'))
 
 		return $crc;
 	}
-}
-
-/**
- * Load a < PHP 5 class file
- *
- * @param string $filename
- */
-function loadOldClassFile($filename)
-{
-	static $files_included = array();
-
-	// Check if it was included before.
-	if (in_array($filename, $files_included))
-		return;
-
-	// Make sure we don't include it again.
-	$files_included[] = $filename;
-
-	// Do some replacements to make it PHP 4 compatible.
-	eval('?' . '>' . preg_replace(array(
-		'~class\s+([\w-_]+)([^}]+)function\s+__construct\s*\(~',
-		'~([\s\t]+)public\s+\$~',
-		'~([\s\t]+)private\s+\$~',
-		'~([\s\t]+)protected\s+\$~',
-		'~([\s\t]+)public\s+function\s+~',
-		'~([\s\t]+)private\s+function\s+~',
-		'~([\s\t]+)protected\s+function\s+~',
-	), array(
-		'class $1$2function $1(',
-		'$1var $',
-		'$1var $',
-		'$1var $',
-		'$1function ',
-		'$1function ',
-		'$1function ',
-	), rtrim(file_get_contents(SOURCEDIR . '/' . $filename))));
 }

@@ -337,7 +337,7 @@ function template_view_versions()
 				<thead>
 					<tr class="catbg" align="left">
 						<th class="first_th" scope="col" width="50%">
-							<strong>', $txt['admin_smffile'], '</strong>
+							<strong>', $txt['admin_elkfile'], '</strong>
 						</th>
 						<th scope="col" width="25%">
 							<strong>', $txt['dvc_your'], '</strong>
@@ -353,7 +353,7 @@ function template_view_versions()
 	echo '
 					<tr>
 						<td class="windowbg">
-							', $txt['admin_smfpackage'], '
+							', $txt['admin_elkpackage'], '
 						</td>
 						<td class="windowbg">
 							<em id="yourVersion">', $context['forum_version'], '</em>

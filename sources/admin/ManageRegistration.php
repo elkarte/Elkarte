@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Entrance point for the registration center, it checks permisions and forwards
@@ -280,7 +280,7 @@ function ModifyRegistrationSettings($return_config = false)
 	global $txt, $context, $scripturl, $modSettings;
 
 	// This is really quite wanting.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	$config_vars = array(
 			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),

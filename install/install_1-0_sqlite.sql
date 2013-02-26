@@ -1617,6 +1617,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'karma_edit');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'view_mlist');
@@ -1636,6 +1637,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_title_own');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'calendar_post');
@@ -1893,6 +1895,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('autoLinkUrls', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('banLastUpdated', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_dir', '{BOARDDIR}/smileys');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_url', '{$boardurl}/smileys');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_default', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_directory', '{BOARDDIR}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_url', '{$boardurl}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_external', '65');
@@ -1902,6 +1905,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_up
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_width_upload', '65');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_resize_upload', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_download_png', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('gravatar_rating', 'g');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('failed_login_threshold', '3');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('oldTopicDays', '120');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('edit_wait_time', '90');

@@ -9,7 +9,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Modify any setting related to drafts.
@@ -42,7 +42,7 @@ function ModifyDraftSettings($return_config = false)
 		return $config_vars;
 
 	// Get the settings template ready.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Setup the template.
 	$context['page_title'] = $txt['managedrafts_settings'];

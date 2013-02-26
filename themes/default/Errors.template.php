@@ -62,7 +62,7 @@ function template_error_log()
 					', $context['page_index'], '
 				</div>
 			</div>
-			<table border="0" cellspacing="1" class="table_grid" id="error_log">
+			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
@@ -203,7 +203,7 @@ function template_show_file()
 		$is_target = $line_num == $context['file_data']['target'];
 		echo '
 			<tr>
-				<td align="right"', $is_target ? ' class="current">==&gt;' : '>', $line_num , ':</td>
+				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num , ':</td>
 				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;':'','">', $line, '</td>
 			</tr>';
 	}

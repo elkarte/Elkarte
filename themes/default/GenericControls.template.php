@@ -35,6 +35,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					plugins: "bbcode",
+					enablePasteFiltering: true,
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
@@ -150,7 +151,7 @@ function template_control_richedit_buttons($editor_id)
 				if (!spellCheck)
 					return false
 
-				var sUniqueId = ', JavaScriptEscape($editor_id), ';,
+				var sUniqueId = ', JavaScriptEscape($editor_id), ';
 				$("#" + sUniqueId).data("sceditor").storeLastState();
 
 				// If we\'re in HTML mode we need to get the non-HTML text.
@@ -178,7 +179,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_draft\',
@@ -205,7 +206,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_pm_draft\',

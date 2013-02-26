@@ -20,7 +20,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Main dispatcher.
@@ -37,7 +37,7 @@ function action_managemail()
 	loadLanguage('ManageMail');
 
 	// We'll need the utility functions from here.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	$context['page_title'] = $txt['mailqueue_title'];
 	$context['sub_template'] = 'show_settings';

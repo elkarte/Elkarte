@@ -315,7 +315,7 @@ function load_database()
 	global $db_prefix, $db_connection, $db_character_set, $language;
 	global $smcFunc, $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user;
 
-	if (!defined(SOURCEDIR))
+	if (!defined('SOURCEDIR'))
 		define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 	// Need this to check whether we need the database password.
@@ -375,6 +375,11 @@ function installExit($fallThrough = false)
 	die();
 }
 
+/**
+ * Welcome screen.
+ * It makes a few basic checks for compatibility
+ * and informs the user if there are problems.
+ */
 function action_welcome()
 {
 	global $incontext, $txt, $databases, $installurl;
@@ -767,7 +772,7 @@ function action_databaseSettings()
 		// Make sure it works.
 		require(dirname(__FILE__) . '/Settings.php');
 
-		if (!defined(SOURCEDIR))
+		if (!defined('SOURCEDIR'))
 			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
@@ -911,6 +916,7 @@ function action_forumSettings()
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
+			'extdir' => addslashes(dirname(__FILE__)) . '/sources/subs',
 		);
 
 		// Must save!
@@ -1367,6 +1373,9 @@ function action_deleteInstall()
 
 	require(dirname(__FILE__) . '/Settings.php');
 	load_database();
+
+	if (!defined('SUBSDIR'))
+		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
 
 	chdir(dirname(__FILE__));
 
@@ -1846,6 +1855,13 @@ class Ftp_Connection
 	}
 }
 
+/**
+ * Write out the contents of Settings.php file.
+ * This function will add the variables passed to it in $vars,
+ * to the Settings.php file.
+ *
+ * @param array $vars the configuration variables to write out.
+ */
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
@@ -1915,6 +1931,9 @@ function updateSettingsFile($vars)
 	return true;
 }
 
+/**
+ * Write the db_last_error file.
+ */
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
@@ -1923,7 +1942,8 @@ function updateDbLastError()
 }
 
 /**
- * Create an .htaccess file to prevent mod_security. Elkarte has filtering built-in.
+ * Create an .htaccess file to prevent mod_security.
+ * Elkarte has filtering built-in.
  */
 function fixModSecurity()
 {

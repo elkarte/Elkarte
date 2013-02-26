@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is the notoriously defunct package manager..... :/.
@@ -30,7 +30,7 @@ function Packages()
 	// @todo Remove this!
 	if (isset($_GET['get']) || isset($_GET['pgdownload']))
 	{
-		loadAdminClass('PackageServers.php');
+		require_once(ADMINDIR . '/PackageServers.php');
 		return PackageServers();
 	}
 

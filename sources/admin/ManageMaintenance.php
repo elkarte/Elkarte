@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Main dispatcher, the maintenance access point.
@@ -283,7 +283,7 @@ function MaintainFindFixErrors()
 	// Honestly, this should be done in the sub function.
 	validateToken('admin-maint');
 
-	loadAdminClass('RepairBoards.php');
+	require_once(ADMINDIR . '/RepairBoards.php');
 	action_repairboards();
 }
 
@@ -518,7 +518,7 @@ function OptimizeTables()
 	$context['page_title'] = $txt['database_optimize'];
 	$context['sub_template'] = 'optimize';
 
-	// Only optimize the tables related to this smf install, not all the tables in the db
+	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
 	// Get a list of tables, as well as how many there are.

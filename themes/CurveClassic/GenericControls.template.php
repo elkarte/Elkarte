@@ -27,7 +27,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		</div>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script type="text/javascript"><!-- // --><![CDATA[
-			$(document).ready(function(){',
+			$(document).ready(function() {',
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
@@ -35,6 +35,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					plugins: "bbcode",
+					enablePasteFiltering: true,
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
@@ -179,7 +180,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_draft\',
@@ -206,7 +207,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="draft_lastautosave" ></span>
 		</span>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_pm_draft\',

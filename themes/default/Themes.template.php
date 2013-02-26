@@ -848,12 +848,12 @@ function template_edit_browse()
 
 	echo '
 	<div id="admincenter">
-		<table width="100%" class="table_grid tborder">
+		<table class="table_grid tborder">
 		<thead>
 			<tr class="catbg">
-				<th class="lefttext first_th" scope="col" width="50%">', $txt['themeadmin_edit_filename'], '</th>
-				<th scope="col" width="35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th class="last_th" scope="col" width="15%">', $txt['themeadmin_edit_size'], '</th>
+				<th class="lefttext first_th" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
+				<th class="last_th" scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';

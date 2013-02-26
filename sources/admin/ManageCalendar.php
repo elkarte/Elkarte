@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The main controlling function doesn't have much to do... yet.
@@ -344,7 +344,7 @@ function ModifyCalendarSettings($return_config = false)
 		return $config_vars;
 
 	// Get the settings template fired up.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Some important context stuff
 	$context['page_title'] = $txt['calendar_settings'];

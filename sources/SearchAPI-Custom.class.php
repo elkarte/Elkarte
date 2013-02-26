@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * SearchAPI-Custom.php, Custom Search API class .. used when custom ELKARTE index is used
@@ -33,7 +33,7 @@ class Custom_Search
 	 *This won't work with versions of ELKARTE less than this.
 	 * @var string
 	 */
-	public $min_smf_version = 'ELKARTE 1.0 Alpha';
+	public $min_elk_version = 'ELKARTE 1.0 Alpha';
 
 	/**
 	 * Is it supported?

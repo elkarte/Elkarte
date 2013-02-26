@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
@@ -86,7 +86,6 @@ function cleanRequest()
 			$_SERVER['QUERY_STRING'] = urldecode($_SERVER['QUERY_STRING']);
 
 		// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
-		// @todo smflib
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 		// Magic quotes still applies with parse_str - so clean it up.
@@ -612,7 +611,6 @@ function ob_sessrewrite($buffer)
 		return $buffer;
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().  This doesn't work below PHP 4.3.0, because it makes the output buffer bigger.
-	// @todo smflib
 	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
 		$buffer = preg_replace('/"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
 	// Debugging templates, are we?

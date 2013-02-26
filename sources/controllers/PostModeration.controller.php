@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is a handling function for all things post moderation.
@@ -179,39 +179,16 @@ function action_unapproved()
 			{
 				removeMessages ($toAction, $details, $context['current_view']);
 			}
+			cache_put_data('num_menu_errors', null, 900);
 		}
 	}
 
-	// How many unapproved posts are there?
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_first_msg != m.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE m.approved = {int:not_approved}
-			AND {query_see_board}
-			' . $approve_query,
-		array(
-			'not_approved' => 0,
-		)
-	);
-	list ($context['total_unapproved_posts']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	// What about topics?  Normally we'd use the table alias t for topics but lets use m so we don't have to redo our approve query.
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(m.id_topic)
-		FROM {db_prefix}topics AS m
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE m.approved = {int:not_approved}
-			AND {query_see_board}
-			' . $approve_query,
-		array(
-			'not_approved' => 0,
-		)
-	);
-	list ($context['total_unapproved_topics']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	// Get the moderation values for the board level
+	$brd = isset($_REQUEST['brd']) ? (int) $_REQUEST['brd'] : null;
+	require_once(SUBSDIR . '/Moderation.subs.php');
+	$mod_count = loadModeratorMenuCounts($brd);
+	$context['total_unapproved_topics'] = $mod_count['topics'];
+	$context['total_unapproved_posts'] = $mod_count['posts'];
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($_REQUEST['brd']) ? ';brd=' . (int) $_REQUEST['brd'] : ''), $_GET['start'], $context['current_view'] == 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 	$context['start'] = $_GET['start'];
@@ -223,9 +200,10 @@ function action_unapproved()
 		'description' => $txt['mc_unapproved_posts_desc'],
 	);
 
-	// Update the tabs with the correct number of posts.
-	$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] .= ' (' . $context['total_unapproved_posts'] . ')';
-	$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] .= ' (' . $context['total_unapproved_topics'] . ')';
+	// Update the tabs with the correct number of actions to account for brd filtering
+	$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' (' . $context['total_unapproved_posts'] . ')';
+	$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' (' . $context['total_unapproved_topics'] . ')';
+	$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label']. ' (' . $context['total_unapproved_topics'] . ')';
 
 	// If we are filtering some boards out then make sure to send that along with the links.
 	if (isset($_REQUEST['brd']))
@@ -376,6 +354,8 @@ function action_unapproved_attachments()
 				approveAttachments($attachments);
 			else
 				removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+
+			cache_put_data('num_menu_errors', null, 900);
 		}
 	}
 
@@ -683,6 +663,8 @@ function action_approve()
 		if ($poster != $user_info['id'])
 			logAction(($approved ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $subject, 'member' => $poster, 'board' => $board));
 	}
+	
+	cache_put_data('num_menu_errors', null, 900);
 
 	redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg']. '#msg' . $_REQUEST['msg']);
 }
@@ -742,6 +724,7 @@ function approveAllData()
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
+		cache_put_data('num_menu_errors', null, 900);
 	}
 
 	// Now do attachments
@@ -762,6 +745,7 @@ function approveAllData()
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		approveAttachments($attaches);
+		cache_put_data('num_menu_errors', null, 900);
 	}
 }
 

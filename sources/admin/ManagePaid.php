@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The main entrance point for the 'Paid Subscription' screen, calling
@@ -119,7 +119,7 @@ function ModifySubscriptionSettings($return_config = false)
 		return $config_vars;
 
 	// Get the settings template fired up.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Some important context stuff
 	$context['page_title'] = $txt['settings'];

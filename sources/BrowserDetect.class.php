@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  *  This class is an experiment for the job of correctly detecting browsers and settings needed for them.

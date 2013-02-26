@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The main dispatcher; doesn't do anything, just delegates.
@@ -382,7 +382,7 @@ function EditBoard()
 
 	// For editing the profile we'll need this.
 	loadLanguage('ManagePermissions');
-	loadAdminClass ('ManagePermissions.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
 	loadPermissionProfiles();
 
 	// id_board must be a number....
@@ -771,7 +771,7 @@ function EditBoardSettings($return_config = false)
 		return $config_vars;
 
 	// Needed for the settings template.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Don't let guests have these permissions.
 	$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';

@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Function for doing all the paid subscription stuff - kinda.
@@ -34,7 +34,7 @@ function action_subscriptions($memID)
 	loadLanguage('ManagePaid');
 
 	// Load all of the subscriptions.
-	loadAdminClass ('ManagePaid.php');
+	require_once(ADMINDIR . '/ManagePaid.php');
 	loadSubscriptions();
 	$context['member']['id'] = $memID;
 

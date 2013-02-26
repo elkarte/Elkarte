@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is the main function for the languages area.
@@ -79,7 +79,7 @@ function AddLanguage()
 		$context['smf_search_term'] = htmlspecialchars(trim($_POST['smf_add']));
 
 		$listOptions = array(
-			'id' => 'smf_languages',
+			'id' => 'languages',
 			'get_items' => array(
 				'function' => 'list_getLanguagesList',
 			),
@@ -132,7 +132,7 @@ function AddLanguage()
 		require_once(SUBSDIR . '/List.subs.php');
 		createList($listOptions);
 
-		$context['default_list'] = 'smf_languages';
+		$context['default_list'] = 'languages';
 	}
 
 	$context['sub_template'] = 'add_language';
@@ -165,14 +165,14 @@ function list_getLanguagesList()
 	{
 		$language_list = $language_list->path('languages[0]');
 		$lang_files = $language_list->set('language');
-		$smf_languages = array();
+		$languages = array();
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
 			if (!empty($context['smf_search_term']) && strpos($file->fetch('name'), $smcFunc['strtolower']($context['smf_search_term'])) === false)
 				continue;
 
-			$smf_languages[] = array(
+			$languages[] = array(
 				'id' => $file->fetch('id'),
 				'name' => $smcFunc['ucwords']($file->fetch('name')),
 				'version' => $file->fetch('version'),
@@ -181,10 +181,10 @@ function list_getLanguagesList()
 				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elkarte_install'] . '</a>',
 			);
 		}
-		if (empty($smf_languages))
+		if (empty($languages))
 			$context['langfile_error'] = 'no_files';
 		else
-			return $smf_languages;
+			return $languages;
 	}
 }
 
@@ -781,7 +781,7 @@ function ModifyLanguageSettings($return_config = false)
 	global $scripturl, $context, $txt, $settings, $smcFunc;
 
 	// We'll want to save them someday.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Warn the user if the backup of Settings.php failed.
 	$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');

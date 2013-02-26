@@ -78,19 +78,19 @@ function template_download_language()
 					', $txt['languages_download_theme_files'], '
 				</h3>
 			</div>
-			<table class="table_grid" cellspacing="0" width="100%">
+			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th" scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
-						<th scope="col" width="100">
+						<th scope="col" style="width:100">
 							', $txt['languages_download_writable'], '
 						</th>
-						<th scope="col" width="100">
+						<th scope="col" style="width:100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centercol" scope="col" width="4%">
+						<th class="last_th centercol" scope="col" style="width:4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -462,12 +462,12 @@ function template_add_language()
 		';
 
 	// Had some results?
-	if (!empty($context['smf_languages']))
+	if (!empty($context['languages']))
 	{
 		echo '
 			<div class="information">', $txt['add_language_elkarte_found'], '</div>';
 
-		template_show_list('smf_languages');
+		template_show_list('languages');
 	}
 
 	echo '

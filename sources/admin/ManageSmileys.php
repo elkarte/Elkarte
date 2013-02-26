@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is the dispatcher of smileys administration.
@@ -153,7 +153,7 @@ function EditSmileySettings($return_config = false)
 		return $config_vars;
 
 	// Setup the basics of the settings template.
-	loadAdminClass ('ManageServer.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 	$context['sub_template'] = 'show_settings';
 
 	// Finish up the form...

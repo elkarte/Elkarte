@@ -767,7 +767,7 @@ function template_main()
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
 			<script type="text/javascript"><!-- // --><![CDATA[
-				var oDraftAutoSave = new smf_DraftAutoSave({
+				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',

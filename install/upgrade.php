@@ -962,7 +962,7 @@ function action_welcomeLogin()
 	$upcontext += createToken('login');
 
 	// Check the cache directory.
-	$CACHEDIR_temp = !defined(CACHEDIR) ? BOARDDIR . '/cache' : CACHEDIR;
+	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
 	if (!file_exists($CACHEDIR_temp))
 		@mkdir($CACHEDIR_temp);
 	if (!file_exists($CACHEDIR_temp))
@@ -1265,7 +1265,7 @@ function action_upgradeOptions()
 	if (substr(SOURCEDIR, 0, 1) == '.')
 		$changes['sourcedir'] = '\'' . fixRelativePath(SOURCEDIR) . '\'';
 
-	if (!defined(CACHEDIR) || substr(CACHEDIR, 0, 1) == '.')
+	if (!defined('CACHEDIR') || substr(CACHEDIR, 0, 1) == '.')
 		$changes['cachedir'] = '\'' . fixRelativePath(BOARDDIR) . '/cache\'';
 
 	// Not had the database type added before?
@@ -2994,7 +2994,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: Unable to obtain write access to "themes".');
 
 	// Make sure cache directory exists and is writable!
-	$CACHEDIR_temp = !defined(CACHEDIR) ? BOARDDIR . '/cache' : CACHEDIR;
+	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
 	if (!file_exists($CACHEDIR_temp))
 		@mkdir($CACHEDIR_temp);
 
@@ -3051,7 +3051,7 @@ function throw_error($message)
 // Check files are writable - make them writable if necessary...
 function makeFilesWritable(&$files)
 {
-	global $upcontext, ;
+	global $upcontext;
 
 	if (empty($files))
 		return true;

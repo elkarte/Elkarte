@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Load the $modSettings array.
@@ -220,7 +220,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $smcFunc;
+	global $modSettings, $user_settings, $smcFunc, $settings;
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -277,6 +277,9 @@ function loadUserSettings()
 			);
 			$user_settings = $smcFunc['db_fetch_assoc']($request);
 			$smcFunc['db_free_result']($request);
+
+			if(!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
+				$user_settings['avatar'] = $settings['images_url'] . '/default_avatar.png';
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
@@ -1109,12 +1112,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'location' => $profile['location'],
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
-			'avatar' => array(
-				'name' => $profile['avatar'],
-				'image' => $profile['avatar'] == '' ? ($profile['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename']) . '" alt="" />' : '') : (stristr($profile['avatar'], 'http://') ? '<img class="avatar" src="' . $profile['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($profile['avatar']) . '" alt="" />'),
-				'href' => $profile['avatar'] == '' ? ($profile['id_attach'] > 0 ? (empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename']) : '') : (stristr($profile['avatar'], 'http://') ? $profile['avatar'] : $modSettings['avatar_url'] . '/' . $profile['avatar']),
-				'url' => $profile['avatar'] == '' ? '' : (stristr($profile['avatar'], 'http://') ? $profile['avatar'] : $modSettings['avatar_url'] . '/' . $profile['avatar'])
-			),
+			'avatar' => determineAvatar($profile, $avatar_width, $avatar_height),
 			'last_login' => empty($profile['last_login']) ? $txt['never'] : timeformat($profile['last_login']),
 			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
 			'karma' => array(
@@ -1633,6 +1631,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
+		'use_click_menu' => (!empty($options['use_click_menu']) ? 'true' : 'false'),
 	);
 
 	// Queue our Javascript
@@ -1685,6 +1684,60 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// We are ready to go.
 	$context['theme_loaded'] = true;
+}
+
+/**
+ * This loads the bare minimum data.
+ * Needed by scheduled tasks, and any other code that needs language files
+ * before the forum (the theme) is loaded.
+ */
+function loadEssentialThemeData()
+{
+	global $settings, $modSettings, $smcFunc, $mbname, $context;
+
+	// Get all the default theme variables.
+	$result = $smcFunc['db_query']('', '
+		SELECT id_theme, variable, value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:no_member}
+			AND id_theme IN (1, {int:theme_guests})',
+		array(
+			'no_member' => 0,
+			'theme_guests' => $modSettings['theme_guests'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+	{
+		$settings[$row['variable']] = $row['value'];
+
+		// Is this the default theme?
+		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
+			$settings['default_' . $row['variable']] = $row['value'];
+	}
+	$smcFunc['db_free_result']($result);
+
+	// Check we have some directories setup.
+	if (empty($settings['template_dirs']))
+	{
+		$settings['template_dirs'] = array($settings['theme_dir']);
+
+		// Based on theme (if there is one).
+		if (!empty($settings['base_theme_dir']))
+			$settings['template_dirs'][] = $settings['base_theme_dir'];
+
+		// Lastly the default theme.
+		if ($settings['theme_dir'] != $settings['default_theme_dir'])
+			$settings['template_dirs'][] = $settings['default_theme_dir'];
+	}
+
+	// Assume we want this.
+	$context['forum_name'] = $mbname;
+
+	// Check loadLanguage actually exists!
+	if (!function_exists('loadLanguage'))
+		require_once(SOURCEDIR . '/Subs.php');
+
+	loadLanguage('index+Modifications');
 }
 
 /**
@@ -1975,16 +2028,6 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 }
 
 /**
- * Load an admin controller from the admin area.
- *
- * @param string $filename
- */
-function loadAdminClass($filename)
-{
-	require_once(SOURCEDIR . '/admin/' . $filename);
-}
-
-/**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  * Cleaner and easier (for modders) than to use the function below.
  *
@@ -2046,10 +2089,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
-	{
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
-	}
 
 	// What theme are we in?
 	$theme_name = basename($settings['theme_url']);
@@ -2548,4 +2588,84 @@ function loadDatabase()
 	// If in SSI mode fix up the prefix.
 	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
+}
+/**
+ * Determine the user's avatar type and return the information as an array
+ *
+ * @param array $profile
+ * @param type $max_avatar_width
+ * @param type $max_avatar_height
+ * @return array $avatar
+ */
+function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
+{
+	global $modSettings, $scripturl, $settings;
+
+	// uploaded avatar?
+	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar" alt="" />',
+			'href' => $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar',
+			'url' => '',
+		);
+	}
+
+	// remote avatar?
+	elseif (stristr($profile['avatar'], 'http://'))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" ' . $max_avatar_width . $max_avatar_height . ' alt="" border="0" />',
+			'href' => $profile['avatar'],
+			'url' => $profile['avatar'],
+		);
+	}
+
+	// Gravatar instead?
+	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
+	{
+		// Gravatars URL.
+		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
+
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
+			'href' => $gravatar_url,
+			'url' => $gravatar_url,
+		);
+	}
+
+	// an avatar from the gallery?
+	elseif (!empty($profile['avatar']) && !stristr($profile['avatar'], 'http://'))
+	{
+		$avatar = array(
+			'name' => $profile['avatar'],
+			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
+			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
+		);
+	}
+
+	// no custon avatar found yet, maybe a default avatar?
+	elseif (($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	{
+		$avatar = array(
+			'name' => '',
+			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
+			'href' => $settings['images_url'] . '/default_avatar.png',
+			'url' => 'http://',
+		);
+	}
+	//finally ...
+	else
+		$avatar = array(
+			'name' => '',
+			'image' => '',
+			'href' => '',
+			'url' => ''
+		);
+
+	return $avatar;
 }

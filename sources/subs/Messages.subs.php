@@ -21,7 +21,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {

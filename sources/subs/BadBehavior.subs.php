@@ -10,7 +10,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Delete all or some of the entries in the bad behavior log.
@@ -106,7 +106,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 {
 	global $context, $scripturl, $smcFunc;
 
-	require_once(SOURCEDIR . '/lib/bad-behavior/bad-behavior/responses.inc.php');
+	require_once(EXTDIR . '/bad-behavior/bad-behavior/responses.inc.php');
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session

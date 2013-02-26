@@ -669,17 +669,19 @@ function template_spellcheck()
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
-			<table border="0" cellpadding="4" cellspacing="0" width="100%"><tr class="windowbg">
-				<td width="50%" valign="top">
-					', $txt['spellcheck_change_to'], '<br />
-					<input type="text" name="changeto" style="width: 98%;" class="input_text" />
-				</td>
-				<td width="50%">
-					', $txt['spellcheck_suggest'], '<br />
-					<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
-					</select>
-				</td>
-			</tr></table>
+			<table class="table_padding" style="width:100%">
+				<tr class="windowbg">
+					<td style="width:50%;vertical-align:top">
+						', $txt['spellcheck_change_to'], '<br />
+						<input type="text" name="changeto" style="width: 98%;" class="input_text" />
+					</td>
+					<td style="width:50%">
+						', $txt['spellcheck_suggest'], '<br />
+						<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
+						</select>
+					</td>
+				</tr>
+			</table>
 			<div class="righttext" style="padding: 4px;">
 				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
 				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />
