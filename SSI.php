@@ -265,7 +265,7 @@ function ssi_menubar($output_method = 'echo')
  * Show a logout link.
  *
  * @param string $redirect_to
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_logout($redirect_to = '', $output_method = 'echo')
 {
@@ -345,7 +345,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  *
  * @param array $post_ids
  * @param bool $override_permissions
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $output_method = 'echo')
 {
@@ -379,7 +379,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
  * @param array $query_where_params
  * @param int $query_limit
  * @param string $query_order
- * @param string $output_method
+ * @param string $output_method = 'echo'
  * @param bool $limit_body
  * @param bool $override_permissions
  */
@@ -485,7 +485,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
  * @param int $num_recent
  * @param array $exclude_boards
  * @param bool $include_boards
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
@@ -621,7 +621,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
  * Show the top poster's name and profile link.
  *
  * @param int $topNumber
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
@@ -663,7 +663,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
  * Show boards by activity.
  *
  * @param int $num_top
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
@@ -725,7 +725,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
  *
  * @param string $type
  * @param 10 $num_topics
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
@@ -815,7 +815,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
  * Shows the top topics, by replies.
  *
  * @param int $num_topics = 10
- * @param string $output_method
+ * @param string $output_method = 'echo'
  */
 function ssi_topTopicsReplies($num_topics = 10, $output_method = 'echo')
 {
@@ -853,7 +853,7 @@ function ssi_latestMember($output_method = 'echo')
 /**
  * Fetch a random member - if type set to 'day' will only change once a day!
  *
- * @param string $random_type
+ * @param string $random_type = ''
  * @param string $output_method = 'echo'
  */
 function ssi_randomMember($random_type = '', $output_method = 'echo')
@@ -1332,6 +1332,12 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		echo $txt['poll_cannot_see'];
 }
 
+/**
+ * Show a poll.
+ *
+ * @param int $topic = null
+ * @param string $output_method = 'echo'
+ */
 function ssi_showPoll($topic = null, $output_method = 'echo')
 {
 	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $smcFunc, $modSettings;
@@ -1507,7 +1513,9 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 		echo $txt['poll_cannot_see'];
 }
 
-// Takes care of voting - don't worry, this is done automatically.
+/**
+ * Takes care of voting - don't worry, this is done automatically.
+ */
 function ssi_pollVote()
 {
 	global $context, $db_prefix, $user_info, $sc, $smcFunc, $modSettings;
@@ -1615,7 +1623,11 @@ function ssi_pollVote()
 	redirectexit('topic=' . $row['id_topic'] . '.0');
 }
 
-// Show a search box.
+/**
+ * Show a search box.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_quickSearch($output_method = 'echo')
 {
 	global $scripturl, $txt, $context;
@@ -1632,7 +1644,11 @@ function ssi_quickSearch($output_method = 'echo')
 		</form>';
 }
 
-// Show what would be the forum news.
+/**
+ * Show what would be the forum news.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_news($output_method = 'echo')
 {
 	global $context;
@@ -1643,7 +1659,11 @@ function ssi_news($output_method = 'echo')
 	echo $context['random_news_line'];
 }
 
-// Show today's birthdays.
+/**
+ * Show today's birthdays.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysBirthdays($output_method = 'echo')
 {
 	global $scripturl, $modSettings, $user_info;
@@ -1665,7 +1685,11 @@ function ssi_todaysBirthdays($output_method = 'echo')
 			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">' . $member['name'] . '</span>' . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
 }
 
-// Show today's holidays.
+/**
+ * Show today's holidays.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysHolidays($output_method = 'echo')
 {
 	global $modSettings, $user_info;
@@ -1686,7 +1710,11 @@ function ssi_todaysHolidays($output_method = 'echo')
 		', implode(', ', $return['calendar_holidays']);
 }
 
-// Show today's events.
+/**
+ * Show today's events.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysEvents($output_method = 'echo')
 {
 	global $modSettings, $user_info;
@@ -1713,7 +1741,11 @@ function ssi_todaysEvents($output_method = 'echo')
 	}
 }
 
-// Show all calendar entires for today. (birthdays, holodays, and events.)
+/**
+ * Show all calendar entires for today. (birthdays, holidays, and events.)
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysCalendar($output_method = 'echo')
 {
 	global $modSettings, $txt, $scripturl, $user_info;
@@ -1760,7 +1792,15 @@ function ssi_todaysCalendar($output_method = 'echo')
 	}
 }
 
-// Show the latest news, with a template... by board.
+/**
+ * Show the latest news, with a template... by board.
+ *
+ * @param int $board
+ * @param int $limit
+ * @param int $start
+ * @param int $length
+ * @param string $output_method = 'echo'
+ */
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
 {
 	global $scripturl, $db_prefix, $txt, $settings, $modSettings, $context;
@@ -1941,7 +1981,12 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	}
 }
 
-// Show the most recent events.
+/**
+ * Show the most recent events.
+ *
+ * @param int $max_events
+ * @param string $output_method = 'echo'
+ */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
 	global $db_prefix, $user_info, $scripturl, $modSettings, $txt, $context, $smcFunc;
@@ -2025,7 +2070,14 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 		}
 }
 
-// Check the passed id_member/password.  If $is_username is true, treats $id as a username.
+/**
+ * Check the passed id_member/password.
+ *  If $is_username is true, treats $id as a username.
+ *
+ * @param int $id
+ * @param string $password
+ * @param bool $is_username
+ */
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
 {
 	global $db_prefix, $smcFunc;
@@ -2049,7 +2101,13 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 	return sha1(strtolower($user) . $password) == $pass && $active == 1;
 }
 
-// We want to show the recent attachments outside of the forum.
+/**
+ * We want to show the recent attachments outside of the forum.
+ *
+ * @param int $num_attachments = 10
+ * @param array $attachment_ext = array()
+ * @param string $output_method = 'echo'
+ */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')
 {
 	global $smcFunc, $context, $modSettings, $scripturl, $txt, $settings;
