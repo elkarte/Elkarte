@@ -1855,6 +1855,13 @@ class Ftp_Connection
 	}
 }
 
+/**
+ * Write out the contents of Settings.php file.
+ * This function will add the variables passed to it in $vars,
+ * to the Settings.php file.
+ *
+ * @param array $vars the configuration variables to write out.
+ */
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
@@ -1924,6 +1931,9 @@ function updateSettingsFile($vars)
 	return true;
 }
 
+/**
+ * Write the db_last_error file.
+ */
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
@@ -1932,7 +1942,8 @@ function updateDbLastError()
 }
 
 /**
- * Create an .htaccess file to prevent mod_security. Elkarte has filtering built-in.
+ * Create an .htaccess file to prevent mod_security.
+ * Elkarte has filtering built-in.
  */
 function fixModSecurity()
 {
