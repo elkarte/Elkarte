@@ -3814,7 +3814,7 @@ function setupMenuContext()
 /**
  * Generate a random seed and ensure it's stored in settings.
  */
-function smf_seed_generator()
+function elk_seed_generator()
 {
 	global $modSettings;
 

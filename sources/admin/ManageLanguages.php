@@ -70,13 +70,13 @@ function AddLanguage()
 {
 	global $context, $forum_version, $txt, $smcFunc, $scripturl;
 
-	// Are we searching for new languages courtesy of Simple Machines (R)?
-	if (!empty($_POST['smf_add_sub']))
+	// Are we searching for new languages on the site?
+	if (!empty($_POST['lang_add_sub']))
 	{
 		// Need fetch_web_data.
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		$context['smf_search_term'] = htmlspecialchars(trim($_POST['smf_add']));
+		$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
 
 		$listOptions = array(
 			'id' => 'languages',
@@ -94,7 +94,7 @@ function AddLanguage()
 				),
 				'description' => array(
 					'header' => array(
-						'value' => $txt['add_language_elkarte_desc'],
+						'value' => $txt['add_language_elk_desc'],
 					),
 					'data' => array(
 						'db' => 'description',
@@ -102,7 +102,7 @@ function AddLanguage()
 				),
 				'version' => array(
 					'header' => array(
-						'value' => $txt['add_language_elkarte_version'],
+						'value' => $txt['add_language_elk_version'],
 					),
 					'data' => array(
 						'db' => 'version',
@@ -110,7 +110,7 @@ function AddLanguage()
 				),
 				'utf8' => array(
 					'header' => array(
-						'value' => $txt['add_language_elkarte_utf8'],
+						'value' => $txt['add_language_elk_utf8'],
 					),
 					'data' => array(
 						'db' => 'utf8',
@@ -118,7 +118,7 @@ function AddLanguage()
 				),
 				'install_link' => array(
 					'header' => array(
-						'value' => $txt['add_language_elkarte_install'],
+						'value' => $txt['add_language_elk_install'],
 						'class' => 'centercol',
 					),
 					'data' => array(
@@ -169,7 +169,7 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['smf_search_term']) && strpos($file->fetch('name'), $smcFunc['strtolower']($context['smf_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), $smcFunc['strtolower']($context['elk_search_term'])) === false)
 				continue;
 
 			$languages[] = array(
@@ -178,7 +178,7 @@ function list_getLanguagesList()
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
-				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elkarte_install'] . '</a>',
+				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elk_install'] . '</a>',
 			);
 		}
 		if (empty($languages))
