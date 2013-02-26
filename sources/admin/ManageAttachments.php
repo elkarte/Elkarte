@@ -1201,15 +1201,7 @@ function action_repair()
 
 								// Are we going to fix this now?
 								if ($fix_errors && in_array('wrong_folder', $to_fix))
-									$smcFunc['db_query']('', '
-										UPDATE {db_prefix}attachments
-										SET id_folder = {int:new_folder}
-										WHERE id_attach = {int:id_attach}',
-										array(
-											'new_folder' => $id,
-											'id_attach' => $row['id_attach'],
-										)
-									);
+									attachment_folder($row['id_attach'], $id);
 
 								continue 2;
 							}
