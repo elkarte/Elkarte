@@ -1750,7 +1750,7 @@ function attachment_filesize($attach_id, $filesize = null)
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
 			array(
-				'id_attach' => $id_attach,
+				'id_attach' => $attach_id,
 			)
 		);
 		if (!empty($result))
