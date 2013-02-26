@@ -92,10 +92,9 @@ function checkMessagePermissions($message)
 		isAllowedTo('modify_any');
 
 	if ($context['can_announce'] && !empty($message['id_action']))
-	{
-		loadLanguage('Errors');
-		$context['post_error']['messages'][] = $txt['error_topic_already_announced'];
-	}
+		return array('topic_already_announced');
+
+	return false;
 }
 
 function prepareMessageContext($message)

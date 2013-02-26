@@ -296,8 +296,12 @@ function action_reporttm()
 	// You can't use this if it's off or you are not allowed to do it.
 	isAllowedTo('report_any');
 
+	// No errors, yet.
+	$report_errors = error_context::context('report', 1);
+	$context['report_error'] = $report_errors->prepareErrors();
+	$context['error_type'] = $report_errors->getErrorType() == 0 ? 'minor' : 'serious';
 	// If they're posting, it should be processed by action_reporttm2.
-	if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && empty($context['post_errors']))
+	if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && !$report_errors->hasErrors())
 		action_reporttm2();
 
 	// We need a message ID to check!
@@ -343,26 +347,21 @@ function action_reporttm()
 	loadTemplate('Emailuser');
 
 	addInlineJavascript('
-	var error_box = $("#error_box");
-	$("#report_comment").keyup(function() {
-		var post_too_long = $("#error_post_too_long");
-		if ($(this).val().length > 254)
-		{
-			if (post_too_long.length == 0)
-			{
-				error_box.show();
-				if ($.trim(error_box.html()) == \'\')
-					error_box.append("<ul id=\'error_list\'></ul>");
+	error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
 
-				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['error_post_too_long']) . ' + "</li>");
+	var report_errors = new errorbox_handler({
+		self: \'report_errors\',
+		error_box_id: \'report_error\',
+		error_checks: [{
+			code: \'post_too_long\',
+			function: function(box_value) {
+				if (box_value.length > 254)
+					return true;
+				else
+					return false;
 			}
-		}
-		else
-		{
-			post_too_long.remove();
-			if ($("#error_list li").length == 0)
-				error_box.hide();
-		}
+		}],
+		error_checking: "report_comment"
 	});', true);
 
 	$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
@@ -396,28 +395,28 @@ function action_reporttm2()
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// No errors, yet.
-	$post_errors = array();
+	$report_errors = error_context::context('report', 1);
 
 	// Check their session.
 	if (checkSession('post', '', false) != '')
-		$post_errors[] = 'session_timeout';
+		$report_errors->addError('session_timeout');
 
 	// Make sure we have a comment and it's clean.
 	if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
-		$post_errors[] = 'no_comment';
+		$report_errors->addError('no_comment');
 	$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
 
 	if ($smcFunc['strlen']($poster_comment) > 254)
-		$post_errors[] = 'post_too_long';
+		$report_errors->addError('post_too_long');
 
 	// Guests need to provide their address!
 	if ($user_info['is_guest'])
 	{
 		$_POST['email'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
 		if ($_POST['email'] === '')
-			$post_errors[] = 'no_email';
+			$report_errors->addError('no_email');
 		elseif (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-			$post_errors[] = 'bad_email';
+			$report_errors->addError('bad_email');
 
 		isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
@@ -432,18 +431,13 @@ function action_reporttm2()
 			'id' => 'report',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
-		if (is_array($context['require_verification']))
-			$post_errors = array_merge($post_errors, $context['require_verification']);
 	}
 
 	// Any errors?
-	if (!empty($post_errors))
+	if ($report_errors->hasErrors())
 	{
-		loadLanguage('Errors');
-
-		$context['post_errors'] = array();
-		foreach ($post_errors as $post_error)
-			$context['post_errors'][$post_error] = $txt['error_' . $post_error];
+		$context['report_error'] = $report_errors->prepareErrors();
+		$context['error_type'] = $report_errors->getErrorType() == 0 ? 'minor' : 'serious';
 
 		return action_reporttm();
 	}

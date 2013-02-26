@@ -317,6 +317,7 @@ function action_editpoll()
 
 	$context['start'] = (int) $_REQUEST['start'];
 	$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
+	$poll_errors = error_context::context('poll');
 
 	$pollinfo = getPollInfo($topic);
 
@@ -343,7 +344,7 @@ function action_editpoll()
 	$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
 
 	// Want to make sure before you actually submit?  Must be a lot of options, or something.
-	if (isset($_POST['preview']))
+	if (isset($_POST['preview']) || $poll_errors->hasErrors())
 	{
 		$question = $smcFunc['htmlspecialchars']($_POST['question']);
 
@@ -435,7 +436,7 @@ function action_editpoll()
 					'votes' => -1,
 					'is_last' => false
 				);
-			$poll_errors[] = 'poll_few';
+			$poll_errors->addError('poll_few');
 		}
 
 		// Always show one extra box...
@@ -453,23 +454,19 @@ function action_editpoll()
 			$context['poll']['expiration'] = $_POST['poll_expire'];
 
 		// Check the question/option count for errors.
-		if (trim($_POST['question']) == '' && empty($context['post_error']))
-			$poll_errors[] = 'no_question';
+		// @todo: why !$poll_errors->hasErrors()?
+		if (trim($_POST['question']) == '' && !$poll_errors->hasErrors())
+			$poll_errors->addError('no_question');
 
 		// No check is needed, since nothing is really posted.
 		checkSubmitOnce('free');
 
 		// Take a check for any errors... assuming we haven't already done so!
-		if (!empty($poll_errors) && empty($context['post_error']))
+		if ($poll_errors->hasErrors())
 		{
-			loadLanguage('Errors');
-
-			$context['post_error'] = array('messages' => array());
-			foreach ($poll_errors as $poll_error)
-			{
-				$context['post_error'][$poll_error] = true;
-				$context['post_error']['messages'][] = $txt['error_' . $poll_error];
-			}
+			$context['poll_error'] = $poll_errors->prepareErrors();
+			$context['error_type'] = $poll_errors->getErrorType();
+			$context['error_title'] = $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'];
 		}
 	}
 	else
@@ -591,8 +588,10 @@ function action_editpoll2()
 	if (empty($_POST))
 		redirectexit('action=editpoll;topic=' . $topic . '.0');
 
+	$poll_errors = error_context::context('poll');
+
 	if (checkSession('post', '', false) != '')
-		$poll_errors[] = 'session_timeout';
+		$poll_errors->addError('session_timeout');
 
 	if (isset($_POST['preview']))
 		return action_editpoll();
@@ -648,30 +647,17 @@ function action_editpoll2()
 		}
 	}
 	if ($optionCount < 2)
-		$poll_errors[] = 'poll_few';
+		$poll_errors->addError('poll_few');
 	elseif ($optionCount > 256 || $idCount > 255)
-		$poll_errors[] = 'poll_many';
+		$poll_errors->addError('poll_many');
 
 	// Also - ensure they are not removing the question.
 	if (trim($_POST['question']) == '')
-		$poll_errors[] = 'no_question';
+		$poll_errors->addError('no_question');
 
 	// Got any errors to report?
-	if (!empty($poll_errors))
-	{
-		loadLanguage('Errors');
-		// Previewing.
-		$_POST['preview'] = true;
-
-		$context['post_error'] = array('messages' => array());
-		foreach ($poll_errors as $poll_error)
-		{
-			$context['post_error'][$poll_error] = true;
-			$context['post_error']['messages'][] = $txt['error_' . $poll_error];
-		}
-
+	if ($poll_errors->hasErrors())
 		return action_editpoll();
-	}
 
 	// Prevent double submission of this form.
 	checkSubmitOnce('check');

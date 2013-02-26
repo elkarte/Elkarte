@@ -599,3 +599,40 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 							</ul>
 						</div>';
 }
+
+function template_show_error($error_id)
+{
+	global $context;
+
+	if (empty($error_id))
+		return;
+
+	$error = $context[$error_id];
+
+	echo '
+					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', 'id="', $error_id, '">';
+	if (!empty($error['title']))
+		echo '
+						<dl>
+							<dt>
+								<strong id="', $error_id, '_title">', $error['title'], '</strong>
+							</dt>
+							<dd>';
+	if (!empty($error['errors']))
+	{
+		echo '
+								<ul class="error" id="', $error_id, '_list">';
+
+		foreach ($error['errors'] as $key => $error)
+			echo '
+									<li id="', $error_id, '_', $key, '">', $error, '</li>';
+		echo '
+								</ul>';
+	}
+	if (!empty($error['title']))
+		echo '
+							</dd>
+						</dl>';
+	echo '
+					</div>';
+}
