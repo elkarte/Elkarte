@@ -1162,12 +1162,6 @@ function action_sendmessage()
 	// Set the defaults...
 	$context['subject'] = $form_subject;
 	$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-	$post_errors = error_context::context('pm', 1);
-	$context['post_error'] = array(
-		'errors' => $post_errors->prepareErrors(),
-		'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
-		'title' => $txt['error_while_submitting'],
-	);
 	$context['copy_to_outbox'] = !empty($options['copy_to_outbox']);
 
 	// And build the link tree.
@@ -1358,11 +1352,12 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	loadLanguage('Errors');
 
 	$context['error_type'] = 'minor';
-	$context['post_error'] = array(
-		'errors' => $error_types->prepareErrors(),
-		'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
-		'title' => $txt['error_while_submitting'],
-	);
+	if ($error_types->hasErrors())
+		$context['post_error'] = array(
+			'errors' => $error_types->prepareErrors(),
+			'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
+			'title' => $txt['error_while_submitting'],
+		);
 
 	// We need to load the editor once more.
 	require_once(SUBSDIR . '/Editor.subs.php');

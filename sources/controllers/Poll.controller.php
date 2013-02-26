@@ -463,11 +463,11 @@ function action_editpoll()
 
 		// Take a check for any errors... assuming we haven't already done so!
 		if ($poll_errors->hasErrors())
-		{
-			$context['poll_error'] = $poll_errors->prepareErrors();
-			$context['error_type'] = $poll_errors->getErrorType();
-			$context['error_title'] = $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'];
-		}
+			$context['poll_error'] = array(
+				'errors' => $poll_errors->prepareErrors(),
+				'type' => $poll_errors->getErrorType() == 0 ? 'minor' : 'serious',
+				'title' => $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'],
+			);
 	}
 	else
 	{
