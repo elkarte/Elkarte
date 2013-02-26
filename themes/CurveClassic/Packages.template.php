@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -556,7 +556,7 @@ function template_browse()
 			window.ourVersion = "', $context['forum_version'], '";
 		// ]]></script>';
 
-		if (empty($modSettings['disable_smf_js']))
+		if (empty($modSettings['disable_elk_js']))
 			echo '
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-packages.js"></script>';
 

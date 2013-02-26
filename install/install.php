@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -982,7 +982,7 @@ function action_databasePopulation()
 		$smcFunc['db_free_result']($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] != $GLOBALS['current_version'])
+		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != $GLOBALS['current_version'])
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;

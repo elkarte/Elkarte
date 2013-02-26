@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 ---{
 // We cannot do this twice
 // @todo this won't work when you upgrade from smf
-if (@$modSettings['ourVersion'] < '1.0')
+if (@$modSettings['elkVersion'] < '1.0')
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
@@ -307,7 +307,7 @@ VALUES
 ---{
 // We cannot do this twice
 // @todo this won't work when you upgrade from smf
-if (@$modSettings['ourVersion'] < '1.0')
+if (@$modSettings['elkVersion'] < '1.0')
 {
 	$request = upgrade_query("
 		SELECT id_member, aim, icq, msn, yim
@@ -350,7 +350,7 @@ ALTER TABLE `{$db_prefix}members`
 ---# Adding gravatar permissions...
 ---{
 // Don't do this twice!
-if (@$modSettings['ourVersion'] < '1.0')
+if (@$modSettings['elkVersion'] < '1.0')
 {
 	// Try find people who probably can use remote avatars.
 	$request = upgrade_query("
@@ -372,4 +372,14 @@ if (@$modSettings['ourVersion'] < '1.0')
 				" . implode(',', $inserts));
 }
 ---}
+---#
+
+/******************************************************************************/
+--- Updating URLs information.
+/******************************************************************************/
+
+---# Changing URL to Elk package server...
+UPDATE {$db_prefix}package_servers
+SET url = 'https://github.com/elkarte/addons/tree/master/packages'
+WHERE url = 'http://custom.simplemachines.org/packages/mods';
 ---#

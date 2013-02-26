@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -86,7 +86,7 @@ $context = array();
 
 // Seed the random generator.
 if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	smf_seed_generator();
+	elk_seed_generator();
 
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
@@ -122,7 +122,7 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 }
 
 // Pre-dispatch
-smf_main();
+elk_main();
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -131,7 +131,7 @@ obExit(null, null, true);
  * The main dispatcher.
  * This delegates to each area.
  */
-function smf_main()
+function elk_main()
 {
 	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
 
