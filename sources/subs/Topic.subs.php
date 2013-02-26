@@ -915,7 +915,7 @@ function setTopicNotification($id_member, $id_topic, $on = false)
  */
 function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	return getSubsequentTopic($id_topic, $id_board, false, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
+	return topicPointer($id_topic, $id_board, false, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
 
 /**
@@ -929,10 +929,10 @@ function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapprov
  */
 function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	return getSubsequentTopic($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
+	return topicPointer($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
 
-function getSubsequentTopic($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
 	global $smcFunc;
 
