@@ -42,7 +42,7 @@ function template_editsets()
 		window.smfForum_sessionvar = smf_session_var;
 	// ]]></script>';
 
-	if (empty($modSettings['disable_smf_js']))
+	if (empty($modSettings['disable_elk_js']))
 		echo '
 	<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
 

@@ -556,7 +556,7 @@ function template_browse()
 			window.ourVersion = "', $context['forum_version'], '";
 		// ]]></script>';
 
-		if (empty($modSettings['disable_smf_js']))
+		if (empty($modSettings['disable_elk_js']))
 			echo '
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-packages.js"></script>';
 

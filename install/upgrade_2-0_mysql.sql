@@ -1516,7 +1516,7 @@ VALUES
 	(0, 120, 1, 'd', 0, 'paid_subscriptions');
 ---#
 
----# Adding the simple machines (R) scheduled task.
+---# Adding fetch files scheduled task.
 ---{
 // Randomise the time.
 $randomTime = 82800 + rand(0, 86399);

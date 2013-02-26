@@ -134,9 +134,9 @@ function sha1_rol($num, $cnt)
  * http://www.php.net/crc32#79567
  * @param $number
  */
-if (!function_exists('smf_crc32'))
+if (!function_exists('crc32_compat'))
 {
-	function smf_crc32($number)
+	function crc32_compat($number)
 	{
 		$crc = crc32($number);
 

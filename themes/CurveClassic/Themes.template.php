@@ -179,7 +179,7 @@ function template_main()
 		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	// ]]></script>';
 
-	if (empty($modSettings['disable_smf_js']))
+	if (empty($modSettings['disable_elk_js']))
 		echo '
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-themes.js"></script>';
 
