@@ -1702,3 +1702,75 @@ function getServerStoredAvatars($directory, $level)
 
 	return $result;
 }
+
+/**
+ * Simple function to remove the strictly needed of orphan attachments.
+ * This is used from attachments maintenance.
+ * It assumes the files have no message, no member information.
+ * It only removes the attachments and thumbnails from the database.
+ *
+ * @param array $attach_ids
+ */
+function removeOrphanAttachments($attach_ids)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}attachments
+		WHERE id_attach IN ({array_int:to_remove})',
+		array(
+			'to_remove' => $attach_ids,
+		)
+	);
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}attachments
+			SET id_thumb = {int:no_thumb}
+			WHERE id_thumb IN ({array_int:to_remove})',
+			array(
+				'to_remove' => $attach_ids,
+				'no_thumb' => 0,
+			)
+		);
+}
+
+/**
+ * Set or retrieve the size of an attachment.
+ *
+ * @param int $attach_id
+ * @param int $filesize = null
+ */
+function attachment_filesize($attach_id, $filesize = null)
+{
+	global $smcFunc;
+
+	if ($filesize === null)
+	{
+		$result = $smcFunc['db_query']('', '
+			SELECT size
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'id_attach' => $id_attach,
+			)
+		);
+		if (!empty($result))
+		{
+			list($filesize) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+			return $filesize;
+		}
+		return false;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET size = {int:filesize}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'filesize' => $filesize,
+				'id_attach' => $attach_id,
+			)
+		);
+	}
+}
