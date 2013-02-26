@@ -607,10 +607,10 @@ function template_show_error($error_id)
 	if (empty($error_id))
 		return;
 
-	$error = $context[$error_id];
+	$error = !empty($context[$error_id]) ? $context[$error_id] : null;
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', 'id="', $error_id, '">';
+					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
 	if (!empty($error['title']))
 		echo '
 						<dl>
