@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This function allows to move a topic, making sure to ask the moderator

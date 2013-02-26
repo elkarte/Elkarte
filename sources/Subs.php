@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Update some basic statistics.
@@ -2978,17 +2978,8 @@ function template_header()
 			}
 
 			// We are already checking so many files...just few more doesn't make any difference! :P
-			if (!empty($modSettings['currentAttachmentUploadDir']))
-			{
-				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = @unserialize($modSettings['attachmentUploadDir']);
-				$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-			}
-			else
-			{
-				$path = $modSettings['attachmentUploadDir'];
-				$id_folder_thumb = 1;
-			}
+			require_once(SUBSDIR . '/Attachments.subs.php');
+			$path = getAttachmentPath();
 			secureDirectory($path, true);
 			secureDirectory(CACHEDIR);
 

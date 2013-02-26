@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Load the $modSettings array.
@@ -280,7 +280,7 @@ function loadUserSettings()
 
 			if(!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
 				$user_settings['avatar'] = $settings['images_url'] . '/default_avatar.png';
-			
+
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
 		}
@@ -1687,6 +1687,60 @@ function loadTheme($id_theme = 0, $initialize = true)
 }
 
 /**
+ * This loads the bare minimum data.
+ * Needed by scheduled tasks, and any other code that needs language files
+ * before the forum (the theme) is loaded.
+ */
+function loadEssentialThemeData()
+{
+	global $settings, $modSettings, $smcFunc, $mbname, $context;
+
+	// Get all the default theme variables.
+	$result = $smcFunc['db_query']('', '
+		SELECT id_theme, variable, value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:no_member}
+			AND id_theme IN (1, {int:theme_guests})',
+		array(
+			'no_member' => 0,
+			'theme_guests' => $modSettings['theme_guests'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+	{
+		$settings[$row['variable']] = $row['value'];
+
+		// Is this the default theme?
+		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
+			$settings['default_' . $row['variable']] = $row['value'];
+	}
+	$smcFunc['db_free_result']($result);
+
+	// Check we have some directories setup.
+	if (empty($settings['template_dirs']))
+	{
+		$settings['template_dirs'] = array($settings['theme_dir']);
+
+		// Based on theme (if there is one).
+		if (!empty($settings['base_theme_dir']))
+			$settings['template_dirs'][] = $settings['base_theme_dir'];
+
+		// Lastly the default theme.
+		if ($settings['theme_dir'] != $settings['default_theme_dir'])
+			$settings['template_dirs'][] = $settings['default_theme_dir'];
+	}
+
+	// Assume we want this.
+	$context['forum_name'] = $mbname;
+
+	// Check loadLanguage actually exists!
+	if (!function_exists('loadLanguage'))
+		require_once(SOURCEDIR . '/Subs.php');
+
+	loadLanguage('index+Modifications');
+}
+
+/**
  * Load a template - if the theme doesn't include it, use the default.
  * What this function does:
  *  - loads a template file with the name template_name from the current, default, or base theme.
@@ -2035,10 +2089,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
-	{
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
-	}
 
 	// What theme are we in?
 	$theme_name = basename($settings['theme_url']);
@@ -2540,7 +2591,7 @@ function loadDatabase()
 }
 /**
  * Determine the user's avatar type and return the information as an array
- *  
+ *
  * @param array $profile
  * @param type $max_avatar_width
  * @param type $max_avatar_height
@@ -2577,7 +2628,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		// Gravatars URL.
 		$gravatar_url = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
-		
+
 		$avatar = array(
 			'name' => $profile['avatar'],
 			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
@@ -2592,7 +2643,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 		$avatar = array(
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
-			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'], 
+			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
 	}
@@ -2605,7 +2656,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
-		);	
+		);
 	}
 	//finally ...
 	else

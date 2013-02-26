@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The main 'Attachments and Avatars' management function.
@@ -310,7 +310,7 @@ function action_avatars($return_config = false)
 			),
 		array('title','gravatar'),
 			array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
-			array('select', 'gravatar_rating', 
+			array('select', 'gravatar_rating',
 				array(
 					'g' => 'g',
 					'pg' => 'pg',
@@ -998,6 +998,9 @@ function action_repair()
 		}
 	}
 
+	// We will work hard with attachments.
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	// All the valid problems are here:
 	$context['repair_errors'] = array(
 		'missing_thumbnail_parent' => 0,
@@ -1088,16 +1091,7 @@ function action_repair()
 	// Find parents which think they have thumbnails, but actually, don't.
 	if ($_GET['step'] <= 1)
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT MAX(id_attach)
-			FROM {db_prefix}attachments
-			WHERE id_thumb != {int:no_thumb}',
-			array(
-				'no_thumb' => 0,
-			)
-		);
-		list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$thumbnails = maxThumbnails();
 
 		for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 		{
@@ -1198,15 +1192,7 @@ function action_repair()
 
 								// Are we going to fix this now?
 								if ($fix_errors && in_array('wrong_folder', $to_fix))
-									$smcFunc['db_query']('', '
-										UPDATE {db_prefix}attachments
-										SET id_folder = {int:new_folder}
-										WHERE id_attach = {int:id_attach}',
-										array(
-											'new_folder' => $id,
-											'id_attach' => $row['id_attach'],
-										)
-									);
+									attachment_folder($row['id_attach'], $id);
 
 								continue 2;
 							}
@@ -1235,17 +1221,7 @@ function action_repair()
 
 					// Fix it here?
 					if ($fix_errors && in_array('file_wrong_size', $to_fix))
-					{
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}attachments
-							SET size = {int:filesize}
-							WHERE id_attach = {int:id_attach}',
-							array(
-								'filesize' => filesize($filename),
-								'id_attach' => $row['id_attach'],
-							)
-						);
-					}
+						attachment_filesize($row['id_attach'], filesize($filename));
 				}
 			}
 
@@ -1261,24 +1237,7 @@ function action_repair()
 
 			// Do we need to delete what we have?
 			if ($fix_errors && !empty($to_remove))
-			{
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}attachments
-					WHERE id_attach IN ({array_int:to_remove})',
-					array(
-						'to_remove' => $to_remove,
-					)
-				);
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}attachments
-					SET id_thumb = {int:no_thumb}
-					WHERE id_thumb IN ({array_int:to_remove})',
-					array(
-						'to_remove' => $to_remove,
-						'no_thumb' => 0,
-					)
-				);
-			}
+				removeOrphanAttachments($to_remove);
 
 			pauseAttachmentMaintenance($to_fix, $thumbnails);
 		}

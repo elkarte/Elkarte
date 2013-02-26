@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * SearchAPI-Sphinx.php, used when an Sphinx search daemon is used and access is via

@@ -16,7 +16,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * SearchAPI-Custom.php, Custom Search API class .. used when custom ELKARTE index is used

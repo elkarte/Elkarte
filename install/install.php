@@ -375,6 +375,11 @@ function installExit($fallThrough = false)
 	die();
 }
 
+/**
+ * Welcome screen.
+ * It makes a few basic checks for compatibility
+ * and informs the user if there are problems.
+ */
 function action_welcome()
 {
 	global $incontext, $txt, $databases, $installurl;
@@ -1368,7 +1373,7 @@ function action_deleteInstall()
 
 	require(dirname(__FILE__) . '/Settings.php');
 	load_database();
-	
+
 	if (!defined('SUBSDIR'))
 		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
 
@@ -1850,6 +1855,13 @@ class Ftp_Connection
 	}
 }
 
+/**
+ * Write out the contents of Settings.php file.
+ * This function will add the variables passed to it in $vars,
+ * to the Settings.php file.
+ *
+ * @param array $vars the configuration variables to write out.
+ */
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
@@ -1919,6 +1931,9 @@ function updateSettingsFile($vars)
 	return true;
 }
 
+/**
+ * Write the db_last_error file.
+ */
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
@@ -1927,7 +1942,8 @@ function updateDbLastError()
 }
 
 /**
- * Create an .htaccess file to prevent mod_security. Elkarte has filtering built-in.
+ * Create an .htaccess file to prevent mod_security.
+ * Elkarte has filtering built-in.
  */
 function fixModSecurity()
 {

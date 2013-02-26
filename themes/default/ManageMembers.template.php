@@ -158,7 +158,7 @@ function template_search_members()
 				<h3 class="titlebg">', $txt['member_part_of_these_membergroups'], '</h3>
 			</div>
 			<div class="flow_hidden">
-				<table width="49%" class="table_grid floatleft">
+				<table style="width:49%" class="table_grid floatleft">
 					<thead>
 						<tr class="catbg">
 							<th scope="col" class="first_th">', $txt['membergroups'], '</th>
@@ -195,7 +195,7 @@ function template_search_members()
 					</tbody>
 				</table>
 
-				<table width="49%" class="table_grid floatright">
+				<table style="width:49%" class="table_grid floatright">
 					<thead>
 						<tr class="catbg">
 							<th scope="col" class="first_th">
@@ -212,7 +212,7 @@ function template_search_members()
 							<td>
 								', $postgroup['name'], '
 							</td>
-							<td width="40" class="centercol">
+							<td style="width:40px" class="centercol">
 								<input type="checkbox" name="postgroups[]" value="', $postgroup['id'], '" checked="checked" class="input_check" />
 							</td>
 						</tr>';
