@@ -425,7 +425,7 @@ function template_webslice_recent_posts()
  */
 function template_xml_draft()
 {
-	global $context;
+	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <drafts>
