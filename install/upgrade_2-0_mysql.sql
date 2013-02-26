@@ -1524,7 +1524,7 @@ upgrade_query("
 	INSERT IGNORE INTO {$db_prefix}scheduled_tasks
 		(next_time, time_offset, time_regularity, time_unit, disabled, task)
 	VALUES
-		(0, {$randomTime}, 1, 'd', 0, 'fetchSMfiles')");
+		(0, {$randomTime}, 1, 'd', 0, 'fetchFiles')");
 ---}
 ---#
 
