@@ -1816,3 +1816,24 @@ function attachment_folder($attach_id, $folder_id = null)
 		);
 	}
 }
+
+/**
+ * Get max attachment ID with a thumbnail.
+ */
+function maxThumbnails()
+{
+	global $smcFunc;
+
+	$result = $smcFunc['db_query']('', '
+		SELECT MAX(id_attach)
+		FROM {db_prefix}attachments
+		WHERE id_thumb != {int:no_thumb}',
+		array(
+			'no_thumb' => 0,
+		)
+	);
+	list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+	$smcFunc['db_free_result']($result);
+
+	return $thumbnails;
+}
