@@ -907,13 +907,13 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 /**
  * Get the previous topic from where we are.
  *
- * @param int $id_topic
- * @param int $id_board
- * @param int $id_member =0
- * @param bool $includeUnapproved = false
- * @param bool $includeStickies = true
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
  */
-function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
 	return topicPointer($id_topic, $id_board, false, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
@@ -921,13 +921,13 @@ function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapprov
 /**
  * Get the next topic from where we are.
  *
- * @param int $id_topic
- * @param int $id_board
- * @param int $id_member =0
- * @param bool $includeUnapproved = false
- * @param bool $includeStickies = true
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
  */
-function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
 	return topicPointer($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
