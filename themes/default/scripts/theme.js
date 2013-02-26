@@ -152,7 +152,7 @@ errorbox_handler.prototype.checkErrors = function ()
 			if (this.opt.error_checks[i].function(this.boxVal()))
 				this.addError($elem, this.opt.error_checks[i].code);
 			else
-				this.removeError($elem, this.opt.error_checks[i].code);
+				this.removeError(this.error_box, $elem, this.opt.error_checks[i].code);
 		}
 
 		this.error_box.attr("class", "errorbox");
@@ -174,10 +174,12 @@ errorbox_handler.prototype.addError = function (error_elem, error_code)
 	}
 }
 
-errorbox_handler.prototype.removeError = function (error_elem, error_code)
+errorbox_handler.prototype.removeError = function (error_box, error_elem, error_code)
 {
 	if (error_elem.length != 0)
 		error_elem.slideUp(function() {
 			error_elem.remove();
+			if (error_box.find("li").length == 0)
+				error_box.slideUp();
 		});
 }
