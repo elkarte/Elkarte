@@ -1078,8 +1078,8 @@ function allBoards($all = false, $include = array())
 
 		if (!empty($include['access']))
 			$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
-							'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
-							'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
+				'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
+				'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
 			);
 
 
