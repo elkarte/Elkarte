@@ -592,12 +592,17 @@
 						$(draggable).stop().animate({
 							left: positionX + 'px',
 							top: positionY + 'px'
-						}, o.speed, o.easing, function(){o.afterEachAnimation.call(draggable, Ev)});
+						},                        
+						{
+                            duration:o.speed,
+                            easing:o.easing,
+                            step:function(){o.afterEachAnimation.call(draggable, Ev)}
+                        });
 					}
 					lastX = Ev.pageX;
 					lastY = Ev.pageY;
 				}, o.interval);
-				($.browser.safari || e.preventDefault());
+				(e.preventDefault());
 			});
 			$(document).mousemove(function(e) {
 				if(dragging) {

@@ -626,7 +626,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	}
 
 	// How about $_GET['sesc']?
-	elseif ($type == 'get')
+	elseif ($type === 'get')
 	{
 		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
 		if ($check !== $sc)
@@ -732,9 +732,8 @@ function checkConfirm($action)
 {
 	global $modSettings;
 
-	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $_SERVER['HTTP_USER_AGENT']) == $_SESSION['confirm_' . $action])
+	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $_SERVER['HTTP_USER_AGENT']) === $_SESSION['confirm_' . $action])
 		return true;
-
 	else
 	{
 		$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
@@ -801,7 +800,7 @@ function validateToken($action, $type = 'post', $reset = true)
 		4. Match that result against what is in the session.
 		5. If it matchs, success, otherwise we fallout.
 	*/
-	if (isset($_SESSION['token'][$type . '-' . $action], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]] . $_SERVER['HTTP_USER_AGENT']) == $_SESSION['token'][$type . '-' . $action][1])
+	if (isset($_SESSION['token'][$type . '-' . $action], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]] . $_SERVER['HTTP_USER_AGENT']) === $_SESSION['token'][$type . '-' . $action][1])
 	{
 		// Invalidate this token now.
 		unset($_SESSION['token'][$type . '-' . $action]);
