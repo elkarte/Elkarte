@@ -1635,7 +1635,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	);
 
 	// Queue our Javascript
-	loadJavascriptFile(array('smf_jquery_plugins.js', 'script.js', 'theme.js'));
+	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'theme.js'));
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -1806,9 +1806,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 			call_user_func('template_' . $template_name . '_init');
 	}
 	// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/Themes/default'))
+	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
 	{
-		$settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
+		$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 		$settings['template_dirs'][] = $settings['default_theme_dir'];
 
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
@@ -1826,7 +1826,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
 		fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 	elseif ($fatal)
-		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load Themes/default/%s.template.php!', (string) $template_name), 'template'));
+		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
 	else
 		return false;
 }
@@ -2589,6 +2589,7 @@ function loadDatabase()
 	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
+
 /**
  * Determine the user's avatar type and return the information as an array
  *
@@ -2604,10 +2605,13 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
+		// where are those pesky avatars?
+		$avatar_url = empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
+
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar" alt="" />',
-			'href' => $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar',
+			'image' => '<img class="avatar" src="' . $avatar_url . '" alt="" />',
+			'href' => $avatar_url,
 			'url' => '',
 		);
 	}
