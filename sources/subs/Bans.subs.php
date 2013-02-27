@@ -192,7 +192,7 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-	global $context, $smcFunc;
+	global $smcFunc;
 
 	$ban_errors = error_context::context('ban', 1);
 	if (empty($triggers))
@@ -477,7 +477,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {
-	global $smcFunc, $context;
+	global $smcFunc;
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -553,7 +553,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
  */
 function updateBanGroup($ban_info = array())
 {
-	global $smcFunc, $context;
+	global $smcFunc;
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -617,7 +617,7 @@ function updateBanGroup($ban_info = array())
  */
 function insertBanGroup($ban_info = array())
 {
-	global $smcFunc, $context;
+	global $smcFunc;
 
 	$ban_errors = error_context::context('ban', 1);
 
