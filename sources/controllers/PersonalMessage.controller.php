@@ -1349,15 +1349,11 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	);
 
 	// Set each of the errors for the template.
-	loadLanguage('Errors');
-
-	$context['error_type'] = 'minor';
-	if ($error_types->hasErrors())
-		$context['post_error'] = array(
-			'errors' => $error_types->prepareErrors(),
-			'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
-		);
+	$context['post_error'] = array(
+		'errors' => $error_types->prepareErrors(),
+		'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['error_while_submitting'],
+	);
 
 	// We need to load the editor once more.
 	require_once(SUBSDIR . '/Editor.subs.php');

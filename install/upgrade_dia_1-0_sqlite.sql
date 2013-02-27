@@ -240,11 +240,20 @@ $smcFunc['db_alter_table']('{db_prefix}log_topics', array(
 		),
 	)
 ));
-INSERT INTO {$db_prefix}settings
+---}
+---#
+
+/******************************************************************************/
+--- Adding new settings
+/******************************************************************************/
+---# Adding new settings ...
+INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
+	('avatar_default', '0'),
+	('gravatar_rating', 'g'),
+	('xmlnews_limit', 5);
 	('enable_disregard', 0);
----}
 ---#
 
 /******************************************************************************/

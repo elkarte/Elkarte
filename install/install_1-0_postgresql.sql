@@ -2228,6 +2228,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('theme_default', '1')
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('theme_guests', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableEmbeddedFlash', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('xmlnews_enable', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('xmlnews_limit', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('xmlnews_maxlen', '255');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('hotTopicPosts', '15');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('hotTopicVeryPosts', '25');
