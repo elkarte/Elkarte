@@ -815,19 +815,17 @@ function action_post()
 		$post_errors->addError('need_qr_verification', 0);
 
 	// Any errors occurred?
-	if ($post_errors->hasErrors())
-		$context['post_error'] = array(
-			'errors' => $post_errors->prepareErrors(),
-			'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
-		);
+	$context['post_error'] = array(
+		'errors' => $post_errors->prepareErrors(),
+		'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['error_while_submitting'],
+	);
 
-	if ($attach_errors->hasErrors())
-		$context['attachment_error'] = array(
-			'errors' => $attach_errors->prepareErrors(),
-			'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
-		);
+	$context['attachment_error'] = array(
+		'errors' => $attach_errors->prepareErrors(),
+		'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['error_while_submitting'],
+	);
 
 	// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
 	if (isset($_REQUEST['poll']))
