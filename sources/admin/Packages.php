@@ -2086,7 +2086,7 @@ function PackagePermissions()
 
 	if (substr($modSettings['smileys_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 	{
-		unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Smileys']);
+		unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['smileys']);
 		$context['file_tree'][strtr($modSettings['smileys_dir'], array('\\' => '/'))] = array(
 			'type' => 'dir_recursive',
 			'writable_on' => 'standard',

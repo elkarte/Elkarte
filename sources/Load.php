@@ -1806,9 +1806,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 			call_user_func('template_' . $template_name . '_init');
 	}
 	// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/Themes/default'))
+	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
 	{
-		$settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
+		$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 		$settings['template_dirs'][] = $settings['default_theme_dir'];
 
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
@@ -1826,7 +1826,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
 		fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 	elseif ($fatal)
-		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load Themes/default/%s.template.php!', (string) $template_name), 'template'));
+		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
 	else
 		return false;
 }
