@@ -148,7 +148,7 @@ $txt['package_install_options_make_full_backups'] = 'Create an entire backup (ex
 $txt['package_ftp_necessary'] = 'FTP Information Required';
 $txt['package_ftp_why'] = 'Some of the files the package manager needs to modify are not writable.  This needs to be changed by logging into FTP and using it to chmod or create the files and directories.  Your FTP information may be temporarily cached for proper operation of the package manager. Note you can also do this manually using an FTP client - to view a list of the affected files please click <a href="#" onclick="%1$s">here</a>.';
 $txt['package_ftp_why_file_list'] = 'The following files need to made writable to continue installation:';
-$txt['package_ftp_why_download'] = 'In order to download packages, the Packages directory, and any files in it, must be writable.  Currently the system does not have the needed permissions to write to this directory.  The package manager can use your FTP information to attempt to fix this problem.';
+$txt['package_ftp_why_download'] = 'In order to download packages, the packages directory, and any files in it, must be writable.  Currently the system does not have the needed permissions to write to this directory.  The package manager can use your FTP information to attempt to fix this problem.';
 $txt['package_ftp_server'] = 'FTP Server';
 $txt['package_ftp_port'] = 'Port';
 $txt['package_ftp_username'] = 'Username';
