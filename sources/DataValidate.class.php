@@ -10,7 +10,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Class used to validate and transform data
@@ -37,9 +37,9 @@ if (!defined('ELKARTE'))
  *		validation_data()
  *
  * Current validation can be one or a combination of:
- *		max_length[x], min_length[x], length[x], 
+ *		max_length[x], min_length[x], length[x],
  *		alpha, alpha_numeric, alpha_dash
- *		numeric, integer, boolean, float, 
+ *		numeric, integer, boolean, float,
  *		valid_url, valid_ip, valid_ipv6, valid_email,
  *		contains[x,y,x], required
  */
@@ -53,7 +53,7 @@ class data_Validate
 	/**
 	 * Sanitation rules
 	 */
-	protected $sanitation_rules = array(); 
+	protected $sanitation_rules = array();
 
 	/**
 	 * Holds validation errors
@@ -66,7 +66,7 @@ class data_Validate
 	protected $data = array();
 
 	/**
-	 * Stict data processing, 
+	 * Stict data processing,
 	 * if true drops data for which no sanitation rule was set
 	 */
 	protected $strict = false;
@@ -102,7 +102,7 @@ class data_Validate
 		// If its not an array, make it one
 		if (!is_array($rules))
 			$rules = array($rules);
-		
+
 		// Set the sanitation rules
 		$this->strict = $strict;
 
@@ -222,7 +222,7 @@ class data_Validate
 				continue;
 			}
 
-			// Rules for which we do have data 
+			// Rules for which we do have data
 			$rules = explode('|', $rules);
 			foreach ($rules as $rule)
 			{
@@ -250,7 +250,7 @@ class data_Validate
 	 * Process any errors and return the error strings
 	 *
 	 * @return array
-	 * @return string	
+	 * @return string
 	 */
 	private function _get_error_messages()
 	{
@@ -285,7 +285,7 @@ class data_Validate
 	 * Contains ... Verify that a value is contained within a list
 	 *
 	 * Usage: '[key]' => 'contains[value,value,value]'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -334,7 +334,7 @@ class data_Validate
 	 * valid_email .... Determine if the provided email is valid
 	 *
 	 * Usage: '[key]' => 'valid_email'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -408,10 +408,10 @@ class data_Validate
 	}
 
 	/**
-	 * max_lenght ... Determine if the provided value length is less or equal to a specific value
+	 * max_length ... Determine if the provided value length is less or equal to a specific value
 	 *
 	 * Usage: '[key]' => 'max_length[x]'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -436,10 +436,10 @@ class data_Validate
 	}
 
 	/**
-	 * min_length Determine if the provided value length is more or equal to a specific value
+	 * min_length Determine if the provided value length is greater than or equal to a specific value
 	 *
 	 * Usage: '[key]' => 'min_length[x]'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -467,7 +467,7 @@ class data_Validate
 	 * length ... Determine if the provided value length matches a specific value
 	 *
 	 * Usage: '[key]' => 'exact_length[x]'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -522,7 +522,7 @@ class data_Validate
 	 * alpha_numeric ... Determine if the provided value contains only alpha-numeric characters
 	 *
 	 * Usage: '[key]' => 'alpha_numeric'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -549,7 +549,7 @@ class data_Validate
 	 * alpha_dash ... Determine if the provided value contains only alpha characters plus dashed and underscores
 	 *
 	 * Usage: '[key]' => 'alpha_dash'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -575,7 +575,7 @@ class data_Validate
 	 * numeric ... Determine if the provided value is a valid number or numeric string
 	 *
 	 * Usage: '[key]' => 'numeric'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -601,7 +601,7 @@ class data_Validate
 	 * integer ... Determine if the provided value is a valid integer
 	 *
 	 * Usage: '[key]' => 'integer'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -653,7 +653,7 @@ class data_Validate
 	 * float ... Determine if the provided value is a valid float
 	 *
 	 * Usage: '[key]' => 'float'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -706,7 +706,7 @@ class data_Validate
 	 * valid_ipv6 ... Determine if the provided value is a valid IPv6 address
 	 *
 	 * Usage: '[key]' => 'valid_ipv6'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -732,7 +732,7 @@ class data_Validate
 	 * valid_ip ... Determine if the provided value is a valid IP4 address
 	 *
 	 * Usage: '[key]' => 'valid_ip'
-	 * 	
+	 *
 	 * @param string $field
 	 * @param array $input
 	 * @param array or null $validation_parameters
@@ -753,11 +753,11 @@ class data_Validate
 			);
 		}
 	}
-	
+
 	//
 	// Start of sanitation functions
 	//
-	
+
 	/**
 	 * email_normalize ... Used to normalize a gmail address as many resolve to the same thing address
 	 *
@@ -765,7 +765,7 @@ class data_Validate
 	 * - Gmail ignores all characters after a + (plus sign) in the username
 	 * - Gmail ignores all . (dots) in username
 	 * - ahole@gmail.com, a.hole@gmail.com, ahole+big@gmail.com and a.hole+gigantic@googlemail.com are same email address.
-	 * 
+	 *
 	 * @param string $input
 	 */
 	protected function _sanitation_email_normalize($input)
