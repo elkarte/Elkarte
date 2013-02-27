@@ -355,7 +355,9 @@ function BanEdit()
 {
 	global $txt, $modSettings, $context, $ban_request, $scripturl, $smcFunc, $sourcedir;
 
-	if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && empty($context['ban_errors']))
+	$ban_errors = error_context::context('ban', 1);
+
+	if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors()))
 		BanEdit2();
 
 	$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : (isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0);
@@ -365,11 +367,13 @@ function BanEdit()
 	createToken('admin-bet');
 	$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 
-	if (!empty($context['ban_errors']))
-	{
-		foreach ($context['ban_errors'] as $error)
-			$context['error_messages'][$error] = $txt[$error];
-	}
+	$ban_errors = error_context::context('ban', 1);
+
+	$context['ban_errors'] = array(
+		'errors' => $ban_errors->prepareErrors(),
+		'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
+		'title' => $txt['ban_errors_detected'],
+	);
 
 	// If we're editing an existing ban, get it from the database.
 	if (!empty($ban_group_id))
@@ -761,7 +765,7 @@ function banEdit2()
 	checkSession();
 	validateToken('admin-bet');
 
-	$context['ban_errors'] = array();
+	$ban_errors = error_context::context('ban', 1);
 
 	// Adding or editing a ban group
 	if (isset($_POST['add_ban']) || isset($_POST['modify_ban']))
@@ -806,7 +810,7 @@ function banEdit2()
 		$context['ban_suggestions']['saved_triggers'] = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 
 	// Something went wrong somewhere... Oh well, let's go back.
-	if (!empty($context['ban_errors']))
+	if ($ban_errors->hasErrors())
 	{
 		// Not strictly necessary, but it's nice
 		if (!empty($context['ban_suggestions']['member']['id']))

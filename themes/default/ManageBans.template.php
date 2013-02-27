@@ -32,21 +32,7 @@ function template_ban_edit()
 			<div class="information">', $txt['ban_add_notes'], '</div>';
 
 	// If there were errors for sending the PM, show them.
-	if (!empty($context['error_messages']))
-	{
-		echo '
-			<div class="errorbox">
-				<strong>', $txt['ban_errors_detected'], '</strong>
-				<ul>';
-
-		foreach ($context['error_messages'] as $error)
-			echo '
-					<li class="error">', $error, '</li>';
-
-		echo '
-				</ul>
-			</div>';
-	}
+	template_show_error('ban_errors');
 
 	echo '
 			<div class="content">

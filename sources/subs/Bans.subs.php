@@ -43,6 +43,7 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
 		)
 	);
 	$ban_triggers = array();
+	$ban_errors = error_context::context('ban', 1);
 
 	foreach ($suggestions as $key => $value)
 	{
@@ -55,14 +56,14 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
 	$ban_triggers = validateTriggers($triggers);
 
 	// Time to save!
-	if (!empty($ban_triggers['ban_triggers']) && empty($context['ban_errors']))
+	if (!empty($ban_triggers['ban_triggers']) && !$ban_errors->hasErrors())
 	{
 		if (empty($ban_id))
 			addTriggers($ban_group, $ban_triggers['ban_triggers'], $ban_triggers['log_info']);
 		else
 			updateTriggers($ban_id, $ban_group, array_shift($ban_triggers['ban_triggers']), $ban_triggers['log_info'][0]);
 	}
-	if (!empty($context['ban_errors']))
+	if ($ban_errors->hasErrors())
 		return $triggers;
 	else
 		return false;
@@ -186,8 +187,6 @@ function removeBanLogs($ids = array())
 /**
  * This function validates the ban triggers
  * 
- * Errors in $context['ban_errors']
- *
  * @param array $triggers
  * @return array triggers and logs info ready to be used
  */
@@ -195,8 +194,9 @@ function validateTriggers(&$triggers)
 {
 	global $context, $smcFunc;
 
+	$ban_errors = error_context::context('ban', 1);
 	if (empty($triggers))
-		$context['ban_erros'][] = 'ban_empty_triggers';
+		$ban_errors->addError('ban_empty_triggers');
 
 	$ban_triggers = array();
 	$log_info = array();
@@ -213,7 +213,7 @@ function validateTriggers(&$triggers)
 				$value = trim($value);
 				$ip_parts = ip2range($value);
 				if (!checkExistingTriggerIP($ip_parts, $value))
-					$context['ban_erros'][] = 'invalid_ip';
+					$ban_errors->addError('invalid_ip');
 				else
 				{
 					$ban_triggers['main_ip'] = array(
@@ -239,7 +239,7 @@ function validateTriggers(&$triggers)
 			elseif ($key == 'hostname')
 			{
 				if (preg_match('/[^\w.\-*]/', $value) == 1)
-					$context['ban_erros'][] = 'invalid_hostname';
+					$ban_errors->addError('invalid_hostname');
 				else
 				{
 					// Replace the * wildcard by a MySQL wildcard %.
@@ -251,7 +251,7 @@ function validateTriggers(&$triggers)
 			elseif ($key == 'email')
 			{
 				if (preg_match('/[^\w.\-\+*@]/', $value) == 1)
-					$context['ban_erros'][] = 'invalid_email';
+					$ban_errors->addError('invalid_email');
 
 				// Check the user is not banning an admin.
 				$request = $smcFunc['db_query']('', '
@@ -266,7 +266,7 @@ function validateTriggers(&$triggers)
 					)
 				);
 				if ($smcFunc['db_num_rows']($request) != 0)
-					$context['ban_erros'][] = 'no_ban_admin';
+					$ban_errors->addError('no_ban_admin');
 				$smcFunc['db_free_result']($request);
 
 				$value = substr(strtolower(str_replace('*', '%', $value)), 0, 255);
@@ -288,14 +288,14 @@ function validateTriggers(&$triggers)
 					)
 				);
 				if ($smcFunc['db_num_rows']($request) == 0)
-					$context['ban_erros'][] = 'invalid_username';
+					$ban_errors->addError('invalid_username');
 				list ($value, $isAdmin) = $smcFunc['db_fetch_row']($request);
 				$smcFunc['db_free_result']($request);
 
 				if ($isAdmin && strtolower($isAdmin) != 'f')
 				{
 					unset($value);
-					$context['ban_erros'][] = 'no_ban_admin';
+					$ban_errors->addError('no_ban_admin');
 				}
 				else
 					$ban_triggers['user']['id_member'] = $value;
@@ -313,7 +313,7 @@ function validateTriggers(&$triggers)
 					$val = trim($val);
 					$ip_parts = ip2range($val);
 					if (!checkExistingTriggerIP($ip_parts, $val))
-						$context['ban_erros'][] = 'invalid_ip';
+						$ban_errors->addError('invalid_ip');
 					else
 					{
 						$ban_triggers[$key][] = array(
@@ -343,7 +343,7 @@ function validateTriggers(&$triggers)
 				}
 			}
 			else
-				$context['ban_erros'][] = 'no_bantype_selected';
+				$ban_errors->addError('no_bantype_selected');
 
 			if (isset($value) && !is_array($value))
 				$log_info[] = array(
@@ -358,8 +358,6 @@ function validateTriggers(&$triggers)
 /**
  * This function actually inserts the ban triggers into the database
  * 
- * Errors in $context['ban_errors']
- *
  * @param int $group_id
  * @param array $triggers
  * @param array $logs
@@ -369,8 +367,10 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
 	global $smcFunc;
 
+	$ban_errors = error_context::context('ban', 1);
+
 	if (empty($group_id))
-		$context['ban_errors'][] = 'ban_group_id_empty';
+		$ban_errors->addError('ban_group_id_empty');
 
 	$logCorrel = array(
 		'main_ip' => 'ip_range',
@@ -443,9 +443,9 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 	}
 
 	if (empty($insertTriggers))
-		$context['ban_errors'][] = 'ban_no_triggers';
+		$ban_errors->addError('ban_no_triggers');
 
-	if (!empty($context['ban_errors']))
+	if ($ban_errors->hasErrors())
 		return false;
 
 	$smcFunc['db_insert']('',
@@ -469,8 +469,6 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 /**
  * This function updates an existing ban trigger into the database
  * 
- * Errors in $context['ban_errors']
- *
  * @param int $ban_item
  * @param int $group_id
  * @param array $trigger
@@ -481,14 +479,16 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 {
 	global $smcFunc, $context;
 
-	if (empty($ban_item))
-		$context['ban_errors'][] = 'ban_ban_item_empty';
-	if (empty($group_id))
-		$context['ban_errors'][] = 'ban_group_id_empty';
-	if (empty($trigger))
-		$context['ban_errors'][] = 'ban_no_triggers';
+	$ban_errors = error_context::context('ban', 1);
 
-	if (!empty($context['ban_errors']))
+	if (empty($ban_item))
+		$ban_errors->addError('ban_ban_item_empty');
+	if (empty($group_id))
+		$ban_errors->addError('ban_group_id_empty');
+	if (empty($trigger))
+		$ban_errors->addError('ban_no_triggers');
+
+	if ($ban_errors->hasErrors())
 		return;
 
 	// Preset all values that are required.
@@ -548,8 +548,6 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
  * Updates an existing ban group
  * If the name doesn't exists a new one is created
  * 
- * Errors in $context['ban_errors']
- *
  * @param array $ban_info
  * @return nothing
  */
@@ -557,12 +555,14 @@ function updateBanGroup($ban_info = array())
 {
 	global $smcFunc, $context;
 
-	if (empty($ban_info['name']))
-		$context['ban_errors'][] = 'ban_name_empty';
-	if (empty($ban_info['id']))
-		$context['ban_errors'][] = 'ban_id_empty';
+	$ban_errors = error_context::context('ban', 1);
 
-	if (!empty($context['ban_errors']))
+	if (empty($ban_info['name']))
+		$ban_errors->addError('ban_name_empty');
+	if (empty($ban_info['id']))
+		$ban_errors->addError('ban_id_empty');
+
+	if ($ban_errors->hasErrors())
 		return;
 
 	$request = $smcFunc['db_query']('', '
@@ -612,8 +612,6 @@ function updateBanGroup($ban_info = array())
  * If a ban group with the same name already exists or the group s sucessfully created the ID is returned
  * On error the error code is returned or false
  * 
- * Errors in $context['ban_errors']
- * 
  * @param array $ban_info
  * @return int the ban group's ID
  */
@@ -621,12 +619,14 @@ function insertBanGroup($ban_info = array())
 {
 	global $smcFunc, $context;
 
-	if (empty($ban_info['name']))
-		$context['ban_errors'][] = 'ban_name_empty';
-	if (empty($ban_info['cannot']['access']) && empty($ban_info['cannot']['register']) && empty($ban_info['cannot']['post']) && empty($ban_info['cannot']['login']))
-		$context['ban_errors'][] = 'ban_unknown_restriction_type';
+	$ban_errors = error_context::context('ban', 1);
 
-	if (!empty($context['ban_errors']))
+	if (empty($ban_info['name']))
+		$ban_errors->addError('ban_name_empty');
+	if (empty($ban_info['cannot']['access']) && empty($ban_info['cannot']['register']) && empty($ban_info['cannot']['post']) && empty($ban_info['cannot']['login']))
+		$ban_errors->addError('ban_unknown_restriction_type');
+
+	if ($ban_errors->hasErrors())
 		return;
 
 	// Check whether a ban with this name already exists.
@@ -664,7 +664,7 @@ function insertBanGroup($ban_info = array())
 	$ban_info['id'] = $smcFunc['db_insert_id']('{db_prefix}ban_groups', 'id_ban_group');
 
 	if (empty($ban_info['id']))
-		$context['ban_errors'][] = 'impossible_insert_new_bangroup';
+		$ban_errors->addError('impossible_insert_new_bangroup');
 
 	return $ban_info['id'];
 }
