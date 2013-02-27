@@ -921,7 +921,7 @@ function action_ignoreboards($memID)
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
 	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards(false, array('access' => $groups['id_group']));
+	$context += allBoards(false, array('ignore' => explode(',', $cur_profile['ignore_boards'])));
 
 	loadThemeOptions($memID);
 }
