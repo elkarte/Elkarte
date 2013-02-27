@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  * This file is the file which all subscription gateways should call
@@ -23,17 +23,17 @@ if (!file_exists(dirname(__FILE__) . '/SSI.php'))
 	die('Cannot find SSI.php');
 
 require_once(dirname(__FILE__) . '/SSI.php');
-loadAdminClass ('ManagePaid.php');
+require_once(ADMINDIR . '/ManagePaid.php');
 
 // For any admin emailing.
-require_once($sourcedir . '/Subs-Admin.php');
+require_once(SUBSDIR . '/Admin.subs.php');
 
 loadLanguage('ManagePaid');
 
 // If there's literally nothing coming in, let's take flight!
 if (empty($_POST))
 {
-	header('Content-Type: text/html; charset=' . (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set']));
+	header('Content-Type: text/html; charset=UTF-8');
 	die($txt['paid_no_data']);
 }
 

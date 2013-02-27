@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  */
@@ -22,10 +22,10 @@ define('ELKARTE', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
-global $boardurl, $boarddir, $sourcedir, $webmaster_email, $cookiename;
+global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $db_connection, $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
-global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd, $cachedir;
+global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
@@ -41,9 +41,25 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Get the forum's settings for database and file paths.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+
+// Time to forget about variables and go with constants!
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('SOURCEDIR', $sourcedir);
+
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
+unset($boarddir, $cachedir, $sourcedir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -57,20 +73,16 @@ $ssi_on_error_method = false;
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 
-// Fix for using the current directory as a path.
-if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
-	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
-
 // Load the important includes.
-require_once($sourcedir . '/QueryString.php');
-require_once($sourcedir . '/Session.php');
-require_once($sourcedir . '/Subs.php');
-require_once($sourcedir . '/Errors.php');
-require_once($sourcedir . '/Logging.php');
-require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/Subs-Cache.php');
-require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/Class-BrowserDetect.php');
+require_once(SOURCEDIR . '/QueryString.php');
+require_once(SOURCEDIR . '/Session.php');
+require_once(SOURCEDIR . '/Subs.php');
+require_once(SOURCEDIR . '/Errors.php');
+require_once(SOURCEDIR . '/Logging.php');
+require_once(SOURCEDIR . '/Load.php');
+require_once(SUBSDIR . '/Cache.subs.php');
+require_once(SOURCEDIR . '/Security.php');
+require_once(SOURCEDIR . '/BrowserDetect.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();
@@ -86,7 +98,7 @@ cleanRequest();
 
 // Seed the random generator?
 if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	smf_seed_generator();
+	elk_seed_generator();
 
 // Check on any hacking attempts.
 if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
@@ -150,7 +162,7 @@ loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 // @todo: probably not the best place, but somewhere it should be set...
 if (!headers_sent())
-	header('Content-Type: text/html; charset=' . (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set']));
+	header('Content-Type: text/html; charset=UTF-8');
 
 // Take care of any banning that needs to be done.
 if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
@@ -159,7 +171,7 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 	KickGuest();
 	obExit(null, true);
 }
@@ -202,14 +214,21 @@ if (function_exists('set_magic_quotes_runtime'))
 
 return true;
 
-// This shuts down the SSI and shows the footer.
+/**
+ * This shuts down the SSI and shows the footer.
+ */
 function ssi_shutdown()
 {
 	if (!isset($_GET['ssi_function']) || $_GET['ssi_function'] != 'shutdown')
 		template_footer();
 }
 
-// Display a welcome message, like:  Hey, User, you have 0 messages, 0 are new.
+/**
+ * Display a welcome message, like:
+ * "Hey, User, you have 0 messages, 0 are new."
+ *
+ * @param string $output_method
+ */
 function ssi_welcome($output_method = 'echo')
 {
 	global $context, $txt, $scripturl;
@@ -226,7 +245,11 @@ function ssi_welcome($output_method = 'echo')
 		return $context['user'];
 }
 
-// Display a menu bar, like is displayed at the top of the forum.
+/**
+ * Display a menu bar, like is displayed at the top of the forum.
+ *
+ * @param string $output_method
+ */
 function ssi_menubar($output_method = 'echo')
 {
 	global $context;
@@ -238,7 +261,12 @@ function ssi_menubar($output_method = 'echo')
 		return $context['menu_buttons'];
 }
 
-// Show a logout link.
+/**
+ * Show a logout link.
+ *
+ * @param string $redirect_to
+ * @param string $output_method = 'echo'
+ */
 function ssi_logout($redirect_to = '', $output_method = 'echo')
 {
 	global $context, $txt, $scripturl;
@@ -258,7 +286,16 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 		return $link;
 }
 
-// Recent post list:   [board] Subject by Poster	Date
+/**
+ * Recent post list:
+ *  [board] Subject by Poster	Date
+ *
+ * @param int $num_recent
+ * @param array $exclude_boards
+ * @param array $include_boards
+ * @param string $output_method
+ * @param bool $limit_body
+ */
 function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo', $limit_body = true)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
@@ -301,7 +338,15 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
 	return ssi_queryPosts($query_where, $query_where_params, $num_recent, 'm.id_msg DESC', $output_method, $limit_body);
 }
 
-// Fetch a post with a particular ID. By default will only show if you have permission to the see the board in question - this can be overriden.
+/**
+ * Fetch a post with a particular ID.
+ * By default will only show if you have permission
+ *  to the see the board in question - this can be overriden.
+ *
+ * @param array $post_ids
+ * @param bool $override_permissions
+ * @param string $output_method = 'echo'
+ */
 function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $output_method = 'echo')
 {
 	global $user_info, $modSettings;
@@ -326,7 +371,18 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 	return ssi_queryPosts($query_where, $query_where_params, '', 'm.id_msg DESC', $output_method);
 }
 
-// This removes code duplication in other queries - don't call it direct unless you really know what you're up to.
+/**
+ * This removes code duplication in other queries
+ *  - don't call it direct unless you really know what you're up to.
+ *
+ * @param string $query_where
+ * @param array $query_where_params
+ * @param int $query_limit
+ * @param string $query_order
+ * @param string $output_method = 'echo'
+ * @param bool $limit_body
+ * @param bool $override_permissions
+ */
 function ssi_queryPosts($query_where = '', $query_where_params = array(), $query_limit = 10, $query_order = 'm.id_msg DESC', $output_method = 'echo', $limit_body = false, $override_permissions = false)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
@@ -422,7 +478,15 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		</table>';
 }
 
-// Recent topic list:   [board] Subject by Poster	Date
+/**
+ * Recent topic list:
+ *  [board] Subject by Poster	Date
+ *
+ * @param int $num_recent
+ * @param array $exclude_boards
+ * @param bool $include_boards
+ * @param string $output_method = 'echo'
+ */
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
@@ -553,7 +617,12 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		</table>';
 }
 
-// Show the top poster's name and profile link.
+/**
+ * Show the top poster's name and profile link.
+ *
+ * @param int $topNumber
+ * @param string $output_method = 'echo'
+ */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
 	global $db_prefix, $scripturl, $smcFunc;
@@ -590,7 +659,12 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 	echo implode(', ', $temp_array);
 }
 
-// Show boards by activity.
+/**
+ * Show boards by activity.
+ *
+ * @param int $num_top
+ * @param string $output_method = 'echo'
+ */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
 	global $context, $settings, $db_prefix, $txt, $scripturl, $user_info, $modSettings, $smcFunc;
@@ -646,7 +720,13 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 		</table>';
 }
 
-// Shows the top topics.
+/**
+ * Shows the top topics.
+ *
+ * @param string $type
+ * @param 10 $num_topics
+ * @param string $output_method = 'echo'
+ */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
 	global $db_prefix, $txt, $scripturl, $user_info, $modSettings, $smcFunc, $context;
@@ -731,19 +811,34 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		</table>';
 }
 
-// Shows the top topics, by replies.
+/**
+ * Shows the top topics, by replies.
+ *
+ * @param int $num_topics = 10
+ * @param string $output_method = 'echo'
+ */
 function ssi_topTopicsReplies($num_topics = 10, $output_method = 'echo')
 {
 	return ssi_topTopics('replies', $num_topics, $output_method);
 }
 
-// Shows the top topics, by views.
+/**
+ * Shows the top topics, by views.
+ *
+ * @param int $num_topics = 10
+ * @param string $output_method = 'echo'
+ */
 function ssi_topTopicsViews($num_topics = 10, $output_method = 'echo')
 {
 	return ssi_topTopics('views', $num_topics, $output_method);
 }
 
-// Show a link to the latest member:  Please welcome, Someone, out latest member.
+/**
+ * Show a link to the latest member:
+ *  Please welcome, Someone, out latest member.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_latestMember($output_method = 'echo')
 {
 	global $db_prefix, $txt, $scripturl, $context;
@@ -755,7 +850,12 @@ function ssi_latestMember($output_method = 'echo')
 		return $context['common_stats']['latest_member'];
 }
 
-// Fetch a random member - if type set to 'day' will only change once a day!
+/**
+ * Fetch a random member - if type set to 'day' will only change once a day!
+ *
+ * @param string $random_type = ''
+ * @param string $output_method = 'echo'
+ */
 function ssi_randomMember($random_type = '', $output_method = 'echo')
 {
 	global $modSettings;
@@ -803,7 +903,12 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 	return $result;
 }
 
-// Fetch a specific member.
+/**
+ * Fetch a specific member.
+ *
+ * @param array $member_ids = array()
+ * @param string $output_method = 'echo'
+ */
 function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
 {
 	if (empty($member_ids))
@@ -824,7 +929,12 @@ function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
 	return ssi_queryMembers($query_where, $query_where_params, '', 'id_member', $output_method);
 }
 
-// Get all members of a group.
+/**
+ * Fetch a specific member.
+ *
+ * @param null $group_id
+ * @param string $output_method = 'echo'
+ */
 function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 {
 	if ($group_id === null)
@@ -842,7 +952,15 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 	return ssi_queryMembers($query_where, $query_where_params, '', 'real_name', $output_method);
 }
 
-// Fetch some member data!
+/**
+ * Fetch some member data!
+ *
+ * @param string $query_where
+ * @param string $query_where_params
+ * @param string $query_limit
+ * @param string $query_order
+ * @param string $output_method
+ */
 function ssi_queryMembers($query_where = null, $query_where_params = array(), $query_limit = '', $query_order = 'id_member DESC', $output_method = 'echo')
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
@@ -908,7 +1026,11 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	return $query_members;
 }
 
-// Show some basic stats:  Total This: XXXX, etc.
+/**
+ * Show some basic stats:  Total This: XXXX, etc.
+ *
+ * @param string $output_method
+ */
 function ssi_boardStats($output_method = 'echo')
 {
 	global $db_prefix, $txt, $scripturl, $modSettings, $smcFunc;
@@ -951,12 +1073,17 @@ function ssi_boardStats($output_method = 'echo')
 		', $txt['total_boards'], ': ', comma_format($totals['boards']);
 }
 
-// Shows a list of online users:  YY Guests, ZZ Users and then a list...
+/**
+ * Shows a list of online users:
+ *  YY Guests, ZZ Users and then a list...
+ *
+ * @param string $output_method
+ */
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $sourcedir, $settings, $modSettings;
+	global $user_info, $txt, $settings, $modSettings;
 
-	require_once($sourcedir . '/Subs-MembersOnline.php');
+	require_once(SUBSDIR . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 	);
@@ -996,7 +1123,11 @@ function ssi_whosOnline($output_method = 'echo')
 			[' . implode(']&nbsp;&nbsp;[', $return['membergroups']) . ']';
 }
 
-// Just like whosOnline except it also logs the online presence.
+/**
+ * Just like whosOnline except it also logs the online presence.
+ *
+ * @param string $output_method
+ */
 function ssi_logOnline($output_method = 'echo')
 {
 	writeLog();
@@ -1007,7 +1138,12 @@ function ssi_logOnline($output_method = 'echo')
 		ssi_whosOnline($output_method);
 }
 
-// Shows a login box.
+/**
+ * Shows a login box.
+ *
+ * @param string $redirect_to = ''
+ * @param string $output_method = 'echo'
+ */
 function ssi_login($redirect_to = '', $output_method = 'echo')
 {
 	global $scripturl, $txt, $user_info, $context, $modSettings;
@@ -1019,7 +1155,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 		return $user_info['is_guest'];
 
 	echo '
-		<form action="', $scripturl, '?action=login2" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
 			<table border="0" cellspacing="1" cellpadding="0" class="ssi_table">
 				<tr>
 					<td align="right"><label for="user">', $txt['username'], ':</label>&nbsp;</td>
@@ -1047,14 +1183,23 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 
 }
 
-// Show the most-voted-in poll.
+/**
+ * Show the most-voted-in poll.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_topPoll($output_method = 'echo')
 {
 	// Just use recentPoll, no need to duplicate code...
 	return ssi_recentPoll(true, $output_method);
 }
 
-// Show the most recently posted poll.
+/**
+ * Show the most recently posted poll.
+ *
+ * @param bool $topPollInstead = false
+ * @param string $output_method = string
+ */
 function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 {
 	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $smcFunc, $modSettings;
@@ -1169,7 +1314,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	if ($allow_view_results)
 	{
 		echo '
-		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="', $context['character_set'], '">
+		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
 			<strong>', $return['question'], '</strong><br />
 			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
 
@@ -1187,6 +1332,12 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		echo $txt['poll_cannot_see'];
 }
 
+/**
+ * Show a poll.
+ *
+ * @param int $topic = null
+ * @param string $output_method = 'echo'
+ */
 function ssi_showPoll($topic = null, $output_method = 'echo')
 {
 	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $smcFunc, $modSettings;
@@ -1321,7 +1472,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 	if ($return['allow_vote'])
 	{
 		echo '
-			<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="', $context['character_set'], '">
+			<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
 				<strong>', $return['question'], '</strong><br />
 				', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
 
@@ -1362,10 +1513,12 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 		echo $txt['poll_cannot_see'];
 }
 
-// Takes care of voting - don't worry, this is done automatically.
+/**
+ * Takes care of voting - don't worry, this is done automatically.
+ */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $smcFunc, $sourcedir, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $smcFunc, $modSettings;
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{
@@ -1462,15 +1615,19 @@ function ssi_pollVote()
 	{
 		$_COOKIE['guest_poll_vote'] = !empty($_COOKIE['guest_poll_vote']) ? ($_COOKIE['guest_poll_vote'] . ',' . $row['id_poll']) : $row['id_poll'];
 
-		require_once($sourcedir . '/Subs-Auth.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-		smf_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
+		elk_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 	}
 
 	redirectexit('topic=' . $row['id_topic'] . '.0');
 }
 
-// Show a search box.
+/**
+ * Show a search box.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_quickSearch($output_method = 'echo')
 {
 	global $scripturl, $txt, $context;
@@ -1482,12 +1639,16 @@ function ssi_quickSearch($output_method = 'echo')
 		return $scripturl . '?action=search';
 
 	echo '
-		<form action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="advanced" value="0" /><input type="text" name="ssi_search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
 		</form>';
 }
 
-// Show what would be the forum news.
+/**
+ * Show what would be the forum news.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_news($output_method = 'echo')
 {
 	global $context;
@@ -1498,7 +1659,11 @@ function ssi_news($output_method = 'echo')
 	echo $context['random_news_line'];
 }
 
-// Show today's birthdays.
+/**
+ * Show today's birthdays.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysBirthdays($output_method = 'echo')
 {
 	global $scripturl, $modSettings, $user_info;
@@ -1510,7 +1675,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'include_birthdays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method != 'echo')
 		return $return['calendar_birthdays'];
@@ -1520,7 +1685,11 @@ function ssi_todaysBirthdays($output_method = 'echo')
 			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">' . $member['name'] . '</span>' . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
 }
 
-// Show today's holidays.
+/**
+ * Show today's holidays.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysHolidays($output_method = 'echo')
 {
 	global $modSettings, $user_info;
@@ -1532,7 +1701,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'include_holidays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method != 'echo')
 		return $return['calendar_holidays'];
@@ -1541,7 +1710,11 @@ function ssi_todaysHolidays($output_method = 'echo')
 		', implode(', ', $return['calendar_holidays']);
 }
 
-// Show today's events.
+/**
+ * Show today's events.
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysEvents($output_method = 'echo')
 {
 	global $modSettings, $user_info;
@@ -1553,7 +1726,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method != 'echo')
 		return $return['calendar_events'];
@@ -1568,7 +1741,11 @@ function ssi_todaysEvents($output_method = 'echo')
 	}
 }
 
-// Show all calendar entires for today. (birthdays, holodays, and events.)
+/**
+ * Show all calendar entires for today. (birthdays, holidays, and events.)
+ *
+ * @param string $output_method = 'echo'
+ */
 function ssi_todaysCalendar($output_method = 'echo')
 {
 	global $modSettings, $txt, $scripturl, $user_info;
@@ -1582,7 +1759,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method != 'echo')
 		return $return;
@@ -1615,7 +1792,15 @@ function ssi_todaysCalendar($output_method = 'echo')
 	}
 }
 
-// Show the latest news, with a template... by board.
+/**
+ * Show the latest news, with a template... by board.
+ *
+ * @param int $board
+ * @param int $limit
+ * @param int $start
+ * @param int $length
+ * @param string $output_method = 'echo'
+ */
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
 {
 	global $scripturl, $db_prefix, $txt, $settings, $modSettings, $context;
@@ -1796,7 +1981,12 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	}
 }
 
-// Show the most recent events.
+/**
+ * Show the most recent events.
+ *
+ * @param int $max_events
+ * @param string $output_method = 'echo'
+ */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
 	global $db_prefix, $user_info, $scripturl, $modSettings, $txt, $context, $smcFunc;
@@ -1880,10 +2070,17 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 		}
 }
 
-// Check the passed id_member/password.  If $is_username is true, treats $id as a username.
+/**
+ * Check the passed id_member/password.
+ *  If $is_username is true, treats $id as a username.
+ *
+ * @param int $id
+ * @param string $password
+ * @param bool $is_username
+ */
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
 {
-	global $db_prefix, $sourcedir, $smcFunc;
+	global $db_prefix, $smcFunc;
 
 	// If $id is null, this was most likely called from a query string and should do nothing.
 	if ($id === null)
@@ -1904,7 +2101,13 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 	return sha1(strtolower($user) . $password) == $pass && $active == 1;
 }
 
-// We want to show the recent attachments outside of the forum.
+/**
+ * We want to show the recent attachments outside of the forum.
+ *
+ * @param int $num_attachments = 10
+ * @param array $attachment_ext = array()
+ * @param string $output_method = 'echo'
+ */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')
 {
 	global $smcFunc, $context, $modSettings, $scripturl, $txt, $settings;

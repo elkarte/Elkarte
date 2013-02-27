@@ -655,13 +655,13 @@ VALUES ('Independence Day', '0004-07-04'),
 	('Thanksgiving', '2010-11-25'),
 	('Thanksgiving', '2011-11-24'),
 	('Thanksgiving', '2012-11-22'),
-	('Thanksgiving', '2013-11-21'),
-	('Thanksgiving', '2014-11-20'),
+	('Thanksgiving', '2013-11-28'),
+	('Thanksgiving', '2014-11-27'),
 	('Thanksgiving', '2015-11-26'),
 	('Thanksgiving', '2016-11-24'),
 	('Thanksgiving', '2017-11-23'),
 	('Thanksgiving', '2018-11-22'),
-	('Thanksgiving', '2019-11-21'),
+	('Thanksgiving', '2019-11-28'),
 	('Thanksgiving', '2020-11-26'),
 	('Memorial Day', '2010-05-31'),
 	('Memorial Day', '2011-05-30'),
@@ -1386,7 +1386,7 @@ CREATE TABLE {$db_prefix}messages (
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'Elkarte', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -1431,7 +1431,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
 # --------------------------------------------------------
 
 #
@@ -1491,6 +1491,7 @@ VALUES (-1, 'search_posts'),
 	(0, 'profile_server_avatar'),
 	(0, 'profile_upload_avatar'),
 	(0, 'profile_remote_avatar'),
+	(0, 'profile_gravatar'),
 	(0, 'send_email_to_members'),
 	(0, 'karma_edit'),
 	(2, 'view_mlist'),
@@ -1510,6 +1511,7 @@ VALUES (-1, 'search_posts'),
 	(2, 'profile_server_avatar'),
 	(2, 'profile_upload_avatar'),
 	(2, 'profile_remote_avatar'),
+	(2, 'profile_gravatar'),
 	(2, 'send_email_to_members'),
 	(2, 'profile_title_own'),
 	(2, 'calendar_post'),
@@ -1658,7 +1660,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
-VALUES ('ourVersion', '{$current_version}'),
+VALUES ('elkVersion', '{$current_version}'),
 	('news', '{$default_news}'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),
@@ -1680,7 +1682,7 @@ VALUES ('ourVersion', '{$current_version}'),
 	('attachmentNumPerPostLimit', '4'),
 	('attachmentDirSizeLimit', '10240'),
 	('attachmentDirFileLimit', '1000'),
-	('attachmentUploadDir', '{$boarddir}/attachments'),
+	('attachmentUploadDir', '{BOARDDIR}/attachments'),
 	('attachmentExtensions', 'doc,gif,jpg,mpg,pdf,png,txt,zip'),
 	('attachmentCheckExtensions', '0'),
 	('attachmentShowImages', '1'),
@@ -1749,9 +1751,10 @@ VALUES ('ourVersion', '{$current_version}'),
 	('reserveNames', '{$default_reserved_names}'),
 	('autoLinkUrls', '1'),
 	('banLastUpdated', '0'),
-	('smileys_dir', '{$boarddir}/Smileys'),
-	('smileys_url', '{$boardurl}/Smileys'),
-	('avatar_directory', '{$boarddir}/avatars'),
+	('smileys_dir', '{BOARDDIR}/smileys'),
+	('smileys_url', '{$boardurl}/smileys'),
+	('avatar_default', '0'),
+	('avatar_directory', '{BOARDDIR}/avatars'),
 	('avatar_url', '{$boardurl}/avatars'),
 	('avatar_max_height_external', '65'),
 	('avatar_max_width_external', '65'),
@@ -1760,6 +1763,7 @@ VALUES ('ourVersion', '{$current_version}'),
 	('avatar_max_width_upload', '65'),
 	('avatar_resize_upload', '1'),
 	('avatar_download_png', '1'),
+	('gravatar_rating', 'g'),
 	('failed_login_threshold', '3'),
 	('oldTopicDays', '120'),
 	('edit_wait_time', '90'),
@@ -1832,12 +1836,12 @@ VALUES ('ourVersion', '{$current_version}'),
 	('attachment_thumb_png', '1'),
 	('avatar_reencode', '1'),
 	('avatar_paranoid', '0'),
-	('enable_disregard', '0');
-	('badbehavior_enabled', '0');
-	('badbehavior_logging', '0');
-	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
-	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
-	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
+	('enable_disregard', '0'),
+	('badbehavior_enabled', '0'),
+	('badbehavior_logging', '0'),
+	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
+	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
+	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}'),
 	('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
 # --------------------------------------------------------
 
@@ -1984,9 +1988,9 @@ CREATE TABLE {$db_prefix}themes (
 INSERT INTO {$db_prefix}themes
 	(id_theme, variable, value)
 VALUES (1, 'name', '{$default_theme_name}'),
-	(1, 'theme_url', '{$boardurl}/Themes/default'),
-	(1, 'images_url', '{$boardurl}/Themes/default/images'),
-	(1, 'theme_dir', '{$boarddir}/Themes/default'),
+	(1, 'theme_url', '{$boardurl}/themes/default'),
+	(1, 'images_url', '{$boardurl}/themes/default/images'),
+	(1, 'theme_dir', '{BOARDDIR}/themes/default'),
 	(1, 'show_bbc', '1'),
 	(1, 'show_latest_member', '1'),
 	(1, 'show_modify', '1'),

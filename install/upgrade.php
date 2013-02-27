@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
@@ -63,13 +63,13 @@ $upcontext['inactive_timeout'] = 10;
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
 $upcontext['steps'] = array(
-	0 => array(1, 'Login', 'WelcomeLogin', 2),
-	1 => array(2, 'Upgrade Options', 'UpgradeOptions', 2),
-	2 => array(3, 'Backup', 'BackupDatabase', 10),
-	3 => array(4, 'Database Changes', 'DatabaseChanges', 70),
+	0 => array(1, 'Login', 'action_welcomeLogin', 2),
+	1 => array(2, 'Upgrade Options', 'action_upgradeOptions', 2),
+	2 => array(3, 'Backup', 'action_backupDatabase', 10),
+	3 => array(4, 'Database Changes', 'action_databaseChanges', 70),
 	// This is removed as it doesn't really work right at the moment.
-	//4 => array(5, 'Cleanup Mods', 'CleanupMods', 10),
-	4 => array(5, 'Delete Upgrade', 'DeleteUpgrade', 1),
+	//4 => array(5, 'Cleanup Mods', 'action_cleanupMods', 10),
+	4 => array(5, 'Delete Upgrade', 'action_deleteUpgrade', 1),
 );
 // Just to remember which one has files in it.
 $upcontext['database_step'] = 3;
@@ -134,13 +134,13 @@ loadEssentialData();
 // Are we going to be mimic'ing SSI at this point?
 if (isset($_GET['ssi']))
 {
-	require_once($sourcedir . '/Subs.php');
-	require_once($sourcedir . '/Errors.php');
-	require_once($sourcedir . '/Logging.php');
-	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Subs-Cache.php');
-	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once(SOURCEDIR . '/Subs.php');
+	require_once(SOURCEDIR . '/Errors.php');
+	require_once(SOURCEDIR . '/Logging.php');
+	require_once(SOURCEDIR . '/Load.php');
+	require_once(SUBSDIR . '/Cache.subs.php');
+	require_once(SOURCEDIR . '/Security.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	loadUserSettings();
 	loadPermissions();
@@ -148,7 +148,7 @@ if (isset($_GET['ssi']))
 
 // All the non-SSI stuff.
 if (!function_exists('ip2range'))
-	require_once($sourcedir . '/Subs.php');
+	require_once(SOURCEDIR . '/Subs.php');
 
 if (!function_exists('un_htmlspecialchars'))
 {
@@ -190,24 +190,22 @@ if (!function_exists('clean_cache'))
 	// Empty out the cache folder.
 	function clean_cache($type = '')
 	{
-		global $cachedir, $sourcedir;
-
 		// No directory = no game.
-		if (!is_dir($cachedir))
+		if (!is_dir(CACHEDIR))
 			return;
 
 		// Remove the files in our own disk cache, if any
-		$dh = opendir($cachedir);
+		$dh = opendir(CACHEDIR);
 		while ($file = readdir($dh))
 		{
 			if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-				@unlink($cachedir . '/' . $file);
+				@unlink(CACHEDIR . '/' . $file);
 		}
 		closedir($dh);
 
 		// Invalidate cache, to be sure!
 		// ... as long as Load.php can be modified, anyway.
-		@touch($sourcedir . '/' . 'Load.php');
+		@touch(SOURCEDIR . '/' . 'Load.php');
 		clearstatcache();
 	}
 }
@@ -229,20 +227,20 @@ if (!function_exists('md5_hmac'))
 }
 
 // http://www.faqs.org/rfcs/rfc959.html
-if (!class_exists('ftp_connection'))
+if (!class_exists('Ftp_Connection'))
 {
-	class ftp_connection
+	class Ftp_Connection
 	{
 		var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
 		// Create a new FTP connection...
-		function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+		function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
 			if ($ftp_server !== null)
 				$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
 		}
 
-		function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+		function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
 			if (substr($ftp_server, 0, 6) == 'ftp://')
 				$ftp_server = substr($ftp_server, 6);
@@ -571,46 +569,12 @@ if (!class_exists('ftp_connection'))
 	}
 }
 
-// Have we got log data - if so use it (It will be clean!)
-if (isset($_GET['data']))
-{
-	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']));
-	$upcontext['current_step'] = $upcontext['upgrade_status']['curstep'];
-	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
-	$upcontext['rid'] = $upcontext['upgrade_status']['rid'];
-	$is_debug = $upcontext['upgrade_status']['debug'];
-	$support_js = $upcontext['upgrade_status']['js'];
-
-	// Load the language.
-	if (file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
-}
-// Set the defaults.
-else
-{
-	$upcontext['current_step'] = 0;
-	$upcontext['rid'] = mt_rand(0, 5000);
-	$upcontext['upgrade_status'] = array(
-		'curstep' => 0,
-		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
-		'rid' => $upcontext['rid'],
-		'pass' => 0,
-		'debug' => 0,
-		'js' => 0,
-	);
-	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
-}
-
 // Don't do security check if on Yabbse
-if (!isset($modSettings['ourVersion']))
+if (!isset($modSettings['elkVersion']))
 	$disable_security = true;
 
-// If this isn't the first stage see whether they are logging in and resuming.
-if ($upcontext['current_step'] != 0 || !empty($upcontext['user']['step']))
-	checkLogin();
-
 // Does this exist?
-if (isset($modSettings['ourVersion']))
+if (isset($modSettings['elkVersion']))
 {
 	$request = $smcFunc['db_query']('', '
 		SELECT variable, value
@@ -632,9 +596,9 @@ if (isset($modSettings['ourVersion']))
 
 if (!isset($modSettings['theme_url']))
 {
-	$modSettings['theme_dir'] = $boarddir . '/Themes/default';
-	$modSettings['theme_url'] = 'Themes/default';
-	$modSettings['images_url'] = 'Themes/default/images';
+	$modSettings['theme_dir'] = BOARDDIR . '/themes/default';
+	$modSettings['theme_url'] = 'themes/default';
+	$modSettings['images_url'] = 'themes/default/images';
 }
 if (!isset($settings['default_theme_url']))
 	$settings['default_theme_url'] = $modSettings['theme_url'];
@@ -643,9 +607,43 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['ourVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
+
+// Have we got log data - if so use it (It will be clean!)
+if (isset($_GET['data']))
+{
+	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']));
+	$upcontext['current_step'] = $upcontext['upgrade_status']['curstep'];
+	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
+	$upcontext['rid'] = $upcontext['upgrade_status']['rid'];
+	$is_debug = $upcontext['upgrade_status']['debug'];
+	$support_js = $upcontext['upgrade_status']['js'];
+
+	// Load the language.
+	if (file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
+		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
+}
+// Set the defaults.
+else
+{
+	$upcontext['current_step'] = 0;
+	$upcontext['rid'] = mt_rand(0, 5000);
+	$upcontext['upgrade_status'] = array(
+		'curstep' => 0,
+		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
+		'rid' => $upcontext['rid'],
+		'pass' => 0,
+		'debug' => 0,
+		'js' => 0,
+	);
+	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
+}
+
+// If this isn't the first stage see whether they are logging in and resuming.
+if ($upcontext['current_step'] != 0 || !empty($upcontext['user']['step']))
+	checkLogin();
 
 if ($command_line)
 	cmdStep0();
@@ -686,7 +684,7 @@ upgradeExit();
 // Exit the upgrade script.
 function upgradeExit($fallThrough = false)
 {
-	global $upcontext, $upgradeurl, $boarddir, $command_line;
+	global $upcontext, $upgradeurl, $command_line;
 
 	// Save where we are...
 	if (!empty($upcontext['current_step']) && !empty($upcontext['user']['id']))
@@ -695,7 +693,7 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['substep'] = $_GET['substep'];
 		$upcontext['user']['updated'] = time();
 		$upgradeData = base64_encode(serialize($upcontext['user']));
-		copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
+		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 		changeSettings(array('upgradeData' => '"' . $upgradeData . '"'));
 		updateLastError();
 	}
@@ -794,7 +792,7 @@ function redirectLocation($location, $addForm = true)
 function loadEssentialData()
 {
 	global $db_server, $db_user, $db_passwd, $db_name, $db_connection, $db_prefix, $db_character_set, $db_type;
-	global $modSettings, $sourcedir, $smcFunc, $upcontext;
+	global $modSettings, $smcFunc, $upcontext;
 
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
@@ -815,9 +813,9 @@ function loadEssentialData()
 	// Get the database going!
 	if (empty($db_type))
 		$db_type = 'mysql';
-	if (file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php'))
+	if (file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 	{
-		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
 		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
@@ -849,13 +847,13 @@ function loadEssentialData()
 	}
 	else
 	{
-		return throw_error('Cannot find ' . $sourcedir . '/Subs-Db-' . $db_type . '.php' . '. Please check you have uploaded all source files and have the correct paths set.');
+		return throw_error('Cannot find ' . SOURCEDIR . '/database/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
 	}
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
-	if (file_exists($sourcedir . '/QueryString.php'))
+	if (file_exists(SOURCEDIR . '/QueryString.php'))
 	{
-		require_once($sourcedir . '/QueryString.php');
+		require_once(SOURCEDIR . '/QueryString.php');
 		cleanRequest();
 	}
 
@@ -865,7 +863,7 @@ function loadEssentialData()
 
 function initialize_inputs()
 {
-	global $sourcedir, $start_time, $upcontext, $db_type;
+	global $start_time, $upcontext, $db_type;
 
 	$start_time = time();
 
@@ -912,30 +910,30 @@ function initialize_inputs()
 }
 
 // Step 0 - Let's welcome them in and ask them to login!
-function WelcomeLogin()
+function action_welcomeLogin()
 {
-	global $boarddir, $sourcedir, $db_prefix, $language, $modSettings, $cachedir, $upgradeurl, $upcontext, $disable_security;
+	global $db_prefix, $language, $modSettings, $upgradeurl, $upcontext, $disable_security;
 	global $smcFunc, $db_type, $databases, $txt;
 
 	$upcontext['sub_template'] = 'welcome_message';
 
 	// Check for some key files - one template, one language, and a new and an old source file.
-	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
-		&& @file_exists($sourcedir . '/QueryString.php')
-		&& @file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php')
+	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
+		&& @file_exists(SOURCEDIR . '/QueryString.php')
+		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php')
 		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
 
 	// Need legacy scripts?
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.1)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 2.0)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.0)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < 1.1)
+	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	if (!$check)
 		// Don't tell them what files exactly because it's a spot check - just like teachers don't tell which problems they are spot checking, that's dumb.
-		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the Themes, Sources, and other directories.');
+		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
@@ -949,32 +947,32 @@ function WelcomeLogin()
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 		return throw_error('The upgrader found some old or outdated files.<br /><br />Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
 	$writable_files = array(
-		$boarddir . '/Settings.php',
-		$boarddir . '/Settings_bak.php',
+		BOARDDIR . '/Settings.php',
+		BOARDDIR . '/Settings_bak.php',
 	);
 
-	require_once($sourcedir . '/Security.php');
+	require_once(SOURCEDIR . '/Security.php');
 	$upcontext += createToken('login');
 
 	// Check the cache directory.
-	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
-	if (!file_exists($cachedir_temp))
-		@mkdir($cachedir_temp);
-	if (!file_exists($cachedir_temp))
+	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
+	if (!file_exists($CACHEDIR_temp))
+		@mkdir($CACHEDIR_temp);
+	if (!file_exists($CACHEDIR_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ELKARTE will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -982,34 +980,34 @@ function WelcomeLogin()
 	}
 
 	// This needs to exist!
-	if (!file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
 		return throw_error('The upgrader could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	else
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
 
 	if (!makeFilesWritable($writable_files))
 		return false;
 
-	// Check agreement.txt. (it may not exist, in which case $boarddir must be writable.)
-	if (isset($modSettings['agreement']) && (!is_writable($boarddir) || file_exists($boarddir . '/agreement.txt')) && !is_writable($boarddir . '/agreement.txt'))
+	// Check agreement.txt. (it may not exist, in which case BOARDDIR must be writable.)
+	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
 		return throw_error('The upgrader was unable to obtain write access to agreement.txt.<br /><br />If you are using a linux or unix based server, please ensure that the file is chmod\'d to 777, or if it does not exist that the directory this upgrader is in is 777.<br />If your server is running Windows, please ensure that the internet guest account has the proper permissions on it or its folder.');
 
 	// Upgrade the agreement.
 	elseif (isset($modSettings['agreement']))
 	{
-		$fp = fopen($boarddir . '/agreement.txt', 'w');
+		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
 		fwrite($fp, $modSettings['agreement']);
 		fclose($fp);
 	}
 
 	// We're going to check that their board dir setting is right incase they've been moving stuff around.
-	if (strtr($boarddir, array('/' => '', '\\' => '')) != strtr(dirname(__FILE__), array('/' => '', '\\' => '')))
+	if (strtr(BOARDDIR, array('/' => '', '\\' => '')) != strtr(dirname(__FILE__), array('/' => '', '\\' => '')))
 		$upcontext['warning'] = '
-			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . $boarddir . '&quot; but should probably be &quot;' . dirname(__FILE__) . '&quot;. Settings.php currently lists your paths as:<br />
+			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . dirname(__FILE__) . '&quot;. Settings.php currently lists your paths as:<br />
 			<ul>
-				<li>Board Directory: ' . $boarddir . '</li>
-				<li>Source Directory: ' . $boarddir . '</li>
-				<li>Cache Directory: ' . $cachedir_temp . '</li>
+				<li>Board Directory: ' . BOARDDIR . '</li>
+				<li>Source Directory: ' . BOARDDIR . '</li>
+				<li>Cache Directory: ' . $CACHEDIR_temp . '</li>
 			</ul>
 			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the Elkarte website before continuing.';
 
@@ -1023,7 +1021,7 @@ function WelcomeLogin()
 // Step 0.5: Does the login work?
 function checkLogin()
 {
-	global $boarddir, $sourcedir, $db_prefix, $language, $modSettings, $cachedir, $upgradeurl, $upcontext, $disable_security;
+	global $db_prefix, $language, $modSettings, $upgradeurl, $upcontext, $disable_security;
 	global $smcFunc, $db_type, $databases, $support_js, $txt;
 
 	// Are we trying to login?
@@ -1111,8 +1109,8 @@ function checkLogin()
 			$support_js = 0;
 
 		// Note down the version we are coming from.
-		if (!empty($modSettings['ourVersion']) && empty($upcontext['user']['version']))
-			$upcontext['user']['version'] = $modSettings['ourVersion'];
+		if (!empty($modSettings['elkVersion']) && empty($upcontext['user']['version']))
+			$upcontext['user']['version'] = $modSettings['elkVersion'];
 
 		// Didn't get anywhere?
 		if ((empty($sha_passwd) || $password != $sha_passwd) && empty($upcontext['username_incorrect']) && !$disable_security)
@@ -1164,15 +1162,15 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($boarddir . '/Themes/default/languages/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/index.' . basename($user_language, '.lng') . '.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
-				elseif (!file_exists($boarddir . '/Themes/default/languages/Install.' . basename($user_language, '.lng') . '.php'))
+				elseif (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . basename($user_language, '.lng') . '.php'))
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				else
 				{
@@ -1181,7 +1179,7 @@ function checkLogin()
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($boarddir . '/Themes/default/languages/Install.' . $user_language . '.php');
+					require_once($modSettings['theme_dir'] . '/languages/Install.' . $user_language . '.php');
 				}
 			}
 
@@ -1200,10 +1198,10 @@ function checkLogin()
 }
 
 // Step 1: Do the maintenance and backup.
-function UpgradeOptions()
+function action_upgradeOptions()
 {
 	global $db_prefix, $command_line, $modSettings, $is_debug, $smcFunc;
-	global $boarddir, $boardurl, $sourcedir, $maintenance, $mmessage, $cachedir, $upcontext, $db_type;
+	global $boardurl, $maintenance, $mmessage, $upcontext, $db_type;
 
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
@@ -1233,7 +1231,7 @@ function UpgradeOptions()
 	$changes = array();
 
 	// If we're overriding the language follow it through.
-	if (isset($_GET['lang']) && file_exists($boarddir . '/Themes/default/languages/index.' . $_GET['lang'] . '.php'))
+	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/index.' . $_GET['lang'] . '.php'))
 		$changes['language'] = '\'' . $_GET['lang'] . '\'';
 
 	if (!empty($_POST['maint']))
@@ -1258,17 +1256,17 @@ function UpgradeOptions()
 		echo ' * Updating Settings.php...';
 
 	// Backup the current one first.
-	copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
+	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 	// Fix some old paths.
-	if (substr($boarddir, 0, 1) == '.')
-		$changes['boarddir'] = '\'' . fixRelativePath($boarddir) . '\'';
+	if (substr(BOARDDIR, 0, 1) == '.')
+		$changes['boarddir'] = '\'' . fixRelativePath(BOARDDIR) . '\'';
 
-	if (substr($sourcedir, 0, 1) == '.')
-		$changes['sourcedir'] = '\'' . fixRelativePath($sourcedir) . '\'';
+	if (substr(SOURCEDIR, 0, 1) == '.')
+		$changes['sourcedir'] = '\'' . fixRelativePath(SOURCEDIR) . '\'';
 
-	if (empty($cachedir) || substr($cachedir, 0, 1) == '.')
-		$changes['cachedir'] = '\'' . fixRelativePath($boarddir) . '/cache\'';
+	if (!defined('CACHEDIR') || substr(CACHEDIR, 0, 1) == '.')
+		$changes['cachedir'] = '\'' . fixRelativePath(BOARDDIR) . '/cache\'';
 
 	// Not had the database type added before?
 	if (empty($db_type))
@@ -1298,7 +1296,7 @@ function UpgradeOptions()
 }
 
 // Backup the database - why not...
-function BackupDatabase()
+function action_backupDatabase()
 {
 	global $upcontext, $db_prefix, $command_line, $is_debug, $support_js, $file_steps, $smcFunc;
 
@@ -1393,10 +1391,10 @@ function backupTable($table)
 }
 
 // Step 2: Everything.
-function DatabaseChanges()
+function action_databaseChanges()
 {
 	global $db_prefix, $modSettings, $command_line, $smcFunc;
-	global $language, $boardurl, $sourcedir, $boarddir, $upcontext, $support_js, $db_type;
+	global $language, $boardurl, $upcontext, $support_js, $db_type;
 
 	// Have we just completed this?
 	if (!empty($_POST['database_done']))
@@ -1423,9 +1421,9 @@ function DatabaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['ourVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
 				$upcontext['file_count']++;
-			elseif (!isset($modSettings['ourVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['ourVersion'] < $file[1]))
+			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['elkVersion'] < $file[1]))
 				$upcontext['file_count']++;
 		}
 	}
@@ -1443,7 +1441,7 @@ function DatabaseChanges()
 			$upcontext['cur_file_num']++;
 			$upcontext['cur_file_name'] = $file[0];
 			// Do we actually need to do this still?
-			if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1])
 			{
 				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
 				if ($nextFile)
@@ -1452,11 +1450,11 @@ function DatabaseChanges()
 					$smcFunc['db_insert']('replace',
 						$db_prefix . 'settings',
 						array('variable' => 'string', 'value' => 'string'),
-						array('ourVersion', $file[2]),
+						array('elkVersion', $file[2]),
 						array('variable')
 					);
 
-					$modSettings['ourVersion'] = $file[2];
+					$modSettings['elkVersion'] = $file[2];
 				}
 
 				// If this is XML we only do this stuff once.
@@ -1485,7 +1483,7 @@ function DatabaseChanges()
 
 		// If this is the command line we can't do any more.
 		if ($command_line)
-			return DeleteUpgrade();
+			return action_deleteUpgrade();
 
 		return true;
 	}
@@ -1493,9 +1491,9 @@ function DatabaseChanges()
 }
 
 // Clean up any mods installed...
-function CleanupMods()
+function action_cleanupMods()
 {
-	global $db_prefix, $modSettings, $upcontext, $boarddir, $sourcedir, $settings, $smcFunc, $command_line;
+	global $db_prefix, $modSettings, $upcontext, $settings, $smcFunc, $command_line;
 
 	// Sorry. Not supported for command line users.
 	if ($command_line)
@@ -1572,7 +1570,7 @@ function CleanupMods()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// Work out the status.
-		if (!file_exists($boarddir . '/Packages/' . $row['filename']))
+		if (!file_exists(BOARDDIR . '/packages/' . $row['filename']))
 		{
 			$status = 'Missing';
 			$status_color = 'red';
@@ -1590,7 +1588,7 @@ function CleanupMods()
 			'themes' => explode(',', $row['themes_installed']),
 			'name' => $row['name'],
 			'filename' => $row['filename'],
-			'missing_file' => file_exists($boarddir . '/Packages/' . $row['filename']) ? 0 : 1,
+			'missing_file' => file_exists(BOARDDIR . '/packages/' . $row['filename']) ? 0 : 1,
 			'files' => array(),
 			'file_count' => 0,
 			'status' => $status,
@@ -1613,12 +1611,12 @@ function CleanupMods()
 	// Before we get started, don't report notice errors.
 	$oldErrorReporting = error_reporting(E_ALL ^ E_NOTICE);
 
-	if (!mktree($boarddir . '/Packages/temp', 0755))
+	if (!mktree(BOARDDIR . '/packages/temp', 0755))
 	{
-		deltree($boarddir . '/Packages/temp', false);
-		if (!mktree($boarddir . '/Packages/temp', 0777))
+		deltree(BOARDDIR . '/packages/temp', false);
+		if (!mktree(BOARDDIR . '/packages/temp', 0777))
 		{
-			deltree($boarddir . '/Packages/temp', false);
+			deltree(BOARDDIR . '/packages/temp', false);
 			// @todo Error here - plus chmod!
 		}
 	}
@@ -1655,10 +1653,10 @@ function CleanupMods()
 		if (isset($_POST['remove']))
 			$infoInstall = parsePackageInfo($packageInfo['xml'], true);
 
-		if (is_file($boarddir . '/Packages/' . $filename))
-			read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+		if (is_file(BOARDDIR . '/packages/' . $filename))
+			read_tgz_file(BOARDDIR . '/packages/' . $filename, BOARDDIR . '/packages/temp');
 		else
-			copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			copytree(BOARDDIR . '/packages/' . $filename, BOARDDIR . '/packages/temp');
 
 		// Work out how we uninstall...
 		$files = array();
@@ -1669,7 +1667,7 @@ function CleanupMods()
 			// 2) Whether it could be installed on the new version.
 			if ($change['type'] == 'modification')
 			{
-				$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+				$contents = @file_get_contents(BOARDDIR . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 				if ($change['boardmod'])
 					$results = parseBoardMod($contents, $test, $change['reverse'], $cur_theme_paths);
 				else
@@ -1702,10 +1700,10 @@ function CleanupMods()
 		if (isset($_POST['remove']) && !$test && isset($infoInstall))
 		{
 			// Need to extract again I'm afraid.
-			if (is_file($boarddir . '/Packages/' . $filename))
-				read_tgz_file($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+			if (is_file(BOARDDIR . '/packages/' . $filename))
+				read_tgz_file(BOARDDIR . '/packages/' . $filename, BOARDDIR . '/packages/temp');
 			else
-				copytree($boarddir . '/Packages/' . $filename, $boarddir . '/Packages/temp');
+				copytree(BOARDDIR . '/packages/' . $filename, BOARDDIR . '/packages/temp');
 
 			$errors = false;
 			$upcontext['packages'][$id]['result'] = 'Removed';
@@ -1713,7 +1711,7 @@ function CleanupMods()
 			{
 				if ($change['type'] == 'modification')
 				{
-					$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+					$contents = @file_get_contents(BOARDDIR . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 					if ($change['boardmod'])
 						$results = parseBoardMod($contents, true, $change['reverse'], $cur_theme_paths);
 					else
@@ -1734,7 +1732,7 @@ function CleanupMods()
 				{
 					if ($change['type'] == 'modification')
 					{
-						$contents = @file_get_contents($boarddir . '/Packages/temp/' . $upcontext['base_path'] . $change['filename']);
+						$contents = @file_get_contents(BOARDDIR . '/packages/temp/' . $upcontext['base_path'] . $change['filename']);
 						if ($change['boardmod'])
 							$results = parseBoardMod($contents, false, $change['reverse'], $cur_theme_paths);
 						else
@@ -1772,8 +1770,8 @@ function CleanupMods()
 		}
 	}
 
-	if (file_exists($boarddir . '/Packages/temp'))
-		deltree($boarddir . '/Packages/temp');
+	if (file_exists(BOARDDIR . '/packages/temp'))
+		deltree(BOARDDIR . '/packages/temp');
 
 	// Removing/Reinstalling any packages?
 	if (isset($_POST['remove']))
@@ -1792,7 +1790,7 @@ function CleanupMods()
 				WHERE id_install IN (' . implode(',', $deletes) . ')');
 
 		// Ensure we don't lose our changes!
-		package_put_contents($boarddir . '/Packages/installed.list', time());
+		package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 		$upcontext['sub_template'] = 'cleanup_done';
 		return false;
@@ -1815,9 +1813,9 @@ function CleanupMods()
 
 
 // Delete the damn thing!
-function DeleteUpgrade()
+function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $smcFunc, $db_type;
+	global $command_line, $language, $upcontext, $forum_version, $user_info, $maintenance, $smcFunc, $db_type;
 
 	// Now it's nice to have some of the basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1850,7 +1848,7 @@ function DeleteUpgrade()
 	$upcontext['user'] = array();
 
 	// Make a backup of Settings.php first as otherwise earlier changes are lost.
-	copy($boarddir . '/Settings.php', $boarddir . '/Settings_bak.php');
+	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 	changeSettings($changes);
 
 	// Clean any old cache files away.
@@ -1864,7 +1862,7 @@ function DeleteUpgrade()
 		cli_scheduled_fetchFiles();
 	else
 	{
-		require_once($sourcedir . '/ScheduledTasks.php');
+		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		$forum_version = CURRENT_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
 		scheduled_fetchFiles(); // Now go get those files!
 	}
@@ -1913,7 +1911,7 @@ function DeleteUpgrade()
 // Just like the built in one, but setup for CLI to not use themes.
 function cli_scheduled_fetchFiles()
 {
-	global $sourcedir, $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
+	global $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
 
 	if (empty($modSettings['time_format']))
 		$modSettings['time_format'] = '%B %d, %Y, %I:%M:%S %p';
@@ -1938,12 +1936,12 @@ function cli_scheduled_fetchFiles()
 	$smcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	foreach ($js_files as $ID_FILE => $file)
 	{
 		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.simplemachines.org' : '';
+		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.elkarte.net' : '';
 		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
 
 		// Get the file
@@ -2054,9 +2052,7 @@ function convertSettingstoOptions()
 
 function changeSettings($config_vars)
 {
-	global $boarddir;
-
-	$settingsArray = file($boarddir . '/Settings_bak.php');
+	$settingsArray = file(BOARDDIR . '/Settings_bak.php');
 
 	if (count($settingsArray) == 1)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
@@ -2097,10 +2093,10 @@ function changeSettings($config_vars)
 	}
 
 	// Blank out the file - done to fix a oddity with some servers.
-	$fp = fopen($boarddir . '/Settings.php', 'w');
+	$fp = fopen(BOARDDIR . '/Settings.php', 'w');
 	fclose($fp);
 
-	$fp = fopen($boarddir . '/Settings.php', 'r+');
+	$fp = fopen(BOARDDIR . '/Settings.php', 'r+');
 	$lines = count($settingsArray);
 	for ($i = 0; $i < $lines; $i++)
 	{
@@ -2181,7 +2177,7 @@ function fixRelativePath($path)
 
 function parse_sql($filename)
 {
-	global $db_prefix, $db_collation, $boarddir, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
+	global $db_prefix, $db_collation, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
 	global $upcontext, $support_js, $is_debug, $smcFunc, $db_connection, $databases, $db_type, $db_character_set;
 
 /*
@@ -2201,7 +2197,7 @@ function parse_sql($filename)
 	Every block of between "--- ..."s is a step.  Every "---#" section represents a substep.
 
 	Replaces the following variables:
-		- {$boarddir}
+		- {BOARDDIR}
 		- {$boardurl}
 		- {$db_prefix}
 		- {$db_collation}
@@ -2419,7 +2415,7 @@ function parse_sql($filename)
 					continue;
 				}
 
-				$current_data = strtr(substr(rtrim($current_data), 0, -1), array('{$db_prefix}' => $db_prefix, '{$boarddir}' => $boarddir, '{$sboarddir}' => addslashes($boarddir), '{$boardurl}' => $boardurl, '{$db_collation}' => $db_collation));
+				$current_data = strtr(substr(rtrim($current_data), 0, -1), array('{$db_prefix}' => $db_prefix, '{BOARDDIR}' => BOARDDIR, '{$sboarddir}' => addslashes(BOARDDIR), '{$boardurl}' => $boardurl, '{$db_collation}' => $db_collation));
 
 				upgrade_query($current_data);
 
@@ -2909,7 +2905,7 @@ function nextSubstep($substep)
 
 function cmdStep0()
 {
-	global $boarddir, $sourcedir, $db_prefix, $language, $modSettings, $start_time, $cachedir, $databases, $db_type, $smcFunc, $upcontext;
+	global $db_prefix, $language, $modSettings, $start_time, $databases, $db_type, $smcFunc, $upcontext;
 	global $language, $is_debug, $txt;
 	$start_time = time();
 
@@ -2933,7 +2929,7 @@ function cmdStep0()
 			$is_debug = true;
 		elseif ($arg == '--backup')
 			$_POST['backup'] = 1;
-		elseif ($arg == '--template' && (file_exists($boarddir . '/template.php') || file_exists($boarddir . '/template.html') && !file_exists($boarddir . '/Themes/converted')))
+		elseif ($arg == '--template' && (file_exists(BOARDDIR . '/template.php') || file_exists(BOARDDIR . '/template.html') && !file_exists($modSettings['theme_dir'] . '/converted')))
 			$_GET['conv'] = 1;
 		elseif ($i != 0)
 		{
@@ -2957,71 +2953,71 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!empty($databases[$db_type]['alter_support']) && $smcFunc['db_query']('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 
-	$check = @file_exists($boarddir . '/Themes/default/index.template.php')
-		&& @file_exists($sourcedir . '/QueryString.php')
-		&& @file_exists($sourcedir . '/ManageBoards.php');
-	if (!$check && !isset($modSettings['ourVersion']))
+	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
+		&& @file_exists(SOURCEDIR . '/QueryString.php')
+		&& @file_exists(SOURCEDIR . '/ManageBoards.php');
+	if (!$check && !isset($modSettings['elkVersion']))
 		print_error('Error: Some files are missing or out-of-date.', true);
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 		print_error('Error: Some files have not yet been updated properly.');
 
 	// Make sure Settings.php is writable.
-	if (!is_writable($boarddir . '/Settings.php'))
-		@chmod($boarddir . '/Settings.php', 0777);
-	if (!is_writable($boarddir . '/Settings.php'))
+	if (!is_writable(BOARDDIR . '/Settings.php'))
+		@chmod(BOARDDIR . '/Settings.php', 0777);
+	if (!is_writable(BOARDDIR . '/Settings.php'))
 		print_error('Error: Unable to obtain write access to "Settings.php".', true);
 
 	// Make sure Settings.php is writable.
-	if (!is_writable($boarddir . '/Settings_bak.php'))
-		@chmod($boarddir . '/Settings_bak.php', 0777);
-	if (!is_writable($boarddir . '/Settings_bak.php'))
+	if (!is_writable(BOARDDIR . '/Settings_bak.php'))
+		@chmod(BOARDDIR . '/Settings_bak.php', 0777);
+	if (!is_writable(BOARDDIR . '/Settings_bak.php'))
 		print_error('Error: Unable to obtain write access to "Settings_bak.php".');
 
-	if (isset($modSettings['agreement']) && (!is_writable($boarddir) || file_exists($boarddir . '/agreement.txt')) && !is_writable($boarddir . '/agreement.txt'))
+	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
 		print_error('Error: Unable to obtain write access to "agreement.txt".');
 	elseif (isset($modSettings['agreement']))
 	{
-		$fp = fopen($boarddir . '/agreement.txt', 'w');
+		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
 		fwrite($fp, $modSettings['agreement']);
 		fclose($fp);
 	}
 
-	// Make sure Themes is writable.
-	if (!is_writable($boarddir . '/Themes'))
-		@chmod($boarddir . '/Themes', 0777);
+	// Make sure themes is writable.
+	if (!is_writable($modSettings['theme_dir']))
+		@chmod($modSettings['theme_dir'], 0777);
 
-	if (!is_writable($boarddir . '/Themes') && !isset($modSettings['ourVersion']))
-		print_error('Error: Unable to obtain write access to "Themes".');
+	if (!is_writable($modSettings['theme_dir']) && !isset($modSettings['elkVersion']))
+		print_error('Error: Unable to obtain write access to "themes".');
 
 	// Make sure cache directory exists and is writable!
-	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
-	if (!file_exists($cachedir_temp))
-		@mkdir($cachedir_temp);
+	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
+	if (!file_exists($CACHEDIR_temp))
+		@mkdir($CACHEDIR_temp);
 
-	if (!is_writable($cachedir_temp))
-		@chmod($cachedir_temp, 0777);
+	if (!is_writable($CACHEDIR_temp))
+		@chmod($CACHEDIR_temp, 0777);
 
-	if (!is_writable($cachedir_temp))
+	if (!is_writable($CACHEDIR_temp))
 		print_error('Error: Unable to obtain write access to "cache".', true);
 
-	if (!file_exists($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['ourVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		print_error('Error: Unable to find language files!', true);
 	else
 	{
-		$temp = substr(@implode('', @file($boarddir . '/Themes/default/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			print_error('Error: Language files out of date.', true);
-		if (!file_exists($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists($modSettings['theme_dir'] . 'languages/Install.' . $upcontext['language'] . '.php'))
 			print_error('Error: Install language is missing for selected language.', true);
 
 		// Otherwise include it!
-		require_once($boarddir . '/Themes/default/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($modSettings['theme_dir'] . 'languages/Install.' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.
@@ -3055,7 +3051,7 @@ function throw_error($message)
 // Check files are writable - make them writable if necessary...
 function makeFilesWritable(&$files)
 {
-	global $upcontext, $boarddir;
+	global $upcontext;
 
 	if (empty($files))
 		return true;
@@ -3146,7 +3142,7 @@ function makeFilesWritable(&$files)
 
 		if (isset($upcontext['chmod']['username']))
 		{
-			$ftp = new ftp_connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
+			$ftp = new Ftp_Connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
 
 			if ($ftp->error === false)
 			{
@@ -3162,7 +3158,7 @@ function makeFilesWritable(&$files)
 		if (!isset($ftp) || $ftp->error !== false)
 		{
 			if (!isset($ftp))
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			// Save the error so we can mess with listing...
 			elseif ($ftp->error !== false && !isset($upcontext['chmod']['ftp_error']))
 				$upcontext['chmod']['ftp_error'] = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -3182,12 +3178,12 @@ function makeFilesWritable(&$files)
 			// We want to do a relative path for FTP.
 			if (!in_array($upcontext['chmod']['path'], array('', '/')))
 			{
-				$ftp_root = strtr($boarddir, array($upcontext['chmod']['path'] => ''));
+				$ftp_root = strtr(BOARDDIR, array($upcontext['chmod']['path'] => ''));
 				if (substr($ftp_root, -1) == '/' && ($upcontext['chmod']['path'] == '' || $upcontext['chmod']['path'][0] === '/'))
 				$ftp_root = substr($ftp_root, 0, -1);
 			}
 			else
-				$ftp_root = $boarddir;
+				$ftp_root = BOARDDIR;
 
 			// Save the info for next time!
 			$_SESSION['installer_temp_ftp'] = array(
@@ -3209,7 +3205,7 @@ function makeFilesWritable(&$files)
 				// Assuming that didn't work calculate the path without the boarddir.
 				if (!is_writable($file))
 				{
-					if (strpos($file, $boarddir) === 0)
+					if (strpos($file, BOARDDIR) === 0)
 					{
 						$ftp_file = strtr($file, array($_SESSION['installer_temp_ftp']['root'] => ''));
 						$ftp->chmod($ftp_file, 0755);
@@ -3260,7 +3256,7 @@ function deleteUpgrader()
 	}
 	closedir($dh);
 
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
 	exit;
 }
 
@@ -3395,7 +3391,7 @@ function template_upgrade_above()
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', $upcontext['right_to_left'] ? ' dir="rtl"' : '', '>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=', isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'ISO-8859-1', '" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
@@ -3403,7 +3399,7 @@ function template_upgrade_above()
 				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var smf_scripturl = \'', $upgradeurl, '\';
-			var smf_charset = \'', (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set']), '\';
+			var smf_charset = \'UTF-8\';
 			var startPercent = ', $upcontext['overall_percent'], ';
 
 			// This function dynamically updates the step progress bar - and overall one as required.
@@ -3429,7 +3425,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
@@ -3778,7 +3774,7 @@ function template_welcome_message()
 
 function template_upgrade_options()
 {
-	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $mmessage, $mtitle, $db_type;
+	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $mmessage, $mtitle, $db_type;
 
 	echo '
 			<h3>Before the upgrade gets underway please review the options below - and hit continue when you\'re ready to begin.</h3>
@@ -3802,7 +3798,7 @@ function template_upgrade_options()
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
 						<td width="100%">
-							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['ourVersion']) ? '' : ' (recommended!)', '
+							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
 					<tr valign="top">
@@ -4260,7 +4256,7 @@ function template_database_xml()
 
 function template_clean_mods()
 {
-	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
+	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	$upcontext['chmod_in_form'] = true;
 
@@ -4312,7 +4308,7 @@ function template_clean_mods()
 // Finished with the mods - let them know what we've done.
 function template_cleanup_done()
 {
-	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
+	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
 	<h3>ELKARTE has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
@@ -4340,7 +4336,7 @@ function template_cleanup_done()
 // Do they want to upgrade their templates?
 function template_upgrade_templates()
 {
-	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
+	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
 	<h3>There have been numerous language and template changes since the previous version of ELKARTE. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
@@ -4443,7 +4439,7 @@ function template_upgrade_templates()
 
 function template_upgrade_complete()
 {
-	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $boarddir, $db_prefix, $boardurl;
+	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
 	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of ELKARTE</a>.  Hope you like it!</h3>
@@ -4461,7 +4457,7 @@ function template_upgrade_complete()
 					theCheck.disabled = true;
 				}
 			// ]]></script>
-			<img src="', $boardurl, '/Themes/default/images/blank.png" alt="" id="delete_upgrader" /><br />';
+			<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
 			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />

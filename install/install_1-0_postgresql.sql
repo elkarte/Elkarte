@@ -853,13 +853,13 @@ INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Groundhog
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2010-11-25');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2011-11-24');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2012-11-22');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2013-11-21');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2014-11-20');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2013-11-28');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2014-11-27');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2015-11-26');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2016-11-24');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2017-11-23');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2018-11-22');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2019-11-21');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2019-11-28');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Thanksgiving', '2020-11-26');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Memorial Day', '2010-05-31');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Memorial Day', '2011-05-30');
@@ -1820,7 +1820,7 @@ CREATE INDEX {$db_prefix}messages_related_ip ON {$db_prefix}messages (id_member,
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Elkarte', 'info@spudsdesign.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -1876,7 +1876,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
 # --------------------------------------------------------
 
 #
@@ -1941,6 +1941,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'karma_edit');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'view_mlist');
@@ -1960,6 +1961,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_title_own');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'calendar_post');
@@ -2147,7 +2149,7 @@ CREATE TABLE {$db_prefix}settings (
 # Dumping data for table `settings`
 #
 
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ourVersion', '{$current_version}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
@@ -2169,7 +2171,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentPostLimit'
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentNumPerPostLimit', '4');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentDirSizeLimit', '10240');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentDirFileLimit', '1000');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentUploadDir', '{$boarddir}/attachments');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentUploadDir', '{BOARDDIR}/attachments');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentExtensions', 'doc,gif,jpg,mpg,pdf,png,txt,zip');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentCheckExtensions', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachmentShowImages', '1');
@@ -2238,9 +2240,10 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reserveName', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reserveNames', '{$default_reserved_names}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('autoLinkUrls', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('banLastUpdated', '0');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_dir', '{$boarddir}/Smileys');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_url', '{$boardurl}/Smileys');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_directory', '{$boarddir}/avatars');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_dir', '{BOARDDIR}/smileys');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smileys_url', '{$boardurl}/smileys');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_default', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_directory', '{BOARDDIR}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_url', '{$boardurl}/avatars');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_external', '65');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_width_external', '65');
@@ -2249,6 +2252,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_up
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_width_upload', '65');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_resize_upload', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_download_png', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('gravatar_rating', 'g');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('failed_login_threshold', '3');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('oldTopicDays', '120');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('edit_wait_time', '90');
@@ -2495,9 +2499,9 @@ CREATE INDEX {$db_prefix}themes_id_member ON {$db_prefix}themes (id_member);
 #
 
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'name', '{$default_theme_name}');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_url', '{$boardurl}/Themes/default');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'images_url', '{$boardurl}/Themes/default/images');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_dir', '{$boarddir}/Themes/default');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_url', '{$boardurl}/themes/default');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'images_url', '{$boardurl}/themes/default/images');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'theme_dir', '{BOARDDIR}/themes/default');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_bbc', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_latest_member', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_modify', '1');

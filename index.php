@@ -1,26 +1,21 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
  * This, as you have probably guessed, is the crux for all functions.
  * Everything should start here, so all the setup and security is done
- * properly.  The most interesting part of this file is the action array in
- * the smf_main() function.  It is formatted as so:
- * 	'action-in-url' => array('Source-File.php', 'FunctionToCall'),
- *
- * Then, you can access the FunctionToCall() function from Source-File.php
- * with the URL index.php?action=action-in-url.  Relatively simple, no?
+ * properly.
  *
  */
 
@@ -44,20 +39,33 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Load the settings...
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Make absolutely sure the cache directory is defined.
+// Make absolutely sure the new directories are defined.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
 
+// Time to forget about variables and go with constants!
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('SOURCEDIR', $sourcedir);
+
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
+unset($boarddir, $cachedir, $sourcedir);
+
 // And important includes.
-require_once($sourcedir . '/QueryString.php');
-require_once($sourcedir . '/Session.php');
-require_once($sourcedir . '/Subs.php');
-require_once($sourcedir . '/Errors.php');
-require_once($sourcedir . '/Logging.php');
-require_once($sourcedir . '/Load.php');
-require_once($sourcedir . '/Subs-Cache.php');
-require_once($sourcedir . '/Security.php');
-require_once($sourcedir . '/Class-BrowserDetect.php');
+require_once(SOURCEDIR . '/QueryString.php');
+require_once(SOURCEDIR . '/Session.php');
+require_once(SOURCEDIR . '/Subs.php');
+require_once(SOURCEDIR . '/Errors.php');
+require_once(SOURCEDIR . '/Logging.php');
+require_once(SOURCEDIR . '/Load.php');
+require_once(SUBSDIR . '/Cache.subs.php');
+require_once(SOURCEDIR . '/Security.php');
+require_once(SOURCEDIR . '/BrowserDetect.class.php');
+require_once(SOURCEDIR . '/Errors.class.php');
 
 // If $maintenance is set specifically to 2, then we're upgrading or something.
 if (!empty($maintenance) && $maintenance == 2)
@@ -78,12 +86,12 @@ $context = array();
 
 // Seed the random generator.
 if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	smf_seed_generator();
+	elk_seed_generator();
 
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
 {
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 	AutoTask();
 }
 
@@ -114,7 +122,7 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 }
 
 // Pre-dispatch
-smf_main();
+elk_main();
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -123,9 +131,9 @@ obExit(null, null, true);
  * The main dispatcher.
  * This delegates to each area.
  */
-function smf_main()
+function elk_main()
 {
-	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;
+	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -176,7 +184,7 @@ function smf_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once $sourcedir . '/Class-Dispatcher.php';
-	$dispatcher = new site_Dispatcher();
+	require_once(SOURCEDIR . '/Dispatcher.class.php');
+	$dispatcher = new Site_Dispatcher();
 	$dispatcher->dispatch();
 }

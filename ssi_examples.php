@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  */
@@ -42,7 +42,7 @@ template_ssi_above();
 
 			<h2>Include Code</h2>
 			<p>To use SSI.php in your page add at the very top of your page before the &lt;html&gt; tag on line 1 of your php file:</p>
-			<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code">&lt;?php require(&quot;<?php echo addslashes($user_info['is_admin'] ? realpath($boarddir . '/SSI.php') : 'SSI.php'); ?>&quot;); ?&gt;</code>
+			<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code">&lt;?php require(&quot;<?php echo addslashes($user_info['is_admin'] ? realpath(BOARDDIR . '/SSI.php') : 'SSI.php'); ?>&quot;); ?&gt;</code>
 
 			<h2>Some notes on usage</h2>
 			<p>All the functions have an output method parameter.  This can either be &quot;echo&quot; (the default) or &quot;array&quot;</p>
@@ -50,7 +50,7 @@ template_ssi_above();
 			<p>This functionality can be used to allow you to present the information in any way you wish.</p>
 
 			<h2>Additional Guides &amp; FAQ</h2>
-			<p>Need more information on using SSI.php? Check out <a href="http://docs.simplemachines.org/index.php?topic=400.0">Using SSI.php article</a> or <a href="http://www.simplemachines.org/community/index.php?topic=14906.0">the SSI FAQ</a>.</p>
+			<p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="http://www.elkarte.net/index.php">ask on the forum</a>.</p>
 
 			<div id="sidenav" class="windowbg">
 				<span class="topslice"><span></span></span>
@@ -497,7 +497,7 @@ function template_ssi_above()
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var smf_scripturl = "', $scripturl, '";
 			var smf_iso_case_folding = ', $context['server']['iso_case_folding'] ? 'true' : 'false', ';
-			var smf_charset = "', $context['character_set'], '";
+			var smf_charset = "UTF-8";
 
 			// Sets all ssi_preview class to hidden, then shows the one requested.
 			function showSSIBlock(elementID)
@@ -525,7 +525,7 @@ function template_ssi_above()
 			<div id="header"><div class="frame">
 				<div id="top_section">
 					<h1 class="forumtitle">SSI.php Examples</h1>
-					<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+					<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 				</div>
 				<div id="upper_section" class="middletext" style="overflow: hidden;">
 					<div class="user"></div>
@@ -559,7 +559,7 @@ function template_ssi_below()
 
 function template_homepage_sample1($method = 'source')
 {
-	global $user_info, $boarddir;
+	global $user_info;
 
 	$header = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -606,7 +606,7 @@ function template_homepage_sample1($method = 'source')
 
 	if ($method == 'source')
 	{
-		$header = '<?php require("' . ($user_info['is_admin'] ? addslashes(realpath($boarddir . '/SSI.php')) : 'SSI.php') . '"); ?>' . "\n" . $header;
+		$header = '<?php require("' . ($user_info['is_admin'] ? addslashes(realpath(BOARDDIR . '/SSI.php')) : 'SSI.php') . '"); ?>' . "\n" . $header;
 		return $header . template_homepage_sample1_html() . $footer;
 	}
 	else

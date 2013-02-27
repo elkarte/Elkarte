@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
@@ -27,7 +27,7 @@ $GLOBALS['required_php_version'] = '5.1.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.0.18',
+		'version' => '4.1.0',
 		'version_check' => 'return min(mysql_get_server_info(), mysql_get_client_info());',
 		'supported' => function_exists('mysql_connect'),
 		'default_user' => 'mysql.default_user',
@@ -37,8 +37,6 @@ $databases = array(
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
 		'utf8_version_check' => 'return mysql_get_server_info();',
-		'utf8_default' => true,
-		'utf8_required' => false,
 		'alter_support' => true,
 		'validate_prefix' => create_function('&$value', '
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
@@ -52,8 +50,6 @@ $databases = array(
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
 		'always_has_db' => true,
-		'utf8_default' => true,
-		'utf8_required' => true,
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
@@ -78,8 +74,6 @@ $databases = array(
 		'version_check' => 'return 1;',
 		'supported' => function_exists('sqlite_open'),
 		'always_has_db' => true,
-		'utf8_default' => true,
-		'utf8_required' => true,
 		'utf8_support' => false,
 		'validate_prefix' => create_function('&$value', '
 			global $incontext, $txt;
@@ -112,13 +106,13 @@ $oursite = 'http://www.elkarte.net/';
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
 $incontext['steps'] = array(
-	0 => array(1, $txt['install_step_welcome'], 'Welcome', 0),
-	1 => array(2, $txt['install_step_writable'], 'CheckFilesWritable', 10),
-	2 => array(3, $txt['install_step_databaseset'], 'DatabaseSettings', 15),
-	3 => array(4, $txt['install_step_forum'], 'ForumSettings', 40),
-	4 => array(5, $txt['install_step_databasechange'], 'DatabasePopulation', 15),
-	5 => array(6, $txt['install_step_admin'], 'AdminAccount', 20),
-	6 => array(7, $txt['install_step_delete'], 'DeleteInstall', 0),
+	0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
+	1 => array(2, $txt['install_step_writable'], 'action_checkFilesWritable', 10),
+	2 => array(3, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
+	3 => array(4, $txt['install_step_forum'], 'action_forumSettings', 40),
+	4 => array(5, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
+	5 => array(6, $txt['install_step_admin'], 'action_adminAccount', 20),
+	6 => array(7, $txt['install_step_delete'], 'action_deleteInstall', 0),
 );
 
 // Default title...
@@ -226,7 +220,7 @@ function initialize_inputs()
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
-		deleteInstaller();
+		action_deleteInstaller();
 
 	// PHP 5 might cry if we don't do this now.
 	if (function_exists('date_default_timezone_set'))
@@ -249,10 +243,10 @@ function load_lang_file()
 	$incontext['detected_languages'] = array();
 
 	// Make sure the languages directory actually exists.
-	if (file_exists(dirname(__FILE__) . '/Themes/default/languages'))
+	if (file_exists(dirname(__FILE__) . '/themes/default/languages'))
 	{
 		// Find all the "Install" language files in the directory.
-		$dir = dir(dirname(__FILE__) . '/Themes/default/languages');
+		$dir = dir(dirname(__FILE__) . '/themes/default/languages');
 		while ($entry = $dir->read())
 		{
 			if (substr($entry, 0, 8) == 'Install.' && substr($entry, -4) == '.php')
@@ -280,10 +274,10 @@ function load_lang_file()
 
 		<p>This installer was unable to find the installer\'s language file or files.  They should be found under:</p>
 
-		<div style="margin: 1ex; font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/Themes/default/languages</div>
+		<div style="margin: 1ex; font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/themes/default/languages</div>
 
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
-		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the Themes folder.</p>
+		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the themes folder.</p>
 
 		<p>If you continue to get this error message, feel free to <a href="http://www.elkarte.net/">look to us for support</a>.</p>
 	</div>
@@ -299,7 +293,7 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $GLOBALS['HTTP_GET_VARS']['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/Themes/default/languages/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
@@ -310,7 +304,7 @@ function load_lang_file()
 	}
 
 	// And now include the actual language file itself.
-	require_once(dirname(__FILE__) . '/Themes/default/languages/' . $_SESSION['installer_temp_lang']);
+	require_once(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
@@ -318,11 +312,11 @@ function load_lang_file()
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $db_character_set, $sourcedir, $language;
+	global $db_prefix, $db_connection, $db_character_set, $language;
 	global $smcFunc, $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user;
 
-	if (empty($sourcedir))
-		$sourcedir = dirname(__FILE__) . '/Sources';
+	if (!defined('SOURCEDIR'))
+		define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
@@ -336,7 +330,7 @@ function load_database()
 	// Connect the database.
 	if (!$db_connection)
 	{
-		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist));
@@ -352,7 +346,7 @@ function installExit($fallThrough = false)
 	global $incontext, $installurl, $txt;
 
 	// Send character set.
-	header('Content-Type: text/html; charset=' . (isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'ISO-8859-1'));
+	header('Content-Type: text/html; charset=UTF-8');
 
 	// We usually dump our templates out.
 	if (!$fallThrough)
@@ -381,7 +375,12 @@ function installExit($fallThrough = false)
 	die();
 }
 
-function Welcome()
+/**
+ * Welcome screen.
+ * It makes a few basic checks for compatibility
+ * and informs the user if there are problems.
+ */
+function action_welcome()
 {
 	global $incontext, $txt, $databases, $installurl;
 
@@ -461,7 +460,7 @@ function Welcome()
 /**
  * Verify and try to make writable the files and folders that need to be.
  */
-function CheckFilesWritable()
+function action_checkFilesWritable()
 {
 	global $txt, $incontext;
 
@@ -472,17 +471,17 @@ function CheckFilesWritable()
 		'attachments',
 		'avatars',
 		'cache',
-		'Packages',
-		'Packages/installed.list',
-		'Smileys',
-		'Themes',
+		'packages',
+		'packages/installed.list',
+		'smileys',
+		'themes',
 		'agreement.txt',
 		'Settings.php',
 		'Settings_bak.php',
 		'db_last_error.php'
 	);
 	foreach ($incontext['detected_languages'] as $lang => $temp)
-		$extra_files[] = 'Themes/default/languages/' . $lang;
+		$extra_files[] = 'themes/default/languages/' . $lang;
 
 	// With mod_security installed, we could attempt to fix it with .htaccess.
 	if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
@@ -569,7 +568,7 @@ function CheckFilesWritable()
 
 		if (isset($_POST['ftp_username']))
 		{
-			$ftp = new ftp_connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 			if ($ftp->error === false)
 			{
@@ -585,7 +584,7 @@ function CheckFilesWritable()
 		if (!isset($ftp) || $ftp->error !== false)
 		{
 			if (!isset($ftp))
-				$ftp = new ftp_connection(null);
+				$ftp = new Ftp_Connection(null);
 			// Save the error so we can mess with listing...
 			elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
 				$incontext['ftp_errors'][] = $ftp->last_message;
@@ -658,9 +657,9 @@ function CheckFilesWritable()
 /**
  * Ask for database settings, verify and save them.
  */
-function DatabaseSettings()
+function action_databaseSettings()
 {
-	global $txt, $databases, $incontext, $smcFunc, $sourcedir;
+	global $txt, $databases, $incontext, $smcFunc;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
@@ -730,6 +729,7 @@ function DatabaseSettings()
 				$incontext['error'] = $txt['error_db_filename'];
 				return false;
 			}
+
 			// Duplicate name in the same dir?  Can't do that with SQLite.  Weird things happen.
 			if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) != '.db' ? '.db' : '')))
 			{
@@ -741,9 +741,9 @@ function DatabaseSettings()
 		// What type are they trying?
 		$db_type = preg_replace('~[^A-Za-z0-9]~', '', $_POST['db_type']);
 		$db_prefix = $_POST['db_prefix'];
+
 		// Validate the prefix.
 		$valid_prefix = $databases[$db_type]['validate_prefix']($db_prefix);
-
 		if ($valid_prefix !== true)
 		{
 			$incontext['error'] = $valid_prefix;
@@ -772,13 +772,13 @@ function DatabaseSettings()
 		// Make sure it works.
 		require(dirname(__FILE__) . '/Settings.php');
 
-		if (empty($sourcedir))
-			$sourcedir = dirname(__FILE__) . '/Sources';
+		if (!defined('SOURCEDIR'))
+			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
-		if (!file_exists($sourcedir . '/Subs-Db-' . $db_type . '.php'))
+		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Subs-Db-' . $db_type . '.php');
+			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
 			return false;
 		}
 
@@ -788,7 +788,7 @@ function DatabaseSettings()
 		if (empty($smcFunc))
 			$smcFunc = array();
 
-			require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
+		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
@@ -870,7 +870,7 @@ function DatabaseSettings()
 /**
  * Basic forum type settings.
  */
-function ForumSettings()
+function action_forumSettings()
 {
 	global $txt, $incontext, $databases, $smcFunc, $db_connection, $db_type;
 
@@ -895,9 +895,6 @@ function ForumSettings()
 
 	// Check if the database sessions will even work.
 	$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
-	$incontext['utf8_default'] = $databases[$db_type]['utf8_default'];
-	$incontext['utf8_required'] = $databases[$db_type]['utf8_required'];
-
 	$incontext['continue'] = 1;
 
 	// Submitting?
@@ -915,10 +912,11 @@ function ForumSettings()
 		$vars = array(
 			'boardurl' => $_POST['boardurl'],
 			'boarddir' => addslashes(dirname(__FILE__)),
-			'sourcedir' => addslashes(dirname(__FILE__)) . '/Sources',
+			'sourcedir' => addslashes(dirname(__FILE__)) . '/sources',
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
+			'extdir' => addslashes(dirname(__FILE__)) . '/sources/subs',
 		);
 
 		// Must save!
@@ -931,18 +929,16 @@ function ForumSettings()
 		// Make sure it works.
 		require(dirname(__FILE__) . '/Settings.php');
 
-		// UTF-8 requires a setting to override the language charset.
-		if ((!empty($databases[$db_type]['utf8_support']) && !empty($databases[$db_type]['utf8_required'])) || (empty($databases[$db_type]['utf8_required']) && !empty($databases[$db_type]['utf8_support']) && isset($_POST['utf8'])))
+		// UTF-8 requires a setting to override any language charset.
+		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
 		{
-			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
-			{
-				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
-				return false;
-			}
-			else
-				// Set the character set here.
-				updateSettingsFile(array('db_character_set' => 'utf8'));
+			// our uft-8 check support on the db failed ....
+			$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
+			return false;
 		}
+		else
+			// Set our db character_set to utf8
+			updateSettingsFile(array('db_character_set' => 'utf8'));
 
 		// Good, skip on.
 		return true;
@@ -954,9 +950,9 @@ function ForumSettings()
 /**
  * Step one. Populate database.
  */
-function DatabasePopulation()
+function action_databasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $sourcedir, $db_prefix, $incontext, $db_name, $boardurl;
+	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];
@@ -986,7 +982,7 @@ function DatabasePopulation()
 		$smcFunc['db_free_result']($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['ourVersion']) || $modSettings['ourVersion'] != $GLOBALS['current_version'])
+		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != $GLOBALS['current_version'])
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -994,19 +990,18 @@ function DatabasePopulation()
 	}
 	$modSettings['disableQueryCheck'] = true;
 
-	// If doing UTF8, select it. PostgreSQL requires passing it as a string...
-	if (!empty($db_character_set) && $db_character_set == 'utf8' && !empty($databases[$db_type]['utf8_support']))
-		$smcFunc['db_query']('', '
-			SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
-			array(
-				'db_error_skip' => true,
-				'utf8' => 'utf8',
-			)
-		);
+	// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
+	$smcFunc['db_query']('', '
+		SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
+		array(
+			'db_error_skip' => true,
+			'utf8' => 'utf8',
+		)
+	);
 
 	$replaces = array(
 		'{$db_prefix}' => $db_prefix,
-		'{$boarddir}' => $smcFunc['db_escape_string'](dirname(__FILE__)),
+		'{BOARDDIR}' => $smcFunc['db_escape_string'](dirname(__FILE__)),
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
@@ -1023,7 +1018,7 @@ function DatabasePopulation()
 	$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
 	// If the UTF-8 setting was enabled, add it to the table definitions.
-	if (empty($databases[$db_type]['utf8_required']) && isset($_POST['utf8']) && !empty($databases[$db_type]['utf8_support']))
+	if (!empty($databases[$db_type]['utf8_support']))
 		$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
 	// Read in the SQL.  Turn this on and that off... internationalize... etc.
@@ -1039,6 +1034,7 @@ function DatabasePopulation()
 		'table_dups' => 0,
 		'insert_dups' => 0,
 	);
+
 	foreach ($sql_lines as $count => $line)
 	{
 		// No comments allowed!
@@ -1099,17 +1095,16 @@ function DatabasePopulation()
 	}
 
 	// Make sure UTF will be used globally.
-	if ((!empty($databases[$db_type]['utf8_support']) && !empty($databases[$db_type]['utf8_required'])) || (empty($databases[$db_type]['utf8_required']) && !empty($databases[$db_type]['utf8_support']) && isset($_POST['utf8'])))
-		$smcFunc['db_insert']('replace',
-			$db_prefix . 'settings',
-			array(
-				'variable' => 'string-255', 'value' => 'string-65534',
-			),
-			array(
-				'global_character_set', 'UTF-8',
-			),
-			array('variable')
-		);
+	$smcFunc['db_insert']('replace',
+		$db_prefix . 'settings',
+		array(
+			'variable' => 'string-255', 'value' => 'string-65534',
+		),
+		array(
+			'global_character_set', 'UTF-8',
+		),
+		array('variable')
+	);
 
 	// Maybe we can auto-detect better cookie settings?
 	preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
@@ -1198,9 +1193,9 @@ function DatabasePopulation()
 /**
  * Ask for the administrator login information.
  */
-function AdminAccount()
+function action_adminAccount()
 {
-	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir;
+	global $txt, $db_type, $db_connection, $databases, $smcFunc, $incontext, $db_prefix, $db_passwd;
 
 	$incontext['sub_template'] = 'admin_account';
 	$incontext['page_title'] = $txt['user_settings'];
@@ -1263,7 +1258,7 @@ function AdminAccount()
 			return false;
 		}
 
-		if (!file_exists($sourcedir . '/Subs.php'))
+		if (!file_exists(SOURCEDIR . '/Subs.php'))
 		{
 			$incontext['error'] = $txt['error_subs_missing'];
 			return false;
@@ -1366,11 +1361,11 @@ function AdminAccount()
 /**
  * Final step, clean up and a complete message!
  */
-function DeleteInstall()
+function action_deleteInstall()
 {
 	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
 	global $smcFunc, $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $current_version, $databases, $forum_version, $modSettings, $user_info, $language, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1379,15 +1374,18 @@ function DeleteInstall()
 	require(dirname(__FILE__) . '/Settings.php');
 	load_database();
 
+	if (!defined('SUBSDIR'))
+		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
+
 	chdir(dirname(__FILE__));
 
-	require_once($sourcedir . '/Errors.php');
-	require_once($sourcedir . '/Logging.php');
-	require_once($sourcedir . '/Subs.php');
-	require_once($sourcedir . '/Load.php');
-	require_once($sourcedir . '/Subs-Cache.php');
-	require_once($sourcedir . '/Security.php');
-	require_once($sourcedir . '/Subs-Auth.php');
+	require_once(SOURCEDIR . '/Errors.php');
+	require_once(SOURCEDIR . '/Logging.php');
+	require_once(SOURCEDIR . '/Subs.php');
+	require_once(SOURCEDIR . '/Load.php');
+	require_once(SUBSDIR . '/Cache.subs.php');
+	require_once(SOURCEDIR . '/Security.php');
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1466,8 +1464,8 @@ function DeleteInstall()
 	updateStats('topic');
 
 	// This function is needed to do the updateStats('subject') call.
-	$smcFunc['strtolower'] = $db_character_set === 'utf8' || $txt['lang_character_set'] === 'UTF-8' ? create_function('$string', '
-		return $string;') : 'strtolower';
+	$smcFunc['strtolower'] = create_function('$string', '
+		return $string;');
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg
@@ -1484,7 +1482,7 @@ function DeleteInstall()
 	$smcFunc['db_free_result']($request);
 
 	// Now is the perfect time to fetch the SM files.
-	require_once($sourcedir . '/ScheduledTasks.php');
+	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
@@ -1518,18 +1516,18 @@ function DeleteInstall()
  *
  * Credit: http://www.faqs.org/rfcs/rfc959.html
  */
-class ftp_connection
+class Ftp_Connection
 {
 	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
 
 	// Create a new FTP connection...
-	function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+	function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
 		if ($ftp_server !== null)
 			$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
 	}
 
-	function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@simplemachines.org')
+	function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
 		if (substr($ftp_server, 0, 6) == 'ftp://')
 			$ftp_server = substr($ftp_server, 6);
@@ -1857,6 +1855,13 @@ class ftp_connection
 	}
 }
 
+/**
+ * Write out the contents of Settings.php file.
+ * This function will add the variables passed to it in $vars,
+ * to the Settings.php file.
+ *
+ * @param array $vars the configuration variables to write out.
+ */
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
@@ -1926,6 +1931,9 @@ function updateSettingsFile($vars)
 	return true;
 }
 
+/**
+ * Write the db_last_error file.
+ */
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
@@ -1934,7 +1942,8 @@ function updateDbLastError()
 }
 
 /**
- * Create an .htaccess file to prevent mod_security. Elkarte has filtering built-in.
+ * Create an .htaccess file to prevent mod_security.
+ * Elkarte has filtering built-in.
  */
 function fixModSecurity()
 {
@@ -1985,11 +1994,15 @@ function fixModSecurity()
 		return false;
 }
 
-function deleteInstaller()
+/**
+ * Delete the installer and its additional files.
+ * Called by ?delete
+ */
+function action_deleteInstaller()
 {
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
-		$ftp = new ftp_connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
 		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
 
 		$ftp->unlink('install.php');
@@ -2012,7 +2025,7 @@ function deleteInstaller()
 	}
 
 	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
 	exit;
 }
 
@@ -2023,18 +2036,18 @@ function template_install_above()
 	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"', !empty($txt['lang_rtl']) ? ' dir="rtl"' : '', '>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=', isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'ISO-8859-1', '" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/index.css?alp10" />
-		<link rel="stylesheet" type="text/css" href="Themes/default/css/install.css?alp10" />
-		<script type="text/javascript" src="Themes/default/scripts/script.js"></script>
+		<link rel="stylesheet" type="text/css" href="themes/default/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="themes/default/css/install.css?alp10" />
+		<script type="text/javascript" src="themes/default/scripts/script.js"></script>
 	</head>
 	<body>
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="Themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+				<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
 			</div>
 		</div>
 		<div id="wrapper">
@@ -2440,13 +2453,6 @@ function template_forum_settings()
 				<td>
 					<input type="checkbox" name="dbsession" id="dbsession_check" checked="checked" class="input_check" /> <label for="dbsession_check">', $txt['install_settings_dbsession_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['test_dbsession'] ? $txt['install_settings_dbsession_info1'] : $txt['install_settings_dbsession_info2'], '</div>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="textbox">', $txt['install_settings_utf8'], ':</td>
-				<td>
-					<input type="checkbox" name="utf8" id="utf8_check"', $incontext['utf8_default'] ? ' checked="checked"' : '', ' class="input_check"', $incontext['utf8_required'] ? ' disabled="disabled"' : '', ' /> <label for="utf8_check">', $txt['install_settings_utf8_title'], '</label><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_utf8_info'], '</div>
 				</td>
 			</tr>
 		</table>';

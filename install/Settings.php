@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
@@ -121,7 +121,7 @@ $db_error_send = 0;
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, smf, or xcache
+ * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, xcache or filesystem-based
  * (you can add more with a mod).
  * @var string
  */
@@ -151,10 +151,20 @@ $cachedir = dirname(__FILE__) . '/cache';
  */
 $boarddir = dirname(__FILE__);
 /**
- * Path to the Sources directory.
+ * Path to the sources directory.
  * @var string
  */
-$sourcedir = dirname(__FILE__) . '/Sources';
+$sourcedir = dirname(__FILE__) . '/sources';
+/**
+ * Path to the external resources directory.
+ * @var string
+ */
+$extdir = dirname(__FILE__) . '/sources/lib';
+/**
+ * Path to the languages directory.
+ * @var string
+ */
+$languagedir = dirname(__FILE__) . '/themes/default/languages';
 
 ########## Error-Catching ##########
 # Note: You shouldn't touch these settings.
@@ -176,7 +186,9 @@ if (file_exists(dirname(__FILE__) . '/install.php'))
 # Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir) && file_exists($boarddir . '/Sources'))
-	$sourcedir = $boarddir . '/Sources';
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
 if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';

@@ -507,16 +507,6 @@ else
 ---#
 
 /******************************************************************************/
---- Making changes to the package manager.
-/******************************************************************************/
-
----# Changing URL to SMF package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'http://custom.simplemachines.org/packages/mods'
-WHERE url = 'http://mods.simplemachines.org';
----#
-
-/******************************************************************************/
 --- Adding new indexes to the topics table.
 /******************************************************************************/
 
@@ -962,11 +952,11 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 		$smcFunc['db_free_result']($request);
 
 		if (!isset($core['theme_dir']))
-			$core['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/Themes/core';
+			$core['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/themes/core';
 		if (!isset($core['theme_url']))
-			$core['theme_url'] = $GLOBALS['boardurl'] . '/Themes/core';
+			$core['theme_url'] = $GLOBALS['boardurl'] . '/themes/core';
 		if (!isset($core['images_url']))
-			$core['images_url'] = $GLOBALS['boardurl'] . '/Themes/core/images';
+			$core['images_url'] = $GLOBALS['boardurl'] . '/themes/core/images';
 
 		// Get an available id_theme first...
 		$request = upgrade_query("
