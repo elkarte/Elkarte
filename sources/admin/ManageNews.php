@@ -947,8 +947,9 @@ function ModifyNewsSettings($return_config = false)
 			array('permissions', 'send_mail'),
 		'',
 			// Just the remaining settings.
-			array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;'),
+			array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
 			array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
+			array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 	);
 
 	call_integration_hook('integrate_modify_news_settings', array($config_vars));
@@ -968,7 +969,8 @@ function ModifyNewsSettings($return_config = false)
 
 	// Add some javascript at the bottom...
 	addInlineJavascript('
-			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;', true);
+		document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
+		document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 	// Saving the settings?
 	if (isset($_GET['save']))
