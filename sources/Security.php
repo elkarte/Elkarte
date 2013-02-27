@@ -776,7 +776,7 @@ function createToken($action, $type = 'post')
  */
 function validateToken($action, $type = 'post', $reset = true)
 {
-	global $modSettings, $db_show_debug;
+	global $modSettings;
 
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
 
