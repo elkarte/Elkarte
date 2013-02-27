@@ -927,7 +927,7 @@ function action_post()
 		}],
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
-		function () {
+		(function () {
 			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
 			var editor_val = \'\';
 			if(editor.inSourceMode())
@@ -936,7 +936,7 @@ function action_post()
 				editor_val  = editor.getText();
 
 			return editor_val;
-		};') . '
+		});') . '
 	});', true);
 
 	// Store the ID.
