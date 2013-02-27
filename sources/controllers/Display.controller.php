@@ -126,21 +126,10 @@ function Display()
 		$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
 
 	// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
-	if ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !$user_info['is_guest'] && !allowedTo('approve_posts'))
+	$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
+	if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(id_member) AS my_unapproved_posts
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}
-				AND id_member = {int:current_member}
-				AND approved = 0',
-			array(
-				'current_topic' => $topic,
-				'current_member' => $user_info['id'],
-			)
-		);
-		list ($myUnapprovedPosts) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
 
 		$context['total_visible_posts'] = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 	}
