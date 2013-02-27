@@ -109,15 +109,13 @@ function template_folder()
 							<div class="poster">
 								<ul class="dropmenu">
 									<li>
-										<h4>
-											<a id="msg', $message['id'], '"></a>';
+										<a id="msg', $message['id'], '"></a>';
 
 			// Show a link to the member's profile.
 			echo '
-											<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-												<span style="padding: 6px; display: block;">', $message['member']['name'], '</span>
-											</a>
-										</h4>
+										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
+											<span class="name">', $message['member']['name'], '</span>
+										</a>
 										<ul class="smalltext" id="msg_', $message['id'], '_extra_info">';
 
 			// Show the member's custom title, if they have one.
