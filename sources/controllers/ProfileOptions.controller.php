@@ -914,14 +914,15 @@ function loadThemeOptions($memID)
  */
 function action_ignoreboards($memID)
 {
-	global $txt, $user_info, $context, $modSettings, $smcFunc, $cur_profile;
+	global $context, $modSettings, $cur_profile;
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
+	$context['sub_template'] = 'ignoreboards';
 	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards(false, array('ignore' => explode(',', $cur_profile['ignore_boards'])));
+	$context += allBoards(false, array('ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 	loadThemeOptions($memID);
 }
