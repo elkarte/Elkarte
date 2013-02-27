@@ -1479,9 +1479,10 @@ function getAvatarPathID()
  * Get all attachments associated with a set of posts.
  * This does not check permissions.
  *
- * @param $messages
+ * @param array $messages array of messages ids
+ * @param bool $includeUnapproved = false
  */
-function getAttachments($messages)
+function getAttachments($messages, $includeUnapproved = false, $filter = null)
 {
 	global $smcFunc, $modSettings;
 
@@ -1498,13 +1499,12 @@ function getAttachments($messages)
 		array(
 			'message_list' => $messages,
 			'attachment_type' => 0,
-			'is_approved' => 1,
 		)
 	);
 	$temp = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!$row['approved'] && $modSettings['postmod_active'] && !allowedTo('approve_posts') && (!isset($all_posters[$row['id_msg']]) || $all_posters[$row['id_msg']] != $user_info['id']))
+		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row)))
 			continue;
 
 		$temp[$row['id_attach']] = $row;
