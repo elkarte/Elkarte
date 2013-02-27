@@ -252,12 +252,20 @@ upgrade_query("
 upgrade_query("
 	ALTER TABLE {$db_prefix}log_topics
 	ADD COLUMN disregarded int NOT NULL DEFAULT '0'");
+---}
+---#
 
-INSERT INTO {$db_prefix}settings
+/******************************************************************************/
+--- Adding new settings
+/******************************************************************************/
+---# Adding new settings ...
+INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
+	('avatar_default', '0'),
+	('gravatar_rating', 'g'),
+	('xmlnews_enable', 5);
 	('enable_disregard', 0);
----}
 ---#
 
 /******************************************************************************/

@@ -46,8 +46,9 @@ function action_showfeed()
 
 	loadLanguage('Stats');
 
-	// Default to latest 5.  No more than 255, please.
-	$_GET['limit'] = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? 5 : min((int) $_GET['limit'], 255);
+	// Default to latest 5.  No more than whats defined in the ACP or 255
+	$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
+	$_GET['limit'] = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
 
 	// Handle the cases where a board, boards, or category is asked for.
 	$query_this_board = 1;
