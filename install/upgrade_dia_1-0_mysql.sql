@@ -33,7 +33,9 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('avatar_default', '0'),
-	('gravatar_rating', 'g');
+	('gravatar_rating', 'g'),
+	('xmlnews_limit', 5);
+	('enable_disregard', 0);
 ---#
 
 /******************************************************************************/
@@ -193,11 +195,6 @@ ADD COLUMN deny_member_groups varchar(255) NOT NULL DEFAULT '';
 ---# Adding new columns to boards...
 ALTER TABLE {$db_prefix}log_topics
 ADD COLUMN disregarded tinyint(3) NOT NULL DEFAULT '0';
-
-INSERT INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('enable_disregard', 0);
 ---#
 
 /******************************************************************************/
