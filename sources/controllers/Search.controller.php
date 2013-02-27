@@ -129,6 +129,9 @@ function action_plushsearch1()
 
 	require_once(SUBSDIR . '/Boards.subs.php');
 	$context += allBoards();
+	foreach ($context['categories'] as &$category)
+		$category['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']) && !in_array($row['id_board'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($row['id_board'], $context['search_params']['brd']));
+
 
 	if (!empty($_REQUEST['topic']))
 	{
