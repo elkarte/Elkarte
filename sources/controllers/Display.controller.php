@@ -32,9 +32,9 @@ if (!defined('ELKARTE'))
  */
 function Display()
 {
-	global $scripturl, $txt, $modSettings, $context, $settings;
+	global $scripturl, $txt, $modSettings, $context, $settings, $smcFunc;
 	global $options, $user_info, $board_info, $topic, $board;
-	global $attachments, $messages_request, $topicinfo, $language, $smcFunc;
+	global $attachments, $messages_request, $topicinfo, $language, $all_posters;
 
 	// What are you gonna display if these are empty?!
 	if (empty($topic))
@@ -126,21 +126,10 @@ function Display()
 		$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
 
 	// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
-	if ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !$user_info['is_guest'] && !allowedTo('approve_posts'))
+	$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
+	if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(id_member) AS my_unapproved_posts
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}
-				AND id_member = {int:current_member}
-				AND approved = 0',
-			array(
-				'current_topic' => $topic,
-				'current_member' => $user_info['id'],
-			)
-		);
-		list ($myUnapprovedPosts) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
 
 		$context['total_visible_posts'] = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 	}
@@ -804,43 +793,12 @@ function Display()
 	// If there _are_ messages here... (probably an error otherwise :!)
 	if (!empty($messages))
 	{
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
 		// Fetch attachments.
+		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT
-					a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
-					a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
-					IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
-				FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
-					LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
-				WHERE a.id_msg IN ({array_int:message_list})
-					AND a.attachment_type = {int:attachment_type}',
-				array(
-					'message_list' => $messages,
-					'attachment_type' => 0,
-					'is_approved' => 1,
-				)
-			);
-			$temp = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if (!$row['approved'] && $modSettings['postmod_active'] && !allowedTo('approve_posts') && (!isset($all_posters[$row['id_msg']]) || $all_posters[$row['id_msg']] != $user_info['id']))
-					continue;
-
-				$temp[$row['id_attach']] = $row;
-
-				if (!isset($attachments[$row['id_msg']]))
-					$attachments[$row['id_msg']] = array();
-			}
-			$smcFunc['db_free_result']($request);
-
-			// This is better than sorting it with the query...
-			ksort($temp);
-
-			foreach ($temp as $row)
-				$attachments[$row['id_msg']][] = $row;
-		}
+			$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment');
 
 		$msg_parameters = array(
 			'message_list' => $messages,
@@ -1473,4 +1431,22 @@ function action_quickmod2()
 	}
 
 	redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . $_REQUEST['start']);
+}
+
+/**
+ * Callback filter for the retrieval of attachments.
+ * This function returns false when:
+ *  - the attachment is unapproved, and
+ *  - the viewer is not the poster of the message where the attachment is
+ *
+ * @param array $attachment_info
+ */
+function filter_accessible_attachment($attachment_info)
+{
+	global $all_posters, $user_info;
+
+	if (!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']))
+		return false;
+
+	return true;
 }

@@ -1321,3 +1321,35 @@ function selectMessages($topic, $start, $per_page, $excluded_messages = array(),
 
 	return $messages;
 }
+
+/**
+ * Retrieve unapproved posts of the member
+ * in a specific topic
+ *
+ * @param int $id_topic topic id
+ * @param int $id_member member id
+ */
+function unapprovedPosts($id_topic, $id_member)
+{
+	global $smcFunc;
+
+	// not all guests are the same!
+	if (empty($id_member))
+		return array();
+
+	$request = $smcFunc['db_query']('', '
+			SELECT COUNT(id_member) AS my_unapproved_posts
+			FROM {db_prefix}messages
+			WHERE id_topic = {int:current_topic}
+				AND id_member = {int:current_member}
+				AND approved = 0',
+			array(
+				'current_topic' => $id_topic,
+				'current_member' => $id_member,
+			)
+		);
+	list ($myUnapprovedPosts) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $myUnapprovedPosts;
+}

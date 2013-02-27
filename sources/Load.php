@@ -2589,6 +2589,7 @@ function loadDatabase()
 	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
+
 /**
  * Determine the user's avatar type and return the information as an array
  *
@@ -2604,10 +2605,13 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
+		// where are those pesky avatars?
+		$avatar_url = empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
+
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar" alt="" />',
-			'href' => $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar',
+			'image' => '<img class="avatar" src="' . $avatar_url . '" alt="" />',
+			'href' => $avatar_url,
 			'url' => '',
 		);
 	}

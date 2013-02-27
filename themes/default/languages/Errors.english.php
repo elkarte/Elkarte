@@ -190,6 +190,7 @@ $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
 $txt['ban_name_empty'] = 'The name of the ban was left empty';
 $txt['ban_name_exists'] = 'The name of this ban (%1$s) already exists. Please choose a different name.';
 $txt['ban_trigger_already_exists'] = 'This ban trigger (%1$s) already exists in %2$s.';
+$txt['attach_check_nag'] = 'Unable to continue due to incomplete data (%1$s).';
 
 $txt['recycle_no_valid_board'] = 'No valid board selected for recycled topics';
 $txt['post_already_deleted'] = 'The topic or message has already been moved to the recycle board. Are you sure you want to delete it completely?<br />If so follow <a href="%1$s">this link</a>';
