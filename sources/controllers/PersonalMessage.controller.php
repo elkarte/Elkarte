@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -20,7 +20,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * This is the main function of personal messages, called before the action handler.
@@ -1162,7 +1162,6 @@ function action_sendmessage()
 	// Set the defaults...
 	$context['subject'] = $form_subject;
 	$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-	$context['post_error'] = array();
 	$context['copy_to_outbox'] = !empty($options['copy_to_outbox']);
 
 	// And build the link tree.
@@ -1238,11 +1237,10 @@ function action_messagedrafts()
 /**
  * An error in the message...
  *
- * @param $error_types
  * @param $named_recipients
  * @param $recipient_ids
  */
-function messagePostError($error_types, $named_recipients, $recipient_ids = array())
+function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
 	global $smcFunc, $user_info;
@@ -1256,6 +1254,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 		$context['sub_template'] = 'pm';
 
 	$context['page_title'] = $txt['send_message'];
+	$error_types = error_context::context('pm', 1);
 
 	// Got some known members?
 	$context['recipients'] = array(
@@ -1318,7 +1317,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 			if (!isset($_REQUEST['xml']))
 				fatal_lang_error('pm_not_yours', false);
 			else
-				$error_types[] = 'pm_not_yours';
+				$error_types->addError('pm_not_yours');
 		}
 		$row_quoted = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
@@ -1353,27 +1352,12 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	loadLanguage('Errors');
 
 	$context['error_type'] = 'minor';
-
-	$context['post_error'] = array(
-		'messages' => array(),
-		// @todo error handling: maybe fatal errors can be error_type => serious
-		'error_type' => '',
-	);
-
-	foreach ($error_types as $error_type)
-	{
-		$context['post_error'][$error_type] = true;
-		if (isset($txt['error_' . $error_type]))
-		{
-			if ($error_type == 'long_message')
-				$txt['error_' . $error_type] = sprintf($txt['error_' . $error_type], $modSettings['max_messageLength']);
-			$context['post_error']['messages'][] = $txt['error_' . $error_type];
-		}
-
-		// If it's not a minor error flag it as such.
-		if (!in_array($error_type, array('new_reply', 'not_approved', 'new_replies', 'old_topic', 'need_qr_verification', 'no_subject')))
-			$context['error_type'] = 'serious';
-	}
+	if ($error_types->hasErrors())
+		$context['post_error'] = array(
+			'errors' => $error_types->prepareErrors(),
+			'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
+			'title' => $txt['error_while_submitting'],
+		);
 
 	// We need to load the editor once more.
 	require_once(SUBSDIR . '/Editor.subs.php');
@@ -1438,7 +1422,7 @@ function action_sendmessage2()
 	list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
 	// Initialize the errors we're about to make.
-	$post_errors = array();
+	$post_errors = error_context::context('pm', 1);
 
 	// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 	if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
@@ -1463,13 +1447,13 @@ function action_sendmessage2()
 			if (!isset($_REQUEST['xml']))
 				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 			else
-				$post_errors[] = 'pm_too_many_per_hour';
+				$post_errors->addError('pm_too_many_per_hour');
 		}
 	}
 
 	// If your session timed out, show an error, but do allow to re-submit.
 	if (!isset($_REQUEST['xml']) && checkSession('post', '', false) != '')
-		$post_errors[] = 'session_timeout';
+		$post_errors->addError('session_timeout');
 
 	$_REQUEST['subject'] = isset($_REQUEST['subject']) ? trim($_REQUEST['subject']) : '';
 	$_REQUEST['to'] = empty($_POST['to']) ? (empty($_GET['to']) ? '' : $_GET['to']) : $_POST['to'];
@@ -1549,7 +1533,7 @@ function action_sendmessage2()
 
 	// Check if there's at least one recipient.
 	if (empty($recipientList['to']) && empty($recipientList['bcc']))
-		$post_errors[] = 'no_to';
+		$post_errors->addError('no_to');
 
 	// Make sure that we remove the members who did get it from the screen.
 	if (!$is_recipient_change)
@@ -1558,10 +1542,10 @@ function action_sendmessage2()
 		{
 			if (!empty($namesNotFound[$recipientType]))
 			{
-				$post_errors[] = 'bad_' . $recipientType;
+				$post_errors->addError('bad_' . $recipientType);
 
 				// Since we already have a post error, remove the previous one.
-				$post_errors = array_diff($post_errors, array('no_to'));
+				$post_errors->removeError('no_to');
 
 				foreach ($namesNotFound[$recipientType] as $name)
 					$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
@@ -1571,11 +1555,11 @@ function action_sendmessage2()
 
 	// Did they make any mistakes?
 	if ($_REQUEST['subject'] == '')
-		$post_errors[] = 'no_subject';
+		$post_errors->addError('no_subject');
 	if (!isset($_REQUEST['message']) || $_REQUEST['message'] == '')
-		$post_errors[] = 'no_message';
+		$post_errors->addError('no_message');
 	elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_REQUEST['message']) > $modSettings['max_messageLength'])
-		$post_errors[] = 'long_message';
+		$post_errors->addError('long_message');
 	else
 	{
 		// Preparse the message.
@@ -1584,7 +1568,7 @@ function action_sendmessage2()
 
 		// Make sure there's still some content left without the tags.
 		if ($smcFunc['htmltrim'](strip_tags(parse_bbc($smcFunc['htmlspecialchars']($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
-			$post_errors[] = 'no_message';
+			$post_errors->addError('no_message');
 	}
 
 	// Wrong verification code?
@@ -1596,13 +1580,13 @@ function action_sendmessage2()
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
 
-		if (is_array($context['require_verification']))
-			$post_errors = array_merge($post_errors, $context['require_verification']);
+		if ($context['require_verification'])
+			$post_errors->addError('need_qr_verification', 0);
 	}
 
 	// If they did, give a chance to make ammends.
-	if (!empty($post_errors) && !$is_recipient_change && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
-		return messagePostError($post_errors, $namedRecipientList, $recipientList);
+	if ($post_errors->hasErrors() && !$is_recipient_change && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
+		return messagePostError($namedRecipientList, $recipientList);
 
 	// Want to take a second glance before you send?
 	if (isset($_REQUEST['preview']))
@@ -1623,7 +1607,7 @@ function action_sendmessage2()
 		$context['page_title'] = $txt['preview'] . ' - ' . $context['preview_subject'];
 
 		// Pretend they messed up but don't ignore if they really did :P.
-		return messagePostError($post_errors, $namedRecipientList, $recipientList);
+		return messagePostError($namedRecipientList, $recipientList);
 	}
 
 	// Adding a recipient cause javascript ain't working?
@@ -1632,19 +1616,19 @@ function action_sendmessage2()
 		// Maybe we couldn't find one?
 		foreach ($namesNotFound as $recipientType => $names)
 		{
-			$post_errors[] = 'bad_' . $recipientType;
+			$post_errors->addError('bad_' . $recipientType);
 			foreach ($names as $name)
 				$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
 		}
 
-		return messagePostError(array(), $namedRecipientList, $recipientList);
+		return messagePostError($namedRecipientList, $recipientList);
 	}
 
 	// Want to save this as a draft and think about it some more?
 	if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
 	{
-		savePMDraft($post_errors, $recipientList);
-		return messagePostError($post_errors, $namedRecipientList, $recipientList);
+		savePMDraft($recipientList);
+		return messagePostError($namedRecipientList, $recipientList);
 	}
 
 	// Before we send the PM, let's make sure we don't have an abuse of numbers.
@@ -1654,7 +1638,7 @@ function action_sendmessage2()
 			'sent' => array(),
 			'failed' => array(sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])),
 		);
-		return messagePostError($post_errors, $namedRecipientList, $recipientList);
+		return messagePostError($namedRecipientList, $recipientList);
 	}
 
 	// Protect from message spamming.
@@ -1689,7 +1673,7 @@ function action_sendmessage2()
 
 	// If one or more of the recipient were invalid, go back to the post screen with the failed usernames.
 	if (!empty($context['send_log']['failed']))
-		return messagePostError($post_errors, $namesNotFound, array(
+		return messagePostError($namesNotFound, array(
 			'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
 			'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
 		));

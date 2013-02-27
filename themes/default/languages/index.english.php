@@ -389,8 +389,8 @@ $txt['template_parse_error'] = 'Template Parse Error!';
 $txt['template_parse_error_message'] = 'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
 $txt['template_parse_error_details'] = 'There was a problem loading the <tt><strong>%1$s</strong></tt> template or language file.  Please check the syntax and try again - remember, single quotes (<tt>\'</tt>) often have to be escaped with a slash (<tt>\\</tt>).  To see more specific error information from PHP, try <a href="' . $boardurl . '%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="' . $scripturl . '?theme=1">use the default theme</a>.';
 
-$txt['today'] = '<strong>Today</strong> at ';
-$txt['yesterday'] = '<strong>Yesterday</strong> at ';
+$txt['today'] = 'Today at ';
+$txt['yesterday'] = 'Yesterday at ';
 $txt['new_poll'] = 'New poll';
 $txt['poll_question'] = 'Question';
 $txt['poll_vote'] = 'Submit Vote';
@@ -490,7 +490,7 @@ $txt['status'] = 'Status';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="Elkarte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/Elkarte/blob/master/license.md" title="License" target="_blank" class="new_win">Elkarte &copy; 2013</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/Elkarte/blob/master/license.md" title="License" target="_blank" class="new_win">Elkarte &copy; 2013</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';

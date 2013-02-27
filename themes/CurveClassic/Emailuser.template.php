@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -43,7 +43,7 @@
 // This is where we get information about who they want to send the topic to, etc.
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="send_topic">
@@ -106,7 +106,7 @@ function template_main()
 // Send an email to a user!
 function template_custom_email()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="send_topic">
@@ -199,7 +199,7 @@ function template_custom_email()
 
 function template_report()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 	<div id="report_topic">
@@ -211,25 +211,7 @@ function template_report()
 				<div class="windowbg">
 					<div class="content">';
 
-	if (!empty($context['post_errors']))
-	{
-	echo '
-				<div id="error_box" class="errorbox">
-					<ul id="error_list">';
-
-		foreach ($context['post_errors'] as $key => $error)
-			echo '
-						<li id="error_', $key, '" class="error">', $error, '</li>';
-
-		echo '
-					</ul>';
-	}
-	else
-		echo '
-				<div style="display:none" id="error_box" class="errorbox">';
-
-		echo '
-				</div>';
+	template_show_error('report_error');
 
 	echo '
 						<p class="noticebox">', $txt['report_to_mod_func'], '</p>

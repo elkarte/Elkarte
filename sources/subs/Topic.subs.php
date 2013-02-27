@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -21,7 +21,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Removes the passed id_topic's. (permissions are NOT checked here!).
@@ -907,87 +907,45 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 /**
  * Get the previous topic from where we are.
  *
- * @param int $id_topic
- * @param int $id_board
- * @param int $id_member =0
- * @param bool $includeUnapproved = false
- * @param bool $includeStickies = true
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
  */
-function getPreviousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT t2.id_topic
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}topics AS t2 ON (' .
-			(empty($includeStickies) ? '
-				t2.id_last_msg > t.id_last_msg' : '
-				(t2.id_last_msg > t.id_last_msg AND t2.is_sticky >= t.is_sticky) OR t2.is_sticky > t.is_sticky')
-			. ')
-		WHERE t.id_topic = {int:current_topic}
-			AND t2.id_board = {int:current_board}' .
-			($includeUnapproved ? '' : '
-				AND (t2.approved = {int:is_approved} OR (t2.id_member_started != {int:id_member_started} AND t2.id_member_started = {int:current_member}))'
-				) . '
-		ORDER BY' . (
-			$includeStickies ? '
-				t2.is_sticky,' :
-				'') .
-			' t2.id_last_msg
-		LIMIT 1',
-		array(
-			'current_board' => $id_board,
-			'current_member' => $id_member,
-			'current_topic' => $id_topic,
-			'is_approved' => 1,
-			'id_member_started' => 0,
-		)
-	);
-
-	// Was there any?
-	if ($smcFunc['db_num_rows']($request) == 0)
-	{
-		$smcFunc['db_free_result']($request);
-
-		// Roll over - if we're going prev, get the last - otherwise the first.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE id_board = {int:current_board}' .
-			($includeUnapproved ? '' : '
-				AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
-			ORDER BY' . (
-				$includeStickies ? ' is_sticky,' :
-				'').
-				' id_last_msg
-			LIMIT 1',
-			array(
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-				'is_approved' => 1,
-				'id_member_started' => 0,
-			)
-		);
-	}
-
-	// Now you can be sure $topic is the id_topic to view.
-	list ($topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $topic;
+	return topicPointer($id_topic, $id_board, false, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
 }
 
 /**
  * Get the next topic from where we are.
  *
- * @param int $id_topic
- * @param int $id_board
- * @param int $id_member =0
- * @param bool $includeUnapproved = false
- * @param bool $includeStickies = true
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
  */
-function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
+{
+	return topicPointer($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
+}
+
+/**
+ * Advance topic pointer.
+ * (in either direction)
+ * This function is used by previousTopic() and nextTopic()
+ * The boolean parameter $next determines direction.
+ *
+ * @param int $id_topic origin topic id
+ * @param int $id_board board id
+ * @param bool $next = true whether to increase or decrease the pointer
+ * @param int $id_member = 0 member id
+ * @param bool $includeUnapproved = false whether to include unapproved topics
+ * @param bool $includeStickies = true whether to include sticky topics
+ */
+function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
 	global $smcFunc;
 
@@ -996,8 +954,8 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}topics AS t2 ON (' .
 			(empty($includeStickies) ? '
-				t2.id_last_msg < t.id_last_msg' : '
-				(t2.id_last_msg < t.id_last_msg AND t2.is_sticky <= t.is_sticky) OR t2.is_sticky < t.is_sticky')
+				t2.id_last_msg {raw:strictly} t.id_last_msg' : '
+				(t2.id_last_msg {raw:strictly} t.id_last_msg AND t2.is_sticky {raw:strictly_equal} t.is_sticky) OR t2.is_sticky {raw:strictly} t.is_sticky')
 			. ')
 		WHERE t.id_topic = {int:current_topic}
 			AND t2.id_board = {int:current_board}' .
@@ -1006,11 +964,14 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 				) . '
 		ORDER BY' . (
 			$includeStickies ? '
-				t2.is_sticky DESC,' :
-				'') .
-			' t2.id_last_msg DESC
+				t2.is_sticky {raw:sorting},' :
+				 '') .
+			' t2.id_last_msg {raw:sorting}
 		LIMIT 1',
 		array(
+			'strictly' => $next ? '<' : '>',
+			'strictly_equal' => $next ? '<=' : '=>',
+			'sorting' => $next ? 'DESC' : '',
 			'current_board' => $id_board,
 			'current_member' => $id_member,
 			'current_topic' => $id_topic,
@@ -1032,11 +993,12 @@ function getNextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved =
 			($includeUnapproved ? '' : '
 				AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
 			ORDER BY' . (
-				$includeStickies ? ' is_sticky DESC,' :
+				$includeStickies ? ' is_sticky {raw:sorting},' :
 				'').
-				' id_last_msg DESC
+				' id_last_msg {raw:sorting}
 			LIMIT 1',
 			array(
+				'sorting' => $next ? 'DESC' : '',
 				'current_board' => $id_board,
 				'current_member' => $id_member,
 				'is_approved' => 1,

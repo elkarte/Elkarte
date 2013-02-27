@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -35,8 +35,6 @@
 	The menu sub template should display all the relevant buttons the user
 	wants and or needs.
 
-	For more information on the templating system, please see the site at:
-	http://www.simplemachines.org/
 */
 
 /**
@@ -173,7 +171,7 @@ function template_body_above()
 				<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />';
 
 	echo empty($settings['site_slogan']) ? '
-				<img id="logo" src="' . $settings['images_url'] . '/logo_sm.png" alt="Elkarte Community" title="Elkarte Community" />' : '
+				<img id="logo" src="' . $settings['images_url'] . '/logo_elk.png" alt="Elkarte Community" title="Elkarte Community" />' : '
 				<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
 			</div>
 			<div id="upper_wrap">
@@ -560,4 +558,41 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 				implode('', $buttons), '
 			</ul>
 		</div>';
+}
+
+function template_show_error($error_id)
+{
+	global $context;
+
+	if (empty($error_id))
+		return;
+
+	$error = !empty($context[$error_id]) ? $context[$error_id] : null;
+
+	echo '
+					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+	if (!empty($error['title']))
+		echo '
+						<dl>
+							<dt>
+								<strong id="', $error_id, '_title">', $error['title'], '</strong>
+							</dt>
+							<dd>';
+	if (!empty($error['errors']))
+	{
+		echo '
+								<ul class="error" id="', $error_id, '_list">';
+
+		foreach ($error['errors'] as $key => $error)
+			echo '
+									<li id="', $error_id, '_', $key, '">', $error, '</li>';
+		echo '
+								</ul>';
+	}
+	if (!empty($error['title']))
+		echo '
+							</dd>
+						</dl>';
+	echo '
+					</div>';
 }

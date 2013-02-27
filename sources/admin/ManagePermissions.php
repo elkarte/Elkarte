@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Dispaches to the right function based on the given subaction.
@@ -219,7 +219,12 @@ function PermissionIndex()
 	$groups = membersInGroups($postGroups, $normalGroups, true);
 	// @todo not sure why += wouldn't = be enough?
 	foreach ($groups as $id_group => $member_count)
-		$context['groups'][$id_group]['member_count'] += $member_count;
+	{
+		if (isset($context['groups'][$id_group]['member_count']))
+			$context['groups'][$id_group]['member_count'] += $member_count;
+		else
+			$context['groups'][$id_group]['member_count'] = $member_count;
+	}
 
 	foreach ($context['groups'] as $id => $data)
 	{
@@ -1503,6 +1508,13 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'issue_warning';
 	if (!in_array('k', $context['admin_features']))
 		$hiddenPermissions[] = 'karma_edit';
+	if (!in_array('dr', $context['admin_features']))
+	{
+		$hiddenPermissions[] = 'post_draft';
+		$hiddenPermissions[] = 'pm_draft';
+		$hiddenPermissions[] = 'post_autosave_draft';
+		$hiddenPermissions[] = 'pm_autosave_draft';
+	}
 
 	// Post moderation?
 	if (!$modSettings['postmod_active'])

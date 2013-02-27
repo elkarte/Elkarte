@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -485,13 +485,13 @@ function template_user_subscription()
 		<div class="information">
 			', $txt['paid_current_desc'], '
 		</div>
-		<table width="100%" class="table_grid">
+		<table class="table_grid">
 			<thead>
 				<tr class="catbg">
-					<th class="first_th" width="30%">', $txt['paid_name'], '</th>
-					<th align="center">', $txt['paid_status'], '</th>
-					<th align="center">', $txt['start_date'], '</th>
-					<th class="last_th" align="center">', $txt['end_date'], '</th>
+					<th class="first_th" style="width:30%">', $txt['paid_name'], '</th>
+					<th class="centertext">', $txt['paid_status'], '</th>
+					<th class="centertext">', $txt['start_date'], '</th>
+					<th class="last_th centertext">', $txt['end_date'], '</th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -499,7 +499,7 @@ function template_user_subscription()
 	if (empty($context['current']))
 		echo '
 				<tr class="windowbg">
-					<td align="center" colspan="4">
+					<td class="centertext" colspan="4">
 						', $txt['paid_none_yet'], '
 					</td>
 				</tr>';

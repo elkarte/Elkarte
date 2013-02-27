@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Creates the javascript code for localization of the editor (SCEditor)
@@ -731,7 +731,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	if (($thisVerification['show_visual'] && empty($_SESSION[$verificationOptions['id'] . '_vv']['code'])) || ($thisVerification['number_questions'] && empty($_SESSION[$verificationOptions['id'] . '_vv']['q'])))
 		$force_refresh = true;
 
-	$verification_errors = array();
+	$verification_errors = error_context::context($verificationOptions['id']);
 
 	// Start with any testing.
 	if ($do_test)
@@ -744,7 +744,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 			fatal_lang_error('no_access', false);
 
 		if ($thisVerification['show_visual'] && (empty($_REQUEST[$verificationOptions['id'] . '_vv']['code']) || empty($_SESSION[$verificationOptions['id'] . '_vv']['code']) || strtoupper($_REQUEST[$verificationOptions['id'] . '_vv']['code']) !== $_SESSION[$verificationOptions['id'] . '_vv']['code']))
-			$verification_errors[] = 'wrong_verification_code';
+			$verification_errors->addError('wrong_verification_code');
 		if ($thisVerification['number_questions'])
 		{
 			// Get the answers and see if they are all right!
@@ -767,12 +767,12 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 			$smcFunc['db_free_result']($request);
 
 			if (!empty($incorrectQuestions))
-				$verification_errors[] = 'wrong_verification_answer';
+				$verification_errors->addError('wrong_verification_answer');
 		}
 	}
 
 	// Any errors means we refresh potentially.
-	if (!empty($verification_errors))
+	if ($verification_errors->hasError(array('wrong_verification_code', 'wrong_verification_answer')))
 	{
 		if (empty($_SESSION[$verificationOptions['id'] . '_vv']['errors']))
 			$_SESSION[$verificationOptions['id'] . '_vv']['errors'] = 0;
@@ -854,8 +854,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	$_SESSION[$verificationOptions['id'] . '_vv']['count'] = empty($_SESSION[$verificationOptions['id'] . '_vv']['count']) ? 1 : $_SESSION[$verificationOptions['id'] . '_vv']['count'] + 1;
 
 	// Return errors if we have them.
-	if (!empty($verification_errors))
-		return $verification_errors;
+	if ($verification_errors->hasErrors())
+		return true;
 	// If we had a test that one, make a note.
 	elseif ($do_test)
 		$_SESSION[$verificationOptions['id'] . '_vv']['did_pass'] = true;

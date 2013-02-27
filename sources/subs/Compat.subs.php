@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -20,7 +20,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Define the old SMF sha1 function.
@@ -134,9 +134,9 @@ function sha1_rol($num, $cnt)
  * http://www.php.net/crc32#79567
  * @param $number
  */
-if (!function_exists('smf_crc32'))
+if (!function_exists('crc32_compat'))
 {
-	function smf_crc32($number)
+	function crc32_compat($number)
 	{
 		$crc = crc32($number);
 

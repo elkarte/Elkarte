@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -377,7 +377,7 @@ function template_folder()
 			}
 
 			echo '
-											<li><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions[', $message['id'], ']=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="remove_button">', $txt['delete'], '</a></li>';
+											<li><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="remove_button">', $txt['delete'], '</a></li>';
 
 			// Showing all then give a remove item checkbox
 			if (empty($context['display_mode']))
@@ -515,22 +515,22 @@ function template_subject_list()
 	global $context, $settings, $modSettings, $txt, $scripturl;
 
 	echo '
-						<table width="100%" class="table_grid">
+						<table class="table_grid">
 						<thead>
 							<tr class="catbg">
-								<th align="center" width="4%" class="centercol first_th">
+								<th style="width:4%" class="centercol first_th">
 									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] == 'up' ? '' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '"><img src="', $settings['images_url'], '/im_switch.png" alt="', $txt['pm_change_view'], '" title="', $txt['pm_change_view'], '" width="16" height="16" /></a>
 								</th>
-								<th class="lefttext" width="22%">
+								<th class="lefttext" style="width:22%">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', $context['sort_by'] == 'date' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', $txt['date'], $context['sort_by'] == 'date' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
-								<th class="lefttext" width="46%">
+								<th class="lefttext" style="width:46%">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=subject', $context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', $txt['subject'], $context['sort_by'] == 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
 								<th class="lefttext">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', ($context['from_or_to'] == 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
-								<th width="4%" class="centercol last_th">
+								<th style="width:4%" class="centercol last_th">
 									<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />
 								</th>
 							</tr>
@@ -548,7 +548,7 @@ function template_subject_list()
 	{
 		echo '
 							<tr class="', $next_alternate ? 'windowbg' : 'windowbg2', '">
-								<td align="center" width="4%">
+								<td style="width:4%;text-align:center">
 									<script type="text/javascript"><!-- // --><![CDATA[
 										currentLabels[', $message['id'], '] = {';
 
@@ -570,7 +570,9 @@ function template_subject_list()
 								<td>', $message['time'], '</td>
 								<td>', ($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''), '<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg', $message['id'], '">', $message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '</a></td>
 								<td>', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '</td>
-								<td class="centercol" width="4%"><input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" /></td>
+								<td class="centercol" style="width:4%">
+									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
+								</td>
 							</tr>';
 			$next_alternate = !$next_alternate;
 	}
@@ -787,12 +789,12 @@ function template_search_results()
 	// complete results ?
 	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
 		echo '
-	<table width="100%" class="table_grid">
+	<table class="table_grid">
 	<thead>
 		<tr class="catbg">
-			<th class="lefttext first_th" width="30%">', $txt['date'], '</th>
-			<th class="lefttext" width="50%">', $txt['subject'], '</th>
-			<th class="lefttext last_th" width="20%">', $txt['from'], '</th>
+			<th class="lefttext first_th" style="width:30%">', $txt['date'], '</th>
+			<th class="lefttext" style="width:50%">', $txt['subject'], '</th>
+			<th class="lefttext last_th" style="width:20%">', $txt['from'], '</th>
 		</tr>
 	</thead>
 	<tbody>';
@@ -856,7 +858,7 @@ function template_search_results()
 		{
 			// @todo No context at all of the search?
 			echo '
-			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" valign="top">
+			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align:top">
 				<td>', $message['time'], '</td>
 				<td>', $message['link'], '</td>
 				<td>', $message['member']['link'], '</td>
@@ -945,17 +947,7 @@ function template_send()
 				<br class="clear" />';
 
 	// If there were errors for sending the PM, show them.
-	echo '
-				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
-					<dl>
-						<dt>
-							<strong id="error_serious">', $txt['error_while_submitting'] , '</strong>
-						</dt>
-						<dd class="error" id="error_list">
-							', empty($context['post_error']['messages']) ? '' : implode('<br />', $context['post_error']['messages']), '
-						</dd>
-					</dl>
-				</div>';
+	template_show_error('post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
@@ -1230,13 +1222,13 @@ function template_labels()
 		<div class="description">
 			', $txt['pm_labels_desc'], '
 		</div>
-		<table width="100%" class="table_grid">
+		<table class="table_grid">
 		<thead>
 			<tr class="catbg">
 				<th class="lefttext first_th">
 					', $txt['pm_label_name'], '
 				</th>
-				<th class="centertext last_th" width="4%">';
+				<th class="centertext last_th" style="width:4%">';
 
 	if (count($context['labels']) > 2)
 		echo '
@@ -1251,7 +1243,7 @@ function template_labels()
 	if (count($context['labels']) < 2)
 		echo '
 			<tr class="windowbg2">
-				<td colspan="2" align="center">', $txt['pm_labels_no_exist'], '</td>
+				<td colspan="2" class="centertext">', $txt['pm_labels_no_exist'], '</td>
 			</tr>';
 	else
 	{
@@ -1266,7 +1258,9 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td width="4%" align="center"><input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" /></td>
+				<td style="width:4%;text-align:center">
+					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
+				</td>
 			</tr>';
 
 			$alternate = !$alternate;
@@ -1395,13 +1389,13 @@ function template_rules()
 		<div class="description">
 			', $txt['pm_manage_rules_desc'], '
 		</div>
-		<table width="100%" class="table_grid">
+		<table class="table_grid">
 		<thead>
 			<tr class="catbg">
 				<th class="lefttext first_th">
 					', $txt['pm_rule_title'], '
 				</th>
-				<th width="4%" class="centertext last_th">';
+				<th style="width:4%" class="centertext last_th">';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1416,7 +1410,7 @@ function template_rules()
 	if (empty($context['rules']))
 		echo '
 			<tr class="windowbg2">
-				<td colspan="2" align="center">
+				<td colspan="2" class="centertext">
 					', $txt['pm_rules_none'], '
 				</td>
 			</tr>';
@@ -1429,7 +1423,7 @@ function template_rules()
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
-				<td width="4%" align="center">
+				<td style="width:4%;text-align:center">
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -16,56 +16,46 @@
 
 function template_poll_edit()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	// Some javascript for adding more options.
-	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var pollOptionNum = 0;
-			var pollOptionId = ', $context['last_choice_id'], ';
-			var form_name = \'postmodify\';
-			var txt_option = "', $txt['option'], '";
-		// ]]></script>';
-
-	// Start the main poll form.
-	echo '
+	if (!empty($context['form_url']))
+		echo '
+	<script type="text/javascript"><!-- // --><![CDATA[
+		var pollOptionNum = 0, pollTabIndex;
+		var pollOptionId = ', $context['last_choice_id'], ';
+		var txt_option = "', $txt['option'], '";
+		var form_name = \'postmodify\';
+	// ]]></script>
 	<div id="edit_poll">
-		<form action="' . $scripturl . '?action=editpoll2', $context['is_edit'] ? '' : ';add', ';topic=' . $context['current_topic'] . '.' . $context['start'] . '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
+		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
 			<div class="cat_bar">
 				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>';
-
-	if (!empty($context['poll_error']['messages']))
-		echo '
-			<div class="errorbox">
-				<dl class="poll_error">
-					<dt>
-						', $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'], ':
-					</dt>
-					<dt>
-						', empty($context['poll_error']['messages']) ? '' : implode('<br />', $context['poll_error']['messages']), '
-					</dt>
-				</dl>
-			</div>';
-
-	echo '
+			</div>
 			<div>
-				<div class="roundframe">
-					<input type="hidden" name="poll" value="', $context['poll']['id'], '" />
+				<div class="roundframe">';
+
+	template_show_error('poll_error');
+
+	if (!empty($context['poll']['id']))
+		echo '
+					<input type="hidden" name="poll" value="', $context['poll']['id'], '" />';
+	echo '
 					<fieldset id="poll_main">
 						<legend><span ', (isset($context['poll_error']['no_question']) ? ' class="error"' : ''), '>', $txt['poll_question'], ':</span></legend>
-						<input type="text" name="question" size="80" value="', $context['poll']['question'], '" class="input_text" />
+						<input type="text" name="question" value="', isset($context['poll']['question']) ? $context['poll']['question'] : '', '" tabindex="', $context['tabindex']++, '" size="80" class="input_text" />
 						<ul class="poll_main">';
 
+	// Loop through all the choices and print them out.
 	foreach ($context['choices'] as $choice)
 	{
 		echo '
 							<li>
 								<label for="options-', $choice['id'], '" ', (isset($context['poll_error']['poll_few']) ? ' class="error"' : ''), '>', $txt['option'], ' ', $choice['number'], '</label>:
-								<input type="text" name="options[', $choice['id'], ']" id="options-', $choice['id'], '" value="', $choice['label'], '" class="input_text" size="80" maxlength="255" />';
+								<input type="text" name="options[', $choice['id'], ']" id="options-', $choice['id'], '" value="', $choice['label'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="255" class="input_text" />';
 
 		// Does this option have a vote count yet, or is it new?
-		if ($choice['votes'] != -1)
+		if (isset($choice['votes']) && $choice['votes'] != -1)
 			echo ' (', $choice['votes'], ' ', $txt['votes'], ')';
 
 		echo '
@@ -95,7 +85,7 @@ function template_poll_edit()
 								<em class="smalltext">', $txt['poll_run_limit'], '</em>
 							</dt>
 							<dd>
-								<input type="text" name="poll_expire" id="poll_expire" size="2" value="', $context['poll']['expiration'], '" onchange="this.form.poll_hide[2].disabled = isEmptyText(this) || this.value == 0; if (this.form.poll_hide[2].checked) this.form.poll_hide[1].checked = true;" maxlength="4" class="input_text" /> ', $txt['days_word'], '
+								<input type="text" name="poll_expire" id="poll_expire" size="2" value="', $context['poll']['expiration'], '" onchange="pollOptions();" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 							</dd>
 							<dt>
 								<label for="poll_change_vote">', $txt['poll_do_change_vote'], ':</label>
@@ -121,26 +111,27 @@ function template_poll_edit()
 							<dd>
 								<input type="radio" name="poll_hide" id="poll_results_anyone" value="0"', $context['poll']['hide_results'] == 0 ? ' checked="checked"' : '', ' class="input_radio" /> <label for="poll_results_anyone">', $txt['poll_results_anyone'], '</label><br />
 								<input type="radio" name="poll_hide" id="poll_results_voted" value="1"', $context['poll']['hide_results'] == 1 ? ' checked="checked"' : '', ' class="input_radio" /> <label for="poll_results_voted">', $txt['poll_results_voted'], '</label><br />
-								<input type="radio" name="poll_hide" id="poll_results_expire" value="2"', $context['poll']['hide_results'] == 2 ? ' checked="checked"' : '', empty($context['poll']['expiration']) ? 'disabled="disabled"' : '', ' class="input_radio" /> <label for="poll_results_expire">', $txt['poll_results_after'], '</label>
+								<input type="radio" name="poll_hide" id="poll_results_expire" value="2"', $context['poll']['hide_results'] == 2 ? ' checked="checked"' : '', empty($context['poll']['expiration']) ? ' disabled="disabled"' : '', ' class="input_radio" /> <label for="poll_results_expire">', $txt['poll_results_after'], '</label>
 							</dd>
 						</dl>
 					</fieldset>';
 	// If this is an edit, we can allow them to reset the vote counts.
-	if ($context['is_edit'])
+	if (!empty($context['is_edit']))
 		echo '
 					<fieldset id="poll_reset">
 						<legend>', $txt['reset_votes'], '</legend>
 						<input type="checkbox" name="resetVoteCount" value="on" class="input_check" /> ' . $txt['reset_votes_check'] . '
 					</fieldset>';
-	echo '
+
+	if (!empty($context['form_url']))
+		echo '
 					<div class="padding flow_auto">
 						<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />
 					</div>
 				</div>
 			</div>
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
-			<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 		</form>
-	</div>
-';
+	</div>';
 }

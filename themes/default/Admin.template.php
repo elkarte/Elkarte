@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -102,8 +102,8 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the simplemachines.org site. The language and format are passed for internationalization.
-	if (empty($modSettings['disable_smf_js']))
+	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
+	if (empty($modSettings['disable_elk_js']))
 		echo '
 					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
 					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
@@ -333,16 +333,16 @@ function template_view_versions()
 							</h3>
 						</div>
 						<div class="information">', $txt['version_check_desc'], '</div>
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<thead>
-									<tr class="catbg" align="left">
-										<th class="first_th" scope="col" width="50%">
+									<tr class="catbg lefttext">
+										<th class="first_th" scope="col" style="width:50%">
 											<strong>', $txt['admin_elkfile'], '</strong>
 										</th>
-										<th scope="col" width="25%">
+										<th scope="col" style="width:25%">
 											<strong>', $txt['dvc_your'], '</strong>
 										</th>
-										<th class="last_th" scope="col" width="25%">
+										<th class="last_th" scope="col" style="width:25%">
 											<strong>', $txt['dvc_current'], '</strong>
 										</th>
 									</tr>
@@ -379,20 +379,20 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table id="sources" width="100%" class="table_grid">
+							<table id="sources" class="table_grid">
 							<tbody>';
 
 	// Loop through every source file displaying its version - using javascript.
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 										', $filename, '
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="yoursources', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="oursources', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -404,36 +404,36 @@ function template_view_versions()
 
 	// List all the admin file versions, starting with the overall version (if all match!).
 	echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="youradmin">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ouradmin">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="admin" width="100%" class="table_grid">
+							<table id="admin" class="table_grid">
 							<tbody>';
 
 	// Loop through every admin file displaying its version - using javascript.
 	foreach ($context['file_versions_admin'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 										', $filename, '
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="youradmin', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="ouradmin', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -445,36 +445,36 @@ function template_view_versions()
 
 	// List all the controller file versions, starting with the overall version (if all match!).
 	echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yourcontrollers">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ourcontrollers">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="controllers" width="100%" class="table_grid">
+							<table id="controllers" class="table_grid">
 							<tbody>';
 
 	// Loop through every controller file displaying its version - using javascript.
 	foreach ($context['file_versions_controllers'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 										', $filename, '
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="yourcontrollers', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="ourcontrollers', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -486,36 +486,36 @@ function template_view_versions()
 
 	// List all the database file versions, starting with the overall version (if all match!).
 	echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="database-link">', $txt['dvc_database'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yourdatabase">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ourdatabase">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="database" width="100%" class="table_grid">
+							<table id="database" class="table_grid">
 							<tbody>';
 
 	// Loop through every database file displaying its version - using javascript.
 	foreach ($context['file_versions_database'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 										', $filename, '
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="yourdatabase', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="ourdatabase', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -527,36 +527,36 @@ function template_view_versions()
 
 	// List all the subs file versions, starting with the overall version (if all match!).
 	echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="subs-link">', $txt['dvc_subs'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yoursubs">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="oursubs">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="subs" width="100%" class="table_grid">
+							<table id="subs" class="table_grid">
 							<tbody>';
 
 	// Loop through every subs file displaying its version - using javascript.
 	foreach ($context['file_versions_subs'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 										', $filename, '
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="yoursubs', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" width="25%">
+									<td class="windowbg2" style="width:25%">
 										<em id="oursubs', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -568,35 +568,35 @@ function template_view_versions()
 
 	// Now the templates
 	echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yourdefault">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ourdefault">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="Default" width="100%" class="table_grid">
+							<table id="Default" class="table_grid">
 								<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
 		echo '
 									<tr>
-										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 											', $filename, '
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="yourdefault', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="ourdefault', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -606,23 +606,23 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yourLanguages">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ourLanguages">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="Languages" width="100%" class="table_grid">
+							<table id="Languages" class="table_grid">
 								<tbody>';
 
 	foreach ($context['default_language_versions'] as $language => $files)
@@ -630,13 +630,13 @@ function template_view_versions()
 		foreach ($files as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 											', $filename, '.<em>', $language, '</em>.php
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="your', $filename, '.', $language, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="our', $filename, '.', $language, '">??</em>
 										</td>
 									</tr>';
@@ -650,35 +650,35 @@ function template_view_versions()
 	if (!empty($context['template_versions']))
 	{
 		echo '
-							<table width="100%" class="table_grid">
+							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" width="50%">
+										<td class="windowbg" style="width:50%">
 											<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="yourTemplates">??</em>
 										</td>
-										<td class="windowbg" width="25%">
+										<td class="windowbg" style="width:25%">
 											<em id="ourTemplates">??</em>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<table id="Templates" width="100%" class="table_grid">
+							<table id="Templates" class="table_grid">
 								<tbody>';
 
 		foreach ($context['template_versions'] as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" width="50%" style="padding-left: 3ex;">
+										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
 											', $filename, '
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="yourTemplates', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" width="25%">
+										<td class="windowbg2" style="width:25%">
 											<em id="ourTemplates', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -996,7 +996,7 @@ function template_show_settings()
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
 					echo '
-							<textarea rows="', ($config_var['size'] ? $config_var['size'] : 4), '" cols="30" ', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+							<textarea rows="', ($config_var['size'] ? $config_var['size'] : 4), '" cols="40" ', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
 					theme_inline_permissions($config_var['name']);
@@ -1437,7 +1437,7 @@ function template_core_features()
 			if (!token_value)
 				token_value = $("#core_features_token").attr("value");
 
-			$(".core_features_img").click(function(){
+			$(".core_features_img").click(function() {
 				var cc = $(this),
 					cf = $(this).attr("id").substring(7),
 					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
@@ -1450,28 +1450,28 @@ function template_core_features()
 				$("#feature_" + cf).attr("checked", new_state);
 
 				data = {save: "save", feature_id: cf};
-				data[$("#core_features_session").attr("name")] = $("#core_features_session").attr("value");
+				data[$("#core_features_session").attr("name")] = $("#core_features_session").val();
 				data[token_name] = token_value;
 
-				$(".core_features_status_box").each(function(){
+				$(".core_features_status_box").each(function() {
 					data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
 				});
 
 				// Launch AJAX request.
 				$.ajax({
 					// The link we are accessing.
-					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
+					url: smf_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
 					
 					// The type of request.
 					type: "post",
 					
 					// The type of data that is getting returned.
 					data: data,
-					error: function(error){
+					error: function(error) {
 							$(ajax_infobar).html(error).slideDown(\'fast\');
 					},
 
-					success: function(request){
+					success: function(request) {
 						if ($(request).find("errors").find("error").length != 0)
 						{
 							$(ajax_infobar).attr(\'class\', \'errorbox\');
@@ -1707,12 +1707,12 @@ function template_php_info()
 	foreach ($context['pinfo'] as $area => $php_area)
 	{
 		echo '
-		<table id="', str_replace(' ', '_', $area), '" width="100%" class="table_grid">
+		<table id="', str_replace(' ', '_', $area), '" class="table_grid">
 			<thead>
 			<tr class="catbg">
-				<th class="first_th" scope="col" width="33%"></th>
-				<th scope="col" width="33%" class="centercol"><strong>', $area, '</strong></th>
-				<th class="last_th" scope="col" width="33%"></th>
+				<th class="first_th" scope="col" style="width:33%"></th>
+				<th scope="col" style="width:33%" class="centercol"><strong>', $area, '</strong></th>
+				<th class="last_th" scope="col" style="width:33%"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1731,21 +1731,21 @@ function template_php_info()
 					// heading row for the settings section of this categorys settings
 					echo '
 			<tr class="titlebg">
-				<td align="center" width="33%"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
-				<td align="center" width="33%"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
-				<td align="center" width="33%"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
+				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
+				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
+				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
 			</tr>';
 					$localmaster = false;
 				}
 
 				echo '
 			<tr>
-				<td align="left" width="33%" class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
+				<td style="width:33;text-align:left" class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
 				{
 					echo '
-				<td align="left" width="33%" class="windowbg', $alternate ? '2' : '', '">', $value, '</td>';
+				<td style="width:33%;text-align:left" class="windowbg', $alternate ? '2' : '', '">', $value, '</td>';
 				}
 				echo '
 			</tr>';
@@ -1755,8 +1755,8 @@ function template_php_info()
 			{
 				echo '
 			<tr>
-				<td align="left" width="33%" class="windowbg', $alternate ? '2' : '', '">', $key,  '</td>
-				<td align="left" class="windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
+				<td style="width:33%" class="lefttext windowbg', $alternate ? '2' : '', '">', $key,  '</td>
+				<td class="lefttext windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
 			</tr>';
 			}
 

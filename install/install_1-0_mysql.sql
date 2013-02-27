@@ -1431,7 +1431,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines (R) Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
 # --------------------------------------------------------
 
 #
@@ -1491,6 +1491,7 @@ VALUES (-1, 'search_posts'),
 	(0, 'profile_server_avatar'),
 	(0, 'profile_upload_avatar'),
 	(0, 'profile_remote_avatar'),
+	(0, 'profile_gravatar'),
 	(0, 'send_email_to_members'),
 	(0, 'karma_edit'),
 	(2, 'view_mlist'),
@@ -1510,6 +1511,7 @@ VALUES (-1, 'search_posts'),
 	(2, 'profile_server_avatar'),
 	(2, 'profile_upload_avatar'),
 	(2, 'profile_remote_avatar'),
+	(2, 'profile_gravatar'),
 	(2, 'send_email_to_members'),
 	(2, 'profile_title_own'),
 	(2, 'calendar_post'),
@@ -1658,7 +1660,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
-VALUES ('ourVersion', '{$current_version}'),
+VALUES ('elkVersion', '{$current_version}'),
 	('news', '{$default_news}'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),
@@ -1761,6 +1763,7 @@ VALUES ('ourVersion', '{$current_version}'),
 	('avatar_max_width_upload', '65'),
 	('avatar_resize_upload', '1'),
 	('avatar_download_png', '1'),
+	('gravatar_rating', 'g'),
 	('failed_login_threshold', '3'),
 	('oldTopicDays', '120'),
 	('edit_wait_time', '90'),

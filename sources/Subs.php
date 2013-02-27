@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Update some basic statistics.
@@ -1176,7 +1176,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'glow',
 				'type' => 'unparsed_commas',
 				'test' => '[#0-9a-zA-Z\-]{3,12},([012]\d{1,2}|\d{1,2})(,[^]]+)?\]',
-				'before' => isBrowser('ie') ? '<table border="0" cellpadding="0" cellspacing="0" style="display: inline; vertical-align: middle; font: inherit;"><tr><td style="filter: Glow(color=$1, strength=$2); font: inherit;">' : '<span style="text-shadow: $1 1px 1px 1px">',
+				'before' => isBrowser('ie') ? '<table style="border-collapse: collapse; border-spacing: 0;display: inline; vertical-align: middle; font: inherit;"><tr><td style="filter: Glow(color=$1, strength=$2); font: inherit;">' : '<span style="text-shadow: $1 1px 1px 1px">',
 				'after' => isBrowser('ie') ? '</td></tr></table> ' : '</span>',
 			),
 			array(
@@ -2943,17 +2943,8 @@ function template_header()
 			}
 
 			// We are already checking so many files...just few more doesn't make any difference! :P
-			if (!empty($modSettings['currentAttachmentUploadDir']))
-			{
-				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = @unserialize($modSettings['attachmentUploadDir']);
-				$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-			}
-			else
-			{
-				$path = $modSettings['attachmentUploadDir'];
-				$id_folder_thumb = 1;
-			}
+			require_once(SUBSDIR . '/Attachments.subs.php');
+			$path = getAttachmentPath();
 			secureDirectory($path, true);
 			secureDirectory(CACHEDIR);
 
@@ -3258,7 +3249,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = $modSettings['attachmentUploadDir'][$dir];
+		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['attachmentUploadDir'];
 	}
 	else
 		$path = $modSettings['attachmentUploadDir'];
@@ -3823,7 +3814,7 @@ function setupMenuContext()
 /**
  * Generate a random seed and ensure it's stored in settings.
  */
-function smf_seed_generator()
+function elk_seed_generator()
 {
 	global $modSettings;
 

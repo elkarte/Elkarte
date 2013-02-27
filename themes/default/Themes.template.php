@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -183,7 +183,7 @@ function template_main()
 		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	// ]]></script>';
 
-	if (empty($modSettings['disable_smf_js']))
+	if (empty($modSettings['disable_elk_js']))
 		echo '
 		<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-themes.js"></script>';
 
@@ -848,12 +848,12 @@ function template_edit_browse()
 
 	echo '
 	<div id="admincenter">
-		<table width="100%" class="table_grid tborder">
+		<table class="table_grid tborder">
 		<thead>
 			<tr class="catbg">
-				<th class="lefttext first_th" scope="col" width="50%">', $txt['themeadmin_edit_filename'], '</th>
-				<th scope="col" width="35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th class="last_th" scope="col" width="15%">', $txt['themeadmin_edit_size'], '</th>
+				<th class="lefttext first_th" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
+				<th class="last_th" scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';

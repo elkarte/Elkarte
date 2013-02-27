@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Edit the position and properties of a category.
@@ -230,7 +230,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 			)
 		);
 
-	// Noone will ever be able to collapse these categories anymore.
+	// No one will ever be able to collapse these categories anymore.
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}collapsed_categories
 		WHERE id_cat IN ({array_int:category_list})',

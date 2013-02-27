@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -78,19 +78,19 @@ function template_download_language()
 					', $txt['languages_download_theme_files'], '
 				</h3>
 			</div>
-			<table class="table_grid" cellspacing="0" width="100%">
+			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th" scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
-						<th scope="col" width="100">
+						<th scope="col" style="width:100">
 							', $txt['languages_download_writable'], '
 						</th>
-						<th scope="col" width="100">
+						<th scope="col" style="width:100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centercol" scope="col" width="4%">
+						<th class="last_th centercol" scope="col" style="width:4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -192,7 +192,7 @@ function template_download_language()
 			<div class="righttext padding">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
-				<input type="submit" name="do_install" value="', $txt['add_language_elkarte_install'], '" class="button_submit" />
+				<input type="submit" name="do_install" value="', $txt['add_language_elk_install'], '" class="button_submit" />
 			</div>
 		</form>
 	</div>';
@@ -441,9 +441,9 @@ function template_add_language()
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>
-						<legend>', $txt['add_language_elkarte'], '</legend>
-						<label class="smalltext">', $txt['add_language_elkarte_browse'], '</label>
-						<input type="text" name="smf_add" size="40" value="', !empty($context['smf_search_term']) ? $context['smf_search_term'] : '', '" class="input_text" />';
+						<legend>', $txt['add_language_elk'], '</legend>
+						<label class="smalltext">', $txt['add_language_elk_browse'], '</label>
+						<input type="text" name="lang_add" size="40" value="', !empty($context['elk_search_term']) ? $context['elk_search_term'] : '', '" class="input_text" />';
 
 	// Do we have some errors? Too bad.
 	if (!empty($context['langfile_error']))
@@ -455,7 +455,7 @@ function template_add_language()
 
 	echo '
 					</fieldset>', isBrowser('is_ie') ? '<input type="text" name="ie_fix" style="display: none;" class="input_text" /> ' : '', '
-					<input type="submit" name="smf_add_sub" value="', $txt['search'], '" class="button_submit" />
+					<input type="submit" name="lang_add_sub" value="', $txt['search'], '" class="button_submit" />
 					<br />
 				</div>
 			</div>
@@ -465,7 +465,7 @@ function template_add_language()
 	if (!empty($context['languages']))
 	{
 		echo '
-			<div class="information">', $txt['add_language_elkarte_found'], '</div>';
+			<div class="information">', $txt['add_language_elk_found'], '</div>';
 
 		template_show_list('languages');
 	}

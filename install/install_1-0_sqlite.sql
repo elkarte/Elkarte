@@ -1555,7 +1555,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines (R) Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
 # --------------------------------------------------------
 
 #
@@ -1617,6 +1617,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'karma_edit');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'view_mlist');
@@ -1636,6 +1637,7 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_r
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_server_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_upload_avatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_remote_avatar');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_gravatar');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'send_email_to_members');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_title_own');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'calendar_post');
@@ -1800,7 +1802,7 @@ CREATE TABLE {$db_prefix}settings (
 #
 
 BEGIN TRANSACTION;
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ourVersion', '{$current_version}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
@@ -1903,6 +1905,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_height_up
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_max_width_upload', '65');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_resize_upload', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_download_png', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('gravatar_rating', 'g');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('failed_login_threshold', '3');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('oldTopicDays', '120');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('edit_wait_time', '90');

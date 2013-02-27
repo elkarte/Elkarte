@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -450,23 +450,26 @@ function template_coppa_form()
 
 	// Show the form (As best we can)
 	echo '
-		<table border="0" width="100%" cellpadding="3" cellspacing="0" class="tborder" align="center">
+		<table style="width:100%;text-align:center" class="tborder">
 			<tr>
-				<td align="left">', $context['forum_contacts'], '</td>
-			</tr><tr>
-				<td align="right">
+				<td style="text-align:left">', $context['forum_contacts'], '</td>
+			</tr>
+			<tr>
+				<td style="text-align:right">
 					<em>', $txt['coppa_form_address'], '</em>: ', $context['ul'], '<br />
 					', $context['ul'], '<br />
 					', $context['ul'], '<br />
 					', $context['ul'], '
 				</td>
-			</tr><tr>
-				<td align="right">
+			</tr>
+			<tr>
+				<td style="text-align:right">
 					<em>', $txt['coppa_form_date'], '</em>: ', $context['ul'], '
 					<br /><br />
 				</td>
-			</tr><tr>
-				<td align="left">
+			</tr>
+			<tr>
+				<td style="text-align:left">
 					', $context['coppa_body'], '
 				</td>
 			</tr>

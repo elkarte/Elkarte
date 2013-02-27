@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -21,7 +21,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 function automanage_attachments_check_directory()
 {
@@ -1389,8 +1389,8 @@ function url_image_size($url)
 /**
  * The current attachments path:
  *  - BOARDDIR . '/attachments', if nothing is set yet.
- *  - if the forum is using multiple attachments directories, the current path
- *  - it is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
+ *  - if the forum is using multiple attachments directories,
+ *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
  */
 function getAttachmentPath()
@@ -1406,6 +1406,28 @@ function getAttachmentPath()
 		$attachmentDir = $modSettings['attachmentUploadDir'];
 
 	return is_array($attachmentDir) ? $attachmentDir[$modSettings['currentAttachmentUploadDir']] : $attachmentDir;
+}
+
+/**
+ * Return an array of attachments directories.
+ * @see getAttachmentPath()
+ */
+function attachmentPaths()
+{
+	global $modSettings, $boarddir;
+
+	if (empty($modSettings['attachmentUploadDir']))
+		return array($boarddir . '/attachments');
+	elseif (!empty($modSettings['currentAttachmentUploadDir']))
+	{
+		// we have more directories
+		if (!is_array($modSettings['attachmentUploadDir']))
+			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
+		return $modSettings['attachmentUploadDir'];
+	}
+	else
+		return array($modSettings['attachmentUploadDir']);
 }
 
 /**
@@ -1679,4 +1701,139 @@ function getServerStoredAvatars($directory, $level)
 	}
 
 	return $result;
+}
+
+/**
+ * Simple function to remove the strictly needed of orphan attachments.
+ * This is used from attachments maintenance.
+ * It assumes the files have no message, no member information.
+ * It only removes the attachments and thumbnails from the database.
+ *
+ * @param array $attach_ids
+ */
+function removeOrphanAttachments($attach_ids)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}attachments
+		WHERE id_attach IN ({array_int:to_remove})',
+		array(
+			'to_remove' => $attach_ids,
+		)
+	);
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}attachments
+			SET id_thumb = {int:no_thumb}
+			WHERE id_thumb IN ({array_int:to_remove})',
+			array(
+				'to_remove' => $attach_ids,
+				'no_thumb' => 0,
+			)
+		);
+}
+
+/**
+ * Set or retrieve the size of an attachment.
+ *
+ * @param int $attach_id
+ * @param int $filesize = null
+ */
+function attachment_filesize($attach_id, $filesize = null)
+{
+	global $smcFunc;
+
+	if ($filesize === null)
+	{
+		$result = $smcFunc['db_query']('', '
+			SELECT size
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'id_attach' => $attach_id,
+			)
+		);
+		if (!empty($result))
+		{
+			list($filesize) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+			return $filesize;
+		}
+		return false;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET size = {int:filesize}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'filesize' => $filesize,
+				'id_attach' => $attach_id,
+			)
+		);
+	}
+}
+
+/**
+ * Set or retrieve the ID of the folder where an attachment is stored on disk.
+ *
+ * @param int $attach_id
+ * @param int $folder_id = null
+ */
+function attachment_folder($attach_id, $folder_id = null)
+{
+	global $smcFunc;
+
+	if ($folder_id === null)
+	{
+		$result = $smcFunc['db_query']('', '
+			SELECT id_folder
+			FROM {db_prefix}attachments
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'id_attach' => $attach_id,
+			)
+		);
+		if (!empty($result))
+		{
+			list($folder_id) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+			return $folder_id;
+		}
+		return false;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET id_folder = {int:new_folder}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'new_folder' => $folder_id,
+				'id_attach' => $attach_id,
+			)
+		);
+	}
+}
+
+/**
+ * Get max attachment ID with a thumbnail.
+ */
+function maxThumbnails()
+{
+	global $smcFunc;
+
+	$result = $smcFunc['db_query']('', '
+		SELECT MAX(id_attach)
+		FROM {db_prefix}attachments
+		WHERE id_thumb != {int:no_thumb}',
+		array(
+			'no_thumb' => 0,
+		)
+	);
+	list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+	$smcFunc['db_free_result']($result);
+
+	return $thumbnails;
 }

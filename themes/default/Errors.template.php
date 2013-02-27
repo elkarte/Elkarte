@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -62,7 +62,7 @@ function template_error_log()
 					', $context['page_index'], '
 				</div>
 			</div>
-			<table border="0" cellspacing="1" class="table_grid" id="error_log">
+			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
@@ -203,7 +203,7 @@ function template_show_file()
 		$is_target = $line_num == $context['file_data']['target'];
 		echo '
 			<tr>
-				<td align="right"', $is_target ? ' class="current">==&gt;' : '>', $line_num , ':</td>
+				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num , ':</td>
 				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;':'','">', $line, '</td>
 			</tr>';
 	}
@@ -221,17 +221,19 @@ function template_attachment_errors()
 	<div>
 		<div class="cat_bar">
 			<h3 class="catbg">
-				', $context['error_title'], '
+				', $txt['attach_error_title'], '
 			</h3>
 		</div>
 		<div class="windowbg">
-			<div class="padding">
-				<div class="noticebox">',
-					$context['error_message'], '
-				</div>',
-				!empty($context['back_link']) ? ('<a class="button_link" href="' . $scripturl . $context['back_link'] . '">' . $txt['back'] . '</a>') : '',
-				'<span style="float: right; margin:.5em;"></span>
-				<a class="button_link" href="', $scripturl, $context['redirect_link'], '">', $txt['continue'], '</a>
+			<div class="padding">';
+
+	foreach ($context['attachment_error_keys'] as $key)
+		template_show_error($key);
+
+	echo 
+				!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '',
+				'
+				<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
 			</div>
 		</div>
 	</div>';

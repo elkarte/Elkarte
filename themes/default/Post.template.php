@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -76,17 +76,7 @@ function template_main()
 					<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '';
 
 	// If an error occurred, explain what happened.
-	echo '
-					<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']) ? ' style="display: none"' : '', ' id="errors">
-						<dl>
-							<dt>
-								<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
-							</dt>
-							<dd class="error" id="error_list">
-								', empty($context['post_error']) ? '' : implode('<br />', $context['post_error']), '
-							</dd>
-						</dl>
-					</div>';
+	template_show_error('post_error');
 
 	// If this won't be approved let them know!
 	if (!$context['becomes_approved'])
@@ -141,7 +131,7 @@ function template_main()
 							<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
 						</dt>
 						<dd>
-							<input type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
+							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
 						</dd>
 						<dt class="clear_left">
 							', $txt['message_icon'], ':
@@ -396,7 +386,7 @@ function template_main()
 						</dl>';
 	}
 
-		echo '
+	echo '
 					</div>';
 	// If the admin enabled the drafts feature, show a draft selection box
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
@@ -679,17 +669,19 @@ function template_spellcheck()
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
-			<table border="0" cellpadding="4" cellspacing="0" width="100%"><tr class="windowbg">
-				<td width="50%" valign="top">
-					', $txt['spellcheck_change_to'], '<br />
-					<input type="text" name="changeto" style="width: 98%;" class="input_text" />
-				</td>
-				<td width="50%">
-					', $txt['spellcheck_suggest'], '<br />
-					<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
-					</select>
-				</td>
-			</tr></table>
+			<table class="table_padding" style="width:100%">
+				<tr class="windowbg">
+					<td style="width:50%;vertical-align:top">
+						', $txt['spellcheck_change_to'], '<br />
+						<input type="text" name="changeto" style="width: 98%;" class="input_text" />
+					</td>
+					<td style="width:50%">
+						', $txt['spellcheck_suggest'], '<br />
+						<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
+						</select>
+					</td>
+				</tr>
+			</table>
 			<div class="righttext" style="padding: 4px;">
 				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
 				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />

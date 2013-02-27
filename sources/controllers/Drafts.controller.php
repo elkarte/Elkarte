@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
@@ -13,7 +13,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 // language and helper functions
 loadLanguage('Drafts');
@@ -23,12 +23,10 @@ require_once(SUBSDIR . '/Drafts.subs.php');
  * Saves a post draft in the user_drafts table
  * The core draft feature must be enabled, as well as the post draft option
  * Determines if this is a new or an existing draft
- * Returns any errors in $post_errors for display in the template
  *
- * @param string $post_errors
  * @return boolean
  */
-function saveDraft(&$post_errors)
+function saveDraft()
 {
 	global $context, $user_info, $smcFunc, $modSettings, $board;
 
@@ -59,6 +57,9 @@ function saveDraft(&$post_errors)
 
 		return;
 	}
+
+	// be ready for surprises
+	$post_errors = error_context::context('post', 1);
 
 	// prepare and clean the data, load the draft array
 	$draft['id_draft'] = $id_draft;
@@ -98,14 +99,14 @@ function saveDraft(&$post_errors)
 			$context['id_draft'] = $id_draft;
 		}
 		else
-			$post_errors[] = 'draft_not_saved';
+			$post_errors->addError('draft_not_saved');
 	}
 
 	// cleanup
 	unset($_POST['save_draft']);
 
 	// if we were called from the autosave function, send something back
-	if (!empty($id_draft) && isset($_REQUEST['xml']) && (!in_array('session_timeout', $post_errors)))
+	if (!empty($id_draft) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
 	{
 		loadTemplate('Xml');
 		$context['sub_template'] = 'xml_draft';
@@ -141,6 +142,7 @@ function savePMDraft(&$post_errors, $recipientList)
 	// read in what was sent
 	$id_pm_draft = empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
+	$post_errors = error_context::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
 	if (isset($_REQUEST['xml']) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
@@ -204,11 +206,11 @@ function savePMDraft(&$post_errors, $recipientList)
 			$context['id_pm_draft'] = $id_pm_draft;
 		}
 		else
-			$post_errors[] = 'draft_not_saved';
+			$post_errors->addError('draft_not_saved');
 	}
 
 	// if we were called from the autosave function, send something back
-	if (!empty($id_pm_draft) && isset($_REQUEST['xml']) && !in_array('session_timeout', $post_errors))
+	if (!empty($id_pm_draft) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
 	{
 		loadTemplate('Xml');
 		$context['sub_template'] = 'xml_draft';
@@ -279,7 +281,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 			$recipients['bcc'] = array_map('intval', $recipients['bcc']);
 
 			// pretend we messed up to populate the pm message form
-			messagePostError(array(), array(), $recipients);
+			messagePostError(array(), $recipients);
 			return true;
 		}
 	}

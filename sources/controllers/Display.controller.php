@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -19,7 +19,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * The central part of the board - topic display.
@@ -78,7 +78,7 @@ function Display()
 		{
 			$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
 			$includeStickies = !empty($modSettings['enableStickyTopics']);
-			$topic = $_REQUEST['prev_next'] === 'prev' ? getPreviousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : getNextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
+			$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
 			$context['current_topic'] = $topic;
 		}
 

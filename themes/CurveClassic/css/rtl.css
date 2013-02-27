@@ -178,7 +178,7 @@ h1.forumtitle {
 	float: right;
 }
 /* float these items to the left */
-#siteslogan, img#smflogo {
+#siteslogan, img#elklogo {
 	float: left;
 }
 /* the upshrink image needs some tweaking */
@@ -186,7 +186,7 @@ img#upshrink {
 	float: left;
 }
 /* ..so does the SMF logo */
-img#smflogo {
+img#elklogo {
 	margin-right: 1em;
 }
 #upper_section div.news {

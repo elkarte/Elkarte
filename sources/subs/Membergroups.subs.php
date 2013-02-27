@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -18,7 +18,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  * Delete one of more membergroups.
@@ -783,7 +783,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($query))
-				$groups[$row['id_group']] += $row['member_count'];
+			{
+				if (isset($groups[$row['id_group']]))
+					$groups[$row['id_group']] += $row['member_count'];
+				else
+					$groups[$row['id_group']] = $row['member_count'];
+			}
 			$smcFunc['db_free_result']($query);
 		}
 	}

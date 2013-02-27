@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -505,23 +505,24 @@ function template_editBuddies()
 				<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />', $txt['editBuddies'], '
 			</h3>
 		</div>
-		<table border="0" width="100%" cellspacing="1" cellpadding="4" class="table_grid" align="center">
+		<table class="table_grid">
 			<tr class="catbg">
-				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
-				<th scope="col">', $txt['status'], '</th>';
+				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
+				<th class="centercol" scope="col">', $txt['status'], '</th>';
+
 	if ($context['can_send_email'])
 		echo '
-				<th scope="col">', $txt['email'], '</th>';
+				<th class="centercol" scope="col">', $txt['email'], '</th>';
 
 	echo '
-				<th class="last_th" scope="col"></th>
+				<th class="last_th centercol" scope="col"></th>
 			</tr>';
 
 	// If they don't have any buddies don't list them!
 	if (empty($context['buddies']))
 		echo '
 			<tr class="windowbg2">
-				<td colspan="8" align="center"><strong>', $txt['no_buddies'], '</strong></td>
+				<td colspan="8" class="centertext"><strong>', $txt['no_buddies'], '</strong></td>
 			</tr>';
 
 	// Now loop through each buddy showing info on each.
@@ -531,21 +532,30 @@ function template_editBuddies()
 		echo '
 			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
 				<td>', $buddy['link'], '</td>
-				<td align="center"><a href="', $buddy['online']['href'], '"><img src="', $buddy['online']['image_href'], '" alt="', $buddy['online']['text'], '" title="', $buddy['online']['text'], '" /></a></td>';
+				<td class="centertext">
+					<a href="', $buddy['online']['href'], '"><img src="', $buddy['online']['image_href'], '" alt="', $buddy['online']['text'], '" title="', $buddy['online']['text'], '" /></a>
+				</td>';
+
 		if ($context['can_send_email'])
 			echo '
-				<td align="center">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
+				<td class="centertext">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
 
 		// If these are off, don't show them
-		foreach ($buddy_fields as $key => $column)
+		// @todo this used to show the IM agents for buddies ... do we want to get any custom profile fields to populate here?
+		if (isset($buddy_fields))
 		{
-			if (!isset($disabled_fields[$column]))
-				echo '
-					<td align="center">', $buddy[$column]['link'], '</td>';
+			foreach ($buddy_fields as $key => $column)
+			{
+				if (!isset($disabled_fields[$column]))
+					echo '
+						<td class="centertext">', $buddy[$column]['link'], '</td>';
+			}
 		}
 
 		echo '
-				<td align="center"><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['buddy_remove'], '" title="', $txt['buddy_remove'], '" /></a></td>
+				<td class="centertext">
+					<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['buddy_remove'], '" title="', $txt['buddy_remove'], '" /></a>
+				</td>
 			</tr>';
 
 		$alternate = !$alternate;
@@ -610,23 +620,24 @@ function template_editIgnoreList()
 				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['editIgnoreList'], '
 			</h3>
 		</div>
-		<table border="0" width="100%" cellspacing="1" cellpadding="4" class="table_grid" align="center">
+		<table class="table_grid">
 			<tr class="catbg">
-				<th class="first_th" scope="col" width="20%">', $txt['name'], '</th>
-				<th scope="col">', $txt['status'], '</th>';
+				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
+				<th class="centercol" scope="col">', $txt['status'], '</th>';
+
 	if ($context['can_send_email'])
 		echo '
-				<th scope="col">', $txt['email'], '</th>';
+				<th class="centercol" scope="col">', $txt['email'], '</th>';
 	
 	echo '
-				<th class="last_th" scope="col"></th>
+				<th class="centercol last_th" scope="col"></th>
 			</tr>';
 
 	// If they don't have anyone on their ignore list, don't list it!
 	if (empty($context['ignore_list']))
 		echo '
 			<tr class="windowbg2">
-				<td colspan="8" align="center"><strong>', $txt['no_ignore'], '</strong></td>
+				<td colspan="4" class="centertext"><strong>', $txt['no_ignore'], '</strong></td>
 			</tr>';
 
 	// Now loop through each buddy showing info on each.
@@ -636,13 +647,14 @@ function template_editIgnoreList()
 		echo '
 			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
 				<td>', $member['link'], '</td>
-				<td align="center"><a href="', $member['online']['href'], '"><img src="', $member['online']['image_href'], '" alt="', $member['online']['text'], '" title="', $member['online']['text'], '" /></a></td>';
+				<td class="centertext"><a href="', $member['online']['href'], '"><img src="', $member['online']['image_href'], '" alt="', $member['online']['text'], '" title="', $member['online']['text'], '" /></a></td>';
+		
 		if ($context['can_send_email'])
 			echo '
-				<td align="center">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
+				<td class="centertext">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
 		
 		echo '
-				<td align="center"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
+				<td class="centertext"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
 			</tr>';
 
 		$alternate = !$alternate;
@@ -662,7 +674,7 @@ function template_editIgnoreList()
 			<div class="roundframe">
 				<dl class="settings">
 					<dt>
-						<label for="new_buddy"><strong>', $txt['who_member'], ':</strong></label>
+						<label for="new_ignore"><strong>', $txt['who_member'], ':</strong></label>
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
@@ -810,7 +822,7 @@ function template_trackIP()
 	else
 	{
 		echo '
-		<table class="table_grid" cellspacing="0" width="100%">
+		<table class="table_grid">
 			<thead>
 				<tr class="catbg">
 					<th class="first_th" scope="col">', $txt['ip_address'], '</th>
@@ -893,11 +905,11 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['general']))
 		{
 			echo '
-					<table class="table_grid" width="100%" cellspacing="0">
+					<table class="table_grid">
 						<thead>
 							<tr class="titlebg">
-								<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>
-								<th class="lefttext last_th" scope="col" width="50%">', $txt['showPermissions_status'], '</th>
+								<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+								<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -960,11 +972,11 @@ function template_action_showPermissions()
 		if (!empty($context['member']['permissions']['board']))
 		{
 			echo '
-				<table class="table_grid" width="100%" cellspacing="0">
+				<table class="table_grid">
 					<thead>
 						<tr class="titlebg">
-							<th class="lefttext first_th" scope="col" width="50%">', $txt['showPermissions_permission'], '</th>
-							<th class="lefttext last_th" scope="col" width="50%">', $txt['showPermissions_status'], '</th>
+							<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+							<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -1827,7 +1839,7 @@ function template_groupMembership()
 	else
 	{
 		echo '
-			<table border="0" width="100%" cellspacing="0" cellpadding="4" class="table_grid">
+			<table style="width:100%" class="table_padding">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th" scope="col" ', $context['can_edit_primary'] ? ' colspan="2"' : '', '>', $txt['current_membergroups'], '</th>
@@ -1844,7 +1856,7 @@ function template_groupMembership()
 
 				if ($context['can_edit_primary'])
 					echo '
-						<td width="4%">
+						<td style="width:4%">
 							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked"' : '', ' onclick="highlightSelected(\'primdiv_' . $group['id'] . '\');" ', $group['can_be_primary'] ? '' : 'disabled="disabled"', ' class="input_radio" />
 						</td>';
 
@@ -1852,7 +1864,7 @@ function template_groupMembership()
 						<td>
 							<label for="primary_', $group['id'], '"><strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '</label>
 						</td>
-						<td width="15%" class="righttext">';
+						<td style="width:15%" class="righttext">';
 
 				// Can they leave their group?
 				if ($group['can_leave'])
@@ -1877,7 +1889,7 @@ function template_groupMembership()
 		{
 			echo '
 			<br />
-			<table border="0" width="100%" cellspacing="0" cellpadding="4" class="table_grid">
+			<table style="width:100%" class="table_padding">
 				<thead>
 					<tr class="catbg">
 						<th class="first_th" scope="col">
@@ -1896,7 +1908,7 @@ function template_groupMembership()
 						<td>
 							<strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '
 						</td>
-						<td width="15%" class="lefttext">';
+						<td style="width:15%" class="lefttext">';
 
 				if ($group['type'] == 3)
 					echo '
@@ -2703,6 +2715,7 @@ function template_profile_avatar_select()
 								<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_none" value="none"' . ($context['member']['avatar']['choice'] == 'none' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_none"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['no_avatar'] . '</label><br />
 								', !empty($context['member']['avatar']['allow_server_stored']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_server_stored" value="server_stored"' . ($context['member']['avatar']['choice'] == 'server_stored' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_server_stored"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['choose_avatar_gallery'] . '</label><br />' : '', '
 								', !empty($context['member']['avatar']['allow_external']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_external" value="external"' . ($context['member']['avatar']['choice'] == 'external' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_external"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['my_own_pic'] . '</label><br />' : '', '
+								', !empty($context['member']['avatar']['allow_gravatar']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_gravatar" value="gravatar"' . ($context['member']['avatar']['choice'] == 'gravatar' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_gravatar"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['gravatar'] . '</label><br />' : '', '
 								', !empty($context['member']['avatar']['allow_upload']) ? '<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_upload" value="upload"' . ($context['member']['avatar']['choice'] == 'upload' ? ' checked="checked"' : '') . ' class="input_radio" /><label for="avatar_choice_upload"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['avatar_will_upload'] . '</label>' : '', '
 							</dt>
 							<dd>';
@@ -2755,6 +2768,15 @@ function template_profile_avatar_select()
 								</div>';
 	}
 
+	// If the user is allowed to use a Gravatar.
+	if (!empty($context['member']['avatar']['allow_gravatar']))
+	{
+		echo '
+								<div id="avatar_gravatar">
+									<input type="checkbox" name="gravatar_all" id="gravatar_all" value="1" class="check" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'gravatar\');" class="input_file"/>
+									<br /><br /><img src='. $context['member']['avatar']['href'] .'" alt="" />
+								</div>';						
+	}
 	// If the user is able to upload avatars to the server show them an upload box.
 	if (!empty($context['member']['avatar']['allow_upload']))
 	{
@@ -2769,6 +2791,7 @@ function template_profile_avatar_select()
 								<script type="text/javascript"><!-- // --><![CDATA[
 									', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "' . ($context['member']['avatar']['choice'] == 'server_stored' ? '' : 'none') . '";' : '', '
 									', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "' . ($context['member']['avatar']['choice'] == 'external' ? '' : 'none') . '";' : '', '
+									', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "' . (($context['member']['avatar']['choice'] == 'gravatar' || (empty($context['member']['avatar']['allow_gravatar']))) ? '' : 'none') . '";' : '', '
 									', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "' . ($context['member']['avatar']['choice'] == 'upload' ? '' : 'none') . '";' : '', '
 
 									function swap_avatar(type)
@@ -2778,21 +2801,31 @@ function template_profile_avatar_select()
 											case "avatar_choice_server_stored":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
 												break;
 											case "avatar_choice_external":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+												break;
+											case "avatar_choice_gravatar":
+												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "";' : '', '
 												break;
 											case "avatar_choice_upload":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "";' : '', '
 												break;
 											case "avatar_choice_none":
 												', !empty($context['member']['avatar']['allow_server_stored']) ? 'document.getElementById("avatar_server_stored").style.display = "none";' : '', '
 												', !empty($context['member']['avatar']['allow_external']) ? 'document.getElementById("avatar_external").style.display = "none";' : '', '
+												', !empty($context['member']['avatar']['allow_gravatar']) ? 'document.getElementById("avatar_gravatar").style.display = "none";' : '', '												
 												', !empty($context['member']['avatar']['allow_upload']) ? 'document.getElementById("avatar_upload").style.display = "none";' : '', '
 												break;
 										}

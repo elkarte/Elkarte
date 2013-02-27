@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -21,7 +21,7 @@
  */
 
 if (!defined('ELKARTE'))
-	die('Hacking attempt...');
+	die('No access...');
 
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {
@@ -92,10 +92,9 @@ function checkMessagePermissions($message)
 		isAllowedTo('modify_any');
 
 	if ($context['can_announce'] && !empty($message['id_action']))
-	{
-		loadLanguage('Errors');
-		$context['post_error']['messages'][] = $txt['error_topic_already_announced'];
-	}
+		return array('topic_already_announced');
+
+	return false;
 }
 
 function prepareMessageContext($message)

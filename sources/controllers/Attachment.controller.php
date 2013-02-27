@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -31,7 +31,6 @@ function action_attachment()
  * Downloads an attachment or avatar, and increments the download count.
  * It requires the view_attachments permission. (not for avatars!)
  * It disables the session parser, and clears any previous output.
- * It depends on the attachmentUploadDir setting being correct.
  * It is accessed via the query string ?action=dlattach.
  * Views to attachments and avatars do not increase hits and are not logged in the "Who's Online" log.
  */
@@ -103,7 +102,7 @@ function action_dlattach()
 		die('404 - ' . $txt['attachment_not_found']);
 	}
 
-	// If it hasn't been modified since the last time this attachement was retrieved, there's no need to display it again.
+	// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
 	if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 	{
 		list($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
