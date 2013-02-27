@@ -16,7 +16,10 @@
 
 $(document).ready(function() {
 	// menu drop downs
-	$('ul.dropmenu, ul.quickbuttons').superfish({useClick: use_click_menu, delay : 600, speed: 200});
+	if (use_click_menu)
+		$('.dropmenu, ul.quickbuttons').superfish({useClick: true, delay : 50, speed: 175, animation: {opacity:'show', height:'toggle'}});
+	else
+		$('.dropmenu, ul.quickbuttons').superfish({useClick: use_click_menu, delay : 300, speed: 175});
 
 	// Smooth scroll navigation
 	$('.topbottom').bind('click', function(event) {

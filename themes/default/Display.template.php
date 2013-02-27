@@ -216,15 +216,13 @@ function template_main()
 		echo '
 						<div class="poster">
 							<ul class="dropmenu">
-								<li>
-									<h4>';
+								<li>';
 
 		// Show a link to the member's profile.
 		echo '
-										<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
-											<span class="name">', $message['member']['name'], '</span>
-										</a>
-									</h4>';
+									<a href="', $scripturl, '?action=profile;u=', $message['member']['id'], '">
+										<span class="name">', $message['member']['name'], '</span>
+									</a>';
 
 		// [WIP] The new member info dropdown starts here. Note that conditionals have not been fully checked yet.
 			echo '
