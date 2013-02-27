@@ -81,6 +81,8 @@ class error_context
 			$this->_default_severity = error_context::MINOR;
 		else
 			$this->_default_severity = $default_severity;
+
+		$this->_errors = array();
 	}
 
 	/**
@@ -259,7 +261,7 @@ class attachment_error_context
 				'error' => error_context::context($id, 1),
 			);
 		return true;
-		
+
 	}
 
 	public function addError($error, $attachID = 'generic', $lang_file = null)
@@ -337,5 +339,5 @@ class attachment_error_context
 
 		return self::$_context;
 	}
-	
+
 }
