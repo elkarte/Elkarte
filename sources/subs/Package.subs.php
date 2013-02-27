@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -129,8 +129,8 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 	$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
 	$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
 
-	// smf_crc32 and crc32 may not return the same results, so we accept either.
-	if ($crc['crc32'] != smf_crc32($data) && $crc['crc32'] != crc32($data))
+	// crc32_compat and crc32 may not return the same results, so we accept either.
+	if ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data))
 		return false;
 
 	$blocks = strlen($data) / 512 - 1;
@@ -3198,7 +3198,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	return $data;
 }
 
-if (!function_exists('smf_crc32'))
+if (!function_exists('crc32_compat'))
 {
 	require_once(SUBSDIR . '/Compat.subs.php');
 }

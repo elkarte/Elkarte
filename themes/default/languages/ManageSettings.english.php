@@ -386,15 +386,15 @@ $txt['lang_entries_not_writable'] = '<strong>Warning:</strong> The language file
 $txt['languages_ltr'] = 'Right to Left';
 
 $txt['add_language'] = 'Add Language';
-$txt['add_language_elkarte'] = 'Download from Elkarte\'s GitHub Repository';
-$txt['add_language_elkarte_browse'] = 'Type name of language to search for or leave blank to search for all.';
-$txt['add_language_elkarte_install'] = 'Install';
-$txt['add_language_elkarte_found'] = 'The following languages were found. Click the install link next to the language you wish to install, you will then be taken to the package manager to install.';
+$txt['add_language_elk'] = 'Download from Elkarte\'s GitHub Repository';
+$txt['add_language_elk_browse'] = 'Type name of language to search for or leave blank to search for all.';
+$txt['add_language_elk_install'] = 'Install';
+$txt['add_language_elk_found'] = 'The following languages were found. Click the install link next to the language you wish to install, you will then be taken to the package manager to install.';
 $txt['add_language_error_no_response'] = 'The Simple Machines (R) site is not responding. Please try again later.';
 $txt['add_language_error_no_files'] = 'No files could be found.';
-$txt['add_language_elkarte_desc'] = 'Description';
-$txt['add_language_elkarte_utf8'] = 'UTF-8';
-$txt['add_language_elkarte_version'] = 'Version';
+$txt['add_language_elk_desc'] = 'Description';
+$txt['add_language_elk_utf8'] = 'UTF-8';
+$txt['add_language_elk_version'] = 'Version';
 
 $txt['edit_language_entries_primary'] = 'Below are the primary language settings for this language pack.';
 $txt['edit_language_entries'] = 'Edit Language Entries';

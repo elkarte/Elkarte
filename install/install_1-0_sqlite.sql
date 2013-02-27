@@ -1560,7 +1560,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines (R) Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
 # --------------------------------------------------------
 
 #
@@ -1808,7 +1808,7 @@ CREATE TABLE {$db_prefix}settings (
 #
 
 BEGIN TRANSACTION;
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ourVersion', '{$current_version}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');

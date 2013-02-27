@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -947,17 +947,7 @@ function template_send()
 				<br class="clear" />';
 
 	// If there were errors for sending the PM, show them.
-	echo '
-				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
-					<dl>
-						<dt>
-							<strong id="error_serious">', $txt['error_while_submitting'] , '</strong>
-						</dt>
-						<dd class="error" id="error_list">
-							', empty($context['post_error']['messages']) ? '' : implode('<br />', $context['post_error']['messages']), '
-						</dd>
-					</dl>
-				</div>';
+	template_show_error('post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '

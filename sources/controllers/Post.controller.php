@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -34,7 +34,7 @@ if (!defined('ELKARTE'))
  *
  *  @param array $post_errors holds any errors found tyring to post
  */
-function action_post($post_errors = array())
+function action_post()
 {
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $context, $settings;
@@ -45,6 +45,9 @@ function action_post($post_errors = array())
 	// You can't reply with a poll... hacker.
 	if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 		unset($_REQUEST['poll']);
+
+	$post_errors = error_context::context('post', 1);
+	$attach_errors = error_context::context('attachment', 1);
 
 	// Posting an event?
 	$context['make_event'] = isset($_REQUEST['calendar']);
@@ -141,7 +144,7 @@ function action_post($post_errors = array())
 
 		// Check whether this is a really old post being bumped...
 		if (!empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
-			$post_errors[] = array('old_topic', array($modSettings['oldTopicDays']));
+			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 	}
 	else
 	{
@@ -348,7 +351,7 @@ function action_post($post_errors = array())
 				else
 					$txt['error_new_replies'] = sprintf(isset($_GET['last_msg']) ? $txt['error_new_replies_reading'] : $txt['error_new_replies'], $context['new_replies']);
 
-				$post_errors[] = 'new_replies';
+				$post_errors->addError('new_replies', 0);
 
 				$modSettings['topicSummaryPosts'] = $context['new_replies'] > $modSettings['topicSummaryPosts'] ? max($modSettings['topicSummaryPosts'], 5) : $modSettings['topicSummaryPosts'];
 			}
@@ -371,10 +374,10 @@ function action_post($post_errors = array())
 
 	// Previewing, modifying, or posting?
 	// Do we have a body, but an error happened.
-	if (isset($_REQUEST['message']) || !empty($context['post_error']))
+	if (isset($_REQUEST['message']) || $post_errors->hasErrors())
 	{
 		// Validate inputs.
-		if (empty($context['post_error']))
+		if (!$post_errors->hasErrors())
 		{
 			// This means they didn't click Post and get an error.
 			$really_previewing = true;
@@ -480,14 +483,14 @@ function action_post($post_errors = array())
 			// Any errors we should tell them about?
 			if ($form_subject === '')
 			{
-				$post_errors[] = 'no_subject';
+				$post_errors->addError('no_subject', 0);
 				$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
 			}
 
 			if ($context['preview_message'] === '')
-				$post_errors[] = 'no_message';
+				$post_errors->addError('no_message');
 			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
-				$post_errors[] = array('long_message', array($modSettings['max_messageLength']));
+				$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 			// Protect any CDATA blocks.
 			if (isset($_REQUEST['xml']))
@@ -515,7 +518,11 @@ function action_post($post_errors = array())
 			if ($message === false)
 				fatal_lang_error('no_board', false);
 
-			checkMessagePermissions($message['message']);
+			$errors = checkMessagePermissions($message['message']);
+			if (!empty($errors))
+				foreach ($errors as $error)
+					$post_errors->addError($error);
+
 			prepareMessageContext($message);
 		}
 
@@ -534,7 +541,11 @@ function action_post($post_errors = array())
 		if ($message === false)
 			fatal_lang_error('no_message', false);
 
-		checkMessagePermissions($message['message']);
+		$errors = checkMessagePermissions($message['message']);
+		if (!empty($errors))
+			foreach ($errors as $error)
+				$post_errors->addError($error);
+
 		prepareMessageContext($message);
 
 		// Get the stuff ready for the form.
@@ -671,7 +682,7 @@ function action_post($post_errors = array())
 						if (file_exists($attachment['tmp_name']))
 							unlink($attachment['tmp_name']);
 				}
-				$post_errors[] = 'temp_attachments_gone';
+				$attach_errors->addError('temp_attachments_gone');
 				$_SESSION['temp_attachments'] = array();
 			}
 			// Hmm, coming in fresh and there are files in session.
@@ -688,7 +699,7 @@ function action_post($post_errors = array())
 
 						if (file_exists($attachment['tmp_name']))
 						{
-							$post_errors[] = 'temp_attachments_new';
+							$attach_errors->addError('temp_attachments_new');
 							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 							unset($_SESSION['temp_attachments']['post']['files']);
 							break;
@@ -717,19 +728,19 @@ function action_post($post_errors = array())
 						// We have a message id, so we can link back to the old topic they were trying to edit..
 						$goback_link = '<a href="' . $scripturl . '?action=post' .(!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
 
-						$post_errors[] = array('temp_attachments_found', array($delete_link, $goback_link, $file_list));
+						$attach_errors->addError(array('temp_attachments_found', array($delete_link, $goback_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 					else
 					{
-						$post_errors[] = array('temp_attachments_lost', array($delete_link, $file_list));
+						$attach_errors->addError(array('temp_attachments_lost', array($delete_link, $file_list)));
 						$context['ignore_temp_attachments'] = true;
 					}
 				}
 			}
 
 			if (!empty($context['we_are_history']))
-				$post_errors[] = $context['we_are_history'];
+				$attach_errors->addError($context['we_are_history']);
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
@@ -742,7 +753,7 @@ function action_post($post_errors = array())
 				if ($attachID == 'initial_error')
 				{
 					$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div style="padding: 0 1em;">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-					$post_errors[] = 'attach_initial_error';
+					$attach_errors->addError('attach_initial_error');
 					unset($_SESSION['temp_attachments']);
 					break;
 				}
@@ -755,7 +766,7 @@ function action_post($post_errors = array())
 					foreach ($attachment['errors'] as $error)
 						$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 					$txt['error_attach_errors'] .= '</div>';
-					$post_errors[] = 'attach_errors';
+					$attach_errors->addError('attach_errors');
 
 					// Take out the trash.
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -801,44 +812,22 @@ function action_post($post_errors = array())
 
 	// If they came from quick reply, and have to enter verification details, give them some notice.
 	if (!empty($_REQUEST['from_qr']) && !empty($context['require_verification']))
-		$post_errors[] = 'need_qr_verification';
-
-	/*
-	 * There are two error types: serious and minor. Serious errors
-	 * actually tell the user that a real error has occurred, while minor
-	 * errors are like warnings that let them know that something with
-	 * their post isn't right.
-	 */
-	$minor_errors = array('not_approved', 'new_replies', 'old_topic', 'need_qr_verification', 'no_subject');
-
-	call_integration_hook('integrate_post_errors', array($post_errors, $minor_errors));
+		$post_errors->addError('need_qr_verification', 0);
 
 	// Any errors occurred?
-	if (!empty($post_errors))
-	{
-		loadLanguage('Errors');
-		$context['error_type'] = 'minor';
-		foreach ($post_errors as $post_error)
-		{
-			if (is_array($post_error))
-			{
-				$post_error_id = $post_error[0];
-				$context['post_error'][$post_error_id] = vsprintf($txt['error_' . $post_error_id], $post_error[1]);
+	if ($post_errors->hasErrors())
+		$context['post_error'] = array(
+			'errors' => $post_errors->prepareErrors(),
+			'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
+			'title' => $txt['error_while_submitting'],
+		);
 
-				// If it's not a minor error flag it as such.
-				if (!in_array($post_error_id, $minor_errors))
-					$context['error_type'] = 'serious';
-			}
-			else
-			{
-				$context['post_error'][$post_error] = $txt['error_' . $post_error];
-
-				// If it's not a minor error flag it as such.
-				if (!in_array($post_error, $minor_errors))
-					$context['error_type'] = 'serious';
-			}
-		}
-	}
+	if ($attach_errors->hasErrors())
+		$context['attachment_error'] = array(
+			'errors' => $attach_errors->prepareErrors(),
+			'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
+			'title' => $txt['error_while_submitting'],
+		);
 
 	// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
 	if (isset($_REQUEST['poll']))
@@ -906,6 +895,51 @@ function action_post($post_errors = array())
 		'preview_type' => 2,
 	);
 	create_control_richedit($editorOptions);
+
+	addInlineJavascript('
+	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
+	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
+
+	var subject_err = new errorbox_handler({
+		self: \'subject_err\',
+		error_box_id: \'post_error\',
+		error_checks: [{
+			code: \'no_subject\',
+			function: function(box_value) {
+				if (box_value.length == 0)
+					return true;
+				else
+					return false;
+			}
+		}],
+		check_id: "post_subject"
+	});
+	
+	var body_err = new errorbox_handler({
+		self: \'body_err\',
+		error_box_id: \'post_error\',
+		error_checks: [{
+			code: \'no_message\',
+			function: function(box_value) {
+				if (box_value.length == 0)
+					return true;
+				else
+					return false;
+			}
+		}],
+		editor_id: \'' . $editorOptions['id'] . '\',
+		editor: ' . JavaScriptEscape('
+		function () {
+			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
+			var editor_val = \'\';
+			if(editor.inSourceMode())
+				editor_val = editor.getText();
+			else
+				editor_val  = editor.getText();
+
+			return editor_val;
+		};') . '
+	});', true);
 
 	// Store the ID.
 	$context['post_box_name'] = $editorOptions['id'];
@@ -992,7 +1026,7 @@ function action_post($post_errors = array())
 function action_post2()
 {
 	global $board, $topic, $txt, $modSettings, $context;
-	global $user_info, $board_info, $options, $smcFunc;
+	global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
 
 	// Sneaking off, are we?
 	if (empty($_POST) && empty($topic))
@@ -1016,11 +1050,12 @@ function action_post2()
 	checkSubmitOnce('check');
 
 	// No errors as yet.
-	$post_errors = array();
+	$post_errors = error_context::context('post', 1);
+	$attach_errors = attachment_error_context::context();
 
 	// If the session has timed out, let the user re-submit their form.
 	if (checkSession('post', '', false) != '')
-		$post_errors[] = 'session_timeout';
+		$post_errors->addError('session_timeout');
 
 	// Wrong verification code?
 	if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
@@ -1030,8 +1065,6 @@ function action_post2()
 			'id' => 'post',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
-		if (is_array($context['require_verification']))
-			$post_errors = array_merge($post_errors, $context['require_verification']);
 	}
 
 	require_once(SUBSDIR . '/Post.subs.php');
@@ -1163,7 +1196,7 @@ function action_post2()
 		// If drafts are enabled, then pass this off
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1208,7 +1241,7 @@ function action_post2()
 		// Saving your new topic as a draft first?
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1291,7 +1324,7 @@ function action_post2()
 		// If drafts are enabled, then lets send this off to save
 		if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
 		{
-			saveDraft($post_errors);
+			saveDraft();
 			return action_post();
 		}
 
@@ -1323,9 +1356,9 @@ function action_post2()
 		$_POST['email'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
 
 		if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
-			$post_errors[] = 'no_name';
+			$post_errors->addError('no_name');
 		if ($smcFunc['strlen']($_POST['guestname']) > 25)
-			$post_errors[] = 'long_name';
+			$post_errors->addError('long_name');
 
 		if (empty($modSettings['guest_post_no_email']))
 		{
@@ -1333,9 +1366,9 @@ function action_post2()
 			if (!isset($row) || $row['poster_email'] != $_POST['email'])
 			{
 				if (!allowedTo('moderate_forum') && (!isset($_POST['email']) || $_POST['email'] == ''))
-					$post_errors[] = 'no_email';
+					$post_errors->addError('no_email');
 				if (!allowedTo('moderate_forum') && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-					$post_errors[] = 'bad_email';
+					$post_errors->addError('bad_email');
 			}
 
 			// Now make sure this email address is not banned from posting.
@@ -1343,7 +1376,7 @@ function action_post2()
 		}
 
 		// In case they are making multiple posts this visit, help them along by storing their name.
-		if (empty($post_errors))
+		if (!$post_errors->hasErrors())
 		{
 			$_SESSION['guest_name'] = $_POST['guestname'];
 			$_SESSION['guest_email'] = $_POST['email'];
@@ -1352,11 +1385,11 @@ function action_post2()
 
 	// Check the subject and message.
 	if (!isset($_POST['subject']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) === '')
-		$post_errors[] = 'no_subject';
+		$post_errors->addError('no_subject', 0);
 	if (!isset($_POST['message']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message']), ENT_QUOTES) === '')
-		$post_errors[] = 'no_message';
+		$post_errors->addError('no_message');
 	elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
-		$post_errors[] = array('long_message', array($modSettings['max_messageLength']));
+		$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 	else
 	{
 		// Prepare the message a bit for some additional testing.
@@ -1369,11 +1402,11 @@ function action_post2()
 
 		// Let's see if there's still some content left without the tags.
 		if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
-			$post_errors[] = 'no_message';
+			$post_errors->addError('no_message');
 	}
 
 	if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
-		$post_errors[] = 'no_event';
+		$post_errors->addError('no_event');
 
 	// Validate the poll...
 	if (isset($_REQUEST['poll']) && $modSettings['pollMode'] == '1')
@@ -1392,7 +1425,7 @@ function action_post2()
 			isAllowedTo('poll_add_any');
 
 		if (!isset($_POST['question']) || trim($_POST['question']) == '')
-			$post_errors[] = 'no_question';
+			$post_errors->addError('no_question');
 
 		$_POST['options'] = empty($_POST['options']) ? array() : htmltrim__recursive($_POST['options']);
 
@@ -1403,9 +1436,9 @@ function action_post2()
 
 		// What are you going to vote between with one choice?!?
 		if (count($_POST['options']) < 2)
-			$post_errors[] = 'poll_few';
+			$post_errors->addError('poll_few');
 		elseif (count($_POST['options']) > 256)
-			$post_errors[] = 'poll_many';
+			$post_errors->addError('poll_many');
 	}
 
 	if ($posterIsGuest)
@@ -1413,7 +1446,7 @@ function action_post2()
 		// If user is a guest, make sure the chosen name isn't taken.
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($row['poster_name']) || $_POST['guestname'] != $row['poster_name']))
-			$post_errors[] = 'bad_name';
+			$post_errors->addError('bad_name');
 	}
 	// If the user isn't a guest, get his or her name and email.
 	elseif (!isset($_REQUEST['msg']))
@@ -1423,12 +1456,12 @@ function action_post2()
 	}
 
 	// Any mistakes?
-	if (!empty($post_errors))
+	if ($post_errors->hasErrors())
 	{
 		// Previewing.
 		$_REQUEST['preview'] = true;
 
-		return action_post($post_errors);
+		return action_post();
 	}
 
 	// Make sure the user isn't spamming the board.
@@ -1497,11 +1530,9 @@ function action_post2()
 	if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 	{
 		$attachIDs = array();
-		$attach_errors = array();
-		$error_count = 0;
 
 		if (!empty($context['we_are_history']))
-			$attach_errors[] = '<dd>' . $txt['error_temp_attachments_flushed'] . '<br /><br /></dd>';
+			$attach_errors->addError('temp_attachments_flushed');
 
 		foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 		{
@@ -1511,29 +1542,29 @@ function action_post2()
 			// If there was an initial error just show that message.
 			if ($attachID == 'initial_error')
 			{
-				$attach_errors[] = '<dt>' . $txt['attach_no_upload'] . '</dt>';
-				$attach_errors[] = '<dd>' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</dd>';
+				$attach_errors->addError($txt['attach_no_upload']);
+				$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
 
 				unset($_SESSION['temp_attachments']);
 				break;
 			}
 
-			// Load the attachmentOptions array with the data needed to create an attachement
-			$attachmentOptions = array(
-				'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
-				'poster' => $user_info['id'],
-				'name' => $attachment['name'],
-				'tmp_name' => $attachment['tmp_name'],
-				'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-				'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-				'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-				'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-				'errors' => $attachment['errors'],
-			);
-
 			// No errors, then try to create the attachment
 			if (empty($attachment['errors']))
 			{
+				// Load the attachmentOptions array with the data needed to create an attachment
+				$attachmentOptions = array(
+					'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+					'poster' => $user_info['id'],
+					'name' => $attachment['name'],
+					'tmp_name' => $attachment['tmp_name'],
+					'size' => isset($attachment['size']) ? $attachment['size'] : 0,
+					'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+					'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
+					'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
+					'errors' => $attachment['errors'],
+				);
+
 				if (createAttachment($attachmentOptions))
 				{
 					$attachIDs[] = $attachmentOptions['id'];
@@ -1545,25 +1576,20 @@ function action_post2()
 			else
 			{
 				// Sort out the errors for display and delete any associated files.
-				$attach_errors[] = '<dt>' . vsprintf($txt['attach_warning'], $attachment['name']) . '</dt>';
+				$attach_errors->addAttach($attachID, $attachment['name']);
 				$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
 
-				foreach ($attachmentOptions['errors'] as $error)
+				foreach ($attachment['errors'] as $error)
 				{
 					if (!is_array($error))
 					{
-						$attach_errors[] = '<dd>' . $txt[$error] . '</dd>';
+						$attach_errors->addError($txt[$error], $attachID);
 						if (in_array($error, $log_these))
 							log_error($attachment['name'] . ': ' . $txt[$error], 'critical');
 					}
 					else
-						$attach_errors[] = '<dd>' . vsprintf($txt[$error[0]], $error[1]) . '</dd>';
+						$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]), $attachID);
 				}
-
-				// a format spacer between file error blocks if needed.
-				if ($error_count > 0)
-					$attach_errors[] = '<dt>&nbsp;</dt>';
-				$error_count++;
 
 				if (file_exists($attachment['tmp_name']))
 					unlink($attachment['tmp_name']);
@@ -1853,18 +1879,19 @@ function action_post2()
 		redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
 
 	// If there are attachment errors. Let's show a list to the user.
-	if (!empty($attach_errors))
+	if ($attach_errors->hasErrors())
 	{
-		global $settings, $scripturl;
-
 		loadTemplate('Errors');
 		$context['sub_template'] = 'attachment_errors';
 		$context['page_title'] = $txt['error_occured'];
 
-		$context['error_message'] = '<dl>';
-		$context['error_message'] .= implode("\n", $attach_errors);
-		$context['error_message'] .= '</dl>';
-		$context['error_title'] = $txt['attach_error_title'];
+		$errors = $attach_errors->prepareErrors();
+
+		foreach ($errors as $key => $error)
+		{
+			$context['attachment_error_keys'][] = $key . '_error';
+			$context[$key . '_error'] = $error;
+		}
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
@@ -1873,11 +1900,11 @@ function action_post2()
 		);
 
 		if (isset($_REQUEST['msg']))
-			$context['redirect_link'] = '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
+			$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
 		else
-			$context['redirect_link'] = '?topic=' . $topic . '.new#new';
+			$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.new#new';
 
-		$context['back_link'] = '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
+		$context['back_link'] =  $scripturl . '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
 
 		obExit(null, true);
 	}
@@ -2126,7 +2153,8 @@ function action_jsmodify()
 		$moderationAction = $row['id_member'] != $user_info['id'];
 	}
 
-	$post_errors = array();
+	$post_errors = error_context::context('post', 1);
+
 	if (isset($_POST['subject']) && $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) !== '')
 	{
 		$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -2137,7 +2165,7 @@ function action_jsmodify()
 	}
 	elseif (isset($_POST['subject']))
 	{
-		$post_errors[] = 'no_subject';
+		$post_errors->addError('no_subject', 0);
 		unset($_POST['subject']);
 	}
 
@@ -2145,12 +2173,12 @@ function action_jsmodify()
 	{
 		if ($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message'])) === '')
 		{
-			$post_errors[] = 'no_message';
+			$post_errors->addError('no_message');
 			unset($_POST['message']);
 		}
 		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
 		{
-			$post_errors[] = 'long_message';
+			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 			unset($_POST['message']);
 		}
 		else
@@ -2161,7 +2189,7 @@ function action_jsmodify()
 
 			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
 			{
-				$post_errors[] = 'no_message';
+				$post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
 		}
@@ -2187,7 +2215,7 @@ function action_jsmodify()
 	if (isset($_POST['sticky']) && !allowedTo('make_sticky'))
 		unset($_POST['sticky']);
 
-	if (empty($post_errors))
+	if (!$post_errors->hasErrors())
 	{
 		$msgOptions = array(
 			'id' => $row['id_msg'],
@@ -2264,7 +2292,7 @@ function action_jsmodify()
 	if (isset($_REQUEST['xml']))
 	{
 		$context['sub_template'] = 'modifydone';
-		if (empty($post_errors) && isset($msgOptions['subject']) && isset($msgOptions['body']))
+		if (!$post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))
 		{
 			$context['message'] = array(
 				'id' => $row['id_msg'],
@@ -2284,7 +2312,7 @@ function action_jsmodify()
 			$context['message']['body'] = parse_bbc($context['message']['body'], $row['smileys_enabled'], $row['id_msg']);
 		}
 		// Topic?
-		elseif (empty($post_errors))
+		elseif (!$post_errors->hasErrors())
 		{
 			$context['sub_template'] = 'modifytopicdone';
 			$context['message'] = array(
@@ -2304,18 +2332,10 @@ function action_jsmodify()
 			$context['message'] = array(
 				'id' => $row['id_msg'],
 				'errors' => array(),
-				'error_in_subject' => in_array('no_subject', $post_errors),
-				'error_in_body' => in_array('no_message', $post_errors) || in_array('long_message', $post_errors),
+				'error_in_subject' => $post_errors->hasError('no_subject'),
+				'error_in_body' => $post_errors->hasError('no_message') || $post_errors->hasError('long_message'),
 			);
-
-			loadLanguage('Errors');
-			foreach ($post_errors as $post_error)
-			{
-				if ($post_error == 'long_message')
-					$context['message']['errors'][] = sprintf($txt['error_' . $post_error], $modSettings['max_messageLength']);
-				else
-					$context['message']['errors'][] = $txt['error_' . $post_error];
-			}
+			$context['message']['errors'] = $post_errors->prepareErrors();
 		}
 	}
 	else

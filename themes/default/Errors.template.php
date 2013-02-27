@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -221,17 +221,19 @@ function template_attachment_errors()
 	<div>
 		<div class="cat_bar">
 			<h3 class="catbg">
-				', $context['error_title'], '
+				', $txt['attach_error_title'], '
 			</h3>
 		</div>
 		<div class="windowbg">
-			<div class="padding">
-				<div class="noticebox">',
-					$context['error_message'], '
-				</div>',
-				!empty($context['back_link']) ? ('<a class="button_link" href="' . $scripturl . $context['back_link'] . '">' . $txt['back'] . '</a>') : '',
-				'<span style="float: right; margin:.5em;"></span>
-				<a class="button_link" href="', $scripturl, $context['redirect_link'], '">', $txt['continue'], '</a>
+			<div class="padding">';
+
+	foreach ($context['attachment_error_keys'] as $key)
+		template_show_error($key);
+
+	echo 
+				!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '',
+				'
+				<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
 			</div>
 		</div>
 	</div>';

@@ -1,6 +1,6 @@
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
@@ -32,56 +32,34 @@ elk_DraftAutoSave.prototype.init = function ()
 		// start the autosave timer
 		this.interval_id = this.oDraftHandle.setInterval(this.opt.sSelf + '.draft' + (this.bPM ? 'PM' : '') + 'Save();', this.opt.iFreq);
 
-		// Set up the textarea focus and blur events
-		this.oDraftHandle.instanceRef = this;
-		if (typeof(this.instanceRef) !== 'undefined')
-		{
-			this.oDraftHandle.onblur = function (oEvent) {return this.instanceRef.draftBlur(oEvent, true);};
-			this.oDraftHandle.onfocus = function (oEvent) {return this.instanceRef.draftFocus(oEvent, true);};
-		}
+		var current_draft_save = this.opt.sSelf;
+		$(document).ready(function () {
+			var current_draft = eval(current_draft_save);
+			$('#' + current_draft.opt.sSceditorID).data("sceditor").addEvent(current_draft.opt.sSceditorID, 'blur', function (oEvent) {
+			// Moved away from the page, where did you go? ... till you return we pause autosaving
+				if (current_draft.bPM)
+					current_draft.draftPMSave();
+				else
+					current_draft.draftSave();
 
-		// find the editors wysiwyg iframe and get its window to set focus/blur events for it as well
-		var oIframe = document.getElementsByTagName('iframe')[0],
-			oIframeWindow = typeof(oIframe) !== 'undefined' ? oIframe.contentWindow || oIframe.contentDocument : null;
+				if (current_draft.interval_id !== "")
+					window.clearInterval(current_draft.interval_id);
 
-		if (oIframeWindow !== null && oIframeWindow.document)
-		{
-			var oIframeDoc = oIframeWindow.document;
-			// @todo oDraftAutoSave should be this.opt.sSelf name not hard code
-			oIframeDoc.body.onblur = function (oEvent) {return parent.oDraftAutoSave.draftBlur(oEvent, false);};
-			oIframeDoc.body.onfocus = function (oEvent) {return parent.oDraftAutoSave.draftFocus(oEvent, false);};
-		}
+				current_draft.interval_id = "";
+			});
+			$('#' + current_draft.opt.sSceditorID).data("sceditor").addEvent(current_draft.opt.sSceditorID, 'focus', function (oEvent) {
+			// Since your back we resume the autosave timer
+				var current_draft = eval(current_draft_save);
+
+				if (current_draft.opt.sType === 'quick')
+				{
+					if (current_draft.interval_id === "")
+						current_draft.interval_id = window.setInterval(current_draft.opt.sSelf + '.draft' + (current_draft.bPM ? 'PM' : '') + 'Save();', current_draft.opt.iFreq);
+				}
+				return;
+			});
+		});
 	}
-}
-
-// Moved away from the page, where did you go? ... till you return we pause autosaving
-elk_DraftAutoSave.prototype.draftBlur = function(oEvent, source)
-{
-	if (this.opt.sType === 'quick' || $('#' + this.opt.sSceditorID).data("sceditor").inSourceMode() === source)
-	{
-		// save what we have and turn of the autosave
-		if (this.bPM)
-			this.draftPMSave();
-		else
-			this.draftSave();
-
-		if (this.interval_id !== "")
-			window.clearInterval(this.interval_id);
-
-		this.interval_id = "";
-	}
-	return;
-}
-
-// Since your back we resume the autosave timer
-elk_DraftAutoSave.prototype.draftFocus = function(oEvent, source)
-{
-	if (this.opt.sType === 'quick' || $('#' + this.opt.sSceditorID).data("sceditor").inSourceMode() === source)
-	{
-		if (this.interval_id === "")
-			this.interval_id = window.setInterval(this.opt.sSelf + '.draft' + (this.bPM ? 'PM' : '') + 'Save();', this.opt.iFreq);
-	}
-	return;
 }
 
 // Make the call to save this draft in the background

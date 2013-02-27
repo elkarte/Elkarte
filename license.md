@@ -1,6 +1,6 @@
 # BSD License
 
-Copyright (c) 2013, Elkarte Forum
+Copyright (c) 2013, ElkArte Forum
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

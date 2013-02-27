@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @name      Elkarte Forum
- * @copyright Elkarte Forum contributors
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This software is a derived product, based on:
@@ -425,7 +425,7 @@ function template_webslice_recent_posts()
  */
 function template_xml_draft()
 {
-	global $context;
+	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <drafts>
