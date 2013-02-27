@@ -550,52 +550,8 @@ function AddMembergroup()
 		);
 	$smcFunc['db_free_result']($result);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT b.id_cat, c.name AS cat_name, b.id_board, b.name, b.child_level
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		ORDER BY board_order',
-		array(
-		)
-	);
-	$context['num_boards'] = $smcFunc['db_num_rows']($request);
-
-	$context['categories'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// This category hasn't been set up yet..
-		if (!isset($context['categories'][$row['id_cat']]))
-			$context['categories'][$row['id_cat']] = array(
-				'id' => $row['id_cat'],
-				'name' => $row['cat_name'],
-				'boards' => array()
-			);
-
-		// Set this board up, and let the template know when it's a child.  (indent them..)
-		$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
-			'id' => $row['id_board'],
-			'name' => $row['name'],
-			'child_level' => $row['child_level'],
-			'allow' => false,
-			'deny' => false
-		);
-
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Now, let's sort the list of categories into the boards for templates that like that.
-	$temp_boards = array();
-	foreach ($context['categories'] as $category)
-	{
-		$temp_boards[] = array(
-			'name' => $category['name'],
-			'child_ids' => array_keys($category['boards'])
-		);
-		$temp_boards = array_merge($temp_boards, array_values($category['boards']));
-
-		// Include a list of boards per category for easy toggling.
-		$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
-	}
+	require_once(SUBSDIR . '/Boards.subs.php');
+	$context += allBoards();
 
 	createToken('admin-mmg');
 }
@@ -995,55 +951,8 @@ function EditMembergroup()
 	$context['boards'] = array();
 	if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_cat, c.name as cat_name, b.id_board, b.name, b.child_level,
-			FIND_IN_SET({string:current_group}, b.member_groups) != 0 AS can_access, FIND_IN_SET({string:current_group}, b.deny_member_groups) != 0 AS cannot_access
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-			ORDER BY board_order',
-			array(
-				'current_group' => $groups['id_group'],
-			)
-		);
-		$context['categories'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// This category hasn't been set up yet..
-			if (!isset($context['categories'][$row['id_cat']]))
-				$context['categories'][$row['id_cat']] = array(
-					'id' => $row['id_cat'],
-					'name' => $row['cat_name'],
-					'boards' => array()
-				);
-
-			// Set this board up, and let the template know when it's a child.  (indent them..)
-			$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
-				'id' => $row['id_board'],
-				'name' => $row['name'],
-				'child_level' => $row['child_level'],
-				'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
-				'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
-		// Now, let's sort the list of categories into the boards for templates that like that.
-		$temp_boards = array();
-		foreach ($context['categories'] as $category)
-		{
-			$temp_boards[] = array(
-				'name' => $category['name'],
-				'child_ids' => array_keys($category['boards'])
-			);
-			$temp_boards = array_merge($temp_boards, array_values($category['boards']));
-
-			// Include a list of boards per category for easy toggling.
-			$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
-		}
-
-		$max_boards = ceil(count($temp_boards) / 2);
-		if ($max_boards == 1)
-			$max_boards = 2;
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$context += allBoards(true, array('access' => $groups['id_group']));
 	}
 
 	// Finally, get all the groups this could be inherited off.
