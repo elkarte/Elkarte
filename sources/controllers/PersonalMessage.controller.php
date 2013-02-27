@@ -957,21 +957,9 @@ function action_sendmessage()
 	if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
 	{
 		// How many messages have they sent this last hour?
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(pr.id_pm) AS post_count
-			FROM {db_prefix}personal_messages AS pm
-				INNER JOIN {db_prefix}pm_recipients AS pr ON (pr.id_pm = pm.id_pm)
-			WHERE pm.id_member_from = {int:current_member}
-				AND pm.msgtime > {int:msgtime}',
-			array(
-				'current_member' => $user_info['id'],
-				'msgtime' => time() - 3600,
-			)
-		);
-		list ($postCount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$pmCount = pmCount($user_info['id'], 3600);
 
-		if (!empty($postCount) && $postCount >= $modSettings['pm_posts_per_hour'])
+		if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 	}
 
@@ -1401,7 +1389,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 }
 
 /**
- * Send it!
+ * Actually send a personal message.
  */
 function action_sendmessage2()
 {
@@ -1428,21 +1416,9 @@ function action_sendmessage2()
 	if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
 	{
 		// How many have they sent this last hour?
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(pr.id_pm) AS post_count
-			FROM {db_prefix}personal_messages AS pm
-				INNER JOIN {db_prefix}pm_recipients AS pr ON (pr.id_pm = pm.id_pm)
-			WHERE pm.id_member_from = {int:current_member}
-				AND pm.msgtime > {int:msgtime}',
-			array(
-				'current_member' => $user_info['id'],
-				'msgtime' => time() - 3600,
-			)
-		);
-		list ($postCount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$pmCount = pmCount($user_info['id'], 3600);
 
-		if (!empty($postCount) && $postCount >= $modSettings['pm_posts_per_hour'])
+		if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 		{
 			if (!isset($_REQUEST['xml']))
 				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
