@@ -910,7 +910,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	// Make sure this attachment is on this board.
 
 	$request = $smcFunc['db_query']('', '
-		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.attachment_type, a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
