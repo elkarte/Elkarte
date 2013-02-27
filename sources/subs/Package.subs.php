@@ -380,7 +380,7 @@ function url_exists($url)
 
 /**
  * Loads and returns an array of installed packages.
- * - gets this information from Packages/installed.list.
+ * - gets this information from packages/installed.list.
  * - returns the array of data.
  * - default sort order is package_installed time
  *
@@ -391,7 +391,7 @@ function loadInstalledPackages()
 	global $smcFunc;
 
 	// First, check that the database is valid, installed.list is still king.
-	$install_file = implode('', file(BOARDDIR . '/Packages/installed.list'));
+	$install_file = implode('', file(BOARDDIR . '/packages/installed.list'));
 	if (trim($install_file) == '')
 	{
 		$smcFunc['db_query']('', '
@@ -441,7 +441,7 @@ function loadInstalledPackages()
 
 /**
  * Loads a package's information and returns a representative array.
- * - expects the file to be a package in Packages/.
+ * - expects the file to be a package in packages/.
  * - returns a error string if the package-info is invalid.
  * - otherwise returns a basic array of id, version, filename, and similar information.
  * - an Xml_Array is available in 'xml'.
@@ -458,13 +458,13 @@ function getPackageInfo($gzfilename)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
 	else
 	{
-		if (!file_exists(BOARDDIR . '/Packages/' . $gzfilename))
+		if (!file_exists(BOARDDIR . '/packages/' . $gzfilename))
 			return 'package_get_error_not_found';
 
-		if (is_file(BOARDDIR . '/Packages/' . $gzfilename))
-			$packageInfo = read_tgz_file(BOARDDIR . '/Packages/' . $gzfilename, '*/package-info.xml', true);
-		elseif (file_exists(BOARDDIR . '/Packages/' . $gzfilename . '/package-info.xml'))
-			$packageInfo = file_get_contents(BOARDDIR . '/Packages/' . $gzfilename . '/package-info.xml');
+		if (is_file(BOARDDIR . '/packages/' . $gzfilename))
+			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/package-info.xml', true);
+		elseif (file_exists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
+			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml');
 		else
 			return 'package_get_error_missing_xml';
 	}
@@ -473,7 +473,7 @@ function getPackageInfo($gzfilename)
 	if (empty($packageInfo))
 	{
 		// Perhaps they are trying to install a theme, lets tell them nicely this is the wrong function
-		$packageInfo = read_tgz_file(BOARDDIR . '/Packages/' . $gzfilename, '*/theme_info.xml', true);
+		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/theme_info.xml', true);
 		if (!empty($packageInfo))
 			return 'package_get_error_is_theme';
 		else
@@ -1092,7 +1092,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 	$return = array();
 
 	$temp_auto = 0;
-	$temp_path = BOARDDIR . '/Packages/temp/' . (isset($context['base_path']) ? $context['base_path'] : '');
+	$temp_path = BOARDDIR . '/packages/temp/' . (isset($context['base_path']) ? $context['base_path'] : '');
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
@@ -2605,7 +2605,7 @@ function package_get_contents($filename)
 			$package_cache = false;
 	}
 
-	if (strpos($filename, 'Packages/') !== false || $package_cache === false || !isset($package_cache[$filename]))
+	if (strpos($filename, 'packages/') !== false || $package_cache === false || !isset($package_cache[$filename]))
 		return file_get_contents($filename);
 	else
 		return $package_cache[$filename];
@@ -2648,7 +2648,7 @@ function package_put_contents($filename, $data, $testing = false)
 
 	package_chmod($filename);
 
-	if (!$testing && (strpos($filename, 'Packages/') !== false || $package_cache === false))
+	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 	{
 		$fp = @fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
 
@@ -2659,7 +2659,7 @@ function package_put_contents($filename, $data, $testing = false)
 		fwrite($fp, $data);
 		fclose($fp);
 	}
-	elseif (strpos($filename, 'Packages/') !== false || $package_cache === false)
+	elseif (strpos($filename, 'packages/') !== false || $package_cache === false)
 		return strlen($data);
 	else
 	{
@@ -2955,11 +2955,11 @@ function package_create_backup($id = 'backup')
 		$listing->close();
 	}
 
-	if (!file_exists(BOARDDIR . '/Packages/backups'))
-		mktree(BOARDDIR . '/Packages/backups', 0777);
-	if (!is_writable(BOARDDIR . '/Packages/backups'))
-		package_chmod(BOARDDIR . '/Packages/backups');
-	$output_file = BOARDDIR . '/Packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+	if (!file_exists(BOARDDIR . '/packages/backups'))
+		mktree(BOARDDIR . '/packages/backups', 0777);
+	if (!is_writable(BOARDDIR . '/packages/backups'))
+		package_chmod(BOARDDIR . '/packages/backups');
+	$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
 
 	if (file_exists($output_file . $output_ext))
