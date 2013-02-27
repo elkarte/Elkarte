@@ -1025,3 +1025,73 @@ function accessibleBoards()
 
 	return $boards;
 }
+
+/**
+ * Find all the boards, all boards this user is allowed to see,
+ * all boards this user wants to see, etc.
+ */
+function allBoards($all = false, $include = array())
+{
+	global $smcFunc, $cur_profile;
+
+	// Find all the boards this user is allowed to see.
+	$request = $smcFunc['db_query']('order_by_board_order', '
+		SELECT b.id_cat, c.name AS cat_name, b.id_board, b.name, b.child_level' . (!empty($include['access']) ? ',
+			FIND_IN_SET({string:current_group}, b.member_groups) != 0 AS can_access,
+			FIND_IN_SET({string:current_group}, b.deny_member_groups) != 0 AS cannot_access' : '') . (!empty($include['ignore']) ? ',
+			'. (!empty($cur_profile['ignore_boards']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored' : '') . '
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
+		WHERE ' . ($all ? '' : '{query_see_board}
+			AND ') . 'redirect = {string:empty_string}
+		ORDER BY board_order',
+		array(
+			'empty_string' => '',
+			'ignore_boards' => $include_ignore && !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array(),
+			'current_group' => $include['access'],
+		)
+	);
+
+	$return = array(
+		'num_boards' => $smcFunc['db_num_rows']($request),
+		'boards_check_all' => true,
+		'categories' => array(),
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		// This category hasn't been set up yet..
+		if (!isset($return['categories'][$row['id_cat']]))
+			$return['categories'][$row['id_cat']] = array(
+				'id' => $row['id_cat'],
+				'name' => $row['cat_name'],
+				'boards' => array()
+			);
+
+		// Set this board up, and let the template know when it's a child.  (indent them..)
+		$return['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'name' => $row['name'],
+			'child_level' => $row['child_level'],
+			'selected' => (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']) && !in_array($row['id_board'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($row['id_board'], $context['search_params']['brd']))
+		);
+
+		if (!empty($include['access']))
+			$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
+							'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
+							'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
+			);
+
+
+		// If a board wasn't checked that probably should have been ensure the board selection is selected, yo!
+		if (!$return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
+			$return['boards_check_all'] = false;
+	}
+	$smcFunc['db_free_result']($request);
+
+	// Include a list of boards per category for easy toggling.
+	foreach ($context['categories'] as $category)
+		$return['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
+
+	return $return;
+}
