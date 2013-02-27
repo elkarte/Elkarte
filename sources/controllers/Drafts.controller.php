@@ -127,7 +127,7 @@ function saveDraft()
  * @param type $recipientList
  * @return boolean
  */
-function savePMDraft(&$post_errors, $recipientList)
+function savePMDraft($recipientList)
 {
 	global $context, $user_info, $smcFunc, $modSettings;
 
