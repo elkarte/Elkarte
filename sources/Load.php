@@ -2670,7 +2670,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 			'href' => '',
 			'url' => ''
 		);
-	
+
 	//Make sure there's a preview for gravatars available..
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
 
