@@ -1101,7 +1101,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'blurb' => $profile['personal_text'],
 			'gender' => array(
 				'name' => $gendertxt,
-				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
+				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/profile/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
 			),
 			'website' => array(
 				'title' => $profile['website_title'],
@@ -1129,7 +1129,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $smcFunc['htmlspecialchars']($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
-				'image_href' => $settings['images_url'] . '/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
+				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
 			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
@@ -1142,7 +1142,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'group_id' => $profile['id_group'],
 			'post_group' => $profile['post_group'],
 			'post_group_color' => $profile['post_group_color'],
-			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
+			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
@@ -1806,9 +1806,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 			call_user_func('template_' . $template_name . '_init');
 	}
 	// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/Themes/default'))
+	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
 	{
-		$settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
+		$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 		$settings['template_dirs'][] = $settings['default_theme_dir'];
 
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
@@ -1826,7 +1826,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
 		fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 	elseif ($fatal)
-		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load Themes/default/%s.template.php!', (string) $template_name), 'template'));
+		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
 	else
 		return false;
 }
@@ -2589,6 +2589,7 @@ function loadDatabase()
 	if (ELKARTE == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
+
 /**
  * Determine the user's avatar type and return the information as an array
  *
@@ -2604,10 +2605,13 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
+		// where are those pesky avatars?
+		$avatar_url = empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
+
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar" alt="" />',
-			'href' => $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar',
+			'image' => '<img class="avatar" src="' . $avatar_url . '" alt="" />',
+			'href' => $avatar_url,
 			'url' => '',
 		);
 	}
@@ -2649,7 +2653,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	}
 
 	// no custon avatar found yet, maybe a default avatar?
-	elseif (($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		$avatar = array(
 			'name' => '',
@@ -2666,6 +2670,9 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 			'href' => '',
 			'url' => ''
 		);
+
+	//Make sure there's a preview for gravatars available..
+	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
 }
