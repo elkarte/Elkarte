@@ -2653,7 +2653,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	}
 
 	// no custon avatar found yet, maybe a default avatar?
-	elseif (($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		$avatar = array(
 			'name' => '',
