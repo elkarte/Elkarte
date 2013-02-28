@@ -299,7 +299,7 @@ function template_editBuddies()
 				<td align="center"><a href="', $buddy['online']['href'], '"><img src="', $buddy['online']['image_href'], '" alt="', $buddy['online']['text'], '" title="', $buddy['online']['text'], '" /></a></td>';
 		if ($context['can_send_email'])
 			echo '
-				<td align="center">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
+				<td align="center">', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
 
 		echo '
 				<td align="center"><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['buddy_remove'], '" title="', $txt['buddy_remove'], '" /></a></td>
@@ -396,7 +396,7 @@ function template_editIgnoreList()
 				<td align="center"><a href="', $member['online']['href'], '"><img src="', $member['online']['image_href'], '" alt="', $member['online']['text'], '" title="', $member['online']['text'], '" /></a></td>';
 		if ($context['can_send_email'])
 			echo '
-				<td align="center">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
+				<td align="center">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
 		
 		echo '
 				<td align="center"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
@@ -3004,11 +3004,11 @@ function template_profile_block_contact()
 
 				if ($context['member']['online']['is_online'])
 					echo '
-						<dt><img src="', $settings['images_url'] ,'/im_on.png" alt="" class="icon" /></dt>
+						<dt><img src="', $settings['images_url'] ,'/profile/im_on.png" alt="" class="icon" /></dt>
 						<dd><a href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '.</a></dd>';
 				else
 					echo '
-						<dt><img src="', $settings['images_url'] ,'/im_off.png" alt="" class="icon" /></dt>
+						<dt><img src="', $settings['images_url'] ,'/profile/im_off.png" alt="" class="icon" /></dt>
 						<dd><a href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '.</a></dd>';
 
 				echo '
@@ -3022,7 +3022,7 @@ function template_profile_block_contact()
 			if ($context['can_send_email'])
 			{
 				echo '
-						<dt><img src="', $settings['images_url'] ,'/email_sm.png" alt="', $txt['email'], '" /></dt>
+						<dt><img src="', $settings['images_url'] ,'/profile/email_sm.png" alt="', $txt['email'], '" /></dt>
 						<dd>';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
@@ -3044,7 +3044,7 @@ function template_profile_block_contact()
 			// Don't show an icon if they haven't specified a website.
 			if ($context['member']['website']['url'] !== '' && !isset($context['disabled_fields']['website']))
 				echo '
-						<dt><img src="', $settings['images_url'] ,'/www.png" alt="', $txt['website'], '" /></dt>
+						<dt><img src="', $settings['images_url'] ,'/profile//www.png" alt="', $txt['website'], '" /></dt>
 						<dd><a href="', $context['member']['website']['url'], '" target="_blank" class="new_win">', $context['member']['website']['title'] == '' ? $context['member']['website']['url'] : $context['member']['website']['title'], '</a></dd>';
 
 			echo '
@@ -3273,23 +3273,23 @@ function template_profile_block_buddies()
 							<td align="center">
 								', $data['avatar']['image'],'<br />
 								<a href="', $scripturl , '?action=profile;u=', $data['id'] , '">' , $data['name'] , '</a><br />
-								<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png' . '" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>
+								<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png' . '" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>
 								';
 
 			// Only show the email address fully if it's not hidden - and we reveal the email.
 			if ($context['can_send_email'] && ($data['show_email'] == 'yes' || $data['show_email'] == 'yes_permission_override'))
 				echo '
 							<br />
-							<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $data['id'], '"><img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $data['name'] . '" class="icon"/></a>';
+							<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $data['id'], '"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $data['name'] . '" class="icon"/></a>';
 
 			if ($context['can_send_pm'])
 			{
 				if ($data['online']['is_online'])
 					echo '
-							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'] ,'/im_on.png" alt="',$txt['profile_sendpm_short'],'" title="',$txt['profile_sendpm_short'],' to ',$data['name'], '" class="icon"/></a>';
+							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'] ,'/profile/im_on.png" alt="',$txt['profile_sendpm_short'],'" title="',$txt['profile_sendpm_short'],' to ',$data['name'], '" class="icon"/></a>';
 				else
 					echo '
-							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'] ,'/im_off.png" alt="',$txt['profile_sendpm_short'],'" title="',$txt['profile_sendpm_short'],' to ',$data['name'], '" class="icon"/></a>';
+							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'] ,'/profile/im_off.png" alt="',$txt['profile_sendpm_short'],'" title="',$txt['profile_sendpm_short'],' to ',$data['name'], '" class="icon"/></a>';
 			}
 
 			echo '

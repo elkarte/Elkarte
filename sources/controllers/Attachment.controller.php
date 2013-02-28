@@ -49,12 +49,13 @@ function action_dlattach()
 	// We need to do some work on attachments and avatars.
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
-	$_REQUEST['attach'] = isset($_REQUEST['attach']) ? (int) $_REQUEST['attach'] : (int) $_REQUEST['id'];
+	$id_attach = isset($_REQUEST['attach']) ? (int) $_REQUEST['attach'] : (int) $_REQUEST['id'];
 
 	if (isset($_REQUEST['type']) && $_REQUEST['type'] == 'avatar')
 	{
-		$attachment = getAvatar($_REQUEST['attach']);
+		$attachment = getAvatar($id_attach);
 
+		$is_avatar = true;
 		$_REQUEST['image'] = true;
 	}
 	// This is just a regular attachment...
@@ -64,18 +65,18 @@ function action_dlattach()
 		// @todo: We must verify that $topic is the attachment's topic, or else the permission check is broken.
 		isAllowedTo('view_attachments');
 
-		$attachment = getAttachmentFromTopic($_REQUEST['attach'], $topic);
+		$attachment = getAttachmentFromTopic($id_attach, $topic);
 	}
 	if (empty($attachment))
 		fatal_lang_error('no_access', false);
-	list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
+	list ($id_folder, $real_filename, $file_hash, $file_ext, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 	// If it isn't yet approved, do they have permission to view it?
 	if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 		isAllowedTo('approve_posts');
 
-	// Update the download counter (unless it's a thumbnail).
-	if ($attachment_type != 3)
+	// Update the download counter (unless it's a thumbnail or an avatar).
+	if (empty($is_avatar) || $attachment_type != 3)
 		increaseDownloadCounter($id_attach);
 
 	$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);

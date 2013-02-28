@@ -143,7 +143,7 @@ function MembergroupIndex()
 						global $settings;
 
 						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
 						else
 							return \'\';
 					'),
@@ -246,7 +246,7 @@ function MembergroupIndex()
 						global $settings;
 
 						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
 						else
 							return \'\';
 					'),
