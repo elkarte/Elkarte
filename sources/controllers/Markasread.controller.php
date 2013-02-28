@@ -122,20 +122,11 @@ function action_marktopic()
 {
 	global $board, $topic, $user_info, $smcFunc;
 
+	require_once(SUBSDIR . '/Topic.subs.php');
+
 	// Mark a topic unread.
 	// First, let's figure out what the latest message is.
-	$result = $smcFunc['db_query']('', '
-		SELECT t.id_first_msg, t.id_last_msg, IFNULL(lt.disregarded, 0) as disregarded
-		FROM {db_prefix}topics as t
-		LEFT JOIN {db_prefix}log_topics as lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-		WHERE t.id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-			'current_member' => $user_info['id'],
-		)
-	);
-	$topicinfo = $smcFunc['db_fetch_assoc']($result);
-	$smcFunc['db_free_result']($result);
+	$topicinfo = getTopicInfo($topic, 3);
 
 	if (!empty($_GET['t']))
 	{
@@ -187,7 +178,6 @@ function action_marktopic()
 	}
 
 	// Blam, unread!
-	require_once(SUBSDIR . '/Topic.subs.php');
 	markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
 
 	redirectexit('board=' . $board . '.0');
