@@ -2773,7 +2773,7 @@ function template_profile_avatar_select()
 	{
 		echo '
 								<div id="avatar_gravatar">
-									<br /><br /><img src='. $context['member']['avatar']['gravatar_preview'] .'" alt="" />
+									<br /><br /><img src="' . $context['member']['avatar']['gravatar_preview'] . '" alt="" />
 								</div>';						
 	}
 	// If the user is able to upload avatars to the server show them an upload box.
