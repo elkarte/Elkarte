@@ -137,7 +137,7 @@ function action_grouplist()
 						global $settings;
 
 						if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
 						else
 							return \'\';
 					'),
@@ -224,7 +224,7 @@ function action_groupmembers()
 
 	// Fix the membergroup icons.
 	$context['group']['icons'] = explode('#', $context['group']['icons']);
-	$context['group']['icons'] = !empty($context['group']['icons'][0]) && !empty($context['group']['icons'][1]) ? str_repeat('<img src="' . $settings['images_url'] . '/' . $context['group']['icons'][1] . '" alt="*" />', $context['group']['icons'][0]) : '';
+	$context['group']['icons'] = !empty($context['group']['icons'][0]) && !empty($context['group']['icons'][1]) ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $context['group']['icons'][1] . '" alt="*" />', $context['group']['icons'][0]) : '';
 	$context['group']['can_moderate'] = allowedTo('manage_membergroups') && (allowedTo('admin_forum') || $context['group']['group_type'] != 1);
 
 	$context['linktree'][] = array(
