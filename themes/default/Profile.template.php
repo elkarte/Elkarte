@@ -2773,8 +2773,7 @@ function template_profile_avatar_select()
 	{
 		echo '
 								<div id="avatar_gravatar">
-									<input type="checkbox" name="gravatar_all" id="gravatar_all" value="1" class="check" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'gravatar\');" class="input_file"/>
-									<br /><br /><img src='. $context['member']['avatar']['href'] .'" alt="" />
+									<br /><br /><img src='. $context['member']['avatar']['gravatar_preview'] .'" alt="" />
 								</div>';						
 	}
 	// If the user is able to upload avatars to the server show them an upload box.
