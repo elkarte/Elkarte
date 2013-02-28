@@ -1101,7 +1101,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'blurb' => $profile['personal_text'],
 			'gender' => array(
 				'name' => $gendertxt,
-				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
+				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/profile/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
 			),
 			'website' => array(
 				'title' => $profile['website_title'],
@@ -1129,7 +1129,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $smcFunc['htmlspecialchars']($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
-				'image_href' => $settings['images_url'] . '/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
+				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
 			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
@@ -1142,7 +1142,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'group_id' => $profile['id_group'],
 			'post_group' => $profile['post_group'],
 			'post_group_color' => $profile['post_group_color'],
-			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
+			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),

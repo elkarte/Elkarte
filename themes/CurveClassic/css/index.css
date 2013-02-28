@@ -2625,7 +2625,7 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 	margin: auto;
 }
 .errorbox  {
-	background: #fee url(../images/warning_mute.png) 10px 50% no-repeat;
+	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
 	text-align: left;
 	border-top: 2px solid #c34;
 	border-bottom: 2px solid #c34;
@@ -2657,7 +2657,7 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 
 .noticebox  {
 	color: #666;
-	background: #fff6ca url(../images/warning_moderate.png) 10px 50% no-repeat;
+	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
 	text-align: left;
 	border-top: 1px solid #ffd324;
 	border-bottom: 1px solid #ffd324;

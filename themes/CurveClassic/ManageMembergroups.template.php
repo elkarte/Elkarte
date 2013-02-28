@@ -290,8 +290,8 @@ function template_edit_group()
 						</dt>
 						<dd>
 							', $txt['membergroups_images_url'], '
-							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value == 0) this.form.icon_count.value = 1; else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'star_preview\').src = smf_images_url + \'/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value.replace(/\$language/g, \'', $context['user']['language'], '\') : \'blank.png\');" size="20" class="input_text" />
-							<img id="star_preview" src="', $settings['images_url'], '/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
+							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value == 0) this.form.icon_count.value = 1; else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'icon_preview\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value.replace(/\$language/g, \'', $context['user']['language'], '\') : \'blank.png\');" size="20" class="input_text" />
+							<img id="icon_preview" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
 						</dd>
 						<dt>
 							<label for="max_messages_input"><strong>', $txt['membergroups_max_messages'], ':</strong></label><br />
@@ -576,7 +576,7 @@ function template_group_members()
 			// ... otherwise it's visible - but only via an image?
 			elseif ($member['show_email'] == 'no_through_forum')
 				echo '
-								<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $member['id'], '" rel="nofollow">', ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']), '</a>';
+								<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $member['id'], '" rel="nofollow">', ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']), '</a>';
 			// ... otherwise it must be a 'yes', show it and show it fully.
 			else
 				echo '
