@@ -438,7 +438,7 @@ function template_main()
 									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 								</span>
 								<h5 id="info_', $message['id'], '">
-									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) . ' - ' . $txt['on'] . ': ' : '', '</a>', $message['time'];
+									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['time'];
 
 		echo '
 								</h5>
@@ -546,13 +546,12 @@ function template_main()
 						</div>';
 
 		// Show the quickbuttons, for various operations on posts.
-		if ($message['can_approve'] || $context['can_reply'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
-			echo '
+		echo '
 						<div class="quickbuttons_wrap">
 							<ul class="quickbuttons">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
-		if ($settings['show_modify'] && !empty($message['modified']['last_edit_text']))
+		if ($settings['show_modify'] && !empty($message['modified']['name']))
 			echo '
 								<li class="modified" id="modified_', $message['id'], '">
 									', $message['modified']['last_edit_text'], '
@@ -621,8 +620,7 @@ function template_main()
 			echo '
 								<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a></li>';
 
-		if ($message['can_approve'] || $context['can_reply'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
-			echo '
+		echo '
 							</ul>
 						</div>';
 
