@@ -353,7 +353,7 @@ function list_getNumBans()
  */
 function BanEdit()
 {
-	global $txt, $modSettings, $context, $ban_request, $scripturl, $smcFunc, $sourcedir;
+	global $txt, $modSettings, $context, $ban_request, $scripturl, $smcFunc;
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -381,7 +381,7 @@ function BanEdit()
 		$context['ban_group_id'] = $ban_group_id;
 
 		// We're going to want this for making our list.
-		require_once($sourcedir . '/Subs-List.php');
+		require_once(SUBSDIR . '/List.subs.php');
 
 		$listOptions = array(
 			'id' => 'ban_items',
