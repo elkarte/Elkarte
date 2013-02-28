@@ -357,7 +357,7 @@ function BanEdit()
 
 	$ban_errors = error_context::context('ban', 1);
 
-	if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors()))
+	if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
 		BanEdit2();
 
 	$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : (isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0);
@@ -438,7 +438,7 @@ function BanEdit()
 					'data' => array(
 						'function' => create_function('$ban_item', '
 							global $txt, $context, $scripturl;
-							
+
 							return \'<a href="\' . $scripturl . \'?action=admin;area=ban;sa=edittrigger;bg=\' . $context[\'ban\'][\'id\'] . \';bi=\' . $ban_item[\'id\'] . \'">\' . $txt[\'ban_edit_trigger\'] . \'</a>\';
 						'),
 						'style' => 'text-align: center;',
@@ -701,7 +701,7 @@ function banLoadAdditionalIPs($member_id)
 	$search_list += array('ips_in_messages' => 'banLoadAdditionalIPsMember', 'ips_in_errors' => 'banLoadAdditionalIPsError');
 
 	$return = array();
-	foreach ($search_list as $key => $callable) 
+	foreach ($search_list as $key => $callable)
 		if (is_callable($callable))
 			$return[$key] = call_user_func($callable, $member_id);
 
@@ -787,7 +787,7 @@ function banEdit2()
 		$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
 		$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_post']) ? 0 : 1;
 		$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_register']) ? 0 : 1;
-		$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_login']) ? 0 : 1;	
+		$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_login']) ? 0 : 1;
 
 		// Adding a new ban group
 		if (empty($_REQUEST['bg']))
