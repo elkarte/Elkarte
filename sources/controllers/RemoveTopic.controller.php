@@ -45,26 +45,15 @@ function action_removetopic2()
 
 	removeDeleteConcurrence();
 
-	$request = $smcFunc['db_query']('', '
-		SELECT t.id_member_started, ms.subject, t.approved
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($starter, $subject, $approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$topic_info = getTopicInfo($topic, 1);
 
-	if ($starter == $user_info['id'] && !allowedTo('remove_any'))
+	if ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('remove_any'))
 		isAllowedTo('remove_own');
 	else
 		isAllowedTo('remove_any');
 
 	// Can they see the topic?
-	if ($modSettings['postmod_active'] && !$approved && $starter != $user_info['id'])
+	if ($modSettings['postmod_active'] && !$topic_info['approved'] && $topic_info['id_member_started'] != $user_info['id'])
 		isAllowedTo('approve_posts');
 
 	// Notify people that this topic has been removed.
@@ -73,8 +62,13 @@ function action_removetopic2()
 	removeTopics($topic);
 
 	// Note, only log topic ID in native form if it's not gone forever.
-	if (allowedTo('remove_any') || (allowedTo('remove_own') && $starter == $user_info['id']))
-		logAction('remove', array((empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic, 'subject' => $subject, 'member' => $starter, 'board' => $board));
+	if (allowedTo('remove_any') || (allowedTo('remove_own') && $topic_info['id_member_started'] == $user_info['id']))
+		logAction('remove', array(
+			(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
+			'subject' => $topic_info['subject'],
+			'member' => $topic_info['id_member_started'],
+			'board' => $board)
+		);
 
 	redirectexit('board=' . $board . '.0');
 }
@@ -90,6 +84,9 @@ function action_deletemsg()
 
 	checkSession('get');
 
+	// This has some handy functions for topics
+	require_once(SUBSDIR . '/Topic.subs.php');
+
 	$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 	// Is $topic set?
@@ -98,37 +95,25 @@ function action_deletemsg()
 
 	removeDeleteConcurrence();
 
-	$request = $smcFunc['db_query']('', '
-		SELECT t.id_member_started, m.id_member, m.subject, m.poster_time, m.approved
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = {int:id_msg} AND m.id_topic = {int:current_topic})
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-			'id_msg' => $_REQUEST['msg'],
-		)
-	);
-	list ($starter, $poster, $subject, $post_time, $approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$topic_info = getTopicInfo($topic, 1);
 
 	// Verify they can see this!
-	if ($modSettings['postmod_active'] && !$approved && !empty($poster) && $poster != $user_info['id'])
+	if ($modSettings['postmod_active'] && !$topic_info['msg_approved'] && !empty($topic_info['poster_time']) && $topic_info['poster_time'] != $user_info['id'])
 		isAllowedTo('approve_posts');
 
-	if ($poster == $user_info['id'])
+	if ($topic_info['poster_time'] == $user_info['id'])
 	{
 		if (!allowedTo('delete_own'))
 		{
-			if ($starter == $user_info['id'] && !allowedTo('delete_any'))
+			if ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
 				isAllowedTo('delete_replies');
 			elseif (!allowedTo('delete_any'))
 				isAllowedTo('delete_own');
 		}
-		elseif (!allowedTo('delete_any') && ($starter != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $post_time + $modSettings['edit_disable_time'] * 60 < time())
+		elseif (!allowedTo('delete_any') && ($topic_info['id_member_started'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 			fatal_lang_error('modify_post_time_passed', false);
 	}
-	elseif ($starter == $user_info['id'] && !allowedTo('delete_any'))
+	elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
 		isAllowedTo('delete_replies');
 	else
 		isAllowedTo('delete_any');
@@ -137,8 +122,13 @@ function action_deletemsg()
 	require_once(SUBSDIR . '/Messages.subs.php');
 	$full_topic = removeMessage($_REQUEST['msg']);
 
-	if (allowedTo('delete_any') && (!allowedTo('delete_own') || $poster != $user_info['id']))
-		logAction('delete', array('topic' => $topic, 'subject' => $subject, 'member' => $poster, 'board' => $board));
+	if (allowedTo('delete_any') && (!allowedTo('delete_own') || $topic_info['poster_time'] != $user_info['id']))
+		logAction('delete', array(
+			'topic' => $topic,
+			'subject' => $topic_info['subject'],
+			'member' => $topic_info['poster_time'],
+			'board' => $board)
+		);
 
 	// We want to redirect back to recent action.
 	if (isset($_REQUEST['recent']))
