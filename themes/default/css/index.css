@@ -2059,18 +2059,15 @@ div#pollmoderation {
 	word-break: hyphenate;
 	word-wrap: break-word;
 }
-.poster h4 {
+.poster span.name {
+    display: block;
+    padding: 6px;
+    line-height: 1.5em;
+    text-align: center;
+	color: #C06002;
 	font-size: 1.2em;
-}
-.poster h4, .poster h4 a, .poster li:hover h4 a, .poster h4 a:hover .poster li.sfhover h4 a, .poster h4 a:focus {
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-	color: #c06002;
-	display: block;
-}
-.poster h4 span{
-	padding: 6px;
-	display: block;
+	cursor: pointer;
+	font-weight: bold;
 }
 /* Nifty new flyout menu for the poster info. */
 /* @todo Can probably clean up the CSS here a bit. */
@@ -2080,9 +2077,7 @@ div#pollmoderation {
 	margin: -8px 0 0 0;
 	float: none;
 }
-.poster .dropmenu>li, .poster .dropmenu>li:hover, .poster .dropmenu>li.sfhover
-.poster .dropmenu>li h4, .poster .dropmenu>li:hover h4, .poster .dropmenu>li.sfhover h4,
-.poster .dropmenu>li h4 a,.poster .dropmenu>li:hover h4 a, .poster .dropmenu>li.sfhover h4 a {
+.poster .dropmenu>li, .poster .dropmenu>li:hover, .poster .dropmenu>li.sfhover {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
 	float: none;
@@ -2126,7 +2121,7 @@ div#pollmoderation {
 	background: none;
 	border: none;
 }
-.poster .dropmenu  li ul li.cf_icons, .poster .dropmenu	ul ol li {
+.poster .dropmenu  li ul li.cf_icons, .poster .dropmenu ul ol li {
 	padding: 3px;
 }
 .poster .dropmenu	ul ol li {
