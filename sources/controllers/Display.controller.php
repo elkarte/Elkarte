@@ -105,7 +105,7 @@ function Display()
 	// @todo Why isn't this cached?
 	// @todo if we get id_board in this query and cache it, we can save a query on posting
 	// Load the topic details
-	$topicinfo = getTopicInfo($topic_parameters, 3, $topic_selects, $topic_tables);
+	$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 	if (empty($topicinfo))
 		fatal_lang_error('not_a_topic', false);
 

@@ -39,7 +39,7 @@ function action_movetopic()
 
 	// Retrieve the basic topic information for whats being moved
 	require_once(SUBSDIR . '/Topic.subs.php');
-	$topic_info = getTopicInfo($topic, 1);
+	$topic_info = getTopicInfo($topic, 'message');
 
 	if ($topic_info === false)
 		fatal_lang_error('topic_gone', false);

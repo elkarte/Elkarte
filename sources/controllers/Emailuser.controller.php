@@ -64,7 +64,7 @@ function action_sendtopic()
 
 	require_once(SUBSDIR . '/Topic.subs.php');
 
-	$row = getTopicInfo($topic, 1);
+	$row = getTopicInfo($topic, 'message');
 	if (empty($row))
 		fatal_lang_error('not_a_topic', false);
 

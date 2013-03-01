@@ -94,7 +94,7 @@ function action_mergeIndex()
 
 	// Get the topic's subject.
 	require_once(SUBSDIR . '/Topic.subs.php');
-	$topic_info = getTopicInfo($_GET['from'], 1);
+	$topic_info = getTopicInfo($_GET['from'], 'message');
 	// @todo review: double check the logic
 	if (empty($topic_info) || ($topic_info['id_board'] !== $board) || ($onlyApproved && empty($topic_info['approved'])))
 		fatal_lang_error('no_board');
