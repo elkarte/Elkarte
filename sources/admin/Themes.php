@@ -1739,33 +1739,10 @@ function action_edittheme()
 
 	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) @$_GET['id'];
 
+	// Main page: display all installed themes
 	if (empty($_GET['th']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
-				AND id_member = {int:no_member}',
-			array(
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-				'theme_templates' => 'theme_templates',
-				'theme_layers' => 'theme_layers',
-				'no_member' => 0,
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if (!isset($context['themes'][$row['id_theme']]))
-				$context['themes'][$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-					'num_default_options' => 0,
-					'num_members' => 0,
-				);
-			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$smcFunc['db_free_result']($request);
+		$context['themes'] = installedThemes();
 
 		foreach ($context['themes'] as $key => $theme)
 		{
@@ -1805,22 +1782,13 @@ function action_edittheme()
 		return 'no_themes';
 	}
 
+	// You chose a theme to edit... lets see where it is
+
 	$context['session_error'] = false;
 
 	// Get the directory of the theme we are editing.
-	$request = $smcFunc['db_query']('', '
-		SELECT value, id_theme
-		FROM {db_prefix}themes
-		WHERE variable = {string:theme_dir}
-			AND id_theme = {int:current_theme}
-		LIMIT 1',
-		array(
-			'current_theme' => $_GET['th'],
-			'theme_dir' => 'theme_dir',
-		)
-	);
-	list ($theme_dir, $context['theme_id']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$context['theme_id'] = (int) $_GET['th'];
+	$theme_dir = themeDirectory($context['theme_id']);
 
 	// Eh? not trying to sneak a peek outside the theme directory are we
 	if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
@@ -1882,6 +1850,7 @@ function action_edittheme()
 			fatal_lang_error('theme_edit_missing', false);
 	}
 
+	// Saving?
 	if (isset($_POST['save']))
 	{
 		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']), 'post', false) == true)
