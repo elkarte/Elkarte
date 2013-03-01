@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is here solely to protect your Smileys directory.
+ * This file is here solely to protect your smileys directory.
  */
 
 // Look for Settings.php....

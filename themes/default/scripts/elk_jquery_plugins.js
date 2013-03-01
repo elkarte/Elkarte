@@ -369,16 +369,16 @@
 					o = sf.op;
 
 				var close = function() {
-					o.retainPath = ($.inArray($this[0], o.$path) > -1);
 					$this.hideSuperfishUl();
 					if (o.$path.length && $this.parents('li.' + o.hoverClass).length < 1)
 					{
-						o.onIdle.call();
 						$.proxy(over, o.$path, e)();
 					}
 				};
+
 				if (e.type !== 'mouseleave' && e.type !== 'focusout')
 				{
+					clearTimeout(menu.sfTimer);
 					close();
 				}
 				else
@@ -437,7 +437,7 @@
 					}
 					else if (sf.op.useClick && follow)
 					{
-						$.proxy(out,$a.parent(), e)();
+						$.proxy(out, $a.parent(), e)();
 					}
 				}
 			};
@@ -456,7 +456,6 @@
 
 			applyHandlers($this);
 			liHasUl.not('.' + c.bcClass).hideSuperfishUl();
-			o.onInit.call(this);
 		});
 	};
 
@@ -475,10 +474,8 @@
 		delay		: 600,
 		animation	: {opacity:'show', height:'show', width:'show'},
 		speed		: '150',
-		disableHI	: true,		// true disables hoverIntent detection
+		disableHI	: false,		// true disables hoverIntent detection
 		useClick	: false,
-		onInit		: function(){}, // callback functions
-		onIdle		: function(){}
 	};
 
 	$.fn.extend({
@@ -487,11 +484,11 @@
 				$this = this;
 
 			$(['li.', o.hoverClass].join(''), this).add(this).removeClass(o.hoverClass).find('>ul').hide();
+
 			if (sf.op.useClick)
 			{
 				$this.children('a').data('follow', false);
 			}
-
 			return this;
 		},
 		showSuperfishUl : function() {
@@ -592,12 +589,17 @@
 						$(draggable).stop().animate({
 							left: positionX + 'px',
 							top: positionY + 'px'
-						}, o.speed, o.easing, function(){o.afterEachAnimation.call(draggable, Ev)});
+						},                        
+						{
+                            duration:o.speed,
+                            easing:o.easing,
+                            step:function(){o.afterEachAnimation.call(draggable, Ev)}
+                        });
 					}
 					lastX = Ev.pageX;
 					lastY = Ev.pageY;
 				}, o.interval);
-				($.browser.safari || e.preventDefault());
+				(e.preventDefault());
 			});
 			$(document).mousemove(function(e) {
 				if(dragging) {

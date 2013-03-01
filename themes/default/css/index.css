@@ -107,7 +107,7 @@ input, button, select {
 select {
 	padding: 2px;
 }
-select option  {
+select option {
 	padding: 0 4px;
 }
 input:hover, textarea:hover, button:hover, select:hover {
@@ -124,7 +124,7 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 }
 
 /* Buttons should be styled a bit differently, in order to make them look more button'ish. */
-#frmLogin input.button_submit, #guest_form  input.button_submit, #calendar_navigation input.button_submit {
+#frmLogin input.button_submit, #guest_form input.button_submit, #calendar_navigation input.button_submit {
 	float: none;
 	margin-left: inherit;
 }
@@ -424,7 +424,7 @@ a img {
 	border: 0;
 }
 
-/* Generally, those [?] icons.  This makes your cursor a help icon. */
+/* Generally, those [?] icons. This makes your cursor a help icon. */
 .help {
 	cursor: help;
 }
@@ -584,7 +584,7 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 	padding: 1px 0;
 }
 
-/* All the signatures used in the forum.  If your forum users use Mozilla, Opera, or Safari, you might add max-height here ;). */
+/* All the signatures used in the forum. If your forum users use Mozilla, Opera, or Safari, you might add max-height here ;). */
 .signature, .attachments, .custom_fields_above_signature {
 	width: 100%;
 	overflow: auto;
@@ -865,11 +865,11 @@ table.table_grid {
 table.table_grid td {
 	padding: 3px;
 }
-table.table_collapse  {
+table.table_collapse {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-table.table_padding  {
+table.table_padding {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
@@ -887,7 +887,7 @@ img.sort {
 }
 
 /* table_grid styles for Profile > Show Permissions. */
-#permissions table.table_grid  td {
+#permissions table.table_grid td {
 	padding: 5px 10px;
 	cursor: default;
 }
@@ -1035,7 +1035,7 @@ img.sort {
 	background: #597b9f url(../images/selected_open.png) no-repeat 96% 60%;
 }
 #menu_nav li.subsections>a.active:hover, #menu_nav li.subsections:hover>a.active, #menu_nav li.subsections>a.active:focus,
-#admin_menu .dropmenu>li.subsections>a.active:hover, #admin_menu  .dropmenu>li.subsections:hover>a.active, #admin_menu  .dropmenu>li.subsections>a.active:focus {
+#admin_menu .dropmenu>li.subsections>a.active:hover, #admin_menu .dropmenu>li.subsections:hover>a.active, #admin_menu .dropmenu>li.subsections>a.active:focus {
 	background: orange url(../images/selected_open.png) no-repeat 96% 60%;
 }
 */
@@ -1793,7 +1793,7 @@ ul li.greeting {
 #ic_recentposts tr:first-child td {
 	border-top: none;
 }
-#ic_recentposts  .recentpost strong {
+#ic_recentposts .recentpost strong {
 	width: 40%;
 }
 #ic_recentposts .recentposter {
@@ -2059,18 +2059,15 @@ div#pollmoderation {
 	word-break: hyphenate;
 	word-wrap: break-word;
 }
-.poster h4 {
+.poster span.name {
+    display: block;
+    padding: 6px;
+    line-height: 1.5em;
+    text-align: center;
+	color: #C06002;
 	font-size: 1.2em;
-}
-.poster h4, .poster h4 a, .poster li:hover h4 a, .poster h4 a:hover .poster li.sfhover h4 a, .poster h4 a:focus {
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-	color: #c06002;
-	display: block;
-}
-.poster h4 span{
-	padding: 6px;
-	display: block;
+	cursor: pointer;
+	font-weight: bold;
 }
 /* Nifty new flyout menu for the poster info. */
 /* @todo Can probably clean up the CSS here a bit. */
@@ -2080,9 +2077,7 @@ div#pollmoderation {
 	margin: -8px 0 0 0;
 	float: none;
 }
-.poster .dropmenu>li, .poster .dropmenu>li:hover, .poster .dropmenu>li.sfhover
-.poster .dropmenu>li h4, .poster .dropmenu>li:hover h4, .poster .dropmenu>li.sfhover h4,
-.poster .dropmenu>li h4 a,.poster .dropmenu>li:hover h4 a, .poster .dropmenu>li.sfhover h4 a {
+.poster .dropmenu>li, .poster .dropmenu>li:hover, .poster .dropmenu>li.sfhover {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
 	float: none;
@@ -2099,11 +2094,11 @@ div#pollmoderation {
 	background: none;
 	border: none;
 }
-.poster .dropmenu>li.sfhover>ul, .poster .dropmenu>li:hover>ul  {
+.poster .dropmenu>li.sfhover>ul, .poster .dropmenu>li:hover>ul {
 	top: 100%;
 	float: none;
 	left: 0;
-	padding: 6px 0.5em 4px  0.5em;
+	padding: 6px 0.5em 4px 0.5em;
 	width: 15.2em;
 }
 .poster .dropmenu>li>ul>li, .poster .dropmenu>li>ul>li:hover {
@@ -2122,21 +2117,21 @@ div#pollmoderation {
 	width: 100%;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
-.poster .dropmenu  li ul li, .poster .dropmenu  li ul li:hover {
+.poster .dropmenu li ul li, .poster .dropmenu li ul li:hover {
 	background: none;
 	border: none;
 }
-.poster .dropmenu  li ul li.cf_icons, .poster .dropmenu	ul ol li {
+.poster .dropmenu li ul li.cf_icons, .poster .dropmenu	ul ol li {
 	padding: 3px;
 }
 .poster .dropmenu	ul ol li {
 	display: table-cell;
 }
-.poster .dropmenu  li.postgroup, .poster .dropmenu  li.postcount, .poster .dropmenu  li.karma,
-.poster .dropmenu  li.karma_allow, .poster .dropmenu  li.gender, .poster .dropmenu  li.blurb {
+.poster .dropmenu li.postgroup, .poster .dropmenu li.postcount, .poster .dropmenu li.karma,
+.poster .dropmenu li.karma_allow, .poster .dropmenu li.gender, .poster .dropmenu li.blurb {
 	padding: 0 10px 0 10px;
 }
-.poster .dropmenu  li ul li.report_link, .poster .dropmenu  li ul li.issue_warning, .poster .dropmenu  li ul li.poster_ip {
+.poster .dropmenu li ul li.report_link, .poster .dropmenu li ul li.issue_warning, .poster .dropmenu li ul li.poster_ip {
 	margin: 0 0 0 0;
 	padding: 0 0 0 0;
 	float: left;
@@ -2144,15 +2139,15 @@ div#pollmoderation {
 	font-size: 1.1em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
-.poster .dropmenu  li ul li.report_seperator {
+.poster .dropmenu li ul li.report_seperator {
 	height: 2px;
 	background: #ccc;
 	box-shadow: 0 -1px 0 #fff inset;
 }
-.poster .dropmenu  li ul li hr {
+.poster .dropmenu li ul li hr {
 	margin: 4px 3px;
 }
-.poster .dropmenu  li ul li.poster_ip a {
+.poster .dropmenu li ul li.poster_ip a {
 	display: table-cell;
 }
 
@@ -2204,14 +2199,14 @@ div#pollmoderation {
 	margin: 0 0 0 175px;
 }
 .post_subject {
-    color: #555;
-    display: block;
-    float: right;
-    font-size: 0.9em;
-    max-width: 15em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: pre;
+	color: #555;
+	display: block;
+	float: right;
+	font-size: 0.9em;
+	max-width: 15em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: pre;
 	line-height: 1.5em;
 	padding-right: 1em;
 }
@@ -2229,7 +2224,7 @@ div#pollmoderation {
 	padding: 0 3px 0 3px;
 }
 .keyinfo h5 {
-    color: #555;
+	color: #555;
 	padding: 1px 0 5px 0;
 	line-height: 1.5em;
 	font-size: 0.9em;
@@ -2266,7 +2261,7 @@ img.smiley {
 .attachments .floatleft {
 	padding: 0 6px 8px 6px;
 }
-.attachments_top  {
+.attachments_top {
 	margin: 0 auto;
 	text-align: center;
 }
@@ -2465,10 +2460,10 @@ ul.quickbuttons li.inline_mod_check {
 	background: none repeat scroll 0 0 transparent;
 	box-shadow: none;
 	border: none;
-    display: block;
-    left: 2px;
-    position: relative;
-    top: 0.65em;
+	display: block;
+	left: 2px;
+	position: relative;
+	top: 0.65em;
 }
 /* Separator of posts. More useful in the print stylesheet. */
 #forumposts .post_separator {
@@ -2588,7 +2583,7 @@ ul.post_options li {
 #postAttachment dt, #postAttachment2 dt {
 	font-weight: bold;
 }
-#postAttachment3  /* Can't see this called anywhere in Post.template.php */{
+#postAttachment3 /* Can't see this called anywhere in Post.template.php */{
 	margin-left: 12px;
 }
 #postDraftOptions {
@@ -2988,8 +2983,8 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 	width: 80%;
 	margin: auto;
 }
-.errorbox  {
-	background: #fee url(../images/warning_mute.png) 10px 50% no-repeat;
+.errorbox {
+	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
 	text-align: left;
 	border-top: 2px solid #c34;
 	border-bottom: 2px solid #c34;
@@ -3019,16 +3014,16 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 /* Styles for info boxes
 ------------------------------------------------- */
 
-.noticebox  {
+.noticebox {
 	color: #666;
-	background: #fff6ca url(../images/warning_moderate.png) 10px 50% no-repeat;
+	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
 	text-align: left;
 	border-top: 1px solid #ffd324;
 	border-bottom: 1px solid #ffd324;
 	padding: 7px 10px 7px 35px;
 	margin-bottom: 12px;
 }
-.infobox  {
+.infobox {
 	color: #222;
 	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
 	text-align: left;
@@ -3037,7 +3032,7 @@ tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
 	padding: 7px 10px 7px 35px;
 	margin-bottom: 12px;
 }
-.descbox  {
+.descbox {
 	text-align: left;
 	padding: 7px 10px 7px 35px;
 	border: 1px solid #c5c5c5;
@@ -3392,7 +3387,7 @@ img.centericon {
 #statistics {
 	padding: 6px 0;
 }
-#statistics  div {
+#statistics div {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #statistics div.title_bar {
@@ -4004,7 +3999,7 @@ span.hidelink {
 /* Tablets (landscape) */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
 }
-/* Tablets (portrait)  Drop the stats col replys/views and topics/messages */
+/* Tablets (portrait) Drop the stats col replys/views and topics/messages */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
 	.table_list td.stats .table_grid td.stats, .table_grid th.stats {
 		display: none;
@@ -4067,7 +4062,7 @@ span.hidelink {
 }
 /* The generic wrapper thingy for teh awesome cool looks innit. */
 /* This lot will be simplified once I get all the styling hooks in place. */
-.generic_list_wrapper, .action_profile  #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
+.generic_list_wrapper, .action_profile #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
 #notify_options .windowbg2, #info_center, #profileview, #messageindex, #unread, #mlist,
 #main_grid table, .core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
 	background: #f0f4f7;
@@ -4277,10 +4272,10 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid td.statsbar div {
 	display: none;
 }
-.table_grid  tr td:first-child, .table_grid td.icon2 {
+.table_grid tr td:first-child, .table_grid td.icon2 {
 	border-left: 1px solid #ccc;
 }
-.table_grid  img.fred {
+.table_grid img.fred {
 	position: absolute;
 	z-index: 5;
 	right: 4px;
@@ -4344,13 +4339,13 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 /* Search results need some help as well */
 .search_results_posts .lockedbg {
-	background:  #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
 }
 .search_results_posts .stickybg {
 	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 95% 15px;
 }
 .search_results_posts .locked_stickybg {
-	background:  #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }
 
 /* Colors for background of posts requiring approval */

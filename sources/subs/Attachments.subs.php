@@ -910,7 +910,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	// Make sure this attachment is on this board.
 
 	$request = $smcFunc['db_query']('', '
-		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.attachment_type, a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -1479,9 +1479,10 @@ function getAvatarPathID()
  * Get all attachments associated with a set of posts.
  * This does not check permissions.
  *
- * @param $messages
+ * @param array $messages array of messages ids
+ * @param bool $includeUnapproved = false
  */
-function getAttachments($messages)
+function getAttachments($messages, $includeUnapproved = false, $filter = null)
 {
 	global $smcFunc, $modSettings;
 
@@ -1498,13 +1499,12 @@ function getAttachments($messages)
 		array(
 			'message_list' => $messages,
 			'attachment_type' => 0,
-			'is_approved' => 1,
 		)
 	);
 	$temp = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!$row['approved'] && $modSettings['postmod_active'] && !allowedTo('approve_posts') && (!isset($all_posters[$row['id_msg']]) || $all_posters[$row['id_msg']] != $user_info['id']))
+		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row)))
 			continue;
 
 		$temp[$row['id_attach']] = $row;

@@ -115,19 +115,19 @@ function PackageInstallTest()
 	create_chmod_control();
 
 	// Make sure temp directory exists and is empty.
-	if (file_exists(BOARDDIR . '/Packages/temp'))
-		deltree(BOARDDIR . '/Packages/temp', false);
+	if (file_exists(BOARDDIR . '/packages/temp'))
+		deltree(BOARDDIR . '/packages/temp', false);
 
-	if (!mktree(BOARDDIR . '/Packages/temp', 0755))
+	if (!mktree(BOARDDIR . '/packages/temp', 0755))
 	{
-		deltree(BOARDDIR . '/Packages/temp', false);
-		if (!mktree(BOARDDIR . '/Packages/temp', 0777))
+		deltree(BOARDDIR . '/packages/temp', false);
+		if (!mktree(BOARDDIR . '/packages/temp', 0777))
 		{
-			deltree(BOARDDIR . '/Packages/temp', false);
-			create_chmod_control(array(BOARDDIR . '/Packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], 'crash_on_error' => true));
+			deltree(BOARDDIR . '/packages/temp', false);
+			create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], 'crash_on_error' => true));
 
-			deltree(BOARDDIR . '/Packages/temp', false);
-			if (!mktree(BOARDDIR . '/Packages/temp', 0777))
+			deltree(BOARDDIR . '/packages/temp', false);
+			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 				fatal_lang_error('package_cant_download', false);
 		}
 	}
@@ -143,18 +143,18 @@ function PackageInstallTest()
 
 	$context['sub_template'] = 'view_package';
 
-	if (!file_exists(BOARDDIR . '/Packages/' . $context['filename']))
+	if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		deltree(BOARDDIR . '/Packages/temp');
+		deltree(BOARDDIR . '/packages/temp');
 		fatal_lang_error('package_no_file', false);
 	}
 
 	// Extract the files so we can get things like the readme, etc.
-	if (is_file(BOARDDIR . '/Packages/' . $context['filename']))
+	if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
+		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
-		if ($context['extracted_files'] && !file_exists(BOARDDIR . '/Packages/temp/package-info.xml'))
+		if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($context['extracted_files'] as $file)
 				if (basename($file['filename']) == 'package-info.xml')
 				{
@@ -165,10 +165,10 @@ function PackageInstallTest()
 		if (!isset($context['base_path']))
 			$context['base_path'] = '';
 	}
-	elseif (is_dir(BOARDDIR . '/Packages/' . $context['filename']))
+	elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		copytree(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
-		$context['extracted_files'] = listtree(BOARDDIR . '/Packages/temp');
+		copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+		$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
 		$context['base_path'] = '';
 	}
 	else
@@ -251,7 +251,7 @@ function PackageInstallTest()
 		// Wait, it's not installed yet!
 		if (!isset($old_version) && $context['uninstalling'])
 		{
-			deltree(BOARDDIR . '/Packages/temp');
+			deltree(BOARDDIR . '/packages/temp');
 			fatal_lang_error('package_cant_uninstall', false);
 		}
 
@@ -260,7 +260,7 @@ function PackageInstallTest()
 		// Gadzooks!  There's no uninstaller at all!?
 		if (empty($actions))
 		{
-			deltree(BOARDDIR . '/Packages/temp');
+			deltree(BOARDDIR . '/packages/temp');
 			fatal_lang_error('package_uninstall_cannot', false);
 		}
 
@@ -324,8 +324,8 @@ function PackageInstallTest()
 		elseif ($action['type'] == 'readme' || $action['type'] == 'license')
 		{
 			$type = 'package_' . $action['type'];
-			if (file_exists(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']))
-				$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"));
+			if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
+				$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"));
 			elseif (file_exists($action['filename']))
 				$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"));
 
@@ -353,7 +353,7 @@ function PackageInstallTest()
 		}
 		elseif ($action['type'] == 'modification')
 		{
-			if (!file_exists(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']))
+			if (!file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
 			{
 				$context['has_failure'] = true;
 
@@ -368,9 +368,9 @@ function PackageInstallTest()
 			{
 
 				if ($action['boardmod'])
-					$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
+					$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
 				else
-					$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
+					$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
 
 				if (count($mod_actions) == 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] == 'error' && $mod_actions[0]['filename'] == '-')
 					$mod_actions[0]['filename'] = $action['filename'];
@@ -652,9 +652,9 @@ function PackageInstallTest()
 			continue;
 
 		if ($context['uninstalling'])
-			$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename'];
+			$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 		else
-			$file =  BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename'];
+			$file =  BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 
 		if (isset($action['filename']) && !file_exists($file))
 		{
@@ -747,8 +747,8 @@ function PackageInstallTest()
 	// Trash the cache... which will also check permissions for us!
 	package_flush_cache(true);
 
-	if (file_exists(BOARDDIR . '/Packages/temp'))
-		deltree(BOARDDIR . '/Packages/temp');
+	if (file_exists(BOARDDIR . '/packages/temp'))
+		deltree(BOARDDIR . '/packages/temp');
 
 	if (!empty($chmod_files))
 	{
@@ -795,24 +795,24 @@ function PackageInstall()
 
 	$context['sub_template'] = 'extract_package';
 
-	if (!file_exists(BOARDDIR . '/Packages/' . $context['filename']))
+	if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
 		fatal_lang_error('package_no_file', false);
 
 	// Load up the package FTP information?
 	create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
 
 	// Make sure temp directory exists and is empty!
-	if (file_exists(BOARDDIR . '/Packages/temp'))
-		deltree(BOARDDIR . '/Packages/temp', false);
+	if (file_exists(BOARDDIR . '/packages/temp'))
+		deltree(BOARDDIR . '/packages/temp', false);
 	else
-		mktree(BOARDDIR . '/Packages/temp', 0777);
+		mktree(BOARDDIR . '/packages/temp', 0777);
 
 	// Let the unpacker do the work.
-	if (is_file(BOARDDIR . '/Packages/' . $context['filename']))
+	if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
+		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
-		if (!file_exists(BOARDDIR . '/Packages/temp/package-info.xml'))
+		if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($context['extracted_files'] as $file)
 				if (basename($file['filename']) == 'package-info.xml')
 				{
@@ -823,10 +823,10 @@ function PackageInstall()
 		if (!isset($context['base_path']))
 			$context['base_path'] = '';
 	}
-	elseif (is_dir(BOARDDIR . '/Packages/' . $context['filename']))
+	elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		copytree(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
-		$context['extracted_files'] = listtree(BOARDDIR . '/Packages/temp');
+		copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+		$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
 		$context['base_path'] = '';
 	}
 	else
@@ -926,7 +926,7 @@ function PackageInstall()
 	// @todo Replace with a better error message!
 	if (!isset($old_version) && $context['uninstalling'])
 	{
-		deltree(BOARDDIR . '/Packages/temp');
+		deltree(BOARDDIR . '/packages/temp');
 		fatal_error('Hacker?', false);
 	}
 	// Uninstalling?
@@ -981,9 +981,9 @@ function PackageInstall()
 			if ($action['type'] == 'modification' && !empty($action['filename']))
 			{
 				if ($action['boardmod'])
-					$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
 				else
-					$mod_actions = parseModification(file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
 
 				// Any errors worth noting?
 				foreach ($mod_actions as $key => $action)
@@ -1007,8 +1007,8 @@ function PackageInstall()
 				global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
 
 				// Now include the file and be done with it ;).
-				if (file_exists(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']))
-					require(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']);
+				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
+					require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
 			}
 			elseif ($action['type'] == 'credits')
 			{
@@ -1038,14 +1038,14 @@ function PackageInstall()
 				db_extend('packages');
 
 				// Let the file work its magic ;)
-				if (file_exists(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']))
-					require(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']);
+				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
+					require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
 			}
 			// Handle a redirect...
 			elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
 			{
 				$context['redirect_url'] = $action['redirect_url'];
-				$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
+				$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
 				$context['redirect_timeout'] = $action['redirect_timeout'];
 
 				// Parse out a couple of common urls.
@@ -1063,7 +1063,7 @@ function PackageInstall()
 		package_flush_cache();
 
 		// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
-		package_put_contents(BOARDDIR . '/Packages/installed.list', time());
+		package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 		// See if this is already installed, and change it's state as required.
 		$request = $smcFunc['db_query']('', '
@@ -1197,8 +1197,8 @@ function PackageInstall()
 	}
 
 	// Clean house... get rid of the evidence ;).
-	if (file_exists(BOARDDIR . '/Packages/temp'))
-		deltree(BOARDDIR . '/Packages/temp');
+	if (file_exists(BOARDDIR . '/packages/temp'))
+		deltree(BOARDDIR . '/packages/temp');
 
 	// Log what we just did.
 	logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
@@ -1234,10 +1234,10 @@ function PackageList()
 	$context['filename'] = $_REQUEST['package'];
 
 	// Let the unpacker do the work.
-	if (is_file(BOARDDIR . '/Packages/' . $context['filename']))
-		$context['files'] = read_tgz_file(BOARDDIR . '/Packages/' . $context['filename'], null);
-	elseif (is_dir(BOARDDIR . '/Packages/' . $context['filename']))
-		$context['files'] = listtree(BOARDDIR . '/Packages/' . $context['filename']);
+	if (is_file(BOARDDIR . '/packages/' . $context['filename']))
+		$context['files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], null);
+	elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		$context['files'] = listtree(BOARDDIR . '/packages/' . $context['filename']);
 }
 
 /**
@@ -1262,10 +1262,10 @@ function ExamineFile()
 
 	if (isset($_REQUEST['raw']))
 	{
-		if (is_file(BOARDDIR . '/Packages/' . $_REQUEST['package']))
-			echo read_tgz_file(BOARDDIR . '/Packages/' . $_REQUEST['package'], $_REQUEST['file'], true);
-		elseif (is_dir(BOARDDIR . '/Packages/' . $_REQUEST['package']))
-			echo file_get_contents(BOARDDIR . '/Packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']);
+		if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
+			echo read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true);
+		elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
+			echo file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']);
 
 		obExit(false);
 	}
@@ -1286,10 +1286,10 @@ function ExamineFile()
 		$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $_REQUEST['package'] . ';file=' . $_REQUEST['file'] . ';raw" alt="' . $_REQUEST['file'] . '" />';
 	else
 	{
-		if (is_file(BOARDDIR . '/Packages/' . $_REQUEST['package']))
-			$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/Packages/' . $_REQUEST['package'], $_REQUEST['file'], true));
-		elseif (is_dir(BOARDDIR . '/Packages/' . $_REQUEST['package']))
-			$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/Packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']));
+		if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
+			$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true));
+		elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
+			$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']));
 
 		if (strtolower(strrchr($_REQUEST['file'], '.')) == '.php')
 			$context['filedata'] = highlight_php_code($context['filedata']);
@@ -1323,7 +1323,7 @@ function FlushInstall()
 	include_once(SUBSDIR . '/Package.subs.php');
 
 	// Record when we last did this.
-	package_put_contents(BOARDDIR . '/Packages/installed.list', time());
+	package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 	// Set everything as uninstalled.
 	$smcFunc['db_query']('', '
@@ -1353,16 +1353,16 @@ function PackageRemove()
 	$_GET['package'] = preg_replace('~[\.]+~', '.', strtr($_GET['package'], array('/' => '_', '\\' => '_')));
 
 	// Can't delete what's not there.
-	if (file_exists(BOARDDIR . '/Packages/' . $_GET['package']) && (substr($_GET['package'], -4) == '.zip' || substr($_GET['package'], -4) == '.tgz' || substr($_GET['package'], -7) == '.tar.gz' || is_dir(BOARDDIR . '/Packages/' . $_GET['package'])) && $_GET['package'] != 'backups' && substr($_GET['package'], 0, 1) != '.')
+	if (file_exists(BOARDDIR . '/packages/' . $_GET['package']) && (substr($_GET['package'], -4) == '.zip' || substr($_GET['package'], -4) == '.tgz' || substr($_GET['package'], -7) == '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $_GET['package'])) && $_GET['package'] != 'backups' && substr($_GET['package'], 0, 1) != '.')
 	{
-		create_chmod_control(array(BOARDDIR . '/Packages/' . $_GET['package']), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $_GET['package'], 'crash_on_error' => true));
+		create_chmod_control(array(BOARDDIR . '/packages/' . $_GET['package']), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $_GET['package'], 'crash_on_error' => true));
 
-		if (is_dir(BOARDDIR . '/Packages/' . $_GET['package']))
-			deltree(BOARDDIR . '/Packages/' . $_GET['package']);
+		if (is_dir(BOARDDIR . '/packages/' . $_GET['package']))
+			deltree(BOARDDIR . '/packages/' . $_GET['package']);
 		else
 		{
-			@chmod(BOARDDIR . '/Packages/' . $_GET['package'], 0777);
-			unlink(BOARDDIR . '/Packages/' . $_GET['package']);
+			@chmod(BOARDDIR . '/packages/' . $_GET['package'], 0777);
+			unlink(BOARDDIR . '/packages/' . $_GET['package']);
 		}
 	}
 
@@ -1535,8 +1535,8 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		$packages[$params] = array();
 
 	// We need the packages directory to be writable for this.
-	if (!@is_writable(BOARDDIR . '/Packages'))
-		create_chmod_control(array(BOARDDIR . '/Packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
+	if (!@is_writable(BOARDDIR . '/packages'))
+		create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
 	list($the_brand, $the_version) = explode(' ', $forum_version, 2);
 
@@ -1598,7 +1598,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		foreach ($context['modification_types'] as $type)
 			$packages[$type] = array();
 
-	if ($dir = @opendir(BOARDDIR . '/Packages'))
+	if ($dir = @opendir(BOARDDIR . '/packages'))
 	{
 		$dirs = array();
 		$sort_id = array(
@@ -1610,7 +1610,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		);
 		while ($package = readdir($dir))
 		{
-			if ($package == '.' || $package == '..' || $package == 'temp' || (!(is_dir(BOARDDIR . '/Packages/' . $package) && file_exists(BOARDDIR . '/Packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
+			if ($package == '.' || $package == '..' || $package == 'temp' || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
 				continue;
 
 			$skip = false;
@@ -1622,7 +1622,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 				continue;
 
 			// Skip directories or files that are named the same.
-			if (is_dir(BOARDDIR . '/Packages/' . $package))
+			if (is_dir(BOARDDIR . '/packages/' . $package))
 			{
 				if (in_array($package, $dirs))
 					continue;
@@ -1851,11 +1851,11 @@ function ViewOperations()
 	$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
 
 	// We need to extract this again.
-	if (is_file(BOARDDIR . '/Packages/' . $context['filename']))
+	if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
+		$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
-		if ($context['extracted_files'] && !file_exists(BOARDDIR . '/Packages/temp/package-info.xml'))
+		if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($context['extracted_files'] as $file)
 				if (basename($file['filename']) == 'package-info.xml')
 				{
@@ -1866,10 +1866,10 @@ function ViewOperations()
 		if (!isset($context['base_path']))
 			$context['base_path'] = '';
 	}
-	elseif (is_dir(BOARDDIR . '/Packages/' . $context['filename']))
+	elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
 	{
-		copytree(BOARDDIR . '/Packages/' . $context['filename'], BOARDDIR . '/Packages/temp');
-		$context['extracted_files'] = listtree(BOARDDIR . '/Packages/temp');
+		copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+		$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
 		$context['base_path'] = '';
 	}
 
@@ -1893,9 +1893,9 @@ function ViewOperations()
 
 	// Boardmod?
 	if (isset($_REQUEST['boardmod']))
-		$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
+		$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
 	else
-		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/Packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
+		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
 
 	// Ok lets get the content of the file.
 	$context['operations'] = array(
@@ -2086,7 +2086,7 @@ function PackagePermissions()
 
 	if (substr($modSettings['smileys_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 	{
-		unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Smileys']);
+		unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['smileys']);
 		$context['file_tree'][strtr($modSettings['smileys_dir'], array('\\' => '/'))] = array(
 			'type' => 'dir_recursive',
 			'writable_on' => 'standard',
