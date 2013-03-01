@@ -1737,10 +1737,13 @@ function action_edittheme()
 	isAllowedTo('admin_forum');
 	loadTemplate('Themes');
 
-	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) @$_GET['id'];
+	// We'll work hard with them themes!
+	require_once(SUBSDIR . '/Themes.subs.php');
+
+	$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (int) @$_GET['id'];
 
 	// Main page: display all installed themes
-	if (empty($_GET['th']))
+	if (empty($selectedTheme))
 	{
 		$context['themes'] = installedThemes();
 
@@ -1787,7 +1790,7 @@ function action_edittheme()
 	$context['session_error'] = false;
 
 	// Get the directory of the theme we are editing.
-	$context['theme_id'] = (int) $_GET['th'];
+	$context['theme_id'] = (int) $selectedTheme;
 	$theme_dir = themeDirectory($context['theme_id']);
 
 	// Eh? not trying to sneak a peek outside the theme directory are we
@@ -1822,7 +1825,7 @@ function action_edittheme()
 				'is_template' => false,
 				'is_image' => false,
 				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
 				'size' => '',
 			));
 		}
@@ -1853,7 +1856,7 @@ function action_edittheme()
 	// Saving?
 	if (isset($_POST['save']))
 	{
-		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']), 'post', false) == true)
+		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
 		{
 			if (is_array($_POST['entire_file']))
 				$_POST['entire_file'] = implode("\n", $_POST['entire_file']);
@@ -1862,19 +1865,7 @@ function action_edittheme()
 			// Check for a parse error!
 			if (substr($_REQUEST['filename'], -13) == '.template.php' && is_writable($theme_dir) && ini_get('display_errors'))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT value
-					FROM {db_prefix}themes
-					WHERE variable = {string:theme_url}
-						AND id_theme = {int:current_theme}
-					LIMIT 1',
-					array(
-						'current_theme' => $_GET['th'],
-						'theme_url' => 'theme_url',
-					)
-				);
-				list ($theme_url) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				$theme_url = themeUrl($selectedTheme);
 
 				$fp = fopen($theme_dir . '/tmp_' . session_id() . '.php', 'w');
 				fwrite($fp, $_POST['entire_file']);
@@ -1893,7 +1884,7 @@ function action_edittheme()
 				fwrite($fp, $_POST['entire_file']);
 				fclose($fp);
 
-				redirectexit('action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
+				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
 			}
 		}
 		// Session timed out.
@@ -1916,7 +1907,7 @@ function action_edittheme()
 			$context['allow_save'] = true;
 
 			// Re-create the token so that it can be used
-			createToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']));
+			createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
 
 			return;
 		}
@@ -1974,7 +1965,7 @@ function action_edittheme()
 	}
 
 	// Create a special token to allow editing of multiple files.
-	createToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']));
+	createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
 }
 
 /**

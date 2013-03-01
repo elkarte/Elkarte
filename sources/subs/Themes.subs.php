@@ -72,3 +72,25 @@ function themeDirectory($id_theme)
 
 	return $themeDirectory;
 }
+
+function themeUrl($id_theme)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT value
+		FROM {db_prefix}themes
+		WHERE variable = {string:theme_url}
+			AND id_theme = {int:current_theme}
+		LIMIT 1',
+		array(
+			'current_theme' => $id_theme,
+			'theme_url' => 'theme_url',
+			)
+		);
+
+	list ($theme_url) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $theme_url;
+}
