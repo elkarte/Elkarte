@@ -19,7 +19,7 @@ if (!defined('ELKARTE'))
  * sanitation_rules()
  *		sanitation_rules(array(
  *			'username'    => 'trim|uppercase',
- *			'email'   	  => 'trim|email_normalize',
+ *			'email'   	  => 'trim|gmail_normalize',
  *		));
  *
  * validation_rules()
@@ -43,27 +43,27 @@ if (!defined('ELKARTE'))
  *		valid_url, valid_ip, valid_ipv6, valid_email,
  *		contains[x,y,x], required
  */
-class data_Validate
+class Data_Validator
 {
 	/**
 	 * Validation rules
 	 */
-	protected $validation_rules = array();
+	protected $_validation_rules = array();
 
 	/**
 	 * Sanitation rules
 	 */
-	protected $sanitation_rules = array();
+	protected $_sanitation_rules = array();
 
 	/**
 	 * Holds validation errors
 	 */
-	protected $validation_errors = array();
+	protected $_validation_errors = array();
 
 	/**
 	 * Holds our data
 	 */
-	protected $data = array();
+	protected $_data = array();
 
 	/**
 	 * Stict data processing,
@@ -85,9 +85,9 @@ class data_Validate
 
 		// Set the validation rules
 		if (!empty($rules))
-			$this->validation_rules = $rules;
+			$this->_validation_rules = $rules;
 		else
-			return $this->validation_rules;
+			return $this->_validation_rules;
 	}
 
 	/**
@@ -107,9 +107,9 @@ class data_Validate
 		$this->strict = $strict;
 
 		if (!empty($rules))
-			$this->sanitation_rules = $rules;
+			$this->_sanitation_rules = $rules;
 		else
-			return $this->sanitation_rules;
+			return $this->_sanitation_rules;
 	}
 
 	/**
@@ -124,10 +124,10 @@ class data_Validate
 			$input = array($input);
 
 		// Clean em
-		$this->data = $this->_sanitize($input, $this->sanitation_rules());
+		$this->_data = $this->_sanitize($input, $this->_sanitation_rules());
 
 		// Check em
-		return $this->_validate($this->data, $this->validation_rules);
+		return $this->_validate($this->_data, $this->_validation_rules);
 	}
 
 	/**
@@ -147,7 +147,7 @@ class data_Validate
 	 */
 	public function validation_data()
 	{
-		return $this->data;
+		return $this->_data;
 	}
 
 	/**
@@ -160,7 +160,7 @@ class data_Validate
 	private function _validate($input, $ruleset)
 	{
 		// No errors ... yet ;)
-		$this->validation_errors = array();
+		$this->_validation_errors = array();
 
 		// For each field, run our rules against the data
 		foreach ($ruleset as $field => $rules)
@@ -195,11 +195,11 @@ class data_Validate
 					);
 
 				if (is_array($result))
-					$this->validation_errors[] = $result;
+					$this->_validation_errors[] = $result;
 			}
 		}
 
-		return count($this->validation_errors) === 0 ? true : false;
+		return count($this->_validation_errors) === 0 ? true : false;
 	}
 
 	/**
@@ -256,13 +256,13 @@ class data_Validate
 	{
 		global $txt;
 
-		if (empty($this->validation_errors))
+		if (empty($this->_validation_errors))
 			return;
 
 		loadLanguage('Validation');
 		$result = array();
 
-		foreach ($this->validation_errors as $error)
+		foreach ($this->_validation_errors as $error)
 		{
 			// Set the error message for this validation failure
 			if (isset($txt[$error['function']]))
@@ -758,7 +758,7 @@ class data_Validate
 	//
 
 	/**
-	 * email_normalize ... Used to normalize a gmail address as many resolve to the same thing address
+	 * gmail_normalize ... Used to normalize a gmail address as many resolve to the same thing address
 	 *
 	 * - Gmail user can use @googlemail.com instead of @gmail.com
 	 * - Gmail ignores all characters after a + (plus sign) in the username
@@ -767,7 +767,7 @@ class data_Validate
 	 *
 	 * @param string $input
 	 */
-	protected function _sanitation_email_normalize($input)
+	protected function _sanitation_gmail_normalize($input)
 	{
 		if (!isset($input))
 			return;
