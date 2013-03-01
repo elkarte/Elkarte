@@ -85,6 +85,9 @@ $txt['search_max_results_disable'] = '(0: no limit)';
 $txt['search_floodcontrol_time'] = 'Time required between searches from same user';
 $txt['search_floodcontrol_time_desc'] = '(0 for no limit, in seconds)';
 
+$txt['additiona_search_engines'] = 'Additional search engines';
+$txt['setup_search_engine_add_more'] = 'Add another search engine';
+
 $txt['search_create_index'] = 'Create index';
 $txt['search_create_index_why'] = 'Why create a search index?';
 $txt['search_create_index_start'] = 'Create';
