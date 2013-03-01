@@ -137,7 +137,7 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
 	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
-	You should check here every now and then for updates, new releases, and important information from Elkarte.';
+	You should check here every now and then for updates, new releases, and important information from ElkArte.';
 
 $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 	This section contains all the functions that could be necessary to manage new registrations on the forum. It contains up to four
