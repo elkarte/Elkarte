@@ -41,7 +41,7 @@ if (!defined('ELKARTE'))
  *		alpha, alpha_numeric, alpha_dash
  *		numeric, integer, boolean, float,
  *		valid_url, valid_ip, valid_ipv6, valid_email,
- *		contains[x,y,x], required
+ *		php_syntax, contains[x,y,x], required
  */
 class Data_Validator
 {
@@ -120,11 +120,12 @@ class Data_Validator
 	 */
 	public function validate($input)
 	{
+		// this won't work, $input[$field] will be undefined
 		if (!is_array($input))
 			$input = array($input);
 
 		// Clean em
-		$this->_data = $this->_sanitize($input, $this->_sanitation_rules());
+		$this->_data = $this->_sanitize($input, $this->_sanitation_rules);
 
 		// Check em
 		return $this->_validate($this->_data, $this->_validation_rules);
@@ -265,9 +266,13 @@ class Data_Validator
 		foreach ($this->_validation_errors as $error)
 		{
 			// Set the error message for this validation failure
-			if (isset($txt[$error['function']]))
+			if (isset($error['error']))
 			{
-				if ($error['param'] !== false)
+					$result[] = sprintf($txt[$error['error']], $error['field']);
+			}
+			elseif (isset($txt[$error['function']]))
+			{
+				if (!empty($error['param']))
 					$result[] = sprintf($txt[$error['function']], $error['field'], $error['param']);
 				else
 					$result[] = sprintf($txt[$error['function']], $error['field'], $error['input']);
@@ -748,6 +753,60 @@ class Data_Validator
 				'field' => $field,
 				'input' => $input[$field],
 				'function' => __FUNCTION__,
+				'param' => $validation_parameters
+			);
+		}
+	}
+
+	/**
+	 * Validate PHP syntax of an input.
+	 *
+	 * This approach to validation has been inspired by Compuart.
+	 *
+	 * Usage: '[key]' => 'php_syntax'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 * @return mixed
+	 */
+	protected function _validate_php_syntax($field, $input, $validation_parameters = null)
+	{
+		if (!isset($input[$field]))
+			return;
+
+		// Check the depth.
+		$level = 0;
+		$tokens = @token_get_all($input[$field]);
+		foreach ($tokens as $token)
+		{
+			if ($token === '{')
+				$level++;
+			elseif($token === '}')
+				$level--;
+		}
+		if (!empty($level))
+			$result = false;
+		else
+		{
+			// Check the validity of the syntax.
+			ob_start();
+			$errorReporting = error_reporting(0);
+			$result = @eval('
+				if (false) {
+					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~', '', $input[$field]) . '
+				}
+			');
+			error_reporting($errorReporting);
+			ob_end_clean();
+		}
+
+		if ($result === false)
+		{
+			return array(
+				'field' => $field,
+				'input' => $input[$field],
+				'error' => 'error_php_syntax',
 				'param' => $validation_parameters
 			);
 		}
