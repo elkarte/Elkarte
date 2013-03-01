@@ -1853,36 +1853,38 @@ function action_edittheme()
 			fatal_lang_error('theme_edit_missing', false);
 	}
 
+	$entire_file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
+
 	// Saving?
 	if (isset($_POST['save']))
 	{
 		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
 		{
-			if (is_array($_POST['entire_file']))
-				$_POST['entire_file'] = implode("\n", $_POST['entire_file']);
-			$_POST['entire_file'] = rtrim(strtr($_POST['entire_file'], array("\r" => '', '   ' => "\t")));
+			if (is_array($entire_file))
+				$entire_file = implode("\n", $entire_file);
+			$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
 
-			// Check for a parse error!
-			if (substr($_REQUEST['filename'], -13) == '.template.php' && is_writable($theme_dir))
-			{
-				$fp = fopen($theme_dir . '/tmp_' . session_id() . '.php', 'w');
-				fwrite($fp, $_POST['entire_file']);
-				fclose($fp);
+			require_once(SUBSDIR . '/DataValidator.class.php');
 
-				$error = @file_get_contents($theme_dir . '/tmp_' . session_id() . '.php');
-				if (preg_match('~ <b>(\d+)</b><br( /)?' . '>$~i', $error) != 0)
-					$error_file = $theme_dir . '/tmp_' . session_id() . '.php';
-				else
-					unlink($theme_dir . '/tmp_' . session_id() . '.php');
-			}
+			$validator = new Data_Validator();
+			$validator->validation_rules(array(
+				'entire_file' => 'php_syntax'
+			));
+			$validator->validate(array('entire_file' => $entire_file));
+			$errors = $validator->validation_errors();
 
-			if (!isset($error_file))
+			if (empty($errors))
 			{
 				$fp = fopen($theme_dir . '/' . $_REQUEST['filename'], 'w');
-				fwrite($fp, $_POST['entire_file']);
+				fwrite($fp, $entire_file);
 				fclose($fp);
 
 				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
+			}
+			else
+			{
+				if (preg_match('~(<b>.+?</b>:.+?<b>).+?(</b>.+?<b>\d+</b>)<br( /)?' . '>$~i', $error, $match) != 0)
+					$context['parse_error'] = $match[1] . $_REQUEST['filename'] . $match[2];
 			}
 		}
 		// Session timed out.
@@ -1894,10 +1896,10 @@ function action_edittheme()
 			$context['sub_template'] = 'edit_file';
 
 			// Recycle the submitted data.
-			if (is_array($_POST['entire_file']))
-				$context['entire_file'] = htmlspecialchars(implode("\n", $_POST['entire_file']));
+			if (is_array($entire_file))
+				$context['entire_file'] = htmlspecialchars(implode("\n", $entire_file));
 			else
-				$context['entire_file'] = htmlspecialchars($_POST['entire_file']);
+				$context['entire_file'] = htmlspecialchars($entire_file);
 
 			$context['edit_filename'] = htmlspecialchars($_POST['filename']);
 
@@ -1925,15 +1927,12 @@ function action_edittheme()
 	{
 		$context['sub_template'] = 'edit_template';
 
-		if (!isset($error_file))
+		// we might get here after we try and fail to save a php file
+		// (with syntax errors)
+		if (!isset($errors))
 			$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
 		else
-		{
-			if (preg_match('~(<b>.+?</b>:.+?<b>).+?(</b>.+?<b>\d+</b>)<br( /)?' . '>$~i', $error, $match) != 0)
-				$context['parse_error'] = $match[1] . $_REQUEST['filename'] . $match[2];
-			$file_data = file($error_file);
-			unlink($error_file);
-		}
+			$file_data = $entire_file;
 
 		$j = 0;
 		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
