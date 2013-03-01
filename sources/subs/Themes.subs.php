@@ -45,6 +45,8 @@ function installedThemes()
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	}
 	$smcFunc['db_free_result']($request);
+
+	return $themes;
 }
 
 /**
@@ -67,7 +69,7 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	$themeDirectory = $smcFunc['db_fetch_row']($request);
+	list($themeDirectory) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
 	return $themeDirectory;

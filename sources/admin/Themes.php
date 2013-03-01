@@ -1845,7 +1845,7 @@ function action_edittheme()
 			$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
 
 			$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
-			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) != realpath($theme_dir))
+			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
 				$_REQUEST['filename'] = '';
 		}
 
@@ -1863,15 +1863,13 @@ function action_edittheme()
 			$_POST['entire_file'] = rtrim(strtr($_POST['entire_file'], array("\r" => '', '   ' => "\t")));
 
 			// Check for a parse error!
-			if (substr($_REQUEST['filename'], -13) == '.template.php' && is_writable($theme_dir) && ini_get('display_errors'))
+			if (substr($_REQUEST['filename'], -13) == '.template.php' && is_writable($theme_dir))
 			{
-				$theme_url = themeUrl($selectedTheme);
-
 				$fp = fopen($theme_dir . '/tmp_' . session_id() . '.php', 'w');
 				fwrite($fp, $_POST['entire_file']);
 				fclose($fp);
 
-				$error = @file_get_contents($theme_url . '/tmp_' . session_id() . '.php');
+				$error = @file_get_contents($theme_dir . '/tmp_' . session_id() . '.php');
 				if (preg_match('~ <b>(\d+)</b><br( /)?' . '>$~i', $error) != 0)
 					$error_file = $theme_dir . '/tmp_' . session_id() . '.php';
 				else
