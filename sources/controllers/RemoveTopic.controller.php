@@ -45,7 +45,7 @@ function action_removetopic2()
 
 	removeDeleteConcurrence();
 
-	$topic_info = getTopicInfo($topic, 1);
+	$topic_info = getTopicInfo($topic, 'message');
 
 	if ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('remove_any'))
 		isAllowedTo('remove_own');
@@ -95,7 +95,7 @@ function action_deletemsg()
 
 	removeDeleteConcurrence();
 
-	$topic_info = getTopicInfo($topic, 1);
+	$topic_info = getTopicInfo($topic, 'message');
 
 	// Verify they can see this!
 	if ($modSettings['postmod_active'] && !$topic_info['msg_approved'] && !empty($topic_info['poster_time']) && $topic_info['poster_time'] != $user_info['id'])

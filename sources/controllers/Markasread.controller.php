@@ -126,7 +126,7 @@ function action_marktopic()
 
 	// Mark a topic unread.
 	// First, let's figure out what the latest message is.
-	$topicinfo = getTopicInfo($topic, 3);
+	$topicinfo = getTopicInfo($topic, 'all');
 
 	if (!empty($_GET['t']))
 	{

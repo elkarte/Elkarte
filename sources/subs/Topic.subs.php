@@ -1054,15 +1054,14 @@ function setTopicRegard($id_member, $topic, $on = false)
  * - uses any integration information (value selects, tables and parameters) if passed and full is true
  *
  * @param array $topic_parameters can also accept a int value for a topic
- * @param int $full:
- *                - if 0 returns only the data from {db_prefix}topics
- *                - if 1 returns also subject and body
- *                - if 2 LEFT JOINs log_topics and log_mark_read
- *                - if 3 equivalent to both 1 and 2
+ * @param int $full defines the values returned by the function:
+ *             - if empty returns only the data from {db_prefix}topics
+ *             - if 'message' returns also informations about the message (subject, body, etc.)
+ *             - if 'all' returns additional infos about the read/disregard status
  * @param array $selects (optional from integation)
  * @param array $tables (optional from integation)
  */
-function getTopicInfo($topic_parameters, $full = 0, $selects = array(), $tables = array())
+function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
 	global $smcFunc, $user_info, $modSettings, $board;
 
@@ -1078,19 +1077,25 @@ function getTopicInfo($topic_parameters, $full = 0, $selects = array(), $tables 
 			'board' => (int) $board,
 		);
 
+	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
+	$logs_table = !empty($full) && $full === 'all';
+
 	// Create the query, taking full and integration in to account
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg, t.id_member_started, t.id_member_updated, t.id_poll,
+			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
+			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
-			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($full == 1 || $full > 2 ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($full > 1 ? ',
+			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . 
+			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') . 
 			(!empty($selects) ? implode(',', $selects) : '') . '
-		FROM {db_prefix}topics AS t' . ($full == 1 || $full > 2 ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($full > 1 && !$user_info['is_guest'] ? '
+		FROM {db_prefix}topics AS t' . ($messages_table ? '
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . 
+			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
 			(!empty($tables) ? implode("\n\t\t\t", $tables) : '') . '

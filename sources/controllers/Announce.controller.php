@@ -108,7 +108,7 @@ function action_selectgroup()
 		$context['groups'][$id_group]['name'] = $group_info['group_name'];
 
 	// Get the subject of the topic we're about to announce.
-	$topic_info = getTopicInfo($topic, 1);
+	$topic_info = getTopicInfo($topic, 'message');
 	$context['topic_subject'] = $topic_info['subject'];
 
 	censorText($context['announce_topic']['subject']);
@@ -152,7 +152,7 @@ function action_send()
 	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Get the topic subject and body and censor them.
-	$topic_info = getTopicInfo($topic, 1);
+	$topic_info = getTopicInfo($topic, 'message');
 	$context['topic_subject'] = $topic_info['subject'];
 
 	censorText($context['topic_subject']);
