@@ -261,14 +261,14 @@ function action_mergeExecute($topics = array())
 			'num_views' => $row['num_views'],
 			'subject' => $row['subject'],
 			'started' => array(
-				'time' => timeformat($row['time_started']),
-				'timestamp' => forum_time(true, $row['time_started']),
+				'time' => timeformat($row['started_on']),
+				'timestamp' => forum_time(true, $row['started_on']),
 				'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
 				'link' => empty($row['id_member_started']) ? $row['started_by'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['started_by'] . '</a>'
 			),
 			'updated' => array(
-				'time' => timeformat($row['time_updated']),
-				'timestamp' => forum_time(true, $row['time_updated']),
+				'time' => timeformat($row['last_post_on']),
+				'timestamp' => forum_time(true, $row['last_post_on']),
 				'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
 				'link' => empty($row['id_member_updated']) ? $row['last_post_by'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_post_by'] . '</a>'
 			)
@@ -285,7 +285,6 @@ function action_mergeExecute($topics = array())
 
 		$is_sticky = max($is_sticky, $row['is_sticky']);
 	}
-	$smcFunc['db_free_result']($request);
 
 	// If we didn't get any topics then they've been messing with unapproved stuff.
 	if (empty($topic_data))

@@ -1137,7 +1137,7 @@ function getTopicsInfo($topics, $messages = '', $members = '', $sort = false, $o
 			t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_last_msg, t.id_previous_board,
 			b.count_posts, b.name as board_name' . 
 			($first_msg ? ',
-			mf.subject, mf.poster_time AS started_on' : '') .
+			mf.subject, mf.poster_time AS started_on, mf.body' : '') .
 			($first_mem ? ',
 			IFNULL(memf.id_member, 0) AS id_member_started, IFNULL(memf.real_name, mf.poster_name) AS started_by' : '') .
 			($last_msg ? ',

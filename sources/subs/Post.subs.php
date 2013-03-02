@@ -566,7 +566,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'exclude' => '',
 		);
 	}
-	$smcFunc['db_free_result']($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
