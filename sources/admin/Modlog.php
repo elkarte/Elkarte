@@ -536,7 +536,6 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['new_topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	if (!empty($messages))

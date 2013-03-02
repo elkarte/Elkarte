@@ -917,7 +917,6 @@ function action_quickmod()
 			// For reporting...
 			$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
 		}
-		$smcFunc['db_free_result']($request);
 
 		$moveCache = $moveCache2;
 

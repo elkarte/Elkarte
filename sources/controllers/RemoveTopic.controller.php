@@ -339,7 +339,6 @@ function action_restoretopic()
 			// Log it.
 			logAction('restore_topic', array('topic' => $row['id_topic'], 'board' => $row['id_board'], 'board_to' => $row['id_previous_board']));
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Didn't find some things?
