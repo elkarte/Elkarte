@@ -297,11 +297,10 @@ function action_modifyprofile()
 				),
 				'issuewarning' => array(
 					'label' => $txt['profile_issue_warning'],
-					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1 && (!$context['user']['is_owner'] || $context['user']['is_admin']),
+					'enabled' => in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] === 1 && (!$context['user']['is_owner'] || $context['user']['is_admin']),
 					'file' => 'ProfileAccount.controller.php',
 					'function' => 'action_issuewarning',
 					'token' => 'profile-iw%u',
-					'enabled' => !$context['user']['is_owner'],
 					'permission' => array(
 						'own' => array('issue_warning'),
 						'any' => array('issue_warning'),
