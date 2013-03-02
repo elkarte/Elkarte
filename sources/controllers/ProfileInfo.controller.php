@@ -37,7 +37,7 @@ function action_summary($memID)
 		'can_send_pm' => allowedTo('pm_send'),
 		'can_send_email' => allowedTo('send_email_to_members'),
 		'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
-		'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && $modSettings['warning_settings'][0] == 1,
+		'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && substr($modSettings['warning_settings'], 0, 1) == 1,
 	);
 	$context['member'] = &$memberContext[$memID];
 	$context['can_view_warning'] = in_array('w', $context['admin_features']) && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']));
