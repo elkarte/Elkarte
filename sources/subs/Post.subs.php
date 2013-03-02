@@ -544,23 +544,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	// Email functions will be helpful here
 	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	// Get the subject and body...
-	$result = $smcFunc['db_query']('', '
-		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
-		WHERE t.id_topic IN ({array_int:topic_list})
-		LIMIT 1',
-		array(
-			'topic_list' => $topics,
-		)
-	);
-	$topicData = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	$topicData = getTopicsInfo($topics, 'all', 'first', false, false, 1);
+	foreach ($topicData as $row)
 	{
 		// Clean it up.
 		censorText($row['subject']);
@@ -573,6 +561,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'body' => $row['body'],
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
+			// @todo :why not $row['started_by']?
 			'name' => $user_info['name'],
 			'exclude' => '',
 		);

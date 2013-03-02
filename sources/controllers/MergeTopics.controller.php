@@ -220,25 +220,11 @@ function action_mergeExecute($topics = array())
 	if ($modSettings['postmod_active'])
 		$can_approve_boards = boardsAllowedTo('approve_posts');
 
+	require_once(SUBSDIR . '/Topic.subs.php');
 	// Get info about the topics and polls that will be merged.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
-			m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
-			m2.poster_time AS time_updated, IFNULL(mem2.id_member, 0) AS id_member_updated, IFNULL(mem2.real_name, m2.poster_name) AS name_updated
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m1 ON (m1.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
-			LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
-			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
-		WHERE t.id_topic IN ({array_int:topic_list})
-		ORDER BY t.id_first_msg
-		LIMIT ' . count($topics),
-		array(
-			'topic_list' => $topics,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) < 2)
+	$topics_info = getTopicsInfo($topics, 'all', 'all', true);
+
+	if (count($topics_info) < 2)
 		fatal_lang_error('no_topic_id');
 	$num_views = 0;
 	$is_sticky = 0;
@@ -246,7 +232,7 @@ function action_mergeExecute($topics = array())
 	$boards = array();
 	$polls = array();
 	$firstTopic = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($topics_info as $row)
 	{
 		// Make a note for the board counts...
 		if (!isset($boardTotals[$row['id_board']]))
@@ -278,13 +264,13 @@ function action_mergeExecute($topics = array())
 				'time' => timeformat($row['time_started']),
 				'timestamp' => forum_time(true, $row['time_started']),
 				'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
-				'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
+				'link' => empty($row['id_member_started']) ? $row['started_by'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['started_by'] . '</a>'
 			),
 			'updated' => array(
 				'time' => timeformat($row['time_updated']),
 				'timestamp' => forum_time(true, $row['time_updated']),
 				'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
-				'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'
+				'link' => empty($row['id_member_updated']) ? $row['last_post_by'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_post_by'] . '</a>'
 			)
 		);
 		$num_views += $row['num_views'];

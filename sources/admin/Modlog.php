@@ -513,17 +513,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($topics))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT ms.subject, t.id_topic
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-			WHERE t.id_topic IN ({array_int:topic_list})
-			LIMIT ' . count(array_keys($topics)),
-			array(
-				'topic_list' => array_keys($topics),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topics_info = getTopicsInfo(array_keys($topics), 'first');
+		foreach ($topics_info as $row)
 		{
 			foreach ($topics[$row['id_topic']] as $action)
 			{

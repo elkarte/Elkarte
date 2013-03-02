@@ -693,22 +693,10 @@ function moveTopicConcurrence()
 		return true;
 	else
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT m.subject, b.name
-			FROM {db_prefix}topics as t
-				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
-			WHERE t.id_topic = {int:topic_id}
-			LIMIT 1',
-			array(
-				'topic_id' => $topic,
-			)
-		);
-		list($topic_subject, $board_name) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$topics_info = getTopicsInfo(array($topic), 'first');
 
-		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $board_name . '</a>';
-		$topic_link = '<a href="' . $scripturl . '?topic=' . $topic . '.0">' . $topic_subject . '</a>';
+		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $topics_info['board_name'] . '</a>';
+		$topic_link = '<a href="' . $scripturl . '?topic=' . $topic . '.0">' . $topics_info['subject'] . '</a>';
 		fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
@@ -1109,6 +1097,79 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	$smcFunc['db_free_result']($request);
 
 	return $topic_info;
+}
+
+/**
+ * Get some the details of multiple topics at once,
+ * including some informations of the board the topics are in and,
+ * if specified, first and last messages subject and post time
+ *
+ * @param array $topics an array of integers representing the topics ids
+ * @param array $messages (optional) if include details about the messages:
+ *             - if empty returns only the data from {db_prefix}topics
+ *             - if 'first' returns the subject and poster_time of the first message
+ *             - if 'last' returns the poster_time of the last message
+ *             - if 'all' subject of the first message and and poster_time of both first and last message
+ * @param array $members (optional) if include details about the authors of the messages:
+ *             - if empty doesn't return any info about members
+ *             - if 'first' returns the details of the author of the first message (requires $messages)
+ *             - if 'last' returns the details of the author of the last message (requires $messages)
+ *             - if 'all' returns the details of the author of the first and last message (requires $messages)
+ * @param bool $sort (optional) if true sort the topics by id_first_msg
+ * @param bool $only_own_topics (optional) if true returns only the topics of current user (default false)
+ * @param iny $limit (optional) an alternative limit to the number of results returned (default count($topics))
+ */
+function getTopicsInfo($topics, $messages = '', $members = '', $sort = false, $only_own_topics = false, $limit = null)
+{
+	global $smcFunc, $user_info;
+
+	if (empty($topics))
+		return array();
+
+	$first_msg = $messages === 'first' || $messages === 'all';
+	$last_msg = $messages === 'last' || $messages === 'all';
+	$first_mem = $first_msg && ($members === 'first' || $members === 'all');
+	$last_mem = $last_msg && ($members === 'last' || $members === 'all');
+	$topics_info = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_last_msg, t.id_previous_board,
+			b.count_posts, b.name as board_name' . 
+			($first_msg ? ',
+			mf.subject, mf.poster_time AS started_on' : '') .
+			($first_mem ? ',
+			IFNULL(memf.id_member, 0) AS id_member_started, IFNULL(memf.real_name, mf.poster_name) AS started_by' : '') .
+			($last_msg ? ',
+			ml.poster_time AS last_post_on' : '') .
+			($last_mem ? ',
+			IFNULL(meml.id_member, 0) AS id_member_updated, IFNULL(meml.real_name, ml.poster_name) AS last_post_by' : '') . '
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)' . 
+			($first_msg ? '
+			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)' : '') .
+			($last_msg ? '
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' : '') .
+			($first_mem ? '
+			LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' : '') .
+			($last_mem ? '
+			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)' : '') . '
+		WHERE t.id_topic IN ({array_int:topic_list})' . ($only_own_topics ? '
+			AND t.id_member_started = {int:current_member}' : '') . '
+		{raw:order}
+		LIMIT {int:limit}',
+		array(
+			'topic_list' => $topics,
+			'current_member' => $user_info['id'],
+			'limit' => $limit === null ? count($topics) : $limit,
+			'order' => $sort ? 'ORDER BY t.id_first_msg' : '',
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$topics_info[$row['id_topic']] = $row;
+
+	return $topics_info;
 }
 
 /**
