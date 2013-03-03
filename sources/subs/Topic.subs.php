@@ -193,22 +193,13 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		if (function_exists('apache_reset_timeout'))
 			@apache_reset_timeout();
 
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
-				num_topics = CASE WHEN {int:num_topics} > num_topics THEN 0 ELSE num_topics - {int:num_topics} END,
-				unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END,
-				unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $stats['id_board'],
-				'num_posts' => $stats['num_posts'],
-				'num_topics' => $stats['num_topics'],
-				'unapproved_posts' => $stats['unapproved_posts'],
-				'unapproved_topics' => $stats['unapproved_topics'],
-			)
-		);
+		updateBoardData($stats['id_board'], array(
+			'id_board' => '-' . $stats['id_board'],
+			'num_posts' => '-' . $stats['num_posts'],
+			'num_topics' => '-' . $stats['num_topics'],
+			'unapproved_posts' => '-' . $stats['unapproved_posts'],
+			'unapproved_topics' => '-' . $stats['unapproved_topics'],
+		));
 	}
 
 	// Remove Polls.
@@ -472,45 +463,24 @@ function moveTopics($topics, $toBoard)
 	$totalUnapprovedPosts = 0;
 	foreach ($fromBoards as $stats)
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
-				num_topics = CASE WHEN {int:num_topics} > num_topics THEN 0 ELSE num_topics - {int:num_topics} END,
-				unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END,
-				unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $stats['id_board'],
-				'num_posts' => $stats['num_posts'],
-				'num_topics' => $stats['num_topics'],
-				'unapproved_posts' => $stats['unapproved_posts'],
-				'unapproved_topics' => $stats['unapproved_topics'],
-			)
-		);
+		updateBoardData($stats['id_board'], array(
+			'num_posts' => '-' . $stats['num_posts'],
+			'num_topics' => '-' . $stats['num_topics'],
+			'unapproved_posts' => '-' . $stats['unapproved_posts'],
+			'unapproved_topics' => '-' . $stats['unapproved_topics'],
+		));
 		$totalTopics += $stats['num_topics'];
 		$totalPosts += $stats['num_posts'];
 		$totalUnapprovedTopics += $stats['unapproved_topics'];
 		$totalUnapprovedPosts += $stats['unapproved_posts'];
 	}
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET
-			num_topics = num_topics + {int:total_topics},
-			num_posts = num_posts + {int:total_posts},' . ($isRecycleDest ? '
-			unapproved_posts = {int:no_unapproved}, unapproved_topics = {int:no_unapproved}' : '
-			unapproved_posts = unapproved_posts + {int:total_unapproved_posts},
-			unapproved_topics = unapproved_topics + {int:total_unapproved_topics}') . '
-		WHERE id_board = {int:id_board}',
-		array(
-			'id_board' => $toBoard,
-			'total_topics' => $totalTopics,
-			'total_posts' => $totalPosts,
-			'total_unapproved_topics' => $totalUnapprovedTopics,
-			'total_unapproved_posts' => $totalUnapprovedPosts,
-			'no_unapproved' => 0,
-		)
-	);
+
+	updateBoardData($toBoard, array(
+		'num_topics' => '+' . $totalTopics,
+		'num_posts' => '+' . $totalPosts,
+		'unapproved_topics' => $isRecycleDest ? 0 : '+' . $totalUnapprovedTopics,
+		'unapproved_posts' => $isRecycleDest ? 0 : '+' . $totalUnapprovedPosts,
+	));
 
 	// Move the topic.  Done.  :P
 	$smcFunc['db_query']('', '

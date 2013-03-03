@@ -647,16 +647,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 	// The board has more topics now (Or more unapproved ones!).
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET ' . ($split2_approved ? '
-			num_topics = num_topics + 1' : '
-			unapproved_topics = unapproved_topics + 1') . '
-		WHERE id_board = {int:id_board}',
-		array(
-			'id_board' => $id_board,
-		)
-	);
+	updateBoardData($id_board, array(
+		$split2_approved ? 'num_topics' : 'unapproved_topics' => '+'
+	));
 
 	// Copy log topic entries.
 	// @todo This should really be chunked.

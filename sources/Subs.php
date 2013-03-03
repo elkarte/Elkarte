@@ -371,7 +371,46 @@ function updateMemberData($members, $data)
 	}
 }
 
-function updateTable($query, $data, $knownInts, $knownFloats, $knownDates, $ensure_overflow)
+function updateBoardData($boards, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'boards'
+	);
+	switch ($boards)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		case 'redir':
+			$query['condition'] = 'redirect = ({string:redirect})';
+			$query['range'] = array('redirect' => '');
+			break;
+		case 'no_redir':
+			$query['condition'] = 'redirect != ({string:redirect})';
+			$query['range'] = array('redirect' => '');
+			break;
+		default:
+			$boards = is_array($boards) ? $boards : is_array($boards);
+			$query['condition'] = 'id_board IN ({array_int:boards})';
+			$query['range'] = array('boards' => $boards);
+	}
+
+	updateTable($query, $data,
+		array(
+		'id_cat', 'child_level', 'id_parent', 'board_order',
+		'is_last_msg', 'id_msg_updated', 'id_profile',
+		'num_topics', 'num_posts', 'count_posts', 'id_theme', 'overrider_theme',
+		'unapproved_posts', 'unapproved_topics'
+		),
+		array(),
+		array(),
+		array('num_topics', 'num_posts', 'count_posts', 'unapproved_posts', 'unapproved_topics')
+	);
+}
+
+function updateTable($query, $data, $knownInts = array(), $knownFloats = array(), $knownDates = array(), $ensure_overflow = array())
 {
 	global $smcFunc;
 
@@ -383,6 +422,9 @@ function updateTable($query, $data, $knownInts, $knownFloats, $knownDates, $ensu
 	$setString = '';
 	foreach ($data as $var => $val)
 	{
+		if ($val[0] === '=')
+			continue;
+
 		$type = 'string';
 		if (in_array($var, $knownInts))
 			$type = 'int';
@@ -392,9 +434,24 @@ function updateTable($query, $data, $knownInts, $knownFloats, $knownDates, $ensu
 			$type = 'date';
 
 		// Doing an increment?
-		if ($type == 'int' && ($val === '+' || $val === '-'))
+		if ($type == 'int' && ($val[0] === '+' || $val[0] === '-'))
 		{
-			$val = $var . ' ' . $val . ' 1';
+			$val = $var . ' ' . $val[0] . (isset($val[1]) ? ' ' . (int) substr($val, 1) : ' 1');
+			$type = 'raw';
+		}
+		elseif (substr($val, 0, 7) === 'concat-')
+		{
+			switch ($type)
+			{
+				case 'int':
+					$default = '0';
+					break;
+				default:
+					$default = '\'\'';
+					break;
+			}
+			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
+			$val = 'CASE WHEN ' . $var . ' = ' . $default . ' THEN ' . $quoted_val . ' ELSE CONCAT(' . $var . ', ' . $quoted_val . ') END';
 			$type = 'raw';
 		}
 

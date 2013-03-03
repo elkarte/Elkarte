@@ -172,15 +172,9 @@ function deleteMembergroups($groups)
 	$smcFunc['db_free_result']($request);
 
 	foreach ($updates as $member_groups => $boardArray)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET member_groups = {string:member_groups}
-			WHERE id_board IN ({array_int:board_lists})',
-			array(
-				'board_lists' => $boardArray,
-				'member_groups' => implode(',', array_diff(explode(',', $member_groups), $groups)),
-			)
-		);
+		updateBoardData($boardArray, array(
+			'member_groups' => implode(',', array_diff(explode(',', $member_groups), $groups)),
+		));
 
 	// Recalculate the post groups, as they likely changed.
 	updateStats('postgroups');

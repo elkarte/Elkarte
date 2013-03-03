@@ -975,24 +975,16 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + 1' . ($new_topic ? ', num_topics = num_topics + 1' : '') . '
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $topicOptions['board'],
-			)
-		);
+		updateBoardData($topicOptions['board'], array(
+			'num_posts' => '+',
+			'num_topics' => $new_topic ? '+' : '='
+		));
 	else
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET unapproved_posts = unapproved_posts + 1' . ($new_topic ? ', unapproved_topics = unapproved_topics + 1' : '') . '
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $topicOptions['board'],
-			)
-		);
+		updateBoardData($topicOptions['board'], array(
+			'unapproved_posts' => '+',
+			'unapproved_topics' => $new_topic ? '+' : '='
+		));
 
 		// Add to the approval queue too.
 		$smcFunc['db_insert']('',
@@ -1388,19 +1380,12 @@ function approvePosts($msgs, $approve = true)
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
-			WHERE id_board = {int:id_board}',
-			array(
-				'num_posts' => $changes['posts'],
-				'unapproved_posts' => $changes['unapproved_posts'],
-				'num_topics' => $changes['topics'],
-				'unapproved_topics' => $changes['unapproved_topics'],
-				'id_board' => $id,
-			)
-		);
+		updateBoardData($id, array(
+			'num_posts' => ($changes['posts'] > 0 ? '+' : '') . $changes['posts'],
+			'unapproved_posts' => ($changes['unapproved_posts'] > 0 ? '+' : '') . $changes['unapproved_posts'],
+			'num_topics' => ($changes['topics'] > 0 ? '+' : '') . $changes['topics'],
+			'unapproved_topics' => ($changes['unapproved_topics'] > 0 ? '+' : '') . $changes['unapproved_topics'],
+		));
 
 	// Finally, least importantly, notifications!
 	if ($approve)
@@ -1743,18 +1728,10 @@ function updateLastMessages($setboards, $id_msg = 0)
 		);
 	}
 	foreach ($board_updates as $board_data)
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
-			WHERE id_board IN ({array_int:board_list})',
-			array(
-				'board_list' => $board_data['boards'],
-				'id_last_msg' => $board_data['id'],
-				'id_msg_updated' => $board_data['updated'],
-			)
-		);
-	}
+		updateBoardData($board_data['boards'], array(
+			'id_last_msg' => $board_data['id'],
+			'id_msg_updated' => $board_data['updated'],
+		));
 }
 
 /**

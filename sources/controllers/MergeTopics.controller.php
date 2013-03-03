@@ -755,24 +755,12 @@ function action_mergeExecute($topics = array())
 
 	// Cycle through each board...
 	foreach ($boardTotals as $id_board => $stats)
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_topics = CASE WHEN {int:topics} > num_topics THEN 0 ELSE num_topics - {int:topics} END,
-				unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END,
-				num_posts = CASE WHEN {int:posts} > num_posts THEN 0 ELSE num_posts - {int:posts} END,
-				unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $id_board,
-				'topics' => $stats['topics'],
+		updateBoardData($id_board, array(
+				'num_topics' => $stats['topics'],
 				'unapproved_topics' => $stats['unapproved_topics'],
-				'posts' => $stats['posts'],
+				'num_posts' => $stats['posts'],
 				'unapproved_posts' => $stats['unapproved_posts'],
-			)
-		);
-	}
+		));
 
 	// Determine the board the final topic resides in
 	$request = $smcFunc['db_query']('', '

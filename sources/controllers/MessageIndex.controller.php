@@ -32,14 +32,7 @@ function action_messageindex()
 	// If this is a redirection board head off.
 	if ($board_info['redirect'])
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + 1
-			WHERE id_board = {int:current_board}',
-			array(
-				'current_board' => $board,
-			)
-		);
+		updateBoardData($board, array('num_posts' => '+'));
 
 		redirectexit($board_info['redirect']);
 	}

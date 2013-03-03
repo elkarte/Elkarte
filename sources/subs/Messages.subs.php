@@ -452,19 +452,11 @@ function removeMessage($message, $decreasePostCount = true)
 				);
 
 			// Add one topic and post to the recycle bin board.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET
-					num_topics = num_topics + {int:num_topics_inc},
-					num_posts = num_posts + 1' .
-						($message > $last_board_msg ? ', id_last_msg = {int:id_merged_msg}' : '') . '
-				WHERE id_board = {int:recycle_board}',
-				array(
-					'num_topics_inc' => empty($id_recycle_topic) ? 1 : 0,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_merged_msg' => $message,
-				)
-			);
+			updateBoardData($modSettings['recycle_board'], array(
+				'num_topics' => empty($id_recycle_topic) ? 1 : 0,
+				'num_posts' => '+',
+				'id_last_msg' => $message > $last_board_msg ? $message : '=',
+			));
 
 			// Lets increase the num_replies, and the first/last message ID as appropriate.
 			if (!empty($id_recycle_topic))
@@ -500,18 +492,9 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 	}
 
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET ' . ($row['approved'] ? '
-			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
-			unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-		WHERE id_board = {int:id_board}',
-		array(
-			'no_posts' => 0,
-			'no_unapproved' => 0,
-			'id_board' => $row['id_board'],
-		)
-	);
+	updateBoardData($row['id_board'], array(
+		$row['approved'] ? 'num_posts' : 'unapproved_posts' => '-'
+	));
 
 	// If the poster was registered and the board this message was on incremented
 	// the member's posts when it was posted, decrease his or her post count.
