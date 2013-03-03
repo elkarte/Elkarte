@@ -268,7 +268,7 @@ class Data_Validator
 			// Set the error message for this validation failure
 			if (isset($error['error']))
 			{
-					$result[] = sprintf($txt[$error['error']], $error['field']);
+					$result[] = sprintf($txt[$error['error']], $error['field'], $error['error_msg']);
 			}
 			elseif (isset($txt[$error['function']]))
 			{
@@ -803,10 +803,13 @@ class Data_Validator
 
 		if ($result === false)
 		{
+			$errorMsg = error_get_last();
+
 			return array(
 				'field' => $field,
 				'input' => $input[$field],
-				'error' => 'error_php_syntax',
+				'error' => 'php_syntax_error',
+				'error_msg' => $errorMsg['message'],
 				'param' => $validation_parameters
 			);
 		}

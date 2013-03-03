@@ -1740,7 +1740,7 @@ function action_edittheme()
 	// We'll work hard with them themes!
 	require_once(SUBSDIR . '/Themes.subs.php');
 
-	$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (int) @$_GET['id'];
+	$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
 	// Main page: display all installed themes
 	if (empty($selectedTheme))
@@ -1790,7 +1790,7 @@ function action_edittheme()
 	$context['session_error'] = false;
 
 	// Get the directory of the theme we are editing.
-	$context['theme_id'] = (int) $selectedTheme;
+	$context['theme_id'] = $selectedTheme;
 	$theme_dir = themeDirectory($context['theme_id']);
 
 	// Eh? not trying to sneak a peek outside the theme directory are we
@@ -1853,15 +1853,15 @@ function action_edittheme()
 			fatal_lang_error('theme_edit_missing', false);
 	}
 
-	$entire_file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
+	$file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
 
 	// Saving?
 	if (isset($_POST['save']))
 	{
 		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
 		{
-			if (is_array($entire_file))
-				$entire_file = implode("\n", $entire_file);
+			if (is_array($file))
+				$entire_file = implode("\n", $file);
 			$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
 
 			require_once(SUBSDIR . '/DataValidator.class.php');
@@ -1883,8 +1883,8 @@ function action_edittheme()
 			}
 			else
 			{
-				if (preg_match('~(<b>.+?</b>:.+?<b>).+?(</b>.+?<b>\d+</b>)<br( /)?' . '>$~i', $error, $match) != 0)
-					$context['parse_error'] = $match[1] . $_REQUEST['filename'] . $match[2];
+				foreach ($errors as $error)
+					$context['parse_error'][] = $error;
 			}
 		}
 		// Session timed out.
