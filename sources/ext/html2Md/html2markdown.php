@@ -352,7 +352,7 @@ class Convert_Md
 	private function _convert_code($node)
 	{
 		$markdown = '';
-		$value = $this->_parser ? $this->_innerHTML($node) : $node->innertext;
+		$value = $this->_innerHTML($node);
 		//$value = str_replace(array('<code>', '</code>'), '', $value);
 		$value = trim($value);
 
@@ -648,11 +648,16 @@ class Convert_Md
 	 */
 	private function _innerHTML($node)
 	{
-		$doc = new DOMDocument();
-		$doc->appendChild($doc->importNode($node, true));
-		$html = trim($doc->saveHTML());
-		$tag = $node->nodeName;
+		if ($this->_parser)
+		{
+			$doc = new DOMDocument();
+			$doc->appendChild($doc->importNode($node, true));
+			$html = trim($doc->saveHTML());
+			$tag = $node->nodeName;
 
-		return preg_replace('@^<' . $tag . '[^>]*>|</' . $tag . '>$@', '', $html);
+			return preg_replace('@^<' . $tag . '[^>]*>|</' . $tag . '>$@', '', $html);
+		}
+		else
+			return $node->innertext;
 	}
 }
