@@ -16,6 +16,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Retrieve all installed themes
+ */
 function installedThemes()
 {
 	global $smcFunc;
@@ -75,6 +78,11 @@ function themeDirectory($id_theme)
 	return $themeDirectory;
 }
 
+/**
+ * Retrieve theme URL
+ *
+ * @param int $id_theme id of the theme
+ */
 function themeUrl($id_theme)
 {
 	global $smcFunc;

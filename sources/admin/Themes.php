@@ -1785,7 +1785,7 @@ function action_edittheme()
 		return 'no_themes';
 	}
 
-	// You chose a theme to edit... lets see where it is
+	// Want to edit a theme? Lets see where it is
 
 	$context['session_error'] = false;
 
@@ -1838,6 +1838,7 @@ function action_edittheme()
 	}
 	else
 	{
+		// Editing a file
 		if (substr($_REQUEST['filename'], 0, 1) == '.')
 			$_REQUEST['filename'] = '';
 		else
