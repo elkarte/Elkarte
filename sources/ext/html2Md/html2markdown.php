@@ -43,14 +43,15 @@ class Convert_Md
 	 */
 	public function __construct($html)
 	{
-		// Remove multiple newlines between html tags
-		$html = preg_replace('~(</[a-zA-Z0-9]+>)(\s)+(<[a-zA-Z0-9]+(?: /)?>)~s', "$1$3", $html);
+		// Remove whitespace between html tags
+		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 
 		// Use PHP built in functions ...
 		if (class_exists('DOMDocument'))
 		{
 			$this->_parser = true;
 			$this->doc = new DOMDocument();
+			$this->doc->preserveWhiteSpace = false;
 
 			// Make it a utf-8 doc always and be silent about those html structure errors
 			libxml_use_internal_errors(true);
