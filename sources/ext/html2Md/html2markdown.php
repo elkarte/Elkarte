@@ -85,9 +85,8 @@ class Convert_Md
 		{
 			// Using the internal method we need to do a little extra work
 			$markdown =  html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-			$markdown = preg_replace('~<!DOCTYPE [^>]+>~', '', $markdown);
-			$markdown = str_replace(array('<html>', '</html>', '<body>', '</body>', '<?xml encoding="UTF-8">'), '', $markdown);
-
+			if (preg_match('~<body>(.*)</body>~s', $markdown, $body))
+				$markdown = $body[1];
 		}
 
 		return $markdown;
