@@ -183,9 +183,6 @@ class Convert_Md
 		// based on the tag, determine how to convert
 		switch ($tag)
 		{
-			case 'root':
-				$markdown = '';
-				break;
 			case 'a':
 				$markdown = $this->_convert_anchor($node);
 				break;
@@ -254,6 +251,11 @@ class Convert_Md
 			case 'thead':
 				// Just skip over these as we handle them in the table tag itself
 				$markdown = '`skip`';
+				break;
+			case 'root':
+			case 'span':
+				// remove these tags and simply replace with the text inside the tags
+				$markdown = $this->_innerHTML($node);
 				break;
 			default:
 				$markdown = $this->_parser ? $this->doc->saveHTML($node) : trim($node->outertext);
