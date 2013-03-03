@@ -334,11 +334,10 @@ class Convert_Md
 
 		// Go line by line
 		$lines = preg_split('~\r\n|\r|\n~', $value);
-		$lines = array_filter($lines);
 
 		// Each line gets a '> ' in front of it, just like email quotes really
 		foreach ($lines as $line)
-			$markdown .= '> ' . ltrim($line, "\t") . $this->line_break;
+			$markdown .= '> ' . ltrim($line, "\t") . $this->line_end;
 
 		return $markdown;
 	}
