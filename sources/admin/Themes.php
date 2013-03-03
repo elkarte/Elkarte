@@ -1863,6 +1863,8 @@ function action_edittheme()
 		{
 			if (is_array($file))
 				$entire_file = implode("\n", $file);
+			else
+				$entire_file = $file;
 			$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
 
 			require_once(SUBSDIR . '/DataValidator.class.php');
@@ -1884,8 +1886,26 @@ function action_edittheme()
 			}
 			else
 			{
+				$context['sub_template'] = 'edit_template';
+
 				foreach ($errors as $error)
 					$context['parse_error'][] = $error;
+				// we might get here after we try and fail to save a php file
+				// (with syntax errors)
+				$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
+
+				if (!is_array($file))
+					$file = array($file);
+				foreach ($file as $i => $file_part)
+				{
+					$context['file_parts'][$i]['lines'] = strlen($file_part);
+					$context['file_parts'][$i]['data'] = $file_part;
+				}
+
+				// re-create token for another try
+				createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
+
+				return;
 			}
 		}
 		// Session timed out.
@@ -1897,10 +1917,10 @@ function action_edittheme()
 			$context['sub_template'] = 'edit_file';
 
 			// Recycle the submitted data.
-			if (is_array($entire_file))
-				$context['entire_file'] = htmlspecialchars(implode("\n", $entire_file));
+			if (is_array($file))
+				$context['entire_file'] = htmlspecialchars(implode("\n", $file));
 			else
-				$context['entire_file'] = htmlspecialchars($entire_file);
+				$context['entire_file'] = htmlspecialchars($file);
 
 			$context['edit_filename'] = htmlspecialchars($_POST['filename']);
 
@@ -1928,12 +1948,8 @@ function action_edittheme()
 	{
 		$context['sub_template'] = 'edit_template';
 
-		// we might get here after we try and fail to save a php file
-		// (with syntax errors)
 		if (!isset($errors))
 			$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
-		else
-			$file_data = $entire_file;
 
 		$j = 0;
 		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
