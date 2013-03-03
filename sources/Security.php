@@ -779,7 +779,7 @@ function validateToken($action, $type = 'post', $reset = true)
 
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
 
-	// Logins are special: the token is used to has the password with javascript before POST it
+	// Logins are special: the token is used to hash the password with javascript before POST it
 	if ($action == 'login')
 	{
 		if (isset($_SESSION['token'][$type . '-' . $action]))
