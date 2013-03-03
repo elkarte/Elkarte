@@ -274,30 +274,17 @@ function updateMemberData($members, $data)
 {
 	global $modSettings, $user_info, $smcFunc;
 
-	$parameters = array();
-	if (is_array($members))
-	{
-		$condition = 'id_member IN ({array_int:members})';
-		$parameters['members'] = $members;
-	}
-	elseif ($members === null)
-		$condition = '1=1';
+	$query = array(
+		'table' => 'members'
+	);
+	if ($members === null)
+		$query['condition'] = '1=1';
 	else
 	{
-		$condition = 'id_member = {int:member}';
-		$parameters['member'] = $members;
+		$members = is_array($members) ? $members : is_array($members);
+		$query['condition'] = 'id_member IN ({array_int:members})';
+		$query['range'] = array('members' => $members);
 	}
-
-	// Everything is assumed to be a string unless it's in the below.
-	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
-		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'pm_receive_from', 'karma_good', 'karma_bad',
-		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
-		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
-	);
-	$knownFloats = array(
-		'time_offset',
-	);
 
 	if (!empty($modSettings['integrate_change_member_data']))
 	{
@@ -346,46 +333,23 @@ function updateMemberData($members, $data)
 		}
 	}
 
-	$setString = '';
-	foreach ($data as $var => $val)
-	{
-		$type = 'string';
-		if (in_array($var, $knownInts))
-			$type = 'int';
-		elseif (in_array($var, $knownFloats))
-			$type = 'float';
-		elseif ($var == 'birthdate')
-			$type = 'date';
-
-		// Doing an increment?
-		if ($type == 'int' && ($val === '+' || $val === '-'))
-		{
-			$val = $var . ' ' . $val . ' 1';
-			$type = 'raw';
-		}
-
-		// Ensure posts, instant_messages, and unread_messages don't overflow or underflow.
-		if (in_array($var, array('posts', 'instant_messages', 'unread_messages')))
-		{
-			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
-			{
-				if ($match[1] != '+ ')
-					$val = 'CASE WHEN ' . $var . ' <= ' . abs($match[2]) . ' THEN 0 ELSE ' . $val . ' END';
-				$type = 'raw';
-			}
-		}
-
-		$setString .= ' ' . $var . ' = {' . $type . ':p_' . $var . '},';
-		$parameters['p_' . $var] = $val;
-	}
-
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}members
-		SET' . substr($setString, 0, -1) . '
-		WHERE ' . $condition,
-		$parameters
+	updateTable($query, $data,
+		array(
+			'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
+			'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'pm_receive_from', 'karma_good', 'karma_bad',
+			'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
+			'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
+		),
+		array(
+			'time_offset',
+		),
+		array(
+			'birthdate',
+		),
+		array(
+			'posts', 'instant_messages', 'unread_messages',
+		)
 	);
-
 	updateStats('postgroups', $members, array_keys($data));
 
 	// Clear any caching?
@@ -405,6 +369,56 @@ function updateMemberData($members, $data)
 			cache_put_data('user_settings-' . $member, null, 60);
 		}
 	}
+}
+
+function updateTable($query, $data, $knownInts, $knownFloats, $knownDates, $ensure_overflow)
+{
+	global $smcFunc;
+
+	call_integration_hook('integrate_update_' . $query['table'], array(&$knownInts, &$knownFloats, &$knownDates, &$ensure_overflow));
+
+	$parameters = $query['range'];
+	$parameters['table'] = $query['table'];
+
+	$setString = '';
+	foreach ($data as $var => $val)
+	{
+		$type = 'string';
+		if (in_array($var, $knownInts))
+			$type = 'int';
+		elseif (in_array($var, $knownFloats))
+			$type = 'float';
+		elseif (in_array($var, $knownDates))
+			$type = 'date';
+
+		// Doing an increment?
+		if ($type == 'int' && ($val === '+' || $val === '-'))
+		{
+			$val = $var . ' ' . $val . ' 1';
+			$type = 'raw';
+		}
+
+		// Ensure posts, instant_messages, and unread_messages don't overflow or underflow.
+		if (in_array($var, $ensure_overflow))
+		{
+			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
+			{
+				if ($match[1] != '+ ')
+					$val = 'CASE WHEN ' . $var . ' <= ' . abs($match[2]) . ' THEN 0 ELSE ' . $val . ' END';
+				$type = 'raw';
+			}
+		}
+
+		$setString .= ' ' . $var . ' = {' . $type . ':p_' . $var . '},';
+		$parameters['p_' . $var] = $val;
+	}
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}{raw:table}
+		SET' . substr($setString, 0, -1) . '
+		WHERE ' . $query['condition'],
+		$parameters
+	);
 }
 
 /**
