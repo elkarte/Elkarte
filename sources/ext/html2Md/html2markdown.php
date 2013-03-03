@@ -209,14 +209,14 @@ class Convert_Md
 				$markdown = ':   ' . $value . $this->line_break;
 				break;
 			case 'dl':
-				$markdown = trim($value) . $this->line_end;
+				$markdown = trim($value) . $this->line_break;
 				break;
 			case 'em':
 			case 'i':
-				$markdown = '*' . $value . '*';
+				$markdown = '_' . $value . '_';
 				break;
 			case 'hr':
-				$markdown = str_repeat('- ', 20) . $this->line_break;
+				$markdown = str_repeat('- ', 30) . $this->line_end;
 				break;
 			case 'h1':
 			case 'h2':
@@ -237,9 +237,14 @@ class Convert_Md
 				$markdown = $this->_convert_list($node);
 				break;
 			case 'p':
+				$markdown = str_replace("\n", ' ', $value) . $this->line_break;
+				break;
 			case 'pre':
+			case 'div':
 				$markdown = $value . $this->line_break;
 				break;
+			case 'title':
+				$markdown = '# ' . $value . $this->line_break;
 			case 'table':
 				$markdown = $this->_convert_table($node) . $this->line_break;
 				break;
@@ -258,8 +263,8 @@ class Convert_Md
 				$markdown = $this->_innerHTML($node);
 				break;
 			default:
-				$markdown = $this->_parser ? $this->doc->saveHTML($node) : trim($node->outertext);
-				$markdown = $tag !== '#text' ? trim(strip_tags($markdown)) : $markdown;
+				// Don't know you, so just preserve whats there
+				$markdown = $this->_parser ? htmlspecialchars_decode($this->doc->saveHTML($node)) : $node->outertext;
 		}
 
 		// Replace the node with our markdown replacement, or with the node itself if none was found
