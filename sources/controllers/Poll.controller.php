@@ -740,15 +740,7 @@ function action_editpoll2()
 		$bcinfo['id_poll'] = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
 
 		// Link the poll to the topic
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET id_poll = {int:id_poll}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-				'id_poll' => $bcinfo['id_poll'],
-			)
-		);
+		updateTopicData($topic, array('id_poll' => $bcinfo['id_poll']));
 	}
 
 	// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)

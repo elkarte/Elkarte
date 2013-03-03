@@ -637,15 +637,9 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET num_replies = {int:num_replies}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'num_replies' => $row['real_num_replies'],
-						'id_topic' => $row['id_topic'],
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'num_replies' => $row['real_num_replies']
+				));
 			$smcFunc['db_free_result']($request);
 
 			// Recount unapproved messages
@@ -665,15 +659,9 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET unapproved_posts = {int:unapproved_posts}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'unapproved_posts' => $row['real_unapproved_posts'],
-						'id_topic' => $row['id_topic'],
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'unapproved_posts' => $row['real_unapproved_posts']
+				));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;

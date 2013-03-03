@@ -919,44 +919,25 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// The topic already exists, it only needs a little updating.
 	else
 	{
-		$update_parameters = array(
-			'poster_id' => $posterOptions['id'],
-			'id_msg' => $msgOptions['id'],
-			'locked' => $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'],
-			'id_topic' => $topicOptions['id'],
-			'counter_increment' => 1,
-		);
-		$topics_columns = array();
 		if ($msgOptions['approved'])
 			$topics_columns = array(
-				'id_member_updated = {int:poster_id}',
-				'id_last_msg = {int:id_msg}',
-				'num_replies = num_replies + {int:counter_increment}',
+				'id_member_updated' => $posterOptions['id'],
+				'id_last_msg' => $msgOptions['id'],
+				'num_replies' => '+',
 			);
 		else
 			$topics_columns = array(
-				'unapproved_posts = unapproved_posts + {int:counter_increment}',
+				'unapproved_posts' => '+',
 			);
 		if ($topicOptions['lock_mode'] !== null)
-			$topics_columns = array(
-				'locked = {int:locked}',
-			);
+			$topics_columns['locked'] = $topicOptions['lock_mode'];
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns = array(
-				'is_sticky = {int:is_sticky}',
-			);
+			$topics_columns['is_sticky'] = $topicOptions['sticky_mode'];
 
-		call_integration_hook('integrate_modify_topic', array($topics_columns, $update_parameters, $msgOptions, $topicOptions, $posterOptions));
+		call_integration_hook('integrate_modify_topic', array($topics_columns, $msgOptions, $topicOptions, $posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				' . implode(', ', $topics_columns) . '
-			WHERE id_topic = {int:id_topic}',
-			$update_parameters
-		);
+		updateTopicData($topicOptions['id'], $topics_columns);
 
 		// One new post has been added today.
 		trackStats(array('posts' => '+'));
@@ -1145,20 +1126,11 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				is_sticky = {raw:is_sticky},
-				locked = {raw:locked},
-				id_poll = {raw:id_poll}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'is_sticky' => $topicOptions['sticky_mode'] === null ? 'is_sticky' : (int) $topicOptions['sticky_mode'],
-				'locked' => $topicOptions['lock_mode'] === null ? 'locked' : (int) $topicOptions['lock_mode'],
-				'id_poll' => $topicOptions['poll'] === null ? 'id_poll' : (int) $topicOptions['poll'],
-				'id_topic' => $topicOptions['id'],
-			)
-		);
+		updateTopicData($topicOptions['id'], array(
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? '=' : (int) $topicOptions['sticky_mode'],
+			'locked' => $topicOptions['lock_mode'] === null ? '=' : (int) $topicOptions['lock_mode'],
+			'id_poll' => $topicOptions['poll'] === null ? '=' : (int) $topicOptions['poll'],
+		));
 	}
 
 	// Mark the edited post as read.
@@ -1364,19 +1336,12 @@ function approvePosts($msgs, $approve = true)
 
 	// ... next the topics...
 	foreach ($topic_changes as $id => $changes)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'approved' => $changes['approved'],
-				'unapproved_posts' => $changes['unapproved_posts'],
-				'num_replies' => $changes['replies'],
-				'id_last_msg' => $changes['id_last_msg'],
-				'id_topic' => $id,
-			)
-		);
+		updateTopicData($id, array(
+			'approved' => $changes['approved'],
+			'unapproved_posts' => '+' . $changes['unapproved_posts'],
+			'num_replies' => '+' . $changes['replies'],
+			'id_last_msg' => $changes['id_last_msg'],
+		));
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)

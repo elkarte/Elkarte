@@ -95,16 +95,10 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				$recycleTopics[] = $row['id_topic'];
 
 				// Set the id_previous_board for this topic - and make it not sticky.
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET id_previous_board = {int:id_previous_board}, is_sticky = {int:not_sticky}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'id_previous_board' => $row['id_board'],
-						'id_topic' => $row['id_topic'],
-						'not_sticky' => 0,
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'id_previous_board' => $row['id_board'],
+					'is_sticky' => 0,
+				));
 			}
 			$smcFunc['db_free_result']($request);
 
@@ -483,18 +477,11 @@ function moveTopics($topics, $toBoard)
 	));
 
 	// Move the topic.  Done.  :P
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET id_board = {int:id_board}' . ($isRecycleDest ? ',
-			unapproved_posts = {int:no_unapproved}, approved = {int:is_approved}' : '') . '
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'id_board' => $toBoard,
-			'topics' => $topics,
-			'is_approved' => 1,
-			'no_unapproved' => 0,
-		)
-	);
+	updateTopicData($topics, array(
+		'id_board' => $toBoard,
+		'approved' => $isRecycleDest ? 1 : '=',
+		'unapproved_posts' => $isRecycleDest ? 0 : '=',
+	));
 
 	// If this was going to the recycle bin, check what messages are being recycled, and remove them from the queue.
 	if ($isRecycleDest && ($totalUnapprovedTopics || $totalUnapprovedPosts))
@@ -559,16 +546,10 @@ function moveTopics($topics, $toBoard)
 		{
 			// If not, update.
 			if ($row['first_msg'] != $topicMaxMin[$row['id_topic']]['min'] || $row['last_msg'] != $topicMaxMin[$row['id_topic']]['max'])
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET id_first_msg = {int:first_msg}, id_last_msg = {int:last_msg}
-					WHERE id_topic = {int:selected_topic}',
-					array(
-						'first_msg' => $row['first_msg'],
-						'last_msg' => $row['last_msg'],
-						'selected_topic' => $row['id_topic'],
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'id_first_msg' => $row['first_msg'],
+					'id_last_msg' => $row['last_msg'],
+				));
 		}
 		$smcFunc['db_free_result']($request);
 	}
@@ -690,16 +671,7 @@ function moveTopicConcurrence()
  */
 function increaseViewCounter($id_topic)
 {
-	global $smcFunc;
-
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET num_views = num_views + 1
-		WHERE id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $id_topic,
-		)
-	);
+	updateTopicData($id_topic, array('num_views' => '+'));
 }
 
 /**

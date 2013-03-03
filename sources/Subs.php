@@ -410,6 +410,37 @@ function updateBoardData($boards, $data)
 	);
 }
 
+function updateTopicData($topics, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'topics'
+	);
+	switch ($topics)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		default:
+			$topics = is_array($topics) ? $topics : is_array($topics);
+			$query['condition'] = 'id_topic IN ({array_int:topics})';
+			$query['range'] = array('topics' => $topics);
+	}
+
+	updateTable($query, $data,
+		array(
+		'is_sticky', 'id_board', 'id_first_msg', 'id_last_msg',
+		'id_member_started', 'id_member_updated', 'id_poll',
+		'id_previous_board', 'id_previous_topic', 'num_replies', 'num_views', 'locked',
+		'redirect_expires', 'id_redirect_topic', 'unapproved_posts', 'approved'
+		),
+		array(),
+		array(),
+		array('num_views', 'unapproved_posts', 'approved')
+	);
+}
+
 function updateTable($query, $data, $knownInts = array(), $knownFloats = array(), $knownDates = array(), $ensure_overflow = array())
 {
 	global $smcFunc;
@@ -452,6 +483,12 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 			}
 			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
 			$val = 'CASE WHEN ' . $var . ' = ' . $default . ' THEN ' . $quoted_val . ' ELSE CONCAT(' . $var . ', ' . $quoted_val . ') END';
+			$type = 'raw';
+		}
+		elseif ($type == 'int' && substr($val, 0, 7) === 'toggle-')
+		{
+			$values = explode('-', $val);
+			$val = 'CASE WHEN ' . $var . ' = ' . (int) $values[1] . ' THEN ' . (int) $values[2] . ' ELSE ' . (int) $values[3] . ' END';
 			$type = 'raw';
 		}
 

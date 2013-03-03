@@ -78,15 +78,7 @@ function action_lock()
 		fatal_lang_error('locked_by_admin', 'user');
 
 	// Actually lock the topic in the database with the new value.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET locked = {int:locked}
-		WHERE id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-			'locked' => $locked,
-		)
-	);
+	updateTopicData($topic, array('locked' => $locked));
 
 	// If they are allowed a "moderator" permission, log it in the moderator log.
 	if (!$user_lock)
@@ -142,15 +134,7 @@ function action_sticky()
 	$smcFunc['db_free_result']($request);
 
 	// Toggle the sticky value.... pretty simple ;).
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET is_sticky = {int:is_sticky}
-		WHERE id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-			'is_sticky' => empty($is_sticky) ? 1 : 0,
-		)
-	);
+	updateTopicData($topic, array('is_sticky' => empty($is_sticky) ? 1 : 0));
 
 	// Log this sticky action - always a moderator thing.
 	logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));

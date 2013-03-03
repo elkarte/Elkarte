@@ -40,17 +40,7 @@ function associatedPoll($topicID, $pollID = null)
 		return $pollID;
 	}
 	else
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET id_poll = {int:poll}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topicID,
-				'poll' => $pollID,
-			)
-		);
-	}
+		updateTopicData($topicID, array('id_poll' => $pollID));
 }
 
 /**

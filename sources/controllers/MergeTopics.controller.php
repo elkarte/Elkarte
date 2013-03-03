@@ -556,37 +556,21 @@ function action_mergeExecute($topics = array())
 		)
 	);
 
-	// Asssign the properties of the newly merged topic.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			id_board = {int:id_board},
-			id_member_started = {int:id_member_started},
-			id_member_updated = {int:id_member_updated},
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg},
-			id_poll = {int:id_poll},
-			num_replies = {int:num_replies},
-			unapproved_posts = {int:unapproved_posts},
-			num_views = {int:num_views},
-			is_sticky = {int:is_sticky},
-			approved = {int:approved}
-		WHERE id_topic = {int:id_topic}',
-		array(
-			'id_board' => $target_board,
-			'is_sticky' => $is_sticky,
-			'approved' => $topic_approved,
-			'id_topic' => $id_topic,
-			'id_member_started' => $member_started,
-			'id_member_updated' => $member_updated,
-			'id_first_msg' => $first_msg,
-			'id_last_msg' => $last_msg,
-			'id_poll' => $target_poll,
-			'num_replies' => $num_replies,
-			'unapproved_posts' => $num_unapproved,
-			'num_views' => $num_views,
-		)
-	);
+	// Assign the properties of the newly merged topic.
+	updateTopicData($id_topic, array(
+		'id_board' => $target_board,
+		'is_sticky' => $is_sticky,
+		'approved' => $topic_approved,
+		'id_topic' => $id_topic,
+		'id_member_started' => $member_started,
+		'id_member_updated' => $member_updated,
+		'id_first_msg' => $first_msg,
+		'id_last_msg' => $last_msg,
+		'id_poll' => $target_poll,
+		'num_replies' => $num_replies,
+		'unapproved_posts' => $num_unapproved,
+		'num_views' => $num_views,
+	));
 
 	// Grab the response prefix (like 'Re: ') in the default forum language.
 	if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))

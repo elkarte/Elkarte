@@ -557,22 +557,12 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		$smcFunc['db_free_result']($request);
 
 		// Update the topic details for the source topic.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_first_msg = {int:id_first_msg},
-				id_last_msg = {int:id_last_msg},
-				num_replies = {int:num_replies},
-				unapproved_posts = {int:unapproved_posts}
-			WHERE id_topic = {int:from_topic}',
-			array(
-				'id_first_msg' => $source_topic_data['id_first_msg'],
-				'id_last_msg' => $source_topic_data['id_last_msg'],
-				'num_replies' => $source_topic_data['num_replies'],
-				'unapproved_posts' => $source_topic_data['unapproved_posts'],
-				'from_topic' => $from_topic,
-			)
-		);
+		updateTopicData($from_topic, array(
+			'id_first_msg' => $source_topic_data['id_first_msg'],
+			'id_last_msg' => $source_topic_data['id_last_msg'],
+			'num_replies' => $source_topic_data['num_replies'],
+			'unapproved_posts' => $source_topic_data['unapproved_posts'],
+		));
 
 		// We have a new post count for the source board.
 		updateBoardData($from_board, array(
@@ -582,22 +572,13 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	}
 
 	// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg},
-			num_replies = {int:num_replies},
-			unapproved_posts = {int:unapproved_posts}
-		WHERE id_topic = {int:target_topic}',
-		array(
-			'id_first_msg' => $target_topic_data['id_first_msg'],
-			'id_last_msg' => $target_topic_data['id_last_msg'],
-			'num_replies' => $target_topic_data['num_replies'],
-			'unapproved_posts' => $target_topic_data['unapproved_posts'],
-			'target_topic' => $target_topic,
-		)
-	);
+	updateTopicData($target_topic, array(
+		'id_first_msg' => $target_topic_data['id_first_msg'],
+		'id_last_msg' => $target_topic_data['id_last_msg'],
+		'num_replies' => $target_topic_data['num_replies'],
+		'unapproved_posts' => $target_topic_data['unapproved_posts'],
+		'target_topic' => $target_topic,
+	));
 
 	// Need it to update some stats.
 	require_once(SUBSDIR . '/Post.subs.php');

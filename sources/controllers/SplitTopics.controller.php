@@ -597,40 +597,20 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 
 	// Mess with the old topic's first, last, and number of messages.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			num_replies = {int:num_replies},
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg},
-			id_member_started = {int:id_member_started},
-			id_member_updated = {int:id_member_updated},
-			unapproved_posts = {int:unapproved_posts}
-		WHERE id_topic = {int:id_topic}',
-		array(
-			'num_replies' => $split1_replies,
-			'id_first_msg' => $split1_first_msg,
-			'id_last_msg' => $split1_last_msg,
-			'id_member_started' => $split1_firstMem,
-			'id_member_updated' => $split1_lastMem,
-			'unapproved_posts' => $split1_unapprovedposts,
-			'id_topic' => $split1_ID_TOPIC,
-		)
-	);
+	updateTopicData($split1_ID_TOPIC, array(
+		'num_replies' => $split1_replies,
+		'id_first_msg' => $split1_first_msg,
+		'id_last_msg' => $split1_last_msg,
+		'id_member_started' => $split1_firstMem,
+		'id_member_updated' => $split1_lastMem,
+		'unapproved_posts' => $split1_unapprovedposts,
+	));
 
 	// Now, put the first/last message back to what they should be.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg}
-		WHERE id_topic = {int:id_topic}',
-		array(
-			'id_first_msg' => $split2_first_msg,
-			'id_last_msg' => $split2_last_msg,
-			'id_topic' => $split2_ID_TOPIC,
-		)
-	);
+	updateTopicData($split2_ID_TOPIC, array(
+		'id_first_msg' => $split2_first_msg,
+		'id_last_msg' => $split2_last_msg,
+	));
 
 	// If the new topic isn't approved ensure the first message flags this just in case.
 	if (!$split2_approved)
