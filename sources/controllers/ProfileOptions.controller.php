@@ -914,75 +914,15 @@ function loadThemeOptions($memID)
  */
 function action_ignoreboards($memID)
 {
-	global $txt, $user_info, $context, $modSettings, $smcFunc, $cur_profile;
+	global $context, $modSettings, $cur_profile;
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
-	// Find all the boards this user is allowed to see.
-	$request = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_cat, c.name AS cat_name, b.id_board, b.name, b.child_level,
-			'. (!empty($cur_profile['ignore_boards']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE {query_see_board}
-			AND redirect = {string:empty_string}',
-		array(
-			'ignore_boards' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array(),
-			'empty_string' => '',
-		)
-	);
-	$context['num_boards'] = $smcFunc['db_num_rows']($request);
-	$context['categories'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// This category hasn't been set up yet..
-		if (!isset($context['categories'][$row['id_cat']]))
-			$context['categories'][$row['id_cat']] = array(
-				'id' => $row['id_cat'],
-				'name' => $row['cat_name'],
-				'boards' => array()
-			);
-
-		// Set this board up, and let the template know when it's a child.  (indent them..)
-		$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
-			'id' => $row['id_board'],
-			'name' => $row['name'],
-			'child_level' => $row['child_level'],
-			'selected' => $row['is_ignored'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Now, let's sort the list of categories into the boards for templates that like that.
-	$temp_boards = array();
-	foreach ($context['categories'] as $category)
-	{
-		// Include a list of boards per category for easy toggling.
-		$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
-
-		$temp_boards[] = array(
-			'name' => $category['name'],
-			'child_ids' => array_keys($category['boards'])
-		);
-		$temp_boards = array_merge($temp_boards, array_values($category['boards']));
-	}
-
-	$max_boards = ceil(count($temp_boards) / 2);
-	if ($max_boards == 1)
-		$max_boards = 2;
-
-	// Now, alternate them so they can be shown left and right ;).
-	$context['board_columns'] = array();
-	for ($i = 0; $i < $max_boards; $i++)
-	{
-		$context['board_columns'][] = $temp_boards[$i];
-		if (isset($temp_boards[$i + $max_boards]))
-			$context['board_columns'][] = $temp_boards[$i + $max_boards];
-		else
-			$context['board_columns'][] = array();
-	}
+	$context['sub_template'] = 'ignoreboards';
+	require_once(SUBSDIR . '/Boards.subs.php');
+	$context += allBoards(false, array('ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 	loadThemeOptions($memID);
 }
