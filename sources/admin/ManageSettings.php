@@ -98,7 +98,7 @@ function ModifyFeatureSettings()
 		),
 	);
 
-	// Call the right function for this sub-acton.
+	// Call the right function for this sub-action.
 	$subActions[$_REQUEST['sa']]();
 }
 
@@ -145,7 +145,7 @@ function ModifySecuritySettings()
 		),
 	);
 
-	// Call the right function for this sub-acton.
+	// Call the right function for this sub-action.
 	$subActions[$_REQUEST['sa']]();
 }
 
@@ -182,7 +182,7 @@ function ModifyModSettings()
 		),
 	);
 
-	// Call the right function for this sub-acton.
+	// Call the right function for this sub-action.
 	$subActions[$_REQUEST['sa']]();
 }
 
@@ -277,6 +277,15 @@ function ModifyCoreFeatures($return_config = false)
 			'url' => 'action=admin;area=logs;sa=modlog',
 			'settings' => array(
 				'modlog_enabled' => 1,
+			),
+		),
+		// pe = post email
+		'pe' => array(
+			'url' => 'action=admin;area=maillist',
+			'settings' => array(
+				'maillist_enabled' => 1,
+				'pbe_post_enabled' => 2,
+				'pbe_pm_enabled' => 2,
 			),
 		),
 		// pm = post moderation.

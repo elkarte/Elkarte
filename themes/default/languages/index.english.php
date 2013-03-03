@@ -760,6 +760,7 @@ $txt['package'] = 'Package Manager';
 $txt['errlog'] = 'Error Log';
 $txt['edit_permissions'] = 'Permissions';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
+$txt['mc_emailerror'] = 'Unapproved Emails';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
 $txt['mc_reported_posts'] = 'Reported Posts';
 $txt['modlog_view'] = 'Moderation Log';

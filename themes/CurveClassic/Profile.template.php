@@ -1503,9 +1503,16 @@ function template_action_notification()
 							<label for="notify_types">', $txt['notify_send_types'], ':</label>
 						</dt>
 						<dd>
-							<select name="notify_types" id="notify_types">
+							<select name="notify_types" id="notify_types">';
+
+	if (!empty($modSettings['pbe_no_mod_notices']) && !empty($modSettings['maillist_enabled']))
+	{
+		echo '
 								<option value="1"', $context['member']['notify_types'] == 1 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything'], '</option>
-								<option value="2"', $context['member']['notify_types'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything_own'], '</option>
+								<option value="2"', $context['member']['notify_types'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything_own'], '</option>';
+	}
+
+	echo '
 								<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies'], '</option>
 								<option value="4"', $context['member']['notify_types'] == 4 ? ' selected="selected"' : '', '>', $txt['notify_send_type_nothing'], '</option>
 							</select>
@@ -1524,12 +1531,12 @@ function template_action_notification()
 		</form>
 		<br />';
 
-	template_show_list('topic_notification_list');
+	template_show_list('board_notification_list');
 
 	echo '
 		<br />';
 
-	template_show_list('board_notification_list');
+	template_show_list('topic_notification_list');
 }
 
 // Template for choosing group membership.

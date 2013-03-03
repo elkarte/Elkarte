@@ -1443,6 +1443,7 @@ function loadAllPermissions($loadType = 'classic')
 			'profile_server_avatar' => array(false, 'profile', 'use_avatar'),
 			'profile_upload_avatar' => array(false, 'profile', 'use_avatar'),
 			'profile_remote_avatar' => array(false, 'profile', 'use_avatar'),
+			'approve_emails' => array(false, 'member_admin', 'administrate'),
 		),
 		'board' => array(
 			'moderate_board' => array(false, 'general_board', 'moderate'),
@@ -1478,6 +1479,7 @@ function loadAllPermissions($loadType = 'classic')
 			'view_attachments' => array(false, 'attachment', 'participate'),
 			'post_unapproved_attachments' => array(false, 'attachment', 'make_unapproved_posts'),
 			'post_attachment' => array(false, 'attachment', 'attach'),
+			'postby_email' => array(false, 'topic', 'make_posts'),
 		),
 	);
 
@@ -1514,6 +1516,11 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'pm_draft';
 		$hiddenPermissions[] = 'post_autosave_draft';
 		$hiddenPermissions[] = 'pm_autosave_draft';
+	}
+	if (!in_array('pe', $context['admin_features']))
+	{
+		$hiddenPermissions[] = 'approve_emails';
+		$hiddenPermissions[] = 'postby_email';
 	}
 
 	// Post moderation?
@@ -2216,6 +2223,8 @@ function loadIllegalGuestPermissions()
 		'approve_posts',
 		'post_draft',
 		'post_autosave_draft',
+		'postby_email',
+		'approve_emails',
 	);
 
 	call_integration_hook('integrate_load_illegal_guest_permissions');

@@ -476,7 +476,7 @@ function action_post()
 			$context['preview_message'] = parse_bbc($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 			censorText($context['preview_message']);
 
-			// Dont forget the subject
+			// Don't forget the subject
 			$context['preview_subject'] = $form_subject;
 			censorText($context['preview_subject']);
 
@@ -558,7 +558,7 @@ function action_post()
 		$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
 		$context['icon'] = $message['message']['icon'];
 
-		// Set the destinaton.
+		// Set the destination.
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 		$context['submit_label'] = $txt['save'];
 	}
@@ -758,7 +758,7 @@ function action_post()
 					break;
 				}
 
-				// Show any errors which might of occured.
+				// Show any errors which might of occurred.
 				if (!empty($attachment['errors']))
 				{
 					$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
@@ -1781,7 +1781,7 @@ function action_post2()
 	if (isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']))
 		logAction('sticky', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
 
-	// Notify any members who have notification turned on for this topic - only do this if it's going to be approved(!)
+	// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 	if ($becomesApproved)
 	{
 		if ($newTopic)
@@ -1794,6 +1794,7 @@ function action_post2()
 				'msg' => $msgOptions['id'],
 				'board' => $board,
 				'topic' => $topic,
+				'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
 			);
 			notifyMembersBoard($notifyData);
 		}
