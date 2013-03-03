@@ -118,6 +118,32 @@ class Convert_Md
 	}
 
 	/**
+	 * Get the nesting level when inside a list
+	 *
+	 * @param type $node
+	 * @return boolean
+	 */
+	private static function _has_parent_list($node, $parser)
+	{
+		$inlist = array('ul', 'ol');
+		$depth = 0;
+
+		$parent = $parser ? $node->parentNode : $node->parentNode();
+		while ($parent)
+		{
+			// Anywhere nested inside a list we need to get the depth
+			$tag = $parser ? $parent->nodeName : $parent->nodeName();
+			if (in_array($tag, $inlist))
+				$depth++;
+
+			// Back out another level
+			$parent = $parser ? $parent->parentNode : $parent->parentNode();
+		}
+
+		return $depth;
+	}
+
+	/**
 	 * Traverse each node to its base, then convert tags to markup on the way back out
 	 *
 	 * @param object $node
@@ -208,7 +234,7 @@ class Convert_Md
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = trim($value) . $this->line_break;
+				$markdown = rtrim($value) . $this->line_break;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
@@ -422,17 +448,20 @@ class Convert_Md
 		$list_type = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
 		$value = $this->_get_value($node);
 
+		$loose = rtrim($value) !== $value;
+		$depth = max(0, $this-> _has_parent_list($node, $this->_parser) - 1);
+
 		// Unordered lists get a simple bullet
 		if ($list_type === 'ul')
-			$markdown = '* ' . $value . $this->line_end;
+			$markdown = str_repeat("\t", $depth) . '* ' . $value;
 		// Ordered lists need a number
 		else
 		{
 			$number = $this->_get_list_position($node);
-			$markdown = $number . '. ' . $value . $this->line_end;
+			$markdown = str_repeat("\t", $depth) . $number . '. ' . $value;
 		}
 
-		return $markdown;
+		return $markdown . (!$loose ? $this->line_end : '');
 	}
 
 	/**
