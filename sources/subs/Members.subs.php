@@ -1412,3 +1412,35 @@ function isAnotherAdmin($memberID)
 
 	return $another;
 }
+
+/**
+ * Retrieve administrators of the site.
+ * The function returns basic information: name, language file.
+ * It is used in personal messages reporting.
+ *
+ * @param int $id_admin = 0 if requested, only data about a specific admin is retrieved
+ */
+function admins($id_admin = 0)
+{
+	global $smcFunc;
+
+	// Now let's get out and loop through the admins.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name, lngfile
+		FROM {db_prefix}members
+		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
+			' . (empty($id_admin) ? '' : 'AND id_member = {int:specific_admin}') . '
+		ORDER BY real_name, lngfile',
+		array(
+			'admin_group' => 1,
+			'specific_admin' => isset($id_admin) ? (int) $id_admin : 0,
+		)
+	);
+
+	$admins = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$admins[$row['id_member']] = array($row['real_name'], $row['lngfile']);
+	$smcFunc['db_free_result']($request);
+
+	return $admins;
+}
