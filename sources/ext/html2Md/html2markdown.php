@@ -485,6 +485,8 @@ class Convert_Md
 		global $smcFunc;
 
 		$table_heading = $node->getElementsByTagName('th');
+		if ($this->_get_item($table_heading, 0) === null)
+			return;
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
 
 		// We only markdown well formed tables ...
