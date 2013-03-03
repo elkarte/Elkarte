@@ -232,7 +232,7 @@ class Convert_Md
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = rtrim($value) . $this->line_break;
+				$markdown = $this->line_end . rtrim($value) . $this->line_break;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
@@ -241,8 +241,10 @@ class Convert_Md
 				$markdown = str_replace("\n", ' ', $value) . $this->line_break;
 				break;
 			case 'pre':
-			case 'div':
 				$markdown = $value . $this->line_break;
+				break;
+			case 'div':
+				$markdown = $value;
 				break;
 			case 'title':
 				$markdown = '# ' . $value . $this->line_break;
