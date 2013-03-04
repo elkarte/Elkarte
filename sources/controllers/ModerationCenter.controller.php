@@ -90,7 +90,7 @@ function action_modcenter($dont_call = false)
 				),
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],
-					'enabled' => in_array('w', $context['admin_features']) && substr($modSettings['warning_settings'], 0, 1) == 1 && $context['can_moderate_boards'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 					'function' => 'action_viewWarnings',
 					'subsections' => array(
 						'log' => array($txt['mc_warning_log']),
@@ -138,7 +138,7 @@ function action_modcenter($dont_call = false)
 			'areas' => array(
 				'userwatch' => array(
 					'label' => $txt['mc_watched_users_title'],
-					'enabled' => in_array('w', $context['admin_features']) && substr($modSettings['warning_settings'], 0, 1) == 1 && $context['can_moderate_boards'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 					'function' => 'action_viewWatchedUsers',
 					'subsections' => array(
 						'member' => array($txt['mc_watched_users_member']),

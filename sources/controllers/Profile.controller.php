@@ -155,7 +155,7 @@ function action_modifyprofile()
 				),
 				'viewwarning' => array(
 					'label' => $txt['profile_view_warnings'],
-					'enabled' => in_array('w', $context['admin_features']) && substr($modSettings['warning_settings'], 0, 1) == 1 && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 					'file' => 'ProfileInfo.controller.php',
 					'function' => 'action_viewWarning',
 					'permission' => array(
@@ -297,7 +297,7 @@ function action_modifyprofile()
 				),
 				'issuewarning' => array(
 					'label' => $txt['profile_issue_warning'],
-					'enabled' => in_array('w', $context['admin_features']) && substr($modSettings['warning_settings'], 0, 1) == 1 && (!$context['user']['is_owner'] || $context['user']['is_admin']),
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
 					'file' => 'ProfileAccount.controller.php',
 					'function' => 'action_issuewarning',
 					'token' => 'profile-iw%u',
