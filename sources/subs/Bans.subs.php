@@ -892,13 +892,10 @@ function updateBanMembers()
 
 	// We welcome our new members in the realm of the banned.
 	if (!empty($newMembers))
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_online
-			WHERE id_member IN ({array_int:new_banned_members})',
-			array(
-				'new_banned_members' => $newMembers,
-			)
-		);
+	{
+		require_once(SUBSDIR . '/Auth.subs.php');
+		logOnline($newMembers, false);
+	}
 
 	// Find members that are wrongfully marked as banned.
 	$request = $smcFunc['db_query']('', '

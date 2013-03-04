@@ -528,13 +528,7 @@ function DoLogin()
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']));
 
 	// Get rid of the online entry for that old guest....
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_online
-		WHERE session = {string:session}',
-		array(
-			'session' => 'ip' . $user_info['ip'],
-		)
-	);
+	deleteOnline('ip' . $user_info['ip']);
 	$_SESSION['log_time'] = 0;
 
 	// Log this entry, only if we have it enabled.
@@ -595,13 +589,7 @@ function action_logout($internal = false, $redirect = true)
 		call_integration_hook('integrate_logout', array($user_settings['member_name']));
 
 		// If you log out, you aren't online anymore :P.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_online
-			WHERE id_member = {int:current_member}',
-			array(
-				'current_member' => $user_info['id'],
-			)
-		);
+		logOnline($user_info['id'], false);
 	}
 
 	$_SESSION['log_time'] = 0;

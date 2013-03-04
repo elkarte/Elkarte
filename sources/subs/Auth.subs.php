@@ -681,3 +681,47 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 			.(!$secure ? '' : '; Secure')
 			.(!$httponly ? '' : '; HttpOnly'), false);
 }
+
+/**
+ * Set the passed users online or not, in the online log table
+ *
+ * @param array|int $ids ids of the member(s) to log
+ * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
+ */
+function logOnline($ids, $on = false)
+{
+	global $smcFunc;
+
+	if (!is_array($ids))
+		$ids = array($ids);
+
+	if (empty($on))
+	{
+		// set the user(s) out of log_online
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}log_online
+			WHERE id_member IN ({array_int:members})',
+			array(
+				'members' => $ids,
+			)
+		);
+	}
+}
+
+/**
+ * Delete expired/outdated session from log_online
+ *
+ * @param string $session
+ */
+function deleteOnline($session)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_online
+		WHERE session = {string:session}',
+		array(
+			'session' => $session,
+		)
+	);
+}
