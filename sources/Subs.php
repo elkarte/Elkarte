@@ -479,9 +479,6 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 	$setString = '';
 	foreach ($data as $var => $val)
 	{
-		if ($val[0] === '=')
-			continue;
-
 		$type = 'string';
 		if (in_array($var, $knownInts))
 			$type = 'int';
@@ -495,6 +492,10 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 		{
 			$val = $var . ' ' . $val[0] . (isset($val[1]) ? ' ' . (int) substr($val, 1) : ' 1');
 			$type = 'raw';
+		}
+		elseif ($type == 'int' && $val[0] === '=')
+		{
+			continue;
 		}
 		elseif (substr($var, 0, 12) === 'concatcomma-')
 		{
