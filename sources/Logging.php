@@ -529,3 +529,29 @@ function logActions($logs)
 
 	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
 }
+
+/**
+ * Actualize login history, for the passed member and IPs.
+ * It will log it as entry for the current time.
+ *
+ * @param int $id_member
+ * @param string $ip
+ * @param string $ip2
+ */
+function logLoginHistory($id_member, $ip, $ip2)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('insert',
+		'{db_prefix}member_logins',
+		array(
+			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',
+		),
+		array(
+			$id_member, time(), $ip, $ip2
+		),
+		array(
+			'id_member', 'time'
+		)
+	);
+}
