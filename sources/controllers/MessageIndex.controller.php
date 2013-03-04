@@ -222,61 +222,8 @@ function action_messageindex()
 	// Nosey, nosey - who's viewing this topic?
 	if (!empty($settings['display_who_viewing']))
 	{
-		$context['view_members'] = array();
-		$context['view_members_list'] = array();
-		$context['view_num_hidden'] = 0;
-
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				lo.id_member, lo.log_time, mem.real_name, mem.member_name, mem.show_online,
-				mg.online_color, mg.id_group, mg.group_name
-			FROM {db_prefix}log_online AS lo
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lo.id_member)
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:reg_member_group} THEN mem.id_post_group ELSE mem.id_group END)
-			WHERE INSTR(lo.url, {string:in_url_string}) > 0 OR lo.session = {string:session}',
-			array(
-				'reg_member_group' => 0,
-				'in_url_string' => 's:5:"board";i:' . $board . ';',
-				'session' => $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id(),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if (empty($row['id_member']))
-				continue;
-
-			if (!empty($row['online_color']))
-				$link = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" style="color: ' . $row['online_color'] . ';">' . $row['real_name'] . '</a>';
-			else
-				$link = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-
-			$is_buddy = in_array($row['id_member'], $user_info['buddies']);
-			if ($is_buddy)
-				$link = '<strong>' . $link . '</strong>';
-
-			if (!empty($row['show_online']) || allowedTo('moderate_forum'))
-				$context['view_members_list'][$row['log_time'] . $row['member_name']] = empty($row['show_online']) ? '<em>' . $link . '</em>' : $link;
-			// @todo why are we filling this array of data that are just counted (twice) and discarded? ???
-			$context['view_members'][$row['log_time'] . $row['member_name']] = array(
-				'id' => $row['id_member'],
-				'username' => $row['member_name'],
-				'name' => $row['real_name'],
-				'group' => $row['id_group'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => $link,
-				'is_buddy' => $is_buddy,
-				'hidden' => empty($row['show_online']),
-			);
-
-			if (empty($row['show_online']))
-				$context['view_num_hidden']++;
-		}
-		$context['view_num_guests'] = $smcFunc['db_num_rows']($request) - count($context['view_members']);
-		$smcFunc['db_free_result']($request);
-
-		// Put them in "last clicked" order.
-		krsort($context['view_members_list']);
-		krsort($context['view_members']);
+		require_once(SUBSDIR . '/Who.subs.php');
+		formatViewers($board, 'board');
 	}
 
 	// Default sort methods.

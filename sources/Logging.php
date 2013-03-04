@@ -71,7 +71,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	// Grab the last all-of-ELKARTE-specific log_online deletion time.
+	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
