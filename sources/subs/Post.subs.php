@@ -561,7 +561,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'body' => $row['body'],
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
-			// @todo :why not $row['started_by']?
+			// $user_info['name'] and not $row['started_by'] because it is used for
+			// many different actions and the poster is not always the topic starter
 			'name' => $user_info['name'],
 			'exclude' => '',
 		);
