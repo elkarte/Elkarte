@@ -281,7 +281,7 @@ function updateMemberData($members, $data)
 		$query['condition'] = '1=1';
 	else
 	{
-		$members = is_array($members) ? $members : is_array($members);
+		$members = is_array($members) ? $members : array($members);
 		$query['condition'] = 'id_member IN ({array_int:members})';
 		$query['range'] = array('members' => $members);
 	}
@@ -392,7 +392,7 @@ function updateBoardData($boards, $data)
 			$query['range'] = array('redirect' => '');
 			break;
 		default:
-			$boards = is_array($boards) ? $boards : is_array($boards);
+			$boards = is_array($boards) ? $boards : array($boards);
 			$query['condition'] = 'id_board IN ({array_int:boards})';
 			$query['range'] = array('boards' => $boards);
 	}
@@ -423,7 +423,7 @@ function updateTopicData($topics, $data)
 			$query['condition'] = '1=1';
 			break;
 		default:
-			$topics = is_array($topics) ? $topics : is_array($topics);
+			$topics = is_array($topics) ? $topics : array($topics);
 			$query['condition'] = 'id_topic IN ({array_int:topics})';
 			$query['range'] = array('topics' => $topics);
 	}
@@ -454,7 +454,7 @@ function updateMessageData($messages, $data)
 			$query['condition'] = '1=1';
 			break;
 		default:
-			$messages = is_array($messages) ? $messages : is_array($messages);
+			$messages = is_array($messages) ? $messages : array($messages);
 			$query['condition'] = 'ig_msg IN ({array_int:messages})';
 			$query['range'] = array('messages' => $messages);
 	}
