@@ -897,15 +897,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 
 		// Fix the message with the topic.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}messages
-			SET id_topic = {int:id_topic}
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_topic' => $topicOptions['id'],
-				'id_msg' => $msgOptions['id'],
-			)
-		);
+		updateMessageData($msgOptions['id'], array('id_topic' => $topicOptions['id']));
 
 		// There's been a new topic AND a new post today.
 		trackStats(array('topics' => '+', 'posts' => '+'));
@@ -945,14 +937,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Creating is modifying...in a way.
 	// @todo Why not set id_msg_modified on the insert?
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET id_msg_modified = {int:id_msg}
-		WHERE id_msg = {int:id_msg}',
-		array(
-			'id_msg' => $msgOptions['id'],
-		)
-	);
+	updateMessageData($msgOptions['id'], array('id_msg_modified' => $msgOptions['id']));
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
@@ -1097,31 +1082,14 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (isset($msgOptions['smileys_enabled']))
 		$messages_columns['smileys_enabled'] = empty($msgOptions['smileys_enabled']) ? 0 : 1;
 
-	// Which columns need to be ints?
-	$messageInts = array('modified_time', 'id_msg_modified', 'smileys_enabled');
-	$update_parameters = array(
-		'id_msg' => $msgOptions['id'],
-	);
-
-	call_integration_hook('integrate_modify_post', array($messages_columns, $update_parameters, $msgOptions, $topicOptions, $posterOptions, $messageInts));
-
-	foreach ($messages_columns as $var => $val)
-	{
-		$messages_columns[$var] = $var . ' = {' . (in_array($var, $messageInts) ? 'int' : 'string') . ':var_' . $var . '}';
-		$update_parameters['var_' . $var] = $val;
-	}
+	call_integration_hook('integrate_modify_post', array($messages_columns, $msgOptions, $topicOptions, $posterOptions));
 
 	// Nothing to do?
 	if (empty($messages_columns))
 		return true;
 
 	// Change the post.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET ' . implode(', ', $messages_columns) . '
-		WHERE id_msg = {int:id_msg}',
-		$update_parameters
-	);
+	updateMessageData($msgOptions['id'], $messages_columns);
 
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
@@ -1305,15 +1273,7 @@ function approvePosts($msgs, $approve = true)
 		return;
 
 	// Now we have the differences make the changes, first the easy one.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET approved = {int:approved_state}
-		WHERE id_msg IN ({array_int:message_list})',
-		array(
-			'message_list' => $msgs,
-			'approved_state' => $approve ? 1 : 0,
-		)
-	);
+	updateMessageData($msgs, array('approved' => $approve ? 1 : 0));
 
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)

@@ -386,22 +386,12 @@ function removeMessage($message, $decreasePostCount = true)
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)
 		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET
-					id_topic = {int:id_topic},
-					id_board = {int:recycle_board},
-					icon = {string:recycled},
-					approved = {int:is_approved}
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_topic' => $topicID,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_msg' => $message,
-					'recycled' => 'recycled',
-					'is_approved' => 1,
-				)
-			);
+			updateMessageData($message, array(
+				'id_topic' => $topicID,
+				'id_board' => $modSettings['recycle_board'],
+				'icon' => 'recycled',
+				'approved' => 1,
+			));
 
 			// Take any reported posts with us...
 			$smcFunc['db_query']('', '

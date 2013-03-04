@@ -287,15 +287,7 @@ function action_restoretopic()
 
 		// Put the icons back.
 		if (!empty($messages))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET icon = {string:icon}
-				WHERE id_msg IN ({array_int:messages})',
-				array(
-					'icon' => 'xx',
-					'messages' => $messages,
-				)
-			);
+			updateMessageData($messages, array('icon' => 'xx'));
 	}
 
 	// Now any topics?
@@ -454,20 +446,11 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	}
 
 	// Time to move the messages.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET
-			id_topic = {int:target_topic},
-			id_board = {int:target_board},
-			icon = {string:icon}
-		WHERE id_msg IN({array_int:msgs})',
-		array(
-			'target_topic' => $target_topic,
-			'target_board' => $target_board,
-			'icon' => $target_board == $modSettings['recycle_board'] ? 'recycled' : 'xx',
-			'msgs' => $msgs,
-		)
-	);
+	updateMessageData($msgs, array(
+		'id_topic' => $target_topic,
+		'id_board' => $target_board,
+		'icon' => $target_board == $modSettings['recycle_board'] ? 'recycled' : 'xx',
+	));
 
 	// Fix the id_first_msg and id_last_msg for the target topic.
 	$target_topic_data = array(

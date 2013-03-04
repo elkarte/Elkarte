@@ -917,15 +917,7 @@ function AdminBoardRecount()
 			$smcFunc['db_free_result']($request);
 
 			foreach ($boards as $board_id => $messages)
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}messages
-					SET id_board = {int:id_board}
-					WHERE id_msg IN ({array_int:id_msg_array})',
-					array(
-						'id_msg_array' => $messages,
-						'id_board' => $board_id,
-					)
-				);
+				updateMessageData($messages, array('id_board' => $board_id));
 
 			$_REQUEST['start'] += $increment;
 

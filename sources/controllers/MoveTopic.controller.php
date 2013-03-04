@@ -255,15 +255,7 @@ function action_movetopic2()
 				);
 			}
 
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET subject = {string:custom_subject}
-				WHERE id_msg = {int:id_first_msg}',
-				array(
-					'id_first_msg' => $topic_info['id_first_msg'],
-					'custom_subject' => $custom_subject,
-				)
-			);
+			updateMessageData($topic_info['id_first_msg'], array('subject' => $custom_subject));
 
 			// Fix the subject cache.
 			updateStats('subject', $topic, $custom_subject);

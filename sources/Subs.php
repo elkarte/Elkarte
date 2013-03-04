@@ -441,6 +441,32 @@ function updateTopicData($topics, $data)
 	);
 }
 
+function updateMessageData($messages, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'topics'
+	);
+	switch ($messages)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		default:
+			$messages = is_array($messages) ? $messages : is_array($messages);
+			$query['condition'] = 'ig_msg IN ({array_int:messages})';
+			$query['range'] = array('messages' => $messages);
+	}
+
+	updateTable($query, $data,
+		array(
+		'id_topic', 'id_board', 'poster_time', 'id_member', 'id_msg_modified',
+		'smileys_enabled', 'modified_time', 'approved'
+		)
+	);
+}
+
 function updateTable($query, $data, $knownInts = array(), $knownFloats = array(), $knownDates = array(), $ensure_overflow = array())
 {
 	global $smcFunc;
@@ -500,7 +526,7 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 			$type = 'raw';
 		}
 
-		// Ensure posts, instant_messages, and unread_messages don't overflow or underflow.
+		// Ensure some fields don't overflow or underflow.
 		if (in_array($var, $ensure_overflow))
 		{
 			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))

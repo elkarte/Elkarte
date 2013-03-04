@@ -613,6 +613,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	));
 
 	// If the new topic isn't approved ensure the first message flags this just in case.
+	// @todo it is really necessary the "AND id_topic = {int:id_topic}"?
 	if (!$split2_approved)
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}messages

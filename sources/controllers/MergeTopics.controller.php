@@ -617,15 +617,7 @@ function action_mergeExecute($topics = array())
 	);
 
 	// Change the subject of the first message...
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET subject = {string:target_subject}
-		WHERE id_msg = {int:first_msg}',
-		array(
-			'first_msg' => $first_msg,
-			'target_subject' => $target_subject,
-		)
-	);
+	updateMessageData($first_msg, array('subject' => $target_subject));
 
 	// Adjust all calendar events to point to the new topic.
 	$smcFunc['db_query']('', '
