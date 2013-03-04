@@ -48,10 +48,17 @@ function viewers($id, $session, $type = 'topic')
 	return $viewers;
 }
 
+/**
+ * Format viewers list for display, for a topic or board.
+ *
+ * @param int $id id of the element (topic or board) we're watching
+ * @param string $type = 'topic, 'topic' or 'board'
+ */
 function formatViewers($id, $type)
 {
 	global $user_info, $context, $scripturl;
 
+	// Lets say there's no one around. (what? could happen!)
 	$context['view_members'] = array();
 	$context['view_members_list'] = array();
 	$context['view_num_hidden'] = 0;
@@ -61,12 +68,14 @@ function formatViewers($id, $type)
 
 	foreach ($viewers as $viewer)
 	{
+		// is this a guest?
 		if (empty($viewer['id_member']))
 		{
 			$context['view_num_guests']++;
 			continue;
 		}
 
+		// it's a member. We format them with links 'n stuff.
 		if (!empty($viewer['online_color']))
 			$link = '<a href="' . $scripturl . '?action=profile;u=' . $viewer['id_member'] . '" style="color: ' . $viewer['online_color'] . ';">' . $viewer['real_name'] . '</a>';
 		else
@@ -76,9 +85,11 @@ function formatViewers($id, $type)
 		if ($is_buddy)
 			$link = '<strong>' . $link . '</strong>';
 
+		// fill the summary list
 		if (!empty($viewer['show_online']) || allowedTo('moderate_forum'))
 			$context['view_members_list'][$viewer['log_time'] . $viewer['member_name']] = empty($viewer['show_online']) ? '<em>' . $link . '</em>' : $link;
-		// @todo why are we filling this array of data that are just counted (twice) and discarded? ???
+
+		// fill the detailed list
 		$context['view_members'][$viewer['log_time'] . $viewer['member_name']] = array(
 			'id' => $viewer['id_member'],
 			'username' => $viewer['member_name'],
@@ -90,11 +101,12 @@ function formatViewers($id, $type)
 			'hidden' => empty($viewer['show_online']),
 		);
 
+		// add the hidden members to the count (and don't show them in the template)
 		if (empty($viewer['show_online']))
 			$context['view_num_hidden']++;
 	}
 
-	// Put them in "last clicked" order.
+	// Sort them out.
 	krsort($context['view_members_list']);
 	krsort($context['view_members']);
 }

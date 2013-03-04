@@ -219,7 +219,7 @@ function action_messageindex()
 	);
 	$context['boards'] = getBoardIndex($boardIndexOptions);
 
-	// Nosey, nosey - who's viewing this topic?
+	// Nosey, nosey - who's viewing this board?
 	if (!empty($settings['display_who_viewing']))
 	{
 		require_once(SUBSDIR . '/Who.subs.php');
