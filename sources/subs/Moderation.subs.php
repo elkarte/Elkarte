@@ -23,9 +23,9 @@ if (!defined('ELKARTE'))
 /**
  * How many open reports do we have?
  *  - if flush is true will clear the moderator menu count
- *  - returns the number of open reports 
+ *  - returns the number of open reports
  *  - sets $context['open_mod_reports'] for template use
- * 
+ *
  * @param boolean $flush
  */
 function recountOpenReports($flush = true)
@@ -63,7 +63,7 @@ function recountOpenReports($flush = true)
  * 	- Sets $context['total_unapproved_topics']
  *  - Sets $context['total_unapproved_posts']
  *  - approve_query is set to list of boards they can see
- * 
+ *
  * @param string $approve_query
  * @return array of values
  */
@@ -90,7 +90,7 @@ function recountUnapprovedPosts($approve_query = null)
 	list ($unapproved_posts) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	// What about topics? 
+	// What about topics?
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(m.id_topic)
 		FROM {db_prefix}topics AS m
@@ -175,7 +175,7 @@ function loadModeratorMenuCounts($brd = null)
 			require_once(CONTROLLERDIR . '/PostModeration.controller.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
-		
+
 		// Reported posts
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
 			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
@@ -198,7 +198,7 @@ function loadModeratorMenuCounts($brd = null)
 
 /**
  * Log a warning notice.
- * 
+ *
  * @param string $subject
  * @param string $body
  */
@@ -224,7 +224,7 @@ function logWarningNotice($subject, $body)
 
 /**
  * Logs the warning being sent to the user so other moderators can see
- * 
+ *
  * @param int $memberID
  * @param string $real_name
  * @param int $id_notice
@@ -247,4 +247,295 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
 		),
 		array('id_comment')
 	);
+}
+
+/**
+ * Removes a custom moderation center warning template from log_comments
+ *  - Logs the template removal action for each warning affected
+ *  - Removes the warning details for all warnings that used the template being removed
+ */
+function removeWarningTemplate($id_tpl)
+{
+	global $smcFunc, $user_info;
+
+	// Log the actions.
+	$request = $smcFunc['db_query']('', '
+		SELECT recipient_name
+		FROM {db_prefix}log_comments
+		WHERE id_comment IN ({array_int:delete_ids})
+			AND comment_type = {string:warntpl}
+			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
+		array(
+			'delete_ids' => $id_tpl,
+			'warntpl' => 'warntpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		logAction('delete_warn_template', array('template' => $row['recipient_name']));
+	$smcFunc['db_free_result']($request);
+
+	// Do the deletes.
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_comments
+		WHERE id_comment IN ({array_int:delete_ids})
+			AND comment_type = {string:warntpl}
+			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
+		array(
+			'delete_ids' => $_POST['deltpl'],
+			'warntpl' => 'warntpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+}
+
+/**
+ * Callback for createList() to get all of the warning templates in the system
+ *
+ * @param $start
+ * @param $items_per_page
+ * @param $sort
+ */
+function list_getWarningTemplates($start, $items_per_page, $sort)
+{
+	global $smcFunc, $scripturl, $user_info;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
+			IFNULL(mem.real_name, lc.member_name) AS creator_name, recipient_name AS template_title,
+			lc.log_time, lc.body
+		FROM {db_prefix}log_comments AS lc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+		WHERE lc.comment_type = {string:warntpl}
+			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'warntpl' => 'warntpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+	$templates = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$templates[] = array(
+			'id_comment' => $row['id_comment'],
+			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
+			'time' => timeformat($row['log_time']),
+			'title' => $row['template_title'],
+			'body' => $smcFunc['htmlspecialchars']($row['body']),
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $templates;
+}
+
+/**
+  * Callback for createList() to get the number of warning templates in the system
+  */
+function list_getWarningTemplateCount()
+{
+	global $smcFunc, $user_info;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_comments
+		WHERE comment_type = {string:warntpl}
+			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})',
+		array(
+			'warntpl' => 'warntpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $totalWarns;
+}
+
+/**
+ * Callback for createList() to get all issued warnings in the system
+ *
+ * @param $start
+ * @param $items_per_page
+ * @param $sort
+ */
+function list_getWarnings($start, $items_per_page, $sort)
+{
+	global $smcFunc, $scripturl;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
+			IFNULL(mem2.id_member, 0) AS id_recipient, IFNULL(mem2.real_name, lc.recipient_name) AS recipient_name,
+			lc.log_time, lc.body, lc.id_notice, lc.counter
+		FROM {db_prefix}log_comments AS lc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = lc.id_recipient)
+		WHERE lc.comment_type = {string:warning}
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'warning' => 'warning',
+		)
+	);
+	$warnings = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$warnings[] = array(
+			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
+			'recipient_link' => $row['id_recipient'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_recipient'] . '">' . $row['recipient_name'] . '</a>') : $row['recipient_name'],
+			'time' => timeformat($row['log_time']),
+			'reason' => $row['body'],
+			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
+			'id_notice' => $row['id_notice'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $warnings;
+}
+
+/**
+ * Callback for createList(), get the total count of all current warnings
+ */
+function list_getWarningCount()
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_comments
+		WHERE comment_type = {string:warning}',
+		array(
+			'warning' => 'warning',
+		)
+	);
+	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $totalWarns;
+}
+
+/**
+ * Loads a moderation template in to context for use in editing a template
+ * 
+ * @param type $id_template
+ */
+function modLoadTemplate($id_template)
+{
+	global $smcFunc, $user_info, $context;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, id_recipient, recipient_name AS template_title, body
+		FROM {db_prefix}log_comments
+		WHERE id_comment = {int:id}
+			AND comment_type = {string:warntpl}
+			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
+		array(
+			'id' => $id_template,
+			'warntpl' => 'warntpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$context['template_data'] = array(
+			'title' => $row['template_title'],
+			'body' => $smcFunc['htmlspecialchars']($row['body']),
+			'personal' => $row['id_recipient'],
+			'can_edit_personal' => $row['id_member'] == $user_info['id'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+}
+
+/**
+ * Updates an existing template or adds in a new one to the log comments table
+ *
+ * @param int $recipient_id
+ * @param string $template_title
+ * @param string $template_body
+ * @param int $id_template
+ * @param bool $edit true to update, false to insert a new row
+ */
+function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true)
+{
+	global $smcFunc, $user_info;
+
+	if ($edit)
+	{
+		// Simple update...
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}log_comments
+			SET id_recipient = {int:personal}, recipient_name = {string:title}, body = {string:body}
+			WHERE id_comment = {int:id}
+				AND comment_type = {string:warntpl}
+				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})'.
+				($recipient_id ? ' AND id_member = {int:current_member}' : ''),
+			array(
+				'personal' => $recipient_id,
+				'title' => $template_title,
+				'body' => $template_body,
+				'id' => $id_template,
+				'warntpl' => 'warntpl',
+				'generic' => 0,
+				'current_member' => $user_info['id'],
+			)
+		);
+	}
+	// Or inserting a new row
+	else
+	{
+		$smcFunc['db_insert']('',
+			'{db_prefix}log_comments',
+			array(
+				'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int',
+				'recipient_name' => 'string-255', 'body' => 'string-65535', 'log_time' => 'int',
+			),
+			array(
+				$user_info['id'], $user_info['name'], 'warntpl', $recipient_id,
+				$template_title, $template_body, time(),
+			),
+			array('id_comment')
+		);
+	}
+}
+
+/**
+ * Get the report details, need this so we can limit access to a particular board
+ * 	 - returns false if they are requesting a report they can not see or does not exist
+ */
+function modReportDetails($id_report)
+{
+	global $smcFunc, $user_info;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
+			lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
+			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
+		FROM {db_prefix}log_reported AS lr
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
+		WHERE lr.id_report = {int:id_report}
+			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+		LIMIT 1',
+		array(
+			'id_report' => $id_report,
+		)
+	);
+
+	// So did we find anything?
+	if (!$smcFunc['db_num_rows']($request))
+		$row = false;
+	else
+		$row = $smcFunc['db_fetch_assoc']($request);
+
+	$smcFunc['db_free_result']($request);
+
+	return $row;
 }
