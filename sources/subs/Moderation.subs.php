@@ -297,8 +297,9 @@ function removeWarningTemplate($id_tpl)
  * @param $start
  * @param $items_per_page
  * @param $sort
+ * @param $template_type type of template to load
  */
-function list_getWarningTemplates($start, $items_per_page, $sort)
+function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
 	global $smcFunc, $scripturl, $user_info;
 
@@ -313,7 +314,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
-			'warntpl' => 'warntpl',
+			'warntpl' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -335,9 +336,13 @@ function list_getWarningTemplates($start, $items_per_page, $sort)
 }
 
 /**
-  * Callback for createList() to get the number of warning templates in the system
-  */
-function list_getWarningTemplateCount()
+ * Callback for createList() to get the number of warning templates in the system
+ *  - Loads the public and users private templates
+ *  - Loads warning templates by default
+ *
+ * @param type $template_type
+ */
+function list_getWarningTemplateCount($template_type = 'warntpl')
 {
 	global $smcFunc, $user_info;
 
@@ -347,7 +352,7 @@ function list_getWarningTemplateCount()
 		WHERE comment_type = {string:warntpl}
 			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})',
 		array(
-			'warntpl' => 'warntpl',
+			'warntpl' =>$template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -423,7 +428,7 @@ function list_getWarningCount()
 
 /**
  * Loads a moderation template in to context for use in editing a template
- * 
+ *
  * @param type $id_template
  */
 function modLoadTemplate($id_template)
