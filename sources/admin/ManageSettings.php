@@ -1382,15 +1382,7 @@ function ModifySignatureSettings($return_config = false)
 			if (!empty($changes))
 			{
 				foreach ($changes as $id => $sig)
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}members
-						SET signature = {string:signature}
-						WHERE id_member = {int:id_member}',
-						array(
-							'id_member' => $id,
-							'signature' => $sig,
-						)
-					);
+					updateMemberData($id, array('signature' => $sig));
 			}
 
 			$_GET['step'] += 50;

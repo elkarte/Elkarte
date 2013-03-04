@@ -1418,17 +1418,10 @@ function MaintainRecountPosts()
 
 	// Update the post count for this group
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET posts = {int:posts}
-			WHERE id_member = {int:row}',
-			array(
-				'row' => $row['id_member'],
-				'posts' => $row['posts'],
-			)
-		);
-	}
+		updateMemberData($row['id_member'], array(
+			'posts' => $row['posts'],
+		));
+
 	$smcFunc['db_free_result']($request);
 
 	// Continue?
@@ -1484,16 +1477,7 @@ function MaintainRecountPosts()
 
 		// set the post count to zero for any delinquents we may have found
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET posts = {int:zero}
-				WHERE id_member = {int:row}',
-				array(
-					'row' => $row['id_member'],
-					'zero' => 0,
-				)
-			);
+			updateMemberData($row['id_member'], array('posts' => 0));
 		}
 		$smcFunc['db_free_result']($request);
 	}
