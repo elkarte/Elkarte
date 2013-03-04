@@ -775,7 +775,7 @@ function ModifyModerationSettings($return_config = false)
 		checkSession();
 
 		// Make sure these don't have an effect.
-		if (substr($modSettings['warning_settings'], 0, 1) != 1)
+		if ($modSettings['warning_settings'][0] != 1)
 		{
 			$_POST['warning_watch'] = 0;
 			$_POST['warning_moderate'] = 0;
