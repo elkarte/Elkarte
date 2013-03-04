@@ -508,21 +508,11 @@ function DoLogin()
 	// Don't stick the language or theme after this point.
 	unset($_SESSION['language'], $_SESSION['id_theme']);
 
-	// First login?
-	$request = $smcFunc['db_query']('', '
-		SELECT last_login
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-			AND last_login = 0',
-		array(
-			'id_member' => $user_info['id'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 1)
+	// We want to know if this is first login
+	if (isFirstLogin($user_info['id']))
 		$_SESSION['first_login'] = true;
 	else
 		unset($_SESSION['first_login']);
-	$smcFunc['db_free_result']($request);
 
 	// You've logged in, haven't you?
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']));

@@ -725,3 +725,32 @@ function deleteOnline($session)
 		)
 	);
 }
+
+/**
+ * This functions determines whether this is the first login of the given user.
+ *
+ * @param int $id_member the id of the member to check for
+ */
+function isFirstLogin($id_member)
+{
+	global $smcFunc;
+
+	$isFirstLogin = false;
+
+	// First login?
+	$request = $smcFunc['db_query']('', '
+		SELECT last_login
+		FROM {db_prefix}members
+		WHERE id_member = {int:id_member}
+			AND last_login = 0',
+		array(
+			'id_member' => $id_member,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) == 1)
+		$isFirstLogin = true;
+
+	$smcFunc['db_free_result']($request);
+
+	return $isFirstLogin;
+}
