@@ -489,7 +489,7 @@ function AddMembergroup()
 			// Only do this if they have special access requirements.
 			if (!empty($changed_boards[$board_action]))
 				updateBoardData($changed_boards[$board_action], array(
-					$board_action == 'allow' ? 'member_groups' : 'deny_member_groups' => 'concat-' . $id_group
+					$board_action == 'allow' ? 'concatcomma-member_groups' : 'concatcomma-deny_member_groups' => $id_group
 				));
 		}
 

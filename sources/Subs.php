@@ -470,7 +470,7 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 			$val = $var . ' ' . $val[0] . (isset($val[1]) ? ' ' . (int) substr($val, 1) : ' 1');
 			$type = 'raw';
 		}
-		elseif (substr($val, 0, 7) === 'concat-')
+		elseif (substr($var, 0, 12) === 'concatcomma-')
 		{
 			switch ($type)
 			{
@@ -482,7 +482,15 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 					break;
 			}
 			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
+			$var = substr($var, 12);
 			$val = 'CASE WHEN ' . $var . ' = ' . $default . ' THEN ' . $quoted_val . ' ELSE CONCAT(' . $var . ', ' . $quoted_val . ') END';
+			$type = 'raw';
+		}
+		elseif (substr($var, 0, 7) === 'concat-')
+		{
+			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
+			$var = substr($var, 7);
+			$val = 'CONCAT(' . $var . ', ' . $quoted_val . ')';
 			$type = 'raw';
 		}
 		elseif ($type == 'int' && substr($val, 0, 7) === 'toggle-')
