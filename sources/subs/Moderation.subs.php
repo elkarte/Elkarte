@@ -250,11 +250,11 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
 }
 
 /**
- * Removes a custom moderation center warning template from log_comments
+ * Removes a custom moderation center template from log_comments
  *  - Logs the template removal action for each warning affected
- *  - Removes the warning details for all warnings that used the template being removed
+ *  - Removes the details for all warnings that used the template being removed
  */
-function removeWarningTemplate($id_tpl)
+function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
 	global $smcFunc, $user_info;
 
@@ -267,7 +267,7 @@ function removeWarningTemplate($id_tpl)
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
 			'delete_ids' => $id_tpl,
-			'warntpl' => 'warntpl',
+			'warntpl' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -283,8 +283,8 @@ function removeWarningTemplate($id_tpl)
 			AND comment_type = {string:warntpl}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
-			'delete_ids' => $_POST['deltpl'],
-			'warntpl' => 'warntpl',
+			'delete_ids' => $id_tpl,
+			'warntpl' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -292,7 +292,7 @@ function removeWarningTemplate($id_tpl)
 }
 
 /**
- * Callback for createList() to get all of the warning templates in the system
+ * Callback for createList() to get all the templates of a type from the system
  *
  * @param $start
  * @param $items_per_page
@@ -336,7 +336,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 }
 
 /**
- * Callback for createList() to get the number of warning templates in the system
+ * Callback for createList() to get the number of templates of a type in the system
  *  - Loads the public and users private templates
  *  - Loads warning templates by default
  *
@@ -352,7 +352,7 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 		WHERE comment_type = {string:warntpl}
 			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})',
 		array(
-			'warntpl' =>$template_type,
+			'warntpl' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
