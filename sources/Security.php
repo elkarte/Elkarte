@@ -777,10 +777,10 @@ function validateToken($action, $type = 'post', $reset = true)
 {
 	global $modSettings;
 
-	$type = $type == 'get' || $type == 'request' ? $type : 'post';
+	$type = ($type == 'get' || $type == 'request') ? $type : 'post';
 
-	// Logins are special: the token is used to has the password with javascript before POST it
-	if ($action == 'login')
+	// Logins and profiles are special: the token is used to hash the password with javascript before POST it
+	if ($action == 'login' ||  substr($action, 0, 7) == 'profile')
 	{
 		if (isset($_SESSION['token'][$type . '-' . $action]))
 		{
