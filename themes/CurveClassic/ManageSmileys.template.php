@@ -486,24 +486,9 @@ function template_editicon()
 							<input type="text" name="icon_description" id="icon_description" value="', !empty($context['icon']['title']) ? $context['icon']['title'] : '', '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
+							<strong><label for="icon_board">', $txt['icons_board'], '</label>: </strong>
 						</dt>
-						<dd>
-							<select name="icon_board" id="icon_board_select">
-								<option value="0"', empty($context['icon']['board_id']) ? ' selected="selected"' : '', '>', $txt['icons_edit_icons_all_boards'], '</option>';
-
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-								<optgroup label="', $category['name'], '">';
-		foreach ($category['boards'] as $board)
-			echo '
-									<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt;' : '', ' ', $board['name'], '</option>';
-		echo '
-								</optgroup>';
-	}
-	echo '
-							</select>
+						<dd>', template_select_boards('icon_board'), '
 						</dd>
 						<dt>
 							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>
