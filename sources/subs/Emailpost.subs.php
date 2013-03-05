@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * All the vital functions for email posting
+ * All the vital helper functions for use in email posting, formatting and conversion
  */
 
 if (!defined('ELKARTE'))
@@ -120,7 +120,7 @@ function pbe_email_to_bbc($text, $html)
 		if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
 			$text = $text_save;
 	}
-	// Starting with plain text, possibly even markup style ;)
+	// Starting with plain text, possibly even markdown style ;)
 	else
 	{
 		// Run the parser to try and remove common mail clients "reply to" stuff
@@ -131,11 +131,11 @@ function pbe_email_to_bbc($text, $html)
 		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
 			$text = $text_save;
 
-		// Convert this (markup) text to html
-		require_once(EXTDIR . '/markdown/markdown.php');
-
 		// Fix textual quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
+
+		// Convert this (markup) text to html
+		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
@@ -249,14 +249,14 @@ function pbe_fix_email_quotes($body, $html)
 		// Get the quote "depth" level for this line
 		$level = pbe_email_quote_depth($body_array[$i]);
 
-		// no quote marker on this line but we we are in a quote
+		// No quote marker on this line but we we are in a quote
 		if ($level === 0 && $current_quote > 0)
 		{
 			// Make sure we don't have an email wrap issue
 			$level_prev = pbe_email_quote_depth($original[$i - 1], false);
 			$level_next = pbe_email_quote_depth($original[$i + 1], false);
 
-			// a line between two = quote or descending quote levels,
+			// A line between two = quote or descending quote levels,
 			// probably an email break so join (wrap) it back up and continue
 			if ((!empty($level_prev)) && ($level_prev >= $level_next))
 			{
@@ -330,7 +330,7 @@ function pbe_fix_email_quotes($body, $html)
  */
 function pbe_email_quote_depth(&$string, $update = true)
 {
-	// get the quote "depth" level for this line
+	// Get the quote "depth" level for this line
 	$level = 0;
 	$check = true;
 	$string_save = $string;
@@ -942,7 +942,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	censorText($signature);
 	$subject = un_htmlspecialchars($subject);
 
-	// convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
+	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
 	$message = preg_replace('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~seU', "'<blockquote>{$txt['email_on']}: ' . date('D M j, Y','\\4') . ' \\2 {$txt['email_wrote']}:'", $message);
 	$message = preg_replace('~(\[quote\s?\])~sU', "'<blockquote>'", $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
@@ -1086,7 +1086,7 @@ function query_load_user_info($email)
 		// Load the user's general permissions....
 		query_load_permissions('general', $pbe);
 
-		// set the moderation warning level
+		// Set the moderation warning level
 		$pbe['user_info']['warning'] = isset($pbe['profile']['warning']) ? $pbe['profile']['warning'] : 0;
 
 		// Work out our query_see_board string for security
@@ -1296,7 +1296,7 @@ function query_load_subject($message_id, $message_type, $email)
 			)
 		);
 
-		// found them, now we find the PM to them with this ID
+		// Found them, now we find the PM to them with this ID
 		if ($smcFunc['db_num_rows']($request) !== 0)
 		{
 			list($id_member) = $smcFunc['db_fetch_row']($request);
@@ -1399,7 +1399,7 @@ function query_load_message($message_type, $message_id, $pbe)
 		$topic_info = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 
-	// return the results or false
+	// Return the results or false
 	return !empty($topic_info) ? $topic_info : false;
 }
 
@@ -1493,7 +1493,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 		)
 	);
 
-	// put everything about this member/theme into a theme setting array
+	// Put everything about this member/theme into a theme setting array
 	$theme_settings = array();
 	while ($row = $smcFunc['db_fetch_assoc']($result))
 		$theme_settings[$row['variable']] = $row['value'];

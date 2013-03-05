@@ -5,6 +5,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
+ * @version 1.0 Alpha
+ *
+ * All of the helper functions for use by the maillist controller
  */
 
 if (!defined('ELKARTE'))
@@ -169,7 +172,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 {
 	global $smcFunc;
 
-	// init
+	// Init
 	$i = 0;
 	if (empty($sort))
 		$sort = 'id_filter ASC';
@@ -300,7 +303,7 @@ function maillist_delete_filter_parser($id)
 
 /**
  * Creates a select list of boards for the admin
- *  - sets the first one as a blank for use in a template select element
+ *  - Sets the first one as a blank for use in a template select element
  *
  * @global type $smcFunc
  * @return type
@@ -329,10 +332,10 @@ function maillist_board_list()
 
 /**
  * Similar in construction to saveDBSettings,
- * - saves the config_vars to a specified table
- * - var names are considered the col names,
- * - values are cast per config vars
- * - if editing a row, the primary col index and existing index value must be
+ * - Saves the config_vars to a specified table
+ * - Var names are considered the col names,
+ * - Values are cast per config vars
+ * - If editing a row, the primary col index and existing index value must be
  *   supplied, otherwise a new row will be added
  *
  * @param array $config_vars

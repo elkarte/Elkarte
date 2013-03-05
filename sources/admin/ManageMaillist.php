@@ -5,11 +5,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * functions for showing, repairing, deleting and bouncing failed emails
- * functions for adding / editing / removing filters
- * functions for adding / editing / removing parsers
- * functions for saving the general settings for the function
+ * @version   1.0 Alpha
  *
+ * This file contains maillist functions that are specifically done by administrators
+ * and those with approve email permission
+ *
+ * Functions for showing, repairing, deleting and bouncing failed emails
+ * Functions for adding / editing / removing filters
+ * Functions for adding / editing / removing parsers
+ * Functions for saving the general settings for the function
  */
 
 if (!defined('ELKARTE'))
@@ -49,7 +53,7 @@ function action_managemaillist()
 	// Now you have chosen, so shall we check
 	isAllowedTo($subActions[$_REQUEST['sa']][1]);
 
-	// Template
+	// Template & language
 	loadTemplate('Maillist');
 	loadLanguage('Maillist');
 
@@ -69,7 +73,6 @@ function action_managemaillist()
  *  - shows the sender, key and subject of the email
  *  - Will show the found key if it was missing or possible sender if it was wrong
  *  - icons to view, bounce, delete or approve a failure
- *
  */
 function action_unapproved_email()
 {
@@ -258,7 +261,6 @@ function action_unapproved_email()
 /**
  * Show a failed email for review by the moderation team
  *  - Will not show a PM if it has been identified as such
- *
  */
 function action_view_email()
 {
@@ -314,7 +316,7 @@ function action_view_email()
 
 /**
  * Deletes an entry from the database
- * Flushes the menu num cache to the menu numbers update
+ *  - Flushes the moderator menu todo numbers so the menu numbers update
  */
 function action_delete_email()
 {
@@ -342,7 +344,6 @@ function action_delete_email()
  *  - Reviews the data to see if the email error function fixed typical issues like key and wrong id
  *  - Submits the fixed email to the main function which will post it or fail it again
  *  - If successful will remove the entry from the failed log
- *
  */
 function action_approve_email()
 {
@@ -357,7 +358,7 @@ function action_approve_email()
 
 	if (!empty($id) && $id !== -1)
 	{
-		// load up the email data
+		// Load up the email data
 		require_once(SUBSDIR . '/Maillist.subs.php');
 		$temp_email = list_maillist_unapproved('', '', '', $id);
 		if (!empty($temp_email))
@@ -388,7 +389,7 @@ function action_approve_email()
 				{
 					maillist_delete_entry($id);
 
-					// flush the cache
+					// Flush the menu count cache
 					cache_put_data('num_menu_errors', null, 900);
 
 					$_SESSION['email_error'] = $txt['approved'];
@@ -411,13 +412,13 @@ function action_approve_email()
 }
 
 /**
- * Allows the admin to choose from predefined templates and send a bounce notice
- * to the sender with the error that was generated.
- *
+ * Allows the admin to choose from predefined and custom templates
+ *   - Uses the selected template to send a bounce notification with
+ *     details as specified by the template
  */
 function action_bounce_email()
 {
-	global $context, $txt;
+	global $context, $txt, $modSettings, $scripturl, $mbname;
 
 	if (!isset($_REQUEST['bounce']))
 	{
@@ -518,11 +519,10 @@ function action_bounce_email()
 
 /**
  * List all the filters in the system
- * - allows to add/edit or delete filters
- * - filters are used to alter text in a post, to remove crud that comes with emails
- * - filters can be defined as regex, the system will check it for valid syntax
- * - uses list_get_filter_parser for the data and list_count_filter_parser for the number
- *
+ * - Allows to add/edit or delete filters
+ * - Filters are used to alter text in a post, to remove crud that comes with emails
+ * - Filters can be defined as regex, the system will check it for valid syntax
+ * - Uses list_get_filter_parser for the data and list_count_filter_parser for the number
  */
 function action_list_filters()
 {
@@ -650,8 +650,7 @@ function action_list_filters()
 
 /**
  * Edit or Add a filter
- *  - if regex will check for proper syntax before saving to the database
- *
+ *  - If regex will check for proper syntax before saving to the database
  */
 function action_edit_filters()
 {
@@ -769,7 +768,6 @@ function action_edit_filters()
 
 /**
  * Deletes a filter from the system / database
- *
  */
 function action_delete_filters()
 {
@@ -786,11 +784,10 @@ function action_delete_filters()
 
 /**
  * Show a list of all the parsers in the system
- * - allows to add/edit or delete parsers
- * - parsers are used to split a message at a line of text
- * - parsers can only be defined as regex, the system will check it for valid syntax
- * - uses list_get_filter_parser for the data and list_count_filter_parser for the number
- *
+ * - Allows to add/edit or delete parsers
+ * - Parsers are used to split a message at a line of text
+ * - Parsers can only be defined as regex, the system will check it for valid syntax
+ * - Uses list_get_filter_parser for the data and list_count_filter_parser for the number
  */
 function action_list_parsers()
 {
@@ -907,14 +904,13 @@ function action_list_parsers()
 
 /**
  * Adds or Edits an existing parser
- *  - all parsers are assumed regex
- *
+ *  - All parsers are assumed regex
  */
 function action_edit_parsers()
 {
 	global $context, $scripturl, $txt, $modSettings;
 
-	// editing an existing filter?
+	// Editing an existing filter?
 	if (isset($_REQUEST['f_id']))
 	{
 		// Needs to be an int!
@@ -971,7 +967,7 @@ function action_edit_parsers()
 			$valid = (preg_replace($_POST['filter_from'], '', '12@$%^*(09#98&76') === null) ? false : true;
 			if (!$valid)
 			{
-				// regex did not compute
+				// Regex did not compute will robinson
 				$context['settings_message'] =  $txt['regex_invalid'];
 				$context['error_type'] = 'notice';
 
@@ -1017,7 +1013,6 @@ function action_edit_parsers()
 
 /**
  * Removes a parser from the system and database
- *
  */
 function action_delete_parsers()
 {
@@ -1146,7 +1141,7 @@ function action_settings($return_config = false)
 			// Get the board ids for a quick check
 			$boards = maillist_board_list();
 
-			// check the receiving emails and the board id as well
+			// Check the receiving emails and the board id as well
 			$maillist_receiving_address = array();
 			$boardtocheck = !empty($_POST['boardto']) ? $_POST['boardto'] : array();
 			$addresstocheck = !empty($_POST['emailfrom']) ? $_POST['emailfrom'] : array();

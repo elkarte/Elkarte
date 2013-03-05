@@ -7,6 +7,7 @@
  *
  * @version 1.0 Alpha
  *
+ * All the functions that validate and then save an email as a post or pm
  */
 
 if (!defined('ELKARTE'))
@@ -503,9 +504,9 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 /**
  * Used to preview a failed email from the ACP
- *  - called from ManageMaillist, which checks topic/message permission for viewing
- *  - calls pbe_load_text to prepare text for the preview
- *  - returns an array of values for use in the template
+ *  - Called from ManageMaillist, which checks topic/message permission for viewing
+ *  - Calls pbe_load_text to prepare text for the preview
+ *  - Returns an array of values for use in the template
  *
  * @param type $data
  * @return boolean
@@ -577,7 +578,7 @@ function pbe_load_text($html, $email_message, $pbe)
 
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >=2)
 	{
-		// Some mobile responses wrap everything in a table structure
+		// Some mobile responses wrap everything in a table structure so use plain text
 		$text = $email_message->body_plain;
 		$html = false;
 	}
