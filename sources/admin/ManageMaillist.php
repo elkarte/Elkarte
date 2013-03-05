@@ -27,7 +27,7 @@ function action_managemaillist()
 	isAllowedTo(array('approve_emails'));
 
 	// All the functions available
-	$subactions = array(
+	$subActions = array(
 		'emaillist' => array('action_unapproved_email', 'approve_emails'),
 		'approve' => array('action_approve_email', 'approve_emails'),
 		'delete' =>  array('action_delete_email', 'approve_emails'),
@@ -44,10 +44,10 @@ function action_managemaillist()
 	);
 
 	// Default to sub action 'emaillist' as a default
-	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subactions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'emaillist';
+	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1]))? $_REQUEST['sa'] : 'emaillist';
 
 	// Now you have chosen, so shall we check
-	isAllowedTo($subactions[$_REQUEST['sa']][1]);
+	isAllowedTo($subActions[$_REQUEST['sa']][1]);
 
 	// Template
 	loadTemplate('Maillist');
@@ -61,7 +61,7 @@ function action_managemaillist()
 	);
 
 	// Go Play!
-	$subactions[$_REQUEST['sa']][0]();
+	$subActions[$_REQUEST['sa']][0]();
 }
 
 /**
