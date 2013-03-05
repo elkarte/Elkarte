@@ -469,7 +469,7 @@ function modLoadTemplate($id_template)
  * @param int $id_template
  * @param bool $edit true to update, false to insert a new row
  */
-function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true)
+function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
 	global $smcFunc, $user_info;
 
@@ -480,7 +480,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 			UPDATE {db_prefix}log_comments
 			SET id_recipient = {int:personal}, recipient_name = {string:title}, body = {string:body}
 			WHERE id_comment = {int:id}
-				AND comment_type = {string:warntpl}
+				AND comment_type = {string:comment_type}
 				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})'.
 				($recipient_id ? ' AND id_member = {int:current_member}' : ''),
 			array(
@@ -488,7 +488,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 				'title' => $template_title,
 				'body' => $template_body,
 				'id' => $id_template,
-				'warntpl' => 'warntpl',
+				'comment_type' => $type,
 				'generic' => 0,
 				'current_member' => $user_info['id'],
 			)
@@ -504,7 +504,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 				'recipient_name' => 'string-255', 'body' => 'string-65535', 'log_time' => 'int',
 			),
 			array(
-				$user_info['id'], $user_info['name'], 'warntpl', $recipient_id,
+				$user_info['id'], $user_info['name'], $type, $recipient_id,
 				$template_title, $template_body, time(),
 			),
 			array('id_comment')
