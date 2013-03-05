@@ -323,11 +323,11 @@ function action_splitSelectTopics()
 	$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
 	// Retrieve the unselected messages.
-	$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic], !$modSettings['postmod_active'] || allowedTo('approve_posts'));
+	$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : array('excluded' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 	// Now retrieve the selected messages.
 	if (!empty($_SESSION['split_selection'][$topic]))
-		$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], $_SESSION['split_selection'][$topic], !$modSettings['postmod_active'] || allowedTo('approve_posts'));
+		$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 	// The XMLhttp method only needs the stuff that changed, so let's compare.
 	if (isset($_REQUEST['xml']))
