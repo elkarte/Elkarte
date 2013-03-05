@@ -1091,7 +1091,7 @@ function allBoards($all = false, $include = array())
 			$return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] = $row['is_ignored'];
 
 		// If a board wasn't checked that probably should have been ensure the board selection is selected, yo!
-		if (!$return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
+		if (!empty($return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
 			$return['boards_check_all'] = false;
 	}
 	$smcFunc['db_free_result']($request);
