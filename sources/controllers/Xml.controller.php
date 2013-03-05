@@ -27,28 +27,26 @@ function action_xmlhttp()
 {
 	loadTemplate('Xml');
 
-	$sub_actions = array(
-		'jumpto' => array(
-			'function' => 'action_jumpto',
-		),
-		'messageicons' => array(
-			'function' => 'action_messageicons',
-		),
-		'corefeatures' => array(
-			'function' => 'action_corefeatures',
-		),
-		'previews' => array(
-			'function' => 'action_previews',
-		),
+	$subActions = array(
+		'jumpto' => array('action_jumpto'),
+		'messageicons' => array('action_messageicons'),
+		'corefeatures' => array('action_corefeatures', 'admin_forum'),
+		'previews' => array('action_previews'),
 	);
 
-	// Easy adding of sub actions
- 	call_integration_hook('integrate_xmlhttp', array($sub_actions));
+	// Easy adding of xml sub actions
+	call_integration_hook('integrate_xmlhttp', array($subActions));
 
-	if (!isset($_REQUEST['sa'], $sub_actions[$_REQUEST['sa']]))
+	// Valid action?
+	if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))
 		fatal_lang_error('no_access', false);
 
-	$sub_actions[$_REQUEST['sa']]['function']();
+	// Permissions check in the subAction?
+	if (isset($subActions[$_REQUEST['sa']][1]))
+		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+
+	// Off we go then
+	$subActions[$_REQUEST['sa']][0]();
 }
 
 /**
@@ -56,9 +54,9 @@ function action_xmlhttp()
  */
 function action_jumpto()
 {
-	global $user_info, $context, $smcFunc;
+	global $context;
 
-	// Find the boards/cateogories they can see.
+	// Find the boards/categories they can see.
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	$boardListOptions = array(
 		'use_permissions' => true,
@@ -77,6 +75,9 @@ function action_jumpto()
 	$context['sub_template'] = 'jump_to';
 }
 
+/**
+ * Get the message icons available for a given board
+ */
 function action_messageicons()
 {
 	global $context, $board;
@@ -87,11 +88,15 @@ function action_messageicons()
 	$context['sub_template'] = 'message_icons';
 }
 
+/**
+ * Turns on or off a core forum feature via ajax
+ */
 function action_corefeatures()
 {
-	global $context, $smcFunc, $modSettings, $txt, $settings;
+	global $context, $modSettings, $txt, $settings;
 
 	$context['xml_data'] = array();
+
 	// Just in case, maybe we don't need it
 	loadLanguage('Errors');
 
@@ -110,115 +115,113 @@ function action_corefeatures()
 	$errors = array();
 	$returns = array();
 	$tokens = array();
-	if (allowedTo('admin_forum'))
+
+	// You have to be allowed to do this of course
+	$validation = validateSession();
+	if (empty($validation))
 	{
-		$validation = validateSession();
-		if (empty($validation))
+		require_once(ADMINDIR . '/ManageSettings.php');
+		$result = ModifyCoreFeatures();
+
+		// Load up the core features of the system
+		if (empty($result))
 		{
-			require_once(ADMINDIR . '/ManageSettings.php');
-			$result = ModifyCoreFeatures();
+			$id = isset($_POST['feature_id']) ? $_POST['feature_id'] : '';
 
-			if (empty($result))
+			// The feature being enabled does exist, no messing about
+			if (!empty($id) && isset($context['features'][$id]))
 			{
-				$id = isset($_POST['feature_id']) ? $_POST['feature_id'] : '';
+				$feature = $context['features'][$id];
+				$returns[] = array(
+					'value' => (!empty($_POST['feature_' . $id]) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+				);
 
-				if (!empty($id) && isset($context['features'][$id]))
-				{
-					$feature = $context['features'][$id];
-
-					$returns[] = array(
-						'value' => (!empty($_POST['feature_' . $id]) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
-					);
-
-					createToken('admin-core', 'post');
-					$tokens = array(
-						array(
-							'value' => $context['admin-core_token'],
-							'attributes' => array('type' => 'token_var'),
-						),
-						array(
-							'value' => $context['admin-core_token_var'],
-							'attributes' => array('type' => 'token'),
-						),
-					);
-				}
-				else
-				{
-					$errors[] = array(
-						'value' => $txt['feature_no_exists'],
-					);
-				}
-			}
-			else
-			{
-				$errors[] = array(
-					'value' => $txt[$result],
+				createToken('admin-core', 'post');
+				$tokens = array(
+					array(
+						'value' => $context['admin-core_token'],
+						'attributes' => array('type' => 'token_var'),
+					),
+					array(
+						'value' => $context['admin-core_token_var'],
+						'attributes' => array('type' => 'token'),
+					),
 				);
 			}
+			else
+				$errors[] = array('value' => $txt['feature_no_exists']);
 		}
+		// Some problem loading in the core feature set
 		else
-		{
-			$errors[] = array(
-				'value' => $txt[$validation],
-			);
-		}
+			$errors[] = array('value' => $txt[$result]);
 	}
+	// Failed session validation I'm afraid
 	else
-	{
-		$errors[] = array(
-			'value' => $txt['cannot_admin_forum']
-		);
-	}
+		$errors[] = array('value' => $txt[$validation]);
 
+
+	// Return the response to the calling program
 	$context['sub_template'] = 'generic_xml';
-	$context['xml_data'] = array (
-		'corefeatures' => array (
+	$context['xml_data'] = array(
+		'corefeatures' => array(
 			'identifier' => 'corefeature',
 			'children' => $returns,
 		),
-		'tokens' => array (
+		'tokens' => array(
 			'identifier' => 'token',
 			'children' => $tokens,
 		),
-		'errors' => array (
+		'errors' => array(
 			'identifier' => 'error',
 			'children' => $errors,
 		),
 	);
 }
 
+/**
+ * Returns a preview of an item for use in an ajax enabled template
+ *  - Calls the correct function for the action
+ */
 function action_previews()
 {
 	global $context;
 
-	$items = array(
-		'newspreview',
-		'newsletterpreview',
-		'sig_preview',
-		'warning_preview',
+	$subActions = array(
+		'newspreview' => array('action_newspreview'),
+		'newsletterpreview' => array('action_newsletterpreview'),
+		'sig_preview' => array('action_sig_preview'),
+		'warning_preview' => array('action_warning_preview'),
 	);
 
 	$context['sub_template'] = 'generic_xml';
 
-	if (!isset($_POST['item']) || !in_array($_POST['item'], $items))
+	// Valid action?
+	if (!isset($_REQUEST['item'], $subActions[$_REQUEST['item']]))
 		return false;
 
-	$_POST['item']();
+	// A preview it is then
+	$subActions[$_REQUEST['item']][0]();
 }
 
-function newspreview()
+/**
+ * Get a preview of the important forum news for review before use
+ *  - Calls parse bbc to render bbc tags for the preview
+ */
+function action_newspreview()
 {
 	global $context, $smcFunc;
 
+	// Needed for parse bbc
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$errors = array();
-	$news = !isset($_POST['news'])? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
+	$news = !isset($_POST['news']) ? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
 	if (empty($news))
 		$errors[] = array('value' => 'no_news');
 	else
 		preparsecode($news);
 
+	// Return the xml response to the template
 	$context['xml_data'] = array(
 		'news' => array(
 			'identifier' => 'parsedNews',
@@ -234,10 +237,16 @@ function newspreview()
 		),
 	);
 }
-function newsletterpreview()
-{
-	global $context, $smcFunc, $txt;
 
+/**
+ * Get a preview of a news letter before its sent on to the masses
+ *  - Uses prepareMailingForPreview to create the actual preview
+ */
+function action_newsletterpreview()
+{
+	global $context, $txt;
+
+	// needed to create the preview
 	require_once(SUBSDIR . '/Mail.subs.php');
 	loadLanguage('Errors');
 
@@ -245,6 +254,7 @@ function newsletterpreview()
 	$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
 	$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
 
+	// Let them know about any mistakes
 	if (empty($_POST['subject']))
 		$context['post_error']['messages'][] = $txt['error_no_subject'];
 	if (empty($_POST['message']))
@@ -255,7 +265,10 @@ function newsletterpreview()
 	$context['sub_template'] = 'pm';
 }
 
-function sig_preview()
+/**
+ * Let them see what their signature looks like before they use it like spam
+ */
+function action_sig_preview()
 {
 	global $context, $smcFunc, $txt, $user_info;
 
@@ -273,6 +286,7 @@ function sig_preview()
 	$errors = array();
 	if (!empty($user) && $can_change)
 	{
+		// Get the current signature
 		$request = $smcFunc['db_query']('', '
 			SELECT signature
 			FROM {db_prefix}members
@@ -284,18 +298,22 @@ function sig_preview()
 		);
 		list($current_signature) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
+
 		censorText($current_signature);
 		$current_signature = parse_bbc($current_signature, true, 'sig' . $user);
 
+		// And now what they want it to be
 		$preview_signature = !empty($_POST['signature']) ? $_POST['signature'] : '';
 		$validation = profileValidateSignature($preview_signature);
 
+		// An odd check for errors to be sure
 		if ($validation !== true && $validation !== false)
 			$errors[] = array('value' => $txt['profile_error_' . $validation], 'attributes' => array('type' => 'error'));
 
 		censorText($preview_signature);
 		$preview_signature = parse_bbc($preview_signature, true, 'sig' . $user);
 	}
+	// Sorry but you can't change the signature
 	elseif (!$can_change)
 	{
 		if ($is_owner)
@@ -306,36 +324,42 @@ function sig_preview()
 	else
 		$errors[] = array('value' => $txt['no_user_selected'], 'attributes' => array('type' => 'error'));
 
+	// Return the response for the template
 	$context['xml_data']['signatures'] = array(
-			'identifier' => 'signature',
-			'children' => array()
-		);
+		'identifier' => 'signature',
+		'children' => array()
+	);
+
 	if (isset($current_signature))
 		$context['xml_data']['signatures']['children'][] = array(
-					'value' => $current_signature,
-					'attributes' => array('type' => 'current'),
-				);
+			'value' => $current_signature,
+			'attributes' => array('type' => 'current'),
+		);
+
 	if (isset($preview_signature))
 		$context['xml_data']['signatures']['children'][] = array(
-					'value' => $preview_signature,
-					'attributes' => array('type' => 'preview'),
-				);
+			'value' => $preview_signature,
+			'attributes' => array('type' => 'preview'),
+		);
+
 	if (!empty($errors))
 		$context['xml_data']['errors'] = array(
 			'identifier' => 'error',
 			'children' => array_merge(
-				array(
 					array(
-						'value' => $txt['profile_errors_occurred'],
-						'attributes' => array('type' => 'errors_occurred'),
-					),
+				array(
+					'value' => $txt['profile_errors_occurred'],
+					'attributes' => array('type' => 'errors_occurred'),
 				),
-				$errors
+					), $errors
 			),
 		);
 }
 
-function warning_preview()
+/**
+ * Used to preview custom warning templates before they are saved to submitted to the user
+ */
+function action_warning_preview()
 {
 	global $context, $smcFunc, $txt, $user_info, $scripturl, $mbname;
 
@@ -343,9 +367,9 @@ function warning_preview()
 	loadLanguage('Errors');
 	loadLanguage('ModerationCenter');
 
-	$user = isset($_POST['user']) ? (int) $_POST['user'] : 0;
-
 	$context['post_error']['messages'] = array();
+
+	// If you can't issue the warning, what are you doing here?
 	if (allowedTo('issue_warning'))
 	{
 		$warning_body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
@@ -363,13 +387,13 @@ function warning_preview()
 				$context['post_error']['messages'][] = $txt['mc_warning_template_error_no_body'];
 			// Add in few replacements.
 			/**
-			* These are the defaults:
-			* - {MEMBER} - Member Name. => current user for review
-			* - {MESSAGE} - Link to Offending Post. (If Applicable) => not applicable here, so not replaced
-			* - {FORUMNAME} - Forum Name.
-			* - {SCRIPTURL} - Web address of forum.
-			* - {REGARDS} - Standard email sign-off.
-			*/
+			 * These are the defaults:
+			 * - {MEMBER} - Member Name. => current user for review
+			 * - {MESSAGE} - Link to Offending Post. (If Applicable) => not applicable here, so not replaced
+			 * - {FORUMNAME} - Forum Name.
+			 * - {SCRIPTURL} - Web address of forum.
+			 * - {REGARDS} - Standard email sign-off.
+			 */
 			$find = array(
 				'{MEMBER}',
 				'{FORUMNAME}',
@@ -385,6 +409,7 @@ function warning_preview()
 			$warning_body = str_replace($find, $replace, $warning_body);
 		}
 
+		// Deal with any BBC so it looks good for the preview
 		if (!empty($_POST['body']))
 		{
 			preparsecode($warning_body);
