@@ -12,8 +12,6 @@
 
 /**
  * Shows the details of a failed email for moderation review
- *
- * @return
  */
 function template_show_email()
 {
@@ -51,8 +49,6 @@ function template_show_email()
 
 /**
  * Used to select a bounce template and send a bounce message to a email sender
- *
- * @return
  */
 function template_bounce_email()
 {
@@ -96,7 +92,7 @@ function template_bounce_email()
 	<form action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/notify_sm.png" alt="" class="icon" />', $txt['show_notice'], '
+				<img src="', $settings['images_url'], '/icons/mail_hd.png" alt="" class="icon" />', $txt['show_notice'], '
 			</h3>
 		</div>';
 
@@ -165,6 +161,7 @@ function template_bounce_email()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="item" value="', $context['item'], '" />
 					<input type="submit" name="bounce" value="', $txt['bounce_issue'], '" class="button_submit" />
+					<input type="hidden" name="', $context['admin-ml_token_var'], '" value="', $context['admin-ml_token'], '" />
 				</div>
 			</div>
 		</div>
@@ -180,8 +177,6 @@ function template_bounce_email()
 
 /**
  * Shows email address to board selections.
- *
- * @return
  */
 function template_callback_maillist_receive_email_list()
 {
@@ -245,7 +240,7 @@ function template_callback_maillist_receive_email_list()
 		</dt>
 		<dd></dd>';
 
-	// build our board id and name arrays for use in the javascript
+	// Build our board id and name arrays for use in the javascript
 	$i = 0;
 	$script = '
 		var boardname = new Array();
