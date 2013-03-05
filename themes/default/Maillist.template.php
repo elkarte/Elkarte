@@ -319,3 +319,125 @@ function template_callback_maillist_receive_email_list()
 		document.getElementById(\'add_more_board_div\').style.display = \'\';
 	';
 }
+
+/**
+ * Add or edit a bounce template.
+ */
+function template_bounce_template()
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+	<div id="modcenter">
+		<form action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
+			<div class="cat_bar">
+				<h3 class="catbg">', $context['page_title'], '</h3>
+			</div>
+			<div class="information">
+				', $txt['ml_bounce_template_desc'], '
+			</div>
+			<div class="windowbg">
+				<div class="content">
+					<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
+						<dl>
+							<dt>
+								<strong id="error_serious">', $txt['error_while_submitting'] , '</strong>
+							</dt>
+							<dd class="error" id="error_list">
+								', empty($context['warning_errors']) ? '' : implode('<br />', $context['warning_errors']), '
+							</dd>
+						</dl>
+					</div>
+					<div id="box_preview"', !empty($context['template_preview']) ? '' : ' style="display:none"', '>
+						<dl class="settings">
+							<dt>
+								', $txt['preview'] , '
+							</dt>
+							<dd id="template_preview">
+								', !empty($context['template_preview']) ? $context['template_preview'] : '', '
+							</dd>
+						</dl>
+					</div>
+					<dl class="settings">
+						<dt>
+							<label for="template_title">', $txt['ml_bounce_template_title'], '</label>:<br />
+							<span class="smalltext">', $txt['ml_bounce_template_title_desc'], '</span>
+						</dt>
+						<dd>
+							<input type="text" id="template_title" name="template_title" value="', $context['template_data']['title'], '" size="60" class="input_text" />
+						</dd>
+						<dt>
+							<label>', $txt['subject'], '</label>:<br />
+						</dt>
+						<dd>
+							', $txt['ml_bounce_template_subject_default'], '
+						</dd>
+						<dt>
+							<label for="template_body">', $txt['ml_bounce_template_body'], '</label>:<br />
+							<span class="smalltext">', $txt['ml_bounce_template_body_desc'], '</span>
+						</dt>
+						<dd>
+							<textarea id="template_body" name="template_body" rows="10" cols="65">', $context['template_data']['body'], '</textarea>
+						</dd>
+					</dl>';
+
+	if ($context['template_data']['can_edit_personal'])
+		echo '
+					<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' class="input_check" />
+						<label for="make_personal">
+							', $txt['ml_bounce_template_personal'], '
+						</label>
+						<br />
+						<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>
+						<br />';
+
+	echo '
+					<hr class="hrcolor" />
+					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+				</div>
+			</div>
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['mod-mlt_token_var'], '" value="', $context['mod-mlt_token'], '" />
+		</form>
+	</div>
+
+	<script type="text/javascript"><!-- // --><![CDATA[
+		$(document).ready(function() {
+			$("#preview_button").click(function() {
+				return ajax_getTemplatePreview();
+			});
+		});
+
+		function ajax_getTemplatePreview ()
+		{
+			$.ajax({
+				type: "POST",
+				url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+				data: {item: "bounce_preview", title: $("#template_title").val(), body: $("#template_body").val()},
+				context: document.body,
+				success: function(request){
+					$("#box_preview").css({display:""});
+					$("#template_preview").html($(request).find(\'body\').text());
+					if ($(request).find("error").text() !== \'\')
+					{
+						$("#errors").css({display:""});
+						var errors_html = \'\';
+						var errors = $(request).find(\'error\').each(function() {
+							errors_html += $(this).text() + \'<br />\';
+						});
+
+						$(document).find("#error_list").html(errors_html);
+					}
+					else
+					{
+						$("#errors").css({display:"none"});
+						$("#error_list").html(\'\');
+					}
+				return false;
+				},
+			});
+			return false;
+		}
+	// ]]></script>';
+}

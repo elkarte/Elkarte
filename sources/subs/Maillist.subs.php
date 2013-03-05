@@ -437,3 +437,36 @@ function enable_maillist_imap_cron($switch)
 		)
 	);
 }
+
+/**
+ * Load in the custom (public an this users private) bounce email templates
+ */
+function maillist_templates()
+{
+	global $smcFunc, $user_info, $txt;
+
+	$notification_templates = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT recipient_name AS template_title, body
+		FROM {db_prefix}log_comments
+		WHERE comment_type = {string:tpltype}
+			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
+		array(
+			'tpltype' => 'bnctpl',
+			'generic' => 0,
+			'current_member' => $user_info['id'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$notification_templates[] = array(
+			'title' => $row['template_title'],
+			'body' => $row['body'],
+			'subject' => $txt['ml_bounce_template_subject_default'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $notification_templates;
+}

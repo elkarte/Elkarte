@@ -74,6 +74,7 @@ function AdminMain()
 						'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
 						'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
 						'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
+						'emailtemplates' => array($txt['mm_emailtemplates'], 'approve_emails'),
 						'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
 					),
 				),

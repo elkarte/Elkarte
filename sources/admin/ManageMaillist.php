@@ -32,6 +32,7 @@ function action_managemaillist()
 		'approve' => array('action_approve_email', 'approve_emails'),
 		'delete' =>  array('action_delete_email', 'approve_emails'),
 		'bounce' =>  array('action_bounce_email', 'approve_emails'),
+		'emailtemplates' => array('action_view_bounce_templates', 'approve_emails'),
 		'view' =>  array('action_view_email', 'approve_emails'),
 		'emailsettings' =>  array('action_settings', 'admin_forum'),
 		'emailfilters' =>  array('action_list_filters', 'admin_forum'),
@@ -424,9 +425,6 @@ function action_bounce_email()
 		validateToken('admin-ml', 'get');
 	}
 
-	// Bounce templates
-	$bounce = array('bounce', 'inform');
-
 	require_once(SUBSDIR . '/Mail.subs.php');
 	require_once(SUBSDIR . '/Maillist.subs.php');
 
@@ -437,7 +435,7 @@ function action_bounce_email()
 		$id = (int) $_REQUEST['item'];
 
 		// Load up the email details, no funny biz yall ;)
-		$temp_email = list_maillist_unapproved('', '', '', $id);
+		$temp_email = list_maillist_unapproved(null, null, null, $id);
 
 		if (!empty($temp_email))
 		{
@@ -446,20 +444,35 @@ function action_bounce_email()
 			$fullerrortext = $txt[$temp_email[0]['error_code']];
 			$shorterrortext = $temp_email[0]['error'];
 
-			// Additional replacements.
-			$replacements = array(
-				'SUBJECT' => $temp_email[0]['subject'],
-				'ERROR' => $fullerrortext,
-				'MEMBER' => $temp_email[0]['name'],
-			);
-
+			// Build the template selection area, first the standard ones
+			$bounce = array('bounce', 'inform');
 			foreach ($bounce as $k => $type)
 			{
-				$temp = loadEmailTemplate('bounce_' . $type, $replacements, $temp_email[0]['language']);
-				$context['bounce_templates'][$k]['body'] = $temp['body'];
-				$context['bounce_templates'][$k]['subject'] = $temp['subject'];
-				$context['bounce_templates'][$k]['title'] = $txt['bounce_' . $type . '_title'];
+				$context['bounce_templates'][$k]['body'] = $txt['ml_' . $type . '_body'];
+				$context['bounce_templates'][$k]['subject'] = $txt['ml_' . $type . '_subject'];
+				$context['bounce_templates'][$k]['title'] = $txt['ml_' . $type . '_title'];
 			}
+
+			// And now any custom ones available for this moderator
+			$context['bounce_templates'] += array_merge($context['bounce_templates'], maillist_templates());
+
+			// Replace all the variables in the templates
+			foreach ($context['bounce_templates'] as $k => $name)
+			{
+				$context['bounce_templates'][$k]['body'] = strtr($name['body'],
+					array(
+						'{MEMBER}' => un_htmlspecialchars($temp_email[0]['name']),
+						'{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname,
+						'{REGARDS}' => $txt['regards_team'],
+						'{SUBJECT}' => $temp_email[0]['subject'],
+						'{ERROR}' => $fullerrortext,
+						'{FORUMNAME}' => $mbname,
+						'{FORUMNAMESHORT}' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
+						'{EMAILREGARDS}' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
+						'{REGARDS}' => $txt['regards_team'],
+					));
+			}
+
 		}
 		else
 			$context['settings_message'] = $txt['badid'];
@@ -467,15 +480,16 @@ function action_bounce_email()
 	else
 		$context['settings_message'] = $txt['badid'];
 
-	// Check if they are sending the note
+	// Check if they are sending the notice
 	if (isset($_REQUEST['bounce']))
 	{
 		checkSession('post');
+		validateToken('admin-ml');
 
 		// They did check the box, how else could they have posted
 		if (isset($_POST['warn_notify']))
 		{
-			// lets make sure we have the items to send a nice bounce mail
+			// lets make sure we have the items to send it
 			$check_emails = explode('=>', $temp_email[0]['from']);
 			$to = trim($check_emails[0]);
 			$subject = trim($_POST['warn_sub']);
@@ -485,7 +499,7 @@ function action_bounce_email()
 				$context['settings_message'] = $txt['bad_bounce'];
 			else
 			{
-				// Time for someone to get a so sorry message!
+				// Time for someone to get a we're so sorry message!
 				sendmail($to, $subject, $body, null, null, false, 5);
 				redirectexit('action=admin;area=maillist;bounced');
 			}
@@ -493,6 +507,7 @@ function action_bounce_email()
 	}
 
 	// Prep and show the template
+	createToken('admin-ml');
 	$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
 	$context['body'] = parse_bbc($fullerrortext);
 	$context['item'] = isset($_POST['item']) ? $_POST['item'] : '';
@@ -1197,4 +1212,229 @@ function action_settings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
 	prepareDBSettingContext($config_vars);
 	$context['sub_template'] = 'show_settings';
+}
+
+/**
+ * View all the custom email bounce templates.
+ *  - Shows all the bounce templates in the system available to this user
+ *  - Provides for actions to add or delete them
+ */
+function action_view_bounce_templates()
+{
+	global $modSettings, $context, $txt, $scripturl;
+
+	require_once(SUBSDIR . '/Moderation.subs.php');
+
+	// Submitting a new one or editing an existing one then pass this request off
+	if (isset($_POST['add']) || isset( $_POST['save']) || isset($_REQUEST['tid']))
+		return action_modify_bounce_templates();
+	// Deleting and existing one
+	elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
+	{
+		checkSession('post');
+		validateToken('mod-mlt');
+		removeWarningTemplate($_POST['deltpl'], 'bnctpl');
+	}
+
+	// This is all the information required for showing the email templates.
+	$listOptions = array(
+		'id' => 'bounce_template_list',
+		'title' => $txt['ml_bounce_templates_title'],
+		'items_per_page' => $modSettings['defaultMaxMessages'],
+		'no_items_label' => $txt['ml_bounce_templates_none'],
+		'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates;' . $context['session_var'] . '=' . $context['session_id'],
+		'default_sort_col' => 'title',
+		'get_items' => array(
+			'function' => 'list_getWarningTemplates',
+			'params' => array('bnctpl'),
+		),
+		'get_count' => array(
+			'function' => 'list_getWarningTemplateCount',
+			'params' => array('bnctpl'),
+		),
+		'columns' => array(
+			'title' => array(
+				'header' => array(
+					'value' => $txt['ml_bounce_templates_name'],
+				),
+				'data' => array(
+					'sprintf' => array(
+						'format' => '<a href="' . $scripturl . '?action=admin;area=maillist;sa=emailtemplates;tid=%1$d">%2$s</a>',
+						'params' => array(
+							'id_comment' => false,
+							'title' => false,
+							'body' => false,
+						),
+					),
+				),
+				'sort' => array(
+					'default' => 'template_title',
+					'reverse' => 'template_title DESC',
+				),
+			),
+			'creator' => array(
+				'header' => array(
+					'value' => $txt['ml_bounce_templates_creator'],
+				),
+				'data' => array(
+					'db' => 'creator',
+				),
+				'sort' => array(
+					'default' => 'creator_name',
+					'reverse' => 'creator_name DESC',
+				),
+			),
+			'time' => array(
+				'header' => array(
+					'value' => $txt['ml_bounce_templates_time'],
+				),
+				'data' => array(
+					'db' => 'time',
+				),
+				'sort' => array(
+					'default' => 'lc.log_time DESC',
+					'reverse' => 'lc.log_time',
+				),
+			),
+			'delete' => array(
+				'header' => array(
+					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
+					'style' => 'width: 4%;',
+					'class' => 'centercol',
+				),
+				'data' => array(
+					'function' => create_function('$rowData', '
+						global $context, $txt, $scripturl;
+
+						return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
+					'),
+					'class' => 'centercol',
+				),
+			),
+		),
+		'form' => array(
+			'href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates',
+			'token' => 'mod-mlt',
+		),
+		'additional_rows' => array(
+			array(
+				'position' => 'below_table_data',
+				'value' => '
+					<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" class="button_submit" />
+					<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" class="button_submit" />',
+			),
+		),
+	);
+
+	// Create the template list.
+	$context['page_title'] = $txt['ml_bounce_templates_title'];
+	createToken('mod-mlt');
+
+	require_once(SUBSDIR . '/List.subs.php');
+	createList($listOptions);
+
+	// Show the list
+	$context['sub_template'] = 'show_list';
+	$context['default_list'] = 'bounce_template_list';
+}
+
+/**
+ * Edit a 'it bounced' template.
+ */
+function action_modify_bounce_templates()
+{
+	global $smcFunc, $context, $txt, $user_info;
+
+	require_once(SUBSDIR . '/Moderation.subs.php');
+
+	$context['id_template'] = isset($_REQUEST['tid']) ? (int) $_REQUEST['tid'] : 0;
+	$context['is_edit'] = (bool) $context['id_template'];
+
+	// Standard template things, you know the drill
+	$context['page_title'] = $context['is_edit'] ? $txt['ml_bounce_template_modify'] : $txt['ml_bounce_template_add'];
+	$context['sub_template'] = 'bounce_template';
+	$context[$context['admin_menu_name']]['current_subsection'] = 'templates';
+
+	// Defaults to show
+	$context['template_data'] = array(
+		'title' => '',
+		'body' => $txt['ml_bounce_template_body_default'],
+		'subject' => $txt['ml_bounce_template_subject_default'],
+		'personal' => false,
+		'can_edit_personal' => true,
+	);
+
+	// If it's an edit load it.
+	if ($context['is_edit'])
+		modLoadTemplate($context['id_template'], 'bnctpl');
+
+	// Wait, we are saving?
+	if (isset($_POST['save']))
+	{
+		checkSession('post');
+		validateToken('mod-mlt');
+
+		// To check the BBC is good...
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		// Bit of cleaning!
+		$template_body = trim($_POST['template_body']);
+		$template_title = trim($_POST['template_title']);
+
+		// Need something in both boxes.
+		if (!empty($template_body) && !empty($template_title))
+		{
+			// Safety first.
+			$_POST['template_title'] = $smcFunc['htmlspecialchars']($template_title);
+
+			// Clean up BBC.
+			preparsecode($template_body);
+
+			// But put line breaks back!
+			$template_body = strtr($template_body, array('<br />' => "\n"));
+
+			// Is this personal?
+			$recipient_id = !empty($_POST['make_personal']) ? $user_info['id'] : 0;
+
+			// Updating or adding ?
+			if ($context['is_edit'])
+			{
+				// Simple update...
+				modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], true, 'bnctpl');
+
+				// If it wasn't visible and now is they've effectively added it.
+				if ($context['template_data']['personal'] && !$recipient_id)
+					logAction('add_bounce_template', array('template' => $template_title));
+				// Conversely if they made it personal it's a delete.
+				elseif (!$context['template_data']['personal'] && $recipient_id)
+					logAction('delete_bounce_template', array('template' => $template_title));
+				// Otherwise just an edit.
+				else
+					logAction('modify_bounce_template', array('template' => $template_title));
+			}
+			else
+			{
+				modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], false, 'bnctpl');
+				logAction('add_bounce_template', array('template' => $template_title));
+			}
+
+			// Get out of town...
+			redirectexit('action=admin;area=maillist;sa=emailtemplates');
+		}
+		else
+		{
+			$context['warning_errors'] = array();
+			$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
+			$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['ml_bounce_template_body_default'];
+			$context['template_data']['personal'] = !empty($recipient_id);
+
+			if (empty($template_title))
+				$context['warning_errors'][] = $txt['ml_bounce_template_error_no_title'];
+
+			if (empty($template_body))
+				$context['warning_errors'][] = $txt['ml_bounce_template_error_no_body'];
+		}
+	}
+
+	createToken('mod-mlt');
 }

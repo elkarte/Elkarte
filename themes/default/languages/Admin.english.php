@@ -575,6 +575,7 @@ $txt['mail_center'] = 'Maillist Center';
 $txt['mm_emailerror'] = 'Failed Emails';
 $txt['mm_emailfilters'] = 'Filters';
 $txt['mm_emailparsers'] = 'Parsers';
+$txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
 $txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';

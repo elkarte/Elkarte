@@ -279,33 +279,3 @@ The message they sent you is:
     {REPLYLINK}
 
 {EMAILREGARDS}';
-
-/*
-	@additional_params: bounce_bounce_body
-	@description: A bounce notification email sent when an email can not be posted
-*/
-$txt['bounce_bounce_title'] = 'Bounce';
-$txt['bounce_bounce_subject'] = 'Your email could not be posted';
-$txt['bounce_bounce_body'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}
-
-I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.
-
-The error I received while trying was: {ERROR}
-
-This is a permanent error; I\'ve given up. Sorry it didn\'t work out.
-
-{EMAILREGARDS}';
-
-/*
-	@additional_params: bounce_inform_body
-	@description: A bounce notification sent when an email posting was delayed
-*/
-$txt['bounce_inform_title'] = 'Notify';
-$txt['bounce_inform_subject'] = 'There was a problem with your email';
-$txt['bounce_inform_body'] = '{MEMBER},
-
-The email that you sent to {FORUMNAMESHORT} generated an error which caused delays in its posting.  The error was: {ERROR}
-
-To prevent future delays in posting you should fix this error.
-
-{EMAILREGARDS}';

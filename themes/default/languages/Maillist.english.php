@@ -281,3 +281,38 @@ $txt['notifications_update'] = 'Unnotify';
 // Help
 $txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">Elkarte Wiki</a>';
 $txt['maillist_help_short'] = 'This feature allows users of your forum to reply to the sites email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
+
+// Email bounce templates
+$txt['ml_bounce_templates_title'] = 'Custom bounce email templates';
+$txt['ml_bounce_templates_none'] = 'No custom bounce templates have been created yet';
+
+$txt['ml_bounce_templates_time'] = 'Time Created';
+$txt['ml_bounce_templates_name'] = 'Template';
+$txt['ml_bounce_templates_creator'] = 'Created By';
+$txt['ml_bounce_template_add'] = 'Add Template';
+$txt['ml_bounce_template_modify'] = 'Edit Template';
+$txt['ml_bounce_template_delete'] = 'Delete Selected';
+$txt['ml_bounce_template_delete_confirm'] = 'Are you sure you want to delete the selected templates?';
+$txt['ml_bounce_subject'] = 'Notification Subject';
+$txt['ml_bounce_body'] = 'Notification Message';
+
+$txt['ml_bounce_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template.';
+$txt['ml_bounce_template_title'] = 'Template Title';
+$txt['ml_bounce_template_title_desc'] = 'A name for use in the template selection list';
+$txt['ml_bounce_template_body'] = 'Template Content';
+$txt['ml_bounce_template_body_desc'] = 'The content of the bounced message. Note that you can use the following shortcuts in this template.<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{FORUMNAME} - Forum Name.</li><li>{FORUMNAMESHORT} - Short name for the site.</li><li>{ERROR} - The error that the email generated</li><li>{SUBJECT} - The subject of the email that failed</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{EMAILREGARDS} - Maillist email sign-off.</li><li>{REGARDS} - Standard forum sign-off.</li></ul>';
+$txt['ml_bounce_template_personal'] = 'Personal Template';
+$txt['ml_bounce_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template. If not selected all moderators will be able to use this template.';
+$txt['ml_bounce_template_error_no_title'] = 'You must set a descriptive title.';
+$txt['ml_bounce_template_error_no_body'] = 'You must set a email template body.';
+
+$txt['ml_bounce'] = 'Email Templates';
+$txt['ml_bounce_description'] = 'From this section you can add and modify the email bounce templates used when rejecting a post by email.';
+$txt['ml_bounce_title'] = 'Bounce';
+$txt['ml_bounce_subject'] = 'Your email could not be posted';
+$txt['ml_bounce_body'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}' . "\n\n" . 'I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.' . "\n\n" . 'The error I received while trying was: {ERROR}' . "\n\n" . 'This is a permanent error; I\'ve given up. Sorry it didn\'t work out.' . "\n\n" . '{EMAILREGARDS}';
+$txt['ml_inform_title'] = 'Notify';
+$txt['ml_inform_subject'] = 'There was a problem with your email';
+$txt['ml_inform_body'] = '{MEMBER},' . "\n\n" . 'The email that you sent to {FORUMNAMESHORT} generated an error which caused delays in its posting.  The error was: {ERROR}' . "\n\n" . 'To prevent future delays in posting you should fix this error.' . "\n\n" . '{EMAILREGARDS}';
+$txt['ml_bounce_template_body_default'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}' . "\n\n" . 'I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.' . "\n\n" . 'The error I received while trying was: {ERROR}' . "\n\n" . 'This is a permanent error; I\'ve given up. Sorry it didn\'t work out.' . "\n\n" . '{EMAILREGARDS}';
+$txt['ml_bounce_template_subject_default'] = 'There was a error processing your email';
