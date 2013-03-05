@@ -263,11 +263,11 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 		SELECT recipient_name
 		FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
-			AND comment_type = {string:warntpl}
+			AND comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
 			'delete_ids' => $id_tpl,
-			'warntpl' => $template_type,
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -280,11 +280,11 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
-			AND comment_type = {string:warntpl}
+			AND comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
 			'delete_ids' => $id_tpl,
-			'warntpl' => $template_type,
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -309,12 +309,12 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 			lc.log_time, lc.body
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-		WHERE lc.comment_type = {string:warntpl}
+		WHERE lc.comment_type = {string:tpltype}
 			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
-			'warntpl' => $template_type,
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -349,10 +349,10 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
-		WHERE comment_type = {string:warntpl}
+		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})',
 		array(
-			'warntpl' => $template_type,
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
@@ -431,7 +431,7 @@ function list_getWarningCount()
  *
  * @param type $id_template
  */
-function modLoadTemplate($id_template)
+function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
 	global $smcFunc, $user_info, $context;
 
@@ -439,11 +439,11 @@ function modLoadTemplate($id_template)
 		SELECT id_member, id_recipient, recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE id_comment = {int:id}
-			AND comment_type = {string:warntpl}
+			AND comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
 			'id' => $id_template,
-			'warntpl' => 'warntpl',
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
