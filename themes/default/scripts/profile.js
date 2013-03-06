@@ -195,23 +195,25 @@ function showAvatar()
 	document.getElementById("avatar").style.height = "";
 }
 
-function previewExternalAvatar(src)
+function previewExternalAvatar(src, sid)
 {
-	if (!document.getElementById("avatar"))
+	sid = (typeof(sid) === 'undefined') ? "avatar" : sid;
+
+	if (!document.getElementById(sid))
 		return;
 
 	var tempImage = new Image();
 
 	tempImage.src = src;
-	if (maxWidth != 0 && tempImage.width > maxWidth)
+	if (maxWidth !== 0 && tempImage.width > maxWidth)
 	{
-		document.getElementById("avatar").style.height = parseInt((maxWidth * tempImage.height) / tempImage.width) + "px";
-		document.getElementById("avatar").style.width = maxWidth + "px";
+		document.getElementById(sid).style.height = parseInt((maxWidth * tempImage.height) / tempImage.width) + "px";
+		document.getElementById(sid).style.width = maxWidth + "px";
 	}
-	else if (maxHeight != 0 && tempImage.height > maxHeight)
+	else if (maxHeight !== 0 && tempImage.height > maxHeight)
 	{
-		document.getElementById("avatar").style.width = parseInt((maxHeight * tempImage.width) / tempImage.height) + "px";
-		document.getElementById("avatar").style.height = maxHeight + "px";
+		document.getElementById(sid).style.width = parseInt((maxHeight * tempImage.width) / tempImage.height) + "px";
+		document.getElementById(sid).style.height = maxHeight + "px";
 	}
-	document.getElementById("avatar").src = src;
+	document.getElementById(sid).src = src;
 }
