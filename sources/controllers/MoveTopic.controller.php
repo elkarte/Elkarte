@@ -343,10 +343,10 @@ function action_movetopic2()
 		{
 			// The board we're moving from counted posts, but not to.
 			if (empty($pcounter_from))
-				updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+				updateMemberData($id_member, array('posts' => '-' . $posts));
 			// The reverse: from didn't, to did.
 			else
-				updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+				updateMemberData($id_member, array('posts' => '+' . $posts));
 		}
 	}
 

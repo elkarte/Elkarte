@@ -361,7 +361,7 @@ function action_restoretopic()
 				);
 
 				while ($member = $smcFunc['db_fetch_assoc']($request2))
-					updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
+					updateMemberData($member['id_member'], array('posts' => '+' . $member['post_count']));
 				$smcFunc['db_free_result']($request2);
 			}
 

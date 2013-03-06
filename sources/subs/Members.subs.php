@@ -1128,7 +1128,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		list ($messageCount) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
 
-		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
+		updateMemberData($memID, array('posts' => '+' . $messageCount));
 	}
 
 	$query_parts = array();

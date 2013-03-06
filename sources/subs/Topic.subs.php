@@ -64,7 +64,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		if ($smcFunc['db_num_rows']($requestMembers) > 0)
 		{
 			while ($rowMembers = $smcFunc['db_fetch_assoc']($requestMembers))
-				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
+				updateMemberData($rowMembers['id_member'], array('posts' => '-' . $rowMembers['posts']));
 		}
 		$smcFunc['db_free_result']($requestMembers);
 	}

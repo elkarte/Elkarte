@@ -488,12 +488,12 @@ function updateTable($query, $data, $knownInts = array(), $knownFloats = array()
 			$type = 'date';
 
 		// Doing an increment?
-		if ($type == 'int' && ($val[0] === '+' || $val[0] === '-'))
+		if ($type == 'int' && isset($val[0]) && ($val[0] === '+' || $val[0] === '-'))
 		{
 			$val = $var . ' ' . $val[0] . (isset($val[1]) ? ' ' . (int) substr($val, 1) : ' 1');
 			$type = 'raw';
 		}
-		elseif ($type == 'int' && $val[0] === '=')
+		elseif ($type == 'int' && isset($val[0]) && $val[0] === '=')
 		{
 			continue;
 		}

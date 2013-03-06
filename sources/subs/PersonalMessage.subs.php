@@ -191,9 +191,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['is_read'])
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : '-' . $row['num_deleted_messages']));
 			else
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : '-' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : '-' . $row['num_deleted_messages']));
 
 			// If this is the current member we need to make their message count correct.
 			if ($user_info['id'] == $row['id_member'])

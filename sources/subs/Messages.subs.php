@@ -317,16 +317,12 @@ function removeMessage($message, $decreasePostCount = true)
 		updateTopicData($row['id_topic'], array(
 			'id_last_msg' => $row2['id_msg'],
 			'id_member_updated' => $row2['id_member'],
-			'num_replies' => !$modSettings['postmod_active'] || $row['approved'] ? '-' : '=',
-			'unapproved_posts' => !$modSettings['postmod_active'] || $row['approved'] ? '=' : '-',
+			!$modSettings['postmod_active'] || $row['approved'] ? 'num_replies' : 'unapproved_posts' => '-',
 		));
 	}
 	// Only decrease post counts.
 	else
-		updateTopicData($row['id_topic'], array(
-			'num_replies' => $row['approved'] ? '-' : '=',
-			'unapproved_posts' => $row['approved'] ? '=' : '-',
-		));
+		updateTopicData($row['id_topic'], array($row['approved'] ? 'num_replies' : 'unapproved_posts' => '-'));
 
 	// Default recycle to false.
 	$recycle = false;

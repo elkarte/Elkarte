@@ -980,7 +980,7 @@ function action_quickmod()
 
 				// And now update them member's post counts
 				foreach ($members as $id_member => $post_adj)
-					updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
+					updateMemberData($id_member, array('posts' => '+' . $post_adj));
 
 			}
 		}
