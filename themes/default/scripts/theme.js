@@ -85,7 +85,7 @@ function smf_addButton(sButtonStripId, bUseImage, oOptions)
 	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
 	var oNewButton = document.createElement('li');
 	if ('sId' in oOptions)
-		oNewButton.id = oOptions.sId
+		oNewButton.id = oOptions.sId;
 	setInnerHTML(oNewButton, '<a href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
 
 	oButtonStripList.appendChild(oNewButton);
