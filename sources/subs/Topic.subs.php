@@ -1275,25 +1275,28 @@ function messageInfo($topic, $message)
  * @param int $topic
  * @param int $start
  * @param int $per_page
+ * @param array $messages
  * @param bool $only_approved
  */
-function selectMessages($topic, $start, $per_page, $excluded_messages = array(), $only_approved = false)
+function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-	global $smcFunc, $modSettings;
+	global $smcFunc;
 
 	// Get the messages and stick them into an array.
 	$request = $smcFunc['db_query']('', '
 		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_topic = {int:current_topic}' . (empty($excluded_messages) ? '' : '
-			AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$only_approved ? '' : '
+		WHERE m.id_topic = {int:current_topic}' . (empty($messages['excluded']) ? '' : '
+			AND m.id_msg NOT IN ({array_int:no_split_msgs})') . (empty($messages['included']) ? '' : '
+			AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
 			AND approved = {int:is_approved}') . '
 		ORDER BY m.id_msg DESC
 		LIMIT {int:start}, {int:messages_per_page}',
 		array(
 			'current_topic' => $topic,
-			'no_split_msgs' => !empty($excluded_messages) ? $excluded_messages : array(),
+			'no_split_msgs' => !empty($messages['excluded']) ? $messages['excluded'] : array(),
+			'split_msgs' => !empty($messages['included']) ? $messages['included'] : array(),
 			'is_approved' => 1,
 			'start' => $start,
 			'messages_per_page' => $per_page,
