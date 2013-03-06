@@ -143,6 +143,7 @@ errorbox_handler.prototype.boxVal = function ()
 		return this.oChecks_on();
 }
 
+// Runs the field checks as defined by the object instance
 errorbox_handler.prototype.checkErrors = function ()
 {
 	var num = this.opt.error_checks.length;
@@ -151,8 +152,11 @@ errorbox_handler.prototype.checkErrors = function ()
 		// Adds the error checking functions
 		for (var i = 0; i < num; i++)
 		{
+			// Get the element that holds the errors
 			var $elem = $(document.getElementById(this.opt.error_box_id + "_" + this.opt.error_checks[i].code));
-			if (this.opt.error_checks[i].function(this.boxVal()))
+
+			// Run the efunction check on this field, then add or remove any errors
+			if (this.opt.error_checks[i].efunction(this.boxVal()))
 				this.addError($elem, this.opt.error_checks[i].code);
 			else
 				this.removeError(this.oError_box, $elem);
@@ -160,29 +164,40 @@ errorbox_handler.prototype.checkErrors = function ()
 
 		this.oError_box.attr("class", "noticebox");
 	}
+
+	// Hide show the error box based on if we have any errors
 	if (this.oError_box.find("li").length === 0)
 		this.oError_box.slideUp();
 	else
 		this.oError_box.slideDown();
 }
 
-errorbox_handler.prototype.addError = function (error_elem, error_code)
+// Add and error to the list
+errorbox_handler.prototype.addError = function(error_elem, error_code)
 {
 	if (error_elem.length === 0)
 	{
-		if ($.trim(this.error_box.children("#" + this.opt.error_box_id + "_list").html()) === '')
+		// First error, then set up the list for insertion
+		if ($.trim(this.oError_box.children("#" + this.opt.error_box_id + "_list").html()) === '')
 			this.oError_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
+
+		// Add the error it and show it
 		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
 		$(document.getElementById(this.opt.error_box_id + "_" + error_code)).slideDown();
 	}
 }
 
+// Remove an error from the notice window
 errorbox_handler.prototype.removeError = function (error_box, error_elem)
 {
 	if (error_elem.length !== 0)
+	{
 		error_elem.slideUp(function() {
 			error_elem.remove();
+
+			// No errors at all then close the box
 			if (error_box.find("li").length === 0)
 				error_box.slideUp();
 		});
+	}
 }
