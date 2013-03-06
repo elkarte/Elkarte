@@ -145,10 +145,11 @@ errorbox_handler.prototype.boxVal = function ()
 
 errorbox_handler.prototype.checkErrors = function ()
 {
-	if (this.opt.error_checks.length != 0)
+	var num = this.opt.error_checks.length;
+	if (num !== 0)
 	{
 		// Adds the error checking functions
-		for (var i = 0; i < this.opt.error_checks.length; i++)
+		for (var i = 0; i < num; i++)
 		{
 			var $elem = $(document.getElementById(this.opt.error_box_id + "_" + this.opt.error_checks[i].code));
 			if (this.opt.error_checks[i].function(this.boxVal()))
