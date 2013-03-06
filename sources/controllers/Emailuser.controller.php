@@ -357,7 +357,7 @@ function action_reporttm()
 		error_box_id: \'report_error\',
 		error_checks: [{
 			code: \'post_too_long\',
-			function: function(box_value) {
+			efunction: function(box_value) {
 				if (box_value.length > 254)
 					return true;
 				else
