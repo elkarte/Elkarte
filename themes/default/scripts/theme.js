@@ -55,12 +55,12 @@ function smc_toggleImageDimensions()
 	for (oImage in oImages)
 	{
 		// Not a resized image? Skip it.
-		if (oImages[oImage].className == undefined || oImages[oImage].className.indexOf('bbc_img resized') == -1)
+		if (oImages[oImage].className === undefined || oImages[oImage].className.indexOf('bbc_img resized') === -1)
 			continue;
 
 		oImages[oImage].style.cursor = 'pointer';
 		oImages[oImage].onclick = function() {
-			this.style.width = this.style.height = this.style.width == 'auto' ? null : 'auto';
+			this.style.width = this.style.height = this.style.width === 'auto' ? null : 'auto';
 		};
 	}
 }
@@ -103,12 +103,11 @@ function errorbox_handler(oOptions)
 
 errorbox_handler.prototype.init = function ()
 {
-	
-	if (this.opt.check_id != undefined)
-		this.checks_on = $(document.getElementById(this.opt.check_id));
-	else if (this.opt.selector != undefined)
-		this.checks_on = this.opt.selector;
-	else if (this.opt.editor != undefined)
+	if (this.opt.check_id !== undefined)
+		this.oChecks_on = $(document.getElementById(this.opt.check_id));
+	else if (this.opt.selector !== undefined)
+		this.oChecks_on = this.opt.selector;
+	else if (this.opt.editor !== undefined)
 	{
 		this.checks_on = eval(this.opt.editor);
 		this.eval = true;
@@ -116,7 +115,7 @@ errorbox_handler.prototype.init = function ()
 
 	this.oErrorHandle.instanceRef = this;
 
-	if (this.error_box == null)
+	if (this.error_box === null)
 		this.error_box = $(document.getElementById(this.opt.error_box_id));
 
 	if (this.eval === false)
@@ -160,7 +159,7 @@ errorbox_handler.prototype.checkErrors = function ()
 
 		this.error_box.attr("class", "errorbox");
 	}
-	if (this.error_box.find("li").length == 0)
+	if (this.error_box.find("li").length === 0)
 		this.error_box.slideUp();
 	else
 		this.error_box.slideDown();
@@ -168,9 +167,9 @@ errorbox_handler.prototype.checkErrors = function ()
 
 errorbox_handler.prototype.addError = function (error_elem, error_code)
 {
-	if (error_elem.length == 0)
+	if (error_elem.length === 0)
 	{
-		if ($.trim(this.error_box.children("#" + this.opt.error_box_id + "_list").html()) == '')
+		if ($.trim(this.error_box.children("#" + this.opt.error_box_id + "_list").html()) === '')
 			this.error_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
 		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
 		$(document.getElementById(this.opt.error_box_id + "_" + error_code)).slideDown();
@@ -179,10 +178,10 @@ errorbox_handler.prototype.addError = function (error_elem, error_code)
 
 errorbox_handler.prototype.removeError = function (error_box, error_elem, error_code)
 {
-	if (error_elem.length != 0)
+	if (error_elem.length !== 0)
 		error_elem.slideUp(function() {
 			error_elem.remove();
-			if (error_box.find("li").length == 0)
+			if (error_box.find("li").length === 0)
 				error_box.slideUp();
 		});
 }
