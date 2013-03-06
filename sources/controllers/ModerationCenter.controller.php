@@ -1588,7 +1588,7 @@ function action_viewWarningLog()
 }
 
 /**
- * View all the warning templates.
+ * View all the custom warning templates.
  *  - Shows all the templates in the system
  *  - Provides for actions to add or delete them
  */
@@ -1757,7 +1757,7 @@ function action_modifyWarningTemplate()
 		if (!empty($template_body) && !empty($template_title))
 		{
 			// Safety first.
-			$_POST['template_title'] = $smcFunc['htmlspecialchars']($template_title);
+			$template_title = $smcFunc['htmlspecialchars']($template_title);
 
 			// Clean up BBC.
 			preparsecode($template_body);
