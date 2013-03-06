@@ -158,7 +158,7 @@ errorbox_handler.prototype.checkErrors = function ()
 				this.removeError(this.oError_box, $elem);
 		}
 
-		this.oError_box.attr("class", "errorbox");
+		this.oError_box.attr("class", "noticebox");
 	}
 	if (this.oError_box.find("li").length === 0)
 		this.oError_box.slideUp();
