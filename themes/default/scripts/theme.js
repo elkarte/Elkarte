@@ -97,7 +97,7 @@ function errorbox_handler(oOptions)
 	this.opt = oOptions;
 	this.oError_box = null;
 	this.oErrorHandle = window;
-	this.eval = false;
+	this.evaluate = false;
 	this.init();
 }
 
@@ -110,7 +110,7 @@ errorbox_handler.prototype.init = function ()
 	else if (this.opt.editor !== undefined)
 	{
 		this.oChecks_on = eval(this.opt.editor);
-		this.eval = true;
+		this.evaluate = true;
 	}
 
 	this.oErrorHandle.instanceRef = this;
@@ -118,7 +118,7 @@ errorbox_handler.prototype.init = function ()
 	if (this.oError_box === null)
 		this.oError_box = $(document.getElementById(this.opt.error_box_id));
 
-	if (this.eval === false)
+	if (this.evaluate === false)
 	{
 		this.oChecks_on.attr('onblur', this.opt.self + '.checkErrors()');
 		this.oChecks_on.attr('onkeyup', this.opt.self + '.checkErrors()');
@@ -137,7 +137,7 @@ errorbox_handler.prototype.init = function ()
 
 errorbox_handler.prototype.boxVal = function ()
 {
-	if (this.eval === false)
+	if (this.evaluate === false)
 		return this.oChecks_on.val();
 	else
 		return this.oChecks_on();
