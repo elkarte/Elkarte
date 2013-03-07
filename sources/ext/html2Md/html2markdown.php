@@ -38,6 +38,11 @@ class Convert_Md
 	public $line_break = "\n\n";
 
 	/**
+	 * regex to run on plain text to prevent markdown for acting on
+	 */
+	private $_textEscapeRegex = array();
+
+	/**
 	 * Gets everything started using the built in or external parser
 	 * @param type $html
 	 */
@@ -63,9 +68,26 @@ class Convert_Md
 		else
 		{
 			$this->_parser = false;
-			require_once(EXTDIR . '/other/simple_html_dom.php');
+			require_once(EXTDIR . '/html2Md/simple_html_dom.php');
 			$this->doc = str_get_html($html, true, true, 'UTF-8', false);
 		}
+
+		// Initialize the regex array to escape text only areas
+		$this->_textEscapeRegex = array(
+			// Things that may convert to an hr --- or - - - etc
+			'([-*_])([ ]{0,2}\1){2,}' => '\\\\$0|',
+			// or **stuff** => \*\*stuff\*\*
+			'\*\*([^*\s]+)\*\*' => '\*\*$1\*\*',
+			// or versions of *italic* __italic__ _italic_
+			'\*([^*\s]+)\*' => '\*$1\*',
+			'__(?! |_)(.+)(?!<_| )__' => '\_\_$1\_\_',
+			'_(?! |_)(.+)(?!<_| )_' => '\_$1\_',
+			// nor `code`
+			'`(.+)`' => '\`$1\`',
+			// or links
+			'\[(.+)\](\s*\()' => '\[$1\]$2',
+			'\[(.+)\](\s*)\[(.*)\]' => '\[$1\]$2\[$3\]',
+		);
 	}
 
 	/**
@@ -94,7 +116,8 @@ class Convert_Md
 	}
 
 	/**
-	 * Don't convert code that's inside a code block
+	 * For a given node, checks if it is anywhere inside a code block
+	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param type $node
 	 * @return boolean
@@ -112,7 +135,7 @@ class Convert_Md
 			if ($tag === 'code')
 				return true;
 
-			// Back out another level
+			// Back out another level, until we are done
 			$parent = $parser ? $parent->parentNode : $parent->parentNode();
 		}
 		return false;
@@ -178,7 +201,7 @@ class Convert_Md
 	private function _convert_to_markdown($node)
 	{
 		// html tag and contents
-		$tag = $this->_parser ? $node->nodeName : $node->nodeName();
+		$tag = $this->_get_name($node);
 		$value =$this->_get_value($node);
 
 		// based on the tag, determine how to convert
@@ -217,7 +240,7 @@ class Convert_Md
 				$markdown = '_' . $value . '_';
 				break;
 			case 'hr':
-				$markdown = str_repeat('- ', 30) . $this->line_end;
+				$markdown = str_repeat('-', 3) . $this->line_end;
 				break;
 			case 'h1':
 			case 'h2':
@@ -232,20 +255,27 @@ class Convert_Md
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = $this->line_end . rtrim($value) . $this->line_break;
+				$markdown = rtrim($value) . $this->line_break;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
 				break;
 			case 'p':
 				$markdown = str_replace("\n", ' ', $value) . $this->line_break;
+				if (!$node->hasChildNodes())
+					$markdown = $this->_escape_text($markdown);
 				break;
 			case 'pre':
 				$markdown = $value . $this->line_break;
 				break;
 			case 'div':
 				$markdown = $value;
+				if (!$node->hasChildNodes())
+					$markdown = $this->_escape_text($markdown);
 				break;
+			//case '#text':
+			//	$markdown = $this->_escape_text($value);
+			//	break;
 			case 'title':
 				$markdown = '# ' . $value . $this->line_break;
 			case 'table':
@@ -315,7 +345,7 @@ class Convert_Md
 	 */
 	private function _convert_anchor($node)
 	{
-		$href = $node->getAttribute('href');
+		$href = htmlentities($node->getAttribute('href'));
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
@@ -349,6 +379,7 @@ class Convert_Md
 		foreach ($lines as $line)
 			$markdown .= '> ' . ltrim($line, "\t") . $this->line_end;
 
+		$markdown .= $this->line_end;
 		return $markdown;
 	}
 
@@ -363,8 +394,6 @@ class Convert_Md
 	{
 		$markdown = '';
 		$value = $this->_innerHTML($node);
-		//$value = str_replace(array('<code>', '</code>'), '', $value);
-		$value = trim($value);
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -385,6 +414,8 @@ class Convert_Md
 			// Convert what remains
 			foreach ($lines as $line)
 				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
+
+			$markdown = rtrim($markdown, $this->line_end);
 
 			// The parser will encode, but we don't want that for our code block
 			if ($this->_parser)
@@ -585,6 +616,7 @@ class Convert_Md
 			return count($node);
 	}
 
+
 	/**
 	 * Helper function for getting a node value
 	 *
@@ -592,10 +624,29 @@ class Convert_Md
 	 */
 	private function _get_value($node)
 	{
+		if ($node === null)
+			return '';
+
 		if ($this->_parser)
 			return $node->nodeValue;
 		else
-			return $node->innertext;
+			return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+	}
+
+	/**
+	 * Helper function for getting a node name
+	 *
+	 * @param object $node
+	 */
+	private function _get_name($node)
+	{
+		if ($node === null)
+			return '';
+
+		if ($this->_parser)
+			return $node->nodeName;
+		else
+			return $node->nodeName();
 	}
 
 	/**
@@ -671,5 +722,52 @@ class Convert_Md
 		}
 		else
 			return $node->innertext;
+	}
+
+	/**
+	 * Escapes markup looking text in html to prevent an accidental assignment
+	 *  - <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since its
+	 *    not to be converted later to <strong>stuff</strong>
+	 *
+	 * @param type $value
+	 * @return type
+	 */
+	private function _escape_text($value)
+	{
+		// Search and replace ...
+		foreach ($this->_textEscapeRegex as $regex => $replacement)
+			$value = preg_replace('~' . $regex . '~', $replacement, $value);
+
+		return $value;
+	}
+
+	/**
+	 * handle plain text
+	 *
+	 * @param void
+	 * @return void
+	 */
+	private function handleText()
+	{
+		if ($this->hasParent('pre') && strpos($this->parser->node, "\n") !== false)
+		{
+			$this->parser->node = str_replace("\n", "\n" . $this->indent, $this->parser->node);
+		}
+		if (!$this->hasParent('code') && !$this->hasParent('pre'))
+		{
+			# entity decode
+			$this->parser->node = $this->decode($this->parser->node);
+			if (!$this->skipConversion)
+			{
+				# escape some chars in normal Text
+				$this->parser->node = preg_replace($this->escapeInText['search'], $this->escapeInText['replace'], $this->parser->node);
+			}
+		}
+		else
+		{
+			$this->parser->node = str_replace(array('&quot;', '&apos'), array('"', '\''), $this->parser->node);
+		}
+		$this->out($this->parser->node);
+		$this->lastClosedTag = '';
 	}
 }
