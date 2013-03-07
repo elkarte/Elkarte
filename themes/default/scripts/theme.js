@@ -55,12 +55,12 @@ function smc_toggleImageDimensions()
 	for (oImage in oImages)
 	{
 		// Not a resized image? Skip it.
-		if (oImages[oImage].className == undefined || oImages[oImage].className.indexOf('bbc_img resized') == -1)
+		if (oImages[oImage].className === undefined || oImages[oImage].className.indexOf('bbc_img resized') === -1)
 			continue;
 
 		oImages[oImage].style.cursor = 'pointer';
 		oImages[oImage].onclick = function() {
-			this.style.width = this.style.height = this.style.width == 'auto' ? null : 'auto';
+			this.style.width = this.style.height = this.style.width === 'auto' ? null : 'auto';
 		};
 	}
 }
@@ -85,7 +85,7 @@ function smf_addButton(sButtonStripId, bUseImage, oOptions)
 	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
 	var oNewButton = document.createElement('li');
 	if ('sId' in oOptions)
-		oNewButton.id = oOptions.sId
+		oNewButton.id = oOptions.sId;
 	setInnerHTML(oNewButton, '<a href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
 
 	oButtonStripList.appendChild(oNewButton);
@@ -95,34 +95,33 @@ var error_txts = {};
 function errorbox_handler(oOptions)
 {
 	this.opt = oOptions;
-	this.error_box = null;
+	this.oError_box = null;
 	this.oErrorHandle = window;
-	this.eval = false;
+	this.evaluate = false;
 	this.init();
 }
 
 errorbox_handler.prototype.init = function ()
 {
-	
-	if (this.opt.check_id != undefined)
-		this.checks_on = $(document.getElementById(this.opt.check_id));
-	else if (this.opt.selector != undefined)
-		this.checks_on = this.opt.selector;
-	else if (this.opt.editor != undefined)
+	if (this.opt.check_id !== undefined)
+		this.oChecks_on = $(document.getElementById(this.opt.check_id));
+	else if (this.opt.selector !== undefined)
+		this.oChecks_on = this.opt.selector;
+	else if (this.opt.editor !== undefined)
 	{
-		this.checks_on = eval(this.opt.editor);
-		this.eval = true;
+		this.oChecks_on = eval(this.opt.editor);
+		this.evaluate = true;
 	}
 
 	this.oErrorHandle.instanceRef = this;
 
-	if (this.error_box == null)
-		this.error_box = $(document.getElementById(this.opt.error_box_id));
+	if (this.oError_box === null)
+		this.oError_box = $(document.getElementById(this.opt.error_box_id));
 
-	if (this.eval === false)
+	if (this.evaluate === false)
 	{
-		this.checks_on.attr('onblur', this.opt.self + '.checkErrors()');
-		this.checks_on.attr('onkeyup', this.opt.self + '.checkErrors()');
+		this.oChecks_on.attr('onblur', this.opt.self + '.checkErrors()');
+		this.oChecks_on.attr('onkeyup', this.opt.self + '.checkErrors()');
 	}
 	else
 	{
@@ -138,51 +137,67 @@ errorbox_handler.prototype.init = function ()
 
 errorbox_handler.prototype.boxVal = function ()
 {
-	if (this.eval === false)
-		return this.checks_on.val();
+	if (this.evaluate === false)
+		return this.oChecks_on.val();
 	else
-		return this.checks_on();
+		return this.oChecks_on();
 }
 
+// Runs the field checks as defined by the object instance
 errorbox_handler.prototype.checkErrors = function ()
 {
-	if (this.opt.error_checks.length != 0)
+	var num = this.opt.error_checks.length;
+	if (num !== 0)
 	{
 		// Adds the error checking functions
-		for (var i = 0; i < this.opt.error_checks.length; i++)
+		for (var i = 0; i < num; i++)
 		{
+			// Get the element that holds the errors
 			var $elem = $(document.getElementById(this.opt.error_box_id + "_" + this.opt.error_checks[i].code));
-			if (this.opt.error_checks[i].function(this.boxVal()))
+
+			// Run the efunction check on this field, then add or remove any errors
+			if (this.opt.error_checks[i].efunction(this.boxVal()))
 				this.addError($elem, this.opt.error_checks[i].code);
 			else
-				this.removeError(this.error_box, $elem, this.opt.error_checks[i].code);
+				this.removeError(this.oError_box, $elem);
 		}
 
-		this.error_box.attr("class", "errorbox");
+		this.oError_box.attr("class", "noticebox");
 	}
-	if (this.error_box.find("li").length == 0)
-		this.error_box.slideUp();
+
+	// Hide show the error box based on if we have any errors
+	if (this.oError_box.find("li").length === 0)
+		this.oError_box.slideUp();
 	else
-		this.error_box.slideDown();
+		this.oError_box.slideDown();
 }
 
-errorbox_handler.prototype.addError = function (error_elem, error_code)
+// Add and error to the list
+errorbox_handler.prototype.addError = function(error_elem, error_code)
 {
-	if (error_elem.length == 0)
+	if (error_elem.length === 0)
 	{
-		if ($.trim(this.error_box.children("#" + this.opt.error_box_id + "_list").html()) == '')
-			this.error_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
+		// First error, then set up the list for insertion
+		if ($.trim(this.oError_box.children("#" + this.opt.error_box_id + "_list").html()) === '')
+			this.oError_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
+
+		// Add the error it and show it
 		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
 		$(document.getElementById(this.opt.error_box_id + "_" + error_code)).slideDown();
 	}
 }
 
-errorbox_handler.prototype.removeError = function (error_box, error_elem, error_code)
+// Remove an error from the notice window
+errorbox_handler.prototype.removeError = function (error_box, error_elem)
 {
-	if (error_elem.length != 0)
+	if (error_elem.length !== 0)
+	{
 		error_elem.slideUp(function() {
 			error_elem.remove();
-			if (error_box.find("li").length == 0)
+
+			// No errors at all then close the box
+			if (error_box.find("li").length === 0)
 				error_box.slideUp();
 		});
+	}
 }
