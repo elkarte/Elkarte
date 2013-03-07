@@ -1251,7 +1251,7 @@ function messageInfo($topic, $message)
 
 	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.approved
+		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
 		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
@@ -1265,16 +1265,8 @@ function messageInfo($topic, $message)
 	);
 	if ($smcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('cant_find_messages');
-	list ($subject, $num_replies, $unapproved_posts, $id_first_msg, $approved) = $smcFunc['db_fetch_row']($request);
+	$messageInfo = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
-
-	$messageInfo = array(
-		'subject' => $subject,
-		'num_replies' => $num_replies,
-		'unapproved_posts' => $unapproved_posts,
-		'id_first_msg' => $id_first_msg,
-		'approved' => $approved
-	);
 
 	return $messageInfo;
 }

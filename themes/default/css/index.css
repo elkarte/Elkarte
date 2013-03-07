@@ -2759,12 +2759,12 @@ ul.post_options li {
 #move_topic dl.settings dd {
 	width: 59%;
 }
-.move_topic {
+.split_topics, .move_topic {
 	width: 710px;
 	margin: auto;
 	text-align: left;
 }
-div.move_topic fieldset {
+div.split_topics fieldset, div.move_topic fieldset {
 	padding: 6px;
 }
 

@@ -397,6 +397,8 @@ $txt['cannot_connect_doc_site'] = 'Could not connect to the documentation site. 
 $txt['movetopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection topic\'.';
 $txt['movetopic_no_board'] = 'You must choose a board to move the topic to.';
 
+$txt['splittopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection message\'.';
+
 // OpenID error strings
 $txt['openid_server_bad_response'] = 'The requested identifier did not return the proper information.';
 $txt['openid_return_no_mode'] = 'The identity provider did not respond with the OpenID mode.';
