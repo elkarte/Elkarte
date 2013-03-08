@@ -226,8 +226,8 @@ function template_body_above()
 				echo '
 					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
 
-			if (!empty($context['additiona_dropdown_search']))
-				foreach ($context['additiona_dropdown_search'] as $name => $engine)
+			if (!empty($context['additional_dropdown_search']))
+				foreach ($context['additional_dropdown_search'] as $name => $engine)
 					echo '
 					<option value="', $name, '">', $engine['name'], '</option>';
 
