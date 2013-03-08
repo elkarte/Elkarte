@@ -45,7 +45,7 @@ function ManageLanguages()
 		'editlang' => 'ModifyLanguage',
 	);
 
-	call_integration_hook('integrate_manage_languages', array($subActions));
+	call_integration_hook('integrate_manage_languages', array(&$subActions));
 
 	// By default we're managing languages.
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
@@ -797,7 +797,7 @@ function ModifyLanguageSettings($return_config = false)
 		array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
 	);
 
-	call_integration_hook('integrate_language_settings', array($config_vars));
+	call_integration_hook('integrate_language_settings', array(&$config_vars));
 
 	if ($return_config)
 		return $config_vars;

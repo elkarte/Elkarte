@@ -45,7 +45,7 @@ function ManageNews()
 		'settings' => array('ModifyNewsSettings', 'admin_forum'),
 	);
 
-	call_integration_hook('integrate_manage_news', array($subActions));
+	call_integration_hook('integrate_manage_news', array(&$subActions));
 
 	// Default to sub action 'main' or 'settings' depending on permissions.
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
@@ -952,7 +952,7 @@ function ModifyNewsSettings($return_config = false)
 			array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 	);
 
-	call_integration_hook('integrate_modify_news_settings', array($config_vars));
+	call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
 
 	if ($return_config)
 		return $config_vars;

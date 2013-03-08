@@ -37,7 +37,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
 	// @todo Why are we doing this if caching is disabled?
 
 	if (function_exists('call_integration_hook'))
-		call_integration_hook('pre_cache_quick_get', array($key, $file, $function, $params, $level));
+		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 	/* Refresh the cache if either:
 		1. Caching is disabled.

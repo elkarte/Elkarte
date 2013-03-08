@@ -220,7 +220,7 @@ function action_vote()
 	}
 
 	// Maybe let a social networking mod log this, or something?
-	call_integration_hook('integrate_poll_vote', array($row['id_poll'], $pollOptions));
+	call_integration_hook('integrate_poll_vote', array(&$row['id_poll'], &$pollOptions));
 
 	// Return to the post...
 	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
@@ -897,7 +897,7 @@ function action_removepoll()
 	associatedPoll($topic, 0);
 
 	// A mod might have logged this (social network?), so let them remove, it too
-	call_integration_hook('integrate_poll_remove', array($pollID));
+	call_integration_hook('integrate_poll_remove', array(&$pollID));
 
 	// Take the moderator back to the topic.
 	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
