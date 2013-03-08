@@ -38,7 +38,7 @@ function action_suggest($checkRegistered = null)
 		'versions' => 'versions',
 	);
 
-	call_integration_hook('integrate_autosuggest', array($searchTypes));
+	call_integration_hook('integrate_autosuggest', array(&$searchTypes));
 
 	// If we're just checking the callback function is registered return true or false.
 	if ($checkRegistered != null)
