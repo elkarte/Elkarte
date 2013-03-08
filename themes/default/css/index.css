@@ -2457,6 +2457,26 @@ ul.quickbuttons li.inline_mod_check {
 	width: 12em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
+li.quote, .follow_ups li {
+	position: relative;
+	padding: 0 6px;
+	line-height: 2.0em;
+}
+.follow_ups li:first-child {
+	border-radius: 4px;
+}
+ul.quickbuttons li.quote ul a, ul.follow_ups li a,
+ul.quickbuttons li.quote ul a:hover, ul.follow_ups li a:hover {
+	padding: 0;
+}
+ul.quickbuttons li.quote ul li, ul.quickbuttons li.quote ul a {
+	width: auto;
+	white-space:nowrap;
+}
+ul.follow_ups {
+	float: none;
+	width: auto;
+}
 /* Note: The next declarations are for keyboard access with js disabled. */
 .quickbuttons ul li a:focus {
 	margin: 0 -9910px 0 9910px;

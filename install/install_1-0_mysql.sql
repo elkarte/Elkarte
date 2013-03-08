@@ -756,6 +756,16 @@ CREATE TABLE {$db_prefix}group_moderators (
 ) ENGINE=MyISAM;
 
 #
+# Table structure for table `follow_ups`
+#
+
+CREATE TABLE {$db_prefix}follow_ups (
+  follow_up int(10) NOT NULL default '0',
+  derived_from int(10) NOT NULL default '0',
+  PRIMARY KEY (follow_up, derived_from)
+) ENGINE=MyISAM;
+
+#
 # Table structure for table `log_actions`
 #
 

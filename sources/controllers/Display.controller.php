@@ -127,6 +127,9 @@ function Display()
 
 	// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 	$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
+	if (!empty($topicinfo['derived_from']))
+		$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
+
 	if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 	{
 		$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
@@ -239,6 +242,8 @@ function Display()
 
 	// Create a previous next string if the selected theme has it as a selected option.
 	$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#new">' . $txt['previous_next_forward'] . '</a>' : '';
+	if (!empty($context['topic_derived_from']))
+		$context['previous_next'] .= ' - <a href="' . $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_subject($context['topic_derived_from']['subject'], 25)) . '</em></a>';
 
 	// Check if spellchecking is both enabled and actually working. (for quick reply.)
 	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -806,6 +811,8 @@ function Display()
 			ORDER BY id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
 			$msg_parameters
 		);
+
+		$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
 
 		// Go to the last message if the given time is beyond the time of the last message.
 		if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])

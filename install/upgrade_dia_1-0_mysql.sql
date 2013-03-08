@@ -380,3 +380,15 @@ UPDATE {$db_prefix}package_servers
 SET url = 'https://github.com/elkarte/addons/tree/master/packages'
 WHERE url = 'http://custom.simplemachines.org/packages/mods';
 ---#
+
+/******************************************************************************/
+--- Adding follow-up support.
+/******************************************************************************/
+
+---# Creating follow-up table...
+CREATE TABLE {$db_prefix}follow_ups (
+  follow_up int(10) NOT NULL default '0',
+  derived_from int(10) NOT NULL default '0',
+  PRIMARY KEY (follow_up, derived_from)
+) ENGINE=MyISAM;
+---#

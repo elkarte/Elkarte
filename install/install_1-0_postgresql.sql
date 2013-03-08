@@ -971,6 +971,16 @@ CREATE TABLE {$db_prefix}group_moderators (
 );
 
 #
+# Table structure for table `follow_ups`
+#
+
+CREATE TABLE {$db_prefix}follow_ups (
+  follow_up int NOT NULL default '0',
+  derived_from int NOT NULL default '0',
+  PRIMARY KEY (follow_up, derived_from)
+);
+
+#
 # Sequence for table `log_actions`
 #
 

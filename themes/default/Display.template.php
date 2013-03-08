@@ -432,7 +432,26 @@ function template_main()
 		echo '
 						</div>
 						<div class="postarea">
-							<div class="keyinfo">
+							<div class="keyinfo">';
+
+		if (!empty($context['follow_ups'][$message['id']]))
+		{
+			echo '
+								<ul class="follow_ups quickbuttons">
+									<li>', $txt['follow_ups'], '
+										<ul>';
+				foreach($context['follow_ups'][$message['id']] as $follow_up)
+				{
+					echo '
+											<li><a href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
+				}
+				echo '
+										</ul>
+									</li>
+								</ul>';
+		}
+
+		echo '
 								<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
 								<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
 									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
@@ -614,11 +633,18 @@ function template_main()
 		// Can they reply? Have they turned on quick reply?
 		if ($context['can_quote'] && !empty($options['display_quick_reply']))
 			echo '
-								<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="quote_button">', $txt['quote'], '</a></li>';
+								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="quote_button">', $txt['quote'], '</a>';
 		// So... quick reply is off, but they *can* reply?
 		elseif ($context['can_quote'])
 			echo '
-								<li><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a></li>';
+								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a>';
+
+		if ($context['can_quote'])
+			echo '
+									<ul>
+										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '">', $txt['quote_new'], '</a></li>
+									</ul>
+								</li>';
 
 		echo '
 							</ul>

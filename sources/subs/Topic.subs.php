@@ -1078,6 +1078,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 		);
 
 	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
+	$follow_ups_table = !empty($full) && ($full === 'follow_up' || $full === 'all');
 	$logs_table = !empty($full) && $full === 'all';
 
 	// Create the query, taking full and integration in to account
@@ -1087,14 +1088,16 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') .
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
+			fu.derived_from' : '') . 
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
 			(!empty($selects) ? implode(',', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') .
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
+			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . 
 			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
@@ -1357,4 +1360,54 @@ function unapprovedPosts($id_topic, $id_member)
 	$smcFunc['db_free_result']($request);
 
 	return $myUnapprovedPosts;
+}
+
+function followupTopics($messages, $include_approved = false)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT fu.derived_from, fu.follow_up, m.subject
+		FROM {db_prefix}follow_ups as fu
+			LEFT JOIN {db_prefix}topics as t ON (t.id_topic = fu.follow_up)
+			LEFT JOIN {db_prefix}messages as m ON (t.id_first_msg = m.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE fu.derived_from IN ({array_int:messages})' . ($include_approved ? '' : '
+			AND m.approved = {int:approved}'),
+		array(
+			'messages' => $messages,
+			'approved' => 1,
+		)
+	);
+
+	$returns = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$returns[$row['derived_from']][] = $row;
+
+	return $returns;
+}
+
+function topicStartedHere($topic, $include_approved = false)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT fu.derived_from, m.subject
+		FROM {db_prefix}follow_ups as fu
+			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE fu.follow_up = {int:original_topic}' . ($include_approved ? '' : '
+			AND m.approved = {int:approved}') . '
+		LIMIT 1',
+		array(
+			'original_topic' => $topic,
+			'approved' => 1,
+		)
+	);
+
+	$returns = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$returns = $row;
+
+	return $returns;
 }
