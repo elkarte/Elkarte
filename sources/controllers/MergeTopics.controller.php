@@ -69,7 +69,7 @@ function action_mergeIndex()
 	// Prepare a handy query bit for approval...
 	if ($modSettings['postmod_active'])
 	{
-		$can_approve_boards = boardsAllowedTo('approve_posts');
+		$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 		$onlyApproved = $can_approve_boards !== array(0) && !in_array($_REQUEST['targetboard'], $can_approve_boards);
 	}
 	else

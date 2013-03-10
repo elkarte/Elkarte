@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function action_attachapprove()
 {
-	global $smcFunc;
+	global $smcFunc, $user_info;
 
 	// Security is our primary concern...
 	checkSession('get');
@@ -63,7 +63,7 @@ function action_attachapprove()
 
 	// @todo nb: this requires permission to approve posts, not manage attachments
 	// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
-	$allowed_boards = boardsAllowedTo('approve_posts');
+	$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Validate the attachments exist and are the right approval state.
 	$request = $smcFunc['db_query']('', '
