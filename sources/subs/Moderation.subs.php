@@ -128,7 +128,7 @@ function loadModeratorMenuCounts($brd = null)
 	$menu_errors = array();
 
 	// Work out what boards they can work in!
-	$approve_boards = boardsAllowedTo('approve_posts');
+	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Supplied a specific board to check?
 	if (!empty($brd))
@@ -159,7 +159,7 @@ function loadModeratorMenuCounts($brd = null)
 		$menu_errors[$cache_key]['topics'] = 0;
 		$menu_errors[$cache_key]['posts'] = 0;
 
-		if ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))
+		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
 			$totals = recountUnapprovedPosts($approve_query);
 			$menu_errors[$cache_key]['posts'] = $totals['posts'];
@@ -170,7 +170,7 @@ function loadModeratorMenuCounts($brd = null)
 		}
 
 		// Attachments
-		if ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))
+		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
 			require_once(CONTROLLERDIR . '/PostModeration.controller.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
