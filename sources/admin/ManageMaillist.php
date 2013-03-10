@@ -1380,7 +1380,7 @@ function action_modify_bounce_templates()
 		if (!empty($template_body) && !empty($template_title))
 		{
 			// Safety first.
-			$_POST['template_title'] = $smcFunc['htmlspecialchars']($template_title);
+			$template_title = $smcFunc['htmlspecialchars']($template_title);
 
 			// Clean up BBC.
 			preparsecode($template_body);

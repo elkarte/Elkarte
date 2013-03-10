@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 {
-	global $smcFunc, $txt, $boardurl;
+	global $smcFunc, $txt, $boardurl, $user_info;
 
 	// Init
 	$i = 0;
@@ -34,7 +34,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 	require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	// Where can they approve items?
-	$approve_boards = boardsAllowedTo('approve_posts');
+	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Work out the query
 	if ($approve_boards == array(0))
@@ -105,12 +105,12 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
  */
 function list_maillist_count_unapproved()
 {
-	global $smcFunc;
+	global $smcFunc, $user_info;
 
 	$total= 0;
 
 	// Where can they approve items?
-	$approve_boards = boardsAllowedTo('approve_posts');
+	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Work out the query
 	if ($approve_boards == array(0))
