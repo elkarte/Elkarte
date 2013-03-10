@@ -423,7 +423,19 @@ class Convert_Md
 		}
 		// Single line, back tick and move on
 		else
-			$markdown .= '`' . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . '`';
+		{
+			// Account for backticks in the single line
+			$ticks = $this->_got_ticks($node, $value);
+			if (!empty($ticks))
+			{
+				// If the ticks were at the start/end of the word space it off
+				if ($lines[0][0] == '`' || substr($lines[0], -1) == '`')
+					$lines[0] = ' ' . $lines[0] . ' ';
+				$markdown .= $ticks . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . $ticks;
+			}
+			else
+				$markdown .= '`' . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . '`';
+		}
 
 		return $markdown;
 	}
@@ -518,6 +530,7 @@ class Convert_Md
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
 			return;
+
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
 
 		// We only markdown well formed tables ...
@@ -742,32 +755,39 @@ class Convert_Md
 	}
 
 	/**
-	 * handle plain text
+	 * If inline code contains backticks ` as part of its content, we need to wrap them so
+	 * when markdown is run we don't inteprete the ` as additonal code blocks
 	 *
-	 * @param void
-	 * @return void
+	 * @param type $node
+	 * @param string $value
 	 */
-	private function handleText()
+	private function _got_ticks($node, $value)
 	{
-		if ($this->hasParent('pre') && strpos($this->parser->node, "\n") !== false)
+		$ticks = '';
+		$code_parent = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
+
+		// inside of a pre, we don't do anything
+		if ($code_parent === 'pre')
+			return $value;
+
+		// If we have backticks in code, then we back tick the ticks
+		// e.g. <code>`bla`</code> will become `` `bla` `` so markdown will deal with it properly
+		preg_match_all('~`+~', $value, $matches);
+		if (!empty($matches[0]))
 		{
-			$this->parser->node = str_replace("\n", "\n" . $this->indent, $this->parser->node);
-		}
-		if (!$this->hasParent('code') && !$this->hasParent('pre'))
-		{
-			# entity decode
-			$this->parser->node = $this->decode($this->parser->node);
-			if (!$this->skipConversion)
+			// Yup ticks in the hair
+			$ticks = '`';
+			rsort($matches[0]);
+
+			// backtick as many as needed so markdown will work
+			while (true)
 			{
-				# escape some chars in normal Text
-				$this->parser->node = preg_replace($this->escapeInText['search'], $this->escapeInText['replace'], $this->parser->node);
+				if (!in_array($ticks, $matches[0]))
+					break;
+				$ticks .= '`';
 			}
 		}
-		else
-		{
-			$this->parser->node = str_replace(array('&quot;', '&apos'), array('"', '\''), $this->parser->node);
-		}
-		$this->out($this->parser->node);
-		$this->lastClosedTag = '';
+
+		return $ticks;
 	}
 }
