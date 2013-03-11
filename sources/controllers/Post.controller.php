@@ -650,7 +650,7 @@ function action_post()
 		$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 		$context['show_boards_dropdown'] = true;
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 		$context['boards_current_disabled'] = false;
 	}
 

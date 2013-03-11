@@ -33,7 +33,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 {
 	global $smcFunc, $user_info;
 
-	if (isset($boardListOptions['excluded_boards']) && isset($boardListOptions['included_boards']))
+	if ((isset($boardListOptions['excluded_boards']) || isset($boardListOptions['allowed_to'])) && isset($boardListOptions['included_boards']))
 		trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);
 
 	$where = array();
@@ -45,6 +45,12 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['excluded_boards'] = $boardListOptions['excluded_boards'];
 	}
 
+	if (isset($boardListOptions['allowed_to']))
+	{
+		$boardListOptions['included_boards'] = boardsAllowedTo($boardListOptions['allowed_to']);
+		if (in_array(0, $boardListOptions['included_boards']))
+			unset($boardListOptions['included_boards']);
+	}
 	if (isset($boardListOptions['included_boards']))
 	{
 		$where[] = 'b.id_board IN ({array_int:included_boards})';

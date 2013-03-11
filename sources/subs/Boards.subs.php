@@ -1025,4 +1025,48 @@ function accessibleBoards()
 	$smcFunc['db_free_result']($result);
 
 	return $boards;
+
+function boardInfo($board_id, $topic_id = null)
+{
+	global $smcFunc;
+
+	$returns = array();
+
+	if (!empty($topic_id))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT b.count_posts, b.name, m.subject
+			FROM {db_prefix}boards AS b
+				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
+				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			WHERE {query_see_board}
+				AND b.id_board = {int:board}
+				AND b.redirect = {string:blank_redirect}
+			LIMIT 1',
+			array(
+				'current_topic' => $topic_id,
+				'board' => $board_id,
+				'blank_redirect' => '',
+			)
+		);
+	}
+	else
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT b.count_posts, b.name
+			FROM {db_prefix}boards AS b
+			WHERE {query_see_board}
+				AND b.id_board = {int:board}
+				AND b.redirect = {string:blank_redirect}
+			LIMIT 1',
+			array(
+				'board' => $board_id,
+				'blank_redirect' => '',
+			)
+		);
+	}
+
+	$returns = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+	return $returns;
 }

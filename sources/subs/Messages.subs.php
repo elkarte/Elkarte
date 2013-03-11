@@ -620,6 +620,7 @@ function associatedTopic($msg_id)
 	$smcFunc['db_free_result']($request);
 
 	return $topic;
+}
 
 /**
  * Small function that simply query the database to verify
