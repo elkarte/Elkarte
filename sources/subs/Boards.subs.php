@@ -1041,18 +1041,16 @@ function allBoards($all = false, $include = array())
 	global $smcFunc, $modSettings;
 
 	if ($all === false)
-		$query = '{query_see_board}
-			AND ';
+		$query = '{query_see_board}';
 	elseif ($all === true)
-		$query = '';
+		$query = '1=1';
 	else
 	{
 		$boards = boardsAllowedTo($all);
 		if (in_array(0, $boards))
-			$query = '';
+			$query = '1=1';
 		else
-			$query = 'b.id_board IN ({array_int:boards})
-			AND ';
+			$query = 'b.id_board IN ({array_int:boards})';
 	}
 
 	// Find all the boards this user is allowed to see.
@@ -1063,7 +1061,8 @@ function allBoards($all = false, $include = array())
 			'. (!empty($include['ignore']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored' : '') . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE ' . $query . 'b.redirect = {string:empty_string}
+		WHERE ' . $query . '
+			AND b.redirect = {string:empty_string}
 		ORDER BY b.board_order',
 		array(
 			'boards' => $boards,
