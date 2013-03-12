@@ -390,18 +390,10 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET
-				pm_ignore_list = {string:pm_ignore_list},
-				buddy_list = {string:buddy_list}
-			WHERE id_member = {int:id_member}',
-			array(
-				'id_member' => $row['id_member'],
-				'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
-				'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users)),
-			)
-		);
+		updateMemberData($row['id_member'], array(
+			'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
+			'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users)),
+		));
 	$smcFunc['db_free_result']($request);
 
 	// Make sure no member's birthday is still sticking in the calendar...
@@ -1136,7 +1128,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		list ($messageCount) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
 
-		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
+		updateMemberData($memID, array('posts' => '+' . $messageCount));
 	}
 
 	$query_parts = array();

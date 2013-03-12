@@ -488,18 +488,9 @@ function AddMembergroup()
 		{
 			// Only do this if they have special access requirements.
 			if (!empty($changed_boards[$board_action]))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET {raw:column} = CASE WHEN {raw:column} = {string:blank_string} THEN {string:group_id_string} ELSE CONCAT({raw:column}, {string:comma_group}) END
-					WHERE id_board IN ({array_int:board_list})',
-					array(
-						'board_list' => $changed_boards[$board_action],
-						'blank_string' => '',
-						'group_id_string' => (string) $id_group,
-						'comma_group' => ',' . $id_group,
-						'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
-					)
-				);
+				updateBoardData($changed_boards[$board_action], array(
+					$board_action == 'allow' ? 'concatcomma-member_groups' : 'concatcomma-deny_member_groups' => $id_group
+				));
 		}
 
 		// If this is joinable then set it to show group membership in people's profiles.
@@ -687,16 +678,9 @@ function EditMembergroup()
 					)
 				);
 				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET {raw:column} = {string:member_group_access}
-						WHERE id_board = {int:current_board}',
-						array(
-							'current_board' => $row['id_board'],
-							'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($groups['id_group']))),
-							'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
-						)
-					);
+					updateBoardData($row['id_board'], array(
+						$board_action == 'allow' ? 'member_groups' : 'deny_member_groups' => implode(',', array_diff(explode(',', $row['member_groups']), array($groups['id_group'])))
+					));
 				$smcFunc['db_free_result']($request);
 
 				// Add the membergroup to all boards that hadn't been set yet.

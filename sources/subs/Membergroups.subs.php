@@ -172,15 +172,9 @@ function deleteMembergroups($groups)
 	$smcFunc['db_free_result']($request);
 
 	foreach ($updates as $member_groups => $boardArray)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET member_groups = {string:member_groups}
-			WHERE id_board IN ({array_int:board_lists})',
-			array(
-				'board_lists' => $boardArray,
-				'member_groups' => implode(',', array_diff(explode(',', $member_groups), $groups)),
-			)
-		);
+		updateBoardData($boardArray, array(
+			'member_groups' => implode(',', array_diff(explode(',', $member_groups), $groups)),
+		));
 
 	// Recalculate the post groups, as they likely changed.
 	updateStats('postgroups');
@@ -376,15 +370,9 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	$smcFunc['db_free_result']($request);
 
 	foreach ($updates as $additional_groups => $memberArray)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET additional_groups = {string:additional_groups}
-			WHERE id_member IN ({array_int:member_list})',
-			array(
-				'member_list' => $memberArray,
-				'additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups)),
-			)
-		);
+		updateMemberData($memberArray, array(
+			'additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups)),
+		));
 
 	// Their post groups may have changed now...
 	updateStats('postgroups', $members);

@@ -274,30 +274,17 @@ function updateMemberData($members, $data)
 {
 	global $modSettings, $user_info, $smcFunc;
 
-	$parameters = array();
-	if (is_array($members))
-	{
-		$condition = 'id_member IN ({array_int:members})';
-		$parameters['members'] = $members;
-	}
-	elseif ($members === null)
-		$condition = '1=1';
+	$query = array(
+		'table' => 'members'
+	);
+	if ($members === null)
+		$query['condition'] = '1=1';
 	else
 	{
-		$condition = 'id_member = {int:member}';
-		$parameters['member'] = $members;
+		$members = is_array($members) ? $members : array($members);
+		$query['condition'] = 'id_member IN ({array_int:members})';
+		$query['range'] = array('members' => $members);
 	}
-
-	// Everything is assumed to be a string unless it's in the below.
-	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
-		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'pm_receive_from', 'karma_good', 'karma_bad',
-		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
-		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
-	);
-	$knownFloats = array(
-		'time_offset',
-	);
 
 	if (!empty($modSettings['integrate_change_member_data']))
 	{
@@ -346,46 +333,23 @@ function updateMemberData($members, $data)
 		}
 	}
 
-	$setString = '';
-	foreach ($data as $var => $val)
-	{
-		$type = 'string';
-		if (in_array($var, $knownInts))
-			$type = 'int';
-		elseif (in_array($var, $knownFloats))
-			$type = 'float';
-		elseif ($var == 'birthdate')
-			$type = 'date';
-
-		// Doing an increment?
-		if ($type == 'int' && ($val === '+' || $val === '-'))
-		{
-			$val = $var . ' ' . $val . ' 1';
-			$type = 'raw';
-		}
-
-		// Ensure posts, instant_messages, and unread_messages don't overflow or underflow.
-		if (in_array($var, array('posts', 'instant_messages', 'unread_messages')))
-		{
-			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
-			{
-				if ($match[1] != '+ ')
-					$val = 'CASE WHEN ' . $var . ' <= ' . abs($match[2]) . ' THEN 0 ELSE ' . $val . ' END';
-				$type = 'raw';
-			}
-		}
-
-		$setString .= ' ' . $var . ' = {' . $type . ':p_' . $var . '},';
-		$parameters['p_' . $var] = $val;
-	}
-
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}members
-		SET' . substr($setString, 0, -1) . '
-		WHERE ' . $condition,
-		$parameters
+	updateTable($query, $data,
+		array(
+			'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
+			'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'pm_receive_from', 'karma_good', 'karma_bad',
+			'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
+			'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
+		),
+		array(
+			'time_offset',
+		),
+		array(
+			'birthdate',
+		),
+		array(
+			'posts', 'instant_messages', 'unread_messages',
+		)
 	);
-
 	updateStats('postgroups', $members, array_keys($data));
 
 	// Clear any caching?
@@ -405,6 +369,185 @@ function updateMemberData($members, $data)
 			cache_put_data('user_settings-' . $member, null, 60);
 		}
 	}
+}
+
+function updateBoardData($boards, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'boards'
+	);
+	switch ($boards)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		case 'redir':
+			$query['condition'] = 'redirect = ({string:redirect})';
+			$query['range'] = array('redirect' => '');
+			break;
+		case 'no_redir':
+			$query['condition'] = 'redirect != ({string:redirect})';
+			$query['range'] = array('redirect' => '');
+			break;
+		default:
+			$boards = is_array($boards) ? $boards : array($boards);
+			$query['condition'] = 'id_board IN ({array_int:boards})';
+			$query['range'] = array('boards' => $boards);
+	}
+
+	updateTable($query, $data,
+		array(
+		'id_cat', 'child_level', 'id_parent', 'board_order',
+		'is_last_msg', 'id_msg_updated', 'id_profile',
+		'num_topics', 'num_posts', 'count_posts', 'id_theme', 'overrider_theme',
+		'unapproved_posts', 'unapproved_topics'
+		),
+		array(),
+		array(),
+		array('num_topics', 'num_posts', 'count_posts', 'unapproved_posts', 'unapproved_topics')
+	);
+}
+
+function updateTopicData($topics, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'topics'
+	);
+	switch ($topics)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		default:
+			$topics = is_array($topics) ? $topics : array($topics);
+			$query['condition'] = 'id_topic IN ({array_int:topics})';
+			$query['range'] = array('topics' => $topics);
+	}
+
+	updateTable($query, $data,
+		array(
+		'is_sticky', 'id_board', 'id_first_msg', 'id_last_msg',
+		'id_member_started', 'id_member_updated', 'id_poll',
+		'id_previous_board', 'id_previous_topic', 'num_replies', 'num_views', 'locked',
+		'redirect_expires', 'id_redirect_topic', 'unapproved_posts', 'approved'
+		),
+		array(),
+		array(),
+		array('num_views', 'unapproved_posts', 'approved')
+	);
+}
+
+function updateMessageData($messages, $data)
+{
+	global $modSettings, $user_info, $smcFunc;
+
+	$query = array(
+		'table' => 'topics'
+	);
+	switch ($messages)
+	{
+		case null:
+			$query['condition'] = '1=1';
+			break;
+		default:
+			$messages = is_array($messages) ? $messages : array($messages);
+			$query['condition'] = 'ig_msg IN ({array_int:messages})';
+			$query['range'] = array('messages' => $messages);
+	}
+
+	updateTable($query, $data,
+		array(
+		'id_topic', 'id_board', 'poster_time', 'id_member', 'id_msg_modified',
+		'smileys_enabled', 'modified_time', 'approved'
+		)
+	);
+}
+
+function updateTable($query, $data, $knownInts = array(), $knownFloats = array(), $knownDates = array(), $ensure_overflow = array())
+{
+	global $smcFunc;
+
+	call_integration_hook('integrate_update_' . $query['table'], array(&$knownInts, &$knownFloats, &$knownDates, &$ensure_overflow));
+
+	$parameters = $query['range'];
+	$parameters['table'] = $query['table'];
+
+	$setString = '';
+	foreach ($data as $var => $val)
+	{
+		$type = 'string';
+		if (in_array($var, $knownInts))
+			$type = 'int';
+		elseif (in_array($var, $knownFloats))
+			$type = 'float';
+		elseif (in_array($var, $knownDates))
+			$type = 'date';
+
+		// Doing an increment?
+		if ($type == 'int' && isset($val[0]) && ($val[0] === '+' || $val[0] === '-'))
+		{
+			$val = $var . ' ' . $val[0] . (isset($val[1]) ? ' ' . (int) substr($val, 1) : ' 1');
+			$type = 'raw';
+		}
+		elseif ($type == 'int' && isset($val[0]) && $val[0] === '=')
+		{
+			continue;
+		}
+		elseif (substr($var, 0, 12) === 'concatcomma-')
+		{
+			switch ($type)
+			{
+				case 'int':
+					$default = '0';
+					break;
+				default:
+					$default = '\'\'';
+					break;
+			}
+			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
+			$var = substr($var, 12);
+			$val = 'CASE WHEN ' . $var . ' = ' . $default . ' THEN ' . $quoted_val . ' ELSE CONCAT(' . $var . ', ' . $quoted_val . ') END';
+			$type = 'raw';
+		}
+		elseif (substr($var, 0, 7) === 'concat-')
+		{
+			$quoted_val = $smcFunc['db_quote']('{' . $type . ':value}', array('value' => $val));
+			$var = substr($var, 7);
+			$val = 'CONCAT(' . $var . ', ' . $quoted_val . ')';
+			$type = 'raw';
+		}
+		elseif ($type == 'int' && substr($val, 0, 7) === 'toggle-')
+		{
+			$values = explode('-', $val);
+			$val = 'CASE WHEN ' . $var . ' = ' . (int) $values[1] . ' THEN ' . (int) $values[2] . ' ELSE ' . (int) $values[3] . ' END';
+			$type = 'raw';
+		}
+
+		// Ensure some fields don't overflow or underflow.
+		if (in_array($var, $ensure_overflow))
+		{
+			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
+			{
+				if ($match[1] != '+ ')
+					$val = 'CASE WHEN ' . $var . ' <= ' . abs($match[2]) . ' THEN 0 ELSE ' . $val . ' END';
+				$type = 'raw';
+			}
+		}
+
+		$setString .= ' ' . $var . ' = {' . $type . ':p_' . $var . '},';
+		$parameters['p_' . $var] = $val;
+	}
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}{raw:table}
+		SET' . substr($setString, 0, -1) . '
+		WHERE ' . $query['condition'],
+		$parameters
+	);
 }
 
 /**

@@ -332,15 +332,7 @@ function PermissionByBoard()
 		if (!empty($changes))
 		{
 			foreach ($changes as $profile => $boards)
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET id_profile = {int:current_profile}
-					WHERE id_board IN ({array_int:board_list})',
-					array(
-						'board_list' => $boards,
-						'current_profile' => $profile,
-					)
-				);
+				updateBoardData($boards, array('id_profile' => $profile));
 		}
 
 		$context['edit_all'] = false;

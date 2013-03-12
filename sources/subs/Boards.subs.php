@@ -191,7 +191,6 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// All things that will be updated in the database will be in $boardUpdates.
 	$boardUpdates = array();
-	$boardUpdateParameters = array();
 
 	// In case the board has to be moved
 	if (isset($boardOptions['move_to']))
@@ -258,23 +257,13 @@ function modifyBoard($board_id, &$boardOptions)
 		$childUpdates = array();
 		$levelDiff = $child_level - $boards[$board_id]['level'];
 		if ($levelDiff != 0)
-			$childUpdates[] = 'child_level = child_level ' . ($levelDiff > 0 ? '+ ' : '') . '{int:level_diff}';
+			$childUpdates['child_level'] = ($levelDiff > 0 ? '+ ' : '') . $levelDiff;
 		if ($id_cat != $boards[$board_id]['category'])
-			$childUpdates[] = 'id_cat = {int:category}';
+			$childUpdates['id_cat'] = $id_cat;
 
 		// Fix the children of this board.
 		if (!empty($childList) && !empty($childUpdates))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET ' . implode(',
-					', $childUpdates) . '
-				WHERE id_board IN ({array_int:board_list})',
-				array(
-					'board_list' => $childList,
-					'category' => $id_cat,
-					'level_diff' => $levelDiff,
-				)
-			);
+			updateBoardData($childList, $childUpdates);
 
 		// Make some room for this spot.
 		$smcFunc['db_query']('', '
@@ -289,11 +278,7 @@ function modifyBoard($board_id, &$boardOptions)
 			)
 		);
 
-		$boardUpdates[] = 'id_cat = {int:id_cat}';
-		$boardUpdates[] = 'id_parent = {int:id_parent}';
-		$boardUpdates[] = 'child_level = {int:child_level}';
-		$boardUpdates[] = 'board_order = {int:board_order}';
-		$boardUpdateParameters += array(
+		$boardUpdates = array(
 			'id_cat' => $id_cat,
 			'id_parent' => $id_parent,
 			'child_level' => $child_level,
@@ -303,84 +288,44 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// This setting is a little twisted in the database...
 	if (isset($boardOptions['posts_count']))
-	{
-		$boardUpdates[] = 'count_posts = {int:count_posts}';
-		$boardUpdateParameters['count_posts'] = $boardOptions['posts_count'] ? 0 : 1;
-	}
+		$boardUpdates['count_posts'] = $boardOptions['posts_count'] ? 0 : 1;
 
 	// Set the theme for this board.
 	if (isset($boardOptions['board_theme']))
-	{
-		$boardUpdates[] = 'id_theme = {int:id_theme}';
-		$boardUpdateParameters['id_theme'] = (int) $boardOptions['board_theme'];
-	}
+		$boardUpdates['id_theme'] = (int) $boardOptions['board_theme'];
 
 	// Should the board theme override the user preferred theme?
 	if (isset($boardOptions['override_theme']))
-	{
-		$boardUpdates[] = 'override_theme = {int:override_theme}';
-		$boardUpdateParameters['override_theme'] = $boardOptions['override_theme'] ? 1 : 0;
-	}
+		$boardUpdates['override_theme'] = $boardOptions['override_theme'] ? 1 : 0;
 
 	// Who's allowed to access this board.
 	if (isset($boardOptions['access_groups']))
-	{
-		$boardUpdates[] = 'member_groups = {string:member_groups}';
-		$boardUpdateParameters['member_groups'] = implode(',', $boardOptions['access_groups']);
-	}
+		$boardUpdates['member_groups'] = implode(',', $boardOptions['access_groups']);
 
 	// And who isn't.
 	if (isset($boardOptions['deny_groups']))
-	{
-		$boardUpdates[] = 'deny_member_groups = {string:deny_groups}';
-		$boardUpdateParameters['deny_groups'] = implode(',', $boardOptions['deny_groups']);
-	}
+		$boardUpdates['deny_member_groups'] = implode(',', $boardOptions['deny_groups']);
 
 	if (isset($boardOptions['board_name']))
-	{
-		$boardUpdates[] = 'name = {string:board_name}';
-		$boardUpdateParameters['board_name'] = $boardOptions['board_name'];
-	}
+		$boardUpdates['name'] = $boardOptions['board_name'];
 
 	if (isset($boardOptions['board_description']))
-	{
-		$boardUpdates[] = 'description = {string:board_description}';
-		$boardUpdateParameters['board_description'] = $boardOptions['board_description'];
-	}
+		$boardUpdates['description'] = $boardOptions['board_description'];
 
 	if (isset($boardOptions['profile']))
-	{
-		$boardUpdates[] = 'id_profile = {int:profile}';
-		$boardUpdateParameters['profile'] = (int) $boardOptions['profile'];
-	}
+		$boardUpdates['id_profile'] = (int) $boardOptions['profile'];
 
 	if (isset($boardOptions['redirect']))
-	{
-		$boardUpdates[] = 'redirect = {string:redirect}';
-		$boardUpdateParameters['redirect'] = $boardOptions['redirect'];
-	}
+		$boardUpdates['redirect'] = $boardOptions['redirect'];
 
 	if (isset($boardOptions['num_posts']))
-	{
-		$boardUpdates[] = 'num_posts = {int:num_posts}';
-		$boardUpdateParameters['num_posts'] = (int) $boardOptions['num_posts'];
-	}
+		$boardUpdates['num_posts'] = (int) $boardOptions['num_posts'];
 
-	$id = $board_id;
-	call_integration_hook('integrate_modify_board', array($id, $boardUpdates, $boardUpdateParameters));
+	call_integration_hook('integrate_modify_board', array($id, &$boardUpdates));
 
 	// Do the updates (if any).
 	if (!empty($boardUpdates))
-		$request = $smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				' . implode(',
-				', $boardUpdates) . '
-			WHERE id_board = {int:selected_board}',
-			array_merge($boardUpdateParameters, array(
-				'selected_board' => $board_id,
-			))
-		);
+		updateBoardData($id, $boardUpdates);
 
 	// Set moderators of this board.
 	if (isset($boardOptions['moderators']) || isset($boardOptions['moderator_string']))
@@ -534,15 +479,7 @@ function createBoard($boardOptions)
 			list ($boardOptions['profile']) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);
 
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET id_profile = {int:new_profile}
-				WHERE id_board = {int:current_board}',
-				array(
-					'new_profile' => $boardOptions['profile'],
-					'current_board' => $board_id,
-				)
-			);
+			updateBoardData($board_id, array('id_profile' => $boardOptions['profile']));
 		}
 	}
 
@@ -717,15 +654,7 @@ function reorderBoards()
 	{
 		foreach ($boardList[$catID] as $boardID)
 			if ($boards[$boardID]['order'] != ++$board_order)
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET board_order = {int:new_order}
-					WHERE id_board = {int:selected_board}',
-					array(
-						'new_order' => $board_order,
-						'selected_board' => $boardID,
-					)
-				);
+				updateBoardData($boardID, array('board_order' => $board_order));
 	}
 
 	// Sort the records of the boards table on the board_order value.
@@ -870,15 +799,9 @@ function getBoardTree()
 
 				// Wrong childlevel...we can silently fix this...
 				if ($boards[$row['id_parent']]['tree']['node']['level'] != $row['child_level'] - 1)
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET child_level = {int:new_child_level}
-						WHERE id_board = {int:selected_board}',
-						array(
-							'new_child_level' => $boards[$row['id_parent']]['tree']['node']['level'] + 1,
-							'selected_board' => $row['id_board'],
-						)
-					);
+					updateBoardData($row['id_board'], array(
+						'child_level' => $boards[$row['id_parent']]['tree']['node']['level'] + 1,
+					));
 
 				$boards[$row['id_parent']]['tree']['children'][$row['id_board']] = array(
 					'node' => &$boards[$row['id_board']],

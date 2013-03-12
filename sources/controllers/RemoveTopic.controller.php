@@ -277,15 +277,7 @@ function action_restoretopic()
 
 		// Put the icons back.
 		if (!empty($messages))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET icon = {string:icon}
-				WHERE id_msg IN ({array_int:messages})',
-				array(
-					'icon' => 'xx',
-					'messages' => $messages,
-				)
-			);
+			updateMessageData($messages, array('icon' => 'xx'));
 	}
 
 	// Now any topics?
@@ -359,7 +351,7 @@ function action_restoretopic()
 				);
 
 				while ($member = $smcFunc['db_fetch_assoc']($request2))
-					updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
+					updateMemberData($member['id_member'], array('posts' => '+' . $member['post_count']));
 				$smcFunc['db_free_result']($request2);
 			}
 
@@ -444,20 +436,11 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	}
 
 	// Time to move the messages.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET
-			id_topic = {int:target_topic},
-			id_board = {int:target_board},
-			icon = {string:icon}
-		WHERE id_msg IN({array_int:msgs})',
-		array(
-			'target_topic' => $target_topic,
-			'target_board' => $target_board,
-			'icon' => $target_board == $modSettings['recycle_board'] ? 'recycled' : 'xx',
-			'msgs' => $msgs,
-		)
-	);
+	updateMessageData($msgs, array(
+		'id_topic' => $target_topic,
+		'id_board' => $target_board,
+		'icon' => $target_board == $modSettings['recycle_board'] ? 'recycled' : 'xx',
+	));
 
 	// Fix the id_first_msg and id_last_msg for the target topic.
 	$target_topic_data = array(
@@ -489,18 +472,10 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$smcFunc['db_free_result']($request);
 
 	// We have a new post count for the board.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET
-			num_posts = num_posts + {int:diff_replies},
-			unapproved_posts = unapproved_posts + {int:diff_unapproved_posts}
-		WHERE id_board = {int:target_board}',
-		array(
-			'diff_replies' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
-			'diff_unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
-			'target_board' => $target_board,
-		)
-	);
+	updateBoardData($target_board, array(
+		'num_posts' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+		'unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
+	));
 
 	// In some cases we merged the only post in a topic so the topic data is left behind in the topic table.
 	$request = $smcFunc['db_query']('', '
@@ -555,55 +530,28 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		$smcFunc['db_free_result']($request);
 
 		// Update the topic details for the source topic.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_first_msg = {int:id_first_msg},
-				id_last_msg = {int:id_last_msg},
-				num_replies = {int:num_replies},
-				unapproved_posts = {int:unapproved_posts}
-			WHERE id_topic = {int:from_topic}',
-			array(
-				'id_first_msg' => $source_topic_data['id_first_msg'],
-				'id_last_msg' => $source_topic_data['id_last_msg'],
-				'num_replies' => $source_topic_data['num_replies'],
-				'unapproved_posts' => $source_topic_data['unapproved_posts'],
-				'from_topic' => $from_topic,
-			)
-		);
+		updateTopicData($from_topic, array(
+			'id_first_msg' => $source_topic_data['id_first_msg'],
+			'id_last_msg' => $source_topic_data['id_last_msg'],
+			'num_replies' => $source_topic_data['num_replies'],
+			'unapproved_posts' => $source_topic_data['unapproved_posts'],
+		));
 
 		// We have a new post count for the source board.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_posts = num_posts + {int:diff_replies},
-				unapproved_posts = unapproved_posts + {int:diff_unapproved_posts}
-			WHERE id_board = {int:from_board}',
-			array(
-				'diff_replies' => $source_topic_data['num_replies'] - $from_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
-				'diff_unapproved_posts' => $source_topic_data['unapproved_posts'] - $from_unapproved_posts,
-				'from_board' => $from_board,
-			)
-		);
+		updateBoardData($from_board, array(
+			'num_posts' => $source_topic_data['num_replies'] - $from_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+			'unapproved_posts' => $source_topic_data['unapproved_posts'] - $from_unapproved_posts,
+		));
 	}
 
 	// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg},
-			num_replies = {int:num_replies},
-			unapproved_posts = {int:unapproved_posts}
-		WHERE id_topic = {int:target_topic}',
-		array(
-			'id_first_msg' => $target_topic_data['id_first_msg'],
-			'id_last_msg' => $target_topic_data['id_last_msg'],
-			'num_replies' => $target_topic_data['num_replies'],
-			'unapproved_posts' => $target_topic_data['unapproved_posts'],
-			'target_topic' => $target_topic,
-		)
-	);
+	updateTopicData($target_topic, array(
+		'id_first_msg' => $target_topic_data['id_first_msg'],
+		'id_last_msg' => $target_topic_data['id_last_msg'],
+		'num_replies' => $target_topic_data['num_replies'],
+		'unapproved_posts' => $target_topic_data['unapproved_posts'],
+		'target_topic' => $target_topic,
+	));
 
 	// Need it to update some stats.
 	require_once(SUBSDIR . '/Post.subs.php');

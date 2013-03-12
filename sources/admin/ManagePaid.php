@@ -1267,17 +1267,10 @@ function reapplySubscriptions($users)
 				unset($group['additional'][$key]);
 		$addgroups = implode(',', $group['additional']);
 
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-			WHERE id_member = {int:current_member}
-			LIMIT 1',
-			array(
-				'primary_group' => $group['primary'],
-				'current_member' => $id,
-				'additional_groups' => $addgroups,
-			)
-		);
+		updateMemberData($id, array(
+			'id_group' => $id,
+			'additional_groups' => $addgroups,
+		));
 	}
 }
 
@@ -1415,16 +1408,10 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $id_group,
-			'current_member' => $id_member,
-			'additional_groups' => $newAddGroups,
-		)
-	);
+	updateMemberData($id_member, array(
+		'current_member' => $id_member,
+		'additional_groups' => $newAddGroups,
+	));
 
 	// Now log the subscription - maybe we have a dorment subscription we can restore?
 	$request = $smcFunc['db_query']('', '
@@ -1612,16 +1599,10 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	$existingGroups = implode(',', $existingGroups);
 
 	// Update the member
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:existing_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $id_group,
-			'current_member' => $id_member,
-			'existing_groups' => $existingGroups,
-		)
-	);
+	updateMemberData($id_member, array(
+		'current_member' => $id_member,
+		'additional_groups' => $existingGroups,
+	));
 
 	// Disable the subscription.
 	if (!$delete)

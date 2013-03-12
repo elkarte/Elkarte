@@ -637,15 +637,9 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET num_replies = {int:num_replies}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'num_replies' => $row['real_num_replies'],
-						'id_topic' => $row['id_topic'],
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'num_replies' => $row['real_num_replies']
+				));
 			$smcFunc['db_free_result']($request);
 
 			// Recount unapproved messages
@@ -665,15 +659,9 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET unapproved_posts = {int:unapproved_posts}
-					WHERE id_topic = {int:id_topic}',
-					array(
-						'unapproved_posts' => $row['real_unapproved_posts'],
-						'id_topic' => $row['id_topic'],
-					)
-				);
+				updateTopicData($row['id_topic'], array(
+					'unapproved_posts' => $row['real_unapproved_posts']
+				));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;
@@ -697,15 +685,7 @@ function AdminBoardRecount()
 	if ($_REQUEST['step'] <= 1)
 	{
 		if (empty($_REQUEST['start']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET num_posts = {int:num_posts}
-				WHERE redirect = {string:redirect}',
-				array(
-					'num_posts' => 0,
-					'redirect' => '',
-				)
-			);
+			updateBoardData('redir', array('num_posts' => 0));
 
 		while ($_REQUEST['start'] < $max_topics)
 		{
@@ -723,15 +703,7 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET num_posts = num_posts + {int:real_num_posts}
-					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_num_posts' => $row['real_num_posts'],
-					)
-				);
+				updateBoardData($row['id_board'], array('num_posts' => '+' . $row['real_num_posts']));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;
@@ -755,13 +727,7 @@ function AdminBoardRecount()
 	if ($_REQUEST['step'] <= 2)
 	{
 		if (empty($_REQUEST['start']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET num_topics = {int:num_topics}',
-				array(
-					'num_topics' => 0,
-				)
-			);
+			updateBoardData(null, array('num_topics' => 0));
 
 		while ($_REQUEST['start'] < $max_topics)
 		{
@@ -779,15 +745,7 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET num_topics = num_topics + {int:real_num_topics}
-					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_num_topics' => $row['real_num_topics'],
-					)
-				);
+				updateBoardData($row['id_board'], array('num_topics' => '+' . $row['real_num_topics']));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;
@@ -811,13 +769,7 @@ function AdminBoardRecount()
 	if ($_REQUEST['step'] <= 3)
 	{
 		if (empty($_REQUEST['start']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET unapproved_posts = {int:unapproved_posts}',
-				array(
-					'unapproved_posts' => 0,
-				)
-			);
+			updateBoardData(null, array('unapproved_posts' => 0,));
 
 		while ($_REQUEST['start'] < $max_topics)
 		{
@@ -835,15 +787,7 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
-					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'unapproved_posts' => $row['real_unapproved_posts'],
-					)
-				);
+				updateBoardData($row['id_board'], array('unapproved_posts' => '+' . $row['real_unapproved_posts']));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;
@@ -867,13 +811,7 @@ function AdminBoardRecount()
 	if ($_REQUEST['step'] <= 4)
 	{
 		if (empty($_REQUEST['start']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET unapproved_topics = {int:unapproved_topics}',
-				array(
-					'unapproved_topics' => 0,
-				)
-			);
+			updateBoardData(null, array('unapproved_topics' => 0,));
 
 		while ($_REQUEST['start'] < $max_topics)
 		{
@@ -891,15 +829,7 @@ function AdminBoardRecount()
 				)
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
-					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_unapproved_topics' => $row['real_unapproved_topics'],
-					)
-				);
+				updateBoardData($row['id_board'], array('unapproved_topics' => '+' . $row['real_unapproved_topics']));
 			$smcFunc['db_free_result']($request);
 
 			$_REQUEST['start'] += $increment;
@@ -987,15 +917,7 @@ function AdminBoardRecount()
 			$smcFunc['db_free_result']($request);
 
 			foreach ($boards as $board_id => $messages)
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}messages
-					SET id_board = {int:id_board}
-					WHERE id_msg IN ({array_int:id_msg_array})',
-					array(
-						'id_msg_array' => $messages,
-						'id_board' => $board_id,
-					)
-				);
+				updateMessageData($messages, array('id_board' => $board_id));
 
 			$_REQUEST['start'] += $increment;
 
@@ -1057,16 +979,10 @@ function AdminBoardRecount()
 
 			// If what is and what should be the latest message differ, an update is necessary.
 			if ($row['local_last_msg'] != $row['id_last_msg'] || $curLastModifiedMsg != $row['id_msg_updated'])
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
-					WHERE id_board = {int:id_board}',
-					array(
-						'id_last_msg' => $row['local_last_msg'],
-						'id_msg_updated' => $curLastModifiedMsg,
-						'id_board' => $row['id_board'],
-					)
-				);
+				updateBoardData($row['id_board'], array(
+					'id_last_msg' => $row['local_last_msg'],
+					'id_msg_updated' => $curLastModifiedMsg,
+				));
 
 			// Parent boards inherit the latest modified message of their children.
 			if (isset($lastModifiedMsg[$row['id_parent']]))
@@ -1494,17 +1410,10 @@ function MaintainRecountPosts()
 
 	// Update the post count for this group
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET posts = {int:posts}
-			WHERE id_member = {int:row}',
-			array(
-				'row' => $row['id_member'],
-				'posts' => $row['posts'],
-			)
-		);
-	}
+		updateMemberData($row['id_member'], array(
+			'posts' => $row['posts'],
+		));
+
 	$smcFunc['db_free_result']($request);
 
 	// Continue?
@@ -1560,16 +1469,7 @@ function MaintainRecountPosts()
 
 		// set the post count to zero for any delinquents we may have found
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET posts = {int:zero}
-				WHERE id_member = {int:row}',
-				array(
-					'row' => $row['id_member'],
-					'zero' => 0,
-				)
-			);
+			updateMemberData($row['id_member'], array('posts' => 0));
 		}
 		$smcFunc['db_free_result']($request);
 	}

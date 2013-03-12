@@ -543,37 +543,21 @@ function action_mergeExecute($topics = array())
 		)
 	);
 
-	// Asssign the properties of the newly merged topic.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}topics
-		SET
-			id_board = {int:id_board},
-			id_member_started = {int:id_member_started},
-			id_member_updated = {int:id_member_updated},
-			id_first_msg = {int:id_first_msg},
-			id_last_msg = {int:id_last_msg},
-			id_poll = {int:id_poll},
-			num_replies = {int:num_replies},
-			unapproved_posts = {int:unapproved_posts},
-			num_views = {int:num_views},
-			is_sticky = {int:is_sticky},
-			approved = {int:approved}
-		WHERE id_topic = {int:id_topic}',
-		array(
-			'id_board' => $target_board,
-			'is_sticky' => $is_sticky,
-			'approved' => $topic_approved,
-			'id_topic' => $id_topic,
-			'id_member_started' => $member_started,
-			'id_member_updated' => $member_updated,
-			'id_first_msg' => $first_msg,
-			'id_last_msg' => $last_msg,
-			'id_poll' => $target_poll,
-			'num_replies' => $num_replies,
-			'unapproved_posts' => $num_unapproved,
-			'num_views' => $num_views,
-		)
-	);
+	// Assign the properties of the newly merged topic.
+	updateTopicData($id_topic, array(
+		'id_board' => $target_board,
+		'is_sticky' => $is_sticky,
+		'approved' => $topic_approved,
+		'id_topic' => $id_topic,
+		'id_member_started' => $member_started,
+		'id_member_updated' => $member_updated,
+		'id_first_msg' => $first_msg,
+		'id_last_msg' => $last_msg,
+		'id_poll' => $target_poll,
+		'num_replies' => $num_replies,
+		'unapproved_posts' => $num_unapproved,
+		'num_views' => $num_views,
+	));
 
 	// Grab the response prefix (like 'Re: ') in the default forum language.
 	if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
@@ -620,15 +604,7 @@ function action_mergeExecute($topics = array())
 	);
 
 	// Change the subject of the first message...
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET subject = {string:target_subject}
-		WHERE id_msg = {int:first_msg}',
-		array(
-			'first_msg' => $first_msg,
-			'target_subject' => $target_subject,
-		)
-	);
+	updateMessageData($first_msg, array('subject' => $target_subject));
 
 	// Adjust all calendar events to point to the new topic.
 	$smcFunc['db_query']('', '
@@ -742,24 +718,12 @@ function action_mergeExecute($topics = array())
 
 	// Cycle through each board...
 	foreach ($boardTotals as $id_board => $stats)
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_topics = CASE WHEN {int:topics} > num_topics THEN 0 ELSE num_topics - {int:topics} END,
-				unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END,
-				num_posts = CASE WHEN {int:posts} > num_posts THEN 0 ELSE num_posts - {int:posts} END,
-				unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $id_board,
-				'topics' => $stats['topics'],
+		updateBoardData($id_board, array(
+				'num_topics' => $stats['topics'],
 				'unapproved_topics' => $stats['unapproved_topics'],
-				'posts' => $stats['posts'],
+				'num_posts' => $stats['posts'],
 				'unapproved_posts' => $stats['unapproved_posts'],
-			)
-		);
-	}
+		));
 
 	// Determine the board the final topic resides in
 	$request = $smcFunc['db_query']('', '

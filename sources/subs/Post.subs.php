@@ -897,15 +897,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 
 		// Fix the message with the topic.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}messages
-			SET id_topic = {int:id_topic}
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_topic' => $topicOptions['id'],
-				'id_msg' => $msgOptions['id'],
-			)
-		);
+		updateMessageData($msgOptions['id'], array('id_topic' => $topicOptions['id']));
 
 		// There's been a new topic AND a new post today.
 		trackStats(array('topics' => '+', 'posts' => '+'));
@@ -919,44 +911,25 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// The topic already exists, it only needs a little updating.
 	else
 	{
-		$update_parameters = array(
-			'poster_id' => $posterOptions['id'],
-			'id_msg' => $msgOptions['id'],
-			'locked' => $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'],
-			'id_topic' => $topicOptions['id'],
-			'counter_increment' => 1,
-		);
-		$topics_columns = array();
 		if ($msgOptions['approved'])
 			$topics_columns = array(
-				'id_member_updated = {int:poster_id}',
-				'id_last_msg = {int:id_msg}',
-				'num_replies = num_replies + {int:counter_increment}',
+				'id_member_updated' => $posterOptions['id'],
+				'id_last_msg' => $msgOptions['id'],
+				'num_replies' => '+',
 			);
 		else
 			$topics_columns = array(
-				'unapproved_posts = unapproved_posts + {int:counter_increment}',
+				'unapproved_posts' => '+',
 			);
 		if ($topicOptions['lock_mode'] !== null)
-			$topics_columns = array(
-				'locked = {int:locked}',
-			);
+			$topics_columns['locked'] = $topicOptions['lock_mode'];
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns = array(
-				'is_sticky = {int:is_sticky}',
-			);
+			$topics_columns['is_sticky'] = $topicOptions['sticky_mode'];
 
-		call_integration_hook('integrate_modify_topic', array($topics_columns, $update_parameters, $msgOptions, $topicOptions, $posterOptions));
+		call_integration_hook('integrate_modify_topic', array($topics_columns, $msgOptions, $topicOptions, $posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				' . implode(', ', $topics_columns) . '
-			WHERE id_topic = {int:id_topic}',
-			$update_parameters
-		);
+		updateTopicData($topicOptions['id'], $topics_columns);
 
 		// One new post has been added today.
 		trackStats(array('posts' => '+'));
@@ -964,35 +937,20 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Creating is modifying...in a way.
 	// @todo Why not set id_msg_modified on the insert?
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET id_msg_modified = {int:id_msg}
-		WHERE id_msg = {int:id_msg}',
-		array(
-			'id_msg' => $msgOptions['id'],
-		)
-	);
+	updateMessageData($msgOptions['id'], array('id_msg_modified' => $msgOptions['id']));
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + 1' . ($new_topic ? ', num_topics = num_topics + 1' : '') . '
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $topicOptions['board'],
-			)
-		);
+		updateBoardData($topicOptions['board'], array(
+			'num_posts' => '+',
+			'num_topics' => $new_topic ? '+' : '='
+		));
 	else
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET unapproved_posts = unapproved_posts + 1' . ($new_topic ? ', unapproved_topics = unapproved_topics + 1' : '') . '
-			WHERE id_board = {int:id_board}',
-			array(
-				'id_board' => $topicOptions['board'],
-			)
-		);
+		updateBoardData($topicOptions['board'], array(
+			'unapproved_posts' => '+',
+			'unapproved_topics' => $new_topic ? '+' : '='
+		));
 
 		// Add to the approval queue too.
 		$smcFunc['db_insert']('',
@@ -1124,49 +1082,23 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (isset($msgOptions['smileys_enabled']))
 		$messages_columns['smileys_enabled'] = empty($msgOptions['smileys_enabled']) ? 0 : 1;
 
-	// Which columns need to be ints?
-	$messageInts = array('modified_time', 'id_msg_modified', 'smileys_enabled');
-	$update_parameters = array(
-		'id_msg' => $msgOptions['id'],
-	);
-
-	call_integration_hook('integrate_modify_post', array($messages_columns, $update_parameters, $msgOptions, $topicOptions, $posterOptions, $messageInts));
-
-	foreach ($messages_columns as $var => $val)
-	{
-		$messages_columns[$var] = $var . ' = {' . (in_array($var, $messageInts) ? 'int' : 'string') . ':var_' . $var . '}';
-		$update_parameters['var_' . $var] = $val;
-	}
+	call_integration_hook('integrate_modify_post', array($messages_columns, $msgOptions, $topicOptions, $posterOptions));
 
 	// Nothing to do?
 	if (empty($messages_columns))
 		return true;
 
 	// Change the post.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET ' . implode(', ', $messages_columns) . '
-		WHERE id_msg = {int:id_msg}',
-		$update_parameters
-	);
+	updateMessageData($msgOptions['id'], $messages_columns);
 
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				is_sticky = {raw:is_sticky},
-				locked = {raw:locked},
-				id_poll = {raw:id_poll}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'is_sticky' => $topicOptions['sticky_mode'] === null ? 'is_sticky' : (int) $topicOptions['sticky_mode'],
-				'locked' => $topicOptions['lock_mode'] === null ? 'locked' : (int) $topicOptions['lock_mode'],
-				'id_poll' => $topicOptions['poll'] === null ? 'id_poll' : (int) $topicOptions['poll'],
-				'id_topic' => $topicOptions['id'],
-			)
-		);
+		updateTopicData($topicOptions['id'], array(
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? '=' : (int) $topicOptions['sticky_mode'],
+			'locked' => $topicOptions['lock_mode'] === null ? '=' : (int) $topicOptions['lock_mode'],
+			'id_poll' => $topicOptions['poll'] === null ? '=' : (int) $topicOptions['poll'],
+		));
 	}
 
 	// Mark the edited post as read.
@@ -1341,15 +1273,7 @@ function approvePosts($msgs, $approve = true)
 		return;
 
 	// Now we have the differences make the changes, first the easy one.
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}messages
-		SET approved = {int:approved_state}
-		WHERE id_msg IN ({array_int:message_list})',
-		array(
-			'message_list' => $msgs,
-			'approved_state' => $approve ? 1 : 0,
-		)
-	);
+	updateMessageData($msgs, array('approved' => $approve ? 1 : 0));
 
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)
@@ -1372,35 +1296,21 @@ function approvePosts($msgs, $approve = true)
 
 	// ... next the topics...
 	foreach ($topic_changes as $id => $changes)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'approved' => $changes['approved'],
-				'unapproved_posts' => $changes['unapproved_posts'],
-				'num_replies' => $changes['replies'],
-				'id_last_msg' => $changes['id_last_msg'],
-				'id_topic' => $id,
-			)
-		);
+		updateTopicData($id, array(
+			'approved' => $changes['approved'],
+			'unapproved_posts' => '+' . $changes['unapproved_posts'],
+			'num_replies' => '+' . $changes['replies'],
+			'id_last_msg' => $changes['id_last_msg'],
+		));
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
-			WHERE id_board = {int:id_board}',
-			array(
-				'num_posts' => $changes['posts'],
-				'unapproved_posts' => $changes['unapproved_posts'],
-				'num_topics' => $changes['topics'],
-				'unapproved_topics' => $changes['unapproved_topics'],
-				'id_board' => $id,
-			)
-		);
+		updateBoardData($id, array(
+			'num_posts' => ($changes['posts'] > 0 ? '+' : '') . $changes['posts'],
+			'unapproved_posts' => ($changes['unapproved_posts'] > 0 ? '+' : '') . $changes['unapproved_posts'],
+			'num_topics' => ($changes['topics'] > 0 ? '+' : '') . $changes['topics'],
+			'unapproved_topics' => ($changes['unapproved_topics'] > 0 ? '+' : '') . $changes['unapproved_topics'],
+		));
 
 	// Finally, least importantly, notifications!
 	if ($approve)
@@ -1441,7 +1351,7 @@ function approvePosts($msgs, $approve = true)
 	// Post count for the members?
 	if (!empty($member_post_changes))
 		foreach ($member_post_changes as $id_member => $count_change)
-			updateMemberData($id_member, array('posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change));
+			updateMemberData($id_member, array('posts' => ($approve ? '+' : '-') . $count_change));
 
 	return true;
 }
@@ -1743,18 +1653,10 @@ function updateLastMessages($setboards, $id_msg = 0)
 		);
 	}
 	foreach ($board_updates as $board_data)
-	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
-			WHERE id_board IN ({array_int:board_list})',
-			array(
-				'board_list' => $board_data['boards'],
-				'id_last_msg' => $board_data['id'],
-				'id_msg_updated' => $board_data['updated'],
-			)
-		);
-	}
+		updateBoardData($board_data['boards'], array(
+			'id_last_msg' => $board_data['id'],
+			'id_msg_updated' => $board_data['updated'],
+		));
 }
 
 /**

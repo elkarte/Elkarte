@@ -533,7 +533,7 @@ function action_grouprequests()
 					// Add them to the group master list.
 					$group_changes[$row['id_member']] = array(
 						'primary' => $row['primary_group'],
-						'add' => $row['additional_groups'],
+						'add' => trim($row['additional_groups']),
 					);
 				}
 
@@ -575,19 +575,13 @@ function action_grouprequests()
 					{
 						// Sanity check!
 						foreach ($groups['add'] as $key => $value)
-							if ($value == 0 || trim($value) == '')
+							if (empty($value))
 								unset($groups['add'][$key]);
 
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}members
-							SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-							WHERE id_member = {int:selected_member}',
-							array(
-								'primary_group' => $groups['primary'],
-								'selected_member' => $id,
-								'additional_groups' => implode(',', $groups['add']),
-							)
-						);
+						updateMemberData($id, array(
+							'id_group' => $groups['primary'],
+							'additional_groups' => implode(',', $groups['add']),
+						));
 					}
 
 					$lastLng = $user_info['language'];

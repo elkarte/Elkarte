@@ -314,37 +314,15 @@ function removeMessage($message, $decreasePostCount = true)
 		$row2 = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
 
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_last_msg = {int:id_last_msg},
-				id_member_updated = {int:id_member_updated}' . (!$modSettings['postmod_active'] || $row['approved'] ? ',
-				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : ',
-				unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'id_last_msg' => $row2['id_msg'],
-				'id_member_updated' => $row2['id_member'],
-				'no_replies' => 0,
-				'no_unapproved' => 0,
-				'id_topic' => $row['id_topic'],
-			)
-		);
+		updateTopicData($row['id_topic'], array(
+			'id_last_msg' => $row2['id_msg'],
+			'id_member_updated' => $row2['id_member'],
+			!$modSettings['postmod_active'] || $row['approved'] ? 'num_replies' : 'unapproved_posts' => '-',
+		));
 	}
 	// Only decrease post counts.
 	else
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET ' . ($row['approved'] ? '
-				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : '
-				unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'no_replies' => 0,
-				'no_unapproved' => 0,
-				'id_topic' => $row['id_topic'],
-			)
-		);
+		updateTopicData($row['id_topic'], array($row['approved'] ? 'num_replies' : 'unapproved_posts' => '-'));
 
 	// Default recycle to false.
 	$recycle = false;
@@ -404,22 +382,12 @@ function removeMessage($message, $decreasePostCount = true)
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)
 		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET
-					id_topic = {int:id_topic},
-					id_board = {int:recycle_board},
-					icon = {string:recycled},
-					approved = {int:is_approved}
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_topic' => $topicID,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_msg' => $message,
-					'recycled' => 'recycled',
-					'is_approved' => 1,
-				)
-			);
+			updateMessageData($message, array(
+				'id_topic' => $topicID,
+				'id_board' => $modSettings['recycle_board'],
+				'icon' => 'recycled',
+				'approved' => 1,
+			));
 
 			// Take any reported posts with us...
 			$smcFunc['db_query']('', '
@@ -452,33 +420,19 @@ function removeMessage($message, $decreasePostCount = true)
 				);
 
 			// Add one topic and post to the recycle bin board.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET
-					num_topics = num_topics + {int:num_topics_inc},
-					num_posts = num_posts + 1' .
-						($message > $last_board_msg ? ', id_last_msg = {int:id_merged_msg}' : '') . '
-				WHERE id_board = {int:recycle_board}',
-				array(
-					'num_topics_inc' => empty($id_recycle_topic) ? 1 : 0,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_merged_msg' => $message,
-				)
-			);
+			updateBoardData($modSettings['recycle_board'], array(
+				'num_topics' => empty($id_recycle_topic) ? 1 : 0,
+				'num_posts' => '+',
+				'id_last_msg' => $message > $last_board_msg ? $message : '=',
+			));
 
 			// Lets increase the num_replies, and the first/last message ID as appropriate.
 			if (!empty($id_recycle_topic))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}topics
-					SET num_replies = num_replies + 1' .
-						($message > $last_topic_msg ? ', id_last_msg = {int:id_merged_msg}' : '') .
-						($message < $first_topic_msg ? ', id_first_msg = {int:id_merged_msg}' : '') . '
-					WHERE id_topic = {int:id_recycle_topic}',
-					array(
-						'id_recycle_topic' => $id_recycle_topic,
-						'id_merged_msg' => $message,
-					)
-				);
+				updateTopicData($id_recycle_topic, array(
+					'num_replies' => '+',
+					'id_last_msg' => $message > $last_topic_msg ? $message : '=',
+					'id_first_msg' => $message < $first_topic_msg ? $message : '=',
+				));
 
 			// Make sure this message isn't getting deleted later on.
 			$recycle = true;
@@ -500,18 +454,9 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 	}
 
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET ' . ($row['approved'] ? '
-			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
-			unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-		WHERE id_board = {int:id_board}',
-		array(
-			'no_posts' => 0,
-			'no_unapproved' => 0,
-			'id_board' => $row['id_board'],
-		)
-	);
+	updateBoardData($row['id_board'], array(
+		$row['approved'] ? 'num_posts' : 'unapproved_posts' => '-'
+	));
 
 	// If the poster was registered and the board this message was on incremented
 	// the member's posts when it was posted, decrease his or her post count.

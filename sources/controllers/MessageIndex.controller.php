@@ -32,14 +32,7 @@ function action_messageindex()
 	// If this is a redirection board head off.
 	if ($board_info['redirect'])
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + 1
-			WHERE id_board = {int:current_board}',
-			array(
-				'current_board' => $board,
-			)
-		);
+		updateBoardData($board, array('num_posts' => '+'));
 
 		redirectexit($board_info['redirect']);
 	}
@@ -860,15 +853,7 @@ function action_quickmod()
 	// Do all the stickies...
 	if (!empty($stickyCache))
 	{
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics
-			SET is_sticky = CASE WHEN is_sticky = {int:is_sticky} THEN 0 ELSE 1 END
-			WHERE id_topic IN ({array_int:sticky_topic_ids})',
-			array(
-				'sticky_topic_ids' => $stickyCache,
-				'is_sticky' => 1,
-			)
-		);
+		updateTopicData($stickyCache, array('is_sticky' => 'toggle-1-0-1',));
 
 		// Get the board IDs and Sticky status
 		$request = $smcFunc['db_query']('', '
@@ -995,7 +980,7 @@ function action_quickmod()
 
 				// And now update them member's post counts
 				foreach ($members as $id_member => $post_adj)
-					updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
+					updateMemberData($id_member, array('posts' => '+' . $post_adj));
 
 			}
 		}
@@ -1130,18 +1115,8 @@ function action_quickmod()
 
 		// It could just be that *none* were their own topics...
 		if (!empty($lockCache))
-		{
 			// Alternate the locked value.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}topics
-				SET locked = CASE WHEN locked = {int:is_locked} THEN ' . (allowedTo('lock_any') ? '1' : '2') . ' ELSE 0 END
-				WHERE id_topic IN ({array_int:locked_topic_ids})',
-				array(
-					'locked_topic_ids' => $lockCache,
-					'is_locked' => 0,
-				)
-			);
-		}
+			updateTopicData($lockCache, array('locked' => 'toggle-0-' . (allowedTo('lock_any') ? '1' : '2') . '-0',));
 	}
 
 	if (!empty($markCache))

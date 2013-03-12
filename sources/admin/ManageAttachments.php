@@ -825,15 +825,9 @@ function action_byAge()
 
 		// Update the messages to reflect the change.
 		if (!empty($messages) && !empty($_POST['notice']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET body = CONCAT(body, {string:notice})
-				WHERE id_msg IN ({array_int:messages})',
-				array(
-					'messages' => $messages,
-					'notice' => '<br /><br />' . $_POST['notice'],
-				)
-			);
+			updateMessageData($messages, array(
+				'concat-body' => '<br /><br />' . $_POST['notice'],
+			));
 	}
 	else
 	{
@@ -864,15 +858,9 @@ function action_bySize()
 
 	// And make a note on the post.
 	if (!empty($messages) && !empty($_POST['notice']))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}messages
-			SET body = CONCAT(body, {string:notice})
-			WHERE id_msg IN ({array_int:messages})',
-			array(
-				'messages' => $messages,
-				'notice' => '<br /><br />' . $_POST['notice'],
-			)
-		);
+		updateMessageData($messages, array(
+			'concat-notice' => '<br /><br />' . $_POST['notice'],
+		));
 
 	redirectexit('action=admin;area=manageattachments;sa=maintenance');
 }
@@ -908,15 +896,9 @@ function action_remove()
 			if (!empty($messages))
 			{
 				loadLanguage('index', $language, true);
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}messages
-					SET body = CONCAT(body, {string:deleted_message})
-					WHERE id_msg IN ({array_int:messages_affected})',
-					array(
-						'messages_affected' => $messages,
-						'deleted_message' => '<br /><br />' . $txt['attachment_delete_admin'],
-					)
-				);
+				updateMessageData($messages, array(
+					'concat-body' => '<br /><br />' . $txt['attachment_delete_admin'],
+				));
 				loadLanguage('index', $user_info['language'], true);
 			}
 		}
@@ -947,15 +929,9 @@ function action_removeall()
 
 	// Add the notice on the end of the changed messages.
 	if (!empty($messages))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}messages
-			SET body = CONCAT(body, {string:deleted_message})
-			WHERE id_msg IN ({array_int:messages})',
-			array(
-				'messages' => $messages,
-				'deleted_message' => '<br /><br />' . $_POST['notice'],
-			)
-		);
+		updateMessageData($messages, array(
+			'concat-body' => '<br /><br />' . $_POST['notice'],
+		));
 
 	redirectexit('action=admin;area=manageattachments;sa=maintenance');
 }
