@@ -620,10 +620,15 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
  */
 function prepareMailingForPreview()
 {
-	global $context, $smcFunc, $modSettings, $scripturl, $user_info, $txt;
-	loadLanguage('Errors');
+	global $context, $modSettings, $scripturl, $user_info, $txt;
 
-	$processing = array('preview_subject' => 'subject', 'preview_message' => 'message');
+	loadLanguage('Errors');
+	require_once(SUBSDIR . '/Post.subs.php');
+
+	$processing = array(
+		'preview_subject' => 'subject',
+		'preview_message' => 'message'
+	);
 
 	// Use the default time format.
 	$user_info['time_format'] = $modSettings['time_format'];
@@ -651,6 +656,8 @@ function prepareMailingForPreview()
 			continue;
 
 		preparsecode($context[$key]);
+
+		// Sending as html then we convert any bbc
 		if ($html)
 		{
 			$enablePostHTML = $modSettings['enablePostHTML'];
@@ -672,7 +679,7 @@ function prepareMailingForPreview()
 }
 
 /**
- * Callback function for loademaitemplate on subject and body
+ * Callback function for load email template on subject and body
  * Uses capture group 1 in array
  *
  * @param type $matches
