@@ -58,6 +58,10 @@ function pbe_main($data = null, $force = false, $key = null)
 	if (empty($modSettings['pbe_post_enabled']) && empty($modSettings['pbe_pm_enabled']))
 		return pbe_emailError('error_email_notenabled', $email_message);
 
+	// Spam I am?
+	if ($email_message->load_spam())
+		return pbe_emailError('error_found_spam', $email_message);
+
 	// Load the user from the database based on the sending email address
 	$email_message->email['from'] = !empty($email_message->email['from']) ? strtolower($email_message->email['from']) : '';
 	$pbe = query_load_user_info($email_message->email['from']);
@@ -81,10 +85,6 @@ function pbe_main($data = null, $force = false, $key = null)
 	// The key received was not sent to this member ... how we love those email aggregators
 	if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
 		return pbe_emailError('error_key_sender_match', $email_message);
-
-	// Getting spammy with it?
-	if ($email_message->load_spam())
-		return pbe_emailError('error_found_spam', $email_message);
 
 	// In maintenance mode, just log it for now
 	if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && !$user_info['is_admin'])
