@@ -1432,7 +1432,7 @@ function action_installtheme()
 		$theme_name = basename($_REQUEST['theme_dir']);
 		$theme_dir = $_REQUEST['theme_dir'];
 	}
-	elseif ($method = 'upload')
+	elseif ($method == 'upload')
 	{
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/Themes'))

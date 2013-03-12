@@ -155,7 +155,7 @@ function action_movetopic2()
 	if ($modSettings['postmod_active'] && !$context['is_approved'] && !allowedTo('approve_posts'))
 	{
 		// Only allow them to move it to other boards they can't approve it in.
-		$can_approve = boardsAllowedTo('approve_posts');
+		$can_approve = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 		$boards = array_intersect($boards, $can_approve);
 	}
 

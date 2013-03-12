@@ -16,7 +16,6 @@
  * Handle all of the searching from here.
  *
  */
-
 if (!defined('ELKARTE'))
 	die('No access...');
 
@@ -47,6 +46,7 @@ function action_plushsearch1()
 		fatal_lang_error('loadavg_search_disabled', false);
 
 	loadLanguage('Search');
+
 	// Don't load this in XML mode.
 	if (!isset($_REQUEST['xml']))
 		loadTemplate('Search');
@@ -79,6 +79,7 @@ function action_plushsearch1()
 	{
 		// Due to IE's 2083 character limit, we have to compress long search strings
 		$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $_REQUEST['params']));
+
 		// Test for gzuncompress failing
 		$temp_params2 = @gzuncompress($temp_params);
 		$temp_params = explode('|"|', !empty($temp_params2) ? $temp_params2 : $temp_params);
@@ -89,13 +90,13 @@ function action_plushsearch1()
 			@list ($k, $v) = explode('|\'|', $data);
 			$context['search_params'][$k] = $v;
 		}
+
 		if (isset($context['search_params']['brd']))
 			$context['search_params']['brd'] = $context['search_params']['brd'] == '' ? array() : explode(',', $context['search_params']['brd']);
 	}
 
 	if (isset($_REQUEST['search']))
 		$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
-
 	if (isset($context['search_params']['search']))
 		$context['search_params']['search'] = $smcFunc['htmlspecialchars']($context['search_params']['search']);
 	if (isset($context['search_params']['userspec']))
@@ -138,6 +139,7 @@ function action_plushsearch1()
 		$context['search_params']['topic'] = (int) $_REQUEST['topic'];
 		$context['search_params']['show_complete'] = true;
 	}
+
 	if (!empty($context['search_params']['topic']))
 	{
 		$context['search_params']['topic'] = (int) $context['search_params']['topic'];
@@ -190,10 +192,11 @@ function action_plushsearch1()
  */
 function action_plushsearch2()
 {
-	global $scripturl, $modSettings, $txt, $db_connection;
+	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
 	global $excludedWords, $participants, $smcFunc;
 
+	// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 	// Coming from quick search box and going to some custome place?
 	if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
 	{
@@ -550,7 +553,9 @@ function action_plushsearch2()
 	call_integration_hook('integrate_search_sort_columns', array($sort_columns));
 	if (empty($search_params['sort']) && !empty($_REQUEST['sort']))
 		list ($search_params['sort'], $search_params['sort_dir']) = array_pad(explode('|', $_REQUEST['sort']), 2, '');
+
 	$search_params['sort'] = !empty($search_params['sort']) && in_array($search_params['sort'], $sort_columns) ? $search_params['sort'] : 'relevance';
+
 	if (!empty($search_params['topic']) && $search_params['sort'] === 'num_replies')
 		$search_params['sort'] = 'id_msg';
 
@@ -608,7 +613,7 @@ function action_plushsearch2()
 
 	// Remove the phrase parts and extract the words.
 	$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $search_params['search']);
-	$wordArray = explode(' ',  $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
+	$wordArray = explode(' ', $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 	// A minus sign in front of a word excludes the word.... so...
 	$excludedWords = array();
@@ -710,9 +715,7 @@ function action_plushsearch2()
 		foreach ($orParts[$orIndex] as $word)
 		{
 			$is_excluded = in_array($word, $excludedWords);
-
 			$searchWords[$orIndex]['all_words'][] = $word;
-
 			$subjectWords = text2words($word);
 			if (!$is_excluded || count($subjectWords) === 1)
 			{
@@ -844,6 +847,7 @@ function action_plushsearch2()
 			$temp_params['search'] = implode(' ', $did_you_mean['search']);
 			if (isset($temp_params['brd']))
 				$temp_params['brd'] = implode(',', $temp_params['brd']);
+
 			$context['params'] = array();
 			foreach ($temp_params as $k => $v)
 				$context['did_you_mean_params'][] = $k . '|\'|' . $v;
@@ -885,7 +889,6 @@ function action_plushsearch2()
 	}
 
 	// *** Encode all search params
-
 	// All search params have been checked, let's compile them to a single string... made less simple by PHP 4.3.9 and below.
 	$temp_params = $search_params;
 	if (isset($temp_params['brd']))
@@ -898,9 +901,11 @@ function action_plushsearch2()
 	{
 		// Due to old IE's 2083 character limit, we have to compress long search strings
 		$params = @gzcompress(implode('|"|', $context['params']));
+
 		// Gzcompress failed, use try non-gz
 		if (empty($params))
 			$params = implode('|"|', $context['params']);
+
 		// Base64 encode, then replace +/= with uri safe ones that can be reverted
 		$context['params'] = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode($params));
 	}
@@ -928,6 +933,7 @@ function action_plushsearch2()
 	// Spam me not, Spam-a-lot?
 	if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $search_params['search'])
 		spamProtection('search');
+
 	// Store the last search string to allow pages of results to be browsed.
 	$_SESSION['last_ss'] = $search_params['search'];
 
@@ -943,7 +949,6 @@ function action_plushsearch2()
 	{
 		$participants = array();
 		$searchArray = array();
-
 		$num_results = $searchAPI->searchQuery($query_params, $searchWords, $excludedIndexWords, $participants, $searchArray);
 	}
 
@@ -1033,6 +1038,7 @@ function action_plushsearch2()
 						{
 							$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 						}
+
 						$count = 0;
 						foreach ($excludedPhrases as $phrase)
 						{
@@ -1042,13 +1048,17 @@ function action_plushsearch2()
 					}
 					call_integration_hook('integrate_subject_only_search_query', array($subject_query, $subject_query_params));
 
+					// Build the search relevance query
 					$relevance = '1000 * (';
 					foreach ($weight_factors as $type => $value)
 					{
-						$relevance .= $weight[$type];
-						if (!empty($value['search']))
-							$relevance .= ' * ' . $value['search'];
-						$relevance .= ' + ';
+						if (isset($value['results']))
+						{
+							$relevance .= $weight[$type];
+							if (!empty($value['results']))
+								$relevance .= ' * ' . $value['results'];
+							$relevance .= ' + ';
+						}
 					}
 					$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
@@ -1059,7 +1069,7 @@ function action_plushsearch2()
 						SELECT
 							{int:id_search},
 							t.id_topic,
-							' . $relevance. ',
+							' . $relevance . ',
 							' . (empty($userQuery) ? 't.id_first_msg' : 'm.id_msg') . ',
 							1
 						FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
@@ -1142,9 +1152,7 @@ function action_plushsearch2()
 					$main_query['select']['id_topic'] = 't.id_topic';
 					$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
 					$main_query['select']['num_matches'] = 'COUNT(*) AS num_matches';
-
 					$main_query['weights'] = $weight_factors;
-
 					$main_query['group_by'][] = 't.id_topic';
 				}
 				else
@@ -1168,6 +1176,7 @@ function action_plushsearch2()
 						$main_query['where'][] = 't.id_topic = {int:topic}';
 						$main_query['parameters']['topic'] = $search_params['topic'];
 					}
+
 					if (!empty($search_params['show_complete']))
 						$main_query['group_by'][] = 'm.id_msg, t.id_first_msg, t.id_last_msg';
 				}
@@ -1351,6 +1360,7 @@ function action_plushsearch2()
 				}
 
 				$indexedResults = 0;
+
 				// We building an index?
 				if ($searchAPI->supportsMethod('indexedWordQuery', $query_params))
 				{
@@ -1458,7 +1468,6 @@ function action_plushsearch2()
 						}
 					}
 				}
-
 				// Not using an index? All conditions have to be carried over.
 				else
 				{
@@ -2062,7 +2071,7 @@ function MessageSearch2()
 
 	// Remove the phrase parts and extract the words.
 	$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $search_params['search']);
-	$wordArray = explode(' ',  $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
+	$wordArray = explode(' ', $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 	// A minus sign in front of a word excludes the word.... so...
 	$excludedWords = array();
