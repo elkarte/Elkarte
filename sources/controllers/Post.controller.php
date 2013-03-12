@@ -312,7 +312,7 @@ function action_post()
 				'use_permissions' => true,
 				'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
 			);
-			$context['event']['categories'] = getBoardList($boardListOptions);
+			$context['categories'] = getBoardList($boardListOptions);
 		}
 
 		// Find the last day of the month.

@@ -167,20 +167,7 @@ function template_event_post()
 								<input type="checkbox" style="vertical-align: middle;" class="input_check" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
 							</li>
 							<li>
-								', $txt['calendar_post_in'], '
-								<select id="board" name="board" onchange="this.form.submit();">';
-		foreach ($context['event']['categories'] as $category)
-		{
-			echo '
-									<optgroup label="', $category['name'], '">';
-			foreach ($category['boards'] as $board)
-				echo '
-										<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt;' : '', ' ', $board['name'], '&nbsp;</option>';
-			echo '
-									</optgroup>';
-		}
-		echo '
-								</select>
+								', template_select_boards('board', $txt['calendar_post_in'], 'onchange="this.form.submit();"'), '
 							</li>';
 	}
 

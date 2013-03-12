@@ -1815,3 +1815,32 @@ function template_admin_quick_search()
 				</form>
 			</object>';
 }
+
+// A list of urls and "words separators" for new search engines in the dropdown
+function template_callback_external_search_engines()
+{
+	global $txt, $context, $settings;
+
+	if (!empty($context['search_engines']))
+		foreach ($context['search_engines'] as $data)
+			echo '
+			<dt>
+				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
+			</dt>
+			<dd>
+				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
+				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
+			</dd>';
+
+	echo '
+		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
+		<dt id="add_more_link_div" style="display: none;">
+			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
+		</dt><dd></dd>';
+
+	// The javascript needs to go at the end but we'll put it in this template for looks.
+	$context['settings_post_javascript'] .= '
+		var placeHolder = document.getElementById(\'add_more_question_placeholder\');
+		document.getElementById(\'add_more_link_div\').style.display = \'\';
+	';
+}

@@ -483,6 +483,45 @@ function addAnotherQuestion()
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
 
+function addAnotherSearch(txt_name, txt_url, txt_word_sep)
+{
+	var newDT = document.createElement("dt");
+	var newInput = createNamedElement("input", "engine_name[]");
+	newInput.type = "text";
+	newInput.className = "input_text";
+	newInput.size = "50";
+	newInput.setAttribute("class", "verification_question");
+	var newLabel = document.createElement("label");
+	newLabel.textContent = txt_name + ': ';
+	newLabel.appendChild(newInput);
+	newDT.appendChild(newLabel);
+
+	var newDD = document.createElement("dd");
+	newInput = createNamedElement("input", "engine_url[]");
+	newInput.type = "text";
+	newInput.className = "input_text";
+	newInput.size = "35";
+	newInput.setAttribute("class", "input_text verification_answer");
+	var newLabel = document.createElement("label");
+	newLabel.textContent = txt_url + ': ';
+	newLabel.appendChild(newInput);
+	newDD.appendChild(newLabel);
+	newDD.appendChild(document.createElement("br"));
+
+	newInput = createNamedElement("input", "engine_separator[]");
+	newInput.type = "text";
+	newInput.className = "input_text";
+	newInput.size = "5";
+	newInput.setAttribute("class", "input_text verification_answer");
+	var newLabel = document.createElement("label");
+	newLabel.textContent = txt_word_sep + ': ';
+	newLabel.appendChild(newInput);
+	newDD.appendChild(newLabel);
+
+	placeHolder.parentNode.insertBefore(newDT, placeHolder);
+	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}
+
 // Add a new dt/dd pair above a parent selector
 function addAnotherOption(parent, oDtName, oDdName)
 {
