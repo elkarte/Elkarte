@@ -98,10 +98,10 @@ function action_deletemsg()
 	$topic_info = getTopicInfo($topic, 'message');
 
 	// Verify they can see this!
-	if ($modSettings['postmod_active'] && !$topic_info['msg_approved'] && !empty($topic_info['poster_time']) && $topic_info['poster_time'] != $user_info['id'])
+	if ($modSettings['postmod_active'] && !$topic_info['msg_approved'] && !empty($topic_info['id_member']) && $topic_info['id_member'] != $user_info['id'])
 		isAllowedTo('approve_posts');
 
-	if ($topic_info['poster_time'] == $user_info['id'])
+	if ($topic_info['id_member'] == $user_info['id'])
 	{
 		if (!allowedTo('delete_own'))
 		{
@@ -122,11 +122,11 @@ function action_deletemsg()
 	require_once(SUBSDIR . '/Messages.subs.php');
 	$full_topic = removeMessage($_REQUEST['msg']);
 
-	if (allowedTo('delete_any') && (!allowedTo('delete_own') || $topic_info['poster_time'] != $user_info['id']))
+	if (allowedTo('delete_any') && (!allowedTo('delete_own') || $topic_info['id_member'] != $user_info['id']))
 		logAction('delete', array(
 			'topic' => $topic,
 			'subject' => $topic_info['subject'],
-			'member' => $topic_info['poster_time'],
+			'member' => $topic_info['id_member'],
 			'board' => $board)
 		);
 
