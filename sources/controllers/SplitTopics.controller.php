@@ -310,7 +310,7 @@ function action_splitSelectTopics()
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context[empty($row['is_selected']) ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
+		$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
 	$smcFunc['db_free_result']($request);
 
 	// Fix an oversized starting page (to make sure both pageindexes are properly set).
