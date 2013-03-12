@@ -41,7 +41,7 @@ function action_movetopic()
 	require_once(SUBSDIR . '/Topic.subs.php');
 	$topic_info = getTopicInfo($topic, 'message');
 
-	if ($topic_info === false)
+	if (empty($topic_info))
 		fatal_lang_error('topic_gone', false);
 
 	$context['is_approved'] = $topic_info['approved'];
