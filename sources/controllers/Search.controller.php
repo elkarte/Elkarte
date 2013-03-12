@@ -194,6 +194,17 @@ function action_plushsearch2()
 	global $user_info, $context, $options, $messages_request, $boards_can;
 	global $excludedWords, $participants, $smcFunc;
 
+	// Coming from quick search box and going to some custome place?
+	if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
+	{
+		$search_engines = prepareSearchEngines();
+		if (isset($engines[$_REQUEST['search_selection']]))
+		{
+			$engine = $engines[$_REQUEST['search_selection']];
+			redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $_REQUEST['search']))));
+			}
+	}
+
 	// if comming from the quick search box, and we want to search on members, well we need to do that ;)
 	if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 		redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));

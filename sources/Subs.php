@@ -2781,6 +2781,8 @@ function setupThemeContext($forceload = false)
 	// This is here because old index templates might still use it.
 	$context['show_news'] = !empty($settings['enable_news']);
 
+	$context['additional_dropdown_search'] = prepareSearchEngines();
+
 	// This is done to allow theme authors to customize it as they want.
 	$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'pm');
 
@@ -4144,4 +4146,19 @@ function entity_fix__callback($matches)
 		return '';
 	else
 		return '&#' . $num . ';';
+}
+
+function prepareSearchEngines()
+{
+	global $modSettings;
+
+	$engines = array();
+	if (!empty($modSettings['additional_search_engines']))
+	{
+		$search_engines = unserialize($modSettings['additional_search_engines']);
+		foreach ($search_engines as $engine)
+			$engines[strtolower(preg_replace('~[^A-Za-z0-9 ]~', '', $engine['name']))] = $engine;
+	}
+
+	return $engines;
 }

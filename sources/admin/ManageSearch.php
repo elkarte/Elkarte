@@ -92,7 +92,7 @@ function ManageSearch()
  */
 function EditSearchSettings($return_config = false)
 {
-	global $txt, $context, $scripturl, $modSettings;
+	global $txt, $context, $scripturl, $modSettings, $smcFunc;
 
 	// What are we editing anyway?
 	$config_vars = array(
@@ -106,7 +106,12 @@ function EditSearchSettings($return_config = false)
 		'',
 			// Some limitations.
 			array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
+		array('title', 'additiona_search_engines'),
+			array('callback', 'external_search_engines'),
 	);
+
+	if (!isset($context['settings_post_javascript']))
+		$context['settings_post_javascript'] = '';
 
 	call_integration_hook('integrate_modify_search_settings', array($config_vars));
 
@@ -122,6 +127,17 @@ function EditSearchSettings($return_config = false)
 	$context['page_title'] = $txt['search_settings_title'];
 	$context['sub_template'] = 'show_settings';
 
+	$context['search_engines'] = array();
+	if (!empty($modSettings['additional_search_engines']))
+		$context['search_engines'] = unserialize($modSettings['additional_search_engines']);
+
+	for ($count = 0; $count < 3; $count++)
+		$context['search_engines'][] = array(
+			'name' => '',
+			'url' => '',
+			'separator' => '',
+		);
+
 	// We'll need this for the settings.
 	require_once(ADMINDIR . '/ManageServer.php');
 
@@ -131,6 +147,23 @@ function EditSearchSettings($return_config = false)
 		checkSession();
 
 		call_integration_hook('integrate_save_search_settings');
+
+		$new_engines = array();
+		foreach ($_POST['engine_name'] as $id => $searchengine)
+		{
+			// If no url, forget it
+			if (!empty($_POST['engine_url'][$id]))
+			{
+				$new_engines[] = array(
+					'name' => trim($smcFunc['htmlspecialchars']($searchengine, ENT_COMPAT)),
+					'url' => trim($smcFunc['htmlspecialchars']($_POST['engine_url'][$id], ENT_COMPAT)),
+					'separator' => trim($smcFunc['htmlspecialchars'](!empty($_POST['engine_separator'][$id]) ? $_POST['engine_separator'][$id] : '+', ENT_COMPAT)),
+				);
+			}
+		}
+		updateSettings(array(
+			'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
+		));
 
 		saveDBSettings($config_vars);
 		redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
