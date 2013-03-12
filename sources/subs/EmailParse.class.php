@@ -870,13 +870,13 @@ class Email_Parse
 	public function load_spam()
 	{
 		// SpamAssassin (and others like rspamd)
-		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'],0, 3)) === 'yes')
+		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'], 0, 3)) === 'yes')
 			$this->spam_found = true;
 		// SpamStopper and other variants
-		elseif (isset($this->headers['x-spam-status']) && strtolower(substr($this->headers['x-spam-status'],0, 3)) === 'yes')
+		elseif (isset($this->headers['x-spam-status']) && strtolower(substr($this->headers['x-spam-status'], 0, 3)) === 'yes')
 			$this->spam_found = true;
 		// j-chkmail --  hi = likely spam lo = suspect ...
-		elseif (isset($this->headers['x-j-chkmail-status']) && strtolower(substr($this->headers['x-j-chkmail-status'],0 ,2)) === 'hi')
+		elseif (isset($this->headers['x-j-chkmail-status']) && strtolower(substr($this->headers['x-j-chkmail-status'], 0, 2)) === 'hi')
 			$this->spam_found = true;
 		// Cisco Ironport ... This header is encrypted so its useless other than knowing it was scanned
 		//elseif (isset($this->headers['x-ironport-anti-spam-result']) && strtolower(substr($this->headers['x-ironport-anti-spam-result'],0, 4)) === 'No idea what to check')
