@@ -68,6 +68,7 @@ function action_selectgroup()
 		$groups[$id] = (int) $group;
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
 	$context['groups'] = array();
 	if (in_array(0, $groups))
@@ -107,17 +108,8 @@ function action_selectgroup()
 		$context['groups'][$id_group]['name'] = $group_info['group_name'];
 
 	// Get the subject of the topic we're about to announce.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.subject
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($context['topic_subject']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$topic_info = getTopicInfo($topic, 'message');
+	$context['topic_subject'] = $topic_info['subject'];
 
 	censorText($context['announce_topic']['subject']);
 
@@ -157,23 +149,16 @@ function action_send()
 	foreach ($_POST['who'] as $id => $mg)
 		$_POST['who'][$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
 
-	// Get the topic subject and censor it.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.id_msg, m.subject, m.body
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:current_topic}',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	list ($id_msg, $context['topic_subject'], $message) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Topic.subs.php');
+
+	// Get the topic subject and body and censor them.
+	$topic_info = getTopicInfo($topic, 'message');
+	$context['topic_subject'] = $topic_info['subject'];
 
 	censorText($context['topic_subject']);
-	censorText($message);
+	censorText($topic_info['body']);
 
-	$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($message, false, $id_msg), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+	$topic_info['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topic_info['body'], false, $topic_info['id_first_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 
 	// We need this in order to be able send emails.
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -222,7 +207,7 @@ function action_send()
 		{
 			$replacements = array(
 				'TOPICSUBJECT' => $context['topic_subject'],
-				'MESSAGE' => $message,
+				'MESSAGE' => $topic_info['body'],
 				'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
 			);
 
