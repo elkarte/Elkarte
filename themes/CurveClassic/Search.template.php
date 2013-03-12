@@ -31,7 +31,7 @@ function template_main()
 		<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Simple Search?
-	if ($context['simple_search'])
+	if ($context['simple_search'] && empty($context['minmax_preferences']['asearch']))
 	{
 		echo '
 		<fieldset id="simple_search">
@@ -39,7 +39,7 @@ function template_main()
 				<div id="search_term_input">
 					<strong>', $txt['search_for'], ':</strong>
 					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
-					', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />
+					', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit floatnone" />
 				</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -51,11 +51,12 @@ function template_main()
 				<div class="verification>
 					<strong>', $txt['search_visual_verification_label'], ':</strong>
 					<br />', template_control_verification($context['visual_verification_id'], 'all'), '<br />
-					<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />
+					<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit floatnone" />
 				</div>';
 
+		// Show the button to enable advanced search
 		echo '
-				<a href="', $scripturl, '?action=search;advanced" onclick="this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
+				<a href="', $scripturl, '?action=search;advanced" onclick="setTimeout(smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_advanced'], '</a>
 				<input type="hidden" name="advanced" value="0" />
 			</div>
 		</fieldset>';
@@ -125,11 +126,12 @@ function template_main()
 					<dd><label for="minage">',
 						$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 					</dd>
+					<dt>
+					</dt>
+					<dd>
+						<a href="', $scripturl, '?action=search" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
+					</dd>
 				</dl>
-				<script type="text/javascript"><!-- // --><![CDATA[
-					createEventListener(window);
-					window.addEventListener("load", initSearch, false);
-				// ]]></script>
 				<input type="hidden" name="advanced" value="1" />';
 
 		// Require an image to be typed to save spamming?
@@ -223,6 +225,9 @@ function template_main()
 	echo '
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
+			createEventListener(window);
+			window.addEventListener("load", initSearch, false);
+
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: smf_session_id,

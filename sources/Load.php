@@ -1454,6 +1454,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
 		$context['user']['name'] = $txt['guest_title'];
 
+	// Set up some additional interface preference context
+	if ($user_info['is_admin'])
+		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	if (!$user_info['is_guest'])
+		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+
 	// Determine the current smiley set.
 	$user_info['smiley_set'] = (!in_array($user_info['smiley_set'], explode(',', $modSettings['smiley_sets_known'])) && $user_info['smiley_set'] != 'none') || empty($modSettings['smiley_sets_enable']) ? (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default']) : $user_info['smiley_set'];
 	$context['user']['smiley_set'] = $user_info['smiley_set'];

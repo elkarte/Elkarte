@@ -54,12 +54,12 @@ function template_email_members()
 
 			<div id="advanced_panel_header" class="cat_bar">
 				<h3 class="catbg">
-					<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['show_advanced_options']) ? 'collapse' : 'expand', '.png" alt="*" />
+					<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
 					<a href="#" id="advanced_panel_link" >', $txt['advanced'], '</a>
 				</h3>
 			</div>
 
-			<div id="advanced_panel_div" class="windowbg2">
+			<div id="advanced_panel_div" class="windowbg2"', empty($context['admin_preferences']['apn']) ? '' : ' style="display="none"', '>
 				<div class="content">
 					<dl class="settings">
 						<dt>
@@ -127,7 +127,7 @@ function template_email_members()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oAdvancedPanelToggle = new smc_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
+			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
 			aSwappableContainers: [
 				\'advanced_panel_div\'
 			],
@@ -152,7 +152,8 @@ function template_email_members()
 				sOptionName: \'admin_preferences\',
 				sSessionVar: smf_session_var,
 				sSessionId: smf_session_id,
-				sThemeId: \'1\'
+				sThemeId: \'1\',
+				sAdditionalVars: \';admin_key=apn\'
 			}
 		});
 	// ]]></script>

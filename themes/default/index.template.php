@@ -174,7 +174,7 @@ function template_html_above()
 
 function template_body_above()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	// Wrapper div now echoes permanently for better layout options. h1 a is now target for "Go up" links.
 	echo '
@@ -265,7 +265,7 @@ function template_body_above()
 	<div id="wrapper">
 		<div id="upper_section">
 			<div id="inner_section">
-				<div id="inner_wrap" ', empty($options['collapse_header']) ? '' : ' style="display: none;"', '>
+				<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
 					<div class="user floatright">';
 
 	// Otherwise they're a guest - this time ask them to either register or login - lazy bums...
@@ -458,7 +458,7 @@ function theme_linktree($force_show = false)
  */
 function template_menu()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $txt;
 
 	echo '
 				<div id="main_menu">
@@ -531,7 +531,7 @@ function template_menu()
 				<script type="text/javascript"><!-- // --><![CDATA[
 					var oMainHeaderToggle = new smc_Toggle({
 						bToggleEnabled: true,
-						bCurrentlyCollapsed: ', empty($options['collapse_header']) ? 'false' : 'true', ',
+						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
 						aSwappableContainers: [
 							\'inner_wrap\'
 						],
@@ -545,10 +545,11 @@ function template_menu()
 							}
 						],
 						oThemeOptions: {
-							bUseThemeSettings: smf_member_id == 0 ? false : true,
-							sOptionName: \'collapse_header\',
+							bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+							sOptionName: \'minmax_preferences\',
+							sSessionId: smf_session_id,
 							sSessionVar: smf_session_var,
-							sSessionId: smf_session_id
+							sAdditionalVars: \';minmax_key=upshrink\'
 						},
 						oCookieOptions: {
 							bUseCookie: smf_member_id == 0 ? true : false,

@@ -580,7 +580,8 @@ function template_search()
 		</div>';
 	}
 
-	if ($context['simple_search'])
+	// Basic search
+	if ($context['simple_search'] && empty($context['minmax_preferences']['pmsearch']))
 	{
 		echo '
 		<fieldset id="simple_search">
@@ -590,35 +591,37 @@ function template_search()
 					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" />
 					<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
 				</div>
-				<a href="', $scripturl, '?action=pm;sa=search;advanced" onclick="this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
+				<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
 				<input type="hidden" name="advanced" value="0" />
 			</div>
 		</fieldset>';
 	}
-
 	// Advanced search!
 	else
 	{
 		echo '
 		<fieldset id="advanced_search">
 			<div class="roundframe">
-				<input type="hidden" name="advanced" value="1" />
-				<span class="enhanced">
-					<strong>', $txt['pm_search_text'], ':</strong>
-					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" />
-					<script type="text/javascript"><!-- // --><![CDATA[
-						createEventListener(window);
-						window.addEventListener("load", initSearch, false);
-					// ]]></script>
-					<select name="searchtype">
-						<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
-						<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
-					</select>
-				</span>
-				<dl id="search_options">
-					<dt>', $txt['pm_search_user'], ':</dt>
-					<dd><input type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" /></dd>
-					<dt>', $txt['pm_search_order'], ':</dt>
+				<dl class="settings" id="search_options">
+					<dt>
+						<strong>', $txt['pm_search_text'], ':</strong>
+					</dt>
+					<dd>
+						<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" />
+						<select name="searchtype">
+							<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
+							<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
+						</select>
+					</dd>
+					<dt>',
+						$txt['pm_search_user'], ':
+					</dt>
+					<dd>
+						<input type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
+					</dd>
+					<dt>',
+						$txt['pm_search_order'], ':
+					</dt>
 					<dd>
 						<select name="sort">
 							<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
@@ -626,19 +629,36 @@ function template_search()
 							<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
 						</select>
 					</dd>
-					<dt class="options">', $txt['pm_search_options'], ':</dt>
+					<dt class="options">',
+						$txt['pm_search_options'], ':
+					</dt>
 					<dd class="options">
-						<label for="show_complete"><input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_show_complete'], '</label><br />
-						<label for="subject_only"><input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '</label>
+						<label for="show_complete">
+							<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_show_complete'], '
+						</label><br />
+						<label for="subject_only">
+							<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '
+						</label>
 					</dd>
-					<dt class="between">', $txt['pm_search_post_age'], ':</dt>
-					<dd>', $txt['pm_search_between'], ' <input type="text" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" />&nbsp;', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /> ', $txt['pm_search_between_days'], '</dd>
-				</dl>';
+					<dt class="between">',
+						$txt['pm_search_post_age'], ':
+					</dt>
+					<dd>',
+						$txt['pm_search_between'], ' <input type="text" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" />&nbsp;', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /> ', $txt['pm_search_between_days'], '
+					</dd>
+					<dt>
+					</dt>
+					<dd>
+						<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_simple'], '</a>
+					</dd>
+				</dl>
+				<input type="hidden" name="advanced" value="1" />';
+
 		if (!$context['currently_using_labels'])
 			echo '
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />';
-			echo '
-				<br class="clear_right" />
+
+		echo '
 			</div>
 		</fieldset>';
 
@@ -650,10 +670,10 @@ function template_search()
 			<div class="roundframe">
 				<div class="title_bar">
 					<h4 class="titlebg">
-						<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['show_advanced_options']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
+						<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
 					</h4>
 				</div>
-				<div id="advanced_panel_div">
+				<div id="advanced_panel_div"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
 				<ul id="searchLabelsExpand" class="reset" >';
 
 			foreach ($context['search_labels'] as $label)
@@ -677,9 +697,12 @@ function template_search()
 			// Some javascript for the advanced toggling
 			echo '
 		<script type="text/javascript"><!-- // --><![CDATA[
+			createEventListener(window);
+			window.addEventListener("load", initSearch, false);
+
 			var oAdvancedPanelToggle = new smc_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
+				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pm']) ? 'false' : 'true', ',
 				aSwappableContainers: [
 					\'advanced_panel_div\'
 				],
@@ -701,10 +724,11 @@ function template_search()
 				],
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'admin_preferences\',
+					sOptionName: \'minmax_preferences\',
 					sSessionVar: smf_session_var,
 					sSessionId: smf_session_id,
-					sThemeId: \'1\'
+					sAdditionalVars: \';minmax_key=pm\'
+
 				}
 			});
 		// ]]></script>';
@@ -1004,10 +1028,10 @@ function template_send()
 			<br />
 			<div id="postDraftOptionsHeader" class="title_bar">
 				<h4 class="titlebg">
-					<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/collapse.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
+					<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '.png"  alt="*" /><strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
 				</h4>
 			</div>
-			<div id="postDraftOptions" class="load_drafts padding">
+			<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['pmdraft']) ? '' : ' style="display: none;"', '>
 				<dl class="settings">
 					<dt><strong>', $txt['subject'], '</strong></dt>
 					<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
@@ -1035,7 +1059,7 @@ function template_send()
 		echo '
 			var oSwapDraftOptions = new smc_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: true,
+				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
@@ -1054,7 +1078,14 @@ function template_send()
 						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
 						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
 					}
-				]
+				],
+				oThemeOptions: {
+					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					sOptionName: \'minmax_preferences\',
+					sSessionId: smf_session_id,
+					sSessionVar: smf_session_var,
+					sAdditionalVars: \';minmax_key=pmdraft\'
+				},
 			});';
 
 	echo '

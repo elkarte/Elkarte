@@ -318,9 +318,6 @@ function SelectMailingMembers()
 	$postGroups = array();
 	$normalGroups = array();
 
-	// Are we going to show the advanced options?
-	$context['show_advanced_options'] = empty($context['admin_preferences']['apn']);
-
 	// If we have post groups disabled then we need to give a "ungrouped members" option.
 	if (empty($modSettings['permission_enable_postgroups']))
 	{
