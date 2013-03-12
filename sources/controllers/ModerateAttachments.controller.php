@@ -83,11 +83,11 @@ function action_attachapprove()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// We can only add it if we can approve in this board!
-		if ($allowed_boards = array(0) || in_array($row['id_board'], $allowed_boards))
+		if ($allowed_boards == array(0) || in_array($row['id_board'], $allowed_boards))
 		{
 			$attachments[] = $row['id_attach'];
 
-			// Also come up witht he redirection URL.
+			// Also come up with the redirection URL.
 			$redirect = 'topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'];
 		}
 	}
