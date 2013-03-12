@@ -66,7 +66,7 @@ class Fulltext_Search
 	 */
 	public function __construct()
 	{
-		global $smcFunc, $db_connection, $modSettings, $db_type;
+		global $modSettings, $db_type;
 
 		// Is this database supported?
 		if (!in_array($db_type, $this->supported_databases))
@@ -147,7 +147,7 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $modSettings, $excludedWords, $smcFunc;
+		global $excludedWords, $smcFunc;
 
 		$x = $smcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = $smcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);

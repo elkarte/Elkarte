@@ -55,7 +55,7 @@ function action_unapproved()
 	$context['page_title'] = $txt['mc_unapproved_posts'];
 
 	// Work out what boards we can work in!
-	$approve_boards = boardsAllowedTo('approve_posts');
+	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// If we filtered by board remove ones outside of this board.
 	// @todo Put a message saying we're filtered?
@@ -292,7 +292,7 @@ function action_unapproved_attachments()
 	$context['page_title'] = $txt['mc_unapproved_attachments'];
 
 	// Once again, permissions are king!
-	$approve_boards = boardsAllowedTo('approve_posts');
+	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	if ($approve_boards == array(0))
 		$approve_query = '';
