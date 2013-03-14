@@ -69,7 +69,7 @@ function action_mergeIndex()
 	// Prepare a handy query bit for approval...
 	if ($modSettings['postmod_active'])
 	{
-		$can_approve_boards = boardsAllowedTo('approve_posts');
+		$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 		$onlyApproved = $can_approve_boards !== array(0) && !in_array($_REQUEST['targetboard'], $can_approve_boards);
 	}
 	else
@@ -93,29 +93,16 @@ function action_mergeIndex()
 	$context['page_index'] = constructPageIndex($scripturl . '?action=mergetopics;from=' . $_GET['from'] . ';targetboard=' . $_REQUEST['targetboard'] . ';board=' . $board . '.%1$d', $_REQUEST['start'], $topiccount, $modSettings['defaultMaxTopics'], true);
 
 	// Get the topic's subject.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.subject
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:id_topic}
-			AND t.id_board = {int:current_board}' . ($onlyApproved ? '
-			AND t.approved = {int:is_approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_board' => $board,
-			'id_topic' => $_GET['from'],
-			'is_approved' => 1,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Topic.subs.php');
+	$topic_info = getTopicInfo($_GET['from'], 'message');
+	// @todo review: double check the logic
+	if (empty($topic_info) || ($topic_info['id_board'] != $board) || ($onlyApproved && empty($topic_info['approved'])))
 		fatal_lang_error('no_board');
-	list ($subject) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Tell the template a few things..
 	$context['origin_topic'] = $_GET['from'];
-	$context['origin_subject'] = $subject;
-	$context['origin_js_subject'] = addcslashes(addslashes($subject), '/');
+	$context['origin_subject'] = $topic_info['subject'];
+	$context['origin_js_subject'] = addcslashes(addslashes($topic_info['subject']), '/');
 	$context['page_title'] = $txt['merge'];
 
 	// Check which boards you have merge permissions on.

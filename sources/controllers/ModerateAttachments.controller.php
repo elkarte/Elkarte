@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function action_attachapprove()
 {
-	global $smcFunc;
+	global $smcFunc, $user_info;
 
 	// Security is our primary concern...
 	checkSession('get');
@@ -63,7 +63,7 @@ function action_attachapprove()
 
 	// @todo nb: this requires permission to approve posts, not manage attachments
 	// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
-	$allowed_boards = boardsAllowedTo('approve_posts');
+	$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Validate the attachments exist and are the right approval state.
 	$request = $smcFunc['db_query']('', '
@@ -83,11 +83,11 @@ function action_attachapprove()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		// We can only add it if we can approve in this board!
-		if ($allowed_boards = array(0) || in_array($row['id_board'], $allowed_boards))
+		if ($allowed_boards == array(0) || in_array($row['id_board'], $allowed_boards))
 		{
 			$attachments[] = $row['id_attach'];
 
-			// Also come up witht he redirection URL.
+			// Also come up with the redirection URL.
 			$redirect = 'topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'];
 		}
 	}

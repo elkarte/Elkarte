@@ -223,20 +223,7 @@ function template_main()
 			{
 				echo '
 									<li>
-										', $txt['calendar_post_in'], '
-										<select name="board">';
-				foreach ($context['event']['categories'] as $category)
-				{
-					echo '
-											<optgroup label="', $category['name'], '">';
-					foreach ($category['boards'] as $board)
-						echo '
-												<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt;' : '', ' ', $board['name'], '&nbsp;</option>';
-					echo '
-											</optgroup>';
-				}
-				echo '
-										</select>
+										', template_select_boards('board', $txt['calendar_post_in']), '
 									</li>';
 			}
 

@@ -9,7 +9,6 @@
  *
  * This file contains all the functions that allow for the saving,
  * retrieving, deleting and settings for the drafts function.
- *
  */
 
 if (!defined('ELKARTE'))
@@ -123,7 +122,6 @@ function saveDraft()
  * The core draft feature must be enabled, as well as the pm draft option
  * Determines if this is a new or and update to an existing pm draft
  *
- * @param string $post_errors
  * @param type $recipientList
  * @return boolean
  */
@@ -458,7 +456,7 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 	// Menu tab
 	$context[$context['profile_menu_name']]['tab_data'] = array(
 		'title' => $txt['drafts_show'] . ' - ' . $context['member']['name'],
-		'icon' => 'message_sm.png'
+		'icon' => 'inbox_hd.png'
 	);
 
 	$context['sub_template'] = 'showDrafts';

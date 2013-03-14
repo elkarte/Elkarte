@@ -1030,7 +1030,8 @@ function accessibleBoards()
  * Find all the boards, all boards this user is allowed to see,
  * all boards this user wants to see, etc.
  *
- * @param bool $all if true retrieves all the boards, if false only those the user can see
+ * @param mixed $all if true retrieves all the boards, if false only those the user can see
+ *              if a permission 
  * @param array $include defines what can additionally be retrived:
  *              - ignore: an array of ignored boards,
  *              - access: an array of groups that can or cannot have access
@@ -1038,6 +1039,19 @@ function accessibleBoards()
 function allBoards($all = false, $include = array())
 {
 	global $smcFunc, $modSettings;
+
+	if ($all === false)
+		$query = '{query_see_board}';
+	elseif ($all === true)
+		$query = '1=1';
+	else
+	{
+		$boards = boardsAllowedTo($all);
+		if (in_array(0, $boards))
+			$query = '1=1';
+		else
+			$query = 'b.id_board IN ({array_int:boards})';
+	}
 
 	// Find all the boards this user is allowed to see.
 	$request = $smcFunc['db_query']('order_by_board_order', '
@@ -1047,10 +1061,11 @@ function allBoards($all = false, $include = array())
 			'. (!empty($include['ignore']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored' : '') . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE ' . ($all ? '' : '{query_see_board}
-			AND ') . 'b.redirect = {string:empty_string}
+		WHERE ' . $query . '
+			AND b.redirect = {string:empty_string}
 		ORDER BY b.board_order',
 		array(
+			'boards' => $boards,
 			'empty_string' => '',
 			'ignore_boards' => !empty($include['ignore']) ? $include['ignore'] : array(),
 			'current_group' => !empty($include['access']) ? $include['access'] : array(),
@@ -1091,7 +1106,7 @@ function allBoards($all = false, $include = array())
 			$return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] = $row['is_ignored'];
 
 		// If a board wasn't checked that probably should have been ensure the board selection is selected, yo!
-		if (!$return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
+		if (!empty($return['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
 			$return['boards_check_all'] = false;
 	}
 	$smcFunc['db_free_result']($request);

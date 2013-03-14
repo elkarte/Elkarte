@@ -128,7 +128,7 @@ class Sphinxql_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $modSettings, $excludedWords;
+		global $excludedWords;
 
 		$x = strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
@@ -147,8 +147,6 @@ class Sphinxql_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings;
-
 		$subwords = text2words($word, null, false);
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
