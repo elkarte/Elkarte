@@ -581,7 +581,7 @@ function template_search()
 	}
 
 	// Basic search
-	if ($context['simple_search'] && empty($context['minmax_preferences']['pmsearch']))
+	if ($context['simple_search'] && (empty($context['minmax_preferences']['pmsearch']) || isset($_GET['basic'])))
 	{
 		echo '
 		<fieldset id="simple_search">
@@ -649,7 +649,7 @@ function template_search()
 					<dt>
 					</dt>
 					<dd>
-						<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_simple'], '</a>
+						<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_simple'], '</a>
 					</dd>
 				</dl>
 				<input type="hidden" name="advanced" value="1" />';

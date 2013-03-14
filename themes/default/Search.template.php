@@ -31,7 +31,7 @@ function template_main()
 					<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Simple Search?
-	if ($context['simple_search'] && empty($context['minmax_preferences']['asearch']))
+	if ($context['simple_search'] && (empty($context['minmax_preferences']['asearch']) || isset($_GET['basic'])))
 	{
 		echo '
 					<fieldset id="simple_search">
@@ -127,7 +127,7 @@ function template_main()
 								<dt>
 								</dt>
 								<dd>
-									<a href="', $scripturl, '?action=search" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
+									<a href="', $scripturl, '?action=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
 								</dd>
 							</dl>
 							<input type="hidden" name="advanced" value="1" />';

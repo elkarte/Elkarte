@@ -31,7 +31,7 @@ function template_main()
 		<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Simple Search?
-	if ($context['simple_search'] && empty($context['minmax_preferences']['asearch']))
+	if ($context['simple_search'] && (empty($context['minmax_preferences']['asearch']) || isset($_GET['basic'])))
 	{
 		echo '
 		<fieldset id="simple_search">
