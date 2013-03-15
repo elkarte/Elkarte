@@ -902,7 +902,8 @@ function pbe_find_board_number($email_address, $check = false)
  * - censors everything it will send
  * - pre-converts select bbc tags to html so they can be markdowned properly
  * - uses parse-bbc to convert remaining bbc to html
- * - uses Markdownify_Extra to convert html to markdown text suitable for email
+ * - uses html2markdown to convert html to markdown text suitable for email
+ * - if someone wants to write a direct bbc->markdown conversion tool, I'm listening!
  *
  * @param string $message
  * @param string $subject
@@ -947,16 +948,11 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = preg_replace('~(\[quote\s?\])~sU', "'<blockquote>'", $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
-	// Make sure some block-ish tags have an extra break so the text looks better
-	$message = preg_replace('~\[center\](.*?)\[/center\]~', "<br />$1<br />", $message);
-	$message = preg_replace('~(?<!^)(\[hr\])(?!\s)~', "<br />$1<br />", $message);
-	$message = preg_replace('~(\[/list\](?!\s\s))~', "$1<br />", $message);
-
 	// Prevent img tags from getting linked
-	$message = preg_replace('~\[img\](.*?)\[/img\]~is', '&lt;img src="\\1">', $message);
+	$message = preg_replace('~\[img\](.*?)\[/img\]~is', '`&lt;img src="\\1">', $message);
 
 	// Leave code tags as code tags for the conversion
-	$message = preg_replace('~\[code(.*?)\](.*?)\[/code\]~is', '&lt;code\\1>\\2</code>', $message);
+	$message = preg_replace('~\[code(.*?)\](.*?)\[/code\]~is', '`&lt;code\\1>\\2`&lt;/code>', $message);
 
 	// Convert the remaining bbc to html
 	$message = parse_bbc($message, false);
@@ -990,26 +986,18 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
 	call_integration_hook('integrate_mailist_pre_markdown', array(&$message));
 
-	// Convert protected html entities back for the final conversion
+	// Convert the protected (hidden) entities back for the final conversion
 	$message = strtr($message, array(
 		'&#91;' => '[',
 		'&#93;' => ']',
-		'&lt;' => '<',
+		'`&lt;' => '<',
 		)
 	);
 
 	// Convert this to text (markdown)
-	require_once(EXTDIR . '/markdownify/markdownify_extra.php');
-	$mark_down = new Markdownify_Extra(true, empty($table_content) ? 78 : 996, false);
-	$message = $mark_down->parseString($message);
-
-	// Remove non breakable spaces that were converted to utf8
-	$message = str_replace("\xC2\xA0\x20", ' ', $message);
-	$message = str_replace("\xC2\xA0", ' ', $message);
-
-	// Strip the chaff and the excess blank lines
-	$message = trim(un_htmlspecialchars(strtr($message, array('<br />' => "\n"))));
-	$message = preg_replace("~(\n){3,}~", "\n\n", $message);
+	require_once(EXTDIR . '/html2Md/html2markdown.php');
+	$mark_down = new Convert_Md($message);
+	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its just plain text
 	if ($signature !== '')
