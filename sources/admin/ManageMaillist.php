@@ -608,7 +608,12 @@ function action_list_filters()
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<a href="?action=admin;area=mailist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '"><img width="8" height="16" title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/icons/modify_small.png" alt="*" /></a>&nbsp;<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img width="16" height="16" title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/delete.png" alt="*" /></a>',
+						'format' => '<a href="?action=admin;area=mailist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
+										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+									</a>&nbsp;
+									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
+										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+									</a>',
 						'params' => array(
 							'id_filter' => true,
 						),
@@ -628,7 +633,7 @@ function action_list_filters()
 		'additional_rows' => array(
 			array(
 				'position' => 'after_title',
-				'value' => isset($_GET['saved']) ? '<img align="top" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="" />&nbsp;' . $txt['saved'] : $txt['filters_title'],
+				'value' => isset($_GET['saved']) ? '<span class="infobox">' . $txt['saved'] . '</span>' : $txt['filters_title'],
 				'class' => 'windowbg2',
 			),
 			array(
@@ -741,6 +746,11 @@ function action_edit_filters()
 		// if we are good to save, so save it ;)
 		if (empty($context['settings_message']))
 		{
+			// And ... its a filter
+			$config_vars[] = array('text', 'filter_style');
+			$_POST['filter_style'] = 'filter';
+
+			require_once(SUBSDIR . '/maillist.subs.php');
 			saveTableSettings($config_vars, 'postby_emails_filters', array() ,$editid, $editname);
 			redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 		}
@@ -861,9 +871,14 @@ function action_list_parsers()
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '"><img  width="8" height="16" title="' . $txt['modify'] . '"src="' . $settings['images_url'] . '/icons/modify_small.gif" alt="*" /></a>&nbsp;<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img width="16" height="16" title="' . $txt['delete'] . '"  src="' . $settings['images_url'] . '/icons/delete.gif" alt="*" /></a>',
+						'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
+										<img title="' . $txt['modify'] . '"src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+									</a>&nbsp;
+									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
+										<img title="' . $txt['delete'] . '"  src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+									</a>',
 						'params' => array(
-							'id' => true,
+							'id_filter' => true,
 						),
 					),
 					'class' => 'centercol',
@@ -881,13 +896,13 @@ function action_list_parsers()
 		'additional_rows' => array(
 			array(
 				'position' => 'after_title',
-				'value' => isset($_GET['saved']) ? '<img align="top" src="' . $settings['images_url'] . '/icons/field_valid.gif" alt="" />&nbsp;' . $txt['saved'] : $txt['parsers_title'],
+				'value' => isset($_GET['saved']) ? '<span class="infobox">' . $txt['saved'] . '</span>' : $txt['parsers_title'] ,
 				'class' => 'windowbg2',
 			),
 			array(
 				'position' => 'below_table_data',
 				'value' => '<input type="submit" name="addfilter" value="' . $txt['add_parser'] . '" class="button_submit" />',
-				'style' => 'text-align: right;',
+				'class' => 'righttext',
 			),
 		),
 	);
@@ -921,7 +936,7 @@ function action_edit_parsers()
 		$row = maillist_load_filter_parser($id, 'parser');
 		$modSettings['id_filter'] = $row['id_filter'];
 		$modSettings['filter_type'] = $row['filter_type'];
-		$modSettings['filter_from'] = $row['filter_name'];
+		$modSettings['filter_from'] = $row['filter_from'];
 		$modSettings['filter_name'] = $row['filter_name'];
 
 		$context['editing'] = true;
@@ -957,7 +972,7 @@ function action_edit_parsers()
 	{
 		checkSession();
 
-		// Editing an parser?
+		// Editing a parser?
 		$editid = isset($_GET['edit']) ? (int) $_GET['edit'] : -1;
 		$editname = isset($_GET['edit']) ? 'id_filter' : '';
 
@@ -967,7 +982,7 @@ function action_edit_parsers()
 			$valid = (preg_replace($_POST['filter_from'], '', '12@$%^*(09#98&76') === null) ? false : true;
 			if (!$valid)
 			{
-				// Regex did not compute will robinson
+				// Regex did not compute .. Danger, Will Robinson
 				$context['settings_message'] =  $txt['regex_invalid'];
 				$context['error_type'] = 'notice';
 
@@ -986,6 +1001,11 @@ function action_edit_parsers()
 		// All clear to save?
 		if (empty($context['settings_message']))
 		{
+			// Shhh ... its a parser
+			$config_vars[] = array('text', 'filter_style');
+			$_POST['filter_style'] = 'parser';
+
+			require_once(SUBSDIR . '/Maillist.subs.php');
 			saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
 			redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 		}

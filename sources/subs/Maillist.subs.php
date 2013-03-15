@@ -376,8 +376,10 @@ function saveTableSettings($config_vars, $tablename, $index = array(), $editid =
 			// For security purposes we need to validate this line by line.
 			$options = array();
 			foreach ($_POST[$var[1]] as $invar)
+			{
 				if (in_array($invar, array_keys($var[2])))
 					$options[] = $invar;
+			}
 
 			$insert_type[$var[1]] = 'string';
 			$insert_value[] = serialize($options);
