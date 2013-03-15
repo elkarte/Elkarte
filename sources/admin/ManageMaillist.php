@@ -608,7 +608,7 @@ function action_list_filters()
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<a href="?action=admin;area=mailist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
+						'format' => '<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
 										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
 									</a>&nbsp;
 									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
@@ -632,8 +632,8 @@ function action_list_filters()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'after_title',
-				'value' => isset($_GET['saved']) ? '<span class="infobox">' . $txt['saved'] . '</span>' : $txt['filters_title'],
+				'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
+				'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
 				'class' => 'windowbg2',
 			),
 			array(
@@ -895,8 +895,8 @@ function action_list_parsers()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'after_title',
-				'value' => isset($_GET['saved']) ? '<span class="infobox">' . $txt['saved'] . '</span>' : $txt['parsers_title'] ,
+				'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
+				'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
 				'class' => 'windowbg2',
 			),
 			array(
