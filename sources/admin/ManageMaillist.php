@@ -670,6 +670,7 @@ function action_edit_filters()
 			fatal_lang_error('error_no_id_filter');
 
 		// Load it up and set it as the current values
+		require_once(SUBSDIR . '/Maillist.subs.php');
 		$row = maillist_load_filter_parser($id, 'filter');
 		$modSettings['id_filter'] = $row['id_filter'];
 		$modSettings['filter_type'] = $row['filter_type'];
@@ -750,7 +751,7 @@ function action_edit_filters()
 			$config_vars[] = array('text', 'filter_style');
 			$_POST['filter_style'] = 'filter';
 
-			require_once(SUBSDIR . '/maillist.subs.php');
+			require_once(SUBSDIR . '/Maillist.subs.php');
 			saveTableSettings($config_vars, 'postby_emails_filters', array() ,$editid, $editname);
 			redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 		}
@@ -933,6 +934,7 @@ function action_edit_parsers()
 		if (empty($id) || $id < 0)
 			fatal_lang_error('error_no_id_filter');
 
+		require_once(SUBSDIR . '/Maillist.subs.php');
 		$row = maillist_load_filter_parser($id, 'parser');
 		$modSettings['id_filter'] = $row['id_filter'];
 		$modSettings['filter_type'] = $row['filter_type'];
@@ -1043,7 +1045,7 @@ function action_delete_parsers()
 		$id = (int) $_GET['f_id'];
 
 		maillist_delete_filter_parser($id);
-		redirectexit('action=admin;area=mailist;sa=emailparser;deleted');
+		redirectexit('action=admin;area=maillist;sa=emailparser;deleted');
 	}
 }
 
