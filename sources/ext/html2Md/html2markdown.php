@@ -112,6 +112,14 @@ class Convert_Md
 				$markdown = $body[1];
 		}
 
+		// Remove non breakable spaces that may be hidding in here
+		$markdown = str_replace("\xC2\xA0\x20", ' ', $markdown);
+		$markdown = str_replace("\xC2\xA0", ' ', $markdown);
+
+		// Strip the chaff and any excess blank lines we may have produced
+		$markdown = trim($markdown);
+		$markdown = preg_replace("~(\n){3,}~", "\n\n", $markdown);
+
 		return $markdown;
 	}
 
@@ -223,6 +231,9 @@ class Convert_Md
 			case 'br':
 				$markdown = '  ' . $this->line_end;
 				break;
+			case 'center':
+				$markdown = $this->line_end . $value . $this->line_end;
+				break;
 			case 'code':
 				$markdown = $this->_convert_code($node);
 				break;
@@ -240,7 +251,7 @@ class Convert_Md
 				$markdown = '_' . $value . '_';
 				break;
 			case 'hr':
-				$markdown = str_repeat('-', 3) . $this->line_end;
+				$markdown = str_repeat('-', 3) . $this->line_break;
 				break;
 			case 'h1':
 			case 'h2':
@@ -542,7 +553,7 @@ class Convert_Md
 			{
 				// Get the align and text for each th (html5 this is no longer valid)
 				$th = $this->_get_item($table_heading, $col);
-				$align_value = strtolower($th->getAttribute('align'));
+				$align_value = ($th !== null) ? strtolower($th->getAttribute('align')) : false;
 				$align[0][$col] = $align_value === false ? 'left' : $align_value;
 				$value[0][$col] = $this->_get_value($th);
 				$width[0][$col] = $smcFunc['strlen']($this->_get_value($th));
@@ -564,7 +575,7 @@ class Convert_Md
 				{
 					// Get the align and text for each td in this row
 					$td = $this->_get_item($row_data, $col);
-					$align_value = strtolower($td->getAttribute('align'));
+					$align_value = ($td !== null) ? strtolower($td->getAttribute('align')) : false;
 					$align[$row][$col] = $align_value === false ? 'left' : $align_value;
 					$value[$row][$col] = $this->_get_value($td);
 					$width[$row][$col] = $smcFunc['strlen']($this->_get_value($td));
