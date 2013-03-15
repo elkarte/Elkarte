@@ -65,8 +65,6 @@ function pbe_email_to_bbc($text, $html)
 		'~<style .*</style>~' => '',
 		// various shapes of rules
 		'~<hr[^<>]*>(\n)?~i' => "[hr]\n$1",
-		'~(\n)?\\[hr\\]~i' => "\n[hr]",
-		'~^\n\\[hr\\]~i' => "[hr]",
 		// use quotes if we can find them
 		'~<blockquote(\s(.)*?)*?' . '>~i' => "[quote]",
 		'~</blockquote>~i' => "[/quote]",
@@ -79,10 +77,9 @@ function pbe_email_to_bbc($text, $html)
 		'~</ol>~i' => "[/list]\n",
 		'~<li(\s(.)*?)*?' . '>~i' => "[li]",
 		'~</li>~i' => "[/li]\n",
-		'~<\*>~i' => '&lt;*&gt;',
+		// some block elements
 		'~</div>~i' => "\n",
 		'~<p(\s(.)*?)*?' . '>~i' => "\n\n",
-		'~<title>(.*)</title>~iU' => '',
 		// tables can be a bit complicated
 		'~<table(\s(.)*?)*?' . '>~i' => '[table]',
 		'~</table>~i' => '[/table]',
@@ -92,6 +89,8 @@ function pbe_email_to_bbc($text, $html)
 		'~<(td|th)(\s(.)*?)*?' . '>~i' => '[td]',
 		'~</(td|th)>~i' => '[/td]',
 		// the ubiquitous "other"
+		'~<\*>~i' => '&lt;*&gt;',
+		'~<title>(.*)</title>~iU' => '',
 		'~(\[b\]){2}From:.*-{36}~s' => 'str_repeat(\'-\', 36)',
 		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
 	);
@@ -100,9 +99,8 @@ function pbe_email_to_bbc($text, $html)
 	// to BBC, with email most HTML is unnecessary
 	if ($html)
 	{
-		// Some HTML comes in as chunks, separated by line feeds etc, remove them it so we have an html string
-		$text = str_replace("\r", '', $text);
-		$text = preg_replace('~(\n){1,}~si', ' ', $text);
+		// Some HTML comes in as chunks, separated by line feeds etc, remove the whitespace so we have an html string
+		$text = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $text);
 
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
