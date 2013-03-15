@@ -704,8 +704,8 @@ function action_edit_filters()
 	);
 
 	// Yup, need to make sure these are available
-	loadAdminClass('ManagePermissions.php');
-	loadAdminClass('ManageServer.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving the new or edited entry?
 	if (isset($_GET['save']))
@@ -949,8 +949,8 @@ function action_edit_parsers()
 	);
 
 	// Load in some dependencies
-	loadAdminClass('ManagePermissions.php');
-	loadAdminClass('ManageServer.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Check if they are saving the changes
 	if (isset($_GET['save']))
@@ -1101,13 +1101,13 @@ function action_settings($return_config = false)
 	);
 	else
 		$config_vars = array_merge($config_vars, array(
-		array('title', 'maillist_imap'),
-		array('title', 'maillist_imap_reason'),
-		array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
-		array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
-		array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
-		array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
-		array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
+			array('title', 'maillist_imap'),
+			array('title', 'maillist_imap_reason'),
+			array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
+			array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
+			array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
+			array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
+			array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
 		)
 	);
 
@@ -1115,8 +1115,8 @@ function action_settings($return_config = false)
 		return $config_vars;
 
 	// Need to have these available
-	loadAdminClass('ManagePermissions.php');
-	loadAdminClass('ManageServer.php');
+	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(ADMINDIR . '/ManageServer.php');
 
 	// Saving settings?
 	if (isset($_GET['save']))
