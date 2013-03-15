@@ -351,6 +351,7 @@ function saveTableSettings($config_vars, $tablename, $index = array(), $editid =
 	// Init
 	$insert_type = array();
 	$insert_value = array();
+	$update = false;
 
 	// Cast all the config vars as defined
 	foreach ($config_vars as $var)
@@ -405,12 +406,13 @@ function saveTableSettings($config_vars, $tablename, $index = array(), $editid =
 	if ($editid !== -1 && !empty($editname))
 	{
 		// Time to edit, add in the id col name, assumed to be primary/unique!
+		$update = true;
 		$insert_type[$editname] = 'int';
 		$insert_value[] = $editid;
 	}
 
 	// Do it !!
-	$smcFunc['db_insert']('replace',
+	$smcFunc['db_insert']($update ? 'replace' : 'insert',
 		'{db_prefix}' . $tablename,
 		$insert_type,
 		$insert_value,
