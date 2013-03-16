@@ -970,7 +970,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		LIMIT 1',
 		array(
 			'strictly' => $next ? '<' : '>',
-			'strictly_equal' => $next ? '<=' : '=>',
+			'strictly_equal' => $next ? '<=' : '>=',
 			'sorting' => $next ? 'DESC' : '',
 			'current_board' => $id_board,
 			'current_member' => $id_member,
