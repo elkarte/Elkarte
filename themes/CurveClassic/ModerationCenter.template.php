@@ -479,8 +479,6 @@ function template_viewmodreport()
 			</div>
 			<br />';
 
-	$alt = false;
-
 	template_show_list('moderation_actions_list');
 
 	echo '
