@@ -23,7 +23,7 @@
 	$.fn.SiteTooltip = function(oInstanceSettings) {
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
-			hoverIntent: {sensitivity: 10, interval: 300, timeout: 50},
+			hoverIntent: {sensitivity: 10, interval: 750, timeout: 50},
 			positionTop: 12,
 			positionLeft: 12,
 			tooltipID: 'site_tooltip', // ID used on the outer div
@@ -187,148 +187,125 @@
 	};
 })(jQuery);
 
-/**
- * hoverIntent is similar to jQuery's built-in "hover" function except that
- * instead of firing the onMouseOver event immediately, hoverIntent checks
- * to see if the user's mouse has slowed down (beneath the sensitivity
- * threshold) before firing the onMouseOver event.
+/*!
+ * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
+ * http://cherne.net/brian/resources/jquery.hoverIntent.html
  *
- * hoverIntent r6 // 2011.02.26 // jQuery 1.5.1+
- * <http://cherne.net/brian/resources/jquery.hoverIntent.html>
- *
- * hoverIntent is currently available for use in all personal or commercial
- * project under MIT license.
- *
- * // basic usage (just like .hover) receives onMouseOver and onMouseOut functions
- * $("ul li").hoverIntent( showNav , hideNav );
- *
- * // advanced usage receives configuration object only
- * $("ul li").hoverIntent({
- *	sensitivity: 7, // number = sensitivity threshold (must be 1 or higher)
- *	interval: 100,   // number = milliseconds of polling interval
- *	over: showNav,  // function = onMouseOver callback (required)
- *	timeout: 0,   // number = milliseconds delay before onMouseOut function call
- *	out: hideNav    // function = onMouseOut callback (required)
- * });
- *
- * @param  f  onMouseOver function || An object with configuration options
- * @param  g  onMouseOut function  || Nothing (use configuration options object)
- * @param  filter support for event delegation.
- * @author    Brian Cherne brian(at)cherne(dot)net
+ * You may use hoverIntent under the terms of the MIT license. Basically that
+ * means you are free to use hoverIntent as long as this header is left intact.
+ * Copyright 2007, 2013 Brian Cherne
  */
+
+/* hoverIntent is similar to jQuery's built-in "hover" method except that
+ * instead of firing the handlerIn function immediately, hoverIntent checks
+ * to see if the user's mouse has slowed down (beneath the sensitivity
+ * threshold) before firing the event. The handlerOut function is only
+ * called after a matching handlerIn.
+ *
+ * // basic usage ... just like .hover()
+ * .hoverIntent( handlerIn, handlerOut )
+ * .hoverIntent( handlerInOut )
+ *
+ * // basic usage ... with event delegation!
+ * .hoverIntent( handlerIn, handlerOut, selector )
+ * .hoverIntent( handlerInOut, selector )
+ *
+ * // using a basic configuration object
+ * .hoverIntent( config )
+ *
+ * @param  handlerIn   function OR configuration object
+ * @param  handlerOut  function OR selector for delegation OR undefined
+ * @param  selector    selector OR undefined
+ * @author Brian Cherne <brian(at)cherne(dot)net>
+ */
+
 ;(function($) {
-	'use strict';
-	$.fn.hoverIntent = function (f, g, filter) {
-		// default configuration options
-		var cfg = {
-			sensitivity: 8,
-			interval: 50,
-			timeout: 1
-		};
+    $.fn.hoverIntent = function(handlerIn,handlerOut,selector) {
 
-		// override configuration options with user supplied object
-		cfg = $.extend(cfg, g ? {over: f, out: g} : f);
+        // default configuration values
+        var cfg = {
+            interval: 50,
+            sensitivity: 8,
+            timeout: 1
+        };
 
-		// instantiate variables
-		// cX, cY = current X and Y position of mouse, updated by mousemove event
-		// pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
-		var cX, cY,
-			pX, pY;
+        if ( typeof handlerIn === "object" ) {
+            cfg = $.extend(cfg, handlerIn );
+        } else if ($.isFunction(handlerOut)) {
+            cfg = $.extend(cfg, { over: handlerIn, out: handlerOut, selector: selector } );
+        } else {
+            cfg = $.extend(cfg, { over: handlerIn, out: handlerIn, selector: handlerOut } );
+        }
 
-		// A private function for getting mouse position
-		var track = function (ev) {
-			cX = ev.pageX;
-			cY = ev.pageY;
-		};
+        // instantiate variables
+        // cX, cY = current X and Y position of mouse, updated by mousemove event
+        // pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
+        var cX, cY, pX, pY;
 
-		// A private function for comparing current and previous mouse position
-		var compare = function (ev, ob) {
-			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+        // A private function for getting mouse position
+        var track = function(ev) {
+            cX = ev.pageX;
+            cY = ev.pageY;
+        };
 
-			// compare mouse positions to see if they've crossed the threshold
-			if((Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity)
-			{
-				$(ob).unbind("mousemove", track);
+        // A private function for comparing current and previous mouse position
+        var compare = function(ev,ob) {
+            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+            // compare mouse positions to see if they've crossed the threshold
+            if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
+                $(ob).off("mousemove.hoverIntent",track);
+                // set hoverIntent state to true (so mouseOut can be called)
+                ob.hoverIntent_s = 1;
+                return cfg.over.apply(ob,[ev]);
+            } else {
+                // set previous coordinates for next time
+                pX = cX; pY = cY;
+                // use self-calling timeout, guarantees intervals are spaced out properly (avoids JavaScript timer bugs)
+                ob.hoverIntent_t = setTimeout( function(){compare(ev, ob);} , cfg.interval );
+            }
+        };
 
-				// set hoverIntent state to true (so mouseOut can be called)
-				ob.hoverIntent_s = 1;
-				return cfg.over.apply(ob,[ev]);
-			}
-			else
-			{
-				// set previous coordinates for next time
-				pX = cX;
-				pY = cY;
+        // A private function for delaying the mouseOut function
+        var delay = function(ev,ob) {
+            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+            ob.hoverIntent_s = 0;
+            return cfg.out.apply(ob,[ev]);
+        };
 
-				// use self-calling timeout, guarantees intervals are spaced out properly (avoids JavaScript timer bugs)
-				ob.hoverIntent_t = setTimeout( function(){compare(ev, ob);} , cfg.interval );
-			}
-		};
+        // A private function for handling mouse 'hovering'
+        var handleHover = function(e) {
+            // copy objects to be passed into t (required for event object to be passed in IE)
+            var ev = jQuery.extend({},e);
+            var ob = this;
 
-		// A private function for delaying the mouseOut function
-		var delay = function(ev,ob) {
-			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-			ob.hoverIntent_s = 0;
+            // cancel hoverIntent timer if it exists
+            if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
 
-			return cfg.out.apply(ob,[ev]);
-		};
+            // if e.type == "mouseenter"
+            if (e.type == "mouseenter") {
+                // set "previous" X and Y position based on initial entry point
+                pX = ev.pageX; pY = ev.pageY;
+                // update "current" X and Y position based on mousemove
+                $(ob).on("mousemove.hoverIntent",track);
+                // start polling interval (self-calling timeout) to compare mouse coordinates over time
+                if (ob.hoverIntent_s != 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
 
-		// A private function for handling mouse 'hovering'
-		var handleHover = function(e)
-		{
-			// copy objects to be passed into t (required for event object to be passed in IE)
-			var ev = jQuery.extend({},e);
-			var ob = this;
+                // else e.type == "mouseleave"
+            } else {
+                // unbind expensive mousemove event
+                $(ob).off("mousemove.hoverIntent",track);
+                // if hoverIntent state is true, then call the mouseOut function after the specified delay
+                if (ob.hoverIntent_s == 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
+            }
+        };
 
-			// cancel hoverIntent timer if it exists
-			if(ob.hoverIntent_t)
-			{
-				ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-			}
-
-			// if e.type == "mouseenter"
-			if(e.type === "mouseenter")
-			{
-				// set "previous" X and Y position based on initial entry point
-				pX = ev.pageX;
-				pY = ev.pageY;
-
-				// update "current" X and Y position based on mousemove
-				$(ob).bind("mousemove",track);
-
-				// start polling interval (self-calling timeout) to compare mouse coordinates over time
-				if (ob.hoverIntent_s !== 1)
-				{
-					ob.hoverIntent_t = setTimeout(function(){compare(ev,ob);}, cfg.interval);
-				}
-			// else e.type == "mouseleave"
-			}
-			else
-			{
-				// unbind expensive mousemove event
-				$(ob).unbind("mousemove", track);
-
-				// if hoverIntent state is true, then call the mouseOut function after the specified delay
-				if(ob.hoverIntent_s === 1)
-				{
-					ob.hoverIntent_t = setTimeout(function(){delay(ev,ob);}, cfg.timeout);
-				}
-			}
-		};
-
-		// bind the function to the two event listeners
-		if(filter)
-			return $(this).on({
-				'mouseenter': handleHover,
-				'mouseleave': handleHover
-			}, filter);
-		else
-			return this.bind('mouseenter', handleHover).bind('mouseleave', handleHover);
-	};
+        // listen for mouseenter and mouseleave
+        return this.on({'mouseenter.hoverIntent':handleHover,'mouseleave.hoverIntent':handleHover}, cfg.selector);
+    };
 })(jQuery);
 
 /**
- * Superfish v1.5.8 - jQuery menu widget
+ * Superfish v1.5.12 - jQuery menu widget
  * Copyright (c) 2013 Joel Birch
  *
  * Licensed under the MIT license:
@@ -356,7 +333,7 @@
 	$.fn.superfish = function(op) {
 		var sf = $.fn.superfish,
 			c = sf.c,
-			over = function(e) {
+			over = function() {
 				var $this = $(this),
 					menu = getMenu($this);
 
@@ -375,8 +352,7 @@
 						$.proxy(over, o.$path, e)();
 					}
 				};
-
-				if (e.type !== 'mouseleave' && e.type !== 'focusout')
+				if (e.type === 'click')
 				{
 					clearTimeout(menu.sfTimer);
 					close();
@@ -392,8 +368,14 @@
 				sf.op = sf.o[menu.serial];
 				return menu;
 			},
+			applyTouchAction = function($menu) {
+				// needed by MS pointer events
+				$menu.css('ms-touch-action', 'none');
+			},
 			applyHandlers = function($menu) {
-				var targets = 'li:has(ul)';
+				var targets = 'li:has(ul)',
+					touchstart = 'MSPointerDown';
+
 				if (!sf.op.useClick)
 				{
 					if ($.fn.hoverIntent && !sf.op.disableHI)
@@ -408,9 +390,15 @@
 					}
 				}
 
+				// Sorry, but avoiding weird glitches with touchstart. iOS doesn't need it, anyway.
+				if (!navigator.userAgent.toLowerCase().match(/(iphone|ipod|ipad)/))
+				{
+					touchstart += ' touchstart';
+				}
+
 				$menu
-					.on('focusin', targets, over)
-					.on('focusout', targets, out)
+					.on('focusin', 'li', over)
+					.on('focusout', 'li', out)
 					.on('click', 'a', clickHandler)
 					.on('touchstart', 'a', touchHandler);
 			},
@@ -422,9 +410,23 @@
 					$(this).data('follow', false);
 				}
 			},
+			touchHandler = function(e) {
+				var $this = $(this),
+					$ul = $this.siblings('ul');
+
+				if ($ul.length > 0 && !$ul.is(':visible'))
+				{
+					$this.data('follow', false);
+					if (e.type === 'MSPointerDown')
+					{
+						$this.trigger('focus');
+						return false;
+					}
+				}
+			},
 			clickHandler = function(e) {
 				var $a = $(this),
-					$submenu = $a.next('ul'),
+					$submenu = $a.siblings('ul'),
 					follow = ($a.data('follow') === false) ? false : true;
 
 				if ($submenu.length && (sf.op.useClick || !follow))
@@ -433,11 +435,11 @@
 
 					if (!$submenu.is(':visible'))
 					{
-						$.proxy(over, $a.parent(), e)();
+						$.proxy(over, $a.parent('li'))();
 					}
 					else if (sf.op.useClick && follow)
 					{
-						$.proxy(out, $a.parent(), e)();
+						$.proxy(out, $a.parent('li'), e)();
 					}
 				}
 			};
@@ -454,6 +456,7 @@
 			});
 			sf.o[s] = sf.op = o;
 
+			applyTouchAction($this);
 			applyHandlers($this);
 			liHasUl.not('.' + c.bcClass).hideSuperfishUl();
 		});
@@ -475,7 +478,7 @@
 		animation	: {opacity:'show', height:'show', width:'show'},
 		speed		: '150',
 		disableHI	: false,		// true disables hoverIntent detection
-		useClick	: false,
+		useClick	: false
 	};
 
 	$.fn.extend({
@@ -483,7 +486,7 @@
 			var o = sf.op,
 				$this = this;
 
-			$(['li.', o.hoverClass].join(''), this).add(this).removeClass(o.hoverClass).find('>ul').hide();
+			$('li.' + o.hoverClass, this).add(this).removeClass(o.hoverClass).find('>ul').hide();
 
 			if (sf.op.useClick)
 			{
@@ -494,9 +497,10 @@
 		showSuperfishUl : function() {
 			var o = sf.op,
 				$this = this,
-				$ul = this.addClass(o.hoverClass).find('>ul:hidden').css('opacity', 1);
+				$ul = this.find('>ul:hidden');
 
-			$ul.stop().animate(o.animation, o.speed, function() {
+			$ul.parent('li').addClass(o.hoverClass);
+			$ul.stop(true, true).animate(o.animation, o.speed, function() {
 				$this.children('a').data('follow', true);
 			});
 
@@ -589,7 +593,7 @@
 						$(draggable).stop().animate({
 							left: positionX + 'px',
 							top: positionY + 'px'
-						},                        
+						},
 						{
                             duration:o.speed,
                             easing:o.easing,
