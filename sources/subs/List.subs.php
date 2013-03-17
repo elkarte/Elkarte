@@ -262,7 +262,7 @@ function createList($listOptions)
 
 	// Add an option for inline JavaScript.
 	if (isset($listOptions['javascript']))
-		$list_context['javascript'] = $listOptions['javascript'];
+		addInlineJavascript($listOptions['javascript'], true);
 
 	// We want a menu.
 	if (isset($listOptions['list_menu']))
