@@ -207,7 +207,7 @@ function removeMessage($message, $decreasePostCount = true)
 		// Can't delete an unapproved message, if you can't see it!
 		if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !(in_array(0, $delete_any) || in_array($row['id_board'], $delete_any)))
 		{
-			$approve_posts = boardsAllowedTo('approve_posts');
+			$approve_posts = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 			if (!in_array(0, $approve_posts) && !in_array($row['id_board'], $approve_posts))
 				return false;
 		}

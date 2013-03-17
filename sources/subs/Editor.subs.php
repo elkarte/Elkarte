@@ -652,8 +652,8 @@ function create_control_richedit($editorOptions)
 		error_box_id: \'post_error\',
 		error_checks: [{
 			code: \'no_subject\',
-			function: function(box_value) {
-				if (box_value.length == 0)
+			efunction: function(box_value) {
+				if (box_value.length === 0)
 					return true;
 				else
 					return false;
@@ -667,8 +667,8 @@ function create_control_richedit($editorOptions)
 		error_box_id: \'post_error\',
 		error_checks: [{
 			code: \'no_message\',
-			function: function(box_value) {
-				if (box_value.length == 0)
+			efunction: function(box_value) {
+				if (box_value.length === 0)
 					return true;
 				else
 					return false;
@@ -676,16 +676,16 @@ function create_control_richedit($editorOptions)
 		}],
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
-		function () {
+		(function () {
 			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
 			var editor_val = \'\';
 			if(editor.inSourceMode())
 				editor_val = editor.getText();
 			else
-				editor_val  = editor.getText();
+				editor_val = editor.getText();
 
 			return editor_val;
-		};') . '
+		});') . '
 	});', true);
 	}
 }

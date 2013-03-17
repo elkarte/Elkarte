@@ -225,6 +225,12 @@ function template_body_above()
 			if (!empty($context['current_board']))
 				echo '
 					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
+
+			if (!empty($context['additional_dropdown_search']))
+				foreach ($context['additional_dropdown_search'] as $name => $engine)
+					echo '
+					<option value="', $name, '">', $engine['name'], '</option>';
+
 			echo '
 					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
 				</select>';
@@ -633,4 +639,31 @@ function template_show_error($error_id)
 						</dl>';
 	echo '
 					</div>';
+}
+
+function template_select_boards($name, $label = '', $extra = '')
+{
+	global $context;
+
+	if (!empty($label))
+		echo '
+	<label for="', $name, '">', $label, ' </label>';
+
+	echo '
+	<select name="', $name, '" id="', $name, '" ', $extra, ' >';
+
+	foreach ($context['categories'] as $category)
+	{
+		echo '
+		<optgroup label="', $category['name'], '">';
+
+		foreach ($category['boards'] as $board)
+			echo '
+			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt; ' : '', $board['name'], '</option>';
+		echo '
+		</optgroup>';
+	}
+
+	echo '
+					</select>';
 }

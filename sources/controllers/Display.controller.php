@@ -94,9 +94,9 @@ function Display()
 	}
 
 	$topic_parameters = array(
-		'current_member' => $user_info['id'],
-		'current_topic' => $topic,
-		'current_board' => $board,
+		'member' => $user_info['id'],
+		'topic' => $topic,
+		'board' => $board,
 	);
 	$topic_selects = array();
 	$topic_tables = array();
@@ -105,7 +105,7 @@ function Display()
 	// @todo Why isn't this cached?
 	// @todo if we get id_board in this query and cache it, we can save a query on posting
 	// Load the topic details
-	$topicinfo = getTopicInfo($topic_parameters, true, $topic_selects, $topic_tables);
+	$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 	if (empty($topicinfo))
 		fatal_lang_error('not_a_topic', false);
 
@@ -168,25 +168,8 @@ function Display()
 			}
 			else
 			{
-				// Find the earliest unread message in the topic. (the use of topics here is just for both tables.)
-				$request = $smcFunc['db_query']('', '
-					SELECT IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from
-					FROM {db_prefix}topics AS t
-						LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:current_topic} AND lt.id_member = {int:current_member})
-						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})
-					WHERE t.id_topic = {int:current_topic}
-					LIMIT 1',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-						'current_topic' => $topic,
-					)
-				);
-				list ($new_from) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
 				// Fall through to the next if statement.
-				$_REQUEST['start'] = 'msg' . $new_from;
+				$_REQUEST['start'] = 'msg' . $topicinfo['new_from'];
 			}
 		}
 
@@ -894,7 +877,7 @@ function Display()
 	$context['can_remove_poll'] &= $modSettings['pollMode'] == '1' && $topicinfo['id_poll'] > 0;
 	$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 	$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
-	$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && $modSettings['warning_settings'][0] == 1;
+	$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
 
 	// Handle approval flags...
 	$context['can_reply_approved'] = $context['can_reply'];

@@ -499,43 +499,14 @@ function template_maintain_topics()
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
-					<p><label for="id_board_from">', $txt['move_topics_from'], ' </label>
-					<select name="id_board_from" id="id_board_from">
-						<option disabled="disabled">(', $txt['move_topics_select_board'], ')</option>';
+					<p>';
 
-	// From board
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-						<option disabled="disabled">--------------------------------------</option>
-						<option disabled="disabled">', $category['name'], '</option>
-						<option disabled="disabled">--------------------------------------</option>';
+	template_select_boards('id_board_from', $txt['move_topics_from']);
 
-		foreach ($category['boards'] as $board)
-			echo '
-						<option value="', $board['id'], '"> ', str_repeat('==', $board['child_level']), '=&gt;&nbsp;', $board['name'], '</option>';
-	}
+	template_select_boards('id_board_to', $txt['move_topics_to']);
 
 	echo '
-					</select>
-					<label for="id_board_to">', $txt['move_topics_to'], '</label>
-					<select name="id_board_to" id="id_board_to">
-						<option disabled="disabled">(', $txt['move_topics_select_board'], ')</option>';
-
-	// To board
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-						<option disabled="disabled">--------------------------------------</option>
-						<option disabled="disabled">', $category['name'], '</option>
-						<option disabled="disabled">--------------------------------------</option>';
-
-		foreach ($category['boards'] as $board)
-			echo '
-						<option value="', $board['id'], '"> ', str_repeat('==', $board['child_level']), '=&gt;&nbsp;', $board['name'], '</option>';
-	}
-	echo '
-					</select></p>
+					</p>
 					<hr class="hrcolor" />
 					<input type="submit" value="', $txt['move_topics_now'], '" onclick="if (document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_from\').selectedIndex].disabled || document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_to\').selectedIndex].disabled) return false; var confirmText = \'', $txt['move_topics_confirm'] . '\'; return confirm(confirmText.replace(/%board_from%/, document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_from\').selectedIndex].text.replace(/^=+&gt;&nbsp;/, \'\')).replace(/%board_to%/, document.getElementById(\'id_board_to\').options[document.getElementById(\'id_board_to\').selectedIndex].text.replace(/^=+&gt;&nbsp;/, \'\')));" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -135,7 +135,7 @@ function action_pm()
 
 	// This is convenient.  Do you know how annoying it is to do this every time?!
 	$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($_GET['start']) ? ';start=' . $_GET['start'] : '') . (isset($_REQUEST['l']) ? ';l=' . $_REQUEST['l'] : '');
-	$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && $modSettings['warning_settings'][0] == 1;
+	$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
 	// Are PM drafts enabled?
 	$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
@@ -957,21 +957,9 @@ function action_sendmessage()
 	if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
 	{
 		// How many messages have they sent this last hour?
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(pr.id_pm) AS post_count
-			FROM {db_prefix}personal_messages AS pm
-				INNER JOIN {db_prefix}pm_recipients AS pr ON (pr.id_pm = pm.id_pm)
-			WHERE pm.id_member_from = {int:current_member}
-				AND pm.msgtime > {int:msgtime}',
-			array(
-				'current_member' => $user_info['id'],
-				'msgtime' => time() - 3600,
-			)
-		);
-		list ($postCount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$pmCount = pmCount($user_info['id'], 3600);
 
-		if (!empty($postCount) && $postCount >= $modSettings['pm_posts_per_hour'])
+		if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 	}
 
@@ -1397,7 +1385,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 }
 
 /**
- * Send it!
+ * Actually send a personal message.
  */
 function action_sendmessage2()
 {
@@ -1424,21 +1412,9 @@ function action_sendmessage2()
 	if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
 	{
 		// How many have they sent this last hour?
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(pr.id_pm) AS post_count
-			FROM {db_prefix}personal_messages AS pm
-				INNER JOIN {db_prefix}pm_recipients AS pr ON (pr.id_pm = pm.id_pm)
-			WHERE pm.id_member_from = {int:current_member}
-				AND pm.msgtime > {int:msgtime}',
-			array(
-				'current_member' => $user_info['id'],
-				'msgtime' => time() - 3600,
-			)
-		);
-		list ($postCount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$pmCount = pmCount($user_info['id'], 3600);
 
-		if (!empty($postCount) && $postCount >= $modSettings['pm_posts_per_hour'])
+		if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 		{
 			if (!isset($_REQUEST['xml']))
 				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
@@ -2245,26 +2221,16 @@ function action_reportmessage()
 	$context['pm_id'] = $pmsg;
 	$context['page_title'] = $txt['pm_report_title'];
 
+	// We'll query some members, we will.
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	// If we're here, just send the user to the template, with a few useful context bits.
 	if (!isset($_POST['report']))
 	{
 		$context['sub_template'] = 'report_message';
 
-		// @todo I don't like being able to pick who to send it to.  Favoritism, etc. sucks.
 		// Now, get all the administrators.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
-			ORDER BY real_name',
-			array(
-				'admin_group' => 1,
-			)
-		);
-		$context['admins'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['admins'][$row['id_member']] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
+		$context['admins'] = admins();
 
 		// How many admins in total?
 		$context['admin_count'] = count($context['admins']);
@@ -2328,20 +2294,10 @@ function action_reportmessage()
 			$recipients[] = sprintf($txt['pm_report_pm_hidden'], $hidden_recipients);
 
 		// Now let's get out and loop through the admins.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, real_name, lngfile
-			FROM {db_prefix}members
-			WHERE (id_group = {int:admin_id} OR FIND_IN_SET({int:admin_id}, additional_groups) != 0)
-				' . (empty($_POST['id_admin']) ? '' : 'AND id_member = {int:specific_admin}') . '
-			ORDER BY lngfile',
-			array(
-				'admin_id' => 1,
-				'specific_admin' => isset($_POST['id_admin']) ? (int) $_POST['id_admin'] : 0,
-			)
-		);
+		$admins = admins(isset($_POST['id_admin']) ? (int) $_POST['id_admin'] : 0);
 
 		// Maybe we shouldn't advertise this?
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if (empty($admins))
 			fatal_lang_error('no_access', false);
 
 		$memberFromName = un_htmlspecialchars($memberFromName);
@@ -2349,10 +2305,10 @@ function action_reportmessage()
 		// Prepare the message storage array.
 		$messagesToSend = array();
 		// Loop through each admin, and add them to the right language pile...
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		foreach ($admins as $id_admin => $admin_info)
 		{
 			// Need to send in the correct language!
-			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+			$cur_language = empty($admin_info['lngfile']) || empty($modSettings['userLanguage']) ? $language : $admin_info['lngfile'];
 
 			if (!isset($messagesToSend[$cur_language]))
 			{
@@ -2377,9 +2333,8 @@ function action_reportmessage()
 			}
 
 			// Add them to the list.
-			$messagesToSend[$cur_language]['recipients']['to'][$row['id_member']] = $row['id_member'];
+			$messagesToSend[$cur_language]['recipients']['to'][$id_admin] = $id_admin;
 		}
-		$smcFunc['db_free_result']($request);
 
 		// Send a different email for each language.
 		foreach ($messagesToSend as $lang => $message)

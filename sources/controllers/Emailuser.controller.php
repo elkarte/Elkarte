@@ -62,21 +62,11 @@ function action_sendtopic()
 	if (empty($topic))
 		fatal_lang_error('not_a_topic', false);
 
-	// Get the topic's subject.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.approved
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Topic.subs.php');
+
+	$row = getTopicInfo($topic, 'message');
+	if (empty($row))
 		fatal_lang_error('not_a_topic', false);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Can't send topic if its unapproved and using post moderation.
 	if ($modSettings['postmod_active'] && !$row['approved'])
@@ -357,7 +347,7 @@ function action_reporttm()
 		error_box_id: \'report_error\',
 		error_checks: [{
 			code: \'post_too_long\',
-			function: function(box_value) {
+			efunction: function(box_value) {
 				if (box_value.length > 254)
 					return true;
 				else

@@ -1953,9 +1953,16 @@ function profileSaveAvatarData(&$value)
 		// Get rid of their old avatar. (if uploaded.)
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'gravatar' && allowedTo('profile_gavatar'))
+	elseif ($value == 'gravatar' && allowedTo('profile_gravatar'))
 	{
 		$profile_vars['avatar'] = 'gravatar';
+
+		// Reset the attach ID.
+		$cur_profile['id_attach'] = 0;
+		$cur_profile['attachment_type'] = 0;
+		$cur_profile['filename'] = '';
+
+		removeAttachments(array('id_member' => $memID));
 	}
 	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && empty($modSettings['avatar_download_external']))
 	{

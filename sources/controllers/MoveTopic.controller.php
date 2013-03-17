@@ -39,9 +39,9 @@ function action_movetopic()
 
 	// Retrieve the basic topic information for whats being moved
 	require_once(SUBSDIR . '/Topic.subs.php');
-	$topic_info = getTopicInfo($topic, true);
+	$topic_info = getTopicInfo($topic, 'message');
 
-	if ($topic_info === false)
+	if (empty($topic_info))
 		fatal_lang_error('topic_gone', false);
 
 	$context['is_approved'] = $topic_info['approved'];
@@ -58,38 +58,11 @@ function action_movetopic()
 	loadTemplate('MoveTopic');
 
 	// Get a list of boards this moderator can move to.
-	$request = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_board, b.name, b.child_level, c.name AS cat_name, c.id_cat
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE {query_see_board}
-			AND b.redirect = {string:blank_redirect}',
-		array(
-			'blank_redirect' => '',
-			'current_board' => $board,
-		)
-	);
-	$number_of_boards = $smcFunc['db_num_rows']($request);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if (!isset($context['categories'][$row['id_cat']]))
-			$context['categories'][$row['id_cat']] = array (
-				'name' => strip_tags($row['cat_name']),
-				'boards' => array(),
-			);
-
-		$context['categories'][$row['id_cat']]['boards'][] = array(
-			'id' => $row['id_board'],
-			'name' => strip_tags($row['name']),
-			'category' => strip_tags($row['cat_name']),
-			'child_level' => $row['child_level'],
-			'selected' => !empty($_SESSION['move_to_topic']) && $_SESSION['move_to_topic'] == $row['id_board'] && $row['id_board'] != $board,
-		);
-	}
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Boards.subs.php');
+	$context += allBoards();
 
 	// No boards?
-	if (empty($context['categories']) || (!empty($number_of_boards) && $number_of_boards == 1))
+	if (empty($context['categories']) || $context['num_boards'] == 1)
 		fatal_lang_error('moveto_noboards', false);
 
 	$context['page_title'] = $txt['move_topic'];
@@ -182,7 +155,7 @@ function action_movetopic2()
 	if ($modSettings['postmod_active'] && !$context['is_approved'] && !allowedTo('approve_posts'))
 	{
 		// Only allow them to move it to other boards they can't approve it in.
-		$can_approve = boardsAllowedTo('approve_posts');
+		$can_approve = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 		$boards = array_intersect($boards, $can_approve);
 	}
 
