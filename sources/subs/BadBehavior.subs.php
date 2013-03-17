@@ -112,7 +112,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
-		ORDER BY id ' . ($sort == 'down' ? 'DESC' : '') . '
+		ORDER BY id ' . ($sort === 'down' ? 'DESC' : '') . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
