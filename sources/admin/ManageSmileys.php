@@ -67,7 +67,6 @@ function ManageSmileys()
 
 	$context['page_title'] = $txt['smileys_manage'];
 	$context['sub_action'] = $_REQUEST['sa'];
-	$context['sub_template'] = $context['sub_action'];
 
 	// Load up all the tabs...
 	$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -198,6 +197,7 @@ function EditSmileySets()
 
 	// Set the right tab to be selected.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
+	$context['sub_template'] = $context['sub_action'];
 
 	// They must've been submitted a form.
 	if (isset($_POST['smiley_save']))
@@ -543,6 +543,8 @@ function AddSmiley()
 	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 	$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 	$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
+	$context['sub_template'] = 'addsmiley';
+	
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
 	foreach ($context['smiley_sets'] as $i => $set)
 		$context['smiley_sets'][$i] = array(
@@ -791,6 +793,7 @@ function EditSmileys()
 
 	// Force the correct tab to be displayed.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
+	$context['sub_template'] = $context['sub_action'];
 
 	// Submitting a form?
 	if (isset($_POST['smiley_save']) || isset($_POST['smiley_action']))
@@ -1248,6 +1251,8 @@ function list_getNumSmileys()
 function EditSmileyOrder()
 {
 	global $modSettings, $context, $settings, $txt, $smcFunc;
+
+	$context['sub_template'] = 'setorder';
 
 	// Move smileys to another position.
 	if (isset($_REQUEST['reorder']))
