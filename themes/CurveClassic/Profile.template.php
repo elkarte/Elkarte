@@ -2112,7 +2112,7 @@ function template_issueWarning()
 	</form>';
 
 	// Previous warnings?
-	template_show_list('view_warnings');
+	template_show_list('issued_warnings');
 
 	// Do our best to get pretty javascript enabled.
 	echo '
