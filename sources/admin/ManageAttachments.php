@@ -553,28 +553,28 @@ function action_browse()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'selectors',
-				'value' => array(
-					array(
-						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse',
-						'selected' => $context['browse_type'] === 'attachments',
-						'text' => $txt['attachment_manager_attachments']
-					),
-					array(
-						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse;avatars',
-						'selected' => $context['browse_type'] === 'avatars',
-						'text' => $txt['attachment_manager_avatars']
-					),
-					array(
-						'url' => $scripturl . '?action=admin;area=manageattachments;sa=browse;thumbs',
-						'selected' => $context['browse_type'] === 'thumbs',
-						'text' => $txt['attachment_manager_thumbs']
-					),
-				),
-			),
-			array(
 				'position' => 'below_table_data',
 				'value' => '<input type="submit" name="remove_submit" class="button_submit" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['confirm_delete_attachments'] . '\');" />',
+			),
+		),
+		'list_menu' => array(
+			'show_on' => 'top',
+			'links' => array(
+				array(
+					'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse',
+					'is_selected' => $context['browse_type'] === 'attachments',
+					'label' => $txt['attachment_manager_attachments']
+				),
+				array(
+					'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse;avatars',
+					'is_selected' => $context['browse_type'] === 'avatars',
+					'label' => $txt['attachment_manager_avatars']
+				),
+				array(
+					'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse;thumbs',
+					'is_selected' => $context['browse_type'] === 'thumbs',
+					'label' => $txt['attachment_manager_thumbs']
+				),
 			),
 		),
 	);

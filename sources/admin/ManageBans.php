@@ -1055,35 +1055,36 @@ function action_browse()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'selectors',
-				'value' => array(
-					array(
-						'url' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
-						'selected' => $context['selected_entity'] == 'ip',
-						'text' => $txt['ip']
-					),
-					array(
-						'url' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
-						'selected' => $context['selected_entity'] == 'hostname',
-						'text' => $txt['hostname']
-					),
-					array(
-						'url' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
-						'selected' => $context['selected_entity'] == 'email',
-						'text' => $txt['email']
-					),
-					array(
-						'url' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
-						'selected' => $context['selected_entity'] == 'member',
-						'text' => $txt['username']
-					)
-				),
-			),
-			array(
 				'position' => 'bottom_of_list',
 				'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" class="button_submit" />',
 			),
 		),
+		'list_menu' => array(
+			array(
+				'show_on' => 'top',
+				'value' => array(
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
+						'is_selected' => $context['selected_entity'] == 'ip',
+						'label' => $txt['ip']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
+						'is_selected' => $context['selected_entity'] == 'hostname',
+						'label' => $txt['hostname']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
+						'is_selected' => $context['selected_entity'] == 'email',
+						'label' => $txt['email']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
+						'is_selected' => $context['selected_entity'] == 'member',
+						'label' => $txt['username']
+					)
+				),
+			),
 	);
 
 	// Specific data for the first column depending on the selected entity.

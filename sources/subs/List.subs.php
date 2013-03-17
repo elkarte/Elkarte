@@ -266,7 +266,12 @@ function createList($listOptions)
 
 	// We want a menu.
 	if (isset($listOptions['list_menu']))
+	{
+		if (!isset($listOptions['list_menu']['position']))
+			$listOptions['list_menu']['position'] = 'left';
+
 		$list_context['list_menu'] = $listOptions['list_menu'];
+	}
 
 	// Make sure the template is loaded.
 	loadTemplate('GenericList');
