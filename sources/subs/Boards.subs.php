@@ -1040,6 +1040,7 @@ function allBoards($all = false, $include = array())
 {
 	global $smcFunc, $modSettings;
 
+	$boards = array();
 	if ($all === false)
 		$query = '{query_see_board}';
 	elseif ($all === true)
