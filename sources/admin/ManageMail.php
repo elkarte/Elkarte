@@ -40,7 +40,6 @@ function action_managemail()
 	require_once(ADMINDIR . '/ManageServer.php');
 
 	$context['page_title'] = $txt['mailqueue_title'];
-	$context['sub_template'] = 'show_settings';
 
 	$subActions = array(
 		'browse' => 'action_browsemail',
