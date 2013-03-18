@@ -402,14 +402,6 @@
 					.on('click', 'a', clickHandler)
 					.on('touchstart', 'a', touchHandler);
 			},
-			touchHandler = function() {
-				var $this = $(this);
-
-				if (!$this.next('ul').is(':visible'))
-				{
-					$(this).data('follow', false);
-				}
-			},
 			touchHandler = function(e) {
 				var $this = $(this),
 					$ul = $this.siblings('ul');
@@ -446,7 +438,7 @@
 
 		return this.addClass(c.menuClass).each(function() {
 			var s = this.serial = sf.o.length,
-			    o = $.extend({}, sf.defaults,op),
+			    o = $.extend({}, sf.defaults, op),
 				$this = $(this),
 				liHasUl = $this.find("li ul").parent();
 
