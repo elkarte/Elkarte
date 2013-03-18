@@ -78,6 +78,11 @@ class Email_Format
 	private $_found_sig = false;
 
 	/**
+	 * Holds the members display name, used for signature check etc.
+	 */
+	private $_real_name = null;
+
+	/**
 	 * tuning value (fudge) used to decide if a line is short
 	 * change with care
 	 */
@@ -106,8 +111,9 @@ class Email_Format
 	 */
 	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8')
 	{
+		$this->_real_name =  $real_name;
 		$this->_prep_data($data);
-		$this->_fix_body($real_name, $html);
+		$this->_fix_body($html);
 		$this->_clean_up($charset);
 
 		return $this->_body;
@@ -167,22 +173,24 @@ class Email_Format
 	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 *
-	 * @param string $real_name
 	 * @param boolean $html
 	 */
-	private function _fix_body($real_name, $html)
+	private function _fix_body($html)
 	{
 		// Go line by line and put in line breaks *only* where (we often erroneously assume) they are needed
 		for ($i = 0, $num = count($this->_body_array); $i < $num; $i++)
 		{
-			// We are already in a text list, and this current line does not start the next item
+			// We are already in a text list, and this current line does not start the next list item
 			if ($this->_in_list && !$this->_body_array[$i]['list_item'])
 			{
-				// Are we at the last known list item, if so we can turn wrapping off
+				// Are we at the last known list item?, if so we can turn wrapping off
 				if (isset($this->_body_array[$i + 1]) && $this->_in_list === $this->_in_plainlist)
-					$this->_body_array[$i - 1] = $this->_body_array[$i - 1] . "\n";
+				{
+					$this->_body_array[$i - 1]['content'] = $this->_body_array[$i - 1]['content'] . "\n";
+					$this->_in_list = 0;
+				}
 				else
-					$this->_body_array[$i] = $this->_body_array[$i];
+					$this->_body_array[$i]['content'] = ' ' . trim($this->_body_array[$i]['content']);
 			}
 
 			// long line in a sig ... but not a link then lets bail out might be a ps or something
@@ -190,7 +198,7 @@ class Email_Format
 				$this->_found_sig = false;
 
 			// Blank line, if its not two in a row and not the start of a bbc code then insert a newline
-			if ($this->_body_array[$i]['content'] === '')
+			if ($this->_body_array[$i]['content'] == '')
 			{
 				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
 					$this->_body_array[$i]['content'] = "\n";
@@ -202,7 +210,7 @@ class Email_Format
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
 			// Signature line start as defined in the ACP, i.e. best, regards, thanks
-			elseif ((!$this->_found_sig && !empty($modSettings['maillist_sig_keys']) && (preg_match('~^(' . $modSettings['maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line))) || (($this->_body_array[$i]['content'] === $real_name) && !$this->_found_sig))
+			elseif ($this->_in_sig($i))
 			{
 				$this->_body_array[$i]['content'] = "\n\n\n" . $this->_body_array[$i]['content'];
 				$this->_found_sig = true;
@@ -215,13 +223,13 @@ class Email_Format
 				else
 					$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'] . "\n";
 			}
-			// line starts with a link .....
+			// Line starts with a link .....
 			elseif (in_array(substr($this->_body_array[$i]['content'], 0, 4), array('www.', 'WWW.', 'http', 'HTTP')))
 			{
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
-			// OK, we can't seem to think of another reason this should not be on the same line
-			// and these numbers are quite frankly subjective, but so is how we got here
+			// OK, we can't seem to think of other obvious reasons this should not be on the same line
+			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
 			else
 			{
 				// Its a wrap ... maybe
@@ -233,20 +241,22 @@ class Email_Format
 				// If this line is longer than the line above it and that line ended in a period then this should be a new paragraph
 				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
 				{
-					if (((substr($this->_body_array[$i - 1]['content'], -1) === '.') && ($para_check < $this->_para_check)) || (substr($this->_body_array[$i - 1]['content'], -1) !== '.'))
+					if (((substr($this->_body_array[$i - 1]['content'], -1) === '.') && ($para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0])))) || (substr($this->_body_array[$i - 1]['content'], -1) !== '.'))
 						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
 					else
 						$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				}
 				elseif ($para_check < 5)
+				{
 					$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
+				}
 				else
 					$this->_body_array[$i]['content'] = "\n\n" . $this->_body_array[$i]['content'];
 			}
 		}
 
 		// Close any open quotes we may have left behind
-		for ($quotes = 1; $quotes <= $this->_in_quote; $$quotes++)
+		for ($quotes = 1; $quotes <= $this->_in_quote; $quotes++)
 			$this->_body_array[$i + $quotes] = '[/quote]';
 
 		// Join the message back together while dropping null index's
@@ -331,6 +341,24 @@ class Email_Format
 			$this->_in_quote--;
 	}
 
+	/**
+	 * Checks if a string is the potentially the start of a signature line
+	 *
+	 * @param string $var
+	 */
+	private function _in_sig($i)
+	{
+		global $modSettings;
+
+		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and its a short line of text
+		if (!$this->_found_sig && !empty($modSettings['maillist_sig_keys']) && (preg_match('~^(' . $modSettings['maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
+				return true;
+		// The line is simply just their name
+		elseif (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
+				return true;
+
+		return false;
+	}
 	/**
 	 * Checks if a string is the start or end of a bbc [code] tag
 	 * Keeps track of the tag depth
