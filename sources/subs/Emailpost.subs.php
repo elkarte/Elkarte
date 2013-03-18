@@ -187,7 +187,7 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	// Any old school email wrote: etc style quotes that we need to update
 	$body = pbe_fix_client_quotes($body);
 
-	// Attempt to remove any email addresses that are in the reply
+	// Attempt to remove any exposed email addresses that are in the reply
 	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)\n~i', '', $body);
 	$body = preg_replace('~\b\s?[a-z0-9._%+-]+@[a-zZ0-9.-]+\.[a-z]{2,4}\b.?' . $txt['email_wrote'] . ':\s?~i', '', $body);
 	$body = preg_replace('~<(.*?)>(.*@.*?)\n~', '$1' . "\n", $body);
@@ -256,9 +256,10 @@ function pbe_fix_email_quotes($body, $html)
 
 			// A line between two = quote or descending quote levels,
 			// probably an email break so join (wrap) it back up and continue
-			if ((!empty($level_prev)) && ($level_prev >= $level_next))
+			if (($level_prev !==0) && ($level_prev >= $level_next && $level_next !== 0))
 			{
 				$body_array[$i - 1] .= ' ' . $body_array[$i];
+				unset($body_array[$i]);
 				continue;
 			}
 		}
@@ -387,16 +388,16 @@ function pbe_parse_email_message(&$body)
 	$expressions = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if ($row['email_parser_type'] === 'regex')
+		if ($row['filter_type'] === 'regex')
 		{
 			// Test the regex and if good add it to the array, else skip it
 			// @todo these are tested at insertion, so this may be unnecessary
-			$temp = preg_replace($row['email_parser_from'], '', '$5#6#8%9456@^)098');
+			$temp = preg_replace($row['filter_from'], '', '$5#6#8%9456@^)098');
 			if ($temp != null)
-				$expressions[] = array('type' => 'regex', 'parser' => $row['email_parser_from']);
+				$expressions[] = array('type' => 'regex', 'parser' => $row['filter_from']);
 		}
 		else
-			$expressions[] = array('type' => 'string', 'parser' => $row['email_parser_from']);
+			$expressions[] = array('type' => 'string', 'parser' => $row['filter_from']);
 	}
 	$smcFunc['db_free_result']($request);
 
@@ -405,7 +406,7 @@ function pbe_parse_email_message(&$body)
 	$split = array();
 	foreach ($expressions as $expression)
 	{
-		if ($expression['type'] == 'regex')
+		if ($expression['type'] === 'regex')
 			$split = preg_split($expression['parser'], $body);
 		else
 			$split = explode($expression['parser'], $body, 2);
@@ -413,7 +414,7 @@ function pbe_parse_email_message(&$body)
 		// If an expression was matched our fine work is done
 		if (!empty($split[1]))
 		{
-			// If we had a find then we remove the mail clients "reply to" section
+			// If we had a find then we clip off the mail clients "reply to" section
 			$match = true;
 			$body = $split[0];
 			break;

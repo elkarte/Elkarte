@@ -576,7 +576,7 @@ function pbe_load_text($html, $email_message, $pbe)
 {
 	global $smcFunc;
 
-	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >=2)
+	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
 		$text = $email_message->body_plain;

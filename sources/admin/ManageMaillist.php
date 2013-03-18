@@ -679,9 +679,9 @@ function action_edit_filters()
 		$modSettings['filter_name'] = $row['filter_name'];
 
 		// Some items for the form
+		$context['page_title'] = $txt['edit_filter'];
 		$context['editing'] = true;
 		$context['settings_message'] = array();
-		$context['page_title'] = $txt['edit_filter'];
 	}
 	else
 	{
@@ -941,8 +941,8 @@ function action_edit_parsers()
 		$modSettings['filter_from'] = $row['filter_from'];
 		$modSettings['filter_name'] = $row['filter_name'];
 
-		$context['editing'] = true;
 		$context['page_title'] = $txt['edit_parser'];
+		$context['editing'] = true;
 	}
 	else
 	{
@@ -960,6 +960,7 @@ function action_edit_parsers()
 		array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
 			array(
 				'regex' => $txt['option_regex'],
+				'standard' => $txt['option_standard'],
 			),
 		),
 		array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
