@@ -22,10 +22,14 @@ if (!defined('ELKARTE'))
  * Generates the query to determine the list of available boards for a user
  * Executes the query and returns the list
  *
- * @param type $boardListOptions
+ * @param array $boardListOptions
+ * @param boolean $simple if true a simple array is returned containing some basic
+ *                informations regarding the board (id_board, board_name, child_level, id_cat, cat_name)
+ *                if false the boards are returned in an array subdivided by categories including also
+ *                additional data like the number of boards
  * @return type
  */
-function getBoardList($boardListOptions = array())
+function getBoardList($boardListOptions = array(), $simple = false)
 {
 	global $smcFunc, $user_info;
 
@@ -82,14 +86,27 @@ function getBoardList($boardListOptions = array())
 		$where_parameters
 	);
 
-	$return_value = array(
-		'num_boards' => $smcFunc['db_num_rows']($request),
-		'boards_check_all' => true,
-		'categories' => array(),
-	);
-
-	if ($smcFunc['db_num_rows']($request) !== 0)
+	if ($simple)
 	{
+		$return_value = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$return_value[$row['id_board']] = array(
+				'id_cat' => $row['id_cat'],
+				'cat_name' => $row['cat_name'],
+				'id_board' => $row['id_board'],
+				'board_name' => $row['board_name'],
+				'child_level' => $row['child_level'],
+			);
+		}
+	}
+	else
+	{
+		$return_value = array(
+			'num_boards' => $smcFunc['db_num_rows']($request),
+			'boards_check_all' => true,
+			'categories' => array(),
+		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			// This category hasn't been set up yet..
@@ -127,6 +144,7 @@ function getBoardList($boardListOptions = array())
 			}
 		}
 	}
+
 	$smcFunc['db_free_result']($request);
 
 	return $return_value;
