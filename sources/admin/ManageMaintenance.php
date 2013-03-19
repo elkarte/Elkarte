@@ -241,9 +241,9 @@ function MaintainTopics()
 {
 	global $context, $smcFunc, $txt;
 
-	require_once(SUBSDIR . '/Boards.subs.php');
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	// Let's load up the boards in case they are useful.
-	$context += allBoards();
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 	if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 		$context['maintenance_finished'] = $txt['maintain_old'];

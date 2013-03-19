@@ -125,7 +125,7 @@ function template_new_group()
 						</dt>
 						<dd>';
 
-	template_add_edit_group_boards_list(false);
+	template_add_edit_group_boards_list('new_group', false);
 
 	echo '
 						</dd>
@@ -299,7 +299,7 @@ function template_edit_group()
 							<span class="smalltext">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 						</dt>
 						<dd>';
-		template_add_edit_group_boards_list();
+		template_add_edit_group_boards_list('groupForm');
 		echo '
 						</dd>';
 	}
@@ -363,7 +363,7 @@ function template_edit_group()
 		// ]]></script>';
 }
 
-function template_add_edit_group_boards_list($collapse = true)
+function template_add_edit_group_boards_list($form_id, $collapse = true)
 {
 	global $context, $txt, $modSettings;
 	echo '
@@ -376,7 +376,7 @@ function template_add_edit_group_boards_list($collapse = true)
 		if (empty($modSettings['deny_boards_access']))
 			echo '
 									<li class="category">
-										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'new_group\'); return false;"><strong>', $category['name'], '</strong></a>
+										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\'); return false;"><strong>', $category['name'], '</strong></a>
 									<ul style="width:100%">';
 		else
 			echo '
