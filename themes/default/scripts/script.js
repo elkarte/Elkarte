@@ -40,7 +40,7 @@ if (!('XMLHttpRequest' in window) && 'ActiveXObject' in window)
 // Some older versions of Mozilla don't have this, for some reason.
 if (!('forms' in document))
 	document.forms = document.getElementsByTagName('form');
-	
+
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))
 {
@@ -326,7 +326,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	var sAjax_indicator = '<div class="centertext"><img src="' + smf_images_url + '/loading.gif" ></div>';
 	var sIcon = smf_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
 	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
-	
+
 	// Create the div that we are going to load
 	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon});
 	var oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
@@ -379,14 +379,14 @@ smc_Popup.prototype.show = function ()
 			popup_instance.hide();
 	});
 	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });
-	
+
 	return false;
 }
 
 smc_Popup.prototype.hide = function ()
 {
 	$('#' + this.popup_id).fadeOut(300, function(){ $(this).remove(); });
-	
+
 	return false;
 }
 
@@ -649,7 +649,7 @@ function smf_avatarResize()
 		// Image.prototype.avatar = possibleAvatars[i];
 		tempAvatars[j] = new Image();
 		tempAvatars[j].avatar = possibleAvatars[i];
-		
+
 		tempAvatars[j].onload = function()
 		{
 			this.avatar.width = this.width;
@@ -1180,6 +1180,10 @@ function IconList(oOptions)
 	if (!('sSessionVar' in this.opt))
 		this.opt.sSessionVar = 'sesc';
 
+	// Set a default Action
+	if (!('sAction' in this.opt) || this.opt.sAction === null)
+		this.opt.sAction = 'messageicons;board=' + this.opt.iBoardId;
+
 	this.initIcons();
 }
 
@@ -1187,7 +1191,7 @@ function IconList(oOptions)
 IconList.prototype.initIcons = function ()
 {
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
-		if (document.images[i].id.substr(0, iPrefixLength) == this.opt.sIconIdPrefix)
+		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
 			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 3px; text-align: center;"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="margin: 0px; padding: ' + (is_ie ? '0px 3px' : '0px 3px') + ';" /></div>');
 }
 
@@ -1196,7 +1200,7 @@ IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
 {
 	oDiv.style.border = bMouseOver ? this.opt.iBoxBorderWidthHover + 'px solid ' + this.opt.sBoxBorderColorHover : '';
 	oDiv.style.background = bMouseOver ? this.opt.sBoxBackgroundHover : this.opt.sBoxBackground;
-	oDiv.style.padding = bMouseOver ? (3 - this.opt.iBoxBorderWidthHover) + 'px' : '3px'
+	oDiv.style.padding = bMouseOver ? (3 - this.opt.iBoxBorderWidthHover) + 'px' : '3px';
 }
 
 // Show the list of icons after the user clicked the original icon.
@@ -1204,7 +1208,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 {
 	this.iCurMessageId = iMessageId;
 
-	if (!this.bListLoaded && this.oContainerDiv == null)
+	if (!this.bListLoaded && this.oContainerDiv === null)
 	{
 		// Create a container div.
 		this.oContainerDiv = document.createElement('div');
@@ -1219,7 +1223,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 
 		// Start to fetch its contents.
 		ajax_indicator(true);
-		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=messageicons;board=' + this.opt.iBoardId + ';xml', '', this.onIconsReceived);
+		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=' + this.opt.sAction + ';xml', '', this.onIconsReceived);
 
 		createEventListener(document.body);
 	}
@@ -1261,7 +1265,7 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 {
 	oDiv.style.background = bMouseOver ? this.opt.sItemBackgroundHover : this.opt.sItemBackground;
 	oDiv.style.border = bMouseOver ? this.opt.sItemBorderHover : this.opt.sItemBorder;
-	if (this.iCurTimeout != 0)
+	if (this.iCurTimeout !== 0)
 		window.clearTimeout(this.iCurTimeout);
 	if (bMouseOver)
 		this.onBoxHover(this.oClickedIcon, true);
@@ -1272,7 +1276,7 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 // Event handler for clicking on one of the icons.
 IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 {
-	if (this.iCurMessageId != 0)
+	if (this.iCurMessageId !== 0)
 	{
 		ajax_indicator(true);
 		this.tmpMethod = getXMLDocument;
@@ -1281,13 +1285,19 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		ajax_indicator(false);
 
 		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
-		if (oMessage.getElementsByTagName('error').length == 0)
+		if (oMessage.getElementsByTagName('error').length === 0)
 		{
-			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
+			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
 				setInnerHTML(document.getElementById('modified_' + this.iCurMessageId), oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
-			
+
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		}
+	}
+	else
+	{
+		this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
+		if ('sLabelIconBox' in this.opt)
+			document.getElementById(this.opt.sLabelIconBox).value = sNewIcon;
 	}
 }
 
@@ -1568,7 +1578,7 @@ function expandCollapse(id, icon, speed)
 	// change the icon on the box as well?
 	if (icon)
 		$('#' + icon).attr("src", smf_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
-	
+
 	// open or collaspe the content id
 	oId.slideToggle(speed);
 
@@ -1664,7 +1674,7 @@ function highlightSelected(box)
 function doAutoSubmit()
 {
 	var formID = typeof(formName) != 'undefined' ? formName : "autoSubmit";
-	
+
 	if (countdown == 0)
 		document.forms[formID].submit();
 	else if (countdown == -1)
