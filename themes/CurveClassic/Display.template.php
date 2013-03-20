@@ -881,6 +881,7 @@ function template_main()
 							iTopicId: ', $context['current_topic'], ',
 							sSessionId: smf_session_id,
 							sSessionVar: smf_session_var,
+							sAction: "messageicons;board=',  $context['current_board'], '" ,
 							sLabelIconList: "', $txt['message_icon'], '",
 							sBoxBackground: "transparent",
 							sBoxBackgroundHover: "#ffffff",

@@ -1957,6 +1957,13 @@ p#whoisviewing {
 .messageicon img {
 	padding: 6px 3px;
 }
+.groupicon {
+	float: left;
+	margin: 0 0 0 2px;
+}
+.groupicon img {
+	padding: 6px 3px;
+}
 .keyinfo {
 	float: left;
 	width: 50%;

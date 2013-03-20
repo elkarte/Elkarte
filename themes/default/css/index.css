@@ -2223,6 +2223,13 @@ div#pollmoderation {
 .messageicon img {
 	padding: 0 3px 0 3px;
 }
+.groupicon {
+	float: left;
+	margin: 2px 0 0 2px;
+}
+.groupicon img {
+	padding: 0 3px 0 3px;
+}
 .keyinfo h5 {
 	color: #555;
 	padding: 1px 0 5px 0;
