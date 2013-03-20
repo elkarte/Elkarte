@@ -30,6 +30,7 @@ function action_xmlhttp()
 	$subActions = array(
 		'jumpto' => array('action_jumpto'),
 		'messageicons' => array('action_messageicons'),
+		'groupicons' => array('action_groupicons'),
 		'corefeatures' => array('action_corefeatures', 'admin_forum'),
 		'previews' => array('action_previews'),
 	);
@@ -85,6 +86,40 @@ function action_messageicons()
 	require_once(SUBSDIR . '/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
 
+	$context['sub_template'] = 'message_icons';
+}
+
+/**
+ * Get the member group icons
+ */
+function action_groupicons()
+{
+	global $context, $settings;
+
+	// Only load images
+	$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
+	$context['membergroup_icons'] = array();
+	$directory = $settings['theme_dir'] . '/images/group_icons';
+
+	// Get all the available member group icons
+	$files = scandir($directory);
+	foreach ($files as $id => $file)
+	{
+		if ($file === 'blank.png')
+			continue;
+
+		if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), $allowedTypes))
+		{
+			$icons[$id] = array(
+				'value' => $file,
+				'name' => '',
+				'url' => $settings['images_url'] . '/group_icons/' .  $file,
+				'is_last' => false,
+			);
+		}
+	}
+
+	$context['icons'] = array_values($icons);
 	$context['sub_template'] = 'message_icons';
 }
 
