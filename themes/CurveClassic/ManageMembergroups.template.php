@@ -285,13 +285,18 @@ function template_edit_group()
 							<input type="text" name="icon_count" id="icon_count_input" value="', $context['group']['icon_count'], '" size="4" onkeyup="if (this.value.length > 2) this.value = 99;" onkeydown="this.onkeyup();" onchange="if (this.value != 0) this.form.icon_image.onchange();" class="input_text" />
 						</dd>
 						<dt>
-							<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label><br />
+							<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label>
+							<br />
 							<span class="smalltext">', $txt['membergroups_icon_image_note'], '</span>
 						</dt>
 						<dd>
-							', $txt['membergroups_images_url'], '
-							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value == 0) this.form.icon_count.value = 1; else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'icon_preview\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value.replace(/\$language/g, \'', $context['user']['language'], '\') : \'blank.png\');" size="20" class="input_text" />
-							<img id="icon_preview" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
+							<span class="floatleft">
+								', $txt['membergroups_images_url'], '
+								<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value === 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
+							</span>
+							<span id="messageicon_0" class="groupicon">
+								<img id="msg_icon_0" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
+							</span>
 						</dd>
 						<dt>
 							<label for="max_messages_input"><strong>', $txt['membergroups_max_messages'], ':</strong></label><br />
@@ -323,6 +328,29 @@ function template_edit_group()
 			<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
 		</form>
 	</div>
+	<script type="text/javascript"><!-- // --><![CDATA[
+	aIconLists[aIconLists.length] = new IconList({
+		sBackReference: "aIconLists[" + aIconLists.length + "]",
+		sIconIdPrefix: "msg_icon_",
+		sScriptUrl: smf_scripturl,
+		bShowModify: false,
+		sSessionId: smf_session_id,
+		sSessionVar: smf_session_var,
+		sAction: "groupicons" ,
+		sLabelIconList: "', $txt['membergroups_icons'], '",
+		sLabelIconBox: "icon_image_input",
+		sBoxBackground: "transparent",
+		sBoxBackgroundHover: "#ffffff",
+		iBoxBorderWidthHover: 1,
+		sBoxBorderColorHover: "#adadad" ,
+		sContainerBackground: "#ffffff",
+		sContainerBorder: "1px solid #adadad",
+		sItemBorder: "1px solid #ffffff",
+		sItemBorderHover: "1px dotted gray",
+		sItemBackground: "transparent",
+		sItemBackgroundHover: "#e0e0f0"
+	});
+// ]]></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oModeratorSuggest = new smc_AutoSuggest({
