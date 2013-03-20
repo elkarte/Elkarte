@@ -105,6 +105,11 @@ class Email_Parse
 	public $message_id = null;
 
 	/**
+	 * if the file was converted to utf8
+	 */
+	public $_converted_utf8 = false;
+
+	/**
 	 * holds the current email address, to, from, cc
 	 */
 	private $_email_address = null;
@@ -964,7 +969,6 @@ class Email_Parse
 		// Convert this to utf-8 if needed.
 		if (!empty($charset) && $charset != 'UTF-8')
 			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
-
 		return $string;
 	}
 
@@ -978,6 +982,9 @@ class Email_Parse
 	 */
 	private function _charset_convert($string, $from, $to)
 	{
+		// Lets assume we have one of the functions available to us
+		$this->_converted_utf8 = true;
+
 		if (function_exists('iconv'))
 			return @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
 		elseif (function_exists('mb_convert_encoding'))
@@ -985,6 +992,9 @@ class Email_Parse
 		elseif (function_exists('recode_string'))
 			return @recode_string($from . '..' . $to, $string);
 		else
+		{
+			$this->_converted_utf8 = false;
 			return $string;
+		}
 	}
 }
