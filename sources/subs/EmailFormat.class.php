@@ -111,7 +111,7 @@ class Email_Format
 	 */
 	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8')
 	{
-		$this->_real_name =  $real_name;
+		$this->_real_name = $real_name;
 		$this->_prep_data($data);
 		$this->_fix_body($html);
 		$this->_clean_up($charset);
@@ -238,18 +238,21 @@ class Email_Format
 				else
 					$para_check = 1;
 
-				// If this line is longer than the line above it and that line ended in a period then this should be a new paragraph
+				// If this line is longer than the line above it we need to do some extra checks
 				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
 				{
-					if (((substr($this->_body_array[$i - 1]['content'], -1) === '.') && ($para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0])))) || (substr($this->_body_array[$i - 1]['content'], -1) !== '.'))
+					// If the previous short line did not end in a period or it did and the next line does not start with a capital and passes para check
+					// then it wraps
+					if ((substr($this->_body_array[$i - 1]['content'], -1) !== '.') || (substr($this->_body_array[$i - 1]['content'], -1) === '.' && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
 						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
 					else
 						$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				}
 				elseif ($para_check < 5)
-				{
 					$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
-				}
+				// A very short line (but not a empty one) followed by a very long line
+				elseif (isset($this->_body_array[$i - 1]) && !empty($this->_body_array[$i - 1]['content']) && $para_check > $this->_sig_longline && $this->_body_array[$i-1]['length'] < 3)
+					$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
 				else
 					$this->_body_array[$i]['content'] = "\n\n" . $this->_body_array[$i]['content'];
 			}
@@ -323,6 +326,7 @@ class Email_Format
 	}
 
 	/**
+	 *
 	 * Checks if a string is the start or end of a bbc [quote] line
 	 * Keeps track of the tag depth
 	 *
@@ -406,7 +410,7 @@ class Email_Format
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
 
-		if (preg_match('~^[a-f](\.|\)|-)\s~i', $var) || preg_match('~^[1-9](\.|\)|-)\s~', $var) || preg_match('~' . chr(187) . '~', $var))
+		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var) || preg_match('~^[1-9](\.|\)|-)\s?~', $var) || preg_match('~' . chr(187) . '~', $var))
 			$this->_in_plainlist++;
 
 		return $this->_in_plainlist !== $temp;
