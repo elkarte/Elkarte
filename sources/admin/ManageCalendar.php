@@ -175,12 +175,7 @@ function ModifyHolidays()
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
-	//loadTemplate('ManageCalendar');
 	$context['page_title'] = $txt['manage_holidays'];
-
-	// Since the list is the only thing to show, use the default list template.
-	$context['default_list'] = 'holiday_list';
-	$context['sub_template'] = 'show_list';
 }
 
 /**

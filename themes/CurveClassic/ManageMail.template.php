@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_browse()
+function template_mail_queue()
 {
 	global $context, $settings, $options, $scripturl, $txt;
 
