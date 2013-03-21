@@ -575,7 +575,7 @@ function template_view_versions()
 				<tbody>
 					<tr>
 						<td class="windowbg" width="50%">
-							<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
+							<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 						</td>
 						<td class="windowbg" width="25%">
 							<em id="yourdefault">??</em>
@@ -587,7 +587,7 @@ function template_view_versions()
 				</tbody>
 			</table>
 
-			<table id="Default" width="100%" class="table_grid">
+			<table id="default" width="100%" class="table_grid">
 				<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
