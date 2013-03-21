@@ -692,7 +692,6 @@ class data_Validate
 
 		if (!preg_match('`^(https{0,1}?:(//([a-z0-9\-._~%]+)(:[0-9]+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
 		{
-			var_dump($matches);
 			return array(
 				'field' => $field,
 				'input' => $input[$field],
