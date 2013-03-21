@@ -71,7 +71,7 @@ function action_unapproved()
 		$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
 	// Nada, zip, etc...
 	else
-		$approve_query = ' AND 0';
+		$approve_query = ' AND 1=0';
 
 	// We also need to know where we can delete topics and/or replies to.
 	if ($context['current_view'] == 'topics')

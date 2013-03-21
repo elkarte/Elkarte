@@ -294,7 +294,7 @@ function template_jump_to()
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <smf>';
-	foreach ($context['jump_to'] as $category)
+	foreach ($context['categories'] as $category)
 	{
 		echo '
 	<item type="category" id="', $category['id'], '"><![CDATA[', cleanXml($category['name']), ']]></item>';

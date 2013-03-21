@@ -737,19 +737,11 @@ function EditBoardSettings($return_config = false)
 	global $context, $txt, $modSettings, $scripturl, $smcFunc;
 
 	// Load the boards list - for the recycle bin!
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$boards = getBoardList(array('not_redirection' => true), true);
 	$recycle_boards = array('');
-	$request = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_board, b.name AS board_name, c.name AS cat_name
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE redirect = {string:empty_string}',
-		array(
-			'empty_string' => '',
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$recycle_boards[$row['id_board']] = $row['cat_name'] . ' - ' . $row['board_name'];
-	$smcFunc['db_free_result']($request);
+	foreach ($boards as $board)
+		$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
 	// Here and the board settings...
 	$config_vars = array(
