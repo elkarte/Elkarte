@@ -36,7 +36,7 @@ function action_xmlhttp()
 	);
 
 	// Easy adding of xml sub actions
-	call_integration_hook('integrate_xmlhttp', array($subActions));
+ 	call_integration_hook('integrate_xmlhttp', array(&$sub_actions));
 
 	// Valid action?
 	if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))

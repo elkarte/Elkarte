@@ -664,8 +664,7 @@ function action_messageindex()
 	);
 
 	// Allow adding new buttons easily.
-	// Note: $context['normal_buttons'] is added for backward compatibility with 2.0, but is deprecated and should not be used
-	call_integration_hook('integrate_messageindex_buttons', $context['normal_buttons']);
+	call_integration_hook('integrate_messageindex_buttons');
 }
 
 /**

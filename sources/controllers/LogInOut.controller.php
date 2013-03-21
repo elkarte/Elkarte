@@ -363,7 +363,7 @@ function action_login2()
 		}
 
 		// Allows mods to easily extend the $other_passwords array
-		call_integration_hook('integrate_other_passwords', array($other_passwords));
+		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
 
 		// Whichever encryption it was using, let's make it use ELKARTE's now ;).
 		if (in_array($user_settings['passwd'], $other_passwords))

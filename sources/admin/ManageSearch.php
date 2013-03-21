@@ -53,7 +53,7 @@ function ManageSearch()
 		'managesphinx' => 'EditSphinxSettings',
 	);
 
-	call_integration_hook('integrate_manage_search', array($subActions));
+	call_integration_hook('integrate_manage_search', array(&$subActions));
 
 	// Default the sub-action to 'edit search settings'.
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
@@ -113,7 +113,7 @@ function EditSearchSettings($return_config = false)
 	if (!isset($context['settings_post_javascript']))
 		$context['settings_post_javascript'] = '';
 
-	call_integration_hook('integrate_modify_search_settings', array($config_vars));
+	call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
 
 	// Perhaps the search method wants to add some settings?
 	require_once(SUBSDIR . '/Search.subs.php');
@@ -202,7 +202,7 @@ function EditWeights()
 		'search_weight_sticky',
 	);
 
-	call_integration_hook('integrate_modify_search_weights', array($factors));
+	call_integration_hook('integrate_modify_search_weights', array(&$factors));
 
 	// A form was submitted.
 	if (isset($_POST['save']))
