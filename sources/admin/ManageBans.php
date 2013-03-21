@@ -281,9 +281,6 @@ function action_list()
 
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
-
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_list';
 }
 
 /**
@@ -1058,14 +1055,36 @@ function action_browse()
 		),
 		'additional_rows' => array(
 			array(
-				'position' => 'above_column_headers',
-				'value' => '<a href="' . $scripturl . '?action=admin;area=ban;sa=browse;entity=ip">' . ($context['selected_entity'] == 'ip' ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '') . $txt['ip'] . '</a>&nbsp;|&nbsp;<a href="' . $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname">' . ($context['selected_entity'] == 'hostname' ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '') . $txt['hostname'] . '</a>&nbsp;|&nbsp;<a href="' . $scripturl . '?action=admin;area=ban;sa=browse;entity=email">' . ($context['selected_entity'] == 'email' ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '') . $txt['email'] . '</a>&nbsp;|&nbsp;<a href="' . $scripturl . '?action=admin;area=ban;sa=browse;entity=member">' . ($context['selected_entity'] == 'member' ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '') . $txt['username'] . '</a>',
-			),
-			array(
 				'position' => 'bottom_of_list',
 				'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" class="button_submit" />',
 			),
 		),
+		'list_menu' => array(
+			array(
+				'show_on' => 'top',
+				'value' => array(
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
+						'is_selected' => $context['selected_entity'] == 'ip',
+						'label' => $txt['ip']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
+						'is_selected' => $context['selected_entity'] == 'hostname',
+						'label' => $txt['hostname']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
+						'is_selected' => $context['selected_entity'] == 'email',
+						'label' => $txt['email']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
+						'is_selected' => $context['selected_entity'] == 'member',
+						'label' => $txt['username']
+					)
+				),
+			),
 	);
 
 	// Specific data for the first column depending on the selected entity.
@@ -1145,10 +1164,6 @@ function action_browse()
 	// Create the list.
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
-
-	// The list is the only thing to show, so make it the default sub template.
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_trigger_list';
 }
 
 /**
@@ -1367,8 +1382,6 @@ function action_log()
 	createList($listOptions);
 
 	$context['page_title'] = $txt['ban_log'];
-	$context['sub_template'] = 'show_list';
-	$context['default_list'] = 'ban_log';
 }
 
 /**

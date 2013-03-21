@@ -507,7 +507,7 @@ function template_trackActivity()
 		</div>';
 
 	// Show the track user list.
-	template_show_list('track_user_list');
+	template_show_list('track_name_user_list');
 }
 
 // The template for trackIP, allowing the admin to see where/who a certain IP has been used.
@@ -596,7 +596,7 @@ function template_trackIP()
 
 	echo '<br />';
 
-	template_show_list('track_user_list');
+	template_show_list('track_ip_user_list');
 }
 
 function template_action_showPermissions()
@@ -2112,7 +2112,7 @@ function template_issueWarning()
 	</form>';
 
 	// Previous warnings?
-	template_show_list('view_warnings');
+	template_show_list('issued_warnings');
 
 	// Do our best to get pretty javascript enabled.
 	echo '

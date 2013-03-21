@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_main()
+function template_regular_membergroups_list()
 {
 	global $context, $settings, $options, $scripturl, $txt;
 

@@ -157,8 +157,7 @@ $txt['spider_log_empty_log'] = 'Clear Log';
 $txt['spider_log_empty_log_confirm'] = 'Are you sure you want to completely clear the log';
 
 $txt['spider_logs_delete'] = 'Delete Entries';
-$txt['spider_logs_delete_older'] = 'Delete all entries older than';
-$txt['spider_logs_delete_day'] = 'days.';
+$txt['spider_logs_delete_older'] = 'Delete all entries older than %1$s days.';
 $txt['spider_logs_delete_submit'] = 'Delete';
 
 $txt['spider_stats_delete_older'] = 'Delete all spider statistics from spiders not seen in %1$s days.';

@@ -40,7 +40,6 @@ function action_managemail()
 	require_once(ADMINDIR . '/ManageServer.php');
 
 	$context['page_title'] = $txt['mailqueue_title'];
-	$context['sub_template'] = 'show_settings';
 
 	$subActions = array(
 		'browse' => 'action_browsemail',
@@ -72,6 +71,8 @@ function action_browsemail()
 {
 	global $scripturl, $context, $modSettings, $txt, $smcFunc;
 
+	loadTemplate('ManageMail');
+
 	// First, are we deleting something from the queue?
 	if (isset($_REQUEST['delete']))
 	{
@@ -98,6 +99,7 @@ function action_browsemail()
 
 	$context['oldest_mail'] = empty($mailOldest) ? $txt['mailqueue_oldest_not_available'] : time_since(time() - $mailOldest);
 	$context['mail_queue_size'] = comma_format($mailQueueSize);
+	loadTemplate('ManageMail');
 
 	$listOptions = array(
 		'id' => 'mail_queue',
@@ -210,9 +212,6 @@ function action_browsemail()
 
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
-
-	loadTemplate('ManageMail');
-	$context['sub_template'] = 'browse';
 }
 
 /**

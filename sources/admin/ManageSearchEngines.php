@@ -589,7 +589,6 @@ function SpiderLogs()
 
 	$context['page_title'] = $txt['spider_logs'];
 	$context['sub_template'] = 'show_spider_logs';
-	$context['default_list'] = 'spider_logs';
 }
 
 /**
@@ -815,7 +814,6 @@ function SpiderStats()
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_spider_stats';
-	$context['default_list'] = 'spider_stat_list';
 }
 
 /**

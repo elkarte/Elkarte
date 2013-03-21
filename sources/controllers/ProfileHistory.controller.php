@@ -84,7 +84,7 @@ function action_trackactivity($memID)
 
 	// Set the options for the list component.
 	$listOptions = array(
-		'id' => 'track_user_list',
+		'id' => 'track_name_user_list',
 		'title' => $txt['errors_by'] . ' ' . $context['member']['name'],
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'no_items_label' => $txt['no_errors_from_user'],
@@ -581,7 +581,7 @@ function action_trackip($memID = 0)
 
 	// Set the options for the error lists.
 	$listOptions = array(
-		'id' => 'track_user_list',
+		'id' => 'track_ip_user_list',
 		'title' => $txt['errors_from_ip'] . ' ' . $context['ip'],
 		'start_var_name' => 'errorStart',
 		'items_per_page' => $modSettings['defaultMaxMessages'],
