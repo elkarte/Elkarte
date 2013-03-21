@@ -1643,7 +1643,7 @@ function getServerStoredAvatars($directory, $level)
 
 	while ($line = $dir->read())
 	{
-		if (in_array($line, array('.', '..', 'blank.gif', 'index.php')))
+		if (in_array($line, array('.', '..', 'blank.png', 'index.php')))
 			continue;
 
 		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
@@ -1660,8 +1660,8 @@ function getServerStoredAvatars($directory, $level)
 	if ($level == 0)
 	{
 		$result[] = array(
-			'filename' => 'blank.gif',
-			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.gif')),
+			'filename' => 'blank.png',
+			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
 			'name' => $txt['no_pic'],
 			'is_dir' => false
 		);

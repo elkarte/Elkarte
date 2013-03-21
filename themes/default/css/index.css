@@ -747,6 +747,9 @@ dl.settings dt a img {
 	position: relative;
 	vertical-align: top;
 }
+dl.settings textarea {
+	width: 85%;
+}
 
 /* Styles for rounded headers.
 ------------------------------------------------------- */
@@ -865,6 +868,9 @@ table.table_grid {
 table.table_grid td {
 	padding: 3px;
 }
+table.table_grid  textarea {
+	width: 100%;
+}
 table.table_collapse {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -874,7 +880,7 @@ table.table_padding {
 	border-spacing: 0;
 }
 table.table_padding td {
-	padding: 3px;
+	padding: 4px;
 }
 
 /* GenericList */
@@ -4299,7 +4305,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid td.windowbg, .table_grid td.windowbg2, .table_grid td.lockedbg, .table_grid td.lockedbg2,
 .table_grid td.stickybg, .table_grid td.stickybg2, .table_grid td.locked_sticky, .table_grid td.locked_sticky2,
 .table_grid td.whos_viewing, .table_grid td.moderation, .table_grid td.qaction_cell, .table_grid tbody ,
-.table_grid td.approvetbg, .table_grid td.approvetbg2 {
+.table_grid td.approvetbg, .table_grid td.approvetbg2, .table_grid td.approvebg, .table_grid td.approvebg2 {
 	border-bottom: 1px solid #ccc;
 }
 .table_grid tr:nth-child(even) td {
@@ -4310,6 +4316,15 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 .table_grid td.whos_viewing {
 	font-size: 0.9em;
+}
+/* Colors for topics or posts that require approval action */
+.table_grid td.approvebg:nth-child(n), .table_grid td.approvebg2:nth-child(n) {
+	border-bottom: 1px solid #ccc;
+	background: #fff6ca;
+}
+.table_grid td.approvetbg:nth-child(n), .table_grid td.approvetbg2:nth-child(n) {
+	border-bottom: 1px solid #ccc;
+	background: #fff6ca;
 }
 
 /* @todo tempo Colors for locked and sticky topics so we something to look at till this is done :P*/
@@ -4344,6 +4359,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 .table_grid tr td.lockedbg2.subject{
 	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }
+
 /* Search results need some help as well */
 .search_results_posts .lockedbg {
 	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
@@ -4356,14 +4372,15 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 }
 
 /* Colors for background of posts requiring approval */
-#forumposts .approvebg {
+#forumposts .approvebg, .table_grid td.approvebg {
 	color: #222;
 	background: #ffeaea;
 }
-#forumposts .approvebg2 {
+#forumposts .approvebg2, .table_grid td.approvebg2 {
 	color: #222;
 	background: #fff2f2;
 }
+
 /* Color for background of *topics* requiring approval */
 .approvetbg {
 	color: #222;

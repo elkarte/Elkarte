@@ -17,7 +17,7 @@
 var localTime = new Date();
 function autoDetectTimeOffset(currentTime)
 {
-	if (typeof(currentTime) != 'string')
+	if (typeof(currentTime) !== 'string')
 		var serverTime = currentTime;
 	else
 		var serverTime = new Date(currentTime);
@@ -50,7 +50,7 @@ function disableAutoCompleteNow()
 		var die = document.forms[i].elements;
 		for (var j = 0, m = die.length; j < m; j++)
 			// Only bother with text/password fields?
-			if (die[j].type == "text" || die[j].type == "password")
+			if (die[j].type === "text" || die[j].type === "password")
 				die[j].setAttribute("autocomplete", "off");
 	}
 }
@@ -63,7 +63,7 @@ function calcCharLeft()
 	if (!document.getElementById("signatureLeft"))
 		return;
 
-	if (oldSignature != currentSignature)
+	if (oldSignature !== currentSignature)
 	{
 		oldSignature = currentSignature;
 
@@ -71,12 +71,12 @@ function calcCharLeft()
 		if (is_opera)
 			currentChars = currentSignature.replace(/\r/g, "").length;
 
-		
+
 		if (currentChars > maxLength)
 			document.getElementById("signatureLeft").className = "error";
 		else
 			document.getElementById("signatureLeft").className = "";
-		
+
 		if (currentChars > maxLength && !$("#profile_error").is(":visible"))
 			ajax_getSignaturePreview(false);
 		else if (currentChars <= maxLength && $("#profile_error").is(":visible"))
@@ -91,7 +91,7 @@ function calcCharLeft()
 
 function ajax_getSignaturePreview (showPreview)
 {
-	showPreview = (typeof showPreview == 'undefined') ? false : showPreview;
+	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
 		type: "POST",
 		url: smf_scripturl + "?action=xmlhttp;sa=previews;xml",
@@ -108,7 +108,7 @@ function ajax_getSignaturePreview (showPreview)
 				}
 			}
 
-			if ($(request).find("error").text() != '')
+			if ($(request).find("error").text() !== '')
 			{
 				if (!$("#profile_error").is(":visible"))
 					$("#profile_error").css({display: "", position: "fixed", top: 0, left: 0, width: "100%"});
@@ -134,7 +134,7 @@ function ajax_getSignaturePreview (showPreview)
 
 function changeSel(selected)
 {
-	if (cat.selectedIndex == -1)
+	if (cat.selectedIndex === -1)
 		return;
 
 	if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
@@ -149,7 +149,7 @@ function changeSel(selected)
 			file.options[i] = null;
 
 		for (i = 0; i < files.length; i++)
-			if (files[i].indexOf(cat.options[cat.selectedIndex].value) == 0)
+			if (files[i].indexOf(cat.options[cat.selectedIndex].value) === 0)
 			{
 				var filename = files[i].substr(files[i].indexOf("/") + 1);
 				var showFilename = filename.substr(0, filename.lastIndexOf("."));
@@ -157,7 +157,7 @@ function changeSel(selected)
 
 				file.options[count] = new Option(showFilename, files[i]);
 
-				if (filename == selected)
+				if (filename === selected)
 				{
 					if (file.options.defaultSelected)
 						file.options[count].defaultSelected = true;
@@ -168,7 +168,7 @@ function changeSel(selected)
 				count++;
 			}
 
-		if (file.selectedIndex == -1 && file.options[0])
+		if (file.selectedIndex === -1 && file.options[0])
 			file.options[0].selected = true;
 
 		showAvatar();
@@ -185,14 +185,16 @@ function changeSel(selected)
 
 function showAvatar()
 {
-	if (file.selectedIndex == -1)
+	if (file.selectedIndex === -1)
 		return;
+	
+	oAvatar = document.getElementById("avatar");
 
-	document.getElementById("avatar").src = avatardir + file.options[file.selectedIndex].value;
-	document.getElementById("avatar").alt = file.options[file.selectedIndex].text;
-	document.getElementById("avatar").alt += file.options[file.selectedIndex].text == size ? "!" : "";
-	document.getElementById("avatar").style.width = "";
-	document.getElementById("avatar").style.height = "";
+	oAvatar.src = avatardir + file.options[file.selectedIndex].value;
+	oAvatar.alt = file.options[file.selectedIndex].text;
+	oAvatar.alt += file.options[file.selectedIndex].text === size ? "!" : "";
+	oAvatar.style.width = "";
+	oAvatar.style.height = "";
 }
 
 function previewExternalAvatar(src, sid)

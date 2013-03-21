@@ -487,7 +487,7 @@ function action_unapproved_attachments()
 						<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
 					</select>
 					<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="button_submit" /></noscript>',
-				'align' => 'right',
+				'class' => 'floatright',
 			),
 		),
 	);
@@ -663,7 +663,7 @@ function action_approve()
 		if ($poster != $user_info['id'])
 			logAction(($approved ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $subject, 'member' => $poster, 'board' => $board));
 	}
-	
+
 	cache_put_data('num_menu_errors', null, 900);
 
 	redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg']. '#msg' . $_REQUEST['msg']);
