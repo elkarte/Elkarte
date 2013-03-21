@@ -58,8 +58,8 @@ function action_movetopic()
 	loadTemplate('MoveTopic');
 
 	// Get a list of boards this moderator can move to.
-	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards();
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 	// No boards?
 	if (empty($context['categories']) || $context['num_boards'] == 1)

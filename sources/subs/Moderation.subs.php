@@ -143,7 +143,7 @@ function loadModeratorMenuCounts($brd = null)
 	elseif (!empty($approve_boards))
 		$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
 	else
-		$approve_query = ' AND 0';
+		$approve_query = ' AND 1=0';
 
 	// Set up the cache key for this one
 	$cache_key = md5($user_info['query_see_board'] . $approve_query);

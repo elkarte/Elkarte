@@ -294,7 +294,7 @@ function CalendarPost()
 			'use_permissions' => true,
 			'selected_board' => $modSettings['cal_defaultboard'],
 		);
-		$context['categories'] = getBoardList($boardListOptions);
+		$context += getBoardList($boardListOptions);
 	}
 	else
 	{
