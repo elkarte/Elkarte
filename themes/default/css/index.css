@@ -747,6 +747,9 @@ dl.settings dt a img {
 	position: relative;
 	vertical-align: top;
 }
+dl.settings textarea {
+	width: 85%;
+}
 
 /* Styles for rounded headers.
 ------------------------------------------------------- */
@@ -865,6 +868,9 @@ table.table_grid {
 table.table_grid td {
 	padding: 3px;
 }
+table.table_grid  textarea {
+	width: 100%;
+}
 table.table_collapse {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -874,7 +880,7 @@ table.table_padding {
 	border-spacing: 0;
 }
 table.table_padding td {
-	padding: 3px;
+	padding: 4px;
 }
 
 /* GenericList */
