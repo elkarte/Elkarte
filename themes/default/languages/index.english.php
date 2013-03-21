@@ -462,7 +462,8 @@ $txt['set_nonsticky'] = 'Set topic non-sticky';
 $txt['set_lock'] = 'Lock topic';
 $txt['set_unlock'] = 'Unlock topic';
 
-$txt['search_advanced'] = 'Advanced search';
+$txt['search_advanced'] = 'Show advanced options';
+$txt['search_simple'] = 'Hide advanced options';
 
 $txt['security_risk'] = 'MAJOR SECURITY RISK:';
 $txt['not_removed'] = 'You have not removed ';
