@@ -71,13 +71,13 @@ smf_AdminIndex.prototype.showCurrentVersion = function ()
 	if (!('elkVersion' in window))
 		return;
 
-	var oSmfVersionContainer = document.getElementById(this.opt.sOurVersionContainerId);
+	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId);
 	var oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId);
 
-	setInnerHTML(oSmfVersionContainer, window.ourVersion);
+	setInnerHTML(oElkVersionContainer, window.elkVersion);
 
 	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
-	if (sCurrentVersion != window.ourVersion)
+	if (sCurrentVersion !== window.elkVersion)
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
 }
 
@@ -211,7 +211,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		Default: '??',
+		default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -221,7 +221,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		Default: '??',
+		default: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -231,7 +231,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: false,
 		database: false,
 		subs: false,
-		Default: false,
+		default: false,
 		Languages: false,
 		Templates: false
 	};
@@ -242,7 +242,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		'controllers',
 		'database',
 		'subs',
-		'Default',
+		'default',
 		'Languages',
 		'Templates'
 	];
@@ -277,21 +277,21 @@ smf_ViewVersions.prototype.determineVersions = function ()
 			continue;
 
 		var sYourVersion = getInnerHTML(document.getElementById('your' + sFilename));
-
 		var sCurVersionType;
+
 		for (var sVersionType in oLowVersion)
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
 			{
 				sCurVersionType = sVersionType;
 				break;
 			}
-		
+
 		// use compareVersion to determine which version is >< the other
 		if (typeof(sCurVersionType) !== 'undefined')
 		{
 			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
 				oHighYour[sCurVersionType] = sYourVersion;
-			
+
 			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] === '??')
 				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
 
@@ -325,6 +325,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 
 			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
 				oHighYour.Languages = sYourVersion;
+
 			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages === '??')
 				oHighCurrent.Languages = ourLanguageVersions[sFilename];
 
@@ -362,11 +363,12 @@ smf_ViewVersions.prototype.determineVersions = function ()
 	if (oLowVersion.sources)
 		document.getElementById('yoursubs').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.Default ? oLowVersion.Default : oHighYour.Default);
-	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.Default);
-	if (oLowVersion.Default)
+	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.default ? oLowVersion.default : oHighYour.default);
+	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.default);
+	if (oLowVersion.default)
 		document.getElementById('yourdefault').style.color = 'red';
 
+	// Custom theme in use?
 	if (document.getElementById('Templates'))
 	{
 		setInnerHTML(document.getElementById('yourTemplates'), oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates);
