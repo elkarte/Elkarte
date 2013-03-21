@@ -1085,6 +1085,7 @@ function action_browse()
 					)
 				),
 			),
+		),
 	);
 
 	// Specific data for the first column depending on the selected entity.

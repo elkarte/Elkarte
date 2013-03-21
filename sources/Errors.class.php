@@ -64,7 +64,7 @@ class error_context
 	const SERIOUS = 1;
 
 	/**
-	 * Initialize the class
+	 * Create and initialize an instance of the class
 	 *
 	 * @param string error identifier
 	 * @param int the default error severity level
@@ -91,6 +91,7 @@ class error_context
 	 *
 	 * @param string error code
 	 * @param mixed error severity
+	 * @param string lang_file
 	 */
 	public function addError($error, $severity = null, $lang_file = null)
 	{
@@ -144,6 +145,7 @@ class error_context
 	 * Returns if there are errors or not.
 	 *
 	 * @param string the severity level wanted. If null returns all the errors
+	 * @return bool
 	 */
 	public function hasErrors($severity = null)
 	{
@@ -159,6 +161,7 @@ class error_context
 	 * Check if a particular error exists.
 	 *
 	 * @param string the error
+	 * @return bool
 	 */
 	public function hasError($errors)
 	{
@@ -234,6 +237,13 @@ class error_context
 		return $returns;
 	}
 
+	/**
+	 * Find and return error_context instance if it exists,
+	 * or create a new instance for $id if it didn't already exist.
+	 *
+	 * @param string $id
+	 * @param int $default_severity
+	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
 		if (self::$_contexts === null)
@@ -245,12 +255,22 @@ class error_context
 	}
 }
 
+/**
+ * Error context for attachments
+ *
+ */
 class attachment_error_context
 {
 	private static $_context = null;
 	private $_attachs = null;
 	private $_generic_error = null;
 
+	/**
+	 * Add attachment
+	 *
+	 * @param string $id
+	 * @param string $name
+	 */
 	public function addAttach($id, $name)
 	{
 		if (empty($id) || empty($name))
@@ -265,6 +285,13 @@ class attachment_error_context
 
 	}
 
+	/**
+	 * Add an error
+	 *
+	 * @param string $error error code
+	 * @param string $attachID = 'generic'
+	 * @param string $lang_file = null
+	 */
 	public function addError($error, $attachID = 'generic', $lang_file = null)
 	{
 		if (empty($error))
@@ -281,6 +308,12 @@ class attachment_error_context
 		$this->_attachs[$attachID]['error']->addError($error, null, $lang_file);
 	}
 
+	/**
+	 * If this error context has errors stored.
+	 *
+	 * @param string $attachID
+	 * @param int $severity the severity level
+	 */
 	public function hasErrors($attachID = null, $severity = null)
 	{
 		if ($this->_generic_error !== null)
@@ -304,6 +337,14 @@ class attachment_error_context
 		return false;
 	}
 
+	/**
+	 * Prepare the errors for display.
+	 * Return an array containing the error strings
+	 * If severity is null the function returns all the errors
+	 *
+	 * @param int = null the severity level wanted
+	 * @return array
+	 */
 	public function prepareErrors($severity = null)
 	{
 		global $txt;
@@ -328,11 +369,22 @@ class attachment_error_context
 		return $returns;
 	}
 
+	/**
+	 * Return the type of the error
+	 *
+	 * @return int
+	 */
 	public function getErrorType()
 	{
 		return 1;
 	}
 
+	/**
+	 * Find and return attachment_error_context instance if it exists,
+	 * or create it if it doesn't exist
+	 *
+	 * @return attachment_error_context
+	 */
 	public static function context()
 	{
 		if (self::$_context === null)
