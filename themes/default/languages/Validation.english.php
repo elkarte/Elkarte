@@ -1,5 +1,6 @@
 <?php
 // Version: 1.0; Validation
+
 $txt['_validate_required'] = 'The %1$s field is required';
 $txt['_validate_valid_email'] = 'The %1$s field is required to be a valid email address';
 $txt['_validate_max_length'] = 'The %1$s field needs to be shorter than %2$s character';
