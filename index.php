@@ -169,7 +169,7 @@ function elk_main()
 		fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
-	call_integration_hook('integrate_pre_log_stats', array($no_stat_actions));
+	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions))

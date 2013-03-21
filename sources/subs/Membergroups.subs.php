@@ -526,16 +526,14 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	else
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 
+	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
+
 	// Update their postgroup statistics.
 	updateStats('postgroups', $members);
 
-	// Log the data.
-	$log_inserts = array();
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
 		logAction('added_to_group', array('group' => $group_names[$group], 'member' => $member), 'admin');
-
-	call_integration_hook('integrate_add_members_to_group', array($log_inserts));
 
 	return true;
 }

@@ -49,7 +49,7 @@ function Ban()
 		'log' => 'action_log',
 	);
 
-	call_integration_hook('integrate_manage_bans', array($subActions));
+	call_integration_hook('integrate_manage_bans', array(&$subActions));
 
 	// Default the sub-action to 'view ban list'.
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
@@ -1434,4 +1434,3 @@ function list_getNumBanLogEntries()
 
 	return $num_entries;
 }
-

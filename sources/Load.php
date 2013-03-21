@@ -944,7 +944,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Allow mods to easily add to the selected member data
-	call_integration_hook('integrate_load_member_data', array($select_columns, $select_tables, $set));
+	call_integration_hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $set));
 
 	if (!empty($users))
 	{
@@ -1189,7 +1189,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		}
 	}
 
-	call_integration_hook('integrate_member_context', array($user, $display_custom_fields));
+	call_integration_hook('integrate_member_context', array(&$user, $display_custom_fields));
 	return true;
 }
 

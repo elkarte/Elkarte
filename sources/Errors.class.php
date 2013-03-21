@@ -213,7 +213,7 @@ class error_context
 		if (empty($this->_errors))
 			return array();
 
-		call_integration_hook('integrate_' . $this->_name . 'errors', array($this->_errors, $this->_severity_levels));
+		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
 
 		$errors = array();
 		$returns = array();
