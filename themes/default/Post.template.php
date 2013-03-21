@@ -264,10 +264,10 @@ function template_main()
 		echo '
 					<div id="postAdditionalOptionsHeader" class="title_bar">
 						<h4 class="titlebg">
-							<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/collapse.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
+							<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
 						</h4>
 					</div>
-					<div id="postAdditionalOptions">';
+					<div id="postAdditionalOptions"', empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
 	// Display the check boxes for all the standard options - if they are available to the user!
 	echo '
@@ -375,19 +375,24 @@ function template_main()
 
 	echo '
 					</div>';
+	
 	// If the admin enabled the drafts feature, show a draft selection box
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
 	{
 		echo '
 					<div id="postDraftOptionsHeader" class="title_bar">
 						<h4 class="titlebg">
-							<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/collapse.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
+							<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
 						</h4>
 					</div>
-					<div id="postDraftOptions">
+					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>>
 						<dl class="settings">
-							<dt><strong>', $txt['subject'], '</strong></dt>
-							<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
+							<dt>
+								<strong>', $txt['subject'], '</strong>
+							</dt>
+							<dd>
+								<strong>', $txt['draft_saved_on'], '</strong>
+							</dd>';
 
 		foreach ($context['drafts'] as $draft)
 			echo '
@@ -463,7 +468,7 @@ function template_main()
 		echo '
 			var oSwapAdditionalOptions = new smc_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', $context['show_additional_options'] ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
 					document.getElementById(\'additional_options\').value = \'0\';
 				},
@@ -488,7 +493,14 @@ function template_main()
 						msgExpanded: ', JavaScriptEscape($context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), ',
 						msgCollapsed: ', JavaScriptEscape($context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), '
 					}
-				]
+				],
+				oThemeOptions: {
+					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					sOptionName: \'minmax_preferences\',
+					sSessionId: smf_session_id,
+					sSessionVar: smf_session_var,
+					sAdditionalVars: \';minmax_key=post\'
+				},
 			});';
 
 	// Code for showing and hiding drafts
@@ -496,7 +508,7 @@ function template_main()
 		echo '
 			var oSwapDraftOptions = new smc_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: true,
+				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
@@ -515,7 +527,14 @@ function template_main()
 						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
 						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
 					}
-				]
+				],
+				oThemeOptions: {
+					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					sOptionName: \'minmax_preferences\',
+					sSessionId: smf_session_id,
+					sSessionVar: smf_session_var,
+					sAdditionalVars: \';minmax_key=draft\'
+				},
 			});';
 
 	echo '

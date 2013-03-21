@@ -107,7 +107,7 @@ function template_permission_index()
 		echo '
 			<div class="cat_bar">
 				<h3 class="catbg">
-					<img id="permissions_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['show_advanced_options']) ? 'collapse' : 'expand', '.png"  alt="*" />
+					<img id="permissions_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '.png"  alt="*" />
 					<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
 				</h3>
 			</div>
@@ -201,7 +201,7 @@ function template_permission_index()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oPermissionsPanelToggle = new smc_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
+			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'true' : 'false', ',
 			aSwappableContainers: [
 				\'permissions_panel_advanced\'
 			],
@@ -600,7 +600,7 @@ function template_modify_group_simple($type)
 						<th class="centertext">', $txt['permissions_option_on'], '</th>
 						<th class="centertext">', $txt['permissions_option_off'], '</th>
 						<th class="last_th centertext">', $txt['permissions_option_deny'], '</th>';
-				
+
 				echo '
 					</tr>
 				</thead>
@@ -1054,7 +1054,7 @@ function template_inline_permissions()
 	echo '
 		<fieldset id="', $context['current_permission'], '">
 			<legend><a href="javascript:void(0);" onclick="document.getElementById(\'', $context['current_permission'], '\').style.display = \'none\';document.getElementById(\'', $context['current_permission'], '_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a></legend>';
-	
+
 	if (empty($modSettings['permission_enable_deny']))
 		echo '
 			<ul class="permission_groups">';

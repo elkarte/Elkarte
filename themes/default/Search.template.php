@@ -31,7 +31,7 @@ function template_main()
 					<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Simple Search?
-	if ($context['simple_search'])
+	if ($context['simple_search'] && (empty($context['minmax_preferences']['asearch']) || isset($_GET['basic'])))
 	{
 		echo '
 					<fieldset id="simple_search">
@@ -39,7 +39,7 @@ function template_main()
 							<div id="search_term_input">
 								<strong>', $txt['search_for'], ':</strong>
 								<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
-								', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />
+								', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit floatnone" />
 							</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -51,11 +51,12 @@ function template_main()
 							<div class="verification>
 								<strong>', $txt['search_visual_verification_label'], ':</strong>
 								<br />', template_control_verification($context['visual_verification_id'], 'all'), '<br />
-								<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />
+								<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit floatnone"/>
 							</div>';
 
+		// Show the button to enable advanced search
 		echo '
-							<a href="', $scripturl, '?action=search;advanced" onclick="this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
+							<a class="button_link floatnone" href="', $scripturl, '?action=search;advanced" onclick="smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
 							<input type="hidden" name="advanced" value="0" />
 						</div>
 					</fieldset>';
@@ -123,6 +124,11 @@ function template_main()
 								<dd><label for="minage">',
 									$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 								</dd>
+								<dt>
+								</dt>
+								<dd>
+									<a href="', $scripturl, '?action=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
+								</dd>
 							</dl>
 							<input type="hidden" name="advanced" value="1" />';
 
@@ -154,10 +160,10 @@ function template_main()
 						<div class="roundframe">
 							<div class="title_bar">
 								<h4 class="titlebg">
-									<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['show_advanced_options']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
+									<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 								</h4>
 							</div>
-							<div class="flow_auto" id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>
+							<div class="flow_auto" id="advanced_panel_div"', $context['boards_check_all'] ? '' : ' style="display: none;"', '>
 								<ul class="ignoreboards floatleft">';
 
 			$i = 0;
@@ -228,7 +234,7 @@ function template_main()
 						// Some javascript for the advanced toggling
 						var oAdvancedPanelToggle = new smc_Toggle({
 							bToggleEnabled: true,
-							bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
+							bCurrentlyCollapsed: ', empty($context['minmax_preferences']['search']) ? 'false' : 'true', ',
 							aSwappableContainers: [
 								\'advanced_panel_div\'
 							],
@@ -248,6 +254,13 @@ function template_main()
 									msgCollapsed: ', JavaScriptEscape($txt['choose_board']), '
 								}
 							],
+							oThemeOptions: {
+								bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+								sOptionName: \'minmax_preferences\',
+								sSessionId: smf_session_id,
+								sSessionVar: smf_session_var,
+								sAdditionalVars: \';minmax_key=search\'
+							},
 						});
 					// ]]></script>';
 	}

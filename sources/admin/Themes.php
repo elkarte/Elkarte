@@ -1628,9 +1628,10 @@ function WrapAction()
  * Set an option via javascript.
  * - sets a theme option without outputting anything.
  * - can be used with javascript, via a dummy image... (which doesn't require
- * the page to reload.)
+ *   the page to reload.)
  * - requires someone who is logged in.
  * - accessed via ?action=jsoption;var=variable;val=value;session_var=sess_id.
+ * - optionally contains &th=theme id
  * - does not log access to the Who's Online log. (in index.php..)
  */
 function action_jsoption()
@@ -1685,12 +1686,25 @@ function action_jsoption()
 	if ($_GET['var'] == 'admin_preferences')
 	{
 		$options['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+
 		// New thingy...
 		if (isset($_GET['admin_key']) && strlen($_GET['admin_key']) < 5)
 			$options['admin_preferences'][$_GET['admin_key']] = $_GET['val'];
 
 		// Change the value to be something nice,
 		$_GET['val'] = serialize($options['admin_preferences']);
+	}
+	// If this is the window min/max settings, the passed window name will just be an element of it.
+	else if ($_GET['var'] == 'minmax_preferences')
+	{
+		$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+
+		// New value for them
+		if (isset($_GET['minmax_key']) && strlen($_GET['minmax_key']) < 10)
+			$options['minmax_preferences'][$_GET['minmax_key']] = $_GET['val'];
+
+		// Change the value to be something nice,
+		$_GET['val'] = serialize($options['minmax_preferences']);
 	}
 
 	// Update the option.

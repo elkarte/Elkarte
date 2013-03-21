@@ -271,11 +271,11 @@ function template_info_center()
 	<div class="roundframe" id="info_center">
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<img class="icon" id="upshrink_ic" src="', $settings['images_url'], '/collapse.png" alt="*" title="', $txt['hide'], '" style="display: none;" />
+				<img class="icon" id="upshrink_ic" title="', $txt['hide'], '" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
 				<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 			</h3>
 		</div>
-		<div id="upshrinkHeaderIC"', empty($options['collapse_header_ic']) ? '' : ' style="display: none;"', '>';
+		<div id="upshrinkHeaderIC"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
 
 	// This is the "Recent Posts" bar.
 	if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
@@ -451,7 +451,7 @@ function template_info_center()
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var oInfoCenterToggle = new smc_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($options['collapse_header_ic']) ? 'false' : 'true', ',
+			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
 			aSwappableContainers: [
 				\'upshrinkHeaderIC\'
 			],
@@ -473,9 +473,10 @@ function template_info_center()
 			],
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'collapse_header_ic\',
+				sOptionName: \'minmax_preferences\',
 				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var
+				sSessionVar: smf_session_var,
+				sAdditionalVars: \';minmax_key=info\'
 			},
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',

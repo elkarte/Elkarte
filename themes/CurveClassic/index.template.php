@@ -175,7 +175,7 @@ function template_body_above()
 				<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
 			</div>
 			<div id="upper_wrap">
-				<div id="upper_section" ', empty($options['collapse_header']) ? '' : ' style="display: none;"', '>
+				<div id="upper_section" ', empty($context['minmax_preferences']['head']) ? '' : ' style="display: none;"', '>
 					<div class="user">';
 
 	// If the user is logged in, display stuff like their name, new messages, etc.
@@ -308,7 +308,7 @@ function template_body_above()
 			<script type="text/javascript"><!-- // --><![CDATA[
 				var oMainHeaderToggle = new smc_Toggle({
 					bToggleEnabled: true,
-					bCurrentlyCollapsed: ', empty($options['collapse_header']) ? 'false' : 'true', ',
+					bCurrentlyCollapsed: ', empty($context['minmax_preferences']['head']) ? 'false' : 'true', ',
 					aSwappableContainers: [
 						\'upper_section\'
 					],
@@ -323,9 +323,10 @@ function template_body_above()
 					],
 					oThemeOptions: {
 						bUseThemeSettings: smf_member_id == 0 ? false : true,
-						sOptionName: \'collapse_header\',
+						sOptionName: \'minmax_preferences\',
 						sSessionVar: smf_session_var,
-						sSessionId: smf_session_id
+						sSessionId: smf_session_id,
+						sAdditionalVars: \';minmax_key=head\'
 					},
 					oCookieOptions: {
 						bUseCookie: smf_member_id == 0 ? true : false,
