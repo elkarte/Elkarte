@@ -166,7 +166,7 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 		aParts = sClean.match(/(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)/);
 
 		// No matches?
-		if (aParts == null)
+		if (aParts === null)
 			return false;
 
 		// Build an array of parts.
@@ -174,10 +174,10 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 			aParts[1] > 0 ? parseInt(aParts[1]) : 0,
 			aParts[2] > 0 ? parseInt(aParts[2]) : 0,
 			aParts[3] > 0 ? parseInt(aParts[3]) : 0,
-			typeof(aParts[4]) == 'undefined' ? 'stable' : aParts[4],
+			typeof(aParts[4]) === 'undefined' ? 'stable' : aParts[4],
 			aParts[5] > 0 ? parseInt(aParts[5]) : 0,
 			aParts[6] > 0 ? parseInt(aParts[6]) : 0,
-			typeof(aParts[7]) != 'undefined',
+			typeof(aParts[7]) !== 'undefined' ? 'dev' : ''
 		];
 	}
 
@@ -185,14 +185,14 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 	for (i = 0; i < 7; i++)
 	{
 		// Is there something for us to calculate?
-		if (aVersions[0][i] != aVersions[1][i])
+		if (aVersions[0][i] !== aVersions[1][i])
 		{
 			// Dev builds are a problematic exception.
 			// (stable) dev < (stable) but (unstable) dev = (unstable)
-			if (i == 3)
+			if (i === 3)
 				return aVersions[0][i] < aVersions[1][i] ? !aVersions[1][6] : aVersions[0][6];
-			else if (i == 6)
-				return aVersions[0][6] ? aVersions[1][3] == 'stable' : false;
+			else if (i === 6)
+				return aVersions[0][6] ? aVersions[1][3] === 'stable' : false;
 			// Otherwise a simple comparison.
 			else
 				return aVersions[0][i] < aVersions[1][i];
@@ -394,7 +394,7 @@ function toggleBBCDisabled(section, disable)
 	elems = document.getElementById(section).getElementsByTagName('*');
 	for (var i = 0; i < elems.length; i++)
 	{
-		if (typeof(elems[i].name) == "undefined" || (elems[i].name.substr((section.length + 1), (elems[i].name.length - 2 - (section.length + 1))) != "enabledTags") || (elems[i].name.indexOf(section) != 0))
+		if (typeof(elems[i].name) === "undefined" || (elems[i].name.substr((section.length + 1), (elems[i].name.length - 2 - (section.length + 1))) !== "enabledTags") || (elems[i].name.indexOf(section) !== 0))
 			continue;
 
 		elems[i].disabled = disable;
@@ -406,24 +406,24 @@ function updateInputBoxes()
 {
 	curType = document.getElementById("field_type").value;
 	privStatus = document.getElementById("private").value;
-	document.getElementById("max_length_dt").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("max_length_dd").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("dimension_dt").style.display = curType == "textarea" ? "" : "none";
-	document.getElementById("dimension_dd").style.display = curType == "textarea" ? "" : "none";
-	document.getElementById("bbc_dt").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("bbc_dd").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("options_dt").style.display = curType == "select" || curType == "radio" ? "" : "none";
-	document.getElementById("options_dd").style.display = curType == "select" || curType == "radio" ? "" : "none";
-	document.getElementById("default_dt").style.display = curType == "check" ? "" : "none";
-	document.getElementById("default_dd").style.display = curType == "check" ? "" : "none";
-	document.getElementById("mask_dt").style.display = curType == "text" ? "" : "none";
-	document.getElementById("mask").style.display = curType == "text" ? "" : "none";
-	document.getElementById("can_search_dt").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("can_search_dd").style.display = curType == "text" || curType == "textarea" ? "" : "none";
-	document.getElementById("regex_div").style.display = curType == "text" && document.getElementById("mask").value == "regex" ? "" : "none";
+	document.getElementById("max_length_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("max_length_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("dimension_dt").style.display = curType === "textarea" ? "" : "none";
+	document.getElementById("dimension_dd").style.display = curType === "textarea" ? "" : "none";
+	document.getElementById("bbc_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("bbc_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("options_dt").style.display = curType === "select" || curType === "radio" ? "" : "none";
+	document.getElementById("options_dd").style.display = curType === "select" || curType === "radio" ? "" : "none";
+	document.getElementById("default_dt").style.display = curType === "check" ? "" : "none";
+	document.getElementById("default_dd").style.display = curType === "check" ? "" : "none";
+	document.getElementById("mask_dt").style.display = curType === "text" ? "" : "none";
+	document.getElementById("mask").style.display = curType === "text" ? "" : "none";
+	document.getElementById("can_search_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("can_search_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	document.getElementById("regex_div").style.display = curType === "text" && document.getElementById("mask").value === "regex" ? "" : "none";
 	document.getElementById("display").disabled = false;
 	// Cannot show this on the topic
-	if (curType == "textarea" || privStatus >= 2)
+	if (curType === "textarea" || privStatus >= 2)
 	{
 		document.getElementById("display").checked = false;
 		document.getElementById("display").disabled = true;
@@ -453,7 +453,7 @@ function createNamedElement(type, name, customFields)
 	catch (e)
 	{
 	}
-	if (!element || element.nodeName != type.toUpperCase())
+	if (!element || element.nodeName !== type.toUpperCase())
 	{
 		// Non-IE browser; use canonical method to create named element
 		element = document.createElement(type);
@@ -560,7 +560,7 @@ function addAnotherOption(parent, oDtName, oDdName)
 
 function smfSetLatestThemes()
 {
-	if (typeof(window.ourLatestThemes) != "undefined")
+	if (typeof(window.ourLatestThemes) !== "undefined")
 		setInnerHTML(document.getElementById("themeLatest"), window.ourLatestThemes);
 
 	if (tempOldOnload)
@@ -586,7 +586,7 @@ function setPreviewTimeout()
 
 function toggleDuration(toChange)
 {
-	if (toChange == 'fixed')
+	if (toChange === 'fixed')
 	{
 		document.getElementById("fixed_area").style.display = "inline";
 		document.getElementById("flexible_area").style.display = "none";
@@ -600,28 +600,28 @@ function toggleDuration(toChange)
 
 function toggleBreakdown(id_group, forcedisplayType)
 {
-	displayType = document.getElementById("group_hr_div_" + id_group).style.display == "none" ? "" : "none";
-	if (typeof(forcedisplayType) != "undefined")
+	displayType = document.getElementById("group_hr_div_" + id_group).style.display === "none" ? "" : "none";
+	if (typeof(forcedisplayType) !== "undefined")
 		displayType = forcedisplayType;
 
 	// swap the image
-	document.getElementById("group_toggle_img_" + id_group).src = smf_images_url + "/" + (displayType == "none" ? "selected" : "selected_open") + ".png";
+	document.getElementById("group_toggle_img_" + id_group).src = smf_images_url + "/" + (displayType === "none" ? "selected" : "selected_open") + ".png";
 
 	// show or hide the elements
 	var aContainer = new Array();
 	for (i = 0; i < groupPermissions[id_group].length; i++)
 	{
 		var oContainerTemp = document.getElementById("perm_div_" + id_group + "_" + groupPermissions[id_group][i]);
-		if (typeof(oContainerTemp) == 'object' && oContainerTemp != null)
+		if (typeof(oContainerTemp) === 'object' && oContainerTemp !== null)
 			aContainer[i] = oContainerTemp;
 	}
-	if (displayType == "none")
+	if (displayType === "none")
 		$(aContainer).fadeOut();
 	else
 		$(aContainer).show();
-		
+
 	// remove or add the separators
-	document.getElementById("group_hr_div_" + id_group).style.display = displayType
+	document.getElementById("group_hr_div_" + id_group).style.display = displayType;
 
 	return false;
 }
@@ -654,8 +654,8 @@ function swapUploads()
 
 function selectMethod(element)
 {
-	document.getElementById("method-existing").checked = element != "upload";
-	document.getElementById("method-upload").checked = element == "upload";
+	document.getElementById("method-existing").checked = element !== "upload";
+	document.getElementById("method-upload").checked = element === "upload";
 }
 
 function updatePreview()
@@ -686,7 +686,7 @@ function testFTP()
 
 	var sPostData = "";
 	for (i = 0; i < 5; i++)
-		sPostData = sPostData + (sPostData.length == 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
+		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
 
 	// Post the data out.
 	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + smf_session_var + '=' + smf_session_id, sPostData, testFTPResults);
@@ -700,9 +700,9 @@ function expandFolder(folderIdent, folderReal)
 
 	for (var i = 0; i < possibleTags.length; i++)
 	{
-		if (possibleTags[i].id.indexOf("content_" + folderIdent + ":-:") == 0)
+		if (possibleTags[i].id.indexOf("content_" + folderIdent + ":-:") === 0)
 		{
-			possibleTags[i].style.display = possibleTags[i].style.display == "none" ? "" : "none";
+			possibleTags[i].style.display = possibleTags[i].style.display === "none" ? "" : "none";
 			foundOne = true;
 		}
 	}
@@ -755,8 +755,8 @@ function toggleCache ()
 {
 	var memcache = document.getElementById('cache_memcached');
 	var cachedir = document.getElementById('cachedir');
-	memcache.disabled = cache_type.value != "memcached";
-	cachedir.disabled = cache_type.value != "filebased";
+	memcache.disabled = cache_type.value !== "memcached";
+	cachedir.disabled = cache_type.value !== "filebased";
 }
 
 /*
@@ -792,7 +792,7 @@ function toggleBaseDir ()
 	var sub_dir = document.getElementById('use_subdirectories_for_attachments');
 	var dir_elem = document.getElementById('basedirectory_for_attachments');
 
-	if (auto_attach.selectedIndex == 0)
+	if (auto_attach.selectedIndex === 0)
 	{
 		dir_elem.disabled = 1;
 	}
