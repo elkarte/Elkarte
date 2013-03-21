@@ -550,8 +550,12 @@ function AddMembergroup()
 		);
 	$smcFunc['db_free_result']($result);
 
-	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards();
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$context += getBoardList(array('use_permissions' => true));
+
+	// Include a list of boards per category for easy toggling.
+	foreach ($context['categories'] as $category)
+		$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
 
 	createToken('admin-mmg');
 }
@@ -951,8 +955,12 @@ function EditMembergroup()
 	$context['boards'] = array();
 	if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 	{
-		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += allBoards(true, array('access' => $groups['id_group']));
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$context += getBoardList(array('access' => $groups['id_group'], 'not_redirection' => true));
+
+		// Include a list of boards per category for easy toggling.
+		foreach ($context['categories'] as $category)
+			$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
 	}
 
 	// Finally, get all the groups this could be inherited off.

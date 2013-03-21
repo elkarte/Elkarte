@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function AdminMain()
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options, $smcFunc;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $smcFunc;
 
 	// Load the language and templates....
 	loadLanguage('Admin');
@@ -40,9 +40,6 @@ function AdminMain()
 	$context['robot_no_index'] = true;
 
 	require_once(SUBSDIR . '/Menu.subs.php');
-
-	// Some preferences.
-	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
 	// Define the menu structure - see subs/Menu.subs.php for details!
 	$admin_areas = array(
@@ -469,7 +466,7 @@ function AdminMain()
 						'banlog' => array($txt['ban_log'], 'manage_bans'),
 						'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
 						'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-						'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled'])),
+						'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
 						'pruning' => array($txt['pruning_title'], 'admin_forum'),
 					),
 				),

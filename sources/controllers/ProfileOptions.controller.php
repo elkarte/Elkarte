@@ -921,8 +921,12 @@ function action_ignoreboards($memID)
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
 	$context['sub_template'] = 'ignoreboards';
-	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards(false, array('ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
+
+	// Include a list of boards per category for easy toggling.
+	foreach ($context['categories'] as &$category)
+		$category['child_ids'] = array_keys($category['boards']);
 
 	loadThemeOptions($memID);
 }

@@ -175,12 +175,7 @@ function ModifyHolidays()
 	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
-	//loadTemplate('ManageCalendar');
 	$context['page_title'] = $txt['manage_holidays'];
-
-	// Since the list is the only thing to show, use the default list template.
-	$context['default_list'] = 'holiday_list';
-	$context['sub_template'] = 'show_list';
 }
 
 /**
@@ -297,17 +292,11 @@ function ModifyCalendarSettings($return_config = false)
 	global $modSettings, $context, $settings, $txt, $scripturl, $smcFunc;
 
 	// Load the boards list.
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$boards_list = getBoardList(array('not_redirection' => true), true);
 	$boards = array('');
-	$request = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_board, b.name AS board_name, c.name AS cat_name
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)',
-		array(
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$boards[$row['id_board']] = $row['cat_name'] . ' - ' . $row['board_name'];
-	$smcFunc['db_free_result']($request);
+	foreach ($boards_list as $board)
+		$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
 	// Look, all the calendar settings - of which there are many!
 	$config_vars = array(

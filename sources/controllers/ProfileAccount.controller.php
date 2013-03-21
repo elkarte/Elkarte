@@ -226,7 +226,7 @@ function action_issuewarning($memID)
 			$context['current_level'] = $limit;
 
 	$listOptions = array(
-		'id' => 'view_warnings',
+		'id' => 'issued_warnings',
 		'title' => $txt['profile_viewwarning_previous_warnings'],
 		'items_per_page' => $modSettings['defaultMaxMessages'],
 		'no_items_label' => $txt['profile_viewwarning_no_warnings'],

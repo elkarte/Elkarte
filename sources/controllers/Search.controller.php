@@ -128,11 +128,14 @@ function action_plushsearch1()
 		}
 	}
 
-	require_once(SUBSDIR . '/Boards.subs.php');
-	$context += allBoards();
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 	foreach ($context['categories'] as &$category)
+	{
+		$category['child_ids'] = array_keys($category['boards']);
 		foreach ($category['boards'] as &$board)
 			$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
+	}
 
 	if (!empty($_REQUEST['topic']))
 	{

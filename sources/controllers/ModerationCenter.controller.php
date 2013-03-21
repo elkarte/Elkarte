@@ -1096,7 +1096,7 @@ function action_viewWatchedUsers()
 	else
 	{
 		// Still obey permissions!
-		$approve_boards = boardsAllowedTo('approve_posts');
+		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 		$delete_boards = boardsAllowedTo('delete_any');
 
 		if ($approve_boards == array(0))
@@ -1105,7 +1105,7 @@ function action_viewWatchedUsers()
 			$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
 		// Nada, zip, etc...
 		else
-			$approve_query = ' AND 0';
+			$approve_query = ' AND 1=0';
 	}
 
 	require_once(SUBSDIR . '/List.subs.php');

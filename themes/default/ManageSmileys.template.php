@@ -440,14 +440,6 @@ function template_setorder()
 	</div>';
 }
 
-// Editing Message Icons
-function template_editicons()
-{
-	global $context, $settings, $scripturl, $txt, $modSettings;
-
-	template_show_list('message_icon_list');
-}
-
 // Editing an individual message icon
 function template_editicon()
 {

@@ -30,6 +30,7 @@ function action_xmlhttp()
 	$subActions = array(
 		'jumpto' => array('action_jumpto'),
 		'messageicons' => array('action_messageicons'),
+		'groupicons' => array('action_groupicons'),
 		'corefeatures' => array('action_corefeatures', 'admin_forum'),
 		'previews' => array('action_previews'),
 	);
@@ -62,14 +63,14 @@ function action_jumpto()
 		'use_permissions' => true,
 		'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
 	);
-	$context['jump_to'] = getBoardList($boardListOptions);
+	$context += getBoardList($boardListOptions);
 
 	// Make the board safe for display.
-	foreach ($context['jump_to'] as $id_cat => $cat)
+	foreach ($context['categories'] as $id_cat => $cat)
 	{
-		$context['jump_to'][$id_cat]['name'] = un_htmlspecialchars(strip_tags($cat['name']));
+		$context['categories'][$id_cat]['name'] = un_htmlspecialchars(strip_tags($cat['name']));
 		foreach ($cat['boards'] as $id_board => $board)
-			$context['jump_to'][$id_cat]['boards'][$id_board]['name'] = un_htmlspecialchars(strip_tags($board['name']));
+			$context['categories'][$id_cat]['boards'][$id_board]['name'] = un_htmlspecialchars(strip_tags($board['name']));
 	}
 
 	$context['sub_template'] = 'jump_to';
@@ -85,6 +86,40 @@ function action_messageicons()
 	require_once(SUBSDIR . '/Editor.subs.php');
 	$context['icons'] = getMessageIcons($board);
 
+	$context['sub_template'] = 'message_icons';
+}
+
+/**
+ * Get the member group icons
+ */
+function action_groupicons()
+{
+	global $context, $settings;
+
+	// Only load images
+	$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
+	$context['membergroup_icons'] = array();
+	$directory = $settings['theme_dir'] . '/images/group_icons';
+
+	// Get all the available member group icons
+	$files = scandir($directory);
+	foreach ($files as $id => $file)
+	{
+		if ($file === 'blank.png')
+			continue;
+
+		if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), $allowedTypes))
+		{
+			$icons[$id] = array(
+				'value' => $file,
+				'name' => '',
+				'url' => $settings['images_url'] . '/group_icons/' .  $file,
+				'is_last' => false,
+			);
+		}
+	}
+
+	$context['icons'] = array_values($icons);
 	$context['sub_template'] = 'message_icons';
 }
 

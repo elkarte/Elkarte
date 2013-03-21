@@ -241,33 +241,9 @@ function MaintainTopics()
 {
 	global $context, $smcFunc, $txt;
 
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	// Let's load up the boards in case they are useful.
-	$result = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_board, b.name, b.child_level, c.name AS cat_name, c.id_cat
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE {query_see_board}
-			AND redirect = {string:blank_redirect}',
-		array(
-			'blank_redirect' => '',
-		)
-	);
-	$context['categories'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-	{
-		if (!isset($context['categories'][$row['id_cat']]))
-			$context['categories'][$row['id_cat']] = array(
-				'name' => $row['cat_name'],
-				'boards' => array()
-			);
-
-		$context['categories'][$row['id_cat']]['boards'][] = array(
-			'id' => $row['id_board'],
-			'name' => $row['name'],
-			'child_level' => $row['child_level']
-		);
-	}
-	$smcFunc['db_free_result']($result);
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 	if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 		$context['maintenance_finished'] = $txt['maintain_old'];

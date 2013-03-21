@@ -70,7 +70,7 @@ function template_admin()
 											<br />
 											<strong>', $txt['administrators'], ':</strong>
 											', implode(', ', $context['administrators']);
-	
+
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
@@ -323,7 +323,7 @@ function template_credits()
  */
 function template_view_versions()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 					<div id="admincenter">
@@ -572,7 +572,7 @@ function template_view_versions()
 								<tbody>
 									<tr>
 										<td class="windowbg" style="width:50%">
-											<a href="#" id="Default-link">', $txt['dvc_default'], '</a>
+											<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 										</td>
 										<td class="windowbg" style="width:25%">
 											<em id="yourdefault">??</em>
@@ -584,7 +584,7 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table id="Default" class="table_grid">
+							<table id="default" class="table_grid">
 								<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
@@ -870,7 +870,7 @@ function template_show_settings()
 	{
 		if (!is_array($context['settings_message']))
 			$context['settings_message'] = array($context['settings_message']);
-		
+
 		echo '
 			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
 				<ul>
@@ -1461,10 +1461,10 @@ function template_core_features()
 				$.ajax({
 					// The link we are accessing.
 					url: smf_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
-					
+
 					// The type of request.
 					type: "post",
-					
+
 					// The type of data that is getting returned.
 					data: data,
 					error: function(error) {

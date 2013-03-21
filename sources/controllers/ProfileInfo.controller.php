@@ -1495,6 +1495,7 @@ function action_viewWarning($memID)
 		$modSettings['warning_mute'] => $txt['profile_warning_effect_own_muted'],
 	);
 	$context['current_level'] = 0;
+	$context['sub_template'] = 'viewWarning';
 	foreach ($context['level_effects'] as $limit => $dummy)
 		if ($context['member']['warning'] >= $limit)
 			$context['current_level'] = $limit;

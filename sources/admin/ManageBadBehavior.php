@@ -79,7 +79,7 @@ function action_badbehaviorlog()
 	$start = (!isset($_GET['start']) || $_GET['start'] < 0) ? 0 : (int) $_GET['start'];
 
 	// Do we want to reverse the listing?
-	$sort = isset($_REQUEST['desc']) ? 'up' : 'down';
+	$sort = isset($_REQUEST['desc']) ? 'down' : 'up';
 
 	// Set the page listing up.
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);

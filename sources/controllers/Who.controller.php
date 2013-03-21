@@ -469,23 +469,14 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load board names.
 	if (!empty($board_ids))
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT b.id_board, b.name
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}
-				AND b.id_board IN ({array_int:board_list})
-			LIMIT ' . count($board_ids),
-			array(
-				'board_list' => array_keys($board_ids),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$boards_list = getBoardList(array('use_permissions' => true, 'included_boards' => array_keys($board_ids)), true);
+		foreach ($boards_list as $board)
 		{
 			// Put the board name into the string for each member...
-			foreach ($board_ids[$row['id_board']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $row['id_board'], $row['name']);
+			foreach ($board_ids[$board['id_board']] as $k => $session_text)
+				$data[$k] = sprintf($session_text, $board['id_board'], $board['board_name']);
 		}
-		$smcFunc['db_free_result']($result);
 	}
 
 	// Load member names for the profile.

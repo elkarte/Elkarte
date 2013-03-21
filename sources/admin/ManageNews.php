@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function ManageNews()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	// First, let's do a quick permissions check for the best error message possible.
 	isAllowedTo(array('edit_news', 'send_mail', 'admin_forum'));
@@ -88,7 +88,7 @@ function ManageNews()
  */
 function EditNews()
 {
-	global $txt, $modSettings, $context, $user_info, $scripturl;
+	global $txt, $modSettings, $context, $scripturl;
 	global $smcFunc;
 
 	require_once(SUBSDIR . '/Post.subs.php');
@@ -156,7 +156,7 @@ function EditNews()
 						if (is_numeric($news[\'id\']))
 							return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" cols="50" name="news[]" style="\' . (isBrowser(\'is_ie8\') ? \'width: 635px; max-width: 85%; min-width: 85%\' : \'width 100%;margin 0 5em\') . \';">\' . $news[\'unparsed\'] . \'</textarea>
 							<br />
-							<div class="floatleft" id="preview_\' . $news[\'id\'] . \'"></div>\';
+							<div class="floatright" id="preview_\' . $news[\'id\'] . \'"></div>\';
 						else
 							return $news[\'unparsed\'];
 					'),
@@ -202,11 +202,11 @@ function EditNews()
 			array(
 				'position' => 'bottom_of_list',
 				'value' => '
-				<span id="moreNewsItems_link" class="floatleft" style="display: none;">
-					<a class="button_link" href="javascript:void(0);" onclick="addNewsItem(); return false;">' . $txt['editnews_clickadd'] . '</a>
-				</span>
 				<input type="submit" name="save_items" value="' . $txt['save'] . '" class="button_submit" />
-				<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="button_submit" />',
+				<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="button_submit" />
+				<span id="moreNewsItems_link" style="display: none;">
+					<a class="button_link" href="javascript:void(0);" onclick="addNewsItem(); return false;">' . $txt['editnews_clickadd'] . '</a>
+				</span>',
 			),
 		),
 		'javascript' => '
@@ -248,9 +248,9 @@ function EditNews()
 						$("#list_news_lists_last").before(' . javaScriptEscape('
 						<tr class="windowbg') . ' + (last_preview % 2 == 0 ? \'\' : \'2\') + ' . javaScriptEscape('">
 							<td style="width: 50%;">
-									<textarea id="data_') . ' + last_preview + ' . javaScriptEscape('" rows="3" cols="65" name="news[]" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 85%; min-width: 85%' : 'width: 95%') . ';"></textarea>
+									<textarea id="data_') . ' + last_preview + ' . javaScriptEscape('" rows="3" cols="65" name="news[]" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 85%; min-width: 85%' : 'width: 100%') . ';"></textarea>
 									<br />
-									<div class="floatleft" id="preview_') . ' + last_preview + ' . javaScriptEscape('"></div>
+									<div class="floatright" id="preview_') . ' + last_preview + ' . javaScriptEscape('"></div>
 							</td>
 							<td style="width: 45%;">
 								<div id="box_preview_') . ' + last_preview + ' . javaScriptEscape('" style="overflow: auto; width: 100%; height: 10ex;"></div>
@@ -278,6 +278,7 @@ function list_getNews()
 	global $modSettings;
 
 	$admin_current_news = array();
+
 	// Ready the current news.
 	foreach (explode("\n", $modSettings['news']) as $id => $line)
 		$admin_current_news[$id] = array(
@@ -311,15 +312,10 @@ function SelectMailingMembers()
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	$context['page_title'] = $txt['admin_newsletters'];
-
 	$context['sub_template'] = 'email_members';
-
 	$context['groups'] = array();
 	$postGroups = array();
 	$normalGroups = array();
-
-	// Are we going to show the advanced options?
-	$context['show_advanced_options'] = empty($context['admin_preferences']['apn']);
 
 	// If we have post groups disabled then we need to give a "ungrouped members" option.
 	if (empty($modSettings['permission_enable_postgroups']))
@@ -334,11 +330,11 @@ function SelectMailingMembers()
 
 	// Get all the extra groups as well as Administrator and Global Moderator.
 	$request = $smcFunc['db_query']('', '
-		SELECT mg.id_group, mg.group_name, mg.min_posts
-		FROM {db_prefix}membergroups AS mg' . (empty($modSettings['permission_enable_postgroups']) ? '
-		WHERE mg.min_posts = {int:min_posts}' : '') . '
-		GROUP BY mg.id_group, mg.min_posts, mg.group_name
-		ORDER BY mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
+		SELECT id_group, group_name, min_posts
+		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
+		WHERE min_posts = {int:min_posts}' : '') . '
+		GROUP BY id_group, min_posts, group_name
+		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
 		array(
 			'min_posts' => -1,
 			'newbie_group' => 4,
@@ -360,9 +356,13 @@ function SelectMailingMembers()
 	$smcFunc['db_free_result']($request);
 
 	$groups = membersInGroups($postGroups, $normalGroups, true, true);
-	// @todo not sure why += wouldn't = be enough?
 	foreach ($groups as $id_group => $member_count)
-		$context['groups'][$id_group]['member_count'] += $member_count;
+	{
+		if (isset($context['groups'][$id_group]['member_count']))
+			$context['groups'][$id_group]['member_count'] += $member_count;
+		else
+			$context['groups'][$id_group]['member_count'] = $member_count;
+	}
 
 	$context['can_send_pm'] = allowedTo('pm_send');
 }
@@ -377,7 +377,7 @@ function SelectMailingMembers()
  */
 function ComposeMailing()
 {
-	global $txt, $context, $smcFunc, $scripturl, $modSettings;
+	global $txt, $context, $smcFunc;
 
 	// Setup the template!
 	$context['page_title'] = $txt['admin_newsletters'];
@@ -393,7 +393,7 @@ function ComposeMailing()
 	$editorOptions = array(
 		'id' => 'message',
 		'value' => $context['message'],
-		'height' => '175px',
+		'height' => '250px',
 		'width' => '100%',
 		'labels' => array(
 			'post_button' => $txt['sendtopic_send'],
@@ -401,6 +401,7 @@ function ComposeMailing()
 		'preview_type' => 2,
 	);
 	create_control_richedit($editorOptions);
+
 	// Store the ID for old compatibility.
 	$context['post_box_name'] = $editorOptions['id'];
 
@@ -425,8 +426,10 @@ function ComposeMailing()
 	$toClean = array();
 	if (!empty($_POST['members']))
 		$toClean[] = 'members';
+
 	if (!empty($_POST['exclude_members']))
 		$toClean[] = 'exclude_members';
+
 	if (!empty($toClean))
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -439,10 +442,12 @@ function ComposeMailing()
 			$_POST[$type] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST[$type]))));
 
 			foreach ($_POST[$type] as $index => $member)
+			{
 				if (strlen(trim($member)) > 0)
 					$_POST[$type][$index] = $smcFunc['htmlspecialchars']($smcFunc['strtolower'](trim($member)));
 				else
 					unset($_POST[$type][$index]);
+			}
 
 			// Find the members
 			$_POST[$type] = implode(',', array_keys(findMembers($_POST[$type])));
@@ -454,6 +459,7 @@ function ComposeMailing()
 		$members = array();
 		foreach ($_POST['member_list'] as $member_id)
 			$members[] = (int) $member_id;
+
 		$_POST['members'] = implode(',', $members);
 	}
 
@@ -462,6 +468,7 @@ function ComposeMailing()
 		$members = array();
 		foreach ($_POST['exclude_member_list'] as $member_id)
 			$members[] = (int) $member_id;
+
 		$_POST['exclude_members'] = implode(',', $members);
 	}
 
@@ -471,7 +478,8 @@ function ComposeMailing()
 	// We need a couple strings from the email template file
 	loadLanguage('EmailTemplates');
 
-	// Get a list of all full banned users.  Use their Username and email to find them.  Only get the ones that can't login to turn off notification.
+	// Get a list of all full banned users.  Use their Username and email to find them.
+	// Only get the ones that can't login to turn off notification.
 	$request = $smcFunc['db_query']('', '
 		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}ban_groups AS bg
@@ -650,6 +658,7 @@ function SendMailing($clean_only = false)
 				$context['recipients']['groups'][] = (int) $group;
 		}
 	}
+
 	// Same for excluded groups
 	if (!empty($_POST['exclude_groups']))
 	{
@@ -665,6 +674,7 @@ function SendMailing($clean_only = false)
 				$context['recipients']['exclude_groups'][] = (int) $group;
 		}
 	}
+
 	// Finally - emails!
 	if (!empty($_POST['emails']))
 	{
@@ -740,6 +750,7 @@ function SendMailing($clean_only = false)
 			$modSettings['latestMember'],
 			$cleanLatestMember
 		), $_POST['message']);
+
 	$_POST['subject'] = str_replace($variables,
 		array(
 			$scripturl,
@@ -913,7 +924,6 @@ function SendMailing($clean_only = false)
 	{
 		// Log this into the admin log.
 		logAction('newsletter', array(), 'admin');
-
 		redirectexit('action=admin');
 	}
 
@@ -938,7 +948,7 @@ function SendMailing($clean_only = false)
  */
 function ModifyNewsSettings($return_config = false)
 {
-	global $context, $modSettings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	$config_vars = array(
 		array('title', 'settings'),

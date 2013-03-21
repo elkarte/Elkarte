@@ -112,24 +112,21 @@ function action_mergeIndex()
 		fatal_lang_error('cannot_merge_any', 'user');
 
 	// Get a list of boards they can navigate to to merge.
-	$request = $smcFunc['db_query']('order_by_board_order', '
-		SELECT b.id_board, b.name AS board_name, c.name AS cat_name
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE {query_see_board}' . (!in_array(0, $merge_boards) ? '
-			AND b.id_board IN ({array_int:merge_boards})' : ''),
-		array(
-			'merge_boards' => $merge_boards,
-		)
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$boardListOptions = array(
+		'use_permissions' => true,
+		'not_redirection' => true
 	);
+	if (!in_array(0, $merge_boards))
+		$boardListOptions['included_boards'] = $merge_boards;
+	$boards_list = getBoardList($boardListOptions, true);
 	$context['boards'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($boards_list as $board)
 		$context['boards'][] = array(
-			'id' => $row['id_board'],
-			'name' => $row['board_name'],
-			'category' => $row['cat_name']
+			'id' => $board['id_board'],
+			'name' => $board['board_name'],
+			'category' => $board['cat_name']
 		);
-	$smcFunc['db_free_result']($request);
 
 	// Get some topics to merge it with.
 	$request = $smcFunc['db_query']('', '

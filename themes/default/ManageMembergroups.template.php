@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_main()
+function template_regular_membergroups_list()
 {
 	global $context, $settings, $scripturl, $txt;
 
@@ -125,7 +125,7 @@ function template_new_group()
 						</dt>
 						<dd>';
 
-	template_add_edit_group_boards_list(false);
+	template_add_edit_group_boards_list('new_group', false);
 
 	echo '
 						</dd>
@@ -262,6 +262,7 @@ function template_edit_group()
 						<dd>
 							<input type="text" name="min_posts" id="min_posts_input"', $context['group']['is_post_group'] ? ' value="' . $context['group']['min_posts'] . '"' : '', ' size="6" class="input_text" />
 						</dd>';
+
 	echo '
 						<dt>
 							<label for="online_color_input"><strong>', $txt['membergroups_online_color'], ':</strong></label>
@@ -276,13 +277,18 @@ function template_edit_group()
 							<input type="text" name="icon_count" id="icon_count_input" value="', $context['group']['icon_count'], '" size="4" onkeyup="if (this.value.length > 2) this.value = 99;" onkeydown="this.onkeyup();" onchange="if (this.value != 0) this.form.icon_image.onchange();" class="input_text" />
 						</dd>
 						<dt>
-							<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label><br />
+							<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label>
+							<br />
 							<span class="smalltext">', $txt['membergroups_icon_image_note'], '</span>
 						</dt>
 						<dd>
-							', $txt['membergroups_images_url'], '
-							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value == 0) this.form.icon_count.value = 1; else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'icon_preview\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value.replace(/\$language/g, \'', $context['user']['language'], '\') : \'blank.png\');" size="20" class="input_text" />
-							<img id="icon_preview" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
+							<span class="floatleft">
+								', $txt['membergroups_images_url'], '
+								<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value === 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
+							</span>
+							<span id="messageicon_0" class="groupicon">
+								<img id="msg_icon_0" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
+							</span>
 						</dd>
 						<dt>
 							<label for="max_messages_input"><strong>', $txt['membergroups_max_messages'], ':</strong></label><br />
@@ -291,6 +297,7 @@ function template_edit_group()
 						<dd>
 							<input type="text" name="max_messages" id="max_messages_input" value="', $context['group']['id'] == 1 ? 0 : $context['group']['max_messages'], '" size="6"', $context['group']['id'] == 1 ? ' disabled="disabled"' : '', ' class="input_text" />
 						</dd>';
+
 	if (!empty($context['categories']))
 	{
 		echo '
@@ -299,10 +306,11 @@ function template_edit_group()
 							<span class="smalltext">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 						</dt>
 						<dd>';
-		template_add_edit_group_boards_list();
+		template_add_edit_group_boards_list('groupForm');
 		echo '
 						</dd>';
 	}
+
 	echo '
 					</dl>
 					<input type="submit" name="save" value="', $txt['membergroups_edit_save'], '" class="button_submit" />', $context['group']['allow_delete'] ? '
@@ -313,33 +321,56 @@ function template_edit_group()
 			<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
 		</form>
 	</div>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oModeratorSuggest = new smc_AutoSuggest({
-				sSelf: \'oModeratorSuggest\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
-				sSuggestId: \'group_moderators\',
-				sControlId: \'group_moderators\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'moderator_list\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'moderator_container\',
-				aListItems: [';
+	<script type="text/javascript"><!-- // --><![CDATA[
+		aIconLists[aIconLists.length] = new IconList({
+			sBackReference: "aIconLists[" + aIconLists.length + "]",
+			sIconIdPrefix: "msg_icon_",
+			sScriptUrl: smf_scripturl,
+			bShowModify: false,
+			sSessionId: smf_session_id,
+			sSessionVar: smf_session_var,
+			sAction: "groupicons" ,
+			sLabelIconList: "', $txt['membergroups_icons'], '",
+			sLabelIconBox: "icon_image_input",
+			sBoxBackground: "transparent",
+			sBoxBackgroundHover: "#ffffff",
+			iBoxBorderWidthHover: 1,
+			sBoxBorderColorHover: "#adadad" ,
+			sContainerBackground: "#ffffff",
+			sContainerBorder: "1px solid #adadad",
+			sItemBorder: "1px solid #ffffff",
+			sItemBorderHover: "1px dotted gray",
+			sItemBackground: "transparent",
+			sItemBackgroundHover: "#e0e0f0"
+		});
+	// ]]></script>
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script type="text/javascript"><!-- // --><![CDATA[
+		var oModeratorSuggest = new smc_AutoSuggest({
+			sSelf: \'oModeratorSuggest\',
+			sSessionId: smf_session_id,
+			sSessionVar: smf_session_var,
+			sSuggestId: \'group_moderators\',
+			sControlId: \'group_moderators\',
+			sSearchType: \'member\',
+			bItemList: true,
+			sPostName: \'moderator_list\',
+			sURLMask: \'action=profile;u=%item_id%\',
+			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sItemListContainerId: \'moderator_container\',
+			aListItems: [';
 
-			foreach ($context['group']['moderators'] as $id_member => $member_name)
-				echo '
-							{
-								sItemId: ', JavaScriptEscape($id_member), ',
-								sItemName: ', JavaScriptEscape($member_name), '
-							}', $id_member == $context['group']['last_moderator_id'] ? '' : ',';
-
+		foreach ($context['group']['moderators'] as $id_member => $member_name)
 			echo '
-				]
-			});
-		// ]]></script>';
+						{
+							sItemId: ', JavaScriptEscape($id_member), ',
+							sItemName: ', JavaScriptEscape($member_name), '
+						}', $id_member == $context['group']['last_moderator_id'] ? '' : ',';
+
+		echo '
+			]
+		});
+	// ]]></script>';
 
 	if ($context['group']['allow_post_group'])
 		echo '
@@ -363,7 +394,7 @@ function template_edit_group()
 		// ]]></script>';
 }
 
-function template_add_edit_group_boards_list($collapse = true)
+function template_add_edit_group_boards_list($form_id, $collapse = true)
 {
 	global $context, $txt, $modSettings;
 	echo '
@@ -376,7 +407,7 @@ function template_add_edit_group_boards_list($collapse = true)
 		if (empty($modSettings['deny_boards_access']))
 			echo '
 									<li class="category">
-										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'new_group\'); return false;"><strong>', $category['name'], '</strong></a>
+										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\'); return false;"><strong>', $category['name'], '</strong></a>
 									<ul style="width:100%">';
 		else
 			echo '

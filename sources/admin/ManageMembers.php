@@ -708,7 +708,10 @@ function MembersAwaitingActivation()
 
 	// If the filter was not sent, set it to whatever has people in it!
 	if ($context['current_filter'] == -1 && !empty($context['available_filters'][0]['amount']))
+	{
 		$context['current_filter'] = $context['available_filters'][0]['type'];
+		$context['available_filters'][0]['selected'] = true;
+	}
 
 	// This little variable is used to determine if we should flag where we are looking.
 	$context['show_filter'] = ($context['current_filter'] != 0 && $context['current_filter'] != 3) || count($context['available_filters']) > 1;
@@ -796,7 +799,6 @@ function MembersAwaitingActivation()
 
 	$listOptions = array(
 		'id' => 'approve_list',
-// 		'title' => $txt['members_approval_title'],
 		'items_per_page' => $modSettings['defaultMaxMembers'],
 		'base_href' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : ''),
 		'default_sort_col' => 'date_registered',
@@ -984,31 +986,20 @@ function MembersAwaitingActivation()
 		unset($listOptions['columns']['hostname']);
 
 	// Is there any need to show filters?
-	if (isset($context['available_filters']) && count($context['available_filters']) > 1)
+	if (isset($context['available_filters']))
 	{
-		$filterOptions = '
-			<strong>' . $txt['admin_browse_filter_by'] . ':</strong>
-			<select name="filter" onchange="this.form.submit();">';
-		foreach ($context['available_filters'] as $filter)
-			$filterOptions .= '
-				<option value="' . $filter['type'] . '"' . ($filter['selected'] ? ' selected="selected"' : '') . '>' . $filter['desc'] . ' - ' . $filter['amount'] . ' ' . ($filter['amount'] == 1 ? $txt['user'] : $txt['users']) . '</option>';
-		$filterOptions .= '
-			</select>
-			<noscript><input type="submit" value="' . $txt['go'] . '" name="filter" class="button_submit" /></noscript>';
-		$listOptions['additional_rows'][] = array(
-			'position' => 'top_of_list',
-			'value' => $filterOptions,
-			'class' => 'righttext',
+		$listOptions['list_menu'] = array(
+			'show_on' => 'top',
+			'links' => array()
 		);
-	}
 
-	// What about if we only have one filter, but it's not the "standard" filter - show them what they are looking at.
-	if (!empty($context['show_filter']) && !empty($context['available_filters']))
-		$listOptions['additional_rows'][] = array(
-			'position' => 'above_column_headers',
-			'value' => '<strong>' . $txt['admin_browse_filter_show'] . ':</strong> ' . $context['available_filters'][0]['desc'],
-			'class' => 'smalltext floatright',
-		);
+		foreach ($context['available_filters'] as $filter)
+			$listOptions['list_menu']['links'][] = array(
+				'is_selected' => $filter['selected'],
+				'href' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=' . $context['browse_type'] . ';filter=' . $filter['type'],
+				'label' => $filter['desc'] . ' - ' . $filter['amount'] . ' ' . ($filter['amount'] == 1 ? $txt['user'] : $txt['users'])
+			);
+	}
 
 	// Now that we have all the options, create the list.
 	require_once(SUBSDIR . '/List.subs.php');

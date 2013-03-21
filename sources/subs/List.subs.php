@@ -42,6 +42,19 @@ function createList($listOptions)
 	$context[$listOptions['id']] = array();
 	$list_context = &$context[$listOptions['id']];
 
+	// Let's set some default that could be useful to avoid repetitions
+	if (!isset($context['sub_template']))
+	{
+		if (function_exists('template_' . $listOptions['id']))
+			$context['sub_template'] = $listOptions['id'];
+		else
+		{
+			$context['sub_template'] = 'show_list';
+			if (!isset($context['default_list']))
+				$context['default_list'] = $listOptions['id'];
+		}
+	}
+
 	// Figure out the sort.
 	if (empty($listOptions['default_sort_col']))
 	{
@@ -239,7 +252,7 @@ function createList($listOptions)
 			if (empty($row))
 				continue;
 
-			// Supported row positions: top_of_list, after_title,
+			// Supported row positions: top_of_list, after_title, selectors,
 			// above_column_headers, below_table_data, bottom_of_list.
 			if (!isset($list_context['additional_rows'][$row['position']]))
 				$list_context['additional_rows'][$row['position']] = array();
@@ -249,11 +262,16 @@ function createList($listOptions)
 
 	// Add an option for inline JavaScript.
 	if (isset($listOptions['javascript']))
-		$list_context['javascript'] = $listOptions['javascript'];
+		addInlineJavascript($listOptions['javascript'], true);
 
 	// We want a menu.
 	if (isset($listOptions['list_menu']))
+	{
+		if (!isset($listOptions['list_menu']['position']))
+			$listOptions['list_menu']['position'] = 'left';
+
 		$list_context['list_menu'] = $listOptions['list_menu'];
+	}
 
 	// Make sure the template is loaded.
 	loadTemplate('GenericList');
