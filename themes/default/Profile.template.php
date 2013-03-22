@@ -2368,7 +2368,8 @@ function template_issueWarning()
 				</div>
 			</div>
 		</div>
-	</form>';
+	</form>
+	</br />';
 
 	// Previous warnings?
 	template_show_list('issued_warnings');
