@@ -70,7 +70,7 @@ function template_modifydone()
 
 function template_modifytopicdone()
 {
-	global $context;
+	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <smf>
