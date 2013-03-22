@@ -19,4 +19,5 @@ Please see [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CO
 Site and IRC
 ===
 Join us on IRC, on #elkarte channel on freenode.
+
 Project site: www.elkarte.net
