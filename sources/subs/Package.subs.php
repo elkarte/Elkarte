@@ -1639,7 +1639,7 @@ function parse_path($path)
 		'$avatars_dir' => $modSettings['avatar_directory'],
 		'$themedir' => $settings['default_theme_dir'],
 		'$imagesdir' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
-		'$themes_dir' => BOARDDIR . '/Themes',
+		'$themes_dir' => BOARDDIR . '/themes',
 		'$languagedir' => $settings['default_theme_dir'] . '/languages',
 		'$languages_dir' => $settings['default_theme_dir'] . '/languages',
 		'$smileysdir' => $modSettings['smileys_dir'],
@@ -1933,7 +1933,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 		{
 			// If this filename is relative, if so take a guess at what it should be.
 			$real_filename = $filename;
-			if (strpos($filename, 'Themes') === 0)
+			if (strpos($filename, 'themes') === 0)
 				$real_filename = BOARDDIR . '/' . $filename;
 
 			if (strpos($real_filename, $theme['theme_dir']) === 0)
@@ -2330,7 +2330,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 		foreach ($theme_paths as $id => $theme)
 		{
 			// If this filename is relative, if so take a guess at what it should be.
-			if (strpos($filename, 'Themes') === 0)
+			if (strpos($filename, 'themes') === 0)
 				$filename = BOARDDIR . '/' . $filename;
 
 			if (strpos($filename, $theme['theme_dir']) === 0)
@@ -2923,7 +2923,7 @@ function package_create_backup($id = 'backup')
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'Themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
+		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$smcFunc['db_free_result']($request);
 
 	while (!empty($dirs))
