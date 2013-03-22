@@ -302,13 +302,13 @@ function template_credits()
 						{
 							var ourVer, yourVer;
 
-							if (!window.ourVersion)
+							if (!window.elkVersion)
 								return;
 
 							ourVer = document.getElementById("ourVersion");
 							yourVer = document.getElementById("yourVersion");
 
-							setInnerHTML(ourVer, window.ourVersion);
+							setInnerHTML(ourVer, window.elkVersion);
 
 							var currentVersion = getInnerHTML(yourVer);
 							if (currentVersion != window.ourVersion)
