@@ -1634,7 +1634,7 @@ function scheduled_remove_temp_attachments()
 	global $modSettings;
 
 	// We need to know where this thing is going.
-	require_once(SUBSDIR . '/Attachment.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$attach_dirs = attachmentPaths();
 
 	foreach ($attach_dirs as $attach_dir)
