@@ -23,6 +23,10 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Check and create a directory automatically.
+ *
+ */
 function automanage_attachments_check_directory()
 {
 	global $modSettings, $context;
@@ -507,7 +511,7 @@ function processAttachments()
  * Performs various checks on an uploaded file.
  * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
  *
- * @param int $attachID
+ * @param int $attachID id of the attachment to check
  */
 function attachmentChecks($attachID)
 {
@@ -859,6 +863,8 @@ function createAttachment(&$attachmentOptions)
 
 /**
  * Get the avatar with the specified ID.
+ * It gets avatar data (folder, name of the file, filehash, etc)
+ * from the database.
  *
  * @param int $id_attach
  * @return array, the avatar data as array
