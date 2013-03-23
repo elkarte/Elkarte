@@ -3,7 +3,7 @@
 // Version: 1.0; Packages
 
 $txt['package_proceed'] = 'Proceed';
-$txt['php_script'] = 'Modification file was extracted, but this modification also comes with a PHP script which should be executed before it will work';
+$txt['php_script'] = 'Modification file was extracted, but this add-on also comes with a PHP script which should be executed before it will work';
 $txt['package_run'] = 'Run';
 $txt['package_id'] = 'ID';
 $txt['package_read'] = 'Read';
@@ -23,26 +23,26 @@ $txt['download'] = 'Download';
 $txt['download_success'] = 'Package downloaded successfully';
 $txt['package_downloaded_successfully'] = 'Package has been downloaded successfully';
 $txt['package_manager'] = 'Package Manager';
-$txt['install_mod'] = 'Install Mod';
-$txt['uninstall_mod'] = 'Uninstall Mod';
-$txt['sql_file'] = 'The Modification file has been extracted.  This modification also comes with a database file containing changes the database needs.  You will need to execute this file for the modification to function properly.';
+$txt['install_mod'] = 'Install Add-on';
+$txt['uninstall_mod'] = 'Uninstall Add-on';
+$txt['sql_file'] = 'The Modification file has been extracted.  This add-on also comes with a database file containing changes the database needs.  You will need to execute this file for the add-on to function properly.';
 $txt['sql_queries'] = 'SQL Queries';
-$txt['no_mods_installed'] = 'No mods currently installed';
-$txt['browse_installed'] = 'Browse installed mods';
+$txt['no_mods_installed'] = 'No add-ons currently installed';
+$txt['browse_installed'] = 'Browse installed add-ons';
 $txt['uninstall'] = 'Uninstall';
-$txt['delete_list'] = 'Delete Mod List';
-$txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed modification list?';
+$txt['delete_list'] = 'Delete Add-on List';
+$txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed add-ons list?';
 $txt['php_safe_mode'] = 'Sorry, your server currently has PHP set to run in SAFE MODE.  This feature is not compatible with SAFE MODE.';
 $txt['lets_try_anyway'] = 'Let me try anyway.';
 
-$txt['package_manager_desc'] = 'From this easy to use interface, you can download and install modifications for use on your forum.';
+$txt['package_manager_desc'] = 'From this easy to use interface, you can download and install add-ons for use on your forum.';
 $txt['installed_packages_desc'] = 'You can use the interface below to view those packages currently installed on the forum, and remove the ones you no longer require.';
 $txt['download_packages_desc'] = 'From this section you can choose to either download new packages from package servers, or upload a package file directly to the forum.';
 
 $txt['create_package'] = 'Create a new Package';
 $txt['download_new_package'] = 'Download new packages';
 $txt['view_and_remove'] = 'View and remove installed packages';
-$txt['modification_package'] = 'Modification packages';
+$txt['modification_package'] = 'Add-on packages';
 $txt['avatar_package'] = 'Avatar packages';
 $txt['language_package'] = 'Language packages';
 $txt['unknown_package'] = 'Unknown packages';
@@ -56,7 +56,7 @@ $txt['extracting'] = 'Extracting';
 $txt['avatars_extracted'] = 'The avatars have been installed, you should now be able to use them.';
 $txt['language_extracted'] = 'The language pack has been installed, you can now enable its use in the language settings area of your admin control panel.';
 
-$txt['mod_name'] = 'Mod Name';
+$txt['mod_name'] = 'Add-on Name';
 $txt['mod_version'] = 'Version';
 $txt['mod_author'] = 'Author';
 $txt['author_website'] = 'Author\'s Homepage';
@@ -64,7 +64,7 @@ $txt['package_no_description'] = 'No description given';
 $txt['package_description'] = 'Description';
 $txt['file_location'] = 'Location of file';
 
-$txt['package_installed_key'] = 'Installed mods:';
+$txt['package_installed_key'] = 'Installed add-ons:';
 $txt['package_installed_current'] = 'current version';
 $txt['package_installed_old'] = 'older version';
 $txt['package_installed_warning1'] = 'This package is already installed, and no upgrade was found.';
@@ -112,15 +112,15 @@ $txt['package_will_fail_title'] = 'Error in package %1$s';
 $txt['package_will_fail_warning'] = 'At least one error was encountered during a test %1$s of this package.<br />It is <strong>strongly</strong> recommended that you do not continue with %1$s unless you know what you are doing, and have made a backup very recently.<br /><br />This error may be caused by a conflict between the package you\'re trying to install and another package you have already installed, an error in the package, a package which requires another package that you have not installed yet, or a package designed for another version of the software.';
 $txt['package_will_fail_unknown_action'] = 'The package is trying to perform an unknown action: %1$s';
 // Don't use entities in the below string.
-$txt['package_will_fail_popup'] = 'Are you sure you wish to continue installing this modification, even though it will not install successfully?';
-$txt['package_will_fail_popup_uninstall'] = 'Are you sure you wish to continue uninstalling this modification, even though it will not uninstall successfully?';
+$txt['package_will_fail_popup'] = 'Are you sure you wish to continue installing this add-on, even though it will not install successfully?';
+$txt['package_will_fail_popup_uninstall'] = 'Are you sure you wish to continue uninstalling this add-on, even though it will not uninstall successfully?';
 $txt['package_install'] = 'installation';
 $txt['package_uninstall'] = 'removal';
 $txt['package_install_now'] = 'Install now';
 $txt['package_uninstall_now'] = 'Uninstall now';
 $txt['package_other_themes'] = 'Install in other themes';
 $txt['package_other_themes_uninstall'] = 'UnInstall in other themes';
-$txt['package_other_themes_desc'] = 'To use this modification in themes other than the default, the package manager needs to make additional changes to the other themes. If you\'d like to install this modification in the other themes, please select these themes below.';
+$txt['package_other_themes_desc'] = 'To use this add-on in themes other than the default, the package manager needs to make additional changes to the other themes. If you\'d like to install this add-on in the other themes, please select these themes below.';
 // Don't use entities in the below string.
 $txt['package_theme_failure_warning'] = 'At least one error was encountered during a test install of this theme. Are you sure you wish to attempt installation?';
 
@@ -134,10 +134,10 @@ $txt['package_action_skipping'] = '<strong>Skipping file</strong>';
 
 $txt['package_uninstall_actions'] = 'Uninstall Actions';
 $txt['package_uninstall_done'] = 'The package has been successfully uninstalled.';
-$txt['package_uninstall_cannot'] = 'This package cannot be uninstalled, because there is no uninstaller.<br /><br />Please contact the mod author for more information.';
+$txt['package_uninstall_cannot'] = 'This package cannot be uninstalled, because there is no uninstaller.<br /><br />Please contact the add-on author for more information.';
 
 $txt['package_install_options'] = 'Installation Options';
-$txt['package_install_options_desc'] = 'Set various options for how the package manager installs modifications, including backups and ftp access';
+$txt['package_install_options_desc'] = 'Set various options for how the package manager installs add-ons, including backups and ftp access';
 $txt['package_install_options_ftp_why'] = 'Using the package manager\'s FTP functionality is the easiest way to avoid having to manually chmod the files writable through FTP yourself for the package manager to work.<br />Here you can set the default values for some fields.';
 $txt['package_install_options_ftp_server'] = 'FTP Server';
 $txt['package_install_options_ftp_port'] = 'Port';
@@ -153,7 +153,7 @@ $txt['package_ftp_server'] = 'FTP Server';
 $txt['package_ftp_port'] = 'Port';
 $txt['package_ftp_username'] = 'Username';
 $txt['package_ftp_password'] = 'Password';
-$txt['package_ftp_path'] = 'Local path to ELKARTE';
+$txt['package_ftp_path'] = 'Local path to ElkArte';
 $txt['package_ftp_test'] = 'Test';
 $txt['package_ftp_test_connection'] = 'Test Connection';
 $txt['package_ftp_test_success'] = 'FTP connection established.';
