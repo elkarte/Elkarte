@@ -23,6 +23,16 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Get message and attachments data, for a message ID.
+ * The function returns the data in an array with:
+ *  'message' => array with message data
+ *  'attachment_stuff' => array with attachments
+ *
+ * @param int $id_msg
+ * @param int $id_topic = 0
+ * @param int $attachment_type = 0
+ */
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {
 	global $smcFunc, $modSettings;
@@ -72,6 +82,13 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 	return array('message' => $row, 'attachment_stuff' => $temp);
 }
 
+/**
+ * Checks permissions to modify a message.
+ * This function will give a fatal error if the current user
+ * doesn't have permissions to modify the message.
+ *
+ * @param int $message
+ */
 function checkMessagePermissions($message)
 {
 	global $user_info, $modSettings, $context;
@@ -97,6 +114,11 @@ function checkMessagePermissions($message)
 	return false;
 }
 
+/**
+ * Prepare context for a message.
+ *
+ * @param int $message the message id
+ */
 function prepareMessageContext($message)
 {
 	global $context, $txt;
