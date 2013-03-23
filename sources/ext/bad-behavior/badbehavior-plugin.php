@@ -83,9 +83,9 @@ function bb2_db_query($query)
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
-	if (strpos('DATE_SUB', $query) !== false)
-		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE `date` < ' . bb2_db_date() - 7 * 86400;
-	if (strpos('@@session.wait_timeout', $query) !== false)
+	if (strpos($query, 'DATE_SUB') !== false)
+		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+	elseif (strpos($query, '@@session.wait_timeout') !== false)
 		return true;
 
 	// Run the query, return success, failure or the actual results
@@ -178,7 +178,7 @@ function bb2_insert($settings, $package, $key)
 	}
 
 	// Add it
-	return "INSERT INTO `{db_prefix}log_badbehavior`
+	return "INSERT INTO {db_prefix}log_badbehavior
 		(`ip`, `date`, `request_method`, `request_uri`, `server_protocol`, `http_headers`, `user_agent`, `request_entity`, `valid`, `id_member`, `session`) VALUES
 		('$ip', '$date', '$request_method', '$request_uri', '$server_protocol', '$headers', '$user_agent', '$request_entity', '$key', '$member_id' , '$session')";
 }
