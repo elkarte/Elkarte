@@ -1087,14 +1087,14 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . 
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') .
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
-			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') . 
+			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
 			(!empty($selects) ? implode(',', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . 
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') .
 			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .

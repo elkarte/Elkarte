@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  * Mark a board or multiple boards read.
  *
  * @param array $boards
- * @param bool $unread
+ * @param bool $unread = false
  */
 function markBoardsRead($boards, $unread = false)
 {
@@ -139,8 +139,9 @@ function markBoardsRead($boards, $unread = false)
 }
 
 /**
- * Get the id_member associated with the specified message.
- * @param int $messageID
+ * Get the id_member associated with the specified message ID.
+ *
+ * @param int $messageID message ID
  * @return int the member id
  */
 function getMsgMemberID($messageID)

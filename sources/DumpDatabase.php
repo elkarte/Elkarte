@@ -179,6 +179,7 @@ function DumpDatabase2()
 				@set_time_limit(150);
 			}
 
+			// for the first pass, start the output with a custom line...
 			if ($first_round)
 			{
 				$db_chunks .=
@@ -213,6 +214,7 @@ function DumpDatabase2()
 			'-- --------------------------------------------------------' . $crlf;
 	}
 
+	// write the last line
 	$db_backup .=
 		$crlf .
 		'-- Done' . $crlf;
@@ -224,7 +226,8 @@ function DumpDatabase2()
 
 /**
  * Dummy/helper function, it simply returns the string passed as argument
- * @param $string, a string
+ *
+ * @param $string, string to uncompress
  * @return the string passed
  */
 function un_compressed($string = '')

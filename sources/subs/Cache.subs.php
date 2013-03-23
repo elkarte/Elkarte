@@ -22,11 +22,13 @@ if (!defined('ELKARTE'))
 
 /**
  * Try to retrieve a cache entry. On failure, call the appropriate function.
+ * This callback is sent as $file to include, and $function to call, with
+ * $params parameters.
  *
- * @param string $key
- * @param string $file
- * @param string $function
- * @param array $params
+ * @param string $key cache entry key
+ * @param string $file file to include
+ * @param string $function function to call
+ * @param array $params parameters sent to the function
  * @param int $level = 1
  * @return string
  */
@@ -454,7 +456,7 @@ function clean_cache($type = '')
  * Get the key for the cache.
  *
  * @param string $key
- * @return string $key
+ * @return string
  */
 function cache_get_key($key)
 {

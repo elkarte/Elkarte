@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  *  - returns the number of open reports
  *  - sets $context['open_mod_reports'] for template use
  *
- * @param boolean $flush
+ * @param boolean $flush = true if moderator menu count will be cleared
  */
 function recountOpenReports($flush = true)
 {
