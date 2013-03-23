@@ -75,6 +75,9 @@ function action_stats()
 	loadLanguage('Stats');
 	loadTemplate('Stats');
 
+	// Just a lil' help from our friend :P
+	require_once(SUBSDIR . '/Stats.subs.php');
+
 	// Build the link tree......
 	$context['linktree'][] = array(
 		'url' => $scripturl . '?action=stats',
@@ -108,14 +111,7 @@ function action_stats()
 	$context['num_hits'] = comma_format($row['hits'], 0);
 
 	// How many users are online now.
-	$result = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_online',
-		array(
-		)
-	);
-	list ($context['users_online']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$context['users_online'] = onlineCount();
 
 	// Statistics such as number of boards, categories, etc.
 	$result = $smcFunc['db_query']('', '

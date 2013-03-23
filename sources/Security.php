@@ -320,15 +320,11 @@ function is_not_banned($forceCheck = false)
 	// If you're fully banned, it's end of the story for you.
 	if (isset($_SESSION['ban']['cannot_access']))
 	{
+		require_once(SUBSDIR . '/Auth.subs.php');
+
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}log_online
-				WHERE id_member = {int:current_member}',
-				array(
-					'current_member' => $user_info['id'],
-				)
-			);
+			logOnline($user_info['id'], false);
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = isset($user_info['name']) && $user_info['name'] != '' ? $user_info['name'] : $txt['guest_title'];
@@ -351,7 +347,6 @@ function is_not_banned($forceCheck = false)
 		);
 
 		// A goodbye present.
-		require_once(SUBSDIR . '/Auth.subs.php');
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 		elk_setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], false, false);
 

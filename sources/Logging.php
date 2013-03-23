@@ -46,7 +46,7 @@ function writeLog($force = false)
 	// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
 	if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once(ADMINDIR . '/ManageSearchEngines.php');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		logSpider();
 	}
 
@@ -71,7 +71,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	// Grab the last all-of-ELKARTE-specific log_online deletion time.
+	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
@@ -528,4 +528,30 @@ function logActions($logs)
 	);
 
 	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
+}
+
+/**
+ * Actualize login history, for the passed member and IPs.
+ * It will log it as entry for the current time.
+ *
+ * @param int $id_member
+ * @param string $ip
+ * @param string $ip2
+ */
+function logLoginHistory($id_member, $ip, $ip2)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('insert',
+		'{db_prefix}member_logins',
+		array(
+			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',
+		),
+		array(
+			$id_member, time(), $ip, $ip2
+		),
+		array(
+			'id_member', 'time'
+		)
+	);
 }
