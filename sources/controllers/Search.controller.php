@@ -1904,10 +1904,6 @@ function MessageSearch2()
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
 		fatal_lang_error('loadavg_search_disabled', false);
 
-	// @todo For the moment force the folder to the inbox.
-	// @todo Maybe set the inbox based on a cookie or theme setting?
-	$context['folder'] = 'inbox';
-
 	// Some useful general permissions.
 	$context['can_send_pm'] = allowedTo('pm_send');
 
@@ -1944,8 +1940,11 @@ function MessageSearch2()
 	if (!empty($search_params['maxage']) || (!empty($_REQUEST['maxage']) && $_REQUEST['maxage'] < 9999))
 		$search_params['maxage'] = !empty($search_params['maxage']) ? (int) $search_params['maxage'] : (int) $_REQUEST['maxage'];
 
+	// Search modifiers
 	$search_params['subject_only'] = !empty($search_params['subject_only']) || !empty($_REQUEST['subject_only']);
 	$search_params['show_complete'] = !empty($search_params['show_complete']) || !empty($_REQUEST['show_complete']);
+	$search_params['sent_only'] = !empty($search_params['sent_only']) || !empty($_REQUEST['sent_only']);
+	$context['folder'] = empty($search_params['sent_only']) ? 'inbox' : 'sent';
 
 	// Default the user name to a wildcard matching every user (*).
 	if (!empty($search_params['userspec']) || (!empty($_REQUEST['userspec']) && $_REQUEST['userspec'] != '*'))
@@ -1974,7 +1973,6 @@ function MessageSearch2()
 		}
 
 		// Who matches those criteria?
-		// @todo This doesn't support sent item searching.
 		$request = $smcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}members
@@ -1988,7 +1986,11 @@ function MessageSearch2()
 			$userQuery = '';
 		elseif ($smcFunc['db_num_rows']($request) == 0)
 		{
-			$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
+			if ($context['folder'] === 'inbox')
+				$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
+			else
+				$userQuery = '';
+
 			$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
 		}
 		else
@@ -1996,7 +1998,13 @@ function MessageSearch2()
 			$memberlist = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$memberlist[] = $row['id_member'];
-			$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})))';
+
+			// Use the name as as sent from or sent to
+			if ($context['folder'] === 'inbox')
+				$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})))';
+			else
+				$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
+
 			$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
 			$searchq_parameters['member_list'] = $memberlist;
 		}
@@ -2004,7 +2012,6 @@ function MessageSearch2()
 	}
 
 	// Setup the sorting variables...
-	// @todo Add more in here!
 	$sort_columns = array(
 		'pm.id_pm',
 	);
@@ -2207,7 +2214,6 @@ function MessageSearch2()
 	$smcFunc['db_free_result']($request);
 
 	// Get all the matching messages... using standard search only (No caching and the like!)
-	// @todo This doesn't support sent item searching yet.
 	$request = $smcFunc['db_query']('', '
 		SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
 		FROM {db_prefix}pm_recipients AS pmr
@@ -2325,7 +2331,7 @@ function MessageSearch2()
 		$counter = 0;
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			// If there's no message subject, use the default.
+			// If there's no subject, use the default.
 			$row['subject'] = $row['subject'] == '' ? $txt['no_subject'] : $row['subject'];
 
 			// Load this posters context info, if it ain't there then fill in the essentials...
@@ -2359,7 +2365,7 @@ function MessageSearch2()
 				$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 			}
 
-			$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] == 2 && isset($real_pm_ids[$head_pms[$row['id_pm']]]) ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg' . $row['id_pm'];
+			$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] == 2 && isset($real_pm_ids[$head_pms[$row['id_pm']]]) && $context['folder'] == 'inbox' ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg' . $row['id_pm'];
 
 			$context['personal_messages'][] = array(
 				'id' => $row['id_pm'],
