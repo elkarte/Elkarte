@@ -211,7 +211,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		default: '??',
+		defaults: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -221,7 +221,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		default: '??',
+		defaults: '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -231,7 +231,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		controllers: false,
 		database: false,
 		subs: false,
-		default: false,
+		defaults: false,
 		Languages: false,
 		Templates: false
 	};
@@ -242,7 +242,7 @@ smf_ViewVersions.prototype.determineVersions = function ()
 		'controllers',
 		'database',
 		'subs',
-		'default',
+		'defaults',
 		'Languages',
 		'Templates'
 	];
@@ -363,10 +363,10 @@ smf_ViewVersions.prototype.determineVersions = function ()
 	if (oLowVersion.sources)
 		document.getElementById('yoursubs').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.default ? oLowVersion.default : oHighYour.default);
-	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.default);
-	if (oLowVersion.default)
-		document.getElementById('yourdefault').style.color = 'red';
+	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults);
+	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.defaults);
+	if (oLowVersion.defaults)
+		document.getElementById('yourdefaults').style.color = 'red';
 
 	// Custom theme in use?
 	if (document.getElementById('Templates'))
@@ -422,6 +422,7 @@ function updateInputBoxes()
 	document.getElementById("can_search_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
 	document.getElementById("regex_div").style.display = curType === "text" && document.getElementById("mask").value === "regex" ? "" : "none";
 	document.getElementById("display").disabled = false;
+
 	// Cannot show this on the topic
 	if (curType === "textarea" || privStatus >= 2)
 	{
