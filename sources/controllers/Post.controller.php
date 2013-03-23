@@ -58,6 +58,7 @@ function action_post()
 		fatal_lang_error('no_board', false);
 
 	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(SUBSDIR . '/Messages.subs.php');
 
 	if (isset($_REQUEST['xml']))
 	{
@@ -71,18 +72,9 @@ function action_post()
 	// No message is complete without a topic.
 	if (empty($topic) && !empty($_REQUEST['msg']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_topic
-			FROM {db_prefix}messages
-			WHERE id_msg = {int:msg}',
-			array(
-				'msg' => (int) $_REQUEST['msg'],
-		));
-		if ($smcFunc['db_num_rows']($request) != 1)
+		$topic = associatedTopic((int) $_REQUEST['msg']);
+		if (empty($topic))
 			unset($_REQUEST['msg'], $_POST['msg'], $_GET['msg']);
-		else
-			list ($topic) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Check if it's locked. It isn't locked if no topic is specified.
