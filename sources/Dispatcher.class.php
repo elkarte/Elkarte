@@ -28,13 +28,24 @@ if (!defined('ELKARTE'))
  */
 class Site_Dispatcher
 {
-	// file name to load
+	/**
+	 * file name to load
+	 */
 	private $_file_name;
-	// function or method to call
+
+	/**
+	 * function or method to call
+	 */
 	private $_function_name;
-	// class name, for object oriented controllers
+
+	/**
+	 * class name, for object oriented controllers
+	 */
 	private $_controller_name;
-	// name of pre_dispatch function, for procedural controllers
+
+	/**
+	 * name of pre_dispatch function, for procedural controllers
+	 */
 	private $_pre_dispatch_func;
 
 	/**
