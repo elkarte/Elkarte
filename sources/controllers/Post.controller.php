@@ -1060,7 +1060,7 @@ function action_post2()
 	if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		 processAttachments();
+		processAttachments();
 	}
 
 	// If this isn't a new topic load the topic info that we need.
@@ -2296,7 +2296,7 @@ function action_jsmodify()
  * It is accessed via ?action=spellcheck.
  */
 function action_spellcheck()
-			{
+{
 	global $txt, $context, $smcFunc;
 
 	// A list of "words" we know about but pspell doesn't.
@@ -2362,10 +2362,10 @@ function action_spellcheck()
 
 			if (!empty($suggestions))
 				$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
-			}
+		}
 
 		$context['spell_js'] .= ']),';
-		}
+	}
 
 	// If words were found, take off the last comma.
 	if ($found_words)
