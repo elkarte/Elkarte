@@ -596,3 +596,28 @@ function removeMessage($message, $decreasePostCount = true)
 
 	return false;
 }
+
+/**
+ * Retrieve the topic associated with a message.
+ *
+ * @return mixed, int topic ID if any, or false
+ */
+function associatedTopic($msg_id)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_topic
+		FROM {db_prefix}messages
+		WHERE id_msg = {int:msg}',
+		array(
+			'msg' => $msg_id,
+	));
+	if ($smcFunc['db_num_rows']($request) != 1)
+		$topic = false;
+	else
+		list ($topic) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $topic;
+}
