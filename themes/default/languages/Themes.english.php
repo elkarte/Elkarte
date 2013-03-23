@@ -26,7 +26,7 @@ $txt['theme_installed'] = 'Installed Successfully';
 $txt['theme_installed_message'] = 'was installed successfully.';
 
 $txt['theme_latest'] = 'Latest and Greatest Themes';
-$txt['theme_latest_fetch'] = 'Fetching latest themes from www.simplemachines.org...';
+$txt['theme_latest_fetch'] = 'Fetching latest themes from www.elkarte.net...';
 
 $txt['theme_pick'] = 'Choose a theme...';
 $txt['theme_preview'] = 'Preview theme';
