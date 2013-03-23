@@ -215,7 +215,7 @@ function action_mergeExecute($topics = array())
 
 	// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
 	if ($modSettings['postmod_active'])
-		$can_approve_boards = boardsAllowedTo('approve_posts');
+		$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 	// Get info about the topics and polls that will be merged.
 	$request = $smcFunc['db_query']('', '
