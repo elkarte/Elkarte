@@ -56,6 +56,10 @@ class Browser_Detector
 	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *  - determines the user agent (browser) as best it can.
+	 * The method fills the instance variables _is_mobile and _is_tablet,
+	 * and the _browsers array. When it returns, the Browser_Detector can
+	 * be queried for information on client browser.
+	 * It also attempts to detect if the client is a robot.
 	 */
 	function detectBrowser()
 	{
@@ -111,6 +115,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is Opera or not
+	*
 	* @return boolean true if the browser is Opera otherwise false
 	*/
 	function isOpera()
@@ -122,6 +127,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is IE or not
+	*
 	* @return boolean true if the browser is IE otherwise false
 	*/
 	function isIe()
@@ -134,6 +140,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is a Webkit based one or not
+	*
 	* @return boolean true if the browser is Webkit based otherwise false
 	*/
 	function isWebkit()
@@ -145,6 +152,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is Firefox or one of its variants
+	*
 	* @return boolean true if the browser is Firefox otherwise false
 	*/
 	function isFirefox()
@@ -156,6 +164,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is WebTv or not
+	*
 	* @return boolean true if the browser is WebTv otherwise false
 	*/
 	function isWebTv()
@@ -167,6 +176,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is konqueror or not
+	*
 	* @return boolean true if the browser is konqueror otherwise false
 	*/
 	function isKonqueror()
@@ -178,6 +188,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is Gecko or not
+	*
 	* @return boolean true if the browser is Gecko otherwise false
 	*/
 	function isGecko()
@@ -189,6 +200,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is OperaMini or not
+	*
 	* @return boolean true if the browser is OperaMini otherwise false
 	*/
 	function isOperaMini()
@@ -202,6 +214,7 @@ class Browser_Detector
 
 	/**
 	* Determine if the browser is OperaMobi or not
+	*
 	* @return boolean true if the browser is OperaMobi otherwise false
 	*/
 	function isOperaMobi()

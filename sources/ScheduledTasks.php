@@ -21,7 +21,10 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * This function works out what to do!
+ * This function works out what to run:
+ *  - it checks if it's time for the next tasks
+ *  - run them
+ *  - update the database for the next round
  */
 function AutoTask()
 {
@@ -144,7 +147,8 @@ function AutoTask()
 }
 
 /**
- * Function to sending out approval notices to moderators etc.
+ * Function to sending out approval notices to moderators.
+ * It checks who needs to receive approvals notifications and sends emails.
  */
 function scheduled_approval_notification()
 {
@@ -361,7 +365,12 @@ function scheduled_approval_notification()
 }
 
 /**
- * Do some daily cleaning up.
+ * This function does daily cleaning up:
+ *  - decrements warning levels if it's enabled
+ *  - consolidate spider statistics
+ *  - fix MySQL version
+ *  - regenerate Diffie-Hellman keys for OpenID
+ *  - remove obsolete login history logs
  */
 function scheduled_daily_maintenance()
 {
@@ -479,7 +488,7 @@ function scheduled_daily_maintenance()
 }
 
 /**
- * Auto optimize the database?
+ * Auto optimize the database.
  */
 function scheduled_auto_optimize()
 {
@@ -529,7 +538,9 @@ function scheduled_auto_optimize()
 }
 
 /**
- * Send out a daily email of all subscribed topics.
+ * Send out a daily email of all subscribed topics, to members.
+ * It sends notifications about replies or new topics,
+ * and moderation actions.
  */
 function scheduled_daily_digest()
 {
@@ -836,7 +847,10 @@ function scheduled_daily_digest()
 }
 
 /**
+ * Sends out email notifications for new/updated topics.
  * Like the daily stuff - just seven times less regular ;)
+ *
+ * This function forwards to scheduled_daily_digest()
  */
 function scheduled_weekly_digest()
 {
@@ -850,9 +864,9 @@ function scheduled_weekly_digest()
 /**
  * Send a group of emails from the mail queue.
  *
- * @param type $number the number to send each loop through
- * @param type $override_limit bypassing our limit flaf
- * @param type $force_send
+ * @param mixed $number = false the number to send each loop through
+ * @param boolean $override_limit = false bypassing our limit flaf
+ * @param boolean $force_send = false
  * @return boolean
  */
 function ReduceMailQueue($number = false, $override_limit = false, $force_send = false)
@@ -1056,8 +1070,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 /**
  * Calculate the next time the passed tasks should be triggered.
  *
- * @param type $tasks
- * @param type $forceUpdate
+ * @param array $tasks = array() the tasks
+ * @param boolean $forceUpdate
  */
 function CalculateNextTrigger($tasks = array(), $forceUpdate = false)
 {
@@ -1342,7 +1356,11 @@ function scheduled_birthdayemails()
 }
 
 /**
- * Weekly maintenance
+ * Weekly maintenance:
+ *  - remove empty or temporary settings
+ *  - prune logs
+ *  - obsolete paid subscriptions
+ *  - clear sessions table
  */
 function scheduled_weekly_maintenance()
 {
@@ -1542,7 +1560,9 @@ function scheduled_weekly_maintenance()
 }
 
 /**
- * Perform the standard checks on expiring/near expiring subscriptions.
+ * Perform the standard checks on expiring/near expiring subscriptions:
+ *  - remove expired subscriptions
+ *  - notify of subscriptions about to expire
  */
 function scheduled_paid_subscriptions()
 {
@@ -1657,7 +1677,8 @@ function scheduled_remove_temp_attachments()
 }
 
 /**
- * Check for move topic notices that have past their best by date
+ * Check for move topic notices that have past their best by date:
+ *  - remove them if the time has expired.
  */
 function scheduled_remove_topic_redirect()
 {
@@ -1684,7 +1705,7 @@ function scheduled_remove_topic_redirect()
 		$topics[] = $row[0];
 	$smcFunc['db_free_result']($request);
 
-	// Zap, your gone
+	// Zap, you're gone
 	if (count($topics) > 0)
 	{
 		require_once(SUBSDIR . '/Topic.subs.php');
