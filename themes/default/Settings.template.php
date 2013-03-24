@@ -16,7 +16,7 @@
 
 function template_options()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	$context['theme_options'] = array(
 		array(
@@ -37,6 +37,11 @@ function template_options()
 		array(
 			'id' => 'show_no_avatars',
 			'label' => $txt['show_no_avatars'],
+			'default' => true,
+		),
+		array(
+			'id' => 'hide_poster_area',
+			'label' => $txt['hide_poster_area'],
 			'default' => true,
 		),
 		array(

@@ -622,7 +622,7 @@ function template_editIgnoreList()
 	if ($context['can_send_email'])
 		echo '
 				<th class="centercol" scope="col">', $txt['email'], '</th>';
-	
+
 	echo '
 				<th class="centercol last_th" scope="col"></th>
 			</tr>';
@@ -642,11 +642,11 @@ function template_editIgnoreList()
 			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
 				<td>', $member['link'], '</td>
 				<td class="centertext"><a href="', $member['online']['href'], '"><img src="', $member['online']['image_href'], '" alt="', $member['online']['text'], '" title="', $member['online']['text'], '" /></a></td>';
-		
+
 		if ($context['can_send_email'])
 			echo '
 				<td class="centertext">', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
-		
+
 		echo '
 				<td class="centertext"><a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['ignore_remove'], '" title="', $txt['ignore_remove'], '" /></a></td>
 			</tr>';
@@ -1541,6 +1541,13 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[show_no_avatars]" value="0" />
 								<input type="checkbox" name="default_options[show_no_avatars]" id="show_no_avatars" value="1"', !empty($context['member']['options']['show_no_avatars']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="hide_poster_area">', $txt['hide_poster_area'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[hide_poster_area]" value="0" />
+								<input type="checkbox" name="default_options[hide_poster_area]" id="hide_poster_area" value="1"', !empty($context['member']['options']['hide_poster_area']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
 								<label for="show_no_signatures">', $txt['show_no_signatures'], '</label>
