@@ -292,6 +292,7 @@ $txt['show_no_signatures'] = 'Don\'t show users\' signatures.';
 $txt['show_no_censored'] = 'Leave words uncensored.';
 $txt['topics_per_page'] = 'Topics to display per page:';
 $txt['messages_per_page'] = 'Messages to display per page:';
+$txt['hide_poster_area'] = 'Hide the poster information area.';
 $txt['per_page_default'] = 'forum default';
 $txt['calendar_start_day'] = 'First day of the week on the calendar';
 $txt['display_quick_reply'] = 'Use quick reply on topic display: ';
