@@ -17,7 +17,7 @@
 // This is the main sidebar for the personal messages section.
 function template_pm_above()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	echo '
 					<div id="personal_messages">';
@@ -563,7 +563,7 @@ function template_build_pmposter_div($message)
 // Just list all the personal message subjects - to make templates easier.
 function template_subject_list()
 {
-	global $context, $settings, $modSettings, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	echo '
 						<table class="table_grid">
@@ -681,7 +681,7 @@ function template_subject_list()
 
 function template_search()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
@@ -755,6 +755,9 @@ function template_search()
 						</label><br />
 						<label for="subject_only">
 							<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '
+						</label><br />
+						<label for="sent_only">
+							<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_sent_only'], '
 						</label>
 					</dd>
 					<dt class="between">',
@@ -857,7 +860,7 @@ function template_search()
 
 function template_search_results()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 		<div class="cat_bar">
@@ -1263,7 +1266,7 @@ function template_send()
 // This template asks the user whether they wish to empty out their folder/messages.
 function template_ask_delete()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 		<div class="cat_bar">
@@ -1280,7 +1283,7 @@ function template_ask_delete()
 // This template asks the user what messages they want to prune.
 function template_prune()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
@@ -1300,7 +1303,7 @@ function template_prune()
 // Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
 function template_labels()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8">
@@ -1396,7 +1399,7 @@ function template_labels()
 // Template for reporting a personal message.
 function template_report_message()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], '" method="post" accept-charset="UTF-8">
@@ -1450,7 +1453,7 @@ function template_report_message()
 // Little template just to say "Yep, it's been submitted"
 function template_report_message_complete()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div class="cat_bar">
@@ -1467,7 +1470,7 @@ function template_report_message_complete()
 // Manage rules.
 function template_rules()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=manrules" method="post" accept-charset="UTF-8" name="manRules" id="manrules">
@@ -1542,7 +1545,7 @@ function template_rules()
 // Template for adding/editing a rule.
 function template_add_rule()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
@@ -1755,7 +1758,7 @@ function template_add_rule()
 // Template for showing all the PM drafts of the user.
 function template_showPMDrafts()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 		<div class="cat_bar">
