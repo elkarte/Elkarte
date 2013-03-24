@@ -70,7 +70,7 @@ function template_merge()
 							<strong>', $txt['target_board'], ':</strong>
 						</dt>
 						<dd>
-							<form action="' . $scripturl . '?action=mergetopics;from=' . $context['origin_topic'] . ';targetboard=' . $context['target_board'] . ';board=' . $context['current_board'] . '.0" method="post" accept-charset="UTF-8">
+							<form action="' . $scripturl . '?action=mergetopics;from=', $context['origin_topic'] . ';targetboard=' . $context['target_board'], ';board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 								<input type="hidden" name="from" value="' . $context['origin_topic'] . '" />
 								<select name="targetboard" onchange="this.form.submit();">';
 			foreach ($context['boards'] as $board)
@@ -153,14 +153,15 @@ function template_merge_extra_options()
 					</tr>
 				</thead>
 				<tbody>';
+
 		foreach ($context['topics'] as $topic)
 			echo '
 					<tr class="windowbg2">
 						<td class="centertext">
-							<input type="checkbox" class="input_check" name="topics[]" value="' . $topic['id'] . '" checked="checked" />
+							<input type="checkbox" class="input_check" name="topics[]" value="', $topic['id'], '" checked="checked" />
 						</td>
 						<td>
-							<a href="' . $scripturl . '?topic=' . $topic['id'] . '.0" target="_blank" class="new_win">' . $topic['subject'] . '</a>
+							<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'] . '</a>
 						</td>
 						<td>
 							', $topic['started']['link'], '<br />
@@ -174,6 +175,7 @@ function template_merge_extra_options()
 							<input type="checkbox" class="input_check" name="notifications[]" value="' . $topic['id'] . '" checked="checked" />
 						</td>
 					</tr>';
+
 		echo '
 				</tbody>
 			</table>
@@ -220,11 +222,11 @@ function template_merge_extra_options()
 		foreach ($context['polls'] as $poll)
 			echo '
 							<li>
-								<input type="radio" name="poll" value="' . $poll['id'] . '"' . ($poll['selected'] ? ' checked="checked"' : '') . ' class="input_radio" /> ' . $poll['question'] . ' (' . $txt['topic'] . ': <a href="' . $scripturl . '?topic=' . $poll['topic']['id'] . '.0" target="_blank" class="new_win">' . $poll['topic']['subject'] . '</a>)
+								<input type="radio" name="poll" value="' . $poll['id'] . '"' . ($poll['selected'] ? ' checked="checked"' : '') . ' class="input_radio" /> ', $poll['question'], ' (', $txt['topic'], ': <a href="', $scripturl, '?topic=', $poll['topic']['id'], '.0" target="_blank" class="new_win">', $poll['topic']['subject'], '</a>)
 							</li>';
 		echo '
 							<li>
-								<input type="radio" name="poll" value="-1" class="input_radio" /> (' . $txt['merge_no_poll'] . ')
+								<input type="radio" name="poll" value="-1" class="input_radio" /> (', $txt['merge_no_poll'], ')
 							</li>
 						</ul>
 					</fieldset>';

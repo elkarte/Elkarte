@@ -43,6 +43,7 @@ function template_new_group()
 						<dd>
 							<input type="text" name="group_name" id="group_name_input" size="30" class="input_text" />
 						</dd>';
+
 	if ($context['undefined_group'])
 	{
 		echo '
@@ -74,6 +75,7 @@ function template_new_group()
 						<dd>
 							<input type="text" name="min_posts" id="min_posts_input" size="5" class="input_text" />
 						</dd>';
+
 	if (!$context['post_group'] || !empty($modSettings['permission_enable_postgroups']))
 	{
 		echo '
@@ -89,9 +91,11 @@ function template_new_group()
 								<select name="inheritperm" id="inheritperm_select" onclick="document.getElementById(\'perm_type_inherit\').checked = true;">
 									<option value="-1">', $txt['membergroups_guests'], '</option>
 									<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
+
 		foreach ($context['groups'] as $group)
 			echo '
 									<option value="', $group['id'], '">', $group['name'], '</option>';
+
 		echo '
 								</select>
 								<br />
@@ -100,9 +104,11 @@ function template_new_group()
 								<select name="copyperm" id="copyperm_select" onclick="document.getElementById(\'perm_type_copy\').checked = true;">
 									<option value="-1">', $txt['membergroups_guests'], '</option>
 									<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
+
 		foreach ($context['groups'] as $group)
 			echo '
 									<option value="', $group['id'], '">', $group['name'], '</option>';
+
 		echo '
 								</select>
 								<br />
@@ -133,6 +139,7 @@ function template_new_group()
 					<input type="submit" value="', $txt['membergroups_add_group'], '" class="button_submit" />
 				</div>
 			</div>';
+
 	if ($context['undefined_group'])
 	{
 		echo '
@@ -146,6 +153,7 @@ function template_new_group()
 				swapPostGroup(', $context['post_group'] ? 'true' : 'false', ');
 			// ]]></script>';
 	}
+	
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />

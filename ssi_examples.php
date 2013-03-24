@@ -403,7 +403,7 @@ template_ssi_above();
 				<h3>Code</h3>
 				<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code"><?php echo htmlspecialchars(template_homepage_sample1('source')); ?></code>
 				<h3>Result</h3>
-				<iframe src="?view=home1" width="99%" height="300"></iframe>
+				<iframe src="?view=home1" style="width: 99%; height: 300px;"></iframe>
 			</div>
 		</div>
 		<span class="botslice"><span></span></span>
@@ -424,71 +424,58 @@ function template_ssi_above()
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style type="text/css">
-			#wrapper
-			{
-				width: 90%;
+			#wrapper {
+				padding: 2px 2px 12px;
 			}
-			#upper_section .user
-			{
+			#upper_section .user {
 				height: 4em;
 			}
-			#upper_section .news
-			{
+			#upper_section .news {
 				height: 80px;
 			}
-			#content_section
-			{
+			#content_section {
 				position: relative;
 				top: -20px;
 			}
-			#main_content_section h2
-			{
+			#main_content_section h2 {
 				font-size: 1.5em;
 				border-bottom: solid 1px #d05800;
 				line-height: 1.5em;
 				margin: 0.5em 0;
 				color: #d05800;
 			}
-			#liftup
-			{
+			#liftup {
 				position: relative;
 				top: -70px;
 				padding: 1em 2em 1em 1em;
 				line-height: 1.6em;
 			}
-			#footer_section
-			{
+			#footer_section {
 				position: relative;
 				top: -20px;
 			}
-			#sidenav
-			{
+			#sidenav {
 				width: 210px;
 				float: left;
 				margin-right: 20px;
 			}
-			#sidenav ul
-			{
+			#sidenav ul {
 				margin: 0 0 0 15px;
 				padding: 0;
 				list-style: none;
 				font-size: 90%;
 			}
-			#preview
-			{
+			#preview {
 				margin-left: 230px;
 			}
-			.ssi_preview
-			{
+			.ssi_preview {
 				margin-bottom: 1.5em;
 			}
-			.ssi_preview h3
-			{
+			.ssi_preview h3 {
 				margin: 1em 0 0.5em 0;
 			}
-			.ssi_result
-			{
-				background-color: #fff;
+			.ssi_result {
+				background: #fff;
 				border: 1px solid #99a;
 				padding: 10px;
 				overflow: hidden;
@@ -521,21 +508,21 @@ function template_ssi_above()
 		// ]]></script>
 	</head>
 	<body>
-		<div id="wrapper">
-			<div id="header"><div class="frame">
-				<div id="top_section">
-					<h1 class="forumtitle">SSI.php Examples</h1>
-					<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
-				</div>
-				<div id="upper_section" class="middletext" style="overflow: hidden;">
-					<div class="user"></div>
-					<div class="news normaltext">
-					</div>
-				</div>
-			</div></div>
-			<div id="content_section"><div class="frame">
-				<div id="main_content_section">
-					<div id="liftup" class="flow_auto">';
+	<div id="header">
+		<div class="frame">
+			<h1 class="forumtitle">SSI.php Examples</h1>
+			<img id="logo" src="themes/default/images/logo_elk.png" alt="Elkarte Community" title="Elkarte Community" />
+
+		</div>
+	</div>
+	<div id="wrapper">
+		<div id="upper_section">
+			<div id="inner_section">
+				<div class="user"></div>
+				<div class="news normaltext"></div>
+				<div class="frame">
+					<div id="main_content_section">
+						<div id="liftup" class="flow_auto">';
 }
 
 function template_ssi_below()
@@ -543,16 +530,20 @@ function template_ssi_below()
 	global $time_start;
 
 	echo '
-						<script type="text/javascript"><!-- // --><![CDATA[
-							showSSIBlock("ssi_recentTopics");
-						// ]]></script>
+							<script type="text/javascript"><!-- // --><![CDATA[
+								showSSIBlock("ssi_recentTopics");
+							// ]]></script>
+						</div>
 					</div>
 				</div>
-			</div></div>
-			<div id="footer_section"><div class="frame">
-				<div class="smalltext"><a href="http://www.elkarte.net/">Elkarte Community</a></div>
-			</div></div>
+			</div>
+			<div id="footer_section">
+				<div class="frame">
+					<div class="smalltext"><a href="http://www.elkarte.net/">Elkarte Community</a></div>
+				</div>
+			</div>
 		</div>
+	</div>
 	</body>
 </html>';
 }
@@ -566,21 +557,68 @@ function template_homepage_sample1($method = 'source')
 <head>
 	<title>SSI.php example for home page</title>
 	<style type="text/css">
-		body { font-family: Arial, Tahoma, sans-serif; font-size: 80%; background: #DFDFDF; color: #FFFFFF; margin: 0 }
-		ul,ol { padding-left: 19px; margin: 0; }
-		li { font-size: 11px; }
-		h1,h2,h3 { margin: 0; padding: 0; }
-		h3 { font-size: 15px; }
-		a:link,a:visited { color: #FF9000; text-decoration: none; }
-		a:hover { text-decoration: underline; }
+		body {
+			font-family: Arial, Tahoma, sans-serif; font-size: 80%;
+			background: #DFDFDF;
+			color: #FFFFFF;
+			margin: 0
+		}
+		ul,ol {
+			padding-left: 19px;
+			margin: 0;
+		}
+		li {
+			font-size: 11px;
+		}
+		h1,h2,h3 {
+			margin: 0;
+			padding: 0;
+		}
+		h3 {
+			font-size: 15px;
+		}
+		a:link,a:visited {
+			color: #FF9000;
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
 
-		#container { background: #52514E; width: 100%; border: 1px solid midnightblue; line-height: 150%; margin: 0; }
-		#header,#footer { color: lightgray; background-color: #2A2825; clear: both; padding: .5em; }
-		#leftbar { background: #DF7E00; float: left; width: 160px; margin: 0; padding: 1em; }
-		#leftbar a { color: #000000; text-decoration: underline; }
-		#content { margin-left: 190px; padding: 1em; }
-		#navigation { float: right; }
-		#navigation a:link,#navigation a:visited { color: #FF9000; }
+		#container {
+			background: #52514E;
+			width: 100%;
+			border: 1px solid midnightblue;
+			line-height: 150%;
+			margin: 0;
+		}
+		#header, #footer {
+			color: lightgray;
+			background: #2A2825;
+			clear: both;
+			padding: .5em;
+		}
+		#leftbar {
+			background: #DF7E00;
+			float: left;
+			width: 160px;
+			margin: 0;
+			padding: 1em;
+		}
+		#leftbar a {
+			color: #000;
+			text-decoration: underline;
+		}
+		#content {
+			margin-left: 190px;
+			padding: 1em;
+		}
+		#navigation {
+			float: right;
+		}
+		#navigation a:link,#navigation a:visited {
+			color: #FF9000;
+		}
 	</style>
 </head>
 <body>
@@ -597,7 +635,7 @@ function template_homepage_sample1($method = 'source')
 
 	$footer = '
 	<div id="footer">
-		<a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/publicdomain/88x31.png" /></a>
+		<a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/"><img alt="Creative Commons License" style="border:0" src="http://i.creativecommons.org/l/publicdomain/88x31.png" /></a>
 		This sample website layout is dedicated to the <a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/">Public Domain</a>.
 	</div>
 </div>

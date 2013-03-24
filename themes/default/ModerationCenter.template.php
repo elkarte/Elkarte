@@ -24,6 +24,7 @@ function template_moderation_center()
 						<div id="mod_main_section" >';
 
 	$alternate = true;
+	
 	// Show all the blocks they want to see.
 	foreach ($context['mod_blocks'] as $block)
 	{
