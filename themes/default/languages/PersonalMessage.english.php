@@ -114,6 +114,7 @@ $txt['pm_search_options'] = 'Options';
 $txt['pm_search_post_age'] = 'Message age';
 $txt['pm_search_show_complete'] = 'Show full message in results.';
 $txt['pm_search_subject_only'] = 'Search by subject and author only.';
+$txt['pm_search_sent_only'] = 'Search only in sent items.';
 $txt['pm_search_between'] = 'between';
 $txt['pm_search_between_and'] = 'and';
 $txt['pm_search_between_days'] = 'days';
