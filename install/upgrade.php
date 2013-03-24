@@ -424,7 +424,7 @@ if (!class_exists('Ftp_Connection'))
 			if (!is_resource($this->connection))
 				return false;
 
-			// Passive... non-agressive...
+			// Passive... non-aggressive...
 			if (!$this->passive())
 				return false;
 

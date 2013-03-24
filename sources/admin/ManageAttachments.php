@@ -2263,7 +2263,7 @@ function action_transfer()
 
 	if (empty($results))
 	{
-		// Get the total file count for the progess bar.
+		// Get the total file count for the progress bar.
 		$request = $smcFunc['db_query']('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}attachments

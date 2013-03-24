@@ -2662,7 +2662,7 @@ function pausePackagePermissionsAction()
 	// Never more than 100%!
 	$context['progress_percent'] = min($context['progress_percent'], 100);
 
-	// And how are we progessing with files within a directory
+	// And how are we progressing with files within a directory
 	if ($context['method'] != 'individual' && !empty($context['total_files']))
 	{
 		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
