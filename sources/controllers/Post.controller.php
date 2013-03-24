@@ -750,7 +750,7 @@ function action_post()
 					break;
 				}
 
-				// Show any errors which might of occured.
+				// Show any errors which might have occurred.
 				if (!empty($attachment['errors']))
 				{
 					$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
@@ -1830,7 +1830,7 @@ function action_post2()
 	{
 		loadTemplate('Errors');
 		$context['sub_template'] = 'attachment_errors';
-		$context['page_title'] = $txt['error_occured'];
+		$context['page_title'] = $txt['error_occurred'];
 
 		$errors = $attach_errors->prepareErrors();
 
