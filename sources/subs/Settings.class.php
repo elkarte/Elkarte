@@ -306,6 +306,113 @@ class Settings_Form
 	}
 
 	/**
+	 * Helper function. Saves settings by putting them in Settings.php or saving them in the settings table.
+	 *
+	 * - Saves those settings set from ?action=admin;area=serversettings.
+	 * - Requires the admin_forum permission.
+	 * - Contains arrays of the types of data to save into Settings.php.
+ 	 *
+	 * @param $config_vars
+ 	*/
+	static function saveSettings(&$config_vars)
+	{
+		global $sc, $cookiename, $modSettings, $user_settings;
+		global $context;
+
+		validateToken('admin-ssc');
+
+		// lets be sure we have settings at hand
+		require_once(SUBSDIR . '/Settings_Form.class.php');
+
+		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
+		if (isset($_POST['cookiename']))
+			$_POST['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $_POST['cookiename']);
+
+		// Fix the forum's URL if necessary.
+		if (isset($_POST['boardurl']))
+		{
+			if (substr($_POST['boardurl'], -10) == '/index.php')
+				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
+			elseif (substr($_POST['boardurl'], -1) == '/')
+				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
+				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
+		}
+
+		// Any passwords?
+		$config_passwords = array(
+			'db_passwd',
+			'ssi_db_passwd',
+		);
+
+		// All the strings to write.
+		$config_strs = array(
+			'mtitle', 'mmessage',
+			'language', 'mbname', 'boardurl',
+			'cookiename',
+			'webmaster_email',
+			'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
+			'cache_accelerator', 'cache_memcached',
+		);
+
+		// All the numeric variables.
+		$config_ints = array(
+			'cache_enable',
+		);
+
+		// All the checkboxes.
+		$config_bools = array(
+			'db_persist', 'db_error_send',
+			'maintenance',
+		);
+
+		// Now sort everything into a big array, and figure out arrays and etc.
+		$new_settings = array();
+		foreach ($config_passwords as $config_var)
+		{
+			if (isset($_POST[$config_var][1]) && $_POST[$config_var][0] == $_POST[$config_var][1])
+				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var][0], '\'\\') . '\'';
+		}
+		foreach ($config_strs as $config_var)
+		{
+			if (isset($_POST[$config_var]))
+				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+		}
+		foreach ($config_ints as $config_var)
+		{
+			if (isset($_POST[$config_var]))
+				$new_settings[$config_var] = (int) $_POST[$config_var];
+		}
+		foreach ($config_bools as $key)
+		{
+			if (!empty($_POST[$key]))
+				$new_settings[$key] = '1';
+			else
+				$new_settings[$key] = '0';
+		}
+
+		// Save the relevant settings in the Settings.php file.
+		require_once(SUBSDIR . '/Admin.subs.php');
+		updateSettingsFile($new_settings);
+
+		// Now loop through the remaining (database-based) settings.
+		$new_settings = array();
+		foreach ($config_vars as $config_var)
+		{
+			// We just saved the file-based settings, so skip their definitions.
+			if (!is_array($config_var) || $config_var[2] == 'file')
+				continue;
+
+			// Rewrite the definition a bit.
+			$new_settings[] = array($config_var[3], $config_var[0]);
+		}
+
+		// Save the new database-based settings, if any.
+		if (!empty($new_settings))
+			Settings_Form::saveDBSettings($new_settings);
+	}
+
+	/**
  	* Helper function for saving database settings.
  	*
  	* @param array $config_vars

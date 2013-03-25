@@ -1037,7 +1037,7 @@ class ManageLanguages_Controller
 		global $scripturl, $context, $txt, $settings, $smcFunc;
 
 		// We'll want to save them someday.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -1182,7 +1182,6 @@ function list_getLanguages()
 	// Return how many we have.
 	return $languages;
 }
-
 
 /**
  * This function cleans language entries to/from display.
