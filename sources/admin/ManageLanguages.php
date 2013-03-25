@@ -1059,7 +1059,7 @@ class ManageLanguages_Controller
 
 			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
 
-			saveSettings($config_vars);
+			Settings_Form::save($config_vars);
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
 
@@ -1074,7 +1074,7 @@ class ManageLanguages_Controller
 			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
 
 		// Fill the config array.
-		prepareServerSettingsContext($config_vars);
+		Settings_Form::prepareServerSettingsContext($config_vars);
 	}
 
 	/**

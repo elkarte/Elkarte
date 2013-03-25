@@ -181,7 +181,7 @@ function ModifyGeneralSettings($return_config = false)
 	{
 		call_integration_hook('integrate_save_general_settings');
 
-		Settings_Form::saveSettings($config_vars);
+		Settings_Form::save($config_vars);
 		redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 	}
 
@@ -247,7 +247,7 @@ function ModifyDatabaseSettings($return_config = false)
 	{
 		call_integration_hook('integrate_save_database_settings');
 
-		Settings_Form::saveSettings($config_vars);
+		Settings_Form::save($config_vars);
 		redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 	}
 
@@ -299,7 +299,7 @@ function ModifyCookieSettings($return_config = false)
 		if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
 			fatal_lang_error('invalid_cookie_domain', false);
 
-		Settings_Form::saveSettings($config_vars);
+		Settings_Form::save($config_vars);
 
 		// If the cookie name was changed, reset the cookie.
 		if ($cookiename != $_POST['cookiename'])
@@ -392,7 +392,7 @@ function ModifyCacheSettings($return_config = false)
 	{
 		call_integration_hook('integrate_save_cache_settings');
 
-		Settings_Form::saveSettings($config_vars);
+		Settings_Form::save($config_vars);
 
 		// we need to save the $cache_enable to $modSettings as well
 		updatesettings(array('cache_enable' => (int) $_POST['cache_enable']));

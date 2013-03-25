@@ -65,7 +65,7 @@ class Settings_Form
 {
 
 	/**
-	 * Helper function, it sets up the context for the settings.
+	 * Helper method, it sets up the context for the settings.
 	 * - The basic usage of the six numbered key fields are
 	 * - array (0 ,1, 2, 3, 4, 5
 	 *		0 variable name - the name of the saved variable
@@ -142,13 +142,13 @@ class Settings_Form
 			}
 		}
 
-		// Two tokens because saving these settings requires both saveSettings and saveDBSettings
+		// Two tokens because saving these settings requires both save and saveDBSettings
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
 	}
 
 	/**
- 	* Helper function, it sets up the context for database settings.
+ 	* Helper method, it sets up the context for database settings.
  	*
  	* @param array $config_vars
  	*/
@@ -306,7 +306,8 @@ class Settings_Form
 	}
 
 	/**
-	 * Helper function. Saves settings by putting them in Settings.php or saving them in the settings table.
+	 * This method saves the settings.
+	 * It will put them in Settings.php or in the settings table.
 	 *
 	 * - Saves those settings set from ?action=admin;area=serversettings.
 	 * - Requires the admin_forum permission.
@@ -314,7 +315,7 @@ class Settings_Form
  	 *
 	 * @param $config_vars
  	*/
-	static function saveSettings(&$config_vars)
+	static function save(&$config_vars)
 	{
 		global $sc, $cookiename, $modSettings, $user_settings;
 		global $context;
@@ -413,7 +414,7 @@ class Settings_Form
 	}
 
 	/**
- 	* Helper function for saving database settings.
+ 	* Helper method for saving database settings.
  	*
  	* @param array $config_vars
  	*/
