@@ -1890,6 +1890,7 @@ function action_edit_submit()
 		fatal_lang_error('theme_edit_missing');
 	}
 
+	$theme_dir = themeDirectory($context['theme_id']);
 	$file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
 
 	// check you up
