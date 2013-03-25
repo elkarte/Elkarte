@@ -51,6 +51,7 @@ function template_main()
 							</dt>
 							<dd>
 								<div id="known_themes_list">';
+
 	foreach ($context['themes'] as $theme)
 		echo '
 									<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label><br />';
@@ -126,7 +127,7 @@ function template_main()
 		echo '
 			<div class="errorbox">', $txt['theme_install_writable'], '</div>';
 
-		echo '
+	echo '
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
@@ -275,7 +276,7 @@ function template_list_themes()
 
 function template_reset_list()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -322,7 +323,7 @@ function template_reset_list()
 
 function template_set_options()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -336,6 +337,7 @@ function template_set_options()
 			</div>
 			<div class="windowbg2">
 				<div class="content">';
+
 	echo '
 					<dl class="settings">';
 
@@ -361,7 +363,8 @@ function template_set_options()
 			if (isset($setting['description']))
 				echo '
 							<br /><span class="smalltext">', $setting['description'], '</span>';
-		echo '
+
+			echo '
 						</dt>
 						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
 							<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
@@ -372,19 +375,19 @@ function template_set_options()
 		{
 			echo '
 							<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
+
 			if (isset($setting['description']))
 				echo '
 							<br /><span class="smalltext">', $setting['description'], '</span>';
-		echo '
+
+			echo '
 						</dt>
 						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
 							&nbsp;<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
 
 			foreach ($setting['options'] as $value => $label)
-			{
 				echo '
 								<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
-			}
 
 			echo '
 							</select>';
@@ -394,10 +397,12 @@ function template_set_options()
 		{
 			echo '
 							<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
+
 			if (isset($setting['description']))
 				echo '
 							<br /><span class="smalltext">', $setting['description'], '</span>';
-		echo '
+
+			echo '
 						</dt>
 						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
 							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
@@ -645,7 +650,7 @@ function template_set_settings()
 // This template allows for the selection of different themes ;).
 function template_pick()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="pick_theme">
@@ -676,6 +681,7 @@ function template_pick()
 				echo '
 						<option value="', $key, '" ', $theme['selected_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
 			}
+
 			echo '
 					</select>
 					<noscript>
@@ -739,7 +745,7 @@ function template_pick()
 // Okay, that theme was installed successfully!
 function template_installed()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// Not much to show except a link back...
 	echo '
@@ -762,7 +768,7 @@ function template_installed()
 
 function template_edit_list()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admin_form_wrapper">
@@ -801,7 +807,7 @@ function template_edit_list()
 
 function template_copy_template()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -844,7 +850,7 @@ function template_copy_template()
 
 function template_edit_browse()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -870,10 +876,8 @@ function template_edit_browse()
 
 		if ($file['is_editable'])
 			echo '<a href="', $file['href'], '"', $file['is_template'] ? ' style="font-weight: bold;"' : '', '>', $file['filename'], '</a>';
-
 		elseif ($file['is_directory'])
 			echo '<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>';
-
 		else
 			echo $file['filename'];
 
@@ -1051,7 +1055,7 @@ function template_edit_style()
 // This edits the template...
 function template_edit_template()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	if ($context['session_error'])
 		echo '
@@ -1106,7 +1110,7 @@ function template_edit_template()
 
 function template_edit_file()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	if ($context['session_error'])
 		echo '
@@ -1114,7 +1118,7 @@ function template_edit_file()
 		', $txt['error_session_timeout'], '
 	</div>';
 
-	//Is this file writeable?
+	// Is this file writeable?
 	if (!$context['allow_save'])
 		echo '
 	<div class="errorbox">

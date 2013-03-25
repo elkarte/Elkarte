@@ -247,7 +247,7 @@ function template_admin_login()
 // Activate your account manually?
 function template_retry_activate()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// Just ask them for their code so they can try it again...
 	echo '
@@ -276,7 +276,7 @@ function template_retry_activate()
 // Activate your account manually?
 function template_resend()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// Just ask them for their code so they can try it again...
 	echo '

@@ -16,7 +16,7 @@
 
 function template_poll_edit()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt;
 
 	// Some javascript for adding more options.
 	if (!empty($context['form_url']))

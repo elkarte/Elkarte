@@ -17,7 +17,7 @@
 // Template for the database maintenance tasks.
 function template_maintain_database()
 {
-	global $context, $settings, $txt, $scripturl, $db_type, $modSettings;
+	global $context, $settings, $txt, $scripturl, $db_type;
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
@@ -74,7 +74,7 @@ function template_maintain_database()
 						<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
 						<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
 					</p>
-					
+
 					<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />';
 	}
 
@@ -112,7 +112,7 @@ function template_maintain_database()
 // Template for the routine maintenance tasks.
 function template_maintain_routine()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl;
 
 	// Starts off with general maintenance procedures.
 	echo '
@@ -511,7 +511,7 @@ function template_maintain_topics()
 // Simple template for showing results of our optimization...
 function template_optimize()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="manage_maintenance">
@@ -543,7 +543,7 @@ function template_optimize()
 
 function template_convert_msgbody()
 {
-	global $context, $txt, $settings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="manage_maintenance">

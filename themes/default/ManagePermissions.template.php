@@ -271,7 +271,7 @@ function template_permission_index()
 
 function template_by_board()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -374,7 +374,7 @@ function template_by_board()
 // Edit permission profiles (predefined).
 function template_edit_profiles()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admin_form_wrapper">
@@ -1049,7 +1049,7 @@ function template_modify_group_classic($type)
 
 function template_inline_permissions()
 {
-	global $context, $settings, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	echo '
 		<fieldset id="', $context['current_permission'], '">
