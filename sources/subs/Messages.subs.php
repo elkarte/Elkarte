@@ -576,6 +576,21 @@ function removeMessage($message, $decreasePostCount = true)
 		);
 		removeAttachments($attachmentQuery);
 
+		// Delete follow-ups too
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		// If it is an entire topic
+		if ($row['id_first_msg'] == $message)
+		{
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}follow_ups
+				WHERE follow_ups IN ({array_int:topics})',
+				array(
+					'topics' => $row['id_topic'],
+				)
+			);
+		}
+		
+
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
 	}

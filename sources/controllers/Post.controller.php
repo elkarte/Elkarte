@@ -1679,9 +1679,9 @@ function action_post2()
 		if (isset($topicOptions['id']))
 			$topic = $topicOptions['id'];
 
-		require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/FollowUps.subs.php');
 		// Time to update the original message with a pointer to the new one
-		if (!empty($original_post) && $topicOptions['is_approved'] && canAccessMessage($original_post))
+		if (!empty($original_post) && canAccessMessage($original_post))
 			linkMessages($original_post, $topic);
 	}
 

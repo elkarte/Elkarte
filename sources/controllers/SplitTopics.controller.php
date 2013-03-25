@@ -187,9 +187,16 @@ function action_splitExecute()
 	splitAttemptMove($boards, $context['new_topic']);
 }
 
+/**
+ * If we are also moving the topic somewhere else, let's try do to it
+ * Includes checks for permissions move_own/any, etc.
+ *
+ * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
+ * @param int $totopic id of the destination topic
+ */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info;
+	global $board, $user_info, $context;
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)
@@ -254,6 +261,11 @@ function splitAttemptMove($boards, $totopic)
 		postSplitRedirect($context['reason'], $_POST['subname'], $boards['destination'], $context['new_topic']);
 }
 
+/**
+ * Retrives informations of the current and destination board of a split topic
+ *
+ * @return array
+ */
 function splitDestinationBoard()
 {
 	global $board, $topic;
@@ -281,9 +293,16 @@ function splitDestinationBoard()
 	return array('current' => $current_board, 'destination' => $destination_board);
 }
 
+/**
+ * Post a message at the end of the original topic
+ *
+ * @param string $reason, the text that will become the message body
+ * @param string $subject, the text that will become the message subject
+ * @param string $board_info, some board informations (at least id, name, if posts are counted)
+ */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $smcFunc, $user_info;
+	global $scripturl, $user_info, $language, $txt, $smcFunc, $user_info, $topic, $board;
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
@@ -712,24 +731,24 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
 	$smcFunc['db_insert']('',
-			'{db_prefix}topics',
-			array(
-				'id_board' => 'int',
-				'id_member_started' => 'int',
-				'id_member_updated' => 'int',
-				'id_first_msg' => 'int',
-				'id_last_msg' => 'int',
-				'num_replies' => 'int',
-				'unapproved_posts' => 'int',
-				'approved' => 'int',
-				'is_sticky' => 'int',
-			),
-			array(
-				(int) $id_board, $split2_firstMem, $split2_lastMem, 0,
-				0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0,
-			),
-			array('id_topic')
-		);
+		'{db_prefix}topics',
+		array(
+			'id_board' => 'int',
+			'id_member_started' => 'int',
+			'id_member_updated' => 'int',
+			'id_first_msg' => 'int',
+			'id_last_msg' => 'int',
+			'num_replies' => 'int',
+			'unapproved_posts' => 'int',
+			'approved' => 'int',
+			'is_sticky' => 'int',
+		),
+		array(
+			(int) $id_board, $split2_firstMem, $split2_lastMem, 0,
+			0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0,
+		),
+		array('id_topic')
+	);
 	$split2_ID_TOPIC = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
 		fatal_lang_error('cant_insert_topic');
@@ -833,6 +852,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_board' => $id_board,
 		)
 	);
+
+	require_once(SUBSDIR . '/FollowUps.subs.php');
+	// Let's see if we can create a stronger bridge between the two topics
+	// @todo not sure what message from the oldest topic I should link to the new one, so I'll go with the first
+	linkMessages($split1_first_msg, $split2_ID_TOPIC);
 
 	// Copy log topic entries.
 	// @todo This should really be chunked.

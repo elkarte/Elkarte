@@ -342,6 +342,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+	require_once(SUBSDIR . '/FollowUps.subs.php');
+	removeFollowUpsByTopic($topics);
 
 	// Maybe there's a mod that wants to delete topic related data of its own
  	call_integration_hook('integrate_remove_topics', array($topics));
@@ -1360,54 +1362,4 @@ function unapprovedPosts($id_topic, $id_member)
 	$smcFunc['db_free_result']($request);
 
 	return $myUnapprovedPosts;
-}
-
-function followupTopics($messages, $include_approved = false)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT fu.derived_from, fu.follow_up, m.subject
-		FROM {db_prefix}follow_ups as fu
-			LEFT JOIN {db_prefix}topics as t ON (t.id_topic = fu.follow_up)
-			LEFT JOIN {db_prefix}messages as m ON (t.id_first_msg = m.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE fu.derived_from IN ({array_int:messages})' . ($include_approved ? '' : '
-			AND m.approved = {int:approved}'),
-		array(
-			'messages' => $messages,
-			'approved' => 1,
-		)
-	);
-
-	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$returns[$row['derived_from']][] = $row;
-
-	return $returns;
-}
-
-function topicStartedHere($topic, $include_approved = false)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT fu.derived_from, m.subject
-		FROM {db_prefix}follow_ups as fu
-			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE fu.follow_up = {int:original_topic}' . ($include_approved ? '' : '
-			AND m.approved = {int:approved}') . '
-		LIMIT 1',
-		array(
-			'original_topic' => $topic,
-			'approved' => 1,
-		)
-	);
-
-	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$returns = $row;
-
-	return $returns;
 }

@@ -128,7 +128,10 @@ function Display()
 	// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 	$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 	if (!empty($topicinfo['derived_from']))
+	{
+		require_once(SUBSDIR . '/FollowUps.subs.php');
 		$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
+	}
 
 	if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 	{
@@ -812,6 +815,7 @@ function Display()
 			$msg_parameters
 		);
 
+		require_once(SUBSDIR . '/FollowUps.subs.php');
 		$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
 
 		// Go to the last message if the given time is beyond the time of the last message.

@@ -1485,40 +1485,6 @@ function approveTopics($topics, $approve = true)
 }
 
 /**
- * Special function used to create a "followup" relation between a message and a topic
- */
-function linkMessages($msg, $topic)
-{
-	global $smcFunc;
-
-	$smcFunc['db_insert']('ignore',
-		'{db_prefix}follow_ups',
-		array('follow_up' => 'int', 'derived_from' => 'int'),
-		array($topic, $msg),
-		array('follow_up', 'derived_from')
-	);
-}
-
-/**
- * Special function used to break a "followup" relation between a message and a topic
- */
-function unlinkMessages($msg, $topic)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		DELERE FROM {db_prefix}follow_ups
-		WHERE derived_from = {int:id_msg}
-			AND follow_up = {int:id_topic}
-		LIMIT 1',
-		array(
-			'id_msg' => $msg,
-			'id_topic' => $topic,
-		)
-	);
-}
-
-/**
  * A special function for handling the hell which is sending approval notifications.
  *
  * @param $topicData
