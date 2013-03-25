@@ -951,7 +951,7 @@ function GeneralPermissionSettings($return_config = false)
 	{
 		checkSession('post');
 		call_integration_hook('integrate_save_permission_settings');
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 
 		// Clear all deny permissions...if we want that.
 		if (empty($modSettings['permission_enable_deny']))

@@ -60,7 +60,13 @@
 
 if (!defined('ELKARTE'))
 	die('No access...');
-
+/**
+ * Settings Form class.
+ * This class handles display, edit, save, of forum settings.
+ * It is used by the various admin areas which set their own settings,
+ * and it is available for addons administration screens.
+ *
+ */
 class Settings_Form
 {
 
@@ -142,7 +148,7 @@ class Settings_Form
 			}
 		}
 
-		// Two tokens because saving these settings requires both save and saveDBSettings
+		// Two tokens because saving these settings requires both save and save_db
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
 	}
@@ -410,7 +416,7 @@ class Settings_Form
 
 		// Save the new database-based settings, if any.
 		if (!empty($new_settings))
-			Settings_Form::saveDBSettings($new_settings);
+			Settings_Form::save_db($new_settings);
 	}
 
 	/**
@@ -418,7 +424,7 @@ class Settings_Form
  	*
  	* @param array $config_vars
  	*/
-	static function saveDBSettings(&$config_vars)
+	static function save_db(&$config_vars)
 	{
 		global $context;
 
@@ -490,6 +496,167 @@ class Settings_Form
 			// we'll need to save inline permissions
 			require_once(SUBSDIR . '/Permission.subs.php');
 			InlinePermissions_Form::save_inline_permissions($inlinePermissions);
+		}
+	}
+
+	/**
+	 * Update the Settings.php file.
+	 * Typically this method is used from admin screens, just like this entire class.
+	 * They're also available for addons and integrations.
+	 *
+	 * - updates the Settings.php file with the changes supplied in config_vars.
+	 * - expects config_vars to be an associative array, with the keys as the
+	 *   variable names in Settings.php, and the values the variable values.
+	 * - does not escape or quote values.
+	 * - preserves case, formatting, and additional options in file.
+	 * - writes nothing if the resulting file would be less than 10 lines
+	 *   in length (sanity check for read lock.)
+	 * - check for changes to db_last_error and passes those off to a separate handler
+	 * - attempts to create a backup file and will use it should the writing of the
+	 *   new settings file fail
+	 *
+	 * @param array $config_vars
+ 	*/
+	static function updateSettingsFile($config_vars)
+	{
+		global $context;
+
+		// Some older code is trying to updating the db_last_error,
+		// then don't mess around with Settings.php
+		if (count($config_vars) === 1 && isset($config_vars['db_last_error']))
+		{
+			require_once(SUBSDIR . '/Admin.subs.php');
+
+			updateDbLastError($config_vars['db_last_error']);
+			return;
+		}
+
+		// When was Settings.php last changed?
+		$last_settings_change = filemtime(BOARDDIR . '/Settings.php');
+
+		// Load the settings file.
+		$settingsArray = trim(file_get_contents(BOARDDIR . '/Settings.php'));
+
+		// Break it up based on \r or \n, and then clean out extra characters.
+		if (strpos($settingsArray, "\n") !== false)
+			$settingsArray = explode("\n", $settingsArray);
+		elseif (strpos($settingsArray, "\r") !== false)
+			$settingsArray = explode("\r", $settingsArray);
+		else
+			return;
+
+		// Presumably, the file has to have stuff in it for this function to be called :P.
+		if (count($settingsArray) < 10)
+			return;
+
+		// remove any /r's that made there way in here
+		foreach ($settingsArray as $k => $dummy)
+			$settingsArray[$k] = strtr($dummy, array("\r" => '')) . "\n";
+
+		// go line by line and see whats changing
+		for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
+		{
+			// Don't trim or bother with it if it's not a variable.
+			if (substr($settingsArray[$i], 0, 1) != '$')
+				continue;
+
+			$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
+
+			// Look through the variables to set....
+			foreach ($config_vars as $var => $val)
+			{
+				// be sure someone is not updating db_last_error this with a group
+				if ($var === 'db_last_error')
+				{
+					updateDbLastError($val);
+					unset($config_vars[$var]);
+				}
+				elseif (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+				{
+					$comment = strstr(substr($settingsArray[$i], strpos($settingsArray[$i], ';')), '#');
+					$settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
+
+					// This one's been 'used', so to speak.
+					unset($config_vars[$var]);
+				}
+			}
+
+			// End of the file ... maybe
+			if (substr(trim($settingsArray[$i]), 0, 2) == '?' . '>')
+				$end = $i;
+		}
+
+		// This should never happen, but apparently it is happening.
+		if (empty($end) || $end < 10)
+			$end = count($settingsArray) - 1;
+
+		// Still more variables to go?  Then lets add them at the end.
+		if (!empty($config_vars))
+		{
+			if (trim($settingsArray[$end]) == '?' . '>')
+				$settingsArray[$end++] = '';
+			else
+				$end++;
+
+			// Add in any newly defined vars that were passed
+			foreach ($config_vars as $var => $val)
+				$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
+		}
+		else
+			$settingsArray[$end] = trim($settingsArray[$end]);
+
+		// Sanity error checking: the file needs to be at least 12 lines.
+		if (count($settingsArray) < 12)
+			return;
+
+		// Try to avoid a few pitfalls:
+		//  - like a possible race condition,
+		//  - or a failure to write at low diskspace
+		//
+		// Check before you act: if cache is enabled, we can do a simple write test
+		// to validate that we even write things on this filesystem.
+		if ((!defined('CACHEDIR') || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+			$tmp_cache = BOARDDIR . '/cache';
+		else
+			$tmp_cache = CACHEDIR;
+
+		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', "w+");
+		if ($test_fp)
+		{
+			fclose($test_fp);
+			$written_bytes = file_put_contents($tmp_cache . '/settings_update.tmp', 'test', LOCK_EX);
+			@unlink($tmp_cache . '/settings_update.tmp');
+
+			if ($written_bytes !== 4)
+			{
+				// Oops. Low disk space, perhaps. Don't mess with Settings.php then.
+				// No means no. :P
+				return;
+			}
+		}
+
+		// Protect me from what I want! :P
+		clearstatcache();
+		if (filemtime(BOARDDIR . '/Settings.php') === $last_settings_change)
+		{
+			// save the old before we do anything
+			$file = BOARDDIR . '/Settings.php';
+			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+			$settings_backup_fail = !$settings_backup_fail ? (!file_exists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
+
+			// write out the new
+			$write_settings = implode('', $settingsArray);
+			$written_bytes = file_put_contents(BOARDDIR . '/Settings.php', $write_settings, LOCK_EX);
+
+			// survey says ...
+			if ($written_bytes !== strlen($write_settings) && !$settings_backup_fail)
+			{
+				// Well this is not good at all, lets see if we can save this
+				$context['settings_message'] = 'settings_error';
+
+				if (file_exists(BOARDDIR . '/Settings_bak.php'))
+					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
+			}
 		}
 	}
 }

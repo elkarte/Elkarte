@@ -167,8 +167,8 @@ class ManageLanguages_Controller
 
 			if ($_POST['def_language'] != $language && $lang_exists)
 			{
-				require_once(SUBSDIR . '/Admin.subs.php');
-				updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
+				require_once(SUBSDIR . '/Settings_Form.class.php');
+				Settings_Form::updateSettingsFile(array('language' => '\'' . $_POST['def_language'] . '\''));
 				$language = $_POST['def_language'];
 			}
 		}
@@ -789,9 +789,9 @@ class ManageLanguages_Controller
 			// Sixth, if we deleted the default language, set us back to english?
 			if ($context['lang_id'] == $language)
 			{
-				require_once(SUBSDIR . '/Admin.subs.php');
+				require_once(SUBSDIR . '/Settings_Form.class.php');
 				$language = 'english';
-				updateSettingsFile(array('language' => '\'' . $language . '\''));
+				Settings_Form::updateSettingsFile(array('language' => '\'' . $language . '\''));
 			}
 
 			// Seventh, get out of here.

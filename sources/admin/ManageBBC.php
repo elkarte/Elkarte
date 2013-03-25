@@ -38,7 +38,7 @@ class ManageBBC_Controller
 
 		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
-		// We'll need this forprepareDBSettingContext() and saveDBSettings()
+		// We'll need this forprepareDBSettingContext() and save_db()
 		require_once(SUBSDIR . '/Settings.php');
 
 		// Make sure we check the right tags!
@@ -65,7 +65,7 @@ class ManageBBC_Controller
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// save the result
-			Settings_Form::saveDBSettings($config_vars);
+			Settings_Form::save_db($config_vars);
 
 			// and we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');

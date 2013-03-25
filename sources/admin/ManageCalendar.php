@@ -317,7 +317,7 @@ class ManageCalendar_Controller
 		{
 			checkSession();
 			call_integration_hook('integrate_save_calendar_settings');
-			Settings_Form::saveDBSettings($config_vars);
+			Settings_Form::save_db($config_vars);
 
 			// Update the stats in case.
 			updateSettings(array(

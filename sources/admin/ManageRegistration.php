@@ -309,7 +309,7 @@ class ManageRegistration_Controller
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			Settings_Form::saveDBSettings($config_vars);
+			Settings_Form::save_db($config_vars);
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}

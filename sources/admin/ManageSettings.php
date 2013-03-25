@@ -573,7 +573,7 @@ function ModifyBasicSettings($return_config = false)
 
 		call_integration_hook('integrate_save_basic_settings');
 
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 
 		writeLog();
 		redirectexit('action=admin;area=featuresettings;sa=basic');
@@ -632,7 +632,7 @@ function ModifyGeneralSecuritySettings($return_config = false)
 	{
 		checkSession();
 
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 
 		call_integration_hook('integrate_save_general_security_settings');
 
@@ -691,7 +691,7 @@ function ModifyLayoutSettings($return_config = false)
 
 		call_integration_hook('integrate_save_layout_settings');
 
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 		writeLog();
 
 		redirectexit('action=admin;area=featuresettings;sa=layout');
@@ -743,7 +743,7 @@ function ModifyKarmaSettings($return_config = false)
 
 		call_integration_hook('integrate_save_karma_settings');
 
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 		redirectexit('action=admin;area=featuresettings;sa=karma');
 	}
 
@@ -811,7 +811,7 @@ function ModifyModerationSettings($return_config = false)
 
 		call_integration_hook('integrate_save_karma_settings', array(&$save_vars));
 
-		Settings_Form::saveDBSettings($save_vars);
+		Settings_Form::save_db($save_vars);
 		redirectexit('action=admin;area=securitysettings;sa=moderation');
 	}
 
@@ -978,7 +978,7 @@ function ModifySpamSettings($return_config = false)
 		call_integration_hook('integrate_save_spam_settings', array(&$save_vars));
 
 		// Now save.
-		Settings_Form::saveDBSettings($save_vars);
+		Settings_Form::save_db($save_vars);
 		cache_put_data('verificationQuestionIds', null, 300);
 		redirectexit('action=admin;area=securitysettings;sa=spam');
 	}
@@ -1119,7 +1119,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 		}
 
-		Settings_Form::saveDBSettings($config_vars);
+		Settings_Form::save_db($config_vars);
 		redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 	}
 
@@ -1477,7 +1477,7 @@ function ModifySignatureSettings($return_config = false)
 		$save_vars = array();
 		$save_vars[] = array('text', 'signature_settings');
 
-		Settings_Form::saveDBSettings($save_vars);
+		Settings_Form::save_db($save_vars);
 		redirectexit('action=admin;area=featuresettings;sa=sig');
 	}
 
@@ -2293,7 +2293,7 @@ function ModifyPruningSettings($return_config = false)
 		else
 			$_POST['pruningOptions'] = '';
 
-		Settings_Form::saveDBSettings($savevar);
+		Settings_Form::save_db($savevar);
 		redirectexit('action=admin;area=logs;sa=pruning');
 	}
 
@@ -2354,7 +2354,7 @@ function ModifyGeneralModSettings($return_config = false)
 		call_integration_hook('integrate_save_general_mod_settings', array(&$save_vars));
 
 		// This line is to help mod authors do a search/add after if you want to add something here. Keyword: FOOT TAPPING SUCKS!
-		Settings_Form::saveDBSettings($save_vars);
+		Settings_Form::save_db($save_vars);
 
 		// This line is to help mod authors do a search/add after if you want to add something here. Keyword: I LOVE TEA!
 		redirectexit('action=admin;area=modsettings;sa=general');
