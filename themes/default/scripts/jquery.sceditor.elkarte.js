@@ -624,9 +624,9 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			// handle [img width=340 height=240]url[/img]
 			if(typeof attrs.width !== "undefined")
-				attribs += ' style="width: ' + attrs.width + ';"';
+				attribs += ' width="' + attrs.width + '"';
 			if(typeof attrs.height !== "undefined")
-				attribs += ' style="height: ' + attrs.height + ';"';
+				attribs += ' height="' + attrs.height + '"';
 
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
