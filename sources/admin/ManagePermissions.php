@@ -390,7 +390,7 @@ function SetQuickGroups()
 	checkSession();
 	validateToken('admin-mpq', 'quick');
 
-	// we'll need to init illegal permissions.
+	// we'll need to init illegal permissions, update permissions, etc.
 	require_once(SUBSDIR . '/Permission.subs.php');
 
 	loadIllegalPermissions();
@@ -801,7 +801,7 @@ function ModifyMembergroup2()
 	checkSession();
 	validateToken('admin-mp');
 
-	// we'll need to init illegal permissions.
+	// we'll need to init illegal permissions, update child permissions, etc.
 	require_once(SUBSDIR . '/Permission.subs.php');
 
 	loadIllegalPermissions();
@@ -1861,131 +1861,6 @@ function EditPermissionProfiles()
 	}
 
 	createToken('admin-mpp');
-}
-
-/**
- * This function updates the permissions of any groups based off this group.
- *
- * @param mixed $parents (array or int)
- * @param mixed $profile = null, int expected
- */
-function updateChildPermissions($parents, $profile = null)
-{
-	global $smcFunc;
-
-	// All the parent groups to sort out.
-	if (!is_array($parents))
-		$parents = array($parents);
-
-	// Find all the children of this group.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_parent, id_group
-		FROM {db_prefix}membergroups
-		WHERE id_parent != {int:not_inherited}
-			' . (empty($parents) ? '' : 'AND id_parent IN ({array_int:parent_list})'),
-		array(
-			'parent_list' => $parents,
-			'not_inherited' => -2,
-		)
-	);
-	$children = array();
-	$parents = array();
-	$child_groups = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$children[$row['id_parent']][] = $row['id_group'];
-		$child_groups[] = $row['id_group'];
-		$parents[] = $row['id_parent'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	$parents = array_unique($parents);
-
-	// Not a sausage, or a child?
-	if (empty($children))
-		return false;
-
-	// First off, are we doing general permissions?
-	if ($profile < 1 || $profile === null)
-	{
-		// Fetch all the parent permissions.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, permission, add_deny
-			FROM {db_prefix}permissions
-			WHERE id_group IN ({array_int:parent_list})',
-			array(
-				'parent_list' => $parents,
-			)
-		);
-		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			foreach ($children[$row['id_group']] as $child)
-				$permissions[] = array($child, $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
-
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}permissions
-			WHERE id_group IN ({array_int:child_groups})',
-			array(
-				'child_groups' => $child_groups,
-			)
-		);
-
-		// Finally insert.
-		if (!empty($permissions))
-		{
-			$smcFunc['db_insert']('insert',
-				'{db_prefix}permissions',
-				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-				$permissions,
-				array('id_group', 'permission')
-			);
-		}
-	}
-
-	// Then, what about board profiles?
-	if ($profile != -1)
-	{
-		$profileQuery = $profile === null ? '' : ' AND id_profile = {int:current_profile}';
-
-		// Again, get all the parent permissions.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_profile, id_group, permission, add_deny
-			FROM {db_prefix}board_permissions
-			WHERE id_group IN ({array_int:parent_groups})
-				' . $profileQuery,
-			array(
-				'parent_groups' => $parents,
-				'current_profile' => $profile !== null && $profile ? $profile : 1,
-			)
-		);
-		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			foreach ($children[$row['id_group']] as $child)
-				$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
-
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}board_permissions
-			WHERE id_group IN ({array_int:child_groups})
-				' . $profileQuery,
-			array(
-				'child_groups' => $child_groups,
-				'current_profile' => $profile !== null && $profile ? $profile : 1,
-			)
-		);
-
-		// Do the insert.
-		if (!empty($permissions))
-		{
-			$smcFunc['db_insert']('insert',
-				'{db_prefix}board_permissions',
-				array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-				$permissions,
-				array('id_group', 'id_profile', 'permission')
-			);
-		}
-	}
 }
 
 /**

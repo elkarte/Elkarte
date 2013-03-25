@@ -397,7 +397,11 @@ class Settings
 		checkSession();
 		validateToken('admin-mp');
 
-		// Check they can't do certain things.
+		// we'll need to initialize illegal permissions, update child permissions, etc.
+		require_once(SUBSDIR . '/Permission.subs.php');
+
+		// Make sure they can't do certain things,
+		// unless they have the right permissions.
 		loadIllegalPermissions();
 
 		$insertRows = array();
