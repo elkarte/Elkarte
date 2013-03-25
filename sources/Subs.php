@@ -1210,7 +1210,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'width' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
 					'height' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
 				),
-				'content' => '<img src="$1" alt="{alt}" style="width:{width}height{height}" class="bbc_img resized" />',
+				'content' => '<img src="$1" alt="{alt}" style="width:{width}height:{height}" class="bbc_img resized" />',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					$data = strtr($data, array(\'<br />\' => \'\'));
 					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
