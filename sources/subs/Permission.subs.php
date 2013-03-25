@@ -360,3 +360,21 @@ class InlinePermissions_Form
 		}
 	}
 }
+
+
+/**
+ * Show a collapsible box to set a specific permission.
+ * The function is called by templates to show a list of permissions settings.
+ * Calls the template function template_inline_permissions().
+ *
+ * @param string $permission
+ */
+function theme_inline_permissions($permission)
+{
+	global $context;
+
+	$context['current_permission'] = $permission;
+	$context['member_groups'] = $context[$permission];
+
+	template_inline_permissions();
+}
