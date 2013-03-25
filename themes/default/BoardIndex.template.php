@@ -16,7 +16,7 @@
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $options, $txt, $scripturl;
 
 	// Show some statistics if stat info is off.
 	if (!$settings['show_stats_index'])
@@ -246,7 +246,7 @@ function template_main()
 
 function template_info_center()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// Here's where the "Info Center" starts...
 	echo '

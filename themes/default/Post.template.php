@@ -375,7 +375,7 @@ function template_main()
 
 	echo '
 					</div>';
-	
+
 	// If the admin enabled the drafts feature, show a draft selection box
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
 	{

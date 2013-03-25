@@ -17,7 +17,7 @@
 // announce a topic
 function template_announce()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="announcement">
@@ -64,7 +64,7 @@ function template_announce()
 
 function template_announcement_send()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="announcement">
