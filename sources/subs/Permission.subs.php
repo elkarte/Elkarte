@@ -203,7 +203,6 @@ class InlinePermissions_Form
 {
 	/**
 	 * Save the permissions of a form containing inline permissions.
- 	 * @internal
  	 *
 	 * @param array $permissions
 	 */
@@ -267,7 +266,6 @@ class InlinePermissions_Form
 	 * Initialize a form with inline permissions settings.
 	 * It loads a context variables for each permission.
 	 * This function is used by several settings screens to set specific permissions.
-	 * @internal
 	 *
 	 * @param array $permissions
 	 * @param array $excluded_groups = array()
