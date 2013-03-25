@@ -1025,6 +1025,7 @@ function accessibleBoards()
 	$smcFunc['db_free_result']($result);
 
 	return $boards;
+}
 
 function boardInfo($board_id, $topic_id = null)
 {

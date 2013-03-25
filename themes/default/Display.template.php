@@ -586,47 +586,50 @@ function template_main()
 			echo '
 								<li class="post_options"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '">', $txt['post_options'], '</a>';
 
-		// Let show them the other options they may have in a nice pulldown
-		echo '
+		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'])
+		{
+			// Let show them the other options they may have in a nice pulldown
+			echo '
 									<ul>';
 
-		// Can the user modify the contents of this post?
-		if ($message['can_modify'])
-			echo '
+			// Can the user modify the contents of this post?
+			if ($message['can_modify'])
+				echo '
 										<li><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="modify_button">', $txt['modify'], '</a></li>';
 
-		// How about... even... remove it entirely?!
-		if ($message['can_remove'])
-			echo '
+			// How about... even... remove it entirely?!
+			if ($message['can_remove'])
+				echo '
 										<li><a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button">', $txt['remove'], '</a></li>';
 
-		// What about splitting it off the rest of the topic?
-		if ($context['can_split'] && !empty($context['real_num_replies']))
-			echo '
+			// What about splitting it off the rest of the topic?
+			if ($context['can_split'] && !empty($context['real_num_replies']))
+				echo '
 										<li><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="split_button">', $txt['split'], '</a></li>';
 
-		// Can we restore topics?
-		if ($context['can_restore_msg'])
-			echo '
+			// Can we restore topics?
+			if ($context['can_restore_msg'])
+				echo '
 										<li><a href="', $scripturl, '?action=restoretopic;msgs=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="restore_button">', $txt['restore_message'], '</a></li>';
 
-		// Maybe we can approve it, maybe we should?
-		if ($message['can_approve'])
-			echo '
+			// Maybe we can approve it, maybe we should?
+			if ($message['can_approve'])
+				echo '
 										<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="approve_button">', $txt['approve'], '</a></li>';
 
-		// Maybe we can unapprove it?
-		if ($message['can_unapprove'])
-					echo '
+			// Maybe we can unapprove it?
+			if ($message['can_unapprove'])
+						echo '
 										<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="unapprove_button">', $txt['unapprove'], '</a></li>';
 
-		echo '
-									</ul>
-								</li>';
+			echo '
+									</ul>';
+		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
+								</li>
 								<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
 
 
@@ -639,7 +642,7 @@ function template_main()
 			echo '
 								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a>';
 
-		if ($context['can_quote'])
+		if ($context['can_follow_up'])
 			echo '
 									<ul>
 										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '">', $txt['quote_new'], '</a></li>
