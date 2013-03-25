@@ -1803,6 +1803,12 @@ function action_edittheme()
 	createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
 }
 
+/**
+ * This function makes necessary pre-checks and fills
+ * the contextual data as needed by theme edition functions.
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
 function prepareThemeEditContext($theme_dir)
 {
 	global $context;
@@ -1832,6 +1838,14 @@ function prepareThemeEditContext($theme_dir)
 
 }
 
+/**
+ * Displays for edition in admin panel a css file.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
 function action_edit_style($theme_dir)
 {
 	global $context;
@@ -1840,6 +1854,14 @@ function action_edit_style($theme_dir)
 	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 }
 
+/**
+ * Displays for edition in admin panel a template file.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
 function action_edit_template($theme_dir)
 {
 	global $context;
@@ -1870,6 +1892,15 @@ function action_edit_template($theme_dir)
 	$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')));
 }
 
+/**
+ * Handles edition in admin of other types of files from a theme,
+ * except templates and css.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
 function action_edit_file($theme_dir)
 {
 	global $context;
@@ -1879,6 +1910,14 @@ function action_edit_file($theme_dir)
 	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 }
 
+/**
+ * This function handles submission of a template file.
+ * It checks the file for syntax errors, and if it passes,
+ * it saves it.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
 function action_edit_submit()
 {
 	global $context, $scripturl;
@@ -1892,6 +1931,13 @@ function action_edit_submit()
 
 	$theme_dir = themeDirectory($context['theme_id']);
 	$file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
+
+	// you did submit *something*, didn't you?
+	if (empty($file))
+	{
+		// @todo a better error message
+		fatal_lang_error('theme_edit_missing');
+	}
 
 	// check you up
 	if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
@@ -1966,6 +2012,14 @@ function action_edit_submit()
 	}
 }
 
+/**
+ * Handles user browsing in theme directories.
+ * The display will allow to choose a file for editing,
+ * if it is writable.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
 function action_edit_browse()
 {
 	global $context, $scripturl;
@@ -2016,6 +2070,13 @@ function action_edit_browse()
 	$context['sub_template'] = 'edit_browse';
 }
 
+/**
+ * List installed themes.
+ * The listing will allow editing if the files are writable.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
 function action_edit_list()
 {
 	global $context;
