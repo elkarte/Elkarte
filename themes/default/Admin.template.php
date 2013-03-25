@@ -720,7 +720,7 @@ function template_view_versions()
 // Form for stopping people using naughty words, etc.
 function template_edit_censored()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// First section is for adding/removing words from the censored list.
 	echo '
@@ -798,7 +798,7 @@ function template_edit_censored()
 // Maintenance is a lovely thing, isn't it?
 function template_not_done()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -1098,8 +1098,6 @@ function template_show_settings()
 // Template for showing custom profile fields.
 function template_show_custom_profile()
 {
-	global $context, $txt, $settings, $scripturl;
-
 	// Standard fields.
 	template_show_list('standard_profile_fields');
 
@@ -1527,7 +1525,6 @@ function template_core_features()
 
 	$alternate = true;
 	$num = 0;
-	$num_features = count($context['features']);
 	foreach ($context['features'] as $id => $feature)
 	{
 		$num++;
@@ -1559,7 +1556,7 @@ function template_core_features()
 // This little beauty shows questions and answer from the captcha type feature.
 function template_callback_question_answer_list()
 {
-	global $txt, $context, $settings;
+	global $txt, $context;
 
 	echo '
 			<dt>
@@ -1819,7 +1816,7 @@ function template_admin_quick_search()
 // A list of urls and "words separators" for new search engines in the dropdown
 function template_callback_external_search_engines()
 {
-	global $txt, $context, $settings;
+	global $txt, $context;
 
 	if (!empty($context['search_engines']))
 		foreach ($context['search_engines'] as $data)

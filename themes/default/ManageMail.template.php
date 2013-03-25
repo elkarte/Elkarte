@@ -16,7 +16,7 @@
 
 function template_mail_queue()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="manage_mail">

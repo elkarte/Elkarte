@@ -52,7 +52,7 @@ function template_pm_below()
 
 function template_folder()
 {
-	global $context, $settings, $scripturl, $options, $modSettings, $txt;
+	global $context, $scripturl, $options, $txt;
 
 	// The every helpful javascript!
 	echo '
