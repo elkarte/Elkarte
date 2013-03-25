@@ -146,6 +146,7 @@ function template_main()
 									<div class="bar" style="width: ', $board['post_percent'] + 4, 'px;">
 										<div style="width: ', $board['post_percent'], 'px;"></div>
 									</div>';
+
 		echo '
 									<span class="righttext">', $board['num_posts'], '</span>
 								</dd>';
@@ -185,6 +186,7 @@ function template_main()
 									<span class="righttext">' . $topic['num_replies'] . '</span>
 								</dd>';
 	}
+	
 	echo '
 							</dl>
 						</div>

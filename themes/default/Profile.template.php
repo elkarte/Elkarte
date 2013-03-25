@@ -17,7 +17,7 @@
 // Template for the profile side bar - goes before any other profile template.
 function template_profile_above()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings;
 
 	echo '
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
@@ -329,7 +329,7 @@ function template_action_summary()
 // Template for showing all the posts of the user, in chronological order.
 function template_action_showPosts()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 		<div class="cat_bar">
@@ -425,7 +425,7 @@ function template_action_showPosts()
 // Template for showing all the drafts of the user.
 function template_showDrafts()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 		<div class="pagesection" style="margin-bottom: 0;">
@@ -605,7 +605,7 @@ function template_editBuddies()
 // Template for showing the ignore list of the current user.
 function template_editIgnoreList()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
@@ -703,7 +703,7 @@ function template_editIgnoreList()
 // This template shows an admin information on a users IP addresses used and errors attributed to them.
 function template_trackActivity()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// The first table shows IP information about the user.
 	echo '
@@ -762,7 +762,7 @@ function template_trackActivity()
 // The template for trackIP, allowing the admin to see where/who a certain IP has been used.
 function template_trackIP()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	// This function always defaults to the last IP used by a member but can be set to track any IP.
 	// The first table in the template gives an input box to allow the admin to enter another IP to track.
@@ -1017,7 +1017,7 @@ function template_action_showPermissions()
 // Template for user statistics, showing graphs and the like.
 function template_action_statPanel()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $txt;
 
 	// First, show a few text statistics such as post/topic count.
 	echo '
@@ -1175,7 +1175,7 @@ function template_action_statPanel()
 // Template for editing profile options.
 function template_edit_options()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	// The main header!
 	echo '
@@ -1420,7 +1420,7 @@ function template_edit_options()
 // Personal Message settings.
 function template_profile_pm_settings()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $modSettings, $txt;
 
 	echo '
 								<dt>
@@ -1504,7 +1504,7 @@ function template_profile_pm_settings()
 // Template for showing theme settings. Note: template_options() actually adds the theme specific options.
 function template_profile_theme_settings()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $modSettings, $txt;
 
 	echo '
 							<dt>
@@ -1800,7 +1800,7 @@ function template_action_notification()
 // Template for choosing group membership.
 function template_groupMembership()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	// The main containing header.
 	echo '
@@ -1920,7 +1920,7 @@ function template_groupMembership()
 				elseif ($group['type'] == 2)
 					echo '
 							<a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], '">', $txt['request_group'], '</a>';
-
+// @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 				echo '
@@ -2051,7 +2051,7 @@ function template_load_warning_variables()
 // Show all warnings of a user?
 function template_viewWarning()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $settings;
 
 	template_load_warning_variables();
 
@@ -2107,7 +2107,7 @@ function template_viewWarning()
 // Show a lovely interface for issuing warnings.
 function template_issueWarning()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $settings, $scripturl, $txt;
 
 	template_load_warning_variables();
 
@@ -2360,6 +2360,7 @@ function template_issueWarning()
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8" style="min-width: 50%; max-width: 99%;">', $context['warning_data']['notify_body'], '</textarea>
 					</dd>';
 	}
+
 	echo '
 				</dl>
 				<div class="righttext">';
@@ -2451,6 +2452,7 @@ function template_deleteAccount()
 	if (!$context['user']['is_owner'])
 		echo '
 			<p class="windowbg2 description">', $txt['deleteAccount_desc'], '</p>';
+
 	echo '
 			<div class="windowbg2">
 				<div class="content">';
@@ -2525,7 +2527,7 @@ function template_deleteAccount()
 // Template for the password box/save button stuck at the bottom of every profile page.
 function template_profile_save()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	echo '
 
@@ -2647,7 +2649,7 @@ function template_profile_birthdate()
 // Show the signature editing box?
 function template_profile_signature_modify()
 {
-	global $txt, $context, $settings, $scripturl;
+	global $txt, $context;
 
 	echo '
 							<dt id="current_signature"', !isset($context['member']['current_signature']) ? ' style="display:none"' : '', '>
@@ -2880,7 +2882,7 @@ function template_profile_karma_modify()
 // Select the time format!
 function template_profile_timeformat_modify()
 {
-	global $context, $modSettings, $txt, $scripturl, $settings;
+	global $context, $txt, $scripturl, $settings;
 
 	echo '
 							<dt>
@@ -2890,6 +2892,7 @@ function template_profile_timeformat_modify()
 							</dt>
 							<dd>
 								<select name="easyformat" id="easyformat" onchange="document.forms.creator.time_format.value = this.options[this.selectedIndex].value;" style="margin-bottom: 4px;">';
+
 	// Help the user by showing a list of common time formats.
 	foreach ($context['easy_timeformats'] as $time_format)
 		echo '

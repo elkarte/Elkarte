@@ -17,7 +17,7 @@
 // The main calendar - January, for example.
 function template_main()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
 		<div id="calendar">
@@ -61,7 +61,7 @@ function template_main()
 // Template for posting a calendar event.
 function template_event_post()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	// Start the javascript for drop down boxes...
 	echo '

@@ -121,6 +121,7 @@ function template_main()
 				</tr>';
 			}
 		}
+		
 		echo '
 			</tbody>
 			<tbody class="divider">

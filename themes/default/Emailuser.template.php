@@ -198,7 +198,7 @@ function template_custom_email()
 
 function template_report()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="report_topic">

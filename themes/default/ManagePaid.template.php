@@ -17,7 +17,7 @@
 // The template for adding or editing a subscription.
 function template_modify_subscription()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
@@ -201,7 +201,7 @@ function template_modify_subscription()
 
 function template_delete_subscription()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -226,7 +226,7 @@ function template_delete_subscription()
 // Add or edit an existing subscriber.
 function template_modify_user_subscription()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -303,7 +303,7 @@ function template_modify_user_subscription()
 						<select name="yearend" id="yearend" onchange="generateDays(\'end\');">';
 
 	// Show a list of all the years we allow...
-	for ($year = 2005; $year <= 2030; $year++)
+	for ($year = 2010; $year <= 2030; $year++)
 		echo '
 							<option value="', $year, '"', $year == $context['sub']['end']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
@@ -532,7 +532,7 @@ function template_user_subscription()
 // The "choose payment" dialog.
 function template_choose_payment()
 {
-	global $context, $txt, $modSettings, $scripturl;
+	global $context, $txt;
 
 	echo '
 	<div id="paid_subscription">
@@ -598,7 +598,7 @@ function template_choose_payment()
 // The "thank you" bit...
 function template_paid_done()
 {
-	global $context, $txt, $modSettings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="paid_subscription">
