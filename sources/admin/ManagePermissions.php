@@ -27,7 +27,6 @@ if (!defined('ELKARTE'))
  *
  * @uses ManagePermissions language file.
  */
-
 function ModifyPermissions()
 {
 	global $txt, $scripturl, $context;
@@ -390,6 +389,9 @@ function SetQuickGroups()
 
 	checkSession();
 	validateToken('admin-mpq', 'quick');
+
+	// we'll need to init illegal permissions.
+	require_once(SUBSDIR . '/Permission.subs.php');
 
 	loadIllegalPermissions();
 	loadIllegalGuestPermissions();
@@ -799,6 +801,9 @@ function ModifyMembergroup2()
 	checkSession();
 	validateToken('admin-mp');
 
+	// we'll need to init illegal permissions.
+	require_once(SUBSDIR . '/Permission.subs.php');
+
 	loadIllegalPermissions();
 
 	$_GET['group'] = (int) $_GET['group'];
@@ -1030,6 +1035,9 @@ function GeneralPermissionSettings($return_config = false)
 function setPermissionLevel($level, $group, $profile = 'null')
 {
 	global $smcFunc, $context;
+
+	// we'll need to init illegal permissions.
+	require_once(SUBSDIR . '/Permission.subs.php');
 
 	loadIllegalPermissions();
 	loadIllegalGuestPermissions();
@@ -1487,6 +1495,9 @@ function loadAllPermissions($loadType = 'classic')
 		'topic',
 		'post',
 	);
+
+	// we'll need to init illegal permissions.
+	require_once(SUBSDIR . '/Permission.subs.php');
 
 	// We need to know what permissions we can't give to guests.
 	loadIllegalGuestPermissions();
@@ -1975,70 +1986,6 @@ function updateChildPermissions($parents, $profile = null)
 			);
 		}
 	}
-}
-
-/**
- * Load permissions someone cannot grant.
- */
-function loadIllegalPermissions()
-{
-	global $context;
-
-	$context['illegal_permissions'] = array();
-	if (!allowedTo('admin_forum'))
-		$context['illegal_permissions'][] = 'admin_forum';
-	if (!allowedTo('manage_membergroups'))
-		$context['illegal_permissions'][] = 'manage_membergroups';
-	if (!allowedTo('manage_permissions'))
-		$context['illegal_permissions'][] = 'manage_permissions';
-
-	call_integration_hook('integrate_load_illegal_permissions');
-}
-
-/**
- * Loads the permissions that can not be given to guests.
- * Stores the permissions in $context['non_guest_permissions'].
-*/
-function loadIllegalGuestPermissions()
-{
-	global $context;
-
-	$context['non_guest_permissions'] = array(
-		'delete_replies',
-		'karma_edit',
-		'poll_add_own',
-		'pm_read',
-		'pm_send',
-		'profile_identity',
-		'profile_extra',
-		'profile_title',
-		'profile_remove',
-		'profile_server_avatar',
-		'profile_upload_avatar',
-		'profile_remote_avatar',
-		'profile_view_own',
-		'mark_any_notify',
-		'mark_notify',
-		'admin_forum',
-		'manage_boards',
-		'manage_attachments',
-		'manage_smileys',
-		'edit_news',
-		'access_mod_center',
-		'moderate_forum',
-		'issue_warning',
-		'manage_membergroups',
-		'manage_permissions',
-		'manage_bans',
-		'move_own',
-		'modify_replies',
-		'send_mail',
-		'approve_posts',
-		'post_draft',
-		'post_autosave_draft',
-	);
-
-	call_integration_hook('integrate_load_illegal_guest_permissions');
 }
 
 /**

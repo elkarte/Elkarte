@@ -337,6 +337,10 @@ class ManageMembergroups_Controller
 
 			// @todo Check for members with same name too?
 
+			// Don't allow copying of a real priviledged person!
+			require_once(SUBSDIR . '/Permission.subs.php');
+			loadIllegalPermissions();
+
 			$request = $smcFunc['db_query']('', '
 				SELECT MAX(id_group)
 				FROM {db_prefix}membergroups',
