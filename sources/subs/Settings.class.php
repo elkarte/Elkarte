@@ -441,25 +441,25 @@ class Settings_Form
 				// For security purposes we validate this line by line.
 				$options = array();
 				foreach ($_POST[$var[1]] as $invar)
-				if (in_array($invar, array_keys($var[2])))
-				$options[] = $invar;
+					if (in_array($invar, array_keys($var[2])))
+						$options[] = $invar;
 
 				$setArray[$var[1]] = serialize($options);
 			}
 			// Integers!
 			elseif ($var[0] == 'int')
-			$setArray[$var[1]] = (int) $_POST[$var[1]];
+				$setArray[$var[1]] = (int) $_POST[$var[1]];
 			// Floating point!
 			elseif ($var[0] == 'float')
-			$setArray[$var[1]] = (float) $_POST[$var[1]];
+				$setArray[$var[1]] = (float) $_POST[$var[1]];
 			// Text!
 			elseif ($var[0] == 'text' || $var[0] == 'large_text')
-			$setArray[$var[1]] = $_POST[$var[1]];
+				$setArray[$var[1]] = $_POST[$var[1]];
 			// Passwords!
 			elseif ($var[0] == 'password')
 			{
 				if (isset($_POST[$var[1]][1]) && $_POST[$var[1]][0] == $_POST[$var[1]][1])
-				$setArray[$var[1]] = $_POST[$var[1]][0];
+					$setArray[$var[1]] = $_POST[$var[1]][0];
 			}
 			// BBC.
 			elseif ($var[0] == 'bbc')
@@ -467,7 +467,7 @@ class Settings_Form
 
 				$bbcTags = array();
 				foreach (parse_bbc(false) as $tag)
-				$bbcTags[] = $tag['tag'];
+					$bbcTags[] = $tag['tag'];
 
 				if (!isset($_POST[$var[1] . '_enabledTags']))
 					$_POST[$var[1] . '_enabledTags'] = array();
