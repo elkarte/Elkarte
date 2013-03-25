@@ -830,6 +830,7 @@ function action_showDisregarded($memID)
 		'base_href' => $scripturl . '?action=profile;area=showposts;sa=disregardedtopics;u=' . $memID,
 		'default_sort_col' => 'started_on',
 		'get_items' => array(
+			'file' => SUBSDIR . '/Topic.subs.php',
 			'function' => 'list_getDisregarded',
 			'params' => array(
 				$memID,
@@ -966,27 +967,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 	$smcFunc['db_free_result']($request);
 
 	// Any topics found?
-	$topicsInfo = array();
-	if (!empty($topics))
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
-			WHERE t.id_topic IN ({array_int:topics})',
-			array(
-				'topics' => $topics,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$topicsInfo[] = $row;
-		$smcFunc['db_free_result']($request);
-	}
-
-	return $topicsInfo;
+	return getTopicsInfo($topics, 'all', 'all');
 }
 
 /**

@@ -840,22 +840,12 @@ function action_quickmod()
 	if (!empty($moveCache[0]))
 	{
 		// I know - I just KNOW you're trying to beat the system.  Too bad for you... we CHECK :P.
-		$request = $smcFunc['db_query']('', '
-			SELECT t.id_topic, t.id_board, b.count_posts
-			FROM {db_prefix}topics AS t
-				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-			WHERE t.id_topic IN ({array_int:move_topic_ids})' . (!empty($board) && !allowedTo('move_any') ? '
-				AND t.id_member_started = {int:current_member}' : '') . '
-			LIMIT ' . count($moveCache[0]),
-			array(
-				'current_member' => $user_info['id'],
-				'move_topic_ids' => $moveCache[0],
-			)
-		);
+		$topics_info = getTopicsInfo($moveCache[0], '', '', false, !empty($board) && !allowedTo('move_any'));
+
 		$moveTos = array();
 		$moveCache2 = array();
 		$countPosts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		foreach ($topics_info as $row)
 		{
 			$to = $moveCache[1][$row['id_topic']];
 
@@ -873,7 +863,6 @@ function action_quickmod()
 			// For reporting...
 			$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
 		}
-		$smcFunc['db_free_result']($request);
 
 		$moveCache = $moveCache2;
 

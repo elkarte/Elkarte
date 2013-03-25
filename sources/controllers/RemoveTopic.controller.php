@@ -229,25 +229,7 @@ function action_restoretopic()
 				unset($actioned_messages[$topic]);
 
 		// Load any previous topics to check they exist.
-		if (!empty($previous_topics))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT t.id_topic, t.id_board, m.subject
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-				WHERE t.id_topic IN ({array_int:previous_topics})',
-				array(
-					'previous_topics' => $previous_topics,
-				)
-			);
-			$previous_topics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$previous_topics[$row['id_topic']] = array(
-					'board' => $row['id_board'],
-					'subject' => $row['subject'],
-				);
-			$smcFunc['db_free_result']($request);
-		}
+		$previous_topics_info = getTopicsInfo($previous_topics, 'first');
 
 		// Restore each topic.
 		$messages = array();
@@ -261,11 +243,11 @@ function action_restoretopic()
 			}
 
 			// Move the posts back then!
-			if (isset($previous_topics[$topic]))
+			if (isset($previous_topics_info[$topic]))
 			{
 				mergePosts(array_keys($data['msgs']), $data['current_topic'], $topic);
 				// Log em.
-				logAction('restore_posts', array('topic' => $topic, 'subject' => $previous_topics[$topic]['subject'], 'board' => empty($data['previous_board']) ? $data['possible_prev_board'] : $data['previous_board']));
+				logAction('restore_posts', array('topic' => $topic, 'subject' => $previous_topics_info[$topic]['subject'], 'board' => empty($data['previous_board']) ? $data['possible_prev_board'] : $data['previous_board']));
 				$messages = array_merge(array_keys($data['msgs']), $messages);
 			}
 			else
@@ -298,17 +280,8 @@ function action_restoretopic()
 
 	if (!empty($topics_to_restore))
 	{
-		// Lets get the data for these topics.
-		$request = $smcFunc['db_query']('', '
-			SELECT t.id_topic, t.id_previous_board, t.id_board, t.id_first_msg, m.subject
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			WHERE t.id_topic IN ({array_int:topics})',
-			array(
-				'topics' => $topics_to_restore,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		$topics_to_restore_info = getTopicsInfo($topics_to_restore, 'first');
+		foreach ($topics_to_restore_info as $row)
 		{
 			// We can only restore if the previous board is set.
 			if (empty($row['id_previous_board']))
@@ -332,7 +305,7 @@ function action_restoretopic()
 			);
 
 			// Lets see if the board that we are returning to has post count enabled.
-			$request2 = $smcFunc['db_query']('', '
+			$request = $smcFunc['db_query']('', '
 				SELECT count_posts
 				FROM {db_prefix}boards
 				WHERE id_board = {int:board}',
@@ -340,13 +313,13 @@ function action_restoretopic()
 					'board' => $row['id_previous_board'],
 				)
 			);
-			list ($count_posts) = $smcFunc['db_fetch_row']($request2);
-			$smcFunc['db_free_result']($request2);
+			list ($count_posts) = $smcFunc['db_fetch_row']($request);
+			$smcFunc['db_free_result']($request);
 
 			if (empty($count_posts))
 			{
 				// Lets get the members that need their post count restored.
-				$request2 = $smcFunc['db_query']('', '
+				$request = $smcFunc['db_query']('', '
 					SELECT id_member, COUNT(id_msg) AS post_count
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:topic}
@@ -358,15 +331,14 @@ function action_restoretopic()
 					)
 				);
 
-				while ($member = $smcFunc['db_fetch_assoc']($request2))
+				while ($member = $smcFunc['db_fetch_assoc']($request))
 					updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
-				$smcFunc['db_free_result']($request2);
+				$smcFunc['db_free_result']($request);
 			}
 
 			// Log it.
 			logAction('restore_topic', array('topic' => $row['id_topic'], 'board' => $row['id_board'], 'board_to' => $row['id_previous_board']));
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Didn't find some things?
