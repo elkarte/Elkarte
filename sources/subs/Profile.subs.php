@@ -275,7 +275,7 @@ function loadProfileFields($force_reload = false)
 								Return types:
 					- true:			Element can be stored.
 					- false:		Skip this element.
-					- a text string:	An error occured - this is the error message.
+					- a text string:	An error occurred - this is the error message.
 
 				function $preload:		A function that is used to load data required for this element to be displayed. Must return
 								true to be displayed at all.
@@ -911,7 +911,7 @@ function saveProfileFields()
 		if (isset($field['input_validate']))
 		{
 			$is_valid = $field['input_validate']($_POST[$key]);
-			// An error occured - set it as such!
+			// An error occurred - set it as such!
 			if ($is_valid !== true)
 			{
 				// Is this an actual error?
@@ -1444,13 +1444,8 @@ function profileSendActivation()
 	sendmail($profile_vars['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 	// Log the user out.
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_online
-		WHERE id_member = {int:selected_member}',
-		array(
-			'selected_member' => $context['id_member'],
-		)
-	);
+	require_once(SUBSDIR . '/Auth.subs.php');
+	logOnline($context['id_member'], false);
 	$_SESSION['log_time'] = 0;
 	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));
 

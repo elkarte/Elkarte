@@ -2065,6 +2065,11 @@ div#pollmoderation {
 	word-break: hyphenate;
 	word-wrap: break-word;
 }
+.poster2 {
+    width: auto;
+	max-width: 25em;
+    font-size: 1em;
+}
 .poster span.name {
     display: block;
     padding: 6px;
@@ -2138,8 +2143,8 @@ div#pollmoderation {
 	padding: 0 10px 0 10px;
 }
 .poster .dropmenu li ul li.report_link, .poster .dropmenu li ul li.issue_warning, .poster .dropmenu li ul li.poster_ip {
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
+	margin: 0;
+	padding: 0;
 	float: left;
 	width: 100%;
 	font-size: 1.1em;
@@ -2149,6 +2154,13 @@ div#pollmoderation {
 	height: 2px;
 	background: #ccc;
 	box-shadow: 0 -1px 0 #fff inset;
+}
+.poster .dropmenu li ul li.warning a, .poster .dropmenu li ul li.warning img {
+	width: auto;
+	display: table-cell;
+	vertical-align: middle;
+	padding: 0 4px;
+	line-height: 1.4em;
 }
 .poster .dropmenu li ul li hr {
 	margin: 4px 3px;
@@ -2235,6 +2247,9 @@ div#pollmoderation {
 }
 .groupicon img {
 	padding: 0 3px 0 3px;
+}
+.keyinfo {
+	margin-bottom: 2px;
 }
 .keyinfo h5 {
 	color: #555;
@@ -2356,6 +2371,12 @@ ul.quickbuttons li a.details_button {
 ul.quickbuttons li a.ignore_button {
 	background: url(../images/theme/quickbuttons.png) no-repeat 1px -288px;
 }
+ul.quickbuttons li a.report_button {
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -312px;
+}
+ul.quickbuttons li a.warn_button {
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -336px;
+}
 ul.quickbuttons li.inline_mod_check {
 	padding: 1px 1px 1px 1px;
 }
@@ -2476,6 +2497,11 @@ ul.quickbuttons li.quote ul li, ul.quickbuttons li.quote ul a {
 ul.follow_ups {
 	float: none;
 	width: auto;
+	margin: 0;
+	padding: 0;
+}
+ul.follow_ups>li {
+	margin-top: -5px;
 }
 /* Note: The next declarations are for keyboard access with js disabled. */
 .quickbuttons ul li a:focus {

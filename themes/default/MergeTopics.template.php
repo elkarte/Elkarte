@@ -16,7 +16,7 @@
 
 function template_merge_done()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div id="merge_topics">
@@ -43,7 +43,7 @@ function template_merge_done()
 
 function template_merge()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div id="merge_topics">
@@ -134,7 +134,7 @@ function template_merge()
 
 function template_merge_extra_options()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="merge_topics">
@@ -153,6 +153,7 @@ function template_merge_extra_options()
 					</tr>
 				</thead>
 				<tbody>';
+
 		foreach ($context['topics'] as $topic)
 			echo '
 					<tr class="windowbg2">
@@ -174,6 +175,7 @@ function template_merge_extra_options()
 							<input type="checkbox" class="input_check" name="notifications[]" value="' . $topic['id'] . '" checked="checked" />
 						</td>
 					</tr>';
+
 		echo '
 				</tbody>
 			</table>
@@ -185,9 +187,11 @@ function template_merge_extra_options()
 					<fieldset id="merge_subject" class="merge_options">
 						<legend>', $txt['merge_select_subject'], '</legend>
 						<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'\' ;">';
+
 	foreach ($context['topics'] as $topic)
 		echo '
 							<option value="', $topic['id'], '"' . ($topic['selected'] ? ' selected="selected"' : '') . '>', $topic['subject'], '</option>';
+
 	echo '
 							<option value="0">', $txt['merge_custom_subject'], ':</option>
 						</select>
@@ -211,6 +215,7 @@ function template_merge_extra_options()
 						</ul>
 					</fieldset>';
 	}
+
 	if (!empty($context['polls']))
 	{
 		echo '
@@ -229,6 +234,7 @@ function template_merge_extra_options()
 						</ul>
 					</fieldset>';
 	}
+	
 	echo '
 					<div class="auto_flow">
 						<input type="submit" value="' . $txt['merge'] . '" class="button_submit" />

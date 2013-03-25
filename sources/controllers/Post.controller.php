@@ -760,7 +760,7 @@ function action_post()
 					break;
 				}
 
-				// Show any errors which might of occured.
+				// Show any errors which might have occurred.
 				if (!empty($attachment['errors']))
 				{
 					$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
@@ -1680,6 +1680,7 @@ function action_post2()
 			$topic = $topicOptions['id'];
 
 		require_once(SUBSDIR . '/FollowUps.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		// Time to update the original message with a pointer to the new one
 		if (!empty($original_post) && canAccessMessage($original_post))
 			linkMessages($original_post, $topic);
@@ -1874,7 +1875,7 @@ function action_post2()
 	{
 		loadTemplate('Errors');
 		$context['sub_template'] = 'attachment_errors';
-		$context['page_title'] = $txt['error_occured'];
+		$context['page_title'] = $txt['error_occurred'];
 
 		$errors = $attach_errors->prepareErrors();
 

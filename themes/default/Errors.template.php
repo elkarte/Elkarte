@@ -22,7 +22,7 @@
 // Show an error message.....
 function template_fatal_error()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="fatal_error">
@@ -46,7 +46,7 @@ function template_fatal_error()
 
 function template_error_log()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">';
@@ -215,7 +215,7 @@ function template_show_file()
 
 function template_attachment_errors()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div>
@@ -230,7 +230,7 @@ function template_attachment_errors()
 	foreach ($context['attachment_error_keys'] as $key)
 		template_show_error($key);
 
-	echo 
+	echo
 				!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '',
 				'
 				<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>

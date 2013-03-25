@@ -16,7 +16,7 @@
 
 function template_ask()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="split_topics">
@@ -77,7 +77,7 @@ function template_ask()
 
 function template_main()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="split_topics">
@@ -154,6 +154,7 @@ function template_select()
 				<ul id="messages_selected" class="split_messages smalltext reset">';
 
 	if (!empty($context['selected']['messages']))
+	{
 		foreach ($context['selected']['messages'] as $message)
 			echo '
 					<li class="windowbg', $message['alternate'] ? '2' : '', '" id="selected_', $message['id'], '">
@@ -166,6 +167,7 @@ function template_select()
 							<div class="post">', $message['body'], '</div>
 						</div>
 					</li>';
+	}
 
 	echo '
 					<li class="dummy" />
@@ -198,6 +200,7 @@ function template_select()
 			else
 				return true;
 		}
+		
 		function onDocReceived(XMLDoc)
 		{
 			var i, j, pageIndex;
