@@ -1828,9 +1828,11 @@ function prepareThemeEditContext($theme_dir)
 			$_REQUEST['filename'] = '';
 	}
 
+	// we shouldn't end up with no file
 	if (empty($_REQUEST['filename']))
 		fatal_lang_error('theme_edit_missing', false);
 
+	// initialize context
 	$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
 	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
 	$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
@@ -1849,6 +1851,7 @@ function action_edit_style($theme_dir)
 {
 	global $context;
 
+	// pick the template and send it the file
 	$context['sub_template'] = 'edit_style';
 	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 }
@@ -1865,11 +1868,10 @@ function action_edit_template($theme_dir)
 {
 	global $context;
 
+	// make sure the sub-template is set
 	$context['sub_template'] = 'edit_template';
 
-	if (!isset($errors))
-		$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
-
+	// for a PHP template file, we display each function in separate boxes.
 	$j = 0;
 	$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
 	for ($i = 0, $n = count($file_data); $i < $n; $i++)
@@ -1904,8 +1906,8 @@ function action_edit_file($theme_dir)
 {
 	global $context;
 
+	// simply set the template and the file contents.
 	$context['sub_template'] = 'edit_file';
-
 	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 }
 
