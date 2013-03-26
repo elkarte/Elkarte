@@ -256,13 +256,13 @@ function action_modlog()
 			'delete' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" name="all" class="input_check" onclick="invertAll(this, this.form);" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$entry', '
 						return \'<input type="checkbox" class="input_check" name="delete[]" value="\' . $entry[\'id\'] . \'"\' . ($entry[\'editable\'] ? \'\' : \' disabled="disabled"\') . \' />\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

@@ -450,12 +450,12 @@ function template_coppa_form()
 
 	// Show the form (As best we can)
 	echo '
-		<table style="width:100%;text-align:center" class="tborder">
+		<table class="tborder centertext" style="width:100%" >
 			<tr>
-				<td style="text-align:left">', $context['forum_contacts'], '</td>
+				<td class="lefttext">', $context['forum_contacts'], '</td>
 			</tr>
 			<tr>
-				<td style="text-align:right">
+				<td class="righttext">
 					<em>', $txt['coppa_form_address'], '</em>: ', $context['ul'], '<br />
 					', $context['ul'], '<br />
 					', $context['ul'], '<br />
@@ -463,13 +463,13 @@ function template_coppa_form()
 				</td>
 			</tr>
 			<tr>
-				<td style="text-align:right">
+				<td class="righttext">
 					<em>', $txt['coppa_form_date'], '</em>: ', $context['ul'], '
 					<br /><br />
 				</td>
 			</tr>
 			<tr>
-				<td style="text-align:left">
+				<td class="lefttext">
 					', $context['coppa_body'], '
 				</td>
 			</tr>
@@ -496,7 +496,7 @@ function template_verification_sound()
 		</style>
 	</head>
 	<body style="margin: 1ex;">
-		<div class="windowbg description" style="text-align: center;">';
+		<div class="windowbg description centertext">';
 
 	if (isBrowser('is_ie'))
 		echo '

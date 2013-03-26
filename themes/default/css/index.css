@@ -3410,9 +3410,17 @@ img.centericon {
 }
 
 /*Issue a warning*/
-#warn_body{
+#warn_body {
 	width: 80%;
 	font-size: 0.9em;
+}
+#warning_text {
+	padding-top: 1pt;
+	width: 100%;
+	z-index: 2;
+	color: black;
+	position: absolute;
+	font-weight: bold;
 }
 
 /* Styles for the statistics center.
@@ -4212,8 +4220,18 @@ table.calendar_table {
 .table_grid tr.catbg th.stats {
 	text-align: center;
 }
-.table_grid tr.catbg th.centercol, .table_grid tr.windowbg2 td.centercol, .table_grid tr.windowbg td.centercol, .table_grid tr.highlight2 td.centercol {
+.table_grid tr.catbg th.centertext, .table_grid tr.windowbg2 td.centertext, .table_grid tr.windowbg td.centertext, .table_grid tr.highlight2 td.centertext {
 	text-align: center;
+}
+.table_grid tr.catbg th.lefttext, .table_grid tr.windowbg2 td.lefttext, .table_grid tr.windowbg td.lefttext, .table_grid tr.highlight2 td.lefttext {
+	margin-left: 0;
+	margin-right: auto;
+	text-align: left;
+}
+.table_grid tr.catbg th.righttext, .table_grid tr.windowbg2 td.righttext, .table_grid tr.windowbg td.righttext, .table_grid tr.highlight2 td.righttext {
+	margin-left: auto;
+	margin-right: 0;
+	text-align: right;
 }
 #show_attachments th {
 	text-align: left;

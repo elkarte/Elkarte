@@ -90,7 +90,7 @@ function template_download_language()
 						<th scope="col" width="100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centercol" scope="col" width="4%">
+						<th class="last_th centertext" scope="col" width="4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -122,7 +122,7 @@ function template_download_language()
 					<td>
 						', $file['exists'] ? ($file['exists'] == 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'], '
 					</td>
-					<td class="centercol">
+					<td class="centertext">
 						<input type="checkbox" name="copy_file[]" value="', $file['generaldest'], '"', ($file['default_copy'] ? ' checked="checked"' : ''), ' class="input_check" />
 					</td>
 				</tr>';
