@@ -1968,6 +1968,9 @@ function action_edit_submit()
 				'entire_file' => 'php_syntax'
 			));
 			$validator->validate(array('entire_file' => $entire_file));
+
+			// retrieve the errors
+			// @todo fix the fields names.
 			$errors = $validator->validation_errors();
 		}
 
@@ -1986,13 +1989,17 @@ function action_edit_submit()
 		{
 			// I can't let you off the hook yet: syntax errors are a nasty beast.
 
+			// pick the right sub-template for the next try
 			if ($is_template)
 				$context['sub_template'] = 'edit_template';
 			else
 				$context['sub_template'] = 'edit_file';
 
+			// fill contextual data for the template, the errors to show
 			foreach ($errors as $error)
 				$context['parse_error'][] = $error;
+
+			// send back the file contents
 			$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
 
 			if (!is_array($file))
