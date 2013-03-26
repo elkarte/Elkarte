@@ -200,14 +200,14 @@ function validateTriggers(&$triggers)
 
 	$ban_triggers = array();
 	$log_info = array();
-	$array_keys = array();
-	call_integration_hook('integrate_extend_ban_triggers', array(&$array_keys));
-	$array_keys += array('ips_in_messages', 'ips_in_errors');
 
 	foreach ($triggers as $key => $value)
 	{
 		if (!empty($value))
 		{
+			if ($key == 'member')
+				continue;
+
 			if ($key == 'main_ip')
 			{
 				$value = trim($value);
@@ -300,7 +300,7 @@ function validateTriggers(&$triggers)
 				else
 					$ban_triggers['user']['id_member'] = $value;
 			}
-			elseif (in_array($key, $array_keys))
+			elseif (in_array($key, array('ips_in_messages', 'ips_in_errors')))
 			{
 				// Special case, those two are arrays themselves
 				$values = array_unique($value);
@@ -419,15 +419,11 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 		'ip_high8' => 'int',
 	);
 
-	$array_keys = array();
-	call_integration_hook('integrate_extend_ban_triggers', array(&$array_keys));
-	$array_keys += array('ips_in_messages', 'ips_in_errors');
-
 	$insertTriggers = array();
 	foreach ($triggers as $key => $trigger)
 	{
 		// Exceptions, exceptions, exceptions...always exceptions... :P
-		if (in_array($key, $array_keys))
+		if (in_array($key, array('ips_in_messages', 'ips_in_errors')))
 			foreach ($trigger as $real_trigger)
 				$insertTriggers[] = array_merge($values, $real_trigger);
 		else
@@ -928,4 +924,25 @@ function updateBanMembers()
 
 	// Update the latest member and our total members as banning may change them.
 	updateStats('member');
+}
+
+function getMemberData($id)
+{
+	global $smcFunc;
+
+	$suggestions = array();
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name, member_ip, email_address
+		FROM {db_prefix}members
+		WHERE id_member = {int:current_user}
+		LIMIT 1',
+		array(
+			'current_user' => $id,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) > 0)
+		list ($suggestions['member']['id'], $suggestions['member']['name'], $suggestions['main_ip'], $suggestions['email']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $suggestions;
 }
