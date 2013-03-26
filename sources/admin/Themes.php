@@ -69,10 +69,6 @@ function action_thememain()
 		'remove' => 'action_removetheme',
 		'pick' => 'action_picktheme',
 		'edit' => 'action_edittheme',
-		'edit_list' => 'action_edit_list',
-		'edit_template' => 'action_edit_template',
-		'edit_style' => 'action_edit_style',
-		'edit_file' => 'action_edit_file',
 		'copy' => 'action_copytemplate',
 	);
 
