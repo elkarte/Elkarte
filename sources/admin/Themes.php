@@ -1871,6 +1871,9 @@ function action_edit_template($theme_dir)
 	// make sure the sub-template is set
 	$context['sub_template'] = 'edit_template';
 
+	// retrieve the contents of the file
+	$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
+
 	// for a PHP template file, we display each function in separate boxes.
 	$j = 0;
 	$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
@@ -2000,11 +2003,13 @@ function action_edit_submit()
 			foreach ($errors as $error)
 				$context['parse_error'][] = $error;
 
+			// the format of the data depends on template/non-template file.
+			if (!is_array($file))
+				$file = array($file);
+
 			// send back the file contents
 			$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
 
-			if (!is_array($file))
-				$file = array($file);
 			foreach ($file as $i => $file_part)
 			{
 				$context['file_parts'][$i]['lines'] = strlen($file_part);
