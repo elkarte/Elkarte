@@ -208,7 +208,7 @@ class Site_Dispatcher
 		if (isset($actionArray[$_GET['action']]))
 		{
 			// admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? SOURCEDIR . '/admin' : CONTROLLERDIR;
+			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
 			// is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
@@ -274,7 +274,7 @@ class Site_Dispatcher
 			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				$this->_file_name = SOURCEDIR . '/admin/Themes.php';
+				$this->_file_name = ADMINDIR . '/Themes.php';
 				$this->_function_name = 'WrapAction';
 			}
 			else
