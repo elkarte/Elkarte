@@ -35,8 +35,32 @@ elk_DraftAutoSave.prototype.init = function ()
 		var current_draft_save = this.opt.sSelf;
 		$(document).ready(function () {
 			var current_draft = eval(current_draft_save);
-			$('#' + current_draft.opt.sSceditorID).data("sceditor").addEvent(current_draft.opt.sSceditorID, 'blur', function (oEvent) {
-			// Moved away from the page, where did you go? ... till you return we pause autosaving
+			if (current_draft.opt.sType === 'quick')
+			{
+				$current_editor = $(document.forms.postmodify["message"]);
+				$current_editor.on('blur', save_onBlur);
+				$current_editor.on('focus', enable_onFocus);
+			}
+			else
+			{
+				$current_editor = $(document.getElementById(current_draft.opt.sSceditorID));
+				$current_editor.data("sceditor").addEvent(current_draft.opt.sSceditorID, 'blur', save_onBlur);
+				$current_editor.data("sceditor").addEvent(current_draft.opt.sSceditorID, 'focus', enable_onFocus);
+			}
+			
+			function enable_onFocus ()
+			{
+				// Since your back we resume the autosave timer
+				var current_draft = eval(current_draft_save);
+
+				if (current_draft.opt.sType === 'quick' && current_draft.interval_id === "")
+					current_draft.interval_id = window.setInterval(current_draft.opt.sSelf + '.draft' + (current_draft.bPM ? 'PM' : '') + 'Save();', current_draft.opt.iFreq);
+
+					return;
+			}
+			function save_onBlur ()
+			{
+				// Moved away from the page, where did you go? ... till you return we pause autosaving
 				if (current_draft.bPM)
 					current_draft.draftPMSave();
 				else
@@ -46,18 +70,7 @@ elk_DraftAutoSave.prototype.init = function ()
 					window.clearInterval(current_draft.interval_id);
 
 				current_draft.interval_id = "";
-			});
-			$('#' + current_draft.opt.sSceditorID).data("sceditor").addEvent(current_draft.opt.sSceditorID, 'focus', function (oEvent) {
-			// Since your back we resume the autosave timer
-				var current_draft = eval(current_draft_save);
-
-				if (current_draft.opt.sType === 'quick')
-				{
-					if (current_draft.interval_id === "")
-						current_draft.interval_id = window.setInterval(current_draft.opt.sSelf + '.draft' + (current_draft.bPM ? 'PM' : '') + 'Save();', current_draft.opt.iFreq);
-				}
-				return;
-			});
+			}
 		});
 	}
 }
