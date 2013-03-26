@@ -43,9 +43,9 @@ function findSearchAPI()
 
 	// Load up the search API we are going to use.
 	$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
-	if (!file_exists(SOURCEDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
+	if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
 		fatal_lang_error('search_api_missing');
-	require_once(SOURCEDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php');
+	require_once(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php');
 
 	// Create an instance of the search API and check it is valid for this version of the software.
 	$search_class_name = $modSettings['search_index'] . '_search';
@@ -58,7 +58,7 @@ function findSearchAPI()
 		loadLanguage('Errors');
 		log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
-		require_once(SOURCEDIR . '/SearchAPI-Standard.class.php');
+		require_once(SUBSDIR . '/SearchAPI-Standard.class.php');
 		$searchAPI = new Standard_Search();
 	}
 
