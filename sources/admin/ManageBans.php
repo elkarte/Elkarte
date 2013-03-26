@@ -752,7 +752,7 @@ function banEdit2()
 	global $smcFunc, $context;
 
 	checkSession();
-// 	validateToken('admin-bet');
+	validateToken('admin-bet');
 
 	$ban_errors = error_context::context('ban', 1);
 
