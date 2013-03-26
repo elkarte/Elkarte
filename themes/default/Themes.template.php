@@ -1064,10 +1064,11 @@ function template_edit_template()
 	</div>';
 
 	if (isset($context['parse_error']))
-		echo '
+		foreach ($context['parse_error'] as $error)
+			echo '
 	<div class="errorbox">
 		', $txt['themeadmin_edit_error'], '
-			<div><tt>', $context['parse_error'], '</tt></div>
+			<div><tt>', $error, '</tt></div>
 	</div>';
 
 	// Just show a big box.... gray out the Save button if it's not saveable... (ie. not 777.)

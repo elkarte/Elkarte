@@ -116,7 +116,7 @@ $txt['karmaLabel'] = 'Karma label';
 $txt['karmaApplaudLabel'] = 'Karma applaud label';
 $txt['karmaSmiteLabel'] = 'Karma smite label';
 
-$txt['caching_information'] = 'ELKARTE supports caching through the use of accelerators. The currently supported accelerators include:
+$txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
 	<li>APC</li>
 	<li>eAccelerator</li>
@@ -384,7 +384,7 @@ $txt['lang_entries_not_writable'] = '<strong>Warning:</strong> The language file
 $txt['languages_ltr'] = 'Right to Left';
 
 $txt['add_language'] = 'Add Language';
-$txt['add_language_elk'] = 'Download from Elkarte\'s Repository';
+$txt['add_language_elk'] = 'Download from ElkArte Languages Repository';
 $txt['add_language_elk_browse'] = 'Type name of language to search for or leave blank to search for all.';
 $txt['add_language_elk_install'] = 'Install';
 $txt['add_language_elk_found'] = 'The following languages were found. Click the install link next to the language you wish to install, you will then be taken to the package manager to install.';
@@ -426,7 +426,7 @@ $txt['languages_download_exists_same'] = 'Identical';
 $txt['languages_download_exists_different'] = 'Different';
 $txt['languages_download_copy'] = 'Copy';
 $txt['languages_download_not_chmod'] = 'You cannot proceed with the installation until all files selected to be copied are writable.';
-$txt['languages_download_illegal_paths'] = 'Package contains illegal paths - please contact Elkarte';
+$txt['languages_download_illegal_paths'] = 'Package contains illegal paths - please contact ElkArte';
 $txt['languages_download_complete'] = 'Installation Complete';
 $txt['languages_download_complete_desc'] = 'Language pack installed successfully. Please click <a href="%1$s">here</a> to return to the languages page';
 $txt['languages_delete_confirm'] = 'Are you sure you want to delete this language?';
