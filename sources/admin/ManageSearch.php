@@ -743,20 +743,20 @@ function loadSearchAPIs()
 	global $txt;
 
 	$apis = array();
-	if ($dh = opendir(SOURCEDIR))
+	if ($dh = opendir(SUBSDIR))
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file(SOURCEDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
+			if (is_file(SUBSDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
 			{
 				// Check that this is definitely a valid API!
-				$fp = fopen(SOURCEDIR . '/' . $file, 'rb');
+				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
 				if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 				{
-					require_once(SOURCEDIR . '/' . $file);
+					require_once(SUBSDIR . '/' . $file);
 
 					$index_name = strtolower($matches[1]);
 					$search_class_name = $index_name . '_search';
