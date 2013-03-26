@@ -190,8 +190,8 @@ function action_admintheme()
 }
 
 /**
- * This function lists the available themes and provides an interface to reset
- * the paths of all the installed themes.
+ * This function lists the available themes and provides an interface
+ * to reset the paths of all the installed themes.
  */
 function action_themelist()
 {
@@ -1722,290 +1722,438 @@ function action_jsoption()
 }
 
 /**
- * Shows an interface for editing the templates.
- * - uses the Themes template and edit_template/edit_style sub template.
- * - accessed via ?action=admin;area=theme;sa=edit
+ * Allows choosing, browsing, and editing a theme files.
+ *
+ * Its subactions handle several features:
+ *  - edit_list: show a list of installed themes
+ *  - edit_browse: display the list of files in the current theme, and allow browsing
+ *  - edit_template: display and edit a PHP template file
+ *  - edit_style: display and edit a CSS file
+ *  - edit_file: display and edit other files in the theme
+ *
+ * uses the Themes template
+ * accessed via ?action=admin;area=theme;sa=edit
  */
 function action_edittheme()
 {
 	global $context, $settings, $scripturl, $smcFunc;
 
-	// @todo Should this be removed?
-	if (isset($_REQUEST['preview']))
-		die('die() with fire');
-
 	isAllowedTo('admin_forum');
 	loadTemplate('Themes');
 
-	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) @$_GET['id'];
+	// We'll work hard with them themes!
+	require_once(SUBSDIR . '/Themes.subs.php');
 
-	if (empty($_GET['th']))
+	$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+
+	if (empty($selectedTheme))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
-				AND id_member = {int:no_member}',
-			array(
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-				'theme_templates' => 'theme_templates',
-				'theme_layers' => 'theme_layers',
-				'no_member' => 0,
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if (!isset($context['themes'][$row['id_theme']]))
-				$context['themes'][$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-					'num_default_options' => 0,
-					'num_members' => 0,
-				);
-			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$smcFunc['db_free_result']($request);
+		// you didn't choose a theme:
+		// we show you all installed themes
+		action_edit_list();
 
-		foreach ($context['themes'] as $key => $theme)
-		{
-			// There has to be a Settings template!
-			if (!file_exists($theme['theme_dir'] . '/index.template.php') && !file_exists($theme['theme_dir'] . '/css/index.css'))
-				unset($context['themes'][$key]);
-			else
-			{
-				if (!isset($theme['theme_templates']))
-					$templates = array('index');
-				else
-					$templates = explode(',', $theme['theme_templates']);
-
-				foreach ($templates as $template)
-					if (file_exists($theme['theme_dir'] . '/' . $template . '.template.php'))
-					{
-						// Fetch the header... a good 256 bytes should be more than enough.
-						$fp = fopen($theme['theme_dir'] . '/' . $template . '.template.php', 'rb');
-						$header = fread($fp, 256);
-						fclose($fp);
-
-						// Can we find a version comment, at all?
-						if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
-						{
-							$ver = $match[1];
-							if (!isset($context['themes'][$key]['version']) || $context['themes'][$key]['version'] > $ver)
-								$context['themes'][$key]['version'] = $ver;
-						}
-					}
-
-				$context['themes'][$key]['can_edit_style'] = file_exists($theme['theme_dir'] . '/css/index.css');
-			}
-		}
-
-		$context['sub_template'] = 'edit_list';
-
-		return 'no_themes';
+		// ugly, but safer :P
+		return;
+	}
+	elseif (!isset($_REQUEST['filename']))
+	{
+		// you're browsing around, aren't you
+		action_edit_browse();
+		return;
 	}
 
+	// We don't have errors. Yet.
 	$context['session_error'] = false;
 
+	// We're editing a theme file.
+
 	// Get the directory of the theme we are editing.
-	$request = $smcFunc['db_query']('', '
-		SELECT value, id_theme
-		FROM {db_prefix}themes
-		WHERE variable = {string:theme_dir}
-			AND id_theme = {int:current_theme}
-		LIMIT 1',
-		array(
-			'current_theme' => $_GET['th'],
-			'theme_dir' => 'theme_dir',
-		)
-	);
-	list ($theme_dir, $context['theme_id']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$context['theme_id'] = $selectedTheme;
+	$theme_dir = themeDirectory($context['theme_id']);
+
+	prepareThemeEditContext($theme_dir);
+
+	// Saving?
+	if (isset($_POST['save']))
+	{
+		action_edit_submit();
+
+		// now lets get out of here!
+		return;
+	}
+
+	// We're editing .css, .template.php, .{language}.php or others.
+	// Note: we're here sending $theme_dir as parameter to action_()
+	// controller functions, which isn't cool. To be refactored.
+	if (substr($_REQUEST['filename'], -4) == '.css')
+	{
+		action_edit_style($theme_dir);
+	}
+	elseif (substr($_REQUEST['filename'], -13) == '.template.php')
+	{
+		action_edit_template($theme_dir);
+	}
+	else
+	{
+		action_edit_file($theme_dir);
+	}
+
+	// Create a special token to allow editing of multiple files.
+	createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
+}
+
+/**
+ * This function makes necessary pre-checks and fills
+ * the contextual data as needed by theme edition functions.
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
+function prepareThemeEditContext($theme_dir)
+{
+	global $context;
 
 	// Eh? not trying to sneak a peek outside the theme directory are we
 	if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
 		fatal_lang_error('theme_edit_missing', false);
 
-	if (!isset($_REQUEST['filename']))
-	{
-		if (isset($_GET['directory']))
-		{
-			if (substr($_GET['directory'], 0, 1) == '.')
-				$_GET['directory'] = '';
-			else
-			{
-				$_GET['directory'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_GET['directory']);
-
-				$temp = realpath($theme_dir . '/' . $_GET['directory']);
-				if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) != realpath($theme_dir))
-					$_GET['directory'] = '';
-			}
-		}
-
-		if (isset($_GET['directory']) && $_GET['directory'] != '')
-		{
-			$context['theme_files'] = get_file_listing($theme_dir . '/' . $_GET['directory'], $_GET['directory'] . '/');
-
-			$temp = dirname($_GET['directory']);
-			array_unshift($context['theme_files'], array(
-				'filename' => $temp == '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
-				'is_writable' => is_writable($theme_dir . '/' . $temp),
-				'is_directory' => true,
-				'is_template' => false,
-				'is_image' => false,
-				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
-				'size' => '',
-			));
-		}
-		else
-			$context['theme_files'] = get_file_listing($theme_dir, '');
-
-		$context['sub_template'] = 'edit_browse';
-
-		return;
-	}
+	// You're editing a file: we have extra-checks coming up first.
+	if (substr($_REQUEST['filename'], 0, 1) == '.')
+		$_REQUEST['filename'] = '';
 	else
 	{
-		if (substr($_REQUEST['filename'], 0, 1) == '.')
+		$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
+
+		$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
+		if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
 			$_REQUEST['filename'] = '';
-		else
-		{
-			$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
-
-			$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
-			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) != realpath($theme_dir))
-				$_REQUEST['filename'] = '';
-		}
-
-		if (empty($_REQUEST['filename']))
-			fatal_lang_error('theme_edit_missing', false);
 	}
 
-	if (isset($_POST['save']))
-	{
-		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']), 'post', false) == true)
-		{
-			if (is_array($_POST['entire_file']))
-				$_POST['entire_file'] = implode("\n", $_POST['entire_file']);
-			$_POST['entire_file'] = rtrim(strtr($_POST['entire_file'], array("\r" => '', '   ' => "\t")));
+	// we shouldn't end up with no file
+	if (empty($_REQUEST['filename']))
+		fatal_lang_error('theme_edit_missing', false);
 
-			// Check for a parse error!
-			if (substr($_REQUEST['filename'], -13) == '.template.php' && is_writable($theme_dir) && ini_get('display_errors'))
-			{
-				$request = $smcFunc['db_query']('', '
-					SELECT value
-					FROM {db_prefix}themes
-					WHERE variable = {string:theme_url}
-						AND id_theme = {int:current_theme}
-					LIMIT 1',
-					array(
-						'current_theme' => $_GET['th'],
-						'theme_url' => 'theme_url',
-					)
-				);
-				list ($theme_url) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
-				$fp = fopen($theme_dir . '/tmp_' . session_id() . '.php', 'w');
-				fwrite($fp, $_POST['entire_file']);
-				fclose($fp);
-
-				$error = @file_get_contents($theme_url . '/tmp_' . session_id() . '.php');
-				if (preg_match('~ <b>(\d+)</b><br( /)?' . '>$~i', $error) != 0)
-					$error_file = $theme_dir . '/tmp_' . session_id() . '.php';
-				else
-					unlink($theme_dir . '/tmp_' . session_id() . '.php');
-			}
-
-			if (!isset($error_file))
-			{
-				$fp = fopen($theme_dir . '/' . $_REQUEST['filename'], 'w');
-				fwrite($fp, $_POST['entire_file']);
-				fclose($fp);
-
-				redirectexit('action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
-			}
-		}
-		// Session timed out.
-		else
-		{
-			loadLanguage('Errors');
-
-			$context['session_error'] = true;
-			$context['sub_template'] = 'edit_file';
-
-			// Recycle the submitted data.
-			if (is_array($_POST['entire_file']))
-				$context['entire_file'] = htmlspecialchars(implode("\n", $_POST['entire_file']));
-			else
-				$context['entire_file'] = htmlspecialchars($_POST['entire_file']);
-
-			$context['edit_filename'] = htmlspecialchars($_POST['filename']);
-
-			// You were able to submit it, so it's reasonable to assume you are allowed to save.
-			$context['allow_save'] = true;
-
-			// Re-create the token so that it can be used
-			createToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']));
-
-			return;
-		}
-	}
-
+	// initialize context
 	$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
 	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
 	$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
 
-	if (substr($_REQUEST['filename'], -4) == '.css')
-	{
-		$context['sub_template'] = 'edit_style';
+}
 
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+/**
+ * Displays for edition in admin panel a css file.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
+function action_edit_style($theme_dir)
+{
+	global $context;
+
+	// pick the template and send it the file
+	$context['sub_template'] = 'edit_style';
+	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+}
+
+/**
+ * Displays for edition in admin panel a template file.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
+function action_edit_template($theme_dir)
+{
+	global $context;
+
+	// make sure the sub-template is set
+	$context['sub_template'] = 'edit_template';
+
+	// for a PHP template file, we display each function in separate boxes.
+	$j = 0;
+	$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
+	for ($i = 0, $n = count($file_data); $i < $n; $i++)
+	{
+		if (isset($file_data[$i + 1]) && substr($file_data[$i + 1], 0, 9) == 'function ')
+		{
+			// Try to format the functions a little nicer...
+			$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']) . "\n";
+
+			if (empty($context['file_parts'][$j]['lines']))
+				unset($context['file_parts'][$j]);
+			$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i + 1, 'data' => '');
+		}
+
+		$context['file_parts'][$j]['lines']++;
+		$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_data[$i], array("\t" => '   ')));
 	}
-	elseif (substr($_REQUEST['filename'], -13) == '.template.php')
-	{
-		$context['sub_template'] = 'edit_template';
 
-		if (!isset($error_file))
-			$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
+	$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')));
+}
+
+/**
+ * Handles edition in admin of other types of files from a theme,
+ * except templates and css.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ *
+ * @param string $theme_dir absolute path of the selected theme directory
+ */
+function action_edit_file($theme_dir)
+{
+	global $context;
+
+	// simply set the template and the file contents.
+	$context['sub_template'] = 'edit_file';
+	$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+}
+
+/**
+ * This function handles submission of a template file.
+ * It checks the file for syntax errors, and if it passes,
+ * it saves it.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
+function action_edit_submit()
+{
+	global $context, $scripturl;
+
+	$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+	if (empty($selectedTheme))
+	{
+		// this should never be happening. Never I say. But... in case it does :P
+		fatal_lang_error('theme_edit_missing');
+	}
+
+	$theme_dir = themeDirectory($context['theme_id']);
+	$file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
+
+	// you did submit *something*, didn't you?
+	if (empty($file))
+	{
+		// @todo a better error message
+		fatal_lang_error('theme_edit_missing');
+	}
+
+	// checking PHP syntax on css files is not a most constructive use of processing power :P
+	// we need to know what kind of file we have
+	$is_php = substr($_REQUEST['filename'], -4) == '.php';
+	$is_template = substr($_REQUEST['filename'], -13) == '.template.php';
+	$is_css = substr($_REQUEST['filename'], -4) == '.css';
+
+	// check you up
+	if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
+	{
+		// consolidate the format in which we received the file contents
+		if (is_array($file))
+			$entire_file = implode("\n", $file);
+		else
+			$entire_file = $file;
+		$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
+
+		// errors? No errors!
+		$errors = array();
+
+		// for PHP files, we check the syntax.
+		if ($is_php)
+		{
+			require_once(SUBSDIR . '/DataValidator.class.php');
+
+			$validator = new Data_Validator();
+			$validator->validation_rules(array(
+				'entire_file' => 'php_syntax'
+			));
+			$validator->validate(array('entire_file' => $entire_file));
+
+			// retrieve the errors
+			// @todo fix the fields names.
+			$errors = $validator->validation_errors();
+		}
+
+		// if successful so far, we'll take the plunge and save this piece of art.
+		if (empty($errors))
+		{
+			// try to save the new file contents
+			$fp = fopen($theme_dir . '/' . $_REQUEST['filename'], 'w');
+			fwrite($fp, $entire_file);
+			fclose($fp);
+
+			// we're done here.
+			redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
+		}
 		else
 		{
-			if (preg_match('~(<b>.+?</b>:.+?<b>).+?(</b>.+?<b>\d+</b>)<br( /)?' . '>$~i', $error, $match) != 0)
-				$context['parse_error'] = $match[1] . $_REQUEST['filename'] . $match[2];
-			$file_data = file($error_file);
-			unlink($error_file);
-		}
+			// I can't let you off the hook yet: syntax errors are a nasty beast.
 
-		$j = 0;
-		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
-		for ($i = 0, $n = count($file_data); $i < $n; $i++)
-		{
-			if (isset($file_data[$i + 1]) && substr($file_data[$i + 1], 0, 9) == 'function ')
+			// pick the right sub-template for the next try
+			if ($is_template)
+				$context['sub_template'] = 'edit_template';
+			else
+				$context['sub_template'] = 'edit_file';
+
+			// fill contextual data for the template, the errors to show
+			foreach ($errors as $error)
+				$context['parse_error'][] = $error;
+
+			// send back the file contents
+			$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
+
+			if (!is_array($file))
+				$file = array($file);
+			foreach ($file as $i => $file_part)
 			{
-				// Try to format the functions a little nicer...
-				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']) . "\n";
-
-				if (empty($context['file_parts'][$j]['lines']))
-					unset($context['file_parts'][$j]);
-				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i + 1, 'data' => '');
+				$context['file_parts'][$i]['lines'] = strlen($file_part);
+				$context['file_parts'][$i]['data'] = $file_part;
 			}
 
-			$context['file_parts'][$j]['lines']++;
-			$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_data[$i], array("\t" => '   ')));
-		}
+			// re-create token for another try
+			createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
 
-		$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')));
+			return;
+		}
 	}
+	// Session timed out.
 	else
 	{
-		$context['sub_template'] = 'edit_file';
+		loadLanguage('Errors');
 
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+		// notify the template of trouble
+		$context['session_error'] = true;
+
+		// choose sub-template
+		if ($is_template)
+			$context['sub_template'] = 'edit_template';
+		elseif ($is_css)
+			$context['sub_template'] = 'edit_style';
+		else
+			$context['sub_template'] = 'edit_file';
+
+		// Recycle the submitted data.
+		if (is_array($file))
+			$context['entire_file'] = htmlspecialchars(implode("\n", $file));
+		else
+			$context['entire_file'] = htmlspecialchars($file);
+
+		$context['edit_filename'] = htmlspecialchars($_POST['filename']);
+
+		// Re-create the token so that it can be used
+		createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
+
+		return;
+	}
+}
+
+/**
+ * Handles user browsing in theme directories.
+ * The display will allow to choose a file for editing,
+ * if it is writable.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
+function action_edit_browse()
+{
+	global $context, $scripturl;
+
+	// Get first the directory of the theme we are editing.
+	$context['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+	$theme_dir = themeDirectory($context['theme_id']);
+
+	// Eh? not trying to sneak a peek outside the theme directory are we
+	if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
+		fatal_lang_error('theme_edit_missing', false);
+
+	// Now, where exactly are you?
+	if (isset($_GET['directory']))
+	{
+		if (substr($_GET['directory'], 0, 1) == '.')
+			$_GET['directory'] = '';
+		else
+		{
+			$_GET['directory'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_GET['directory']);
+
+			$temp = realpath($theme_dir . '/' . $_GET['directory']);
+			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) != realpath($theme_dir))
+				$_GET['directory'] = '';
+		}
 	}
 
-	// Create a special token to allow editing of multiple files.
-	createToken('admin-te-' . md5($_GET['th'] . '-' . $_REQUEST['filename']));
+	if (isset($_GET['directory']) && $_GET['directory'] != '')
+	{
+		$context['theme_files'] = get_file_listing($theme_dir . '/' . $_GET['directory'], $_GET['directory'] . '/');
+
+		$temp = dirname($_GET['directory']);
+		array_unshift($context['theme_files'], array(
+			'filename' => $temp == '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
+			'is_writable' => is_writable($theme_dir . '/' . $temp),
+			'is_directory' => true,
+			'is_template' => false,
+			'is_image' => false,
+			'is_editable' => false,
+			'href' => $scripturl . '?action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
+			'size' => '',
+		));
+	}
+	else
+		$context['theme_files'] = get_file_listing($theme_dir, '');
+
+	// finally, load the sub-template
+	$context['sub_template'] = 'edit_browse';
+}
+
+/**
+ * List installed themes.
+ * The listing will allow editing if the files are writable.
+ *
+ * This function is forwarded to, from
+ * ?action=admin;area=theme;sa=edit
+ */
+function action_edit_list()
+{
+	global $context;
+
+	$context['themes'] = installedThemes();
+
+	foreach ($context['themes'] as $key => $theme)
+	{
+		// There has to be a Settings template!
+		if (!file_exists($theme['theme_dir'] . '/index.template.php') && !file_exists($theme['theme_dir'] . '/css/index.css'))
+			unset($context['themes'][$key]);
+		else
+		{
+			if (!isset($theme['theme_templates']))
+				$templates = array('index');
+			else
+				$templates = explode(',', $theme['theme_templates']);
+
+			foreach ($templates as $template)
+				if (file_exists($theme['theme_dir'] . '/' . $template . '.template.php'))
+				{
+					// Fetch the header... a good 256 bytes should be more than enough.
+					$fp = fopen($theme['theme_dir'] . '/' . $template . '.template.php', 'rb');
+					$header = fread($fp, 256);
+					fclose($fp);
+
+					// Can we find a version comment, at all?
+					if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
+					{
+						$ver = $match[1];
+						if (!isset($context['themes'][$key]['version']) || $context['themes'][$key]['version'] > $ver)
+							$context['themes'][$key]['version'] = $ver;
+					}
+				}
+
+			$context['themes'][$key]['can_edit_style'] = file_exists($theme['theme_dir'] . '/css/index.css');
+		}
+	}
+
+	$context['sub_template'] = 'edit_list';
+
 }
 
 /**

@@ -115,7 +115,7 @@ $txt['errortype_general_desc'] = 'General errors that have not been categorized 
 $txt['errortype_critical'] = '<span style="color:red;">Critical</span>';
 $txt['errortype_critical_desc'] = 'Critical errors.  These should be taken care of as quickly as possible.  Ignoring these errors can result in your forum failing and possibly security issues';
 $txt['errortype_database'] = 'Database';
-$txt['errortype_database_desc'] = 'Errors caused by faulty queries.  These should be looked at and reported to the Elkarte team.';
+$txt['errortype_database_desc'] = 'Errors caused by faulty queries.  These should be looked at and reported to the ElkArte team.';
 $txt['errortype_undefined_vars'] = 'Undefined';
 $txt['errortype_undefined_vars_desc'] = 'Errors caused by the use of undefined variables, indexes, or offsets.';
 $txt['errortype_template'] = 'Template';

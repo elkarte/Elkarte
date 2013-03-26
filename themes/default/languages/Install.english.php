@@ -22,7 +22,7 @@ $txt['still_writable'] = 'Your installation directory is still writable.  It\'s 
 $txt['delete_installer'] = 'Click here to delete this install.php file now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
 $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed forum</a> and begin to use it.  You should first make sure you are logged in, after which you will be able to access the administration center.';
-$txt['good_luck'] = 'Thanks for installing Elkarte!';
+$txt['good_luck'] = 'Thanks for installing ElkArte!';
 
 $txt['install_welcome'] = 'Welcome';
 $txt['install_welcome_desc'] = 'Welcome to ELKARTE. This script will guide you through the process for installing %1$s. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
@@ -31,8 +31,8 @@ $txt['install_all_lovely'] = 'We\'ve completed some initial tests on your server
 $txt['user_refresh_install'] = 'Forum Refreshed';
 $txt['user_refresh_install_desc'] = 'While installing, the installer found that (with the details you provided) one or more of the tables this installer might create already existed.<br />Any missing tables in your installation have been recreated with the default data, but no data was deleted from existing tables.';
 
-$txt['default_topic_subject'] = 'Welcome to ELKARTE!';
-$txt['default_topic_message'] = 'Welcome to Elkarte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to [url=http://www.elkarte.net/index.php]ask us for assistance[/url].<br /><br />Thanks!<br />The Elkarte Community.';
+$txt['default_topic_subject'] = 'Welcome to ElkArte!';
+$txt['default_topic_message'] = 'Welcome to ElkArte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to [url=http://www.elkarte.net/index.php]ask us for assistance[/url].<br /><br />Thanks!<br />The Elkarte Community.';
 $txt['default_board_name'] = 'General Discussion';
 $txt['default_board_description'] = 'Feel free to talk about anything and everything in this board.';
 $txt['default_category_name'] = 'General Category';
@@ -189,7 +189,7 @@ $txt['error_mod_security'] = 'The installer has detected the mod_security module
 $txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before ELKARTE gets a say in anything. ELKARTE has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.elkarte.net/redirect/mod_security">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your ftp client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
 $txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can not install ELKARTE';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
-$txt['error_already_installed'] = 'The installer has detected that you already have ELKARTE installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.elkarte.net/">Elkarte Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
+$txt['error_already_installed'] = 'The installer has detected that you already have ELKARTE installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.elkarte.net/">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of ELKARTE is %1$s but this install script is for %2$s.<br /><br />
 	It is recommended that you visit the <a href="http://www.elkarte.net/">ELKARTE</a> website to ensure you are installing the latest version.';
@@ -201,7 +201,7 @@ $txt['error_username_left_empty'] = 'Username field was left empty.';
 $txt['error_db_filename_exists'] = 'The database that you are trying to create exists.  Please delete the current database file or enter another name.';
 $txt['error_db_prefix_reserved'] = 'The prefix that you entered is a reserved prefix.  Please enter another prefix.';
 
-$txt['upgrade_upgrade_utility'] = 'ELKARTE Upgrade Utility';
+$txt['upgrade_upgrade_utility'] = 'ElkArte Upgrade Utility';
 $txt['upgrade_warning'] = 'Warning!';
 $txt['upgrade_critical_error'] = 'Critical Error!';
 $txt['upgrade_continue'] = 'Continue';
@@ -222,7 +222,7 @@ $txt['upgrade_paused_overload'] = 'This upgrade has been paused to avoid overloa
 
 $txt['upgrade_ready_proceed'] = 'Thank you for choosing to upgrade to ELKARTE %1$s. All files appear to be in place, and we\'re ready to proceed.';
 
-$txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a settings check and repair script from <a href="https://github.com/emanuele45/tools/downloads">Elkarte tools</a>.';
+$txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a settings check and repair script from <a href="https://github.com/elkarte/tools/downloads">ElkArte tools</a>.';
 
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
-$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of ELKARTE is <em id="ourVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.elkarte.net/">Elkarte Community</a> website to ensure you are upgrading to the latest version.';
+$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of ElkArte is <em id="ourVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br /><br />It is recommended that you visit the <a href="http://www.elkarte.net/">ElkArte Community</a> website to ensure you are upgrading to the latest version.';

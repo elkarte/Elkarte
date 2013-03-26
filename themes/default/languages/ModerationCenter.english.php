@@ -22,7 +22,7 @@ $txt['mc_recent_reports'] = 'Recent Topic Reports';
 $txt['mc_warnings'] = 'Warnings';
 $txt['mc_notes'] = 'Moderator Notes';
 
-$txt['mc_cannot_connect_sm'] = 'You are unable to connect to Elkarte\'s latest news file.';
+$txt['mc_cannot_connect_sm'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
 $txt['mc_recent_reports_none'] = 'There are no outstanding reports';
 $txt['mc_watched_users_none'] = 'There are not currently any watches in place.';
