@@ -170,7 +170,7 @@ function action_grouplist()
 						// No explicit members for the moderator group.
 						return $rowData[\'id_group\'] == 3 ? $txt[\'membergroups_guests_na\'] : comma_format($rowData[\'num_members\']);
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'sort' => array(
 					'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -703,7 +703,7 @@ function action_grouprequests()
 				'header' => array(
 					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -712,7 +712,7 @@ function action_grouprequests()
 							'id' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

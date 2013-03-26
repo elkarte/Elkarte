@@ -454,7 +454,7 @@ function action_unapproved_attachments()
 				'header' => array(
 					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" checked="checked" />',
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -463,7 +463,7 @@ function action_unapproved_attachments()
 							'id' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

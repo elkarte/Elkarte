@@ -880,7 +880,7 @@ table.table_list a.collapse {
 .table_grid tr.catbg th {
 	text-align: left;
 }
-.table_grid tr.catbg th.centercol, .table_grid tr.windowbg2 td.centercol, .table_grid tr.windowbg td.centercol, .table_grid tr.highlight2 td.centercol  {
+.table_grid tr.catbg th.centertext, .table_grid tr.windowbg2 td.centertext, .table_grid tr.windowbg td.centertext, .table_grid tr.highlight2 td.centertext  {
 	text-align: center;
 }
 tr.catbg th.first_th {

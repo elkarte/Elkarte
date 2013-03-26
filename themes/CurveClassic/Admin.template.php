@@ -1720,7 +1720,7 @@ function template_php_info()
 		<thead>
 		<tr class="catbg" align="center">
 			<th class="first_th" scope="col" width="33%"></th>
-			<th scope="col" width="33%" class="centercol"><strong>', $area, '</strong></th>
+			<th scope="col" width="33%" class="centertext"><strong>', $area, '</strong></th>
 			<th class="last_th" scope="col" width="33%"></th>
 		</tr>
 		</thead>

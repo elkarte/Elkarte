@@ -1575,7 +1575,7 @@ function ShowCustomProfiles()
 			'active' => array(
 				'header' => array(
 					'value' => $txt['custom_edit_active'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -1584,13 +1584,13 @@ function ShowCustomProfiles()
 						return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
 					'),
 					'style' => 'width: 20%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'show_on_registration' => array(
 				'header' => array(
 					'value' => $txt['custom_edit_registration'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -1599,7 +1599,7 @@ function ShowCustomProfiles()
 						return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
 					'),
 					'style' => 'width: 20%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

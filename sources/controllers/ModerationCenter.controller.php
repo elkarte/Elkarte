@@ -1677,7 +1677,7 @@ function action_viewWarningTemplates()
 				'header' => array(
 					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -1685,7 +1685,7 @@ function action_viewWarningTemplates()
 
 						return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

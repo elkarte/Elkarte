@@ -257,7 +257,7 @@ function template_view_package()
 					echo '
 					<tr class="windowbg', $alternate ? '' : '2', '">
 						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
-						<td style="width:30px;text-align:center">
+						<td class="centertext" style="width:30px">
 							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" class="input_check" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
 						</td>
 						<td>', $action['type'], '</td>
@@ -1521,12 +1521,12 @@ function template_file_permissions()
 			<thead>
 				<tr class="catbg">
 					<th class="first_th lefttext" style="width:30%">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
-					<th style="width:30%" class="lefttext">', $txt['package_file_perms_status'], '</th>
-					<th style="width:8%;text-align:center"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
-					<th style="width:8%;text-align:center"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
-					<th style="width:8%;text-align:center"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
-					<th style="width:8%;text-align:center"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
-					<th class="last_th" style="width:8%;text-align:center"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
+					<th class="lefttext" style="width:30%">', $txt['package_file_perms_status'], '</th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
+					<th class="last_th centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -1549,11 +1549,11 @@ function template_file_permissions()
 						<span style="color: ', ($dir['perms']['chmod'] ? 'green' : 'red'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
+					<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
+					<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
+					<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
+					<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
 				</tr>
 			';
 
@@ -1658,19 +1658,16 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 					<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 					', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 				</td>
-				<td class="perm_read" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
-				<td class="perm_write" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
-				<td class="perm_execute" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
-				<td class="perm_custom" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
-				<td class="perm_nochange" style="text-align:center; width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+				<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
+				<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
+				<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
+				<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
+				<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
 			</tr>
 			<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td></td></tr>';
 
 			if (!empty($dir['contents']))
-			{
 				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
-
-			}
 		}
 	}
 

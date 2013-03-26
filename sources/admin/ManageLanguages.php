@@ -119,11 +119,11 @@ function AddLanguage()
 				'install_link' => array(
 					'header' => array(
 						'value' => $txt['add_language_elk_install'],
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'install_link',
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -535,14 +535,14 @@ function DownloadLanguage()
 			'copy' => array(
 				'header' => array(
 					'value' => $txt['languages_download_copy'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
 						return \'<input type="checkbox" name="copy_file[]" value="\' . $rowData[\'generaldest\'] . \'" \' . ($rowData[\'default_copy\'] ? \'checked="checked"\' : \'\') . \' class="input_check" />\';
 					'),
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -608,14 +608,14 @@ function ModifyLanguages()
 			'default' => array(
 				'header' => array(
 					'value' => $txt['languages_default'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
 						return \'<input type="radio" name="def_language" value="\' . $rowData[\'id\'] . \'" \' . ($rowData[\'default\'] ? \'checked="checked"\' : \'\') . \' onclick="highlightSelected(\\\'list_language_list_\' . $rowData[\'id\'] . \'\\\');" class="input_radio" />\';
 					'),
 					'style' => 'width: 8%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'name' => array(

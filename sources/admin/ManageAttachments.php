@@ -530,7 +530,7 @@ function action_browse()
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -539,7 +539,7 @@ function action_browse()
 							'id_attach' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -1902,14 +1902,14 @@ function action_attachpaths()
 			'current_dir' => array(
 				'header' => array(
 					'value' => $txt['attach_current'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
 						return \'<input type="radio" name="current_dir" value="\' . $rowData[\'id\'] . \'" \' . ($rowData[\'current\'] ? \' checked="checked"\' : \'\') . (!empty($rowData[\'disable_current\']) ? \' disabled="disabled"\' : \'\') . \' class="input_radio" />\';
 					'),
 					'style' => 'width: 10%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'path' => array(
@@ -1944,12 +1944,12 @@ function action_attachpaths()
 			'status' => array(
 				'header' => array(
 					'value' => $txt['attach_dir_status'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db' => 'status',
 					'style' => 'width: 25%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -1993,14 +1993,14 @@ function action_attachpaths()
 				'current_dir' => array(
 					'header' => array(
 						'value' => $txt['attach_current'],
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
 							return \'<input type="radio" name="current_base_dir" value="\' . $rowData[\'id\'] . \'" \' . ($rowData[\'current\'] ? \' checked="checked"\' : \'\') . \' class="input_radio" />\';
 						'),
 						'style' => 'width: 10%;',
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 				'path' => array(
@@ -2028,7 +2028,7 @@ function action_attachpaths()
 					'data' => array(
 						'db' => 'status',
 						'style' => 'width: 15%;',
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 			),

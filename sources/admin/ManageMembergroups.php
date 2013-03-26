@@ -156,7 +156,7 @@ function MembergroupIndex()
 			'members' => array(
 				'header' => array(
 					'value' => $txt['membergroups_members_top'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -165,7 +165,7 @@ function MembergroupIndex()
 						// No explicit members for the moderator group.
 						return $rowData[\'id_group\'] == 3 ? $txt[\'membergroups_guests_na\'] : comma_format($rowData[\'num_members\']);
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'sort' => array(
 					'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -175,7 +175,7 @@ function MembergroupIndex()
 			'modify' => array(
 				'header' => array(
 					'value' => $txt['modify'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -184,7 +184,7 @@ function MembergroupIndex()
 							'id_group' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -259,11 +259,11 @@ function MembergroupIndex()
 			'members' => array(
 				'header' => array(
 					'value' => $txt['membergroups_members_top'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db' => 'num_members',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'sort' => array(
 					'default' => '1 DESC',
@@ -273,11 +273,11 @@ function MembergroupIndex()
 			'required_posts' => array(
 				'header' => array(
 					'value' => $txt['membergroups_min_posts'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db' => 'min_posts',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'sort' => array(
 					'default' => 'mg.min_posts',
@@ -287,7 +287,7 @@ function MembergroupIndex()
 			'modify' => array(
 				'header' => array(
 					'value' => $txt['modify'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -296,7 +296,7 @@ function MembergroupIndex()
 							'id_group' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

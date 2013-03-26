@@ -45,19 +45,19 @@ function template_permission_index()
 				<thead>
 					<tr class="catbg">
 						<th class="first_th">', $txt['membergroups_name'], '</th>
-						<th style="text-align:center;width:10%;vertical-align:middle">', $txt['membergroups_members_top'], '</th>';
+						<th class="centertext" style="width:10%">', $txt['membergroups_members_top'], '</th>';
 
 			if (empty($modSettings['permission_enable_deny']))
 				echo '
-						<th style="width:16%;text-align:center">', $txt['membergroups_permissions'], '</th>';
+						<th class="centertext" style="width:16%">', $txt['membergroups_permissions'], '</th>';
 			else
 				echo '
-						<th style="text-align:center;width:8%">', $txt['permissions_allowed'], '</th>
-						<th style="text-align:center;width:8%">', $txt['permissions_denied'], '</th>';
+						<th class="centertext" style="width:8%">', $txt['permissions_allowed'], '</th>
+						<th class="centertext" style="width:8%">', $txt['permissions_denied'], '</th>';
 
 			echo '
-						<th style="text-align:center;width:10%;vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
-						<th class="last_th" style="text-align: center;width:4%;vertical-align:middle">
+						<th class="centertext" style="width:10%;vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
+						<th class="last_th centertext" style="width:4%;vertical-align:middle">
 							', $context['can_modify'] ? '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'group\');" />' : '', '
 						</th>
 					</tr>
@@ -84,11 +84,11 @@ function template_permission_index()
 
 		if (empty($modSettings['permission_enable_deny']))
 			echo '
-						<td style="width:16%;text-align:center">', $group['num_permissions']['allowed'], '</td>';
+						<td class="centertext" style="width:16%">', $group['num_permissions']['allowed'], '</td>';
 		else
 			echo '
-						<td style="width:8%;text-align:center', $group['id'] == 1 ? ';font-style:italic"' : '"', '>', $group['num_permissions']['allowed'], '</td>
-						<td style="width:8%;text-align:center', $group['id'] == 1 || $group['id'] == -1 ? ';font-style:italic"' : (!empty($group['num_permissions']['denied']) ? ';color: red"' : '"'), '>', $group['num_permissions']['denied'], '</td>';
+						<td class="centertext" style="width:8%', $group['id'] == 1 ? ';font-style:italic"' : '"', '>', $group['num_permissions']['allowed'], '</td>
+						<td class="centertext" style="width:8%', $group['id'] == 1 || $group['id'] == -1 ? ';font-style:italic"' : (!empty($group['num_permissions']['denied']) ? ';color: red"' : '"'), '>', $group['num_permissions']['denied'], '</td>';
 
 		echo '
 						<td class="centertext">', $group['allow_modify'] ? '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $group['id'] . (empty($context['profile']) ? '' : ';pid=' . $context['profile']['id']) . '">' . ($context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view']). '</a>' : '', '</td>
@@ -412,7 +412,7 @@ function template_edit_profiles()
 						<td>
 							', !empty($profile['boards_text']) ? $profile['boards_text'] : $txt['permissions_profile_used_by_none'], '
 						</td>
-						<td style="text-align:center;', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', '>
+						<td class="centertext" ', !empty($context['show_rename_boxes']) ? 'style="display:none"' : '', '>
 							<input type="checkbox" name="delete_profile[]" value="', $profile['id'], '" ', $profile['can_delete'] ? '' : 'disabled="disabled"', ' class="input_check" />
 						</td>
 					</tr>';
@@ -589,7 +589,7 @@ function template_modify_group_simple($type)
 			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
-						<th class="first_th" colspan="2" style="width:100%;text-align:left"></th>';
+						<th class="first_th lefttext" colspan="2" style="width:100%"></th>';
 				if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 					echo '
 						<th></th>
@@ -624,7 +624,7 @@ function template_modify_group_simple($type)
 			{
 				echo '
 					<tr class="windowbg">
-						<td colspan="2" style="width:100%;text-align:left">
+						<td class="lefttext" colspan="2" style="width:100%">
 							<a href="#" onclick="return toggleBreakdown(\'', $id_group, '\');">
 								<img src="', $settings['images_url'], '/selected_open.png" id="group_toggle_img_', $id_group, '" alt="*" />&nbsp;<strong>', $permissionGroup['name'], '</strong>
 							</a>
@@ -680,7 +680,7 @@ function template_modify_group_simple($type)
 						<td style="width:10px;vertical-align:top;padding-right:1ex;">
 							', $permission['help_index'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $permission['help_index'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
 						</td>
-						<td style="width: 100%;vertical-align: top;text-align: left;padding-bottom: 2px">', $permission['name'], '</td>';
+						<td class="lefttext" style="width:100%;vertical-align:top;padding-bottom:2px">', $permission['name'], '</td>';
 
 				if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 					echo '
@@ -891,7 +891,7 @@ function template_modify_group_classic($type)
 				{
 					echo '
 							<tr class="catbg">
-								<th colspan="2" style="width:100%;text-align:left">
+								<th class="lefttext" colspan="2" style="width:100%">
 									<strong class="smalltext">', $permissionGroup['name'], '</strong>
 								</th>';
 
@@ -946,7 +946,7 @@ function template_modify_group_classic($type)
 					if ($permission['has_own_any'])
 					{
 						echo '
-								<td colspan="4" style="width:100%;text-align:left">', $permission['name'], '</td>
+								<td class="lefttext" colspan="4" style="width:100%">', $permission['name'], '</td>
 							</tr>
 							<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">';
 
@@ -955,7 +955,7 @@ function template_modify_group_classic($type)
 						{
 							echo '
 								<td></td>
-								<td style="width:100%;text-align:right" class="smalltext" >', $permission['own']['name'], ':</td>';
+								<td class="smalltext righttext" style="width:100%">', $permission['own']['name'], ':</td>';
 
 							if (empty($modSettings['permission_enable_deny']))
 								echo '
@@ -981,7 +981,7 @@ function template_modify_group_classic($type)
 
 						echo '
 								<td></td>
-								<td style="width:100%;text-align:right" class="smalltext" >', $permission['any']['name'], ':</td>';
+								<td class="smalltext righttext" style="width:100%">', $permission['any']['name'], ':</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -1006,7 +1006,7 @@ function template_modify_group_classic($type)
 					else
 					{
 						echo '
-								<td style="width:100%;text-align:left">', $permission['name'], '</td>';
+								<td class="lefttext" style="width:100%">', $permission['name'], '</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -1153,16 +1153,16 @@ function template_postmod_permissions()
 				<thead>
 					<tr class="catbg">
 						<th class="first_th"></th>
-						<th class="centercol" colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_new_topics'], '
 						</th>
-						<th class="centercol" colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_own'], '
 						</th>
-						<th class="centercol" colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_any'], '
 						</th>
-						<th class="last_th centercol" colspan="3">
+						<th class="last_th centertext" colspan="3">
 							', $txt['permissions_post_moderation_attachments'], '
 						</th>
 					</tr>

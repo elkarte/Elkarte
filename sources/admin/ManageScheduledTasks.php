@@ -211,7 +211,7 @@ function ScheduledTasks()
 				'header' => array(
 					'value' => $txt['scheduled_tasks_enabled'],
 					'style' => 'width: 6%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -222,14 +222,14 @@ function ScheduledTasks()
 							'checked_state' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'run_now' => array(
 				'header' => array(
 					'value' => $txt['scheduled_tasks_run_now'],
 					'style' => 'width: 12%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -239,7 +239,7 @@ function ScheduledTasks()
 							'id' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

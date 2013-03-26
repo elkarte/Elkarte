@@ -240,7 +240,7 @@ function action_list()
 			'actions' => array(
 				'header' => array(
 					'value' => $txt['ban_actions'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -249,13 +249,13 @@ function action_list()
 							'id_ban_group' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -264,7 +264,7 @@ function action_list()
 							'id_ban_group' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -1035,7 +1035,7 @@ function action_browse()
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -1044,7 +1044,7 @@ function action_browse()
 							'id_ban' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -1348,7 +1348,7 @@ function action_log()
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -1357,7 +1357,7 @@ function action_log()
 							'id_ban_log' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
