@@ -579,7 +579,7 @@ function ViewMemberlist()
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -587,7 +587,7 @@ function ViewMemberlist()
 
 						return \'<input type="checkbox" name="delete[]" value="\' . $rowData[\'id_member\'] . \'" class="input_check" \' . ($rowData[\'id_member\'] == $user_info[\'id\'] || $rowData[\'id_group\'] == 1 || in_array(1, explode(\',\', $rowData[\'additional_groups\'])) ? \'disabled="disabled"\' : \'\') . \' />\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -937,7 +937,7 @@ function MembersAwaitingActivation()
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -946,7 +946,7 @@ function MembersAwaitingActivation()
 							'id_member' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

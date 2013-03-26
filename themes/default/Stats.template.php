@@ -186,7 +186,7 @@ function template_main()
 									<span class="righttext">' . $topic['num_replies'] . '</span>
 								</dd>';
 	}
-	
+
 	echo '
 							</dl>
 						</div>
@@ -309,7 +309,7 @@ function template_main()
 		echo '
 		<table class="table_grid" id="stats">
 			<thead>
-				<tr class="titlebg" style="vertical-align:middle;text-align:center">
+				<tr class="titlebg centertext" style="vertical-align:middle">
 					<th class="first_th lefttext" style="width:25%">', $txt['yearly_summary'], '</th>
 					<th style="width:15%">', $txt['stats_new_topics'], '</th>
 					<th style="width:15%">', $txt['stats_new_posts'], '</th>
@@ -328,7 +328,7 @@ function template_main()
 		foreach ($context['yearly'] as $id => $year)
 		{
 			echo '
-				<tr class="windowbg2" style="vertical-align:middle;text-align:center" id="year_', $id, '">
+				<tr class="windowbg2 centertext" style="vertical-align:middle" id="year_', $id, '">
 					<th class="lefttext" style="width:25%">
 						<img id="year_img_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" /> <a href="#year_', $id, '" id="year_link_', $id, '">', $year['year'], '</a>
 					</th>
@@ -347,7 +347,7 @@ function template_main()
 			foreach ($year['months'] as $month)
 			{
 				echo '
-				<tr class="windowbg2" style="vertical-align:middle;text-align:center" id="tr_month_', $month['id'], '">
+				<tr class="windowbg2 centertext" style="vertical-align:middle" id="tr_month_', $month['id'], '">
 					<th class="stats_month">
 						<img src="', $settings['images_url'], '/', $month['expanded'] ? 'selected_open.png' : 'selected.png', '" alt="" id="img_', $month['id'], '" /> <a id="m', $month['id'], '" href="', $month['href'], '">', $month['month'], ' ', $month['year'], '</a>
 					</th>
@@ -368,7 +368,7 @@ function template_main()
 					foreach ($month['days'] as $day)
 					{
 						echo '
-				<tr class="windowbg2" style="vertical-align:middle;text-align:center" id="tr_day_', $day['year'], '-', $day['month'], '-', $day['day'], '">
+				<tr class="windowbg2 centertext" style="vertical-align:middle" id="tr_day_', $day['year'], '-', $day['month'], '-', $day['day'], '">
 					<td class="stats_day">', $day['year'], '-', $day['month'], '-', $day['day'], '</td>
 					<td>', $day['new_topics'], '</td>
 					<td>', $day['new_posts'], '</td>

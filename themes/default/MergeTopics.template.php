@@ -145,11 +145,11 @@ function template_merge_extra_options()
 			<table class="bordercolor table_grid">
 				<thead>
 					<tr class="catbg">
-						<th scope="col" class="first_th" style="text-align:center;width:10px">', $txt['merge_check'], '</th>
+						<th scope="col" class="first_th centertext" style="width:6em">', $txt['merge_check'], '</th>
 						<th scope="col" class="lefttext">', $txt['subject'], '</th>
 						<th scope="col" class="lefttext">', $txt['started_by'], '</th>
 						<th scope="col" class="lefttext">', $txt['last_post'], '</th>
-						<th scope="col" class="last_th" style="width:20px">' . $txt['merge_include_notifications'] . '</th>
+						<th scope="col" class="last_th centertext" style="width:10em">' . $txt['merge_include_notifications'] . '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -234,7 +234,7 @@ function template_merge_extra_options()
 						</ul>
 					</fieldset>';
 	}
-	
+
 	echo '
 					<div class="auto_flow">
 						<input type="submit" value="' . $txt['merge'] . '" class="button_submit" />

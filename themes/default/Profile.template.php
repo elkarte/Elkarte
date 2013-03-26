@@ -502,14 +502,14 @@ function template_editBuddies()
 		<table class="table_grid">
 			<tr class="catbg">
 				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
-				<th class="centercol" scope="col">', $txt['status'], '</th>';
+				<th class="centertext" scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th class="centercol" scope="col">', $txt['email'], '</th>';
+				<th class="centertext" scope="col">', $txt['email'], '</th>';
 
 	echo '
-				<th class="last_th centercol" scope="col"></th>
+				<th class="last_th centertext" scope="col"></th>
 			</tr>';
 
 	// If they don't have any buddies don't list them!
@@ -617,14 +617,14 @@ function template_editIgnoreList()
 		<table class="table_grid">
 			<tr class="catbg">
 				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
-				<th class="centercol" scope="col">', $txt['status'], '</th>';
+				<th class="centertext" scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th class="centercol" scope="col">', $txt['email'], '</th>';
+				<th class="centertext" scope="col">', $txt['email'], '</th>';
 
 	echo '
-				<th class="centercol last_th" scope="col"></th>
+				<th class="centertext last_th" scope="col"></th>
 			</tr>';
 
 	// If they don't have anyone on their ignore list, don't list it!
@@ -2079,7 +2079,7 @@ function template_viewWarning()
 						<div>
 							<div>
 								<div style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background: white; padding: 1px; position: relative;">
-									<div id="warning_text" style="padding-top: 1pt; width: 100%; z-index: 2; color: black; position: absolute; text-align: center; font-weight: bold;">', $context['member']['warning'], '%</div>
+									<div id="warning_text" class="centertext">', $context['member']['warning'], '%</div>
 									<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background: ', $context['current_color'], ';">&nbsp;</div>
 								</div>
 							</div>

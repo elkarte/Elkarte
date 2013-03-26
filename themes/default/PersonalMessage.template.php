@@ -569,7 +569,7 @@ function template_subject_list()
 						<table class="table_grid">
 						<thead>
 							<tr class="catbg">
-								<th style="width:4%" class="centercol first_th">
+								<th style="width:4%" class="centertext first_th">
 									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] == 'up' ? '' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '"><img src="', $settings['images_url'], '/im_switch.png" alt="', $txt['pm_change_view'], '" title="', $txt['pm_change_view'], '" width="16" height="16" /></a>
 								</th>
 								<th class="lefttext" style="width:22%">
@@ -581,7 +581,7 @@ function template_subject_list()
 								<th class="lefttext">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', ($context['from_or_to'] == 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
-								<th style="width:4%" class="centercol last_th">
+								<th style="width:4%" class="centertext last_th">
 									<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />
 								</th>
 							</tr>
@@ -599,7 +599,7 @@ function template_subject_list()
 	{
 		echo '
 							<tr class="', $next_alternate ? 'windowbg' : 'windowbg2', '">
-								<td style="width:4%;text-align:center">
+								<td class="centertext" style="width:4%">
 									<script type="text/javascript"><!-- // --><![CDATA[
 										currentLabels[', $message['id'], '] = {';
 
@@ -621,7 +621,7 @@ function template_subject_list()
 								<td>', $message['time'], '</td>
 								<td>', ($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''), '<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg', $message['id'], '">', $message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '</a></td>
 								<td>', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '</td>
-								<td class="centercol" style="width:4%">
+								<td class="centertext" style="width:4%">
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
 								</td>
 							</tr>';
@@ -1349,7 +1349,7 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td style="width:4%;text-align:center">
+				<td class="centertext" style="width:4%">
 					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
@@ -1514,7 +1514,7 @@ function template_rules()
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
-				<td style="width:4%;text-align:center">
+				<td class="centertext" style="width:4%">
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';

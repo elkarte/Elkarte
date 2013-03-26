@@ -1708,7 +1708,7 @@ function template_php_info()
 			<thead>
 			<tr class="catbg">
 				<th class="first_th" scope="col" style="width:33%"></th>
-				<th scope="col" style="width:33%" class="centercol"><strong>', $area, '</strong></th>
+				<th scope="col" style="width:33%" class="centertext"><strong>', $area, '</strong></th>
 				<th class="last_th" scope="col" style="width:33%"></th>
 			</tr>
 			</thead>
@@ -1728,21 +1728,21 @@ function template_php_info()
 					// heading row for the settings section of this categorys settings
 					echo '
 			<tr class="titlebg">
-				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
-				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
-				<td style="width:33%;text-align:center"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
+				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
+				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
+				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
 			</tr>';
 					$localmaster = false;
 				}
 
 				echo '
 			<tr>
-				<td style="width:33;text-align:left" class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
+				<td style="width:33;" class="windowbg lefttext', $alternate ? '2' : '', '">', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
 				{
 					echo '
-				<td style="width:33%;text-align:left" class="windowbg', $alternate ? '2' : '', '">', $value, '</td>';
+				<td style="width:33%;" class="windowbg lefttext', $alternate ? '2' : '', '">', $value, '</td>';
 				}
 				echo '
 			</tr>';
@@ -1752,8 +1752,8 @@ function template_php_info()
 			{
 				echo '
 			<tr>
-				<td style="width:33%" class="lefttext windowbg', $alternate ? '2' : '', '">', $key,  '</td>
-				<td class="lefttext windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
+				<td style="width:33%" class="windowbg lefttext', $alternate ? '2' : '', '">', $key,  '</td>
+				<td class=" windowbg lefttext', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
 			</tr>';
 			}
 

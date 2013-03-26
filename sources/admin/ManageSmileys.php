@@ -388,14 +388,14 @@ function EditSmileySets()
 			'default' => array(
 				'header' => array(
 					'value' => $txt['smiley_sets_default'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
 						global $settings;
 						return $rowData[\'selected\'] ? \'<img src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" class="icon" />\' : \'\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'sort' => array(
 					'default' => 'selected DESC',
@@ -433,7 +433,7 @@ function EditSmileySets()
 			'modify' => array(
 				'header' => array(
 					'value' => $txt['smiley_set_modify'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -442,19 +442,19 @@ function EditSmileySets()
 							'id' => true,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
 						return $rowData[\'id\'] == 0 ? \'\' : sprintf(\'<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />\', $rowData[\'id\']);
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -962,7 +962,7 @@ function EditSmileys()
 								'description' => true,
 							),
 						),
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 				'code' => array(
@@ -1042,7 +1042,7 @@ function EditSmileys()
 				'modify' => array(
 					'header' => array(
 						'value' => $txt['smileys_modify'],
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 					'data' =>  array(
 						'sprintf' => array(
@@ -1051,13 +1051,13 @@ function EditSmileys()
 								'id_smiley' => false,
 							),
 						),
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -1066,7 +1066,7 @@ function EditSmileys()
 								'id_smiley' => false,
 							),
 						),
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -1879,7 +1879,7 @@ function EditMessageIcons()
 						$images_url = $settings[file_exists(sprintf(\'%1$s/images/post/%2$s.png\', $settings[\'theme_dir\'], $rowData[\'filename\'])) ? \'actual_images_url\' : \'default_images_url\'];
 						return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\']));
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'filename' => array(
@@ -1918,7 +1918,7 @@ function EditMessageIcons()
 			'modify' => array(
 				'header' => array(
 					'value' => $txt['smileys_modify'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -1927,13 +1927,13 @@ function EditMessageIcons()
 							'id_icon' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'check' => array(
 				'header' => array(
 					'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -1942,7 +1942,7 @@ function EditMessageIcons()
 							'id_icon' => false,
 						),
 					),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

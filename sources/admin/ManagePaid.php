@@ -250,37 +250,37 @@ function ViewSubscriptions()
 				'header' => array(
 					'value' => $txt['paid_pending'],
 					'style' => 'width: 18%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db_htmlsafe' => 'pending',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'finished' => array(
 				'header' => array(
 					'value' => $txt['paid_finished'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db_htmlsafe' => 'finished',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'total' => array(
 				'header' => array(
 					'value' => $txt['paid_active'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'db_htmlsafe' => 'total',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'is_active' => array(
 				'header' => array(
 					'value' => $txt['paid_is_active'],
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -288,7 +288,7 @@ function ViewSubscriptions()
 
 						return \'<span style="color: \' . ($rowData[\'active\'] ? \'green\' : \'red\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'modify' => array(
@@ -298,7 +298,7 @@ function ViewSubscriptions()
 
 						return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'delete' => array(
@@ -308,7 +308,7 @@ function ViewSubscriptions()
 
 						return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'delete\'] . \'</a>\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -729,7 +729,7 @@ function ViewSubscribedUsers()
 			'modify' => array(
 				'header' => array(
 					'style' => 'width: 10%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -737,13 +737,13 @@ function ViewSubscribedUsers()
 
 						return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modifyuser;lid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 			'delete' => array(
 				'header' => array(
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
@@ -751,7 +751,7 @@ function ViewSubscribedUsers()
 
 						return \'<input type="checkbox" name="delsub[\' . $rowData[\'id\'] . \']" class="input_check" />\';
 					'),
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 			),
 		),

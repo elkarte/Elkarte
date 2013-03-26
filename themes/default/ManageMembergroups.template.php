@@ -568,7 +568,7 @@ function template_group_members()
 						<th ', empty($context['group']['assignable']) ? ' class="last_th" colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <img src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '','</a></th>';
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th class="last_th" style="width:4%;text-align:center"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th class="last_th centertext" style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
 	echo '
 					</tr>
 				</thead>
@@ -618,7 +618,7 @@ function template_group_members()
 						<td', empty($context['group']['assignable']) ? ' colspan="2"' : '', '>', $member['posts'], '</td>';
 		if (!empty($context['group']['assignable']))
 			echo '
-						<td style="width:4%;text-align:center">
+						<td class="centertext" style="width:4%">
 							<input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
 		echo '

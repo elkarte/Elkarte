@@ -624,7 +624,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -633,7 +633,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 								'path' => false,
 							),
 						),
-						'class' => 'centercol',
+						'class' => 'centertext',
 					),
 				),
 				'result' => array(
