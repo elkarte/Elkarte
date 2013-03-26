@@ -1939,40 +1939,60 @@ function action_edit_submit()
 		fatal_lang_error('theme_edit_missing');
 	}
 
+	// checking PHP syntax on css files is not a most constructive use of processing power :P
+	// we need to know what kind of file we have
+	$is_php = substr($_REQUEST['filename'], -4) == '.php';
+	$is_template = substr($_REQUEST['filename'], -13) == '.template.php';
+	$is_css = substr($_REQUEST['filename'], -4) == '.css';
+
 	// check you up
 	if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
 	{
+		// consolidate the format in which we received the file contents
 		if (is_array($file))
 			$entire_file = implode("\n", $file);
 		else
 			$entire_file = $file;
 		$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
 
-		require_once(SUBSDIR . '/DataValidator.class.php');
+		// errors? No errors!
+		$errors = array();
 
-		$validator = new Data_Validator();
-		$validator->validation_rules(array(
-			'entire_file' => 'php_syntax'
-		));
-		$validator->validate(array('entire_file' => $entire_file));
-		$errors = $validator->validation_errors();
+		// for PHP files, we check the syntax.
+		if ($is_php)
+		{
+			require_once(SUBSDIR . '/DataValidator.class.php');
 
+			$validator = new Data_Validator();
+			$validator->validation_rules(array(
+				'entire_file' => 'php_syntax'
+			));
+			$validator->validate(array('entire_file' => $entire_file));
+			$errors = $validator->validation_errors();
+		}
+
+		// if successful so far, we'll take the plunge and save this piece of art.
 		if (empty($errors))
 		{
+			// try to save the new file contents
 			$fp = fopen($theme_dir . '/' . $_REQUEST['filename'], 'w');
 			fwrite($fp, $entire_file);
 			fclose($fp);
 
+			// we're done here.
 			redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
 		}
 		else
 		{
-			$context['sub_template'] = 'edit_template';
+			// I can't let you off the hook yet: syntax errors are a nasty beast.
+
+			if ($is_template)
+				$context['sub_template'] = 'edit_template';
+			else
+				$context['sub_template'] = 'edit_file';
 
 			foreach ($errors as $error)
 				$context['parse_error'][] = $error;
-			// we might get here after we try and fail to save a php file
-			// (with syntax errors)
 			$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
 
 			if (!is_array($file))
@@ -1994,8 +2014,16 @@ function action_edit_submit()
 	{
 		loadLanguage('Errors');
 
+		// notify the template of trouble
 		$context['session_error'] = true;
-		$context['sub_template'] = 'edit_file';
+
+		// choose sub-template
+		if ($is_template)
+			$context['sub_template'] = 'edit_template';
+		elseif ($is_css)
+			$context['sub_template'] = 'edit_style';
+		else
+			$context['sub_template'] = 'edit_file';
 
 		// Recycle the submitted data.
 		if (is_array($file))
