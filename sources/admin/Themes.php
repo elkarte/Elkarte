@@ -1722,8 +1722,11 @@ function action_jsoption()
 }
 
 /**
- * Allows editing a theme:
- *  - edit_list: display the list of files in the theme, and allow browsing
+ * Allows choosing, browsing, and editing a theme files.
+ *
+ * Its subactions handle several features:
+ *  - edit_list: show a list of installed themes
+ *  - edit_browse: display the list of files in the current theme, and allow browsing
  *  - edit_template: display and edit a PHP template file
  *  - edit_style: display and edit a CSS file
  *  - edit_file: display and edit other files in the theme
