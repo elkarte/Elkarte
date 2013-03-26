@@ -61,16 +61,13 @@ function action_viewquery()
 		<title>', $context['forum_name_html_safe'], '</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 		<style type="text/css">
-			body
-			{
+			body {
 				margin: 1ex;
 			}
-			body, td, th, .normaltext
-			{
+			body, td, th, .normaltext {
 				font-size: x-small;
 			}
-			.smalltext
-			{
+			.smalltext {
 				font-size: xx-small;
 			}
 		</style>

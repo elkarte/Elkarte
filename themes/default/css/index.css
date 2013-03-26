@@ -3748,6 +3748,9 @@ span.hidelink {
 	background: #dceeff url(../images/theme/submit_bg.png) no-repeat 0 -140px;
 	color: #222;
 }
+table.calendar_table {
+	border-spacing: 1px;
+}
 
 /* Styles for the memberlist section.
 ------------------------------------------------- */

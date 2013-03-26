@@ -231,7 +231,7 @@ function template_show_month_grid($grid_name)
 	}
 
 	echo '
-				<table cellspacing="1" class="calendar_table">';
+				<table class="calendar_table">';
 
 	// Show each day of the week.
 	if (empty($calendar_data['disable_day_titles']))

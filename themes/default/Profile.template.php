@@ -1227,7 +1227,7 @@ function template_edit_options()
 		{
 			echo '
 					</dl>
-					<hr width="100%" size="1" class="hrcolor clear" />
+					<hr class="hrcolor clear" style="width: 100%; height: 1px" />
 					<dl>';
 		}
 		elseif ($field['type'] == 'callback')
@@ -1315,7 +1315,7 @@ function template_edit_options()
 	{
 		if ($lastItem != 'hr')
 			echo '
-					<hr width="100%" size="1" class="hrcolor clear" />';
+					<hr class="hrcolor clear" style="width: 100%; height: 1px" />';
 
 		echo '
 					<dl>';
@@ -2078,9 +2078,9 @@ function template_viewWarning()
 					<dd>
 						<div>
 							<div>
-								<div style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background-color: white; padding: 1px; position: relative;">
+								<div style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background: white; padding: 1px; position: relative;">
 									<div id="warning_text" style="padding-top: 1pt; width: 100%; z-index: 2; color: black; position: absolute; text-align: center; font-weight: bold;">', $context['member']['warning'], '%</div>
-									<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background-color: ', $context['current_color'], ';">&nbsp;</div>
+									<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background: ', $context['current_color'], ';">&nbsp;</div>
 								</div>
 							</div>
 						</div>
@@ -2531,7 +2531,7 @@ function template_profile_save()
 
 	echo '
 
-					<hr width="100%" size="1" class="hrcolor clear" />';
+					<hr class="hrcolor clear" style="width: 100%; height: 1px" />';
 
 	// Only show the password box if it's actually needed.
 	if ($context['require_password'])
@@ -3003,7 +3003,7 @@ function template_authentication_method()
 
 	if ($context['require_password'])
 		echo '
-					<hr width="100%" size="1" class="hrcolor clear" />
+					<hr class="hrcolor clear" style="width: 100%; height: 1px" />
 					<dl>
 						<dt>
 							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '>', $txt['current_password'], ': </strong><br />
