@@ -88,7 +88,7 @@ function template_print_above()
 				height: 1px;
 				border: 0;
 				color: black;
-				background-color: black;
+				background: black;
 			}
 			.voted {
 				font-weight: bold;
@@ -162,7 +162,7 @@ function template_main()
 
 			foreach ($context['printattach'][$post['id_msg']] as $attach)
 				echo '
-					<img width="' . $attach['width'] . '" height="' . $attach['height'] . '" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
+					<img style="width:' . $attach['width'] . 'px; height:' . $attach['height'] . 'px" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
 		}
 
 		echo '

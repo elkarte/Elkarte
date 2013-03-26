@@ -1068,8 +1068,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// If we're always html resizing, assume it's too large.
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 	{
-		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
+		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
+		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
 	}
 	else
 	{
@@ -2532,7 +2532,7 @@ function template_include($filename, $once = false)
 				for ($n = min($match[1] + 4, count($data2) + 1); $line <= $n; $line++)
 				{
 					if ($line == $match[1])
-						echo '</pre><div style="background-color: #ffb0b5;"><pre style="margin: 0;">';
+						echo '</pre><div style="background: #ffb0b5;"><pre style="margin: 0;">';
 
 					echo '<span style="color: black;">', sprintf('%' . strlen($n) . 's', $line), ':</span> ';
 					if (isset($data2[$line]) && $data2[$line] != '')
@@ -2629,7 +2629,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" ' . $max_avatar_width . $max_avatar_height . ' alt="" border="0" />',
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style=' . $max_avatar_width . $max_avatar_height . '" alt="" border="0" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);

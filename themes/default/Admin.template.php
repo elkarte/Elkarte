@@ -753,7 +753,7 @@ function template_edit_censored()
 					<script type="text/javascript"><!-- // --><![CDATA[
 						document.getElementById("moreCensoredWords_link").style.display = "";
 					// ]]></script>
-					<hr width="100%" size="1" class="hrcolor clear" />
+					<hr class="hrcolor clear" style="width:100%; height:1px" />
 					<dl class="settings">
 						<dt>
 							<strong><label for="censorWholeWord_check">', $txt['censor_whole_words'], ':</label></strong>
