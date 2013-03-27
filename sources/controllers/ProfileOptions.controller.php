@@ -526,7 +526,7 @@ function action_notification()
 				'header' => array(
 					'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 					'style' => 'width: 4%;',
-					'class' => 'centercol',
+					'class' => 'centertext',
 				),
 				'data' => array(
 					'sprintf' => array(
@@ -535,7 +535,7 @@ function action_notification()
 							'id' => false,
 							'checked' => false,
 						),
-					'class' => 'centercol',
+					'class' => 'centertext',
 					),
 				),
 			),
