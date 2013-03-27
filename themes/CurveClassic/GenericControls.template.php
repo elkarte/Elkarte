@@ -31,6 +31,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
+					width: "', $editor_context['width'], '",
+					height: "', $editor_context['height'], '",
 					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
