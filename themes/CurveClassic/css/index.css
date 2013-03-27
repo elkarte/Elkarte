@@ -1100,7 +1100,7 @@ img.sort {
 	position: absolute;
 	top: 2.25em;
 	left: -9999px;
-	width: 17.5em;
+	width: 18.5em;
 	border: 1px solid #c9c9c9;
 	border-radius: 2px 4px 4px 4px;
 	box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255, 0.8);
@@ -3209,7 +3209,7 @@ dl.addrules dt.floatleft {
 ------------------------------------------------- */
 
 #calendar {
-	overflow: hidden;
+	overflow: auto;
 }
 
 /* Used to indicate the current day in the grid. */
@@ -3218,11 +3218,15 @@ dl.addrules dt.floatleft {
 	border: 1px solid #bbb;
 	box-shadow: 0 2px 5px rgba(0,0,0,0.05) inset;
 }
-#month_grid {
-	padding: 0 15px 0 0;
-	width: 215px;
+#month_grid
+{
+	width: 200px;
 	text-align: center;
 	float: left;
+}
+#main_grid
+{
+	margin: 0 0 0 220px;
 }
 #month_grid div.cat_bar {
 	border-radius: 5px 5px 0 0;

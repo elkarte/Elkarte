@@ -675,7 +675,7 @@ function template_main()
 					</h3>
 				</div>
 				<div id="quickReplyOptions"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
-					<div class="roundframe">
+					<div class="roundframe flow_auto">
 						<p class="smalltext lefttext">', $txt['quick_reply_desc'], '</p>
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
@@ -733,7 +733,7 @@ function template_main()
 		}
 
 		echo '
-							<div class="padding">
+							<div class="padding flow_auto">
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
 								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
