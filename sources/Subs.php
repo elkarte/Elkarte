@@ -2733,15 +2733,14 @@ function setupThemeContext($forceload = false)
 			{
 				if (!empty($modSettings['avatar_max_width_external']))
 					$context['user']['avatar']['width'] = $modSettings['avatar_max_width_external'];
+
 				if (!empty($modSettings['avatar_max_height_external']))
 					$context['user']['avatar']['height'] = $modSettings['avatar_max_height_external'];
 			}
 		}
-
 		// Gravatars URL.
 		elseif ($user_info['avatar']['url'] === 'gravatar')
 			$context['user']['avatar']['href'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
-
 		// Otherwise we assume it's server stored?
 		elseif ($user_info['avatar']['url'] != '')
 			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
