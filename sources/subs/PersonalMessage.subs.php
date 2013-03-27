@@ -478,6 +478,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.
 		foreach ($recipients as $rec_type => $rec)
+		{
 			foreach ($rec as $id => $member)
 			{
 				if (is_numeric($recipients[$rec_type][$id]))
@@ -491,6 +492,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 					unset($recipients[$rec_type][$id]);
 				}
 			}
+		}
 	}
 
 	// Make sure there are no duplicate 'to' members.
