@@ -1093,7 +1093,7 @@ img.sort {
 	margin-left: 19950px;
 }
 /* Cancel those for hover and/or js access. */
-.dropmenu ul li:hover a:focus, .dropmenu ul li.sfhover a:focus {
+.dropmenu ul li:hover a:focus, .dropmenu ul li.sfhover a:focus, .dropmenu li li a:focus {
 	margin-left: 0;
 	width: auto;
 }
@@ -1137,7 +1137,7 @@ img.sort {
 .dropmenu li li:hover ul, .dropmenu li li.sfhover ul {
 	left: -14px;
 }
-.dropmenu li li.subsections a:after, .adm_section .dropmenu li.subsections a:after{
+.dropmenu li li.subsections a:after, .adm_section .dropmenu li.subsections a:after {
 	position: absolute;
 	top: 0.4em;
 	right: 2px;
@@ -1665,7 +1665,7 @@ ul li.greeting {
 	padding: 8px 0 0 0;
 	width: 5%;
 	min-width: 50px;
-	/*Top aligned is much nicer for the icon. */
+	/* Top aligned is much nicer for the icon. */
 	vertical-align: top;
 	border-left: 1px solid #ddd;
 	text-align: center;

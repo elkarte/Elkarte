@@ -850,7 +850,6 @@ dl.right dt {
 #manage_maintenance p {
 	margin: -5px 0 0 0;
 	padding: 0 0 10px 0;
-	max-width: 70em;
 }
 #manage_maintenance p .button_submit{
 	margin: 10px 10px 0px 10px;
