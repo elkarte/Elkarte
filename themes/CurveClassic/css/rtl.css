@@ -740,7 +740,10 @@ tr.windowbg2 th.stats_month, tr.windowbg2 td.stats_day {
 #month_grid {
 	float: right;
 }
-
+#main_grid
+{
+	margin: 0 220px 0 0;
+}
 #main_grid table.weeklist td.windowbg {
 
 	border-left: 2px solid #fff;
