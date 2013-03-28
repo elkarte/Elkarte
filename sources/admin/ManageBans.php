@@ -460,8 +460,7 @@ function BanEdit()
 					),
 				),
 				'form' => array(
-					'href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
-					'name' => 'standardProfileFields',
+					'href' => $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $ban_group_id,
 				),
 				'additional_rows' => array(
 					array(
@@ -816,10 +815,10 @@ function banEdit2()
 	if (isset($_POST['ban_items']))
 	{
 		$items_ids = array();
-		$group_id = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
+		$ban_group_id = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 		array_map('intval', $_POST['ban_items']);
 
-		removeBanTriggers($_POST['ban_items'], $group_id);
+		removeBanTriggers($_POST['ban_items'], $ban_group_id);
 	}
 
 	// Register the last modified date.
