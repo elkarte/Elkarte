@@ -94,6 +94,7 @@ $txt['user_warn_mute'] = 'User is banned from posting';
 $txt['warn_watch'] = 'Watched';
 $txt['warn_moderate'] = 'Moderated';
 $txt['warn_mute'] = 'Muted';
+$txt['warning_issue'] = 'Warn';
 
 $txt['message_index'] = 'Message Index';
 $txt['news'] = 'News';
@@ -604,7 +605,7 @@ $txt['notification_disable_board'] = 'Are you sure you wish to disable notificat
 $txt['notification_enable_topic'] = 'Are you sure you wish to enable notification of new replies for this topic?';
 $txt['notification_disable_topic'] = 'Are you sure you wish to disable notification of new replies for this topic?';
 
-$txt['report_to_mod'] = 'Report to moderator';
+$txt['report_to_mod'] = 'Report Post';
 $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
 $txt['unread_topics_visit'] = 'Recent Unread Topics';

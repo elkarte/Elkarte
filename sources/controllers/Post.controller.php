@@ -468,7 +468,7 @@ function action_post()
 			$context['preview_message'] = parse_bbc($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 			censorText($context['preview_message']);
 
-			// Dont forget the subject
+			// Don't forget the subject
 			$context['preview_subject'] = $form_subject;
 			censorText($context['preview_subject']);
 
@@ -550,7 +550,7 @@ function action_post()
 		$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
 		$context['icon'] = $message['message']['icon'];
 
-		// Set the destinaton.
+		// Set the destination.
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 		$context['submit_label'] = $txt['save'];
 	}
