@@ -473,6 +473,7 @@ function AdminMain()
 				'repairboards' => array(
 					'label' => $txt['admin_repair'],
 					'file' => 'RepairBoards.php',
+					'controller' => 'RepairBoards_Controller',
 					'function' => 'action_repairboards',
 					'select' => 'maintain',
 					'hidden' => true,
@@ -533,7 +534,7 @@ function AdminMain()
 	if (isset($admin_include_data['file']))
 		require_once(ADMINDIR . '/' . $admin_include_data['file']);
 
-	$admin_include_data['function']();
+	callMenu($admin_include_data);
 }
 
 /**

@@ -260,7 +260,8 @@ function MaintainFindFixErrors()
 	validateToken('admin-maint');
 
 	require_once(ADMINDIR . '/RepairBoards.php');
-	action_repairboards();
+	$controller = new RepairBoards_Controller();
+	$controller->action_repairboards();
 }
 
 /**
