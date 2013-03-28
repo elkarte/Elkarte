@@ -530,7 +530,7 @@ ul.post_options li {
 
 /* Styles for the move topic section.
 ---------------------------------------------------- */
-.move_topic {
+.split_topics, .move_topic {
 	text-align: right;
 }
 /* Styles for the login areas.

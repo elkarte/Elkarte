@@ -147,7 +147,15 @@ function template_main()
 	echo '
 							</select>
 							<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
-						</dd>
+						</dd>';
+	if (!empty($context['show_boards_dropdown']))
+		echo '
+						<dt class="clear_left">
+							', $txt['post_in_board'], ': 
+						</dt>
+						<dd>', template_select_boards('post_in_board'), '
+						</dd>';
+	echo '
 					</dl>';
 
 	// Are you posting a calendar event?
@@ -436,6 +444,11 @@ function template_main()
 	if (isset($context['topic_last_message']))
 		echo '
 			<input type="hidden" name="last_msg" value="', $context['topic_last_message'], '" />';
+
+	// If we are starting a new topic starting from another one, here is the place to remember some details
+	if (!empty($context['original_post']))
+		echo '
+			<input type="hidden" name="followup" value="' . $context['original_post'] . '" />';
 
 	echo '
 			<input type="hidden" name="additional_options" id="additional_options" value="', $context['show_additional_options'] ? '1' : '0', '" />

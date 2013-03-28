@@ -5,6 +5,7 @@ global $context;
 
 $txt['post_reply'] = 'Post reply';
 $txt['message_icon'] = 'Message icon';
+$txt['post_in_board'] = 'Post in the board';
 $txt['subject_not_filled'] = 'The subject field was not filled out. It is required.';
 $txt['message_body_not_filled'] = 'The message body was not filled out. It is required.';
 // Use numeric entities in the below string.

@@ -61,3 +61,6 @@ $txt['scheduled_log_empty_log_confirm'] = 'Are you sure you want to completely c
 
 $txt['scheduled_task_remove_old_drafts'] = 'Remove old drafts';
 $txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the admin panel.';
+
+$txt['scheduled_task_remove_old_followups'] = 'Remove old follow-ups';
+$txt['scheduled_task_desc_remove_old_followups'] = 'Deletes follow-up entries still present in the database, but pointing to non-existent topics.';

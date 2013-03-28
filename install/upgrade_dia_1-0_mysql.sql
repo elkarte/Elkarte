@@ -179,6 +179,10 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 240, 1, 'd', 0, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks
+	(next_time, time_offset, time_regularity, time_unit, disabled, task)
+VALUES
+	(0, 0, 6, 'h', 0, 'remove_old_followups');
 ---#
 
 /******************************************************************************/
@@ -379,4 +383,16 @@ if (@$modSettings['elkVersion'] < '1.0')
 UPDATE {$db_prefix}package_servers
 SET url = 'https://github.com/elkarte/addons/tree/master/packages'
 WHERE url = 'http://custom.simplemachines.org/packages/mods';
+---#
+
+/******************************************************************************/
+--- Adding follow-up support.
+/******************************************************************************/
+
+---# Creating follow-up table...
+CREATE TABLE {$db_prefix}follow_ups (
+  follow_up int(10) NOT NULL default '0',
+  derived_from int(10) NOT NULL default '0',
+  PRIMARY KEY (follow_up, derived_from)
+) ENGINE=MyISAM;
 ---#

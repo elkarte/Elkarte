@@ -571,7 +571,7 @@ function action_post()
 		$context['submit_label'] = $txt['post'];
 
 		// Posting a quoted reply?
-		if (!empty($topic) && !empty($_REQUEST['quote']))
+		if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
 		{
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $smcFunc['db_query']('', '
@@ -583,7 +583,7 @@ function action_post()
 					AND m.approved = {int:is_approved}') . '
 				LIMIT 1',
 				array(
-					'id_msg' => (int) $_REQUEST['quote'],
+					'id_msg' => !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'],
 					'is_approved' => 1,
 				)
 			);
@@ -642,6 +642,16 @@ function action_post()
 			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
 			$form_message = '';
 		}
+	}
+
+	// Are we moving a discussion to its own topic?
+	if (!empty($_REQUEST['followup']))
+	{
+		$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+		$context['show_boards_dropdown'] = true;
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
+		$context['boards_current_disabled'] = false;
 	}
 
 	$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
@@ -1403,6 +1413,19 @@ function action_post2()
 		$_POST['email'] = $user_info['email'];
 	}
 
+	// Posting somewhere else? Are we sure you can?
+	if (!empty($_REQUEST['post_in_board']))
+	{
+		if (!allowedTo('post_new', (int) $_REQUEST['post_in_board']))
+		{
+			$post_in_board = boardInfo((int) $_REQUEST['post_in_board']);
+			if (!empty($post_in_board))
+				$post_errors->addError(array('post_new_board', array($post_in_board['name'])));
+			else
+				$post_errors->addError('post_new');
+		}
+	}
+
 	// Any mistakes?
 	if ($post_errors->hasErrors())
 	{
@@ -1635,10 +1658,32 @@ function action_post2()
 	// This is a new topic or an already existing one. Save it.
 	else
 	{
+		$original_post = (int) $_REQUEST['followup'];
+		$new_board = (int) $_REQUEST['post_in_board'];
+
+		// We also have to fake the board:
+		// if it's valid and it's not the current, let's forget about the "current" and load the new one
+		if (!empty($new_board) && $board !== $new_board)
+		{
+			$board = $new_board;
+			loadBoard();
+
+			// Some details changed
+			$topicOptions['board'] = $board;
+			$topicOptions['is_approved'] = !$modSettings['postmod_active'] || empty($topic) || !empty($board_info['cur_topic_approved']);
+			$posterOptions['update_post_count'] = !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'];
+		}
+
 		createPost($msgOptions, $topicOptions, $posterOptions);
 
 		if (isset($topicOptions['id']))
 			$topic = $topicOptions['id'];
+
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
+		// Time to update the original message with a pointer to the new one
+		if (!empty($original_post) && canAccessMessage($original_post))
+			linkMessages($original_post, $topic);
 	}
 
 	// If we had a draft for this, its time to remove it since it was just posted

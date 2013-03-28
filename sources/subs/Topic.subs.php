@@ -342,6 +342,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+	require_once(SUBSDIR . '/FollowUps.subs.php');
+	removeFollowUpsByTopic($topics);
 
 	// Maybe there's a mod that wants to delete topic related data of its own
  	call_integration_hook('integrate_remove_topics', array($topics));
@@ -1078,6 +1080,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 		);
 
 	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
+	$follow_ups_table = !empty($full) && ($full === 'follow_up' || $full === 'all');
 	$logs_table = !empty($full) && $full === 'all';
 
 	// Create the query, taking full and integration in to account
@@ -1087,14 +1090,16 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') .
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
+			fu.derived_from' : '') . 
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
 			(!empty($selects) ? implode(',', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') .
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
+			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . 
 			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
@@ -1251,7 +1256,7 @@ function messageInfo($topic, $message)
 
 	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.approved
+		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
 		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
@@ -1265,16 +1270,8 @@ function messageInfo($topic, $message)
 	);
 	if ($smcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('cant_find_messages');
-	list ($subject, $num_replies, $unapproved_posts, $id_first_msg, $approved) = $smcFunc['db_fetch_row']($request);
+	$messageInfo = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
-
-	$messageInfo = array(
-		'subject' => $subject,
-		'num_replies' => $num_replies,
-		'unapproved_posts' => $unapproved_posts,
-		'id_first_msg' => $id_first_msg,
-		'approved' => $approved
-	);
 
 	return $messageInfo;
 }
