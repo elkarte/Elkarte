@@ -433,30 +433,13 @@ $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
 $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
+$txt['quote_new'] = 'Quote to new topic';
+$txt['follow_ups'] = 'Follow-ups';
+$txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['fulledit'] = 'Full&nbsp;edit';
 $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More...';
-
-$txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split'] = 'Split Topic';
-$txt['merge'] = 'Merge Topics';
-$txt['subject_new_topic'] = 'Subject For New Topic';
-$txt['split_this_post'] = 'Only split this post.';
-$txt['split_after_and_this_post'] = 'Split topic after and including this post.';
-$txt['select_split_posts'] = 'Select posts to split.';
-$txt['new_topic'] = 'New Topic';
-$txt['split_successful'] = 'Topic successfully split into two topics.';
-$txt['origin_topic'] = 'Origin Topic';
-$txt['please_select_split'] = 'Please select which posts you wish to split.';
-$txt['merge_successful'] = 'Topics successfully merged.';
-$txt['new_merged_topic'] = 'Newly Merged Topic';
-$txt['topic_to_merge'] = 'Topic to be merged';
-$txt['target_board'] = 'Target board';
-$txt['target_topic'] = 'Target topic';
-$txt['merge_confirm'] = 'Are you sure you want to merge';
-$txt['with'] = 'with';
-$txt['merge_desc'] = 'This function will merge the messages of two topics into one topic. The messages will be sorted according to the time of posting. Therefore the earliest posted message will be the first message of the merged topic.';
 
 $txt['set_sticky'] = 'Set topic sticky';
 $txt['set_nonsticky'] = 'Set topic non-sticky';
@@ -533,6 +516,31 @@ $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
 $txt['movetopic_default'] = 'This topic has been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
 $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
+
+$txt['merge_to_topic_id'] = 'ID of target topic';
+$txt['split'] = 'Split Topic';
+$txt['merge'] = 'Merge Topics';
+$txt['subject_new_topic'] = 'Subject For New Topic';
+$txt['split_this_post'] = 'Only split this post.';
+$txt['split_after_and_this_post'] = 'Split topic after and including this post.';
+$txt['select_split_posts'] = 'Select posts to split.';
+
+$txt['splittopic_notification'] = 'Post a message when the topic is split.';
+$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
+$txt['splittopic_move'] = 'Move the new topic to another board';
+
+$txt['new_topic'] = 'New Topic';
+$txt['split_successful'] = 'Topic successfully split into two topics.';
+$txt['origin_topic'] = 'Origin Topic';
+$txt['please_select_split'] = 'Please select which posts you wish to split.';
+$txt['merge_successful'] = 'Topics successfully merged.';
+$txt['new_merged_topic'] = 'Newly Merged Topic';
+$txt['topic_to_merge'] = 'Topic to be merged';
+$txt['target_board'] = 'Target board';
+$txt['target_topic'] = 'Target topic';
+$txt['merge_confirm'] = 'Are you sure you want to merge';
+$txt['with'] = 'with';
+$txt['merge_desc'] = 'This function will merge the messages of two topics into one topic. The messages will be sorted according to the time of posting. Therefore the earliest posted message will be the first message of the merged topic.';
 
 $txt['theme_template_error'] = 'Unable to load the \'%1$s\' template.';
 $txt['theme_language_error'] = 'Unable to load the \'%1$s\' language file.';

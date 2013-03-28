@@ -169,6 +169,10 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 240, 1, 'd', 0, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks
+	(next_time, time_offset, time_regularity, time_unit, disabled, task)
+VALUES
+	(0, 0, 6, 'h', 0, 'remove_old_followups');
 ---#
 
 /******************************************************************************/

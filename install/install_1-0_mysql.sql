@@ -756,6 +756,16 @@ CREATE TABLE {$db_prefix}group_moderators (
 ) ENGINE=MyISAM;
 
 #
+# Table structure for table `follow_ups`
+#
+
+CREATE TABLE {$db_prefix}follow_ups (
+  follow_up int(10) NOT NULL default '0',
+  derived_from int(10) NOT NULL default '0',
+  PRIMARY KEY (follow_up, derived_from)
+) ENGINE=MyISAM;
+
+#
 # Table structure for table `log_actions`
 #
 
@@ -1640,7 +1650,8 @@ VALUES
 	(10, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
 	(11, 0, 120, 1, 'd', 1, 'remove_temp_attachments'),
 	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
-	(13, 0, 240, 1, 'd', 1, 'remove_old_drafts');
+	(13, 0, 240, 1, 'd', 1, 'remove_old_drafts'),
+	(14, 0, 0, 6, 'h', 0, 'remove_old_followups');
 	
 # --------------------------------------------------------
 

@@ -161,30 +161,16 @@ function action_movetopic2()
 
 	checkSession();
 	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 
 	// The destination board must be numeric.
 	$toboard = (int) $_POST['toboard'];
 
 	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-	$request = $smcFunc['db_query']('', '
-		SELECT b.count_posts, b.name, m.subject
-		FROM {db_prefix}boards AS b
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE {query_see_board}
-			AND b.id_board = {int:to_board}
-			AND b.redirect = {string:blank_redirect}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-			'to_board' => $toboard,
-			'blank_redirect' => '',
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	$board_info = boardInfo($toboard, $topic);
+	if (empty($board_info))
 		fatal_lang_error('no_board');
-	list ($pcounter, $board_name, $subject) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($pcounter, $board_name, $subject) = $board_info;
 
 	// Remember this for later.
 	$_SESSION['move_to_topic'] = $toboard;

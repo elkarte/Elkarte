@@ -127,6 +127,12 @@ function Display()
 
 	// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 	$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
+	if (!empty($topicinfo['derived_from']))
+	{
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
+	}
+
 	if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 	{
 		$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
@@ -239,6 +245,8 @@ function Display()
 
 	// Create a previous next string if the selected theme has it as a selected option.
 	$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#new">' . $txt['previous_next_forward'] . '</a>' : '';
+	if (!empty($context['topic_derived_from']))
+		$context['previous_next'] .= ' - <a href="' . $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_subject($context['topic_derived_from']['subject'], 25)) . '</em></a>';
 
 	// Check if spellchecking is both enabled and actually working. (for quick reply.)
 	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -750,6 +758,9 @@ function Display()
 			$msg_parameters
 		);
 
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+
 		// Go to the last message if the given time is beyond the time of the last message.
 		if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
 			$context['start_from'] = $topicinfo['num_replies'];
@@ -837,6 +848,8 @@ function Display()
 	// Can restore topic?  That's if the topic is in the recycle board and has a previous restore state.
 	$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 	$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
+
+	$context['can_follow_up'] = boardsallowedto('post_new') !== array();
 
 	// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 	$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];

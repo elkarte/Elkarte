@@ -576,6 +576,21 @@ function removeMessage($message, $decreasePostCount = true)
 		);
 		removeAttachments($attachmentQuery);
 
+		// Delete follow-ups too
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		// If it is an entire topic
+		if ($row['id_first_msg'] == $message)
+		{
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}follow_ups
+				WHERE follow_ups IN ({array_int:topics})',
+				array(
+					'topics' => $row['id_topic'],
+				)
+			);
+		}
+		
+
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
 	}
@@ -620,4 +635,44 @@ function associatedTopic($msg_id)
 	$smcFunc['db_free_result']($request);
 
 	return $topic;
+}
+
+/**
+ * Small function that simply query the database to verify
+ * if the current user can access a specific message
+ *
+ * @param int $id_msg a message id
+ * @param bool $check_approval if true messages are checked for approval (default true)
+ * @return boolean
+ */
+function canAccessMessage($id_msg, $check_approval = true)
+{
+	global $smcFunc, $user_info;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_msg, id_member, approved
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE m.id_msg = {int:id_msg}
+		LIMIT 1',
+		array(
+			'id_msg' => $id_msg,
+		)
+	);
+	$exists = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	// It doesn't exists or is not accessible
+	if (empty($exists))
+		return false;
+	// We have to check for approval...
+	elseif ($check_approval)
+	{
+		// Message approved or user is owner
+		if (!empty($exists['approved']) || $exists['id_member'] == $user_info['id'])
+			return true;
+	}
+
+	// Any other case should be false.
+	return false;
 }

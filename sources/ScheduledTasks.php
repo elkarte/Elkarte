@@ -1754,3 +1754,35 @@ function scheduled_remove_old_drafts()
 
 	return true;
 }
+
+/**
+ * Check for followups from removed topics and remove them from the table
+ */
+function scheduled_remove_old_followups()
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT fu.derived_from
+		FROM smf_follow_ups as fu
+			LEFT JOIN smf_messages as m ON (fu.derived_from = m.id_msg)
+		WHERE m.id_msg IS NULL
+		LIMIT {int:limit}',
+		array(
+			'limit' => 100,
+		)
+	);
+
+	$remove = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$remove[] = $row['derived_from'];
+	$smcFunc['db_free_result']($request);
+
+	if (empty($remove))
+		return true;
+
+	require_once(SUBSDIR . '/FollowUps.subs.php');
+	removeFollowUpsByMessage($remove);
+
+	return true;
+}

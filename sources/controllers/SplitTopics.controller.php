@@ -79,6 +79,9 @@ function action_splitIndex()
 
 	// We deal with topics here.
 	require_once(SUBSDIR . '/Topic.subs.php');
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	// Let's load up the boards in case they are useful.
+	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 	// Retrieve message info for the message at the split point.
 	$messageInfo = messageInfo($topic, $splitAt);
@@ -90,6 +93,8 @@ function action_splitIndex()
 	// If this topic has unapproved posts, we need to count them too...
 	if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 		$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['approved'] ? 0 : 1);
+
+	$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
 
 	// Check if there is more than one message in the topic.  (there should be.)
 	if ($messageInfo['num_replies'] < 1)
@@ -120,14 +125,29 @@ function action_splitIndex()
  */
 function action_splitExecute()
 {
-	global $txt, $board, $topic, $context, $user_info, $smcFunc, $modSettings;
+	global $txt, $context, $user_info, $smcFunc, $modSettings;
+	global $board, $topic, $language, $scripturl;
 
 	// Check the session to make sure they meant to do this.
 	checkSession();
 
 	// Clean up the subject.
+	// @todo: actually clean the subject?
 	if (!isset($_POST['subname']) || $_POST['subname'] == '')
 		$_POST['subname'] = $txt['new_topic'];
+
+	if (empty($_SESSION['move_to_board']))
+	{
+		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+		$context['reason'] = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+	}
+	else
+	{
+		$context['move_to_board'] = (int) $_SESSION['move_to_board'];
+		$context['reason'] = trim($smcFunc['htmlspecialchars']($_SESSION['reason']));
+	}
+	$_SESSION['move_to_board'] = $context['move_to_board'];
+	$_SESSION['reason'] = $context['reason'];
 
 	// Redirect to the selector if they chose selective.
 	if ($_POST['step2'] == 'selective')
@@ -138,6 +158,14 @@ function action_splitExecute()
 
 	// We work with them topics.
 	require_once(SUBSDIR . '/Topic.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
+
+	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
+	if (!empty($_POST['messageRedirect']) && empty($context['reason']))
+				fatal_lang_error('splittopic_no_reason', false);
+
+	// Before the actual split because of the fatal_lang_errors
+	$boards = splitDestinationBoard();
 
 	$splitAt = (int) $_POST['at'];
 	$messagesToBeSplit = array();
@@ -155,6 +183,155 @@ function action_splitExecute()
 	$context['old_topic'] = $topic;
 	$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $_POST['subname']);
 	$context['page_title'] = $txt['split'];
+
+	splitAttemptMove($boards, $context['new_topic']);
+}
+
+/**
+ * If we are also moving the topic somewhere else, let's try do to it
+ * Includes checks for permissions move_own/any, etc.
+ *
+ * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
+ * @param int $totopic id of the destination topic
+ */
+function splitAttemptMove($boards, $totopic)
+{
+	global $board, $user_info, $context;
+
+	// If the starting and final boards are different we have to check some permissions and stuff
+	if ($boards['destination']['id'] != $board)
+	{
+		$doMove = false;
+		$new_topic = array();
+		if (allowedTo('move_any'))
+			$doMove = true;
+		else
+		{
+			$new_topic = getTopicInfo($totopic);
+			if ($new_topic['id_member_started'] == $user_info['id'] && allowedTo('move_own'))
+				$doMove = true;
+		}
+
+		if ($doMove)
+		{
+			// Update member statistics if needed
+			// @todo this should probably go into a function...
+			if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
+			{
+				$request = $smcFunc['db_query']('', '
+					SELECT id_member
+					FROM {db_prefix}messages
+					WHERE id_topic = {int:current_topic}
+						AND approved = {int:is_approved}',
+					array(
+						'current_topic' => $totopic,
+						'is_approved' => 1,
+					)
+				);
+				$posters = array();
+				while ($row = $smcFunc['db_fetch_assoc']($request))
+				{
+					if (!isset($posters[$row['id_member']]))
+						$posters[$row['id_member']] = 0;
+
+					$posters[$row['id_member']]++;
+				}
+				$smcFunc['db_free_result']($request);
+
+				foreach ($posters as $id_member => $posts)
+				{
+					// The board we're moving from counted posts, but not to.
+					if (empty($boards['current']['count_posts']))
+						updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+					// The reverse: from didn't, to did.
+					else
+						updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+				}
+			}
+			// And finally move it!
+			moveTopics($totopic, $boards['destination']['id']);
+		}
+		else
+			$boards['destination'] = $boards['current'];
+	}
+
+	// Create a link to this in the old topic.
+	// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
+	if (!empty($_POST['messageRedirect']))
+		postSplitRedirect($context['reason'], $_POST['subname'], $boards['destination'], $context['new_topic']);
+}
+
+/**
+ * Retrives informations of the current and destination board of a split topic
+ *
+ * @return array
+ */
+function splitDestinationBoard()
+{
+	global $board, $topic;
+
+	$current_board = boardInfo($board, $topic);
+	if (empty($current_board))
+		fatal_lang_error('no_board');
+
+	if (!empty($_POST['move_new_topic']))
+	{
+		$toboard =  !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
+		if (!empty($toboard) && $board !== $toboard)
+		{
+			$destination_board = boardInfo($toboard);
+			if (empty($destination_board))
+				fatal_lang_error('no_board');
+		}
+	}
+
+	if (!isset($destination_board))
+		$destination_board = array_merge($current_board, array('id' => $board));
+	else
+		$destination_board['id'] = $toboard;
+
+	return array('current' => $current_board, 'destination' => $destination_board);
+}
+
+/**
+ * Post a message at the end of the original topic
+ *
+ * @param string $reason, the text that will become the message body
+ * @param string $subject, the text that will become the message subject
+ * @param string $board_info, some board informations (at least id, name, if posts are counted)
+ */
+function postSplitRedirect($reason, $subject, $board_info, $new_topic)
+{
+	global $scripturl, $user_info, $language, $txt, $smcFunc, $user_info, $topic, $board;
+
+	// Should be in the boardwide language.
+	if ($user_info['language'] != $language)
+		loadLanguage('index', $language);
+
+	preparsecode($reason);
+
+	// Add a URL onto the message.
+	$reason = strtr($reason, array(
+		$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $board_info['id'] . '.0]' . $board_info['name'] . '[/url]',
+		$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $new_topic . '.0[/iurl]'
+	));
+
+	$msgOptions = array(
+		'subject' => $txt['moved'] . ': ' . strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'body' => $reason,
+		'icon' => 'moved',
+		'smileys_enabled' => 1,
+	);
+	$topicOptions = array(
+		'id' => $topic,
+		'board' => $board,
+		'mark_as_read' => true,
+	);
+	$posterOptions = array(
+		'id' => $user_info['id'],
+		'update_post_count' => empty($board_info['count_posts']),
+	);
+	createPost($msgOptions, $topicOptions, $posterOptions);
 }
 
 /**
@@ -173,6 +350,7 @@ function action_splitSelectTopics()
 	global $smcFunc;
 
 	$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
+	$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
 
 	// Haven't selected anything have we?
 	$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
@@ -180,6 +358,9 @@ function action_splitSelectTopics()
 	// This is a special case for split topics from quick-moderation checkboxes
 	if (isset($_REQUEST['subname_enc']))
 		$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
+
+	$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
+	$context['reason'] = !empty($_SESSION['reason']) ? trim($smcFunc['htmlspecialchars']($_SESSION['reason'])) : '';
 
 	require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -369,7 +550,6 @@ function action_splitSelectTopics()
  * is accessed with ?action=splittopics;sa=splitSelection.
  * uses the main SplitTopics template.
  * uses splitTopic function to do the actual splitting.
-
  */
 function action_splitSelection()
 {
@@ -386,9 +566,24 @@ function action_splitSelection()
 	if (empty($_SESSION['split_selection'][$topic]))
 		fatal_lang_error('no_posts_selected', false);
 
+	if (!empty($_POST['messageRedirect']) && empty($context['reason']))
+			fatal_lang_error('splittopic_no_reason', false);
+
+		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+		$reason = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+
+	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
+	if (!empty($_POST['messageRedirect']) && empty($reason))
+			fatal_lang_error('splittopic_no_reason', false);
+
+	// This is here because there are two fatal_lang_errors in there
+	$boards = splitDestinationBoard();
+
 	$context['old_topic'] = $topic;
 	$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $_POST['subname']);
 	$context['page_title'] = $txt['split'];
+
+	splitAttemptMove($boards, $context['new_topic']);
 }
 
 /**
@@ -407,7 +602,7 @@ function action_splitSelection()
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt;
+	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $context;
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -536,24 +731,24 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
 	$smcFunc['db_insert']('',
-			'{db_prefix}topics',
-			array(
-				'id_board' => 'int',
-				'id_member_started' => 'int',
-				'id_member_updated' => 'int',
-				'id_first_msg' => 'int',
-				'id_last_msg' => 'int',
-				'num_replies' => 'int',
-				'unapproved_posts' => 'int',
-				'approved' => 'int',
-				'is_sticky' => 'int',
-			),
-			array(
-				(int) $id_board, $split2_firstMem, $split2_lastMem, 0,
-				0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0,
-			),
-			array('id_topic')
-		);
+		'{db_prefix}topics',
+		array(
+			'id_board' => 'int',
+			'id_member_started' => 'int',
+			'id_member_updated' => 'int',
+			'id_first_msg' => 'int',
+			'id_last_msg' => 'int',
+			'num_replies' => 'int',
+			'unapproved_posts' => 'int',
+			'approved' => 'int',
+			'is_sticky' => 'int',
+		),
+		array(
+			(int) $id_board, $split2_firstMem, $split2_lastMem, 0,
+			0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0,
+		),
+		array('id_topic')
+	);
 	$split2_ID_TOPIC = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
 		fatal_lang_error('cant_insert_topic');
@@ -657,6 +852,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_board' => $id_board,
 		)
 	);
+
+	require_once(SUBSDIR . '/FollowUps.subs.php');
+	// Let's see if we can create a stronger bridge between the two topics
+	// @todo not sure what message from the oldest topic I should link to the new one, so I'll go with the first
+	linkMessages($split1_first_msg, $split2_ID_TOPIC);
 
 	// Copy log topic entries.
 	// @todo This should really be chunked.

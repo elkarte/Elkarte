@@ -105,6 +105,7 @@ $txt['cannot_poll_view'] = 'You are not allowed to view polls in this board.';
 $txt['cannot_poll_vote'] = 'Sorry, but you cannot vote in polls in this board.';
 $txt['cannot_post_attachment'] = 'You don\'t have permission to post attachments here.';
 $txt['cannot_post_new'] = 'Sorry, you cannot post new topics in this board.';
+$txt['cannot_post_new_board'] = 'Sorry, you cannot post new topics in the board %1$s.';
 $txt['cannot_post_reply_any'] = 'You are not permitted to post replies to topics on this board.';
 $txt['cannot_post_reply_own'] = 'You are not allowed to post replies even to your own topics in this board.';
 $txt['cannot_profile_remove_own'] = 'Sorry, but you aren\'t allowed to delete your own account.';
@@ -396,6 +397,8 @@ $txt['cannot_connect_doc_site'] = 'Could not connect to the documentation site. 
 
 $txt['movetopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection topic\'.';
 $txt['movetopic_no_board'] = 'You must choose a board to move the topic to.';
+
+$txt['splittopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection message\'.';
 
 // OpenID error strings
 $txt['openid_server_bad_response'] = 'The requested identifier did not return the proper information.';
