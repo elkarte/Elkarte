@@ -333,7 +333,8 @@ function AdminMain()
 				'membergroups' => array(
 					'label' => $txt['admin_groups'],
 					'file' => 'ManageMembergroups.php',
-					'function' => 'ModifyMembergroups',
+					'controller' => 'ManageMembergroups_Controller',
+					'function' => 'action_main',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_membergroups',
 					'permission' => array('manage_membergroups'),
