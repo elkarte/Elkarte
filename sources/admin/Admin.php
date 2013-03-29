@@ -170,6 +170,7 @@ function AdminMain()
 				'current_theme' => array(
 					'label' => $txt['theme_current_settings'],
 					'file' => 'Themes.php',
+					'controller' => 'Themes_Controller',
 					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
 					'icon' => 'transparent.png',
@@ -178,6 +179,7 @@ function AdminMain()
 				'theme' => array(
 					'label' => $txt['theme_admin'],
 					'file' => 'Themes.php',
+					'controller' => 'Themes_Controller',
 					'function' => 'action_thememain',
 					'custom_url' => $scripturl . '?action=admin;area=theme',
 					'icon' => 'transparent.png',

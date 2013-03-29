@@ -143,7 +143,7 @@ class Site_Dispatcher
 			'help' => array('Help.controller.php', 'action_help'),
 			'quickhelp' => array('Help.controller.php', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'action_jsmodify'),
-			'jsoption' => array('Themes.php', 'action_jsoption'),
+			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lock' => array('Topic.controller.php', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'action_lockvoting'),
@@ -185,7 +185,7 @@ class Site_Dispatcher
 			'splittopics' => array('SplitTopics.controller.php', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'action_stats'),
 			'sticky' => array('Topic.controller.php', 'action_sticky'), // done
-			'theme' => array('Themes.php', 'action_thememain'),
+			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'action_unread'),
 			'unreadreplies' => array('Recent.controller.php', 'action_unread'),
