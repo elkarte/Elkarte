@@ -369,7 +369,8 @@ function AdminMain()
 				'ban' => array(
 					'label' => $txt['ban_title'],
 					'file' => 'ManageBans.php',
-					'function' => 'Ban',
+					'controller' => 'ManageBans_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_ban',
 					'permission' => 'manage_bans',

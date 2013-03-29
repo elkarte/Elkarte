@@ -19,6 +19,7 @@
 
 if (!defined('ELKARTE'))
 	die('No access...');
+
 /**
  * Admin logs controller.
  * This class manages logs, and forwards to display, pruning, and other actions on logs.
@@ -39,7 +40,7 @@ class AdminLog_Controller
 			'adminlog' => array('Modlog.php', 'action_modlog'),
 			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
-			'banlog' => array('ManageBans.php', 'action_log'),
+			'banlog' => array('ManageBans.php', 'action_log', 'controller' => 'ManageBans_Controller'),
 			'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 			'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
 			'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),
