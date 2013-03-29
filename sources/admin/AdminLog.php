@@ -38,7 +38,7 @@ class AdminLog_Controller
 			'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
 			'adminlog' => array('Modlog.php', 'action_modlog'),
 			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
-			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled'])),
+			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
 			'banlog' => array('ManageBans.php', 'action_log'),
 			'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
 			'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
@@ -87,6 +87,16 @@ class AdminLog_Controller
 		);
 
 		require_once(ADMINDIR . '/' . $log_functions[$sub_action][0]);
-		$log_functions[$sub_action][1]();
+		if (isset($log_functions['controlller']))
+		{
+			// if we have an object oriented controller, call its method
+			$controller = new $log_functions['controller']();
+			$controller->{$log_functions[$sub_action][1]}();
+		}
+		else
+		{
+			// procedural: call the function
+			$log_functions[$sub_action][1]();
+		}
 	}
 }
