@@ -320,7 +320,7 @@ function ModifyCoreFeatures($return_config = false)
 				if ($value)
 				{
 					require_once(SOURCEDIR . \'/ScheduledTasks.php\');
-					CalculateNextTrigger(\'paid_subscriptions\');
+					calculateNextTrigger(\'paid_subscriptions\');
 				}
 			'),
 		),

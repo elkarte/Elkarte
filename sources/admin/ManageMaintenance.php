@@ -533,7 +533,7 @@ function OptimizeTables()
 
 	// Check that we don't auto optimise again too soon!
 	require_once(SOURCEDIR . '/ScheduledTasks.php');
-	CalculateNextTrigger('auto_optimize', true);
+	calculateNextTrigger('auto_optimize', true);
 }
 
 /**
@@ -1059,7 +1059,7 @@ function AdminBoardRecount()
 
 	// Finally, update the latest event times.
 	require_once(SOURCEDIR . '/ScheduledTasks.php');
-	CalculateNextTrigger();
+	calculateNextTrigger();
 
 	redirectexit('action=admin;area=maintain;sa=routine;done=recount');
 }

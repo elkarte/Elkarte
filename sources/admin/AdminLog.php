@@ -22,7 +22,8 @@ if (!defined('ELKARTE'))
 
 /**
  * Admin logs controller.
- * This class manages logs, and forwards to display, pruning, and other actions on logs.
+ * This class manages logs, and forwards to display, pruning,
+ *  and other actions on logs.
  */
 class AdminLog_Controller
 {
@@ -42,7 +43,7 @@ class AdminLog_Controller
 			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
 			'banlog' => array('ManageBans.php', 'action_log', 'controller' => 'ManageBans_Controller'),
 			'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
-			'tasklog' => array('ManageScheduledTasks.php', 'TaskLog'),
+			'tasklog' => array('ManageScheduledTasks.php', 'action_log', 'controller' => 'ManageScheduledTasks_Controller'),
 			'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),
 		);
 
