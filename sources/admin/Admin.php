@@ -75,6 +75,7 @@ function AdminMain()
 				'packages' => array(
 					'label' => $txt['package'],
 					'file' => 'Packages.php',
+					'controller' => 'Packages_Controller',
 					'function' => 'Packages',
 					'permission' => array('admin_forum'),
 					'icon' => 'transparent.png',
