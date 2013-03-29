@@ -394,9 +394,10 @@ function AdminMain()
 					'label' => $txt['paid_subscriptions'],
 					'enabled' => in_array('ps', $context['admin_features']),
 					'file' => 'ManagePaid.php',
+					'controller' => 'ManagePaid_Controller',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_paid',
-					'function' => 'ManagePaidSubscriptions',
+					'function' => 'action_index',
 					'permission' => 'admin_forum',
 					'subsections' => array(
 						'view' => array($txt['paid_subs_view']),
@@ -770,7 +771,7 @@ function AdminSearchInternal()
 		array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 		array('ModifyRegistrationSettings', 'area=regcenter;sa=settings'),
 		array('ManageSearchEngineSettings', 'area=sengines;sa=settings'),
-		array('ModifySubscriptionSettings', 'area=paidsubscribe;sa=settings'),
+		array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 		array('ModifyPruningSettings', 'area=logs;sa=pruning'),
 	);
 
