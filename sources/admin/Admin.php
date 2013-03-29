@@ -212,7 +212,8 @@ function AdminMain()
 				'manageboards' => array(
 					'label' => $txt['admin_boards'],
 					'file' => 'ManageBoards.php',
-					'function' => 'ManageBoards',
+					'controller' => 'ManageBoards_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_boards',
 					'permission' => array('manage_boards'),
@@ -740,7 +741,7 @@ function AdminSearchInternal()
 		array('action_attachments', 'area=manageattachments;sa=attachments'),
 		array('action_avatars', 'area=manageattachments;sa=avatars'),
 		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-		array('EditBoardSettings', 'area=manageboards;sa=settings'),
+		array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
 		array('ModifyMailSettings', 'area=mailqueue;sa=settings'),
 		array('ModifyNewsSettings', 'area=news;sa=settings'),
 		array('GeneralPermissionSettings', 'area=permissions;sa=settings'),
