@@ -93,7 +93,7 @@ class Settings_Form
 	 *
 	 * @param array $config_vars
 	 */
-	static function prepare_file(&$config_vars)
+	function prepare_file()
 	{
 		global $context, $modSettings;
 
@@ -103,7 +103,7 @@ class Settings_Form
 			'sourcedir',
 			'cachedir',
 		);
-		foreach ($config_vars as $identifier => $config_var)
+		foreach ($this->_config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
 				$context['config_vars'][] = $config_var;

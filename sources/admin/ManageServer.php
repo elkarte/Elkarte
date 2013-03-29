@@ -425,6 +425,9 @@ class ManageServer_Controller
 
 		call_integration_hook('integrate_general_settings', array(&$config_vars));
 
+		// update...
+		$this->_generalSettingsForm->settings($config_vars);
+
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
 		$context['settings_title'] = $txt['general_settings'];
@@ -438,8 +441,8 @@ class ManageServer_Controller
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
-		// Fill the config array.
-		Settings_Form::prepare_file($config_vars);
+		// Fill the config array for the template and all that.
+		$this->_generalSettingsForm->prepare_file();
 	}
 
 	/**
@@ -453,7 +456,7 @@ class ManageServer_Controller
 	 * - Accessed from ?action=admin;area=serversettings;sa=database.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
-	 * for databaseSettings form.
+	 * for _databaseSettings form.
 	 */
 	function action_databaseSettings_settings()
 	{
@@ -462,6 +465,9 @@ class ManageServer_Controller
 		$config_vars = $this->_databaseSettingsForm->settings();
 
 		call_integration_hook('integrate_database_settings', array(&$config_vars));
+
+		// update...
+		$this->_databaseSettingsForm->settings($config_vars);
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
@@ -477,14 +483,14 @@ class ManageServer_Controller
 			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
-		// Fill the config array.
-		Settings_Form::prepare_file($config_vars);
+		// Fill the config array for the template.
+		$this->_databaseSettingsForm->prepare_file();
 	}
 
 	/**
 	 * Modify cookies settings.
 	 * This method handles the display, allows to edit, and saves the result
-	 * for cookieSettings form.
+	 * for the _cookieSettings form.
 	 */
 	function action_cookieSettings_settings()
 	{
@@ -493,6 +499,9 @@ class ManageServer_Controller
 		$config_vars = $this->_cookieSettingsForm->settings();
 
 		call_integration_hook('integrate_cookie_settings', array(&$config_vars));
+
+		// update...
+		$this->_cookieSettingsForm->settings($config_vars);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
@@ -527,13 +536,13 @@ class ManageServer_Controller
 		}
 
 		// Fill the config array.
-		Settings_Form::prepare_file($config_vars);
+		$this->_cookieSettingsForm->prepare_file();
 	}
 
 	/**
 	 * Cache settings editing and submission.
 	 * This method handles the display, allows to edit, and saves the result
-	 * for cacheSettings form.
+	 * for _cacheSettings form.
 	 */
 	function action_cacheSettings_settings()
 	{
@@ -549,6 +558,9 @@ class ManageServer_Controller
 			toggleCache();';
 
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
+
+		// update...
+		$this->_cacheSettingsForm->settings($config_vars);
 
 		// Saving again?
 		if (isset($_GET['save']))
@@ -576,14 +588,14 @@ class ManageServer_Controller
 		createToken('admin-ssc');
 
 		// Prepare settings for display in the template.
-		Settings_Form::prepare_file($config_vars);
+		$this->_cacheSettingsForm->prepare_file();
 	}
 
 	/**
 	 * Allows to edit load balancing settings.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
-	 * for balancingSettings form.
+	 * for the _balancingSettings form.
 	 */
 	function action_balancingSettings_settings()
 	{
@@ -592,6 +604,9 @@ class ManageServer_Controller
 		$config_vars = $this->_balancingSettingsForm->settings();
 
 		call_integration_hook('integrate_loadavg_settings', array(&$config_vars));
+
+		// update...
+		$this->_balancingSettingsForm->settings($config_vars);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
 		$context['settings_title'] = $txt['load_balancing_settings'];
@@ -620,7 +635,7 @@ class ManageServer_Controller
 
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
-		Settings_Form::prepare_db($config_vars);
+		$this->_balancingSettingsForm->prepare_db();
 	}
 
 	/**

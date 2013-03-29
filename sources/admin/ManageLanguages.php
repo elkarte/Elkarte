@@ -26,6 +26,12 @@ if (!defined('ELKARTE'))
 class ManageLanguages_Controller
 {
 	/**
+	 * Language settings form
+	 * @var Settings_Form
+	 */
+	protected $_languageSettings;
+
+	/**
 	 * This is the main function for the languages area.
 	 * It dispatches the requests.
 	 * Loads the ManageLanguages template. (sub-actions will use it)
@@ -45,7 +51,10 @@ class ManageLanguages_Controller
 		$subActions = array(
 			'edit' => 'action_edit',
 			'add' => 'action_add',
-			'settings' => 'action_settings',
+			'settings' => array(
+				'init' => '_initLanguageSettingsForm',
+				'action' => 'action_languageSettings_settings'
+			),
 			'downloadlang' => 'action_downloadlang',
 			'editlang' => 'action_editlang',
 		);
@@ -63,7 +72,22 @@ class ManageLanguages_Controller
 		);
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']]}();
+		// quick 'n dirty plugging the form here...
+		if (is_array($subActions[$_REQUEST['sa']]))
+		{
+			// we haz a form to show off
+
+			// initialize the form
+			$this->{$subActions[$_REQUEST['sa']]['init']}();
+
+			// call the action handler
+			$this->{$subActions[$_REQUEST['sa']]['action']}();
+		}
+		else
+		{
+			// one of our own :P
+			$this->{$subActions[$_REQUEST['sa']]}();
+		}
 	}
 
 	/**
@@ -1031,26 +1055,19 @@ class ManageLanguages_Controller
 
 	/**
 	 * Edit language related settings.
+	 *
+	 * This method handles the display, allows to edit, and saves the result
+	 * for the _languageSettings form.
 	 */
-	function action_settings()
+	function action_languageSettings_settings()
 	{
 		global $scripturl, $context, $txt, $settings, $smcFunc;
-
-		// We'll want to save them someday.
-		require_once(SUBSDIR . '/Settings.php');
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
 		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
-		$config_vars = $this->settings();
-
-		call_integration_hook('integrate_language_settings', array(&$config_vars));
-
-		// Get our languages. No cache.
-		getLanguages(false);
-		foreach ($context['languages'] as $lang)
-			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+		$config_vars = $this->_languageSettings->settings();
 
 		// Saving settings?
 		if (isset($_REQUEST['save']))
@@ -1073,22 +1090,30 @@ class ManageLanguages_Controller
 		elseif ($settings_backup_fail)
 			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
 
-		// Fill the config array.
-		Settings_Form::prepare_file($config_vars);
+		// Fill the config array in contextual data for the template.
+		$this->_languageSettings->prepare_file();
 	}
 
 	/**
-	 * Administration settings for languages area.
-	 * The method will return an array with all settings.
+	 * Administration settings for languages area:
+	 *  the method will initialize the form config array with all settings.
 	 *
 	 * Format of the array:
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.
 	 *  - or, an empty string for a horizontal rule.
 	 *	- or, a string for a titled section.
+	 *
+	 * Initialize _languageSettings form.
 	 */
-	function settings()
+	function _initLanguageSettingsForm()
 	{
-		global $txt;
+		global $txt, $context;
+
+		// We'll want to use them someday. That is, right now.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// make it happen!
+		$this->_languageSettings = new Settings_Form();
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -1099,7 +1124,15 @@ class ManageLanguages_Controller
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
 		);
 
-		return $config_vars;
+		call_integration_hook('integrate_language_settings', array(&$config_vars));
+
+		// Get our languages. No cache.
+		getLanguages(false);
+		foreach ($context['languages'] as $lang)
+			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+
+		// initialize the little form
+		$this->_languageSettings->settings($config_vars);
 	}
 }
 
