@@ -298,6 +298,7 @@ function AdminMain()
 				'manageattachments' => array(
 					'label' => $txt['attachments_avatars'],
 					'file' => 'ManageAttachments.php',
+					'controller' => 'ManageAttachments_Controller',
 					'function' => 'ManageAttachments',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_attachment',
@@ -744,8 +745,8 @@ function AdminSearchInternal()
 		array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
 		array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
 		array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
-		array('action_attachments', 'area=manageattachments;sa=attachments'),
-		array('action_avatars', 'area=manageattachments;sa=avatars'),
+		array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
+		array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
 		array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
 		array('ModifyMailSettings', 'area=mailqueue;sa=settings'),
