@@ -239,7 +239,8 @@ function AdminMain()
 				'managedrafts' => array(
 					'label' => $txt['manage_drafts'],
 					'file' => 'ManageDrafts.php',
-					'function' => 'ModifyDraftSettings',
+					'controller' => 'ManageDrafts_Controller',
+					'function' => 'action_modifysettings',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_logs',
 					'permission' => array('admin_forum'),
