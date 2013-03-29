@@ -53,7 +53,7 @@ class ManageLanguages_Controller
 			'add' => 'action_add',
 			'settings' => array(
 				'init' => '_initLanguageSettingsForm',
-				'action' => 'action_languageSettings_settings'
+				'display' => 'action_languageSettings_display'
 			),
 			'downloadlang' => 'action_downloadlang',
 			'editlang' => 'action_editlang',
@@ -81,7 +81,7 @@ class ManageLanguages_Controller
 			$this->{$subActions[$_REQUEST['sa']]['init']}();
 
 			// call the action handler
-			$this->{$subActions[$_REQUEST['sa']]['action']}();
+			$this->{$subActions[$_REQUEST['sa']]['display']}();
 		}
 		else
 		{
@@ -1059,7 +1059,7 @@ class ManageLanguages_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
 	 */
-	function action_languageSettings_settings()
+	function action_languageSettings_display()
 	{
 		global $scripturl, $context, $txt, $settings, $smcFunc;
 

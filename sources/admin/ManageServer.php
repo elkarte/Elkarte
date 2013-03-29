@@ -138,19 +138,19 @@ class ManageServer_Controller
 		$subActions = array(
 			'general' => array(
 				'init' => '_initGeneralSettingsForm',
-				'action' => 'action_generalSettings_settings'),
+				'display' => 'action_generalSettings_display'),
 			'database' => array(
 				'init' => '_initDatabaseSettingsForm',
-				'action' => 'action_databaseSettings_settings'),
+				'display' => 'action_databaseSettings_display'),
 			'cookie' => array(
 				'init' => '_initCookieSettingsForm',
-				'action' => 'action_cookieSettings_settings'),
+				'display' => 'action_cookieSettings_display'),
 			'cache' => array(
 				'init' => '_initCacheSettingsForm',
-				'action' => 'action_cacheSettings_settings'),
+				'display' => 'action_cacheSettings_display'),
 			'loads' => array(
 				'init' => '_initBalancingSettingsForm',
-				'action' => 'action_balancingSettings_settings'),
+				'display' => 'action_balancingSettings_display'),
 			'phpinfo' => 'action_phpinfo',
 		);
 
@@ -186,7 +186,7 @@ class ManageServer_Controller
 			$this->{$subActions[$_REQUEST['sa']]['init']}();
 
 			// call the action handler
-			$this->{$subActions[$_REQUEST['sa']]['action']}();
+			$this->{$subActions[$_REQUEST['sa']]['display']}();
 		}
 		else
 		{
@@ -416,7 +416,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for generalSettings form.
 	 */
-	function action_generalSettings_settings()
+	function action_generalSettings_display()
 	{
 		global $scripturl, $context, $txt;
 
@@ -458,7 +458,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _databaseSettings form.
 	 */
-	function action_databaseSettings_settings()
+	function action_databaseSettings_display()
 	{
 		global $scripturl, $context, $settings, $txt;
 
@@ -492,7 +492,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
 	 */
-	function action_cookieSettings_settings()
+	function action_cookieSettings_display()
 	{
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
@@ -544,7 +544,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
 	 */
-	function action_cacheSettings_settings()
+	function action_cacheSettings_display()
 	{
 		global $context, $scripturl, $txt, $helptxt, $cache_enable;
 
@@ -597,7 +597,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _balancingSettings form.
 	 */
-	function action_balancingSettings_settings()
+	function action_balancingSettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
