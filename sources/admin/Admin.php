@@ -448,7 +448,8 @@ function AdminMain()
 				'mailqueue' => array(
 					'label' => $txt['mailqueue_title'],
 					'file' => 'ManageMail.php',
-					'function' => 'action_managemail',
+					'controller' => 'ManageMail_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_mail',
 					'subsections' => array(
@@ -750,7 +751,7 @@ function AdminSearchInternal()
 		array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
 		array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-		array('ModifyMailSettings', 'area=mailqueue;sa=settings'),
+		array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 		array('ModifyNewsSettings', 'area=news;sa=settings'),
 		array('GeneralPermissionSettings', 'area=permissions;sa=settings'),
 		array('ModifyPostSettings', 'area=postsettings;sa=posts'),
