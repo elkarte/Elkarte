@@ -36,7 +36,7 @@ class AdminLog_Controller
 
 		// These are the logs they can load.
 		$log_functions = array(
-			'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
+			'errorlog' => array('ManageErrors.php', 'action_log', 'controller' => 'ManageErrors_Controller'),
 			'adminlog' => array('Modlog.php', 'action_modlog', 'controller' => 'Modlog_Controller'),
 			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features']), 'controller' => 'Modlog_Controller'),
 			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
