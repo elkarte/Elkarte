@@ -278,7 +278,8 @@ function AdminMain()
 				'smileys' => array(
 					'label' => $txt['smileys_manage'],
 					'file' => 'ManageSmileys.php',
-					'function' => 'ManageSmileys',
+					'controller' => 'ManageSmileys_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_smiley',
 					'permission' => array('manage_smileys'),
@@ -751,7 +752,7 @@ function AdminSearchInternal()
 		array('ModifyBBCSettings', 'area=postsettings;sa=bbc'),
 		array('ModifyTopicSettings', 'area=postsettings;sa=topics'),
 		array('EditSearchSettings', 'area=managesearch;sa=settings'),
-		array('EditSmileySettings', 'area=smileys;sa=settings'),
+		array('settings', 'area=smileys;sa=settings'),
 		array('ModifyGeneralSettings', 'area=serversettings;sa=general'),
 		array('ModifyDatabaseSettings', 'area=serversettings;sa=database'),
 		array('ModifyCookieSettings', 'area=serversettings;sa=cookie'),
