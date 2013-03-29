@@ -949,14 +949,14 @@ class ManageNews_Controller
 
 			call_integration_hook('integrate_save_news_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=news;sa=settings');
 		}
 
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

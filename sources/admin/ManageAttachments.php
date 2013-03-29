@@ -197,12 +197,12 @@ class ManageAttachments_Controller
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 
 		$context['sub_template'] = 'show_settings';
 	}

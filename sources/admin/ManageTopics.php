@@ -51,7 +51,7 @@ class ManageTopics_Controller
 			call_integration_hook('integrate_save_topic_settings', array(&$config_vars));
 
 			// Save the result!
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
@@ -62,7 +62,7 @@ class ManageTopics_Controller
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

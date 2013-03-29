@@ -235,7 +235,7 @@ class ManagePosts_Controller
 
 			call_integration_hook('integrate_save_post_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}
 
@@ -244,7 +244,7 @@ class ManagePosts_Controller
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

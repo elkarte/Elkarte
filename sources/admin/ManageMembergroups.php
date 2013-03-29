@@ -1030,7 +1030,7 @@ class ManageMembergroups_Controller
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}
 
@@ -1041,7 +1041,7 @@ class ManageMembergroups_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

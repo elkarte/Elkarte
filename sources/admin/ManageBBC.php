@@ -65,7 +65,7 @@ class ManageBBC_Controller
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// save the result
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			// and we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');
@@ -78,7 +78,7 @@ class ManageBBC_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

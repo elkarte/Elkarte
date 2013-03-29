@@ -254,14 +254,14 @@ class ManageMail_Controller
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
 			call_integration_hook('integrate_save_mail_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=mailqueue;save;sa=settings';
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 
 		$javascript = '
 			var bDay = {';

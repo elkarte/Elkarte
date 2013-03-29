@@ -161,13 +161,13 @@ class ManagePaid_Controller
 			}
 			unset($config_vars['dummy_currency']);
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			redirectexit('action=admin;area=paidsubscribe;sa=settings');
 		}
 
 		// Prepare the settings...
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

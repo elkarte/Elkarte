@@ -133,7 +133,7 @@ class ManageSearchEngines_Controller
 			call_integration_hook('integrate_save_search_engine_settings', array(&$config_vars));
 
 			// save the results!
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			// make sure to rebuild the cache with updated results
 			recacheSpiderNames();
@@ -148,7 +148,7 @@ class ManageSearchEngines_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

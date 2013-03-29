@@ -151,7 +151,7 @@ class ManageSearch_Controller
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
 			));
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -162,7 +162,7 @@ class ManageSearch_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

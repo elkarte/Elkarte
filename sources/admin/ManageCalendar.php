@@ -317,7 +317,7 @@ class ManageCalendar_Controller
 		{
 			checkSession();
 			call_integration_hook('integrate_save_calendar_settings');
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			// Update the stats in case.
 			updateSettings(array(
@@ -331,7 +331,7 @@ class ManageCalendar_Controller
 		createToken('admin-mp');
 
 		// Prepare the settings...
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

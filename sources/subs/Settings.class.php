@@ -61,7 +61,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Settings
+class Settings_Form
 {
 
 	/**

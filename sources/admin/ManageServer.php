@@ -492,13 +492,13 @@ function ModifyLoadBalancingSettings($return_config = false)
 
 		call_integration_hook('integrate_save_loadavg_settings');
 
-		Settings::saveDBSettings($config_vars);
+		Settings_Form::saveDBSettings($config_vars);
 		redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	createToken('admin-ssc');
 	createToken('admin-dbsc');
-	Settings::prepareDBSettingContext($config_vars);
+	Settings_Form::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -602,7 +602,7 @@ function saveSettings(&$config_vars)
 
 	// Save the new database-based settings, if any.
 	if (!empty($new_settings))
-		Settings::saveDBSettings($new_settings);
+		Settings_Form::saveDBSettings($new_settings);
 }
 
 /**

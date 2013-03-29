@@ -768,7 +768,7 @@ class ManageBoards_Controller
 
 			call_integration_hook('integrate_save_board_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 
@@ -776,7 +776,7 @@ class ManageBoards_Controller
 		createToken('admin-mp');
 
 		// Prepare the settings...
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**

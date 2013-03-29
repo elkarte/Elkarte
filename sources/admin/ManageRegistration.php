@@ -309,7 +309,7 @@ class ManageRegistration_Controller
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			Settings::saveDBSettings($config_vars);
+			Settings_Form::saveDBSettings($config_vars);
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
@@ -334,7 +334,7 @@ class ManageRegistration_Controller
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepareDBSettingContext($config_vars);
 	}
 
 	/**
