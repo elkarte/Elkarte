@@ -249,7 +249,8 @@ function AdminMain()
 				'managecalendar' => array(
 					'label' => $txt['manage_calendar'],
 					'file' => 'ManageCalendar.php',
-					'function' => 'ManageCalendar',
+					'controller' => 'ManageCalendar_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_calendar',
 					'permission' => array('admin_forum'),
@@ -738,7 +739,7 @@ function AdminSearchInternal()
 		array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
 		array('action_attachments', 'area=manageattachments;sa=attachments'),
 		array('action_avatars', 'area=manageattachments;sa=avatars'),
-		array('ModifyCalendarSettings', 'area=managecalendar;sa=settings'),
+		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
 		array('EditBoardSettings', 'area=manageboards;sa=settings'),
 		array('ModifyMailSettings', 'area=mailqueue;sa=settings'),
 		array('ModifyNewsSettings', 'area=news;sa=settings'),
@@ -800,7 +801,17 @@ function AdminSearchInternal()
 	foreach ($settings_search as $setting_area)
 	{
 		// Get a list of their variables.
-		$config_vars = $setting_area[0](true);
+		if (isset($setting_area[2]))
+		{
+			// an OOP controller: get the settings from the settings method.
+			$controller = new $setting_area[2]();
+			$config_vars = $controller->{$setting_area[0]}();
+		}
+		else
+		{
+			// a good ole' procedural controller: get the settings from the function.
+			$config_vars = $setting_area[0](true);
+		}
 
 		foreach ($config_vars as $var)
 			if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch')))
