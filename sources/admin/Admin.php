@@ -433,9 +433,10 @@ function AdminMain()
 				'maintain' => array(
 					'label' => $txt['maintain_title'],
 					'file' => 'ManageMaintenance.php',
+					'controller' => 'ManageMaintenance_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_maintain',
-					'function' => 'ManageMaintenance',
 					'subsections' => array(
 						'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
 						'database' => array($txt['maintain_sub_database'], 'admin_forum'),
