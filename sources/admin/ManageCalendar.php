@@ -288,18 +288,14 @@ class ManageCalendar_Controller
 
 	/**
 	 * Show and allow to modify calendar settings.
-	 *
-	 * @param bool $return_config = false
 	 */
-	function action_settings($return_config = false)
+	function action_settings()
 	{
 		global $modSettings, $context, $settings, $txt, $scripturl, $smcFunc;
 
 		$config_vars = $this->settings();
 
 		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
-		if ($return_config)
-			return $config_vars;
 
 		// Get the settings template fired up.
 		require_once(SUBSDIR . '/Settings.php');
