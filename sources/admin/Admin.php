@@ -144,7 +144,8 @@ function AdminMain()
 				'languages' => array(
 					'label' => $txt['language_configuration'],
 					'file' => 'ManageLanguages.php',
-					'function' => 'ManageLanguages',
+					'controller' => 'ManageLanguages_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_languages',
 					'subsections' => array(
@@ -761,7 +762,7 @@ function AdminSearchInternal()
 		array('ModifyDatabaseSettings', 'area=serversettings;sa=database'),
 		array('ModifyCookieSettings', 'area=serversettings;sa=cookie'),
 		array('ModifyCacheSettings', 'area=serversettings;sa=cache'),
-		array('ModifyLanguageSettings', 'area=languages;sa=settings'),
+		array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 		array('ModifyRegistrationSettings', 'area=regcenter;sa=settings'),
 		array('ManageSearchEngineSettings', 'area=sengines;sa=settings'),
 		array('ModifySubscriptionSettings', 'area=paidsubscribe;sa=settings'),
