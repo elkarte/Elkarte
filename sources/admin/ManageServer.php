@@ -73,31 +73,31 @@ class ManageServer_Controller
 {
 	/**
 	 * Database settings form controller
-	 * @var Settings_Form_Controller
+	 * @var Settings_Form
 	 */
 	protected $_databaseSettingsForm;
 
 	/**
 	 * General settings form controller
-	 * @var
+	 * @var Settings_Form
 	 */
 	protected $_generalSettingsForm;
 
 	/**
 	 * Cache settings form controller
-	 * @var unknown_type
+	 * @var Settings_Form
 	 */
 	protected $_cacheSettingsForm;
 
 	/**
 	 * Cookies settings form controller
-	 * @var unknown_type
+	 * @var Settings_Form
 	 */
 	protected $_cookieSettingsForm;
 
 	/**
 	 * Load balancing settings form controller
-	 * @var unknown_type
+	 * @var Settings_Form
 	 */
 	protected $_balancingSettingsForm;
 
