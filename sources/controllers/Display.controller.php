@@ -739,14 +739,14 @@ class Display_Controller
 				loadMemberData($posters);
 			$messages_request = $smcFunc['db_query']('', '
 				SELECT
-					id_msg, icon, subject, poster_time, poster_ip, id_member, modified_time, modified_name, body,
-					smileys_enabled, poster_name, poster_email, approved,
-					id_msg_modified < {int:new_from} AS is_read
+					m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
+					m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
+					m.id_msg_modified < {int:new_from} AS is_read
 					' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-				FROM {db_prefix}messages
+				FROM {db_prefix}messages as m
 					' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
-				WHERE id_msg IN ({array_int:message_list})
-				ORDER BY id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+				WHERE m.id_msg IN ({array_int:message_list})
+				ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
 				$msg_parameters
 			);
 
