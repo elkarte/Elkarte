@@ -99,8 +99,8 @@ class ManageAvatars_Controller
 
 		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
-		// We will need Settings::prepareDBSettingContext().
-		require_once(ADMINDIR . '/ManageServer.php');
+		// We will need Settings_Form::prepare_db().
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Saving avatar settings?
 		if (isset($_GET['save']))
@@ -113,7 +113,7 @@ class ManageAvatars_Controller
 
 				call_integration_hook('integrate_save_avatar_settings');
 
-				Settings::saveDBSettings($config_vars);
+				Settings_Form::save_db($config_vars);
 				redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 
@@ -125,7 +125,7 @@ class ManageAvatars_Controller
 
 		// Prepare the context.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
-		Settings::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 
 		// Add a layer for the javascript.
 		$context['template_layers'][] = 'avatar_settings';

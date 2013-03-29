@@ -63,499 +63,612 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
- * the appropriate one based on the sub-action.
+ * ManageServer administration pages controller.
+ * This handles several screens, with low-level essential settings such as
+ * database settings, cache, general forum settings, and others.
+ * It sends the data for display, and it allows the admin to change it.
  *
- * Requires the admin_forum permission.
- * Redirects to the appropriate function based on the sub-action.
- *
- * @uses edit_settings adminIndex.
  */
-function ModifySettings()
+class ManageServer_Controller
 {
-	global $context, $txt, $scripturl;
+	/**
+	 * Database settings form controller
+	 * @var Settings_Form_Controller
+	 */
+	protected $_databaseSettingsForm;
 
-	// This is just to keep the database password more secure.
-	isAllowedTo('admin_forum');
+	/**
+	 * General settings form controller
+	 * @var
+	 */
+	protected $_generalSettingsForm;
 
-	// Load up all the tabs...
-	$context[$context['admin_menu_name']]['tab_data'] = array(
-		'title' => $txt['admin_server_settings'],
-		'help' => 'serversettings',
-		'description' => $txt['admin_basic_settings'],
-	);
+	/**
+	 * Cache settings form controller
+	 * @var unknown_type
+	 */
+	protected $_cacheSettingsForm;
 
-	checkSession('request');
+	/**
+	 * Cookies settings form controller
+	 * @var unknown_type
+	 */
+	protected $_cookieSettingsForm;
 
-	// The settings are in here, I swear!
-	loadLanguage('ManageSettings');
+	/**
+	 * Load balancing settings form controller
+	 * @var unknown_type
+	 */
+	protected $_balancingSettingsForm;
 
-	$context['page_title'] = $txt['admin_server_settings'];
-	$context['sub_template'] = 'show_settings';
-
-	$subActions = array(
-		'general' => 'ModifyGeneralSettings',
-		'database' => 'ModifyDatabaseSettings',
-		'cookie' => 'ModifyCookieSettings',
-		'cache' => 'ModifyCacheSettings',
-		'loads' => 'ModifyLoadBalancingSettings',
-		'phpinfo' => 'ShowPHPinfoSettings',
-	);
-
-	call_integration_hook('integrate_server_settings', array(&$subActions));
-
-	// By default we're editing the core settings
-	$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
-	$context['sub_action'] = $_REQUEST['sa'];
-
-	// Any messages to speak of?
-	$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
-
-	// Warn the user if there's any relevant information regarding Settings.php.
-	if ($_REQUEST['sa'] != 'cache')
+	/**
+	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
+	 * the appropriate one based on the sub-action.
+	 *
+	 * Requires the admin_forum permission.
+	 * Redirects to the appropriate function based on the sub-action.
+	 *
+	 * @uses edit_settings adminIndex.
+	 */
+	function action_index()
 	{
-		// Warn the user if the backup of Settings.php failed.
-		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+		global $context, $txt, $scripturl;
 
-		if ($settings_not_writable)
-			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['settings_not_writable'] . '</strong></div><br />';
-		elseif ($settings_backup_fail)
-			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
+		// This is just to keep the database password more secure.
+		isAllowedTo('admin_forum');
 
-		$context['settings_not_writable'] = $settings_not_writable;
-	}
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['admin_server_settings'],
+			'help' => 'serversettings',
+			'description' => $txt['admin_basic_settings'],
+		);
 
-	// Call the right function for this sub-action.
-	$subActions[$_REQUEST['sa']]();
-}
+		checkSession('request');
 
-/**
- * General forum settings - forum name, maintenance mode, etc.
- * Practically, this shows an interface for the settings in Settings.php to be changed.
- *
- * - It uses the rawdata sub template (not theme-able.)
- * - Requires the admin_forum permission.
- * - Uses the edit_settings administration area.
- * - Contains the actual array of settings to show from Settings.php.
- * - Accessed from ?action=admin;area=serversettings;sa=general.
- *
- * @param $return_config
- */
-function ModifyGeneralSettings($return_config = false)
-{
-	global $scripturl, $context, $txt;
+		// The settings are in here, I swear!
+		loadLanguage('ManageSettings');
 
-	/* If you're writing a mod, it's a bad idea to add things here....
-	For each option:
-		variable name, description, type (constant), size/possible values, helptext.
-	OR	an empty string for a horizontal rule.
-	OR	a string for a titled section. */
-	$config_vars = array(
-		array('mbname', $txt['admin_title'], 'file', 'text', 30),
-		'',
-		array('maintenance', $txt['admin_maintain'], 'file', 'check'),
-		array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
-		array('mmessage', $txt['maintenance_message'], 'file', 'text', 36),
-		'',
-		array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
-		'',
-		array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-		array('disableTemplateEval', $txt['disableTemplateEval'], 'db', 'check', null, 'disableTemplateEval'),
-		array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
-	);
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
 
-	call_integration_hook('integrate_general_settings', array(&$config_vars));
+		$context['page_title'] = $txt['admin_server_settings'];
+		$context['sub_template'] = 'show_settings';
 
-	if ($return_config)
-		return $config_vars;
+		$subActions = array(
+			'general' => array(
+				'init' => '_initGeneralSettingsForm',
+				'action' => 'action_generalSettings_settings'),
+			'database' => array(
+				'init' => '_initDatabaseSettingsForm',
+				'action' => 'action_databaseSettings_settings'),
+			'cookie' => array(
+				'init' => '_initCookieSettingsForm',
+				'action' => 'action_cookieSettings_settings'),
+			'cache' => array(
+				'init' => '_initCacheSettingsForm',
+				'action' => 'action_cacheSettings_settings'),
+			'loads' => array(
+				'init' => '_initBalancingSettingsForm',
+				'action' => 'action_balancingSettings_settings'),
+			'phpinfo' => 'action_phpinfo',
+		);
 
-	// Setup the template stuff.
-	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
-	$context['settings_title'] = $txt['general_settings'];
+		call_integration_hook('integrate_server_settings', array(&$subActions));
 
-	require_once(SUBSDIR . '/Settings_Form.class.php');
+		// By default we're editing the core settings
+		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
+		$context['sub_action'] = $_REQUEST['sa'];
 
-	// Saving settings?
-	if (isset($_REQUEST['save']))
-	{
-		call_integration_hook('integrate_save_general_settings');
+		// Any messages to speak of?
+		$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
 
-		Settings_Form::save($config_vars);
-		redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
-	}
-
-	// Fill the config array.
-	Settings_Form::prepare_file($config_vars);
-}
-
-/**
- * Basic database and paths settings - database name, host, etc.
- *
- * - It shows an interface for the settings in Settings.php to be changed.
- * - It contains the actual array of settings to show from Settings.php.
- * - It uses the rawdata sub template (not theme-able.)
- * - Requires the admin_forum permission.
- * - Uses the edit_settings administration area.
- * - Accessed from ?action=admin;area=serversettings;sa=database.
- *
- * @param $return_config
- */
-function ModifyDatabaseSettings($return_config = false)
-{
-	global $scripturl, $context, $settings, $txt;
-
-	/* If you're writing a mod, it's a bad idea to add things here....
-		For each option:
-		variable name, description, type (constant), size/possible values, helptext.
-		OR an empty string for a horizontal rule.
-		OR a string for a titled section. */
-	$config_vars = array(
-		array('db_server', $txt['database_server'], 'file', 'text'),
-		array('db_user', $txt['database_user'], 'file', 'text'),
-		array('db_passwd', $txt['database_password'], 'file', 'password'),
-		array('db_name', $txt['database_name'], 'file', 'text'),
-		array('db_prefix', $txt['database_prefix'], 'file', 'text'),
-		array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
-		array('db_error_send', $txt['db_error_send'], 'file', 'check'),
-		array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
-		array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
-		'',
-		array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
-		array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
-		'',
-		array('boardurl', $txt['admin_url'], 'file', 'text', 36),
-		array('boarddir', $txt['boarddir'], 'file', 'text', 36),
-		array('sourcedir', $txt['sourcesdir'], 'file', 'text', 36),
-		array('cachedir', $txt['cachedir'], 'file', 'text', 36),
-	);
-
-	call_integration_hook('integrate_database_settings', array(&$config_vars));
-
-	if ($return_config)
-		return $config_vars;
-
-	// Setup the template stuff.
-	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
-	$context['settings_title'] = $txt['database_paths_settings'];
-	$context['save_disabled'] = $context['settings_not_writable'];
-
-	require_once(SUBSDIR . '/Settings_Form.class.php');
-
-	// Saving settings?
-	if (isset($_REQUEST['save']))
-	{
-		call_integration_hook('integrate_save_database_settings');
-
-		Settings_Form::save($config_vars);
-		redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
-	}
-
-	// Fill the config array.
-	Settings_Form::prepare_file($config_vars);
-}
-
-/**
- * This function handles cookies settings modifications.
- *
- * @param bool $return_config = false
- */
-function ModifyCookieSettings($return_config = false)
-{
-	global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
-
-	// Define the variables we want to edit.
-	$config_vars = array(
-		// Cookies...
-		array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
-		array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
-		array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
-		array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
-		array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-		array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies',  'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
-		array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
-		'',
-		// Sessions
-		array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
-		array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
-		array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
-	);
-
-	call_integration_hook('integrate_cookie_settings', array(&$config_vars));
-
-	if ($return_config)
-		return $config_vars;
-
-	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
-	$context['settings_title'] = $txt['cookies_sessions_settings'];
-
-	require_once(SUBSDIR . '/Settings_Form.class.php');
-
-	// Saving settings?
-	if (isset($_REQUEST['save']))
-	{
-		call_integration_hook('integrate_save_cookie_settings');
-
-		if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
-			fatal_lang_error('invalid_cookie_domain', false);
-
-		Settings_Form::save($config_vars);
-
-		// If the cookie name was changed, reset the cookie.
-		if ($cookiename != $_POST['cookiename'])
+		// Warn the user if there's any relevant information regarding Settings.php.
+		if ($_REQUEST['sa'] != 'cache')
 		{
-			$original_session_id = $context['session_id'];
-			include_once(SUBSDIR . '/Auth.subs.php');
+			// Warn the user if the backup of Settings.php failed.
+			$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
-			// Remove the old cookie.
-			setLoginCookie(-3600, 0);
+			if ($settings_not_writable)
+				$context['settings_message'] = '<div class="centertext"><strong>' . $txt['settings_not_writable'] . '</strong></div><br />';
+			elseif ($settings_backup_fail)
+				$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
 
-			// Set the new one.
-			$cookiename = $_POST['cookiename'];
-			setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
-
-			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
+			$context['settings_not_writable'] = $settings_not_writable;
 		}
 
-		redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
-	}
+		// Call the right function for this sub-action.
+		// quick 'n hacky :P
+		if (is_array($subActions[$_REQUEST['sa']]))
+		{
+			// initialize the form
+			$this->{$subActions[$_REQUEST['sa']]['init']}();
 
-	// Fill the config array.
-	Settings_Form::prepare_file($config_vars);
-}
-
-/**
- * Simply modifying cache functions
- *
- * @param bool $return_config = false
- */
-function ModifyCacheSettings($return_config = false)
-{
-	global $context, $scripturl, $txt, $helptxt, $cache_enable;
-
-	// Detect all available optimizers
-	$detected = array();
-	if (function_exists('eaccelerator_put'))
-		$detected['eaccelerator'] = $txt['eAccelerator_cache'];
-	if (function_exists('mmcache_put'))
-		$detected['mmcache'] = $txt['mmcache_cache'];
-	if (function_exists('apc_store'))
-		$detected['apc'] = $txt['apc_cache'];
-	if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
-		$detected['zend'] = $txt['zend_cache'];
-	if (function_exists('memcache_set') || function_exists('memcached_set'))
-		$detected['memcached'] = $txt['memcached_cache'];
-	if (function_exists('xcache_set'))
-		$detected['xcache'] = $txt['xcache_cache'];
-	if (function_exists('file_put_contents'))
-		$detected['filebased'] = $txt['default_cache'];
-
-	// set our values to show what, if anything, we found
-	if (empty($detected))
-	{
-		$txt['cache_settings_message'] = $txt['detected_no_caching'];
-		$cache_level = array($txt['cache_off']);
-		$detected['none'] = $txt['cache_off'];
-	}
-	else
-	{
-		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
-		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
-	}
-
-	// Define the variables we want to edit.
-	$config_vars = array(
-		// Only a few settings, but they are important
-		array('', $txt['cache_settings_message'], '', 'desc'),
-		array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
-		array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
-		array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
-		array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
-	);
-
-	// some javascript to enable / disable certain settings if the option is not selected
-	$context['settings_post_javascript'] = '
-		var cache_type = document.getElementById(\'cache_accelerator\');
-		createEventListener(cache_type);
-		cache_type.addEventListener("change", toggleCache);
-		toggleCache();';
-
-	call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
-
-	if ($return_config)
-		return $config_vars;
-
-	require_once(SUBSDIR . '/Settings_Form.class.php');
-
-	// Saving again?
-	if (isset($_GET['save']))
-	{
-		call_integration_hook('integrate_save_cache_settings');
-
-		Settings_Form::save($config_vars);
-
-		// we need to save the $cache_enable to $modSettings as well
-		updatesettings(array('cache_enable' => (int) $_POST['cache_enable']));
-
-		// exit so we reload our new settings on the page
-		redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
-	}
-
-	loadLanguage('ManageMaintenance');
-	createToken('admin-maint');
-	$context['template_layers'][] = 'clean_cache_button';
-
-	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
-	$context['settings_title'] = $txt['caching_settings'];
-	$context['settings_message'] = $txt['caching_information'];
-
-	// Prepare the template.
-	createToken('admin-ssc');
-
-	// Prepare settings for display in the template.
-	Settings_Form::prepare_file($config_vars);
-}
-
-/**
- * Allows to edit load balancing settings.
- *
- * @param bool $return_config = false
- */
-function ModifyLoadBalancingSettings($return_config = false)
-{
-	global $txt, $scripturl, $context, $settings, $modSettings;
-
-	// Setup a warning message, but disabled by default.
-	$disabled = true;
-	$context['settings_message'] = $txt['loadavg_disabled_conf'];
-
-	if (stripos(PHP_OS, 'win') === 0)
-		$context['settings_message'] = $txt['loadavg_disabled_windows'];
-	else
-	{
-		$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
-		if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) !== 0)
-			$modSettings['load_average'] = (float) $matches[1];
-		elseif (($modSettings['load_average'] = @`uptime`) !== null && preg_match('~load averages?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) !== 0)
-			$modSettings['load_average'] = (float) $matches[1];
+			// call the action handler
+			$this->{$subActions[$_REQUEST['sa']]['action']}();
+		}
 		else
-			unset($modSettings['load_average']);
-
-		if (!empty($modSettings['load_average']))
 		{
-			$context['settings_message'] = sprintf($txt['loadavg_warning'], $modSettings['load_average']);
-			$disabled = false;
+			// one of our 'normal' methods
+			$this->{$subActions[$_REQUEST['sa']]}();
 		}
 	}
 
-	// Start with a simple checkbox.
-	$config_vars = array(
-		array('check', 'loadavg_enable', 'disabled' => $disabled),
-	);
-
-	// Set the default values for each option.
-	$default_values = array(
-		'loadavg_auto_opt' => '1.0',
-		'loadavg_search' => '2.5',
-		'loadavg_allunread' => '2.0',
-		'loadavg_unreadreplies' => '3.5',
-		'loadavg_show_posts' => '2.0',
-		'loadavg_userstats' => '10.0',
-		'loadavg_bbc' => '30.0',
-		'loadavg_forum' => '40.0',
-	);
-
-	// Loop through the settings.
-	foreach ($default_values as $name => $value)
+	/**
+	 * Initialize _databaseSettings form.
+	 */
+	function _initDatabaseSettingsForm()
 	{
-		// Use the default value if the setting isn't set yet.
-		$value = !isset($modSettings[$name]) ? $value : $modSettings[$name];
-		$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
+		global $txt;
+
+		// instantiate the form
+		$this->_databaseSettingsForm = new Settings_Form();
+
+		// initialize settings
+
+		$config_vars = array(
+			array('db_server', $txt['database_server'], 'file', 'text'),
+			array('db_user', $txt['database_user'], 'file', 'text'),
+			array('db_passwd', $txt['database_password'], 'file', 'password'),
+			array('db_name', $txt['database_name'], 'file', 'text'),
+			array('db_prefix', $txt['database_prefix'], 'file', 'text'),
+			array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
+			array('db_error_send', $txt['db_error_send'], 'file', 'check'),
+			array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
+			array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
+			'',
+			array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
+			array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
+			'',
+			array('boardurl', $txt['admin_url'], 'file', 'text', 36),
+			array('boarddir', $txt['boarddir'], 'file', 'text', 36),
+			array('sourcedir', $txt['sourcesdir'], 'file', 'text', 36),
+			array('cachedir', $txt['cachedir'], 'file', 'text', 36),
+		);
+
+		$this->_databaseSettingsForm->settings($config_vars);
 	}
 
-	call_integration_hook('integrate_loadavg_settings', array(&$config_vars));
-
-	if ($return_config)
-		return $config_vars;
-
-	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
-	$context['settings_title'] = $txt['load_balancing_settings'];
-
-	// We're working with them settings here.
-	require_once(SUBSDIR . '/Settings.php');
-
-	// Saving?
-	if (isset($_GET['save']))
+	/**
+	 * Initialize _generalSettings form.
+	 */
+	function _initGeneralSettingsForm()
 	{
-		// Stupidity is not allowed.
-		foreach ($_POST as $key => $value)
+		global $scripturl, $context, $txt;
+
+		$this->_generalSettingsForm = new Settings_Form();
+
+		// initialize configuration
+		$config_vars = array(
+			array('mbname', $txt['admin_title'], 'file', 'text', 30),
+			'',
+			array('maintenance', $txt['admin_maintain'], 'file', 'check'),
+			array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
+			array('mmessage', $txt['maintenance_message'], 'file', 'text', 36),
+			'',
+			array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
+			'',
+			array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
+			array('disableTemplateEval', $txt['disableTemplateEval'], 'db', 'check', null, 'disableTemplateEval'),
+			array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
+		);
+
+		$this->_generalSettingsForm->settings($config_vars);
+	}
+
+	/**
+	 * Initialize _cookieSettings form.
+	 */
+	function _initCookieSettingsForm()
+	{
+		global $txt;
+
+		$this->_cookieSettingsForm = new Settings_Form();
+
+		// Define the variables we want to edit or show in the cookie form.
+		$config_vars = array(
+			// Cookies...
+			array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
+			array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
+			array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
+			array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
+			array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
+			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies',  'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
+			array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
+			'',
+			// Sessions
+			array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
+			array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
+			array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
+		);
+
+		$this->_cookieSettingsForm->settings($config_vars);
+	}
+
+	/**
+	 * Initialize _cacheSettings form.
+	 */
+	function _initCacheSettingsForm()
+	{
+		global $txt;
+
+		$this->_cacheSettingsForm = new Settings_Form();
+
+		// Detect all available optimizers
+		$detected = array();
+		if (function_exists('eaccelerator_put'))
+			$detected['eaccelerator'] = $txt['eAccelerator_cache'];
+		if (function_exists('mmcache_put'))
+			$detected['mmcache'] = $txt['mmcache_cache'];
+		if (function_exists('apc_store'))
+			$detected['apc'] = $txt['apc_cache'];
+		if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
+			$detected['zend'] = $txt['zend_cache'];
+		if (function_exists('memcache_set') || function_exists('memcached_set'))
+			$detected['memcached'] = $txt['memcached_cache'];
+		if (function_exists('xcache_set'))
+			$detected['xcache'] = $txt['xcache_cache'];
+		if (function_exists('file_put_contents'))
+			$detected['filebased'] = $txt['default_cache'];
+
+		// set our values to show what, if anything, we found
+		if (empty($detected))
 		{
-			if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
+			$txt['cache_settings_message'] = $txt['detected_no_caching'];
+			$cache_level = array($txt['cache_off']);
+			$detected['none'] = $txt['cache_off'];
+		}
+		else
+		{
+			$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
+			$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
+		}
+
+		// Define the variables we want to edit.
+		$config_vars = array(
+			// Only a few settings, but they are important
+			array('', $txt['cache_settings_message'], '', 'desc'),
+			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
+			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
+			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
+			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
+		);
+
+		$this->_cacheSettingsForm->settings($config_vars);
+	}
+
+	/**
+	 * Initialize balancingSettings form.
+	 */
+	function _initBalancingSettingsForm()
+	{
+		global $txt, $modSettings, $context;
+
+		$this->_balancingSettingsForm = new Settings_Form();
+
+		// initialize settings for the form to show
+
+		// disabled by default.
+		$disabled = true;
+		$context['settings_message'] = $txt['loadavg_disabled_conf'];
+
+		// don't say you're using that win-thing, no cookies for you :P
+
+		if (stripos(PHP_OS, 'win') === 0)
+			$context['settings_message'] = $txt['loadavg_disabled_windows'];
+		else
+		{
+			$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
+			if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) !== 0)
+				$modSettings['load_average'] = (float) $matches[1];
+			elseif (($modSettings['load_average'] = @`uptime`) !== null && preg_match('~load averages?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) !== 0)
+				$modSettings['load_average'] = (float) $matches[1];
+			else
+				unset($modSettings['load_average']);
+
+			if (!empty($modSettings['load_average']))
+			{
+				$disabled = false;
+				$context['settings_message'] = sprintf($txt['loadavg_warning'], $modSettings['load_average']);
+			}
+		}
+
+		// Start with a simple checkbox.
+		$config_vars = array(
+			array('check', 'loadavg_enable', 'disabled' => $disabled),
+		);
+
+		// Set the default values for each option.
+		$default_values = array(
+			'loadavg_auto_opt' => '1.0',
+			'loadavg_search' => '2.5',
+			'loadavg_allunread' => '2.0',
+			'loadavg_unreadreplies' => '3.5',
+			'loadavg_show_posts' => '2.0',
+			'loadavg_userstats' => '10.0',
+			'loadavg_bbc' => '30.0',
+			'loadavg_forum' => '40.0',
+		);
+
+		// Loop through the settings.
+		foreach ($default_values as $name => $value)
+		{
+			// Use the default value if the setting isn't set yet.
+			$value = !isset($modSettings[$name]) ? $value : $modSettings[$name];
+			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
+		}
+
+		// Set them for the settings form
+		$this->_balancingSettingsForm->settings($config_vars);
+	}
+
+	/**
+	 * General forum settings - forum name, maintenance mode, etc.
+	 * Practically, this shows an interface for the settings in Settings.php to be changed.
+	 *
+	 * - It uses the rawdata sub-template (not theme-able.)
+	 * - Requires the admin_forum permission.
+	 * - Uses the edit_settings administration area.
+	 * - Contains the actual array of settings to show from Settings.php.
+	 * - Accessed from ?action=admin;area=serversettings;sa=general.
+	 *
+	 * This method handles the display, allows to edit, and saves the result
+	 * for generalSettings form.
+	 */
+	function action_generalSettings_settings()
+	{
+		global $scripturl, $context, $txt;
+
+		// lets accept this for now :P
+		$config_vars = $this->_generalSettingsForm->settings();
+
+		call_integration_hook('integrate_general_settings', array(&$config_vars));
+
+		// Setup the template stuff.
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
+		$context['settings_title'] = $txt['general_settings'];
+
+		// Saving settings?
+		if (isset($_REQUEST['save']))
+		{
+			call_integration_hook('integrate_save_general_settings');
+
+			Settings_Form::save($config_vars);
+			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+		}
+
+		// Fill the config array.
+		Settings_Form::prepare_file($config_vars);
+	}
+
+	/**
+	 * Basic database and paths settings - database name, host, etc.
+	 *
+	 * - It shows an interface for the settings in Settings.php to be changed.
+	 * - It contains the actual array of settings to show from Settings.php.
+	 * - It uses the rawdata sub-template (not theme-able.)
+	 * - Requires the admin_forum permission.
+	 * - Uses the edit_settings administration area.
+	 * - Accessed from ?action=admin;area=serversettings;sa=database.
+	 *
+	 * This method handles the display, allows to edit, and saves the result
+	 * for databaseSettings form.
+	 */
+	function action_databaseSettings_settings()
+	{
+		global $scripturl, $context, $settings, $txt;
+
+		$config_vars = $this->_databaseSettingsForm->settings();
+
+		call_integration_hook('integrate_database_settings', array(&$config_vars));
+
+		// Setup the template stuff.
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
+		$context['settings_title'] = $txt['database_paths_settings'];
+		$context['save_disabled'] = $context['settings_not_writable'];
+
+		// Saving settings?
+		if (isset($_REQUEST['save']))
+		{
+			call_integration_hook('integrate_save_database_settings');
+
+			Settings_Form::save($config_vars);
+			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+		}
+
+		// Fill the config array.
+		Settings_Form::prepare_file($config_vars);
+	}
+
+	/**
+	 * Modify cookies settings.
+	 * This method handles the display, allows to edit, and saves the result
+	 * for cookieSettings form.
+	 */
+	function action_cookieSettings_settings()
+	{
+		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
+
+		$config_vars = $this->_cookieSettingsForm->settings();
+
+		call_integration_hook('integrate_cookie_settings', array(&$config_vars));
+
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
+		$context['settings_title'] = $txt['cookies_sessions_settings'];
+
+		// Saving settings?
+		if (isset($_REQUEST['save']))
+		{
+			call_integration_hook('integrate_save_cookie_settings');
+
+			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
+				fatal_lang_error('invalid_cookie_domain', false);
+
+			Settings_Form::save($config_vars);
+
+			// If the cookie name was changed, reset the cookie.
+			if ($cookiename != $_POST['cookiename'])
+			{
+				$original_session_id = $context['session_id'];
+				include_once(SUBSDIR . '/Auth.subs.php');
+
+				// Remove the old cookie.
+				setLoginCookie(-3600, 0);
+
+				// Set the new one.
+				$cookiename = $_POST['cookiename'];
+				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+
+				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
+			}
+
+			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+		}
+
+		// Fill the config array.
+		Settings_Form::prepare_file($config_vars);
+	}
+
+	/**
+	 * Cache settings editing and submission.
+	 * This method handles the display, allows to edit, and saves the result
+	 * for cacheSettings form.
+	 */
+	function action_cacheSettings_settings()
+	{
+		global $context, $scripturl, $txt, $helptxt, $cache_enable;
+
+		$config_vars = $this->_cacheSettingsForm->settings();
+
+		// some javascript to enable / disable certain settings if the option is not selected
+		$context['settings_post_javascript'] = '
+			var cache_type = document.getElementById(\'cache_accelerator\');
+			createEventListener(cache_type);
+			cache_type.addEventListener("change", toggleCache);
+			toggleCache();';
+
+		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
+
+		// Saving again?
+		if (isset($_GET['save']))
+		{
+			call_integration_hook('integrate_save_cache_settings');
+
+			Settings_Form::save($config_vars);
+
+			// we need to save the $cache_enable to $modSettings as well
+			updatesettings(array('cache_enable' => (int) $_POST['cache_enable']));
+
+			// exit so we reload our new settings on the page
+			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
+		}
+
+		loadLanguage('ManageMaintenance');
+		createToken('admin-maint');
+		$context['template_layers'][] = 'clean_cache_button';
+
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
+		$context['settings_title'] = $txt['caching_settings'];
+		$context['settings_message'] = $txt['caching_information'];
+
+		// Prepare the template.
+		createToken('admin-ssc');
+
+		// Prepare settings for display in the template.
+		Settings_Form::prepare_file($config_vars);
+	}
+
+	/**
+	 * Allows to edit load balancing settings.
+	 *
+	 * This method handles the display, allows to edit, and saves the result
+	 * for balancingSettings form.
+	 */
+	function action_balancingSettings_settings()
+	{
+		global $txt, $scripturl, $context, $settings, $modSettings;
+
+		$config_vars = $this->_balancingSettingsForm->settings();
+
+		call_integration_hook('integrate_loadavg_settings', array(&$config_vars));
+
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
+		$context['settings_title'] = $txt['load_balancing_settings'];
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			// Stupidity is not allowed.
+			foreach ($_POST as $key => $value)
+			{
+				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
+					continue;
+				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
+					$_POST['loadavg_auto_opt'] = '1.0';
+				elseif ($key == 'loadavg_forum' && $value < 10)
+					$_POST['loadavg_forum'] = '10.0';
+				elseif ($value < 2)
+					$_POST[$key] = '2.0';
+			}
+
+			call_integration_hook('integrate_save_loadavg_settings');
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
+		}
+
+		createToken('admin-ssc');
+		createToken('admin-dbsc');
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Allows us to see the servers php settings
+	 *
+	 * - loads the settings into an array for display in a template
+	 * - drops cookie values just in case
+	 */
+	function action_phpinfo()
+	{
+		global $context, $txt;
+
+		$info_lines = array();
+		$category = $txt['phpinfo_settings'];
+
+		// get the data
+		ob_start();
+		phpinfo();
+
+		// We only want it for its body, pigs that we are
+		$info_lines = preg_replace('~^.*<body>(.*)</body>.*$~', '$1', ob_get_contents());
+		$info_lines = explode("\n", strip_tags($info_lines, "<tr><td><h2>"));
+		ob_end_clean();
+
+		// remove things that could be considered sensitive
+		$remove = '_COOKIE|Cookie|_GET|_REQUEST|REQUEST_URI|QUERY_STRING|REQUEST_URL|HTTP_REFERER';
+
+		// put all of it into an array
+		foreach ($info_lines as $line)
+		{
+			if (preg_match('~(' . $remove . ')~', $line))
 				continue;
-			elseif ($key == 'loadavg_auto_opt' && $value <= 1)
-				$_POST['loadavg_auto_opt'] = '1.0';
-			elseif ($key == 'loadavg_forum' && $value < 10)
-				$_POST['loadavg_forum'] = '10.0';
-			elseif ($value < 2)
-				$_POST[$key] = '2.0';
+
+			// new category?
+			if (strpos($line, '<h2>') !== false)
+				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $category = $title[1] : $category;
+
+			// load it as setting => value or the old setting local master
+			if (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
+				$pinfo[$category][$val[1]] = $val[2];
+			elseif (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
+				$pinfo[$category][$val[1]] = array($txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]);
 		}
 
-		call_integration_hook('integrate_save_loadavg_settings');
-
-		Settings_Form::save_db($config_vars);
-		redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
+		// load it in to context and display it
+		$context['pinfo'] = $pinfo;
+		$context['page_title'] = $txt['admin_server_settings'];
+		$context['sub_template'] = 'php_info';
+		return;
 	}
-
-	createToken('admin-ssc');
-	createToken('admin-dbsc');
-	Settings_Form::prepare_db($config_vars);
-}
-
-/**
- * Allows us to see the servers php settings
- *
- * - loads the settings into an array for display in a template
- * - drops cookie values just in case
- */
-function ShowPHPinfoSettings()
-{
-	global $context, $txt;
-
-	$info_lines = array();
-	$category = $txt['phpinfo_settings'];
-
-	// get the data
-	ob_start();
-	phpinfo();
-
-	// We only want it for its body, pigs that we are
-	$info_lines = preg_replace('~^.*<body>(.*)</body>.*$~', '$1', ob_get_contents());
-	$info_lines = explode("\n", strip_tags($info_lines, "<tr><td><h2>"));
-	ob_end_clean();
-
-	// remove things that could be considered sensitive
-	$remove = '_COOKIE|Cookie|_GET|_REQUEST|REQUEST_URI|QUERY_STRING|REQUEST_URL|HTTP_REFERER';
-
-	// put all of it into an array
-	foreach ($info_lines as $line)
-	{
-		if (preg_match('~(' . $remove . ')~', $line))
-			continue;
-
-		// new category?
-		if (strpos($line, '<h2>') !== false)
-			$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $category = $title[1] : $category;
-
-		// load it as setting => value or the old setting local master
-		if (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
-			$pinfo[$category][$val[1]] = $val[2];
-		elseif (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
-			$pinfo[$category][$val[1]] = array($txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]);
-	}
-
-	// load it in to context and display it
-	$context['pinfo'] = $pinfo;
-	$context['page_title'] = $txt['admin_server_settings'];
-	$context['sub_template'] = 'php_info';
-	return;
 }

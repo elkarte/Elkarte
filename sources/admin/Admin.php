@@ -158,7 +158,8 @@ function AdminMain()
 				'serversettings' => array(
 					'label' => $txt['admin_server_settings'],
 					'file' => 'ManageServer.php',
-					'function' => 'ModifySettings',
+					'controller' => 'ManageServer_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_server',
 					'subsections' => array(
@@ -768,8 +769,8 @@ function AdminSearchInternal()
 		array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 		array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-		array('ModifyGeneralSettings', 'area=serversettings;sa=general'),
-		array('ModifyDatabaseSettings', 'area=serversettings;sa=database'),
+		array('settings', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+		array('settings', 'area=serversettings;sa=database', 'ManageServer_Controller'),
 		array('ModifyCookieSettings', 'area=serversettings;sa=cookie'),
 		array('ModifyCacheSettings', 'area=serversettings;sa=cache'),
 		array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),

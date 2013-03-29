@@ -70,6 +70,11 @@ if (!defined('ELKARTE'))
  */
 class Settings_Form
 {
+	/**
+	 * Configuration variables and values, for this settings form.
+	 * @var array
+	 */
+	protected $_config_vars;
 
 	/**
 	 * Helper method, it sets up the context for the settings.
@@ -320,7 +325,7 @@ class Settings_Form
 	 * - Requires the admin_forum permission.
 	 * - Contains arrays of the types of data to save into Settings.php.
  	 *
-	 * @param $config_vars
+	 * @param array $config_vars
  	*/
 	static function save(&$config_vars)
 	{
@@ -328,9 +333,6 @@ class Settings_Form
 		global $context;
 
 		validateToken('admin-ssc');
-
-		// lets be sure we have settings at hand
-		require_once(SUBSDIR . '/Settings_Form.class.php');
 
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 		if (isset($_POST['cookiename']))
@@ -658,6 +660,35 @@ class Settings_Form
 				if (file_exists(BOARDDIR . '/Settings_bak.php'))
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 			}
+		}
+	}
+
+	/**
+	 * Method which retrieves or sets new configuration variables.
+	 * If the $config_vars parameter is sent, the method tries to update
+	 *  the internal configuration of the Settings instance.
+	 * If the $config_vars parameter is not sent (is null), the method
+	 *  simply returns the current configuration set.
+	 *
+	 *  The array is formed of:
+	 *  - either, variable name, description, type (constant), size/possible values, helptext.
+	 *  - either, an empty string for a horizontal rule.
+	 *  - or, a string for a titled section.
+	 *
+	 * @param array $config_vars = null array of config vars, if null the method returns the current configuration
+	 */
+	function settings($config_vars = null)
+	{
+		if (is_null($config_vars))
+		{
+			// Simply return the config vars we have
+			return $this->_config_vars;
+		}
+		else
+		{
+			// We got presents :P
+			$this->_config_vars = is_array($config_vars) ? $config_vars : array ($config_vars);
+			return $this->_config_vars;
 		}
 	}
 }
