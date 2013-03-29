@@ -741,7 +741,7 @@ function AdminSearchInternal()
 	// All the files we need to include.
 	$include_files = array(
 		'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail', 'ManagePaid', 'ManagePermissions',
-		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
+		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages', 'ManageBBC', 'ManageTopics'
 	);
 
 	// This is a special array of functions that contain setting data
@@ -765,7 +765,7 @@ function AdminSearchInternal()
 		array('GeneralPermissionSettings', 'area=permissions;sa=settings'),
 		array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
 		array('settings', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
-		array('settings', 'area=postsettings;sa=topics', 'ManageTopic_Controller'),
+		array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 		array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
 		array('ModifyGeneralSettings', 'area=serversettings;sa=general'),
