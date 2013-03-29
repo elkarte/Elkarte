@@ -62,7 +62,7 @@ class ManageTopics_Controller
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**

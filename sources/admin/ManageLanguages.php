@@ -1074,7 +1074,7 @@ class ManageLanguages_Controller
 			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
 
 		// Fill the config array.
-		Settings_Form::prepareServerSettingsContext($config_vars);
+		Settings_Form::prepare_file($config_vars);
 	}
 
 	/**

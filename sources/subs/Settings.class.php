@@ -88,7 +88,7 @@ class Settings_Form
 	 *
 	 * @param array $config_vars
 	 */
-	static function prepareServerSettingsContext(&$config_vars)
+	static function prepare_file(&$config_vars)
 	{
 		global $context, $modSettings;
 
@@ -159,7 +159,7 @@ class Settings_Form
  	*
  	* @param array $config_vars
  	*/
-	static function prepareDBSettingContext(&$config_vars)
+	static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
 

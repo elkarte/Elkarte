@@ -202,7 +202,7 @@ class ManageAttachments_Controller
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 
 		$context['sub_template'] = 'show_settings';
 	}

@@ -186,7 +186,7 @@ function ModifyGeneralSettings($return_config = false)
 	}
 
 	// Fill the config array.
-	Settings_Form::prepareServerSettingsContext($config_vars);
+	Settings_Form::prepare_file($config_vars);
 }
 
 /**
@@ -252,7 +252,7 @@ function ModifyDatabaseSettings($return_config = false)
 	}
 
 	// Fill the config array.
-	Settings_Form::prepareServerSettingsContext($config_vars);
+	Settings_Form::prepare_file($config_vars);
 }
 
 /**
@@ -321,7 +321,7 @@ function ModifyCookieSettings($return_config = false)
 	}
 
 	// Fill the config array.
-	Settings_Form::prepareServerSettingsContext($config_vars);
+	Settings_Form::prepare_file($config_vars);
 }
 
 /**
@@ -413,7 +413,7 @@ function ModifyCacheSettings($return_config = false)
 	createToken('admin-ssc');
 
 	// Prepare settings for display in the template.
-	Settings_Form::prepareServerSettingsContext($config_vars);
+	Settings_Form::prepare_file($config_vars);
 }
 
 /**
@@ -508,7 +508,7 @@ function ModifyLoadBalancingSettings($return_config = false)
 
 	createToken('admin-ssc');
 	createToken('admin-dbsc');
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**

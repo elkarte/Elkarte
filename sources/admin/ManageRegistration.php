@@ -334,7 +334,7 @@ class ManageRegistration_Controller
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**

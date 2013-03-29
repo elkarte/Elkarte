@@ -261,7 +261,7 @@ class ManageMail_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=mailqueue;save;sa=settings';
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 
 		$javascript = '
 			var bDay = {';

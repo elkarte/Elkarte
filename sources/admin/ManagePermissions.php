@@ -1021,7 +1021,7 @@ function GeneralPermissionSettings($return_config = false)
 	// We need this for the in-line permissions
 	createToken('admin-mp');
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**

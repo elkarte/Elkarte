@@ -582,7 +582,7 @@ function ModifyBasicSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
 	$context['settings_title'] = $txt['mods_cat_features'];
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -643,7 +643,7 @@ function ModifyGeneralSecuritySettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
 	$context['settings_title'] = $txt['mods_cat_security_general'];
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -700,7 +700,7 @@ function ModifyLayoutSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=layout';
 	$context['settings_title'] = $txt['mods_cat_layout'];
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -750,7 +750,7 @@ function ModifyKarmaSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=karma';
 	$context['settings_title'] = $txt['karma'];
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -821,7 +821,7 @@ function ModifyModerationSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=moderation';
 	$context['settings_title'] = $txt['moderation_settings'];
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -1018,7 +1018,7 @@ function ModifySpamSettings($return_config = false)
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 	$context['settings_title'] = $txt['antispam_Settings'];
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -1138,7 +1138,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 	var oIpOptionsdd = {name: \'badbehavior_ip_wl[]\', class: \'input_text\'};'
 	);
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -1486,7 +1486,7 @@ function ModifySignatureSettings($return_config = false)
 
 	$context['settings_message'] = !empty($settings_applied) ? '<div class="infobox">' . $txt['signature_settings_applied'] . '</div>' : '<p class="centertext">' . sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var']) . '</p>';
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -2307,7 +2307,7 @@ function ModifyPruningSettings($return_config = false)
 	else
 		$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**
@@ -2338,7 +2338,7 @@ function ModifyGeneralModSettings($return_config = false)
 		$context['settings_save_dont_show'] = true;
 		$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 
-		return Settings_Form::prepareDBSettingContext($config_vars);
+		return Settings_Form::prepare_db($config_vars);
 	}
 
 	// We're working with them settings.
@@ -2361,7 +2361,7 @@ function ModifyGeneralModSettings($return_config = false)
 	}
 
 	// This line is to help mod authors do a search/add after if you want to add something here. Keyword: RED INK IS FOR TEACHERS AND THOSE WHO LIKE PAIN!
-	Settings_Form::prepareDBSettingContext($config_vars);
+	Settings_Form::prepare_db($config_vars);
 }
 
 /**

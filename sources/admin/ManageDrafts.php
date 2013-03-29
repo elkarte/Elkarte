@@ -89,6 +89,6 @@ class ManageDrafts_Controller
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 	}
 }

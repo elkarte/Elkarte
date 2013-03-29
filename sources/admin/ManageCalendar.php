@@ -331,7 +331,7 @@ class ManageCalendar_Controller
 		createToken('admin-mp');
 
 		// Prepare the settings...
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**

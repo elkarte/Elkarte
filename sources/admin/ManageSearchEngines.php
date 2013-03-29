@@ -148,7 +148,7 @@ class ManageSearchEngines_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings_Form::prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**
