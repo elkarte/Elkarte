@@ -1074,9 +1074,10 @@ class ManageLanguages_Controller
 		{
 			checkSession();
 
+			// @todo review these hooks: do they need param and how else can we do this
 			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
 
-			Settings_Form::save($config_vars);
+			$this->_languageSettings->save();
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
 

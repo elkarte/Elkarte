@@ -321,13 +321,13 @@ class Settings_Form
 	 * This method saves the settings.
 	 * It will put them in Settings.php or in the settings table.
 	 *
-	 * - Saves those settings set from ?action=admin;area=serversettings.
+	 * - Used to save those settings set from ?action=admin;area=serversettings.
 	 * - Requires the admin_forum permission.
 	 * - Contains arrays of the types of data to save into Settings.php.
  	 *
 	 * @param array $config_vars
  	*/
-	static function save(&$config_vars)
+	function save()
 	{
 		global $sc, $cookiename, $modSettings, $user_settings;
 		global $context;
@@ -407,7 +407,7 @@ class Settings_Form
 
 		// Now loop through the remaining (database-based) settings.
 		$new_settings = array();
-		foreach ($config_vars as $config_var)
+		foreach ($this->_config_vars as $config_var)
 		{
 			// We just saved the file-based settings, so skip their definitions.
 			if (!is_array($config_var) || $config_var[2] == 'file')
