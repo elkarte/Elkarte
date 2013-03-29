@@ -158,7 +158,7 @@ function template_print_above()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/report.css" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/report.css" />
 	</head>
 	<body>';
 }

@@ -92,7 +92,7 @@ function template_announcement_send()
 		</form>
 	</div>
 	<br />
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var countdown = 2;
 		var txt_message = "', $txt['announce_continue'], '";
 		doAutoSubmit();

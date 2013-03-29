@@ -21,7 +21,7 @@ function template_main()
 
 	// Start the javascript... and boy is there a lot.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[';
+		<script><!-- // --><![CDATA[';
 
 	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
 	if (isBrowser('is_firefox'))
@@ -339,7 +339,7 @@ function template_main()
 			// Show more boxes if they aren't approaching that limit.
 			if ($context['num_allowed_attachments'] > 1)
 				echo '
-								<script type="text/javascript"><!-- // --><![CDATA[
+								<script><!-- // --><![CDATA[
 									var allowed_attachments = ', $context['num_allowed_attachments'], ';
 									var current_attachment = 1;
 									var txt_more_attachments_error = "', $txt['more_attachments_error'], '";
@@ -458,7 +458,7 @@ function template_main()
 
 	// The variables used to preview a post without loading a new page.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var post_box_name = "', $context['post_box_name'], '";
 			var form_name = "postmodify";
 			var preview_area = "post";
@@ -605,7 +605,7 @@ function template_main()
 
 		echo '
 		</div>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var post_box_name = "', $context['post_box_name'], '";
 			var aIgnoreToggles = new Array();';
 
@@ -645,8 +645,8 @@ function template_spellcheck()
 	<head>
 		<title>', $txt['spell_check'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
-		<style type="text/css">
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<style>
 			body, td {
 				font-size: small;
 				margin: 0;
@@ -671,14 +671,14 @@ function template_spellcheck()
 
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var spell_formname = window.opener.spell_formname;
 			var spell_fieldname = window.opener.spell_fieldname;
 			var spell_full = window.opener.spell_full;
 		// ]]></script>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script><!-- // --><![CDATA[
 			', $context['spell_js'], '
 		// ]]></script>
 	</head>
@@ -718,12 +718,12 @@ function template_quotefast()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['retrieving_quote'], '</title>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 	</head>
 	<body>
 		', $txt['retrieving_quote'], '
 		<div id="temporary_posting_area" style="display: none;"></div>
-		<script type="text/javascript"><!-- // --><![CDATA[';
+		<script><!-- // --><![CDATA[';
 
 	if ($context['close_window'])
 		echo '

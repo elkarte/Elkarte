@@ -97,7 +97,7 @@ function template_html_above()
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if (!empty($settings['forum_width']))
 		echo '
-	<style type="text/css">
+	<style>
 		#wrapper, .frame {
 			width: ', $settings['forum_width'], ';
 		}
@@ -105,17 +105,17 @@ function template_html_above()
 
 	// Quick and dirty testing of RTL horrors. Remove before production build.
 	//echo '
-	//<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
+	//<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
 	{
 		echo '
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
 		if (!empty($context['theme_variant']))
 			echo '
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/rtl', $context['theme_variant'], '.css?alp21" />';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl', $context['theme_variant'], '.css?alp21" />';
 	}
 
 	echo '
@@ -282,7 +282,7 @@ function template_body_above()
 	if (!empty($context['show_login_bar']))
 	{
 		echo '
-						<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+						<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 						<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 							<input type="text" name="user" size="10" class="input_text" />
 							<input type="password" name="passwrd" size="10" class="input_password" />
@@ -538,7 +538,7 @@ function template_menu()
 	// Define the upper_section toggle in JavaScript.
 	// Note that this definition had to be shifted for the js to work with the new markup.
 	echo '
-				<script type="text/javascript"><!-- // --><![CDATA[
+				<script><!-- // --><![CDATA[
 					var oMainHeaderToggle = new smc_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',

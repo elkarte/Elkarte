@@ -575,7 +575,7 @@ function template_main()
 
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
-							<script type="text/javascript"><!-- // --><![CDATA[
+							<script><!-- // --><![CDATA[
 								var post_box_name = "', $context['post_box_name'], '";
 							// ]]></script>';
 		}
@@ -614,7 +614,7 @@ function template_main()
 	// draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
-			<script type="text/javascript"><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
@@ -633,10 +633,10 @@ function template_main()
 					<input type="hidden" name="spellstring" value="" />
 					<input type="hidden" name="fulleditor" value="" />
 				</form>
-				<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+				<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
 	echo '
-				<script type="text/javascript"><!-- // --><![CDATA[';
+				<script><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_reply']))
 		echo '

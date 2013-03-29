@@ -63,9 +63,9 @@ function template_latest_news()
 
 	// This requires a lot of javascript...
 	echo '
-								<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-								<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
-								<script type="text/javascript"><!-- // --><![CDATA[
+								<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+								<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+								<script><!-- // --><![CDATA[
 									var oAdminIndex = new smf_AdminIndex({
 										sSelf: \'oAdminCenter\',
 										bLoadAnnouncements: true,
@@ -602,7 +602,7 @@ function template_show_notice()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 	</head>
 	<body>
 		<div class="cat_bar">
@@ -701,7 +701,7 @@ function template_warn_template()
 		</form>
 	</div>
 
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		$(document).ready(function() {
 			$("#preview_button").click(function() {
 				return ajax_getTemplatePreview();

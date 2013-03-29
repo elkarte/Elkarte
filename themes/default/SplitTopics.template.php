@@ -59,7 +59,7 @@ function template_ask()
 		echo '
 						<p>
 							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ',$txt['splittopic_move'] , '.</label>', template_select_boards('board_list'), '
-							<script type="text/javascript"><!-- // --><![CDATA[
+							<script><!-- // --><![CDATA[
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
 						</p>';
@@ -185,7 +185,7 @@ function template_select()
 		</form>
 	</div>
 
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var start = new Array();
 		start[0] = ', $context['not_selected']['start'], ';
 		start[1] = ', $context['selected']['start'], ';

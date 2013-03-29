@@ -374,7 +374,7 @@ function template_webslice_header_above()
 	global $settings;
 
 	echo '
-	<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/wireless.css" type="text/css" />';
+	<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/wireless.css" />';
 }
 
 function template_webslice_header_below()

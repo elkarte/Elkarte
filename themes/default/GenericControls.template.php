@@ -26,7 +26,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" rows="" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width: ', $editor_context['width'], ';height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '">', $editor_context['value'], '</textarea>
 		</div>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			$(document).ready(function(){',
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
@@ -145,8 +145,8 @@ function template_control_richedit_buttons($editor_id)
 	if ($context['show_spellchecking'])
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
+		<script><!-- // --><![CDATA[
 			// Start up the spellchecker!
 			function spellCheckStart(fieldName)
 			{
@@ -180,7 +180,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
@@ -207,7 +207,7 @@ function template_control_richedit_buttons($editor_id)
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var oDraftAutoSave = new elk_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
