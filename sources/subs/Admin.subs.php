@@ -241,7 +241,7 @@ function getFileVersions(&$versionOptions)
 
 /**
  * Saves the time of the last db error for the error log
- * - Done separately from updateSettingsFile to avoid race conditions
+ * - Done separately from Settings_Form::save_file() to avoid race conditions
  *   which can occur during a db error
  * - If it fails Settings.php will assume 0
  *

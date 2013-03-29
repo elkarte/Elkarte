@@ -60,6 +60,7 @@
 
 if (!defined('ELKARTE'))
 	die('No access...');
+
 /**
  * Settings Form class.
  * This class handles display, edit, save, of forum settings.
@@ -400,7 +401,7 @@ class Settings_Form
 
 		// Save the relevant settings in the Settings.php file.
 		require_once(SUBSDIR . '/Admin.subs.php');
-		updateSettingsFile($new_settings);
+		Settings_Form::save_file($new_settings);
 
 		// Now loop through the remaining (database-based) settings.
 		$new_settings = array();
@@ -517,7 +518,7 @@ class Settings_Form
 	 *
 	 * @param array $config_vars
  	*/
-	static function updateSettingsFile($config_vars)
+	static function save_file($config_vars)
 	{
 		global $context;
 
