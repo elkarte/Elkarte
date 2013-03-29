@@ -37,8 +37,8 @@ class AdminLog_Controller
 		// These are the logs they can load.
 		$log_functions = array(
 			'errorlog' => array('ManageErrors.php', 'ViewErrorLog'),
-			'adminlog' => array('Modlog.php', 'action_modlog'),
-			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features'])),
+			'adminlog' => array('Modlog.php', 'action_modlog', 'controller' => 'Modlog_Controller'),
+			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features']), 'controller' => 'Modlog_Controller'),
 			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
 			'banlog' => array('ManageBans.php', 'action_log', 'controller' => 'ManageBans_Controller'),
 			'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
@@ -88,10 +88,10 @@ class AdminLog_Controller
 		);
 
 		require_once(ADMINDIR . '/' . $log_functions[$sub_action][0]);
-		if (isset($log_functions['controlller']))
+		if (isset($log_functions[$sub_action]['controller']))
 		{
 			// if we have an object oriented controller, call its method
-			$controller = new $log_functions['controller']();
+			$controller = new $log_functions[$sub_action]['controller']();
 			$controller->{$log_functions[$sub_action][1]}();
 		}
 		else

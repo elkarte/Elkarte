@@ -86,6 +86,7 @@ function action_modcenter($dont_call = false)
 					'label' => $txt['modlog_view'],
 					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
 					'file' => 'admin/Modlog.php',
+					'controller' => 'Modlog_Controller',
 					'function' => 'action_modlog',
 				),
 				'warnings' => array(
@@ -216,7 +217,7 @@ function action_modcenter($dont_call = false)
 		if (isset($mod_include_data['file']))
 			require_once(SOURCEDIR . '/' . $mod_include_data['file']);
 
-		$mod_include_data['function']();
+		callMenu($mod_include_data);
 	}
 }
 
