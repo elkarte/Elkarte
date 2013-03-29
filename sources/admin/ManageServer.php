@@ -471,6 +471,9 @@ function ModifyLoadBalancingSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
 	$context['settings_title'] = $txt['load_balancing_settings'];
 
+	// We're working with them settings here.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -489,13 +492,13 @@ function ModifyLoadBalancingSettings($return_config = false)
 
 		call_integration_hook('integrate_save_loadavg_settings');
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 		redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	createToken('admin-ssc');
 	createToken('admin-dbsc');
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -599,7 +602,7 @@ function saveSettings(&$config_vars)
 
 	// Save the new database-based settings, if any.
 	if (!empty($new_settings))
-		saveDBSettings($new_settings);
+		Settings::saveDBSettings($new_settings);
 }
 
 /**

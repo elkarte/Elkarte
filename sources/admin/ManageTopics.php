@@ -34,8 +34,8 @@ class ManageTopics_Controller
 
 		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
 
-		// Get the settings template ready.
-		require_once(ADMINDIR . '/ManageServer.php');
+		// Get the settings ready.
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_topic_settings'];
@@ -51,7 +51,7 @@ class ManageTopics_Controller
 			call_integration_hook('integrate_save_topic_settings', array(&$config_vars));
 
 			// Save the result!
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
@@ -62,7 +62,7 @@ class ManageTopics_Controller
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

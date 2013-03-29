@@ -48,7 +48,7 @@ class ManageDrafts_Controller
 			return $config_vars;
 
 		// Get the settings template ready.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];
@@ -66,7 +66,7 @@ class ManageDrafts_Controller
 
 			// Protect them from themselves.
 			$_POST['drafts_autosave_frequency'] = $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=managedrafts');
 		}
 
@@ -89,6 +89,6 @@ class ManageDrafts_Controller
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 }

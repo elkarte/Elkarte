@@ -935,7 +935,7 @@ function GeneralPermissionSettings($return_config = false)
 	$context['sub_template'] = 'show_settings';
 
 	// Needed for the inline permission functions, and the settings template.
-	require_once(ADMINDIR . '/ManageServer.php');
+	require_once(SUBSDIR . '/Settings.php');
 
 	// Don't let guests have these permissions.
 	$context['post_url'] = $scripturl . '?action=admin;area=permissions;save;sa=settings';
@@ -946,7 +946,7 @@ function GeneralPermissionSettings($return_config = false)
 	{
 		checkSession('post');
 		call_integration_hook('integrate_save_permission_settings');
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 
 		// Clear all deny permissions...if we want that.
 		if (empty($modSettings['permission_enable_deny']))
@@ -1016,7 +1016,7 @@ function GeneralPermissionSettings($return_config = false)
 	// We need this for the in-line permissions
 	createToken('admin-mp');
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**

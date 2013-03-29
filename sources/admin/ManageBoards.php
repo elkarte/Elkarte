@@ -743,7 +743,7 @@ class ManageBoards_Controller
 		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
 
 		// Needed for the settings template.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
@@ -768,7 +768,7 @@ class ManageBoards_Controller
 
 			call_integration_hook('integrate_save_board_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 
@@ -776,7 +776,7 @@ class ManageBoards_Controller
 		createToken('admin-mp');
 
 		// Prepare the settings...
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

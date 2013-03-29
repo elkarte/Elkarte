@@ -38,7 +38,7 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	loadLanguage('ManageSettings');
 
 	// Will need the utility functions from here.
-	require_once(ADMINDIR . '/ManageServer.php');
+	require_once(SUBSDIR . '/Settings.php');
 
 	$context['sub_template'] = 'show_settings';
 
@@ -559,6 +559,9 @@ function ModifyBasicSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// We need some settings! ..ok, some work with our settings :P
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -570,7 +573,7 @@ function ModifyBasicSettings($return_config = false)
 
 		call_integration_hook('integrate_save_basic_settings');
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 
 		writeLog();
 		redirectexit('action=admin;area=featuresettings;sa=basic');
@@ -579,7 +582,7 @@ function ModifyBasicSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
 	$context['settings_title'] = $txt['mods_cat_features'];
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -621,12 +624,15 @@ function ModifyGeneralSecuritySettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
 		checkSession();
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 
 		call_integration_hook('integrate_save_general_security_settings');
 
@@ -637,7 +643,7 @@ function ModifyGeneralSecuritySettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
 	$context['settings_title'] = $txt['mods_cat_security_general'];
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -675,6 +681,9 @@ function ModifyLayoutSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -682,7 +691,7 @@ function ModifyLayoutSettings($return_config = false)
 
 		call_integration_hook('integrate_save_layout_settings');
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 		writeLog();
 
 		redirectexit('action=admin;area=featuresettings;sa=layout');
@@ -691,7 +700,7 @@ function ModifyLayoutSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=layout';
 	$context['settings_title'] = $txt['mods_cat_layout'];
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -724,6 +733,9 @@ function ModifyKarmaSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -731,14 +743,14 @@ function ModifyKarmaSettings($return_config = false)
 
 		call_integration_hook('integrate_save_karma_settings');
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 		redirectexit('action=admin;area=featuresettings;sa=karma');
 	}
 
 	$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=karma';
 	$context['settings_title'] = $txt['karma'];
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -769,6 +781,9 @@ function ModifyModerationSettings($return_config = false)
 	if (!$modSettings['postmod_active'])
 		unset($config_vars['moderate']);
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -796,7 +811,7 @@ function ModifyModerationSettings($return_config = false)
 
 		call_integration_hook('integrate_save_karma_settings', array(&$save_vars));
 
-		saveDBSettings($save_vars);
+		Settings::saveDBSettings($save_vars);
 		redirectexit('action=admin;area=securitysettings;sa=moderation');
 	}
 
@@ -806,7 +821,7 @@ function ModifyModerationSettings($return_config = false)
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=moderation';
 	$context['settings_title'] = $txt['moderation_settings'];
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -870,6 +885,9 @@ function ModifySpamSettings($return_config = false)
 		);
 	}
 	$smcFunc['db_free_result']($request);
+
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -960,7 +978,7 @@ function ModifySpamSettings($return_config = false)
 		call_integration_hook('integrate_save_spam_settings', array(&$save_vars));
 
 		// Now save.
-		saveDBSettings($save_vars);
+		Settings::saveDBSettings($save_vars);
 		cache_put_data('verificationQuestionIds', null, 300);
 		redirectexit('action=admin;area=securitysettings;sa=spam');
 	}
@@ -1000,7 +1018,7 @@ function ModifySpamSettings($return_config = false)
 
 	$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 	$context['settings_title'] = $txt['antispam_Settings'];
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -1073,6 +1091,9 @@ function ModifyBadBehaviorSettings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -1098,7 +1119,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 			updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 		}
 
-		saveDBSettings($config_vars);
+		Settings::saveDBSettings($config_vars);
 		redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 	}
 
@@ -1117,7 +1138,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 	var oIpOptionsdd = {name: \'badbehavior_ip_wl[]\', class: \'input_text\'};'
 	);
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -1419,6 +1440,9 @@ function ModifySignatureSettings($return_config = false)
 	// Make sure we check the right tags!
 	$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
+
 	// Saving?
 	if (isset($_GET['save']))
 	{
@@ -1453,7 +1477,7 @@ function ModifySignatureSettings($return_config = false)
 		$save_vars = array();
 		$save_vars[] = array('text', 'signature_settings');
 
-		saveDBSettings($save_vars);
+		Settings::saveDBSettings($save_vars);
 		redirectexit('action=admin;area=featuresettings;sa=sig');
 	}
 
@@ -1462,7 +1486,7 @@ function ModifySignatureSettings($return_config = false)
 
 	$context['settings_message'] = !empty($settings_applied) ? '<div class="infobox">' . $txt['signature_settings_applied'] . '</div>' : '<p class="centertext">' . sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var']) . '</p>';
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -2243,7 +2267,7 @@ function ModifyPruningSettings($return_config = false)
 		return $config_vars;
 
 	// We'll need this in a bit.
-	require_once(ADMINDIR . '/ManageServer.php');
+	require_once(SUBSDIR . '/Settings.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -2269,7 +2293,7 @@ function ModifyPruningSettings($return_config = false)
 		else
 			$_POST['pruningOptions'] = '';
 
-		saveDBSettings($savevar);
+		Settings::saveDBSettings($savevar);
 		redirectexit('action=admin;area=logs;sa=pruning');
 	}
 
@@ -2283,7 +2307,7 @@ function ModifyPruningSettings($return_config = false)
 	else
 		$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**
@@ -2314,8 +2338,11 @@ function ModifyGeneralModSettings($return_config = false)
 		$context['settings_save_dont_show'] = true;
 		$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 
-		return prepareDBSettingContext($config_vars);
+		return Settings::prepareDBSettingContext($config_vars);
 	}
+
+	// We're working with them settings.
+	require_once(SUBSDIR . '/Settings.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -2327,14 +2354,14 @@ function ModifyGeneralModSettings($return_config = false)
 		call_integration_hook('integrate_save_general_mod_settings', array(&$save_vars));
 
 		// This line is to help mod authors do a search/add after if you want to add something here. Keyword: FOOT TAPPING SUCKS!
-		saveDBSettings($save_vars);
+		Settings::saveDBSettings($save_vars);
 
 		// This line is to help mod authors do a search/add after if you want to add something here. Keyword: I LOVE TEA!
 		redirectexit('action=admin;area=modsettings;sa=general');
 	}
 
 	// This line is to help mod authors do a search/add after if you want to add something here. Keyword: RED INK IS FOR TEACHERS AND THOSE WHO LIKE PAIN!
-	prepareDBSettingContext($config_vars);
+	Settings::prepareDBSettingContext($config_vars);
 }
 
 /**

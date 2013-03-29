@@ -117,7 +117,7 @@ class ManageSearchEngines_Controller
 			$_POST['spider_group'] = 0;
 
 		// We'll want this for our easy save.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
@@ -133,7 +133,7 @@ class ManageSearchEngines_Controller
 			call_integration_hook('integrate_save_search_engine_settings', array(&$config_vars));
 
 			// save the results!
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			// make sure to rebuild the cache with updated results
 			recacheSpiderNames();
@@ -148,7 +148,7 @@ class ManageSearchEngines_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

@@ -104,7 +104,7 @@ class ManagePaid_Controller
 		}
 
 		// Get the settings template fired up.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
@@ -161,13 +161,13 @@ class ManagePaid_Controller
 			}
 			unset($config_vars['dummy_currency']);
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			redirectexit('action=admin;area=paidsubscribe;sa=settings');
 		}
 
 		// Prepare the settings...
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

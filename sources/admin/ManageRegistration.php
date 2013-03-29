@@ -286,7 +286,7 @@ class ManageRegistration_Controller
 		global $txt, $context, $scripturl, $modSettings;
 
 		// This is really quite wanting.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		$config_vars = $this->settings();
 
@@ -309,7 +309,7 @@ class ManageRegistration_Controller
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
@@ -334,7 +334,7 @@ class ManageRegistration_Controller
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

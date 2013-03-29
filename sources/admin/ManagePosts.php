@@ -203,7 +203,7 @@ class ManagePosts_Controller
 		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		// We'll want this for our easy save.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];
@@ -235,7 +235,7 @@ class ManagePosts_Controller
 
 			call_integration_hook('integrate_save_post_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}
 
@@ -244,7 +244,7 @@ class ManagePosts_Controller
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

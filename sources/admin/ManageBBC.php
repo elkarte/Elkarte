@@ -38,8 +38,8 @@ class ManageBBC_Controller
 
 		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
-		// We'll need this for prepareDBSettingContext() and saveDBSettings()
-		require_once(ADMINDIR . '/ManageServer.php');
+		// We'll need this forprepareDBSettingContext() and saveDBSettings()
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
@@ -65,7 +65,7 @@ class ManageBBC_Controller
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// save the result
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			// and we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');
@@ -78,7 +78,7 @@ class ManageBBC_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

@@ -125,7 +125,7 @@ class ManageSearch_Controller
 			);
 
 		// We'll need this for the settings.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// A form was submitted.
 		if (isset($_REQUEST['save']))
@@ -151,7 +151,7 @@ class ManageSearch_Controller
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
 			));
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -162,7 +162,7 @@ class ManageSearch_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

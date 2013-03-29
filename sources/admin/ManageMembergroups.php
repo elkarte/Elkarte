@@ -1011,7 +1011,7 @@ class ManageMembergroups_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// Needed for the settings functions.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Don't allow assignment of guests.
 		$context['permissions_excluded'] = array(-1);
@@ -1026,7 +1026,7 @@ class ManageMembergroups_Controller
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}
 
@@ -1037,7 +1037,7 @@ class ManageMembergroups_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

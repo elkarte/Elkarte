@@ -141,6 +141,7 @@ class ManageAttachments_Controller
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.php');
 		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Saving settings?
 		if (isset($_GET['save']))
@@ -196,12 +197,12 @@ class ManageAttachments_Controller
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 
 		$context['sub_template'] = 'show_settings';
 	}

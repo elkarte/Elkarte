@@ -931,7 +931,7 @@ class ManageNews_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Needed for the settings template.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
@@ -949,14 +949,14 @@ class ManageNews_Controller
 
 			call_integration_hook('integrate_save_news_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=news;sa=settings');
 		}
 
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

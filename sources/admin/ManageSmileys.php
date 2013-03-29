@@ -127,8 +127,8 @@ class ManageSmileys_Controller
 
 		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
 
-		// Setup the basics of the settings template.
-		require_once(ADMINDIR . '/ManageServer.php');
+		// For the basics of the settings.
+		require_once(SUBSDIR . '/Settings.php');
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...
@@ -149,7 +149,7 @@ class ManageSmileys_Controller
 
 			call_integration_hook('integrate_save_smiley_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
@@ -160,7 +160,7 @@ class ManageSmileys_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 	}
 
 	/**

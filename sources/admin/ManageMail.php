@@ -39,7 +39,7 @@ class ManageMail_Controller
 		loadLanguage('ManageMail');
 
 		// We'll need the utility functions from here.
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(SUBSDIR . '/Settings.php');
 
 		$context['page_title'] = $txt['mailqueue_title'];
 
@@ -225,6 +225,8 @@ class ManageMail_Controller
 
 		loadLanguage('EmailTemplates');
 
+		require_once(SUBSDIR . '/Settings.php');
+
 		$processedBirthdayEmails = array();
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
@@ -236,9 +238,6 @@ class ManageMail_Controller
 		$config_vars = $this->settings();
 
 		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
-
-		if ($return_config)
-			return $config_vars;
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -255,14 +254,14 @@ class ManageMail_Controller
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
 			call_integration_hook('integrate_save_mail_settings');
 
-			saveDBSettings($config_vars);
+			Settings::saveDBSettings($config_vars);
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=mailqueue;save;sa=settings';
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
-		prepareDBSettingContext($config_vars);
+		Settings::prepareDBSettingContext($config_vars);
 
 		$javascript = '
 			var bDay = {';
