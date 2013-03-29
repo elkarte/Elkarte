@@ -192,8 +192,8 @@ class Site_Dispatcher
 			'verificationcode' => array('Register.controller.php', 'action_verificationcode'),
 			'viewprofile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'vote' => array('Poll.controller.php', 'action_vote'),
-			'viewquery' => array('AdminDebug.php', 'action_viewquery'),
-			'viewadminfile' => array('AdminDebug.php', 'action_viewadminfile'),
+			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
+			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			'who' => array('Who.controller.php', 'action_who'), // done
 			'.xml' => array('News.controller.php', 'action_showfeed'),
 			'xmlhttp' => array('Xml.controller.php', 'action_xmlhttp'),
