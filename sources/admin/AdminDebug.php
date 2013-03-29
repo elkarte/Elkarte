@@ -220,7 +220,8 @@ if (!(\'smfForum_sessionvar\' in window))
 	window.smfForum_sessionvar = \'sesc\';
 ' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
 
-		$context['template_layers'] = array();
+		template_layers::getInstance()->removeAll();
+
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))

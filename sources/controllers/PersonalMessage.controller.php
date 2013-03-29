@@ -2417,7 +2417,7 @@ function messageIndexBar($area)
 
 	// Set the template for this area and add the profile layer.
 	if (!isset($_REQUEST['xml']))
-		$context['template_layers'][] = 'pm';
+		template_layers::getInstance()->add('pm');
 }
 
 /**

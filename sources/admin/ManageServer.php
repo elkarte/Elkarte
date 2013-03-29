@@ -562,7 +562,7 @@ class ManageServer_Controller
 
 		loadLanguage('ManageMaintenance');
 		createToken('admin-maint');
-		$context['template_layers'][] = 'clean_cache_button';
+		template_layers::getInstance()->add('clean_cache_button');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
