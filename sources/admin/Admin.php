@@ -321,7 +321,8 @@ function AdminMain()
 				'viewmembers' => array(
 					'label' => $txt['admin_users'],
 					'file' => 'ManageMembers.php',
-					'function' => 'ViewMembers',
+					'controller' => 'ManageMembers_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_members',
 					'permission' => array('moderate_forum'),
@@ -881,7 +882,7 @@ function AdminSearchMember()
 	$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 	$_POST['types'] = '';
 
-	ViewMembers();
+	action_index();
 }
 
 /**
