@@ -270,7 +270,8 @@ function AdminMain()
 				'managesearch' => array(
 					'label' => $txt['manage_search'],
 					'file' => 'ManageSearch.php',
-					'function' => 'ManageSearch',
+					'controller' => 'ManageSearch_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_search',
 					'permission' => array('admin_forum'),
@@ -765,7 +766,7 @@ function AdminSearchInternal()
 		array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
 		array('settings', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 		array('settings', 'area=postsettings;sa=topics', 'ManageTopic_Controller'),
-		array('EditSearchSettings', 'area=managesearch;sa=settings'),
+		array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 		array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
 		array('ModifyGeneralSettings', 'area=serversettings;sa=general'),
 		array('ModifyDatabaseSettings', 'area=serversettings;sa=database'),
