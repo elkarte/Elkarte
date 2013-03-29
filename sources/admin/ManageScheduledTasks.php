@@ -42,7 +42,7 @@ class ManageScheduledTasks_Controller
 
 		$subActions = array(
 			'taskedit' => 'action_edit',
-			'tasklog' => 'TaskLog',
+			'action_log' => 'action_log',
 			'tasks' => 'action_tasks',
 		);
 
@@ -70,7 +70,7 @@ class ManageScheduledTasks_Controller
 		);
 
 		// Call it.
-		$subActions[$context['sub_action']]();
+		$this->{$subActions[$context['sub_action']]}();
 	}
 
 	/**
@@ -533,7 +533,7 @@ function list_getScheduledTasks($start, $items_per_page, $sort)
 }
 
 /**
- * Callback function for createList() in TaskLog().
+ * Callback function for createList() in action_log().
  *
  * @param int $start
  * @param int $items_per_page
@@ -566,9 +566,9 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 }
 
 /**
- * Callback function for createList() in TaskLog().
+ * Callback function for createList() in action_log().
  */
-function list_getNumTaskLogEntries()
+function list_getNumaction_logEntries()
 {
 	global $smcFunc;
 

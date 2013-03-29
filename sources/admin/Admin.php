@@ -404,9 +404,9 @@ function AdminMain()
 					'label' => $txt['search_engines'],
 					'enabled' => in_array('sp', $context['admin_features']),
 					'file' => 'ManageSearchEngines.php',
+					'function' => 'SearchEngines',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_engines',
-					'function' => 'SearchEngines',
 					'permission' => 'admin_forum',
 					'subsections' => array(
 						'stats' => array($txt['spider_stats']),
@@ -437,9 +437,10 @@ function AdminMain()
 				'scheduledtasks' => array(
 					'label' => $txt['maintain_tasks'],
 					'file' => 'ManageScheduledTasks.php',
+					'controller' => 'ManageScheduledTasks_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_scheduled',
-					'function' => 'ManageScheduledTasks',
 					'subsections' => array(
 						'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
 						'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
