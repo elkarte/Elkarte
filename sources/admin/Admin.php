@@ -231,7 +231,8 @@ function AdminMain()
 				'postsettings' => array(
 					'label' => $txt['manageposts'],
 					'file' => 'ManagePosts.php',
-					'function' => 'ManagePostSettings',
+					'controller' => 'ManagePosts_Controller',
+					'function' => 'action_index',
 					'permission' => array('admin_forum'),
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_posts',
@@ -759,7 +760,7 @@ function AdminSearchInternal()
 		array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 		array('settings', 'area=news;sa=settings', 'ManageNews_Controller'),
 		array('GeneralPermissionSettings', 'area=permissions;sa=settings'),
-		array('ModifyPostSettings', 'area=postsettings;sa=posts'),
+		array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
 		array('ModifyBBCSettings', 'area=postsettings;sa=bbc'),
 		array('ModifyTopicSettings', 'area=postsettings;sa=topics'),
 		array('EditSearchSettings', 'area=managesearch;sa=settings'),
