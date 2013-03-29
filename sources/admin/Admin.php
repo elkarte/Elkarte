@@ -62,7 +62,8 @@ function AdminMain()
 				'news' => array(
 					'label' => $txt['news_title'],
 					'file' => 'ManageNews.php',
-					'function' => 'ManageNews',
+					'controller' => 'ManageNews_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_news',
 					'permission' => array('edit_news', 'send_mail', 'admin_forum'),
@@ -755,7 +756,7 @@ function AdminSearchInternal()
 		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
 		array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
 		array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
-		array('ModifyNewsSettings', 'area=news;sa=settings'),
+		array('settings', 'area=news;sa=settings', 'ManageNews_Controller'),
 		array('GeneralPermissionSettings', 'area=permissions;sa=settings'),
 		array('ModifyPostSettings', 'area=postsettings;sa=posts'),
 		array('ModifyBBCSettings', 'area=postsettings;sa=bbc'),
