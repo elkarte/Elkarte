@@ -365,7 +365,8 @@ function AdminMain()
 				'regcenter' => array(
 					'label' => $txt['registration_center'],
 					'file' => 'ManageRegistration.php',
-					'function' => 'RegCenter',
+					'controller' => 'ManageRegistration_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_regcenter',
 					'permission' => array('admin_forum', 'moderate_forum'),
@@ -771,7 +772,7 @@ function AdminSearchInternal()
 		array('ModifyCookieSettings', 'area=serversettings;sa=cookie'),
 		array('ModifyCacheSettings', 'area=serversettings;sa=cache'),
 		array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
-		array('ModifyRegistrationSettings', 'area=regcenter;sa=settings'),
+		array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
 		array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 		array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 		array('ModifyPruningSettings', 'area=logs;sa=pruning'),
