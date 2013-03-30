@@ -2626,6 +2626,22 @@ class template_layers
 		$this->_highest_priority = max($this->_all_layers) + 100;
 	}
 
+	public function addBefore($layer, $following, $force = false)
+	{
+		if (isset($this->_all_layers[$following]))
+			$this->add(array($layer => $this->_all_layers[$following] - 1));
+		elseif ($force)
+			$this->add($layer);
+	}
+
+	public function addAfter($layer, $previous, $force = false)
+	{
+		if (isset($this->_all_layers[$previous]))
+			$this->add(array($layer => $this->_all_layers[$previous] + 1));
+		elseif ($force)
+			$this->add($layer);
+	}
+
 	public function remove($layer)
 	{
 		if (isset($this->_all_layers[$layer]))
