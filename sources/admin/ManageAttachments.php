@@ -141,7 +141,7 @@ class ManageAttachments_Controller
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.php');
 		require_once(ADMINDIR . '/ManageServer.php');
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Saving settings?
 		if (isset($_GET['save']))

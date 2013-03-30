@@ -48,7 +48,7 @@ class ManageDrafts_Controller
 			return $config_vars;
 
 		// Get the settings template ready.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];

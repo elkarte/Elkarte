@@ -743,7 +743,7 @@ class ManageBoards_Controller
 		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
 
 		// Needed for the settings template.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';

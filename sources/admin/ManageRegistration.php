@@ -286,7 +286,7 @@ class ManageRegistration_Controller
 		global $txt, $context, $scripturl, $modSettings;
 
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		$config_vars = $this->settings();
 

@@ -298,7 +298,7 @@ class ManageCalendar_Controller
 		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
 
 		// Get the settings template fired up.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Some important context stuff
 		$context['page_title'] = $txt['calendar_settings'];

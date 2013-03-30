@@ -104,7 +104,7 @@ class ManagePaid_Controller
 		}
 
 		// Get the settings template fired up.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];

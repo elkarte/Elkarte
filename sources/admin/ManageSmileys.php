@@ -128,7 +128,7 @@ class ManageSmileys_Controller
 		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
 
 		// For the basics of the settings.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...

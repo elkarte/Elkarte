@@ -39,7 +39,7 @@ class ManageMail_Controller
 		loadLanguage('ManageMail');
 
 		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		$context['page_title'] = $txt['mailqueue_title'];
 
@@ -225,7 +225,7 @@ class ManageMail_Controller
 
 		loadLanguage('EmailTemplates');
 
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		$processedBirthdayEmails = array();
 		foreach ($txtBirthdayEmails as $key => $value)

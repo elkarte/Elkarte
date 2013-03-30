@@ -35,7 +35,7 @@ class ManageTopics_Controller
 		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
 
 		// Get the settings ready.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_topic_settings'];

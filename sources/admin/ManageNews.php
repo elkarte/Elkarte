@@ -931,7 +931,7 @@ class ManageNews_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Needed for the settings template.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';

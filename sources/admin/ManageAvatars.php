@@ -100,7 +100,7 @@ class ManageAvatars_Controller
 		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
 		// We will need Settings_Form::prepare_db().
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Saving avatar settings?
 		if (isset($_GET['save']))

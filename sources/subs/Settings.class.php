@@ -666,7 +666,7 @@ class Settings_Form
 	/**
 	 * Method which retrieves or sets new configuration variables.
 	 * If the $config_vars parameter is sent, the method tries to update
-	 *  the internal configuration of the Settings instance.
+	 *  the internal configuration of the Settings_Form instance.
 	 * If the $config_vars parameter is not sent (is null), the method
 	 *  simply returns the current configuration set.
 	 *

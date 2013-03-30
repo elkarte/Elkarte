@@ -1015,7 +1015,7 @@ class ManageMembergroups_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// Needed for the settings functions.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Don't allow assignment of guests.
 		$context['permissions_excluded'] = array(-1);

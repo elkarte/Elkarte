@@ -203,7 +203,7 @@ class ManagePosts_Controller
 		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		// We'll want this for our easy save.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];

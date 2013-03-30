@@ -39,7 +39,7 @@ class ManageBBC_Controller
 		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
 		// We'll need this forprepare_db() and save_db()
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);

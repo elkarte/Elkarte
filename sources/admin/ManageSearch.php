@@ -125,7 +125,7 @@ class ManageSearch_Controller
 			);
 
 		// We'll need this for the settings.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// A form was submitted.
 		if (isset($_REQUEST['save']))

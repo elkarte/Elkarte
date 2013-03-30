@@ -117,7 +117,7 @@ class ManageSearchEngines_Controller
 			$_POST['spider_group'] = 0;
 
 		// We'll want this for our easy save.
-		require_once(SUBSDIR . '/Settings.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];

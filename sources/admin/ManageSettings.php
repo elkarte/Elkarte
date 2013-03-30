@@ -38,7 +38,7 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	loadLanguage('ManageSettings');
 
 	// Will need the utility functions from here.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	$context['sub_template'] = 'show_settings';
 
@@ -560,7 +560,7 @@ function ModifyBasicSettings($return_config = false)
 		return $config_vars;
 
 	// We need some settings! ..ok, some work with our settings :P
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -625,7 +625,7 @@ function ModifyGeneralSecuritySettings($return_config = false)
 		return $config_vars;
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -682,7 +682,7 @@ function ModifyLayoutSettings($return_config = false)
 		return $config_vars;
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -734,7 +734,7 @@ function ModifyKarmaSettings($return_config = false)
 		return $config_vars;
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -782,7 +782,7 @@ function ModifyModerationSettings($return_config = false)
 		unset($config_vars['moderate']);
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -887,7 +887,7 @@ function ModifySpamSettings($return_config = false)
 	$smcFunc['db_free_result']($request);
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -1092,7 +1092,7 @@ function ModifyBadBehaviorSettings($return_config = false)
 		return $config_vars;
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -1441,7 +1441,7 @@ function ModifySignatureSettings($return_config = false)
 	$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -2267,7 +2267,7 @@ function ModifyPruningSettings($return_config = false)
 		return $config_vars;
 
 	// We'll need this in a bit.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
@@ -2342,7 +2342,7 @@ function ModifyGeneralModSettings($return_config = false)
 	}
 
 	// We're working with them settings.
-	require_once(SUBSDIR . '/Settings.php');
+	require_once(SUBSDIR . '/Settings.class.php');
 
 	// Saving?
 	if (isset($_GET['save']))
