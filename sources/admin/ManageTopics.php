@@ -28,18 +28,14 @@ class ManageTopics_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		$form_actions = array(
-			'init' => '_initTopicSettingsForm',
-			'display' => 'action_topicSettings_display');
+		$subActions = array(
+			'display' => array ($this, 'action_topicSettings_display'));
+
+		$action = new Action();
+		$action->initialize($subActions);
 
 		// lets just do it!
-
-		// initialize the form
-		$this->{$form_actions['init']}();
-
-		// call the action handler
-		// this is hardcoded now, to be fixed
-		$this->{$form_actions['display']}();
+		$action->dispatch('display');
 	}
 
 	/**
@@ -53,6 +49,9 @@ class ManageTopics_Controller
 	function action_topicSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl;
+
+		// initialize the form
+		$this->_initTopicSettingsForm();
 
 		// retrieve the current config settings
 		$config_vars = $this->_topicSettings->settings();

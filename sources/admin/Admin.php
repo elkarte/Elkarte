@@ -40,6 +40,7 @@ function AdminMain()
 	$context['robot_no_index'] = true;
 
 	require_once(SUBSDIR . '/Menu.subs.php');
+	require_once(SUBSDIR . '/Action.class.php');
 
 	// Define the menu structure - see subs/Menu.subs.php for details!
 	$admin_areas = array(

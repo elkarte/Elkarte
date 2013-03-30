@@ -49,14 +49,13 @@ class ManageLanguages_Controller
 		$context['sub_template'] = 'show_settings';
 
 		$subActions = array(
-			'edit' => 'action_edit',
-			'add' => 'action_add',
+			'edit' => array ($this, 'action_edit'),
+			'add' => array ($this, 'action_add'),
 			'settings' => array(
-				'init' => '_initLanguageSettingsForm',
-				'display' => 'action_languageSettings_display'
+				$this, 'action_languageSettings_display'
 			),
-			'downloadlang' => 'action_downloadlang',
-			'editlang' => 'action_editlang',
+			'downloadlang' => array ($this, 'action_downloadlang'),
+			'editlang' => array ($this, 'action_editlang'),
 		);
 
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
@@ -72,23 +71,9 @@ class ManageLanguages_Controller
 		);
 
 		// Call the right function for this sub-action.
-		// quick 'n dirty plugging the form here...
-		if (is_array($subActions[$_REQUEST['sa']]))
-		{
-			// we haz a form to show off
-
-			// initialize the form
-			$this->{$subActions[$_REQUEST['sa']]['init']}();
-
-			// call the action handler
-			// this is hardcoded now, to be fixed
-			$this->{$subActions[$_REQUEST['sa']]['display']}();
-		}
-		else
-		{
-			// one of our own :P
-			$this->{$subActions[$_REQUEST['sa']]}();
-		}
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**
@@ -1063,6 +1048,9 @@ class ManageLanguages_Controller
 	function action_languageSettings_display()
 	{
 		global $scripturl, $context, $txt, $settings, $smcFunc;
+
+		// initialize the form
+		$this->_initLanguageSettingsForm();
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');

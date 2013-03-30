@@ -56,24 +56,25 @@ class ManageAttachments_Controller
 
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
-			'attachments' => array(
-				'init' => '_initAttachSettingsForm',
-				'display' => 'action_attachSettings_display'),
+			'attachments' => array($this, 'action_attachSettings_display'),
 			'avatars' => array(
 				'file' => 'ManageAvatars.php',
 				'controller' => 'ManageAvatars_Controller',
 				'function' => 'action_index'),
-			'attachpaths' => 'action_attachpaths',
-			'browse' => 'action_browse',
-			'byAge' => 'action_byAge',
-			'bySize' => 'action_bySize',
-			'maintenance' => 'action_maintenance',
-			'moveAvatars' => 'action_moveAvatars',
-			'repair' => 'action_repair',
-			'remove' => 'action_remove',
-			'removeall' => 'action_removeall',
-			'transfer' => 'action_transfer',
+			'attachpaths' => array ($this, 'action_attachpaths'),
+			'browse' => array ($this, 'action_browse'),
+			'byAge' => array ($this, 'action_byAge'),
+			'bySize' => array ($this, 'action_bySize'),
+			'maintenance' => array ($this, 'action_maintenance'),
+			'moveAvatars' => array ($this, 'action_moveAvatars'),
+			'repair' => array ($this, 'action_repair'),
+			'remove' => array ($this, 'action_remove'),
+			'removeall' => array ($this, 'action_removeall'),
+			'transfer' => array ($this, 'action_transfer'),
 		);
+
+		$action = new Action();
+		$action->initialize($subActions);
 
 		call_integration_hook('integrate_manage_attachments', array(&$subActions));
 
@@ -93,35 +94,8 @@ class ManageAttachments_Controller
 			'description' => $txt['attachments_desc'],
 		);
 
-		// Finally fall through to what we are doing.
-		// We may have a different controller to call.
-		// @todo refactor to call avatars directly.
-		if (isset($subActions[$context['sub_action']]['file']))
-			require_once(ADMINDIR . '/' . $subActions[$context['sub_action']]['file']);
-
-		if (is_array($subActions[$context['sub_action']]))
-		{
-			if (isset($subActions[$context['sub_action']]['controller']))
-			{
-				$controller_name = $subActions[$context['sub_action']]['controller'];
-				$controller = new $controller_name();
-				$controller->{$subActions[$context['sub_action']]['function']}();
-			}
-			else
-			{
-				// initialize the form
-				$this->{$subActions[$_REQUEST['sa']]['init']}();
-
-				// call the action handler
-				// this is hardcoded now, to be fixed
-				$this->{$subActions[$_REQUEST['sa']]['display']}();
-			}
-		}
-		else
-		{
-			// one of our methods: get on with it.
-			$this->{$subActions[$context['sub_action']]}();
-		}
+		// Finally go to where we want to go
+		$action->dispatch($context['sub_action']);
 	}
 
 	/**
@@ -134,6 +108,9 @@ class ManageAttachments_Controller
 	function action_attachSettings_display()
 	{
 		global $modSettings, $scripturl, $context, $options;
+
+		// initialize the form
+		$this->_initAttachSettingsForm();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 

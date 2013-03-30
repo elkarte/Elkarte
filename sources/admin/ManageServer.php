@@ -137,21 +137,17 @@ class ManageServer_Controller
 
 		$subActions = array(
 			'general' => array(
-				'init' => '_initGeneralSettingsForm',
-				'display' => 'action_generalSettings_display'),
+				$this, 'action_generalSettings_display'),
 			'database' => array(
-				'init' => '_initDatabaseSettingsForm',
-				'display' => 'action_databaseSettings_display'),
+				$this, 'action_databaseSettings_display'),
 			'cookie' => array(
-				'init' => '_initCookieSettingsForm',
-				'display' => 'action_cookieSettings_display'),
+				$this, 'action_cookieSettings_display'),
 			'cache' => array(
-				'init' => '_initCacheSettingsForm',
-				'display' => 'action_cacheSettings_display'),
+				$this, 'action_cacheSettings_display'),
 			'loads' => array(
-				'init' => '_initBalancingSettingsForm',
-				'display' => 'action_balancingSettings_display'),
-			'phpinfo' => 'action_phpinfo',
+				$this, 'action_balancingSettings_display'),
+			'phpinfo' => array(
+				$this, 'action_phpinfo'),
 		);
 
 		call_integration_hook('integrate_server_settings', array(&$subActions));
@@ -179,21 +175,9 @@ class ManageServer_Controller
 		}
 
 		// Call the right function for this sub-action.
-		// quick 'n hacky :P
-		if (is_array($subActions[$_REQUEST['sa']]))
-		{
-			// initialize the form
-			$this->{$subActions[$_REQUEST['sa']]['init']}();
-
-			// call the action handler
-			// this is hardcoded now, to be fixed
-			$this->{$subActions[$_REQUEST['sa']]['display']}();
-		}
-		else
-		{
-			// one of our 'normal' methods
-			$this->{$subActions[$_REQUEST['sa']]}();
-		}
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**
@@ -425,6 +409,9 @@ class ManageServer_Controller
 	{
 		global $scripturl, $context, $txt;
 
+		// initialize the form
+		$this->_initGeneralSettingsForm();
+
 		// lets accept this for now :P
 		$config_vars = $this->_generalSettingsForm->settings();
 
@@ -464,6 +451,9 @@ class ManageServer_Controller
 	{
 		global $scripturl, $context, $settings, $txt;
 
+		// initialize the form
+		$this->_initDatabaseSettingsForm();
+
 		$config_vars = $this->_databaseSettingsForm->settings();
 
 		call_integration_hook('integrate_database_settings');
@@ -494,6 +484,9 @@ class ManageServer_Controller
 	function action_cookieSettings_display()
 	{
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
+
+		// initialize the form
+		$this->_initCookieSettingsForm();
 
 		$config_vars = $this->_cookieSettingsForm->settings();
 
@@ -543,6 +536,9 @@ class ManageServer_Controller
 	function action_cacheSettings_display()
 	{
 		global $context, $scripturl, $txt, $helptxt, $cache_enable;
+
+		// initialize the form
+		$this->_initCacheSettingsForm();
 
 		$config_vars = $this->_cacheSettingsForm->settings();
 
@@ -594,6 +590,9 @@ class ManageServer_Controller
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
+		// initialize the form
+		$this->_initBalancingSettingsForm();
+
 		$config_vars = $this->_balancingSettingsForm->settings();
 
 		call_integration_hook('integrate_loadavg_settings');
@@ -635,6 +634,9 @@ class ManageServer_Controller
 	function action_balancingSettings_save()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
+
+		// initialize the form
+		$this->_initBalancingSettingsForm();
 
 		$config_vars = $this->_balancingSettingsForm->settings();
 

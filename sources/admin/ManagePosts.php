@@ -51,14 +51,13 @@ class ManagePosts_Controller
 
 		$subActions = array(
 			'posts' => array(
-				'init' => '_initPostSettingsForm',
-				'display' => 'action_postSettings_display'),
+				$this, 'action_postSettings_display'),
 			'bbc' => array(
 				'function' => 'action_index',
 				'file' => 'ManageBBC.php',
 				'controller' => 'ManageBBC_Controller'),
 			'censor' => array(
-				'function' => 'action_censor'),
+				$this, 'action_censor'),
 			'topics' => array(
 				'function' => 'action_index',
 				'file' => 'ManageTopics.php',
@@ -93,34 +92,10 @@ class ManagePosts_Controller
 			),
 		);
 
-		$subAction = $subActions[$_REQUEST['sa']];
-
 		// Call the right function for this sub-action.
-
-		// different file...
-		if (isset($subAction['file']))
-			require_once(ADMINDIR . '/' . $subAction['file']);
-
-		if (isset($subAction['controller']))
-		{
-			$controller_name = $subAction['controller'];
-			$controller = new $controller_name();
-			$controller->{$subAction['function']}();
-		}
-		elseif (isset($subAction['function']))
-		{
-			// this is one of our methods.
-			$this->{$subAction['function']}();
-		}
-		else
-		{
-			// initialize the form
-			$this->{$subAction['init']}();
-
-			// call the action handler
-			// this is hardcoded now, to be fixed
-			$this->{$subAction['display']}();
-		}
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**
@@ -229,6 +204,9 @@ class ManagePosts_Controller
 	function action_postSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl, $smcFunc, $db_prefix, $db_type;
+
+		// initialize the form
+		$this->_initPostSettingsForm();
 
 		$config_vars = $this->_postSettings->settings();
 

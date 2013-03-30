@@ -28,18 +28,12 @@ class ManageBBC_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		$form_actions = array(
-			'init' => '_initBBCSettingsForm',
-			'display' => 'action_bbcSettings_display');
+		$subActions = array(
+			'display' => array ($this, 'action_bbcSettings_display'));
 
-		// lets just do it!
-
-		// initialize the form
-		$this->{$form_actions['init']}();
-
-		// call the action handler
-		// this is hardcoded now, to be fixed
-		$this->{$form_actions['display']}();
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch('display');
 	}
 
 	/**
@@ -54,6 +48,9 @@ class ManageBBC_Controller
 	function action_bbcSettings_display()
 	{
 		global $context, $txt, $modSettings, $helptxt, $scripturl;
+
+		// initialize the form
+		$this->_initBBCSettingsForm();
 
 		$config_vars = $this->_bbcSettings->settings();
 

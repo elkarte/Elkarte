@@ -29,18 +29,14 @@ class ManageAvatars_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		$form_actions = array(
-			'init' => '_initAvatarSettingsForm',
-			'display' => 'action_avatarSettings_display');
-
-		// lets just do it!
-
-		// initialize the form
-		$this->{$form_actions['init']}();
+		$subActions = array(
+			'display' => array ($this, 'action_avatarSettings_display'));
 
 		// call the action handler
 		// this is hardcoded now, to be fixed
-		$this->{$form_actions['display']}();
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch('display');
 	}
 
 	/**
@@ -52,6 +48,9 @@ class ManageAvatars_Controller
 	function action_avatarSettings_display()
 	{
 		global $txt, $context, $modSettings, $scripturl;
+
+		// initialize the form
+		$this->_initAvatarSettingsForm();
 
 		$config_vars = $this->_avatarSettings->settings();
 
