@@ -28,6 +28,12 @@ if (!defined('ELKARTE'))
 class AdminLog_Controller
 {
 	/**
+	 * Pruning Settings form
+	 * @var Settings_Form
+	 */
+	protected $_pruningSettings;
+
+	/**
  	 * This method decides which log to load.
  	 * Accessed by ?action=admin;area=logs
  	 */
@@ -35,16 +41,44 @@ class AdminLog_Controller
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		// These are the logs they can load.
 		$log_functions = array(
-			'errorlog' => array('ManageErrors.php', 'action_log', 'controller' => 'ManageErrors_Controller'),
-			'adminlog' => array('Modlog.php', 'action_modlog', 'controller' => 'Modlog_Controller'),
-			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features']), 'controller' => 'Modlog_Controller'),
-			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
-			'banlog' => array('ManageBans.php', 'action_log', 'controller' => 'ManageBans_Controller'),
-			'spiderlog' => array('ManageSearchEngines.php', 'action_logs', 'ManageSearchEngines_Controller'),
-			'action_log' => array('ManageScheduledTasks.php', 'action_log', 'controller' => 'ManageScheduledTasks_Controller'),
-			'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),
+			'errorlog' => array(
+				'file' => 'ManageErrors.php',
+				'function' => 'action_log',
+				'controller' => 'ManageErrors_Controller'),
+			'adminlog' => array(
+				'file' => 'Modlog.php',
+				'function' => 'action_modlog',
+				'controller' => 'Modlog_Controller'),
+			'modlog' => array(
+				'file' => 'Modlog.php',
+				'function' => 'action_modlog',
+				'controller' => 'Modlog_Controller',
+				'disabled' => !in_array('ml', $context['admin_features'])),
+			'badbehaviorlog' => array(
+				'file' => 'ManageBadBehavior.php',
+				'function' => 'action_badbehaviorlog',
+				'disabled' => empty($modSettings['badbehavior_enabled']),
+				'controller' => 'ManageBadBehavior_Controller'),
+			'banlog' => array(
+				'file' => 'ManageBans.php',
+				'function' => 'action_log',
+				'controller' => 'ManageBans_Controller'),
+			'spiderlog' => array(
+				'file' => 'ManageSearchEngines.php',
+				'function' => 'action_logs',
+				'controller' => 'ManageSearchEngines_Controller'),
+			'action_log' => array(
+				'file' => 'ManageScheduledTasks.php',
+				'function' => 'action_log',
+				'controller' => 'ManageScheduledTasks_Controller'),
+			'pruning' => array(
+				'init' => '_initPruningSettingsForm',
+				'display' => 'action_pruningSettings_display'),
 		);
 
 		call_integration_hook('integrate_manage_logs', array(&$log_functions));
@@ -88,17 +122,152 @@ class AdminLog_Controller
 			),
 		);
 
-		require_once(ADMINDIR . '/' . $log_functions[$sub_action][0]);
+		// figure out what to call
+		if (isset($log_functions[$sub_action]['file']))
+		{
+			// different file
+			require_once(ADMINDIR . '/' . $log_functions[$sub_action]['file']);
+		}
+
 		if (isset($log_functions[$sub_action]['controller']))
 		{
 			// if we have an object oriented controller, call its method
 			$controller = new $log_functions[$sub_action]['controller']();
-			$controller->{$log_functions[$sub_action][1]}();
+			$controller->{$log_functions[$sub_action]['function']}();
+		}
+		elseif (isset($log_functions[$sub_action]['function']))
+		{
+			// procedural: call the function
+			$log_functions[$sub_action]['function']();
 		}
 		else
 		{
-			// procedural: call the function
-			$log_functions[$sub_action][1]();
+			// our own method then
+
+			// initialize the form
+			$this->{$log_functions[$sub_action]['init']}();
+
+			// call the action handler
+			// this is hardcoded now, to be fixed
+			$this->{$log_functions[$sub_action]['display']}();
 		}
+	}
+
+	/**
+	 * Allow to edit the settings on the pruning screen.
+	 *
+	 * Uses the _pruningSettings form.
+	 */
+	function action_pruningSettings_display()
+	{
+		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+
+		// Make sure we understand what's going on.
+		loadLanguage('ManageSettings');
+
+		$context['page_title'] = $txt['pruning_title'];
+
+		$config_vars = $this->_pruningSettings->settings();
+
+		call_integration_hook('integrate_prune_settings');
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			$savevar = array(
+				array('text', 'pruningOptions')
+			);
+
+			if (!empty($_POST['pruningOptions']))
+			{
+				$vals = array();
+				foreach ($config_vars as $index => $dummy)
+				{
+					if (!is_array($dummy) || $index == 'pruningOptions')
+						continue;
+
+					$vals[] = empty($_POST[$dummy[1]]) || $_POST[$dummy[1]] < 0 ? 0 : (int) $_POST[$dummy[1]];
+				}
+				$_POST['pruningOptions'] = implode(',', $vals);
+			}
+			else
+				$_POST['pruningOptions'] = '';
+
+			Settings_Form::save_db($savevar);
+			redirectexit('action=admin;area=logs;sa=pruning');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=logs;save;sa=pruning';
+		$context['settings_title'] = $txt['pruning_title'];
+		$context['sub_template'] = 'show_settings';
+
+		// Get the actual values
+		if (!empty($modSettings['pruningOptions']))
+			@list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
+		else
+			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Returns the configuration settings for pruning logs.
+	 *
+	 * @return array in the format of config_vars expected by admin search
+	 */
+	function settings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Even do the pruning?
+			// The array indexes are there so we can remove/change them before saving.
+			'pruningOptions' => array('check', 'pruningOptions'),
+		'',
+			// Various logs that could be pruned.
+			array('int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Error log.
+			array('int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Moderation log.
+			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
+			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
+			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
+			array('int', 'pruneBadbehaviorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Bad Behavior log.
+			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
+			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
+		);
+
+		return $config_vars;
+	}
+
+	/**
+	 * Initializes the _pruningSettings form.
+	 */
+	function _initPruningSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the form
+		$this->_pruningSettings = new Settings_Form();
+
+		// initialize settings
+
+		$config_vars = array(
+			// Even do the pruning?
+			// The array indexes are there so we can remove/change them before saving.
+			'pruningOptions' => array('check', 'pruningOptions'),
+		'',
+			// Various logs that could be pruned.
+			array('int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Error log.
+			array('int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Moderation log.
+			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
+			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
+			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
+			array('int', 'pruneBadbehaviorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Bad Behavior log.
+			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
+			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
+		);
+
+		return $this->_pruningSettings->settings($config_vars);
 	}
 }

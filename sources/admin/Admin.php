@@ -746,7 +746,7 @@ function AdminSearchInternal()
 	$include_files = array(
 		'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-		'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures'
+		'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog'
 	);
 
 	// This is a special array of functions that contain setting data
@@ -781,7 +781,7 @@ function AdminSearchInternal()
 		array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
 		array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 		array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
-		array('ModifyPruningSettings', 'area=logs;sa=pruning'),
+		array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
 	);
 
 	call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
