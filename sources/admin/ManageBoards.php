@@ -23,6 +23,12 @@ if (!defined('ELKARTE'))
 class ManageBoards_Controller
 {
 	/**
+	 * Boards settings form.
+	 * @var Settings_Form
+	 */
+	protected $_boardSettings;
+
+	/**
 	 * The main dispatcher; doesn't do anything, just delegates.
 	 * This is the main entry point for all the manageboards admin screens.
 	 * Called by ?action=admin;area=manageboards.
@@ -37,6 +43,9 @@ class ManageBoards_Controller
 		// Everything's gonna need this.
 		loadLanguage('ManageBoards');
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
 			'board' => array('action_board', 'manage_boards'),
@@ -47,7 +56,7 @@ class ManageBoards_Controller
 			'move' => array('action_main', 'manage_boards'),
 			'newcat' => array('action_cat', 'manage_boards'),
 			'newboard' => array('action_board', 'manage_boards'),
-			'settings' => array('action_settings', 'admin_forum'),
+			'settings' => array('action_boardSettings_display', 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_boards', array(&$subActions));
@@ -733,17 +742,17 @@ class ManageBoards_Controller
 	 *
 	 * @uses modify_general_settings sub-template.
 	 */
-	function action_settings()
+	function action_boardSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl, $smcFunc;
 
+		// initialize the form
+		$this->_initBoardSettingsForm();
+
 		// get all settings
-		$config_vars = $this->settings();
+		$config_vars = $this->_boardSettings->settings();
 
-		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
-
-		// Needed for the settings template.
-		require_once(SUBSDIR . '/Settings.class.php');
+		call_integration_hook('integrate_modify_board_settings');
 
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
@@ -777,6 +786,39 @@ class ManageBoards_Controller
 
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize the boardSettings form, with the current configuration
+	 * options for admin board settings screen.
+	 */
+	function _initBoardSettingsForm()
+	{
+		// instantiate the form
+		$this->_boardSettings = new Settings_Form();
+
+		// Load the boards list - for the recycle bin!
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$boards = getBoardList(array('not_redirection' => true), true);
+		$recycle_boards = array('');
+		foreach ($boards as $board)
+			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+
+		// Here and the board settings...
+		$config_vars = array(
+			array('title', 'settings'),
+				// Inline permissions.
+				array('permissions', 'manage_boards'),
+			'',
+				// Other board settings.
+				array('check', 'countChildPosts'),
+				array('check', 'recycle_enable', 'onclick' => 'document.getElementById(\'recycle_board\').disabled = !this.checked;'),
+				array('select', 'recycle_board', $recycle_boards),
+				array('check', 'allow_ignore_boards'),
+				array('check', 'deny_boards_access'),
+		);
+
+		return $this->_boardSettings->settings($config_vars);
 	}
 
 	/**

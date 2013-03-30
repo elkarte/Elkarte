@@ -23,6 +23,12 @@ if (!defined('ELKARTE'))
 class ManageCalendar_Controller
 {
 	/**
+	 * Calendar settings form
+	 * @var Settings_Form
+	 */
+	protected $_calendarSettings;
+
+	/**
 	 * The main controlling function doesn't have much to do... yet.
 	 * Just check permissions and delegate to the rest.
 	 *
@@ -37,14 +43,17 @@ class ManageCalendar_Controller
 		// Everything's gonna need this.
 		loadLanguage('ManageCalendar');
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];
 
 		// Little short on the ground of functions here... but things can and maybe will change...
 		$subActions = array(
-			'editholiday' => 'action_editholiday',
-			'holidays' => 'action_holidays',
-			'settings' => 'action_settings'
+			'editholiday' => array($this, 'action_editholiday'),
+			'holidays' => array($this, 'action_holidays'),
+			'settings' => array($this, 'action_calendarSettings_display')
 		);
 
 		call_integration_hook('integrate_manage_calendar', array(&$subActions));
@@ -66,7 +75,9 @@ class ManageCalendar_Controller
 			),
 		);
 
-		$this->{$subActions[$_REQUEST['sa']]}();
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**
@@ -288,12 +299,16 @@ class ManageCalendar_Controller
 
 	/**
 	 * Show and allow to modify calendar settings.
+	 * The method uses a Settings_Form to do the work.
 	 */
-	function action_settings()
+	function action_calendarSettings_display()
 	{
 		global $modSettings, $context, $settings, $txt, $scripturl, $smcFunc;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initCalendarSettingsForm();
+
+		$config_vars = $this->_calendarSettings->settings();
 
 		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
 
@@ -328,6 +343,56 @@ class ManageCalendar_Controller
 
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for the calendar.
+	 */
+	function _initCalendarSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the form
+		$this->_calendarSettings = new Settings_Form();
+
+		// Load the boards list.
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$boards_list = getBoardList(array('not_redirection' => true), true);
+		$boards = array('');
+		foreach ($boards_list as $board)
+			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+
+		// Look, all the calendar settings - of which there are many!
+		$config_vars = array(
+			// All the permissions:
+			array('permissions', 'calendar_view', 'help' => 'cal_enabled'),
+			array('permissions', 'calendar_post'),
+			array('permissions', 'calendar_edit_own'),
+			array('permissions', 'calendar_edit_any'),
+			'',
+			// How many days to show on board index, and where to display events etc?
+			array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
+			array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('check', 'cal_export'),
+			'',
+			// Linking events etc...
+			array('select', 'cal_defaultboard', $boards),
+			array('check', 'cal_daysaslink'),
+			array('check', 'cal_allow_unlinked'),
+			array('check', 'cal_showInTopic'),
+			'',
+			// Dates of calendar...
+			array('int', 'cal_minyear'),
+			array('int', 'cal_maxyear'),
+			'',
+			// Calendar spanning...
+			array('check', 'cal_allowspan'),
+			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
+		);
+
+		return $this->_calendarSettings->settings($config_vars);
 	}
 
 	/**

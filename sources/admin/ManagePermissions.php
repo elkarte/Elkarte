@@ -24,6 +24,12 @@ if (!defined('ELKARTE'))
 class ManagePermissions_Controller
 {
 	/**
+	 * Permissions settings form
+	 * @var Settings_Form
+	 */
+	protected $_permSettings;
+
+	/**
 	 * Dispaches to the right function based on the given subaction.
 	 * Checks the permissions, based on the sub-action.
 	 * Called by ?action=managepermissions.
@@ -37,6 +43,9 @@ class ManagePermissions_Controller
 		loadLanguage('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(
 			'board' => array('action_board', 'manage_permissions'),
@@ -47,7 +56,7 @@ class ManagePermissions_Controller
 			'quickboard' => array('action_quickboard', 'manage_permissions'),
 			'postmod' => array('action_postmod', 'manage_permissions', 'disabled' => !in_array('pm', $context['admin_features'])),
 			'profiles' => array('action_profiles', 'manage_permissions'),
-			'settings' => array('action_settings', 'admin_forum'),
+			'settings' => array('action_permSettings_display', 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_permissions', array(&$subActions));
@@ -918,19 +927,19 @@ class ManagePermissions_Controller
 	 * A screen to set some general settings for permissions.
 	 *
 	 */
-	function action_settings()
+	function action_permSettings_display()
 	{
 		global $context, $modSettings, $txt, $scripturl, $smcFunc;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initPermSettingsForm();
+
+		$config_vars = $this->_permSettings->settings();
 
 		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
 
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
-
-		// Needed for the inline permission functions, and the settings template.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=permissions;save;sa=settings';
@@ -1012,6 +1021,30 @@ class ManagePermissions_Controller
 		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize the settings form.
+	 */
+	function _initPermSettingsForm()
+	{
+		global $txt;
+
+		// Instantiate the form
+		$this->_permSettings = new Settings_Form();
+
+		// All the setting variables
+		$config_vars = array(
+			array('title', 'settings'),
+				// Inline permissions.
+				array('permissions', 'manage_permissions'),
+			'',
+				// A few useful settings
+				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
+				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
+		);
+
+		return $this->_permSettings->settings($config_vars);
 	}
 
 	/**
