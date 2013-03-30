@@ -315,10 +315,6 @@ class ManageCalendar_Controller
 		// Get the settings template fired up.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// Some important context stuff
-		$context['page_title'] = $txt['calendar_settings'];
-		$context['sub_template'] = 'show_settings';
-
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
 		$context['settings_title'] = $txt['calendar_settings'];
@@ -350,7 +346,7 @@ class ManageCalendar_Controller
 	 */
 	function _initCalendarSettingsForm()
 	{
-		global $txt;
+		global $txt, $context;
 
 		// instantiate the form
 		$this->_calendarSettings = new Settings_Form();
@@ -391,6 +387,10 @@ class ManageCalendar_Controller
 			array('check', 'cal_allowspan'),
 			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
+
+		// Some important context stuff
+		$context['page_title'] = $txt['calendar_settings'];
+		$context['sub_template'] = 'show_settings';
 
 		return $this->_calendarSettings->settings($config_vars);
 	}

@@ -18,34 +18,46 @@ if (!defined('ELKARTE'))
 class ManageDrafts_Controller
 {
 	/**
+	 * Drafts settings form
+	 * @var Settings_Form
+	 */
+	protected $_draftSettings;
+
+	/**
+	 * Default method.
+	 */
+	function action_index()
+	{
+		isAllowedTo('admin_forum');
+		loadLanguage('Drafts');
+
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		$this->action_draftSettings_display();
+	}
+
+	/**
 	 * Modify any setting related to drafts.
 	 * Requires the admin_forum permission.
 	 * Accessed from ?action=admin;area=managedrafts
 	 *
-	 * @param bool $return_config = false
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	function action_modifysettings($return_config = false)
+	function action_draftSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
 
-		// Here are all the draft settings, a bit lite for now, but we can add more :P
-		$config_vars = array(
-			// Draft settings ...
-			array('check', 'drafts_post_enabled'),
-			array('check', 'drafts_pm_enabled'),
-			array('check', 'drafts_show_saved_enabled', 'subtext' => $txt['drafts_show_saved_enabled_subnote']),
-			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
-			'',
-			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
-			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
-		);
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
 
-		if ($return_config)
-			return $config_vars;
+		// initialize the form
+		$this->_initDraftSettingsForm();
+
+		$config_vars = $this->_draftSettings->settings();
 
 		// Get the settings template ready.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -90,5 +102,58 @@ class ManageDrafts_Controller
 
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize drafts settings with the current forum settings
+	 */
+	function _initDraftSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the form
+		$this->_draftSettings = new Settings_Form();
+
+		loadLanguage('Drafts');
+
+		// Here are all the draft settings, a bit lite for now, but we can add more :P
+		$config_vars = array(
+			// Draft settings ...
+			array('check', 'drafts_post_enabled'),
+			array('check', 'drafts_pm_enabled'),
+			array('check', 'drafts_show_saved_enabled', 'subtext' => $txt['drafts_show_saved_enabled_subnote']),
+			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
+			'',
+			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
+			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
+		);
+
+		return $this->_draftSettings->settings($config_vars);
+	}
+
+	/**
+	 * Returns all admin drafts settings in config_vars format.
+	 * Used by admin search.
+	 * @deprecated
+	 */
+	function settings()
+	{
+		global $txt;
+
+		loadLanguage('Drafts');
+
+		// Here are all the draft settings, a bit lite for now, but we can add more :P
+		$config_vars = array(
+			// Draft settings ...
+			array('check', 'drafts_post_enabled'),
+			array('check', 'drafts_pm_enabled'),
+			array('check', 'drafts_show_saved_enabled', 'subtext' => $txt['drafts_show_saved_enabled_subnote']),
+			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
+			'',
+			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
+			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
+		);
+
+		return $config_vars;
 	}
 }

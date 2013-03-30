@@ -253,7 +253,7 @@ function AdminMain()
 					'label' => $txt['manage_drafts'],
 					'file' => 'ManageDrafts.php',
 					'controller' => 'ManageDrafts_Controller',
-					'function' => 'action_modifysettings',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_logs',
 					'permission' => array('admin_forum'),
@@ -866,7 +866,7 @@ class Admin_Controller
 		$include_files = array(
 			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog'
+			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts'
 		);
 
 		// This is a special array of functions that contain setting data
@@ -902,6 +902,7 @@ class Admin_Controller
 			array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
+			array('settings', 'area=managedrafts', 'ManageDrafts_Controller'),
 		);
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));

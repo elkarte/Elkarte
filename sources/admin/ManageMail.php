@@ -13,17 +13,24 @@
  *
  * @version 1.0 Alpha
  *
- * This file is all about mail, how we love it so. In particular it handles the admin side of
- * mail configuration, as well as reviewing the mail queue - if enabled.
- * @todo refactor as controller-model.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * This class is the administration mailing controller.
+ * It handles mail configuration, it displays and allows to remove items from the mail queue.
+ *
+ */
 class ManageMail_Controller
 {
+	/**
+	 * Mail settings form
+	 * @var Settings_Form
+	 */
+	protected $_mailSettings;
+
 	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through to the relevant section.
@@ -44,9 +51,9 @@ class ManageMail_Controller
 		$context['page_title'] = $txt['mailqueue_title'];
 
 		$subActions = array(
-			'browse' => 'action_browse',
-			'clear' => 'action_clear',
-			'settings' => 'action_settings',
+			'browse' => array($this, 'action_browse'),
+			'clear' => array($this, 'action_clear'),
+			'settings' => array($this, 'action_mailSettings_display'),
 		);
 
 		call_integration_hook('integrate_manage_mail', array(&$subActions));
@@ -63,7 +70,9 @@ class ManageMail_Controller
 		);
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']]}();
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**
@@ -101,7 +110,6 @@ class ManageMail_Controller
 
 		$context['oldest_mail'] = empty($mailOldest) ? $txt['mailqueue_oldest_not_available'] : time_since(time() - $mailOldest);
 		$context['mail_queue_size'] = comma_format($mailQueueSize);
-		loadTemplate('ManageMail');
 
 		$listOptions = array(
 			'id' => 'mail_queue',
@@ -219,13 +227,18 @@ class ManageMail_Controller
 	/**
 	 * Allows to view and modify the mail settings.
 	 */
-	function action_settings()
+	function action_mailSettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings, $txtBirthdayEmails;
 
 		loadLanguage('EmailTemplates');
 
-		require_once(SUBSDIR . '/Settings.class.php');
+		// Some important context stuff
+		$context['page_title'] = $txt['calendar_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		// initialize the form
+		$this->_initMailSettingsForm();
 
 		$processedBirthdayEmails = array();
 		foreach ($txtBirthdayEmails as $key => $value)
@@ -235,7 +248,7 @@ class ManageMail_Controller
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_mailSettings->settings();
 
 		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
 
@@ -284,6 +297,51 @@ class ManageMail_Controller
 		document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 		document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
 	}', true);
+	}
+
+	/**
+	 * Initialize mail administration settings.
+	 */
+	function _initMailSettingsForm()
+	{
+		global $txt, $modSettings;
+
+		// instantiate the form
+		$this->_mailSettings = new Settings_Form();
+
+		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
+		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
+
+		$emails = array();
+		$processedBirthdayEmails = array();
+		foreach ($txtBirthdayEmails as $key => $value)
+		{
+			$index = substr($key, 0, strrpos($key, '_'));
+			$element = substr($key, strrpos($key, '_') + 1);
+			$processedBirthdayEmails[$index][$element] = $value;
+		}
+		foreach ($processedBirthdayEmails as $index => $dummy)
+			$emails[$index] = $index;
+
+		$config_vars = array(
+				// Mail queue stuff, this rocks ;)
+				array('check', 'mail_queue'),
+				array('int', 'mail_limit'),
+				array('int', 'mail_quantity'),
+			'',
+				// SMTP stuff.
+				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
+				array('text', 'smtp_host'),
+				array('text', 'smtp_port'),
+				array('text', 'smtp_username'),
+				array('password', 'smtp_password'),
+			'',
+				array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
+				'birthday_subject' => array('var_message', 'birthday_subject', 'var_message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
+				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
+		);
+
+		return $this->_mailSettings->settings($config_vars);
 	}
 
 	/**

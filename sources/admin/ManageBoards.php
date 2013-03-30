@@ -48,24 +48,48 @@ class ManageBoards_Controller
 
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
-			'board' => array('action_board', 'manage_boards'),
-			'board2' => array('action_board2', 'manage_boards'),
-			'cat' => array('action_cat', 'manage_boards'),
-			'cat2' => array('action_cat2', 'manage_boards'),
-			'main' => array('action_main', 'manage_boards'),
-			'move' => array('action_main', 'manage_boards'),
-			'newcat' => array('action_cat', 'manage_boards'),
-			'newboard' => array('action_board', 'manage_boards'),
-			'settings' => array('action_boardSettings_display', 'admin_forum'),
+			'board' => array(
+				'controller' => $this,
+				'function' => 'action_board',
+				'permission' => 'manage_boards'),
+			'board2' => array(
+				'controller' => $this,
+				'function' => 'action_board2',
+				'permission' => 'manage_boards'),
+			'cat' => array(
+				'controller' => $this,
+				'function' => 'action_cat',
+				'permission' => 'manage_boards'),
+			'cat2' => array(
+				'controller' => $this,
+				'function' => 'action_cat2',
+				'permission' => 'manage_boards'),
+			'main' => array(
+				'controller' => $this,
+				'function' => 'action_main',
+				'permission' => 'manage_boards'),
+			'move' => array(
+				'controller' => $this,
+				'function' => 'action_main',
+				'permission' => 'manage_boards'),
+			'newcat' => array(
+				'controller' => $this,
+				'function' => 'action_cat',
+				'permission' => 'manage_boards'),
+			'newboard' => array(
+				'controller' => $this,
+				'function' => 'action_board',
+				'permission' => 'manage_boards'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_boardSettings_display',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_boards', array(&$subActions));
 
 		// Default to sub action 'main' or 'settings' depending on permissions.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
-
-		// Have you got the proper permissions?
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -83,7 +107,10 @@ class ManageBoards_Controller
 			),
 		);
 
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
+		$action->dispatch($_REQUEST['sa']);
 	}
 
 	/**

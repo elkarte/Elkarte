@@ -74,6 +74,9 @@ class Action
 
 		$subAction = $this->_subActions[$sa];
 
+		if (isset($subAction['permission']))
+			isAllowedTo($subAction['permission']);
+
 		// is it in a file we need to load?
 		if (isset($subAction['file']))
 		{
