@@ -25,6 +25,12 @@ if (!defined('ELKARTE'))
 class ManagePosts_Controller
 {
 	/**
+	 * Posts settings form
+	 * @var Settings_Form
+	 */
+	protected $_postSettings;
+
+	/**
 	 * The main entrance point for the 'Posts and topics' screen.
 	 * Like all others, it checks permissions, then forwards to the right function
 	 * based on the given sub-action.
@@ -40,11 +46,23 @@ class ManagePosts_Controller
 		// Make sure you can be here.
 		isAllowedTo('admin_forum');
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		$subActions = array(
-			'posts' => 'action_settings',
-			'bbc' => array('action_settings', 'ManageBBC.php', 'ManageBBC_Controller'),
-			'censor' => 'action_censor',
-			'topics' => array('action_settings', 'ManageTopics.php', 'ManageTopics_Controller'),
+			'posts' => array(
+				'init' => '_initPostSettingsForm',
+				'display' => 'action_postSettings_display'),
+			'bbc' => array(
+				'function' => 'action_index',
+				'file' => 'ManageBBC.php',
+				'controller' => 'ManageBBC_Controller'),
+			'censor' => array(
+				'function' => 'action_censor'),
+			'topics' => array(
+				'function' => 'action_index',
+				'file' => 'ManageTopics.php',
+				'controller' => 'ManageTopics_Controller'),
 		);
 
 		call_integration_hook('integrate_manage_posts', array(&$subActions));
@@ -75,19 +93,33 @@ class ManagePosts_Controller
 			),
 		);
 
+		$subAction = $subActions[$_REQUEST['sa']];
+
 		// Call the right function for this sub-action.
-		if (is_array($subActions[$_REQUEST['sa']]))
+
+		// different file...
+		if (isset($subAction['file']))
+			require_once(ADMINDIR . '/' . $subAction['file']);
+
+		if (isset($subAction['controller']))
 		{
-			// different file...
-			require_once(ADMINDIR . '/' . $subActions[$_REQUEST['sa']][1]);
-			$controller_name = $subActions[$_REQUEST['sa']][2];
+			$controller_name = $subAction['controller'];
 			$controller = new $controller_name();
-			$controller->{$subActions[$_REQUEST['sa']][0]}();
+			$controller->{$subAction['function']}();
+		}
+		elseif (isset($subAction['function']))
+		{
+			// this is one of our methods.
+			$this->{$subAction['function']}();
 		}
 		else
 		{
-			// this is one of our methods.
-			$this->{$subActions[$_REQUEST['sa']]}();
+			// initialize the form
+			$this->{$subAction['init']}();
+
+			// call the action handler
+			// this is hardcoded now, to be fixed
+			$this->{$subAction['display']}();
 		}
 	}
 
@@ -194,11 +226,11 @@ class ManagePosts_Controller
 	 *
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
-	function action_settings()
+	function action_postSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl, $smcFunc, $db_prefix, $db_type;
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_postSettings->settings();
 
 		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
@@ -245,6 +277,43 @@ class ManagePosts_Controller
 
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize postSettings form with admin configuration settings for posts.
+	 *
+	 * @return array
+	 */
+	function _initPostSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the form
+		$this->_postSettings = new Settings_Form();
+
+		// initialize it with our settings
+		$config_vars = array(
+				// Simple post options...
+				array('check', 'removeNestedQuotes'),
+				array('check', 'enableEmbeddedFlash', 'subtext' => $txt['enableEmbeddedFlash_warning']),
+				// Note show the warning as read if pspell not installed!
+				array('check', 'enableSpellChecking', 'subtext' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : ('<span class="alert">' . $txt['enableSpellChecking_warning'] . '</span>'))),
+				array('check', 'disable_wysiwyg'),
+			'',
+				// Posting limits...
+				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
+				array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
+			'',
+				// Posting time limits...
+				array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
+				array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
+				array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
+			'',
+				// First & Last message preview lengths
+				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
+		);
+
+		return $this->_postSettings->settings($config_vars);
 	}
 
 	/**

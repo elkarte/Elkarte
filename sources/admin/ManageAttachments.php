@@ -94,13 +94,15 @@ class ManageAttachments_Controller
 		);
 
 		// Finally fall through to what we are doing.
+		// We may have a different controller to call.
+		// @todo refactor to call avatars directly.
+		if (isset($subActions[$context['sub_action']]['file']))
+			require_once(ADMINDIR . '/' . $subActions[$context['sub_action']]['file']);
+
 		if (is_array($subActions[$context['sub_action']]))
 		{
-			// we may have a different controller to call.
-			// @todo refactor to call avatars directly.
-			if (isset($subActions[$context['sub_action']]['file']))
+			if (isset($subActions[$context['sub_action']]['controller']))
 			{
-				require_once(ADMINDIR . '/' . $subActions[$context['sub_action']]['file']);
 				$controller_name = $subActions[$context['sub_action']]['controller'];
 				$controller = new $controller_name();
 				$controller->{$subActions[$context['sub_action']]['function']}();

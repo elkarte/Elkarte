@@ -18,6 +18,31 @@ if (!defined('ELKARTE'))
 class ManageTopics_Controller
 {
 	/**
+	 * Topic settings form
+	 * @var Settings_Form
+	 */
+	protected $_topicSettings;
+
+	function action_index()
+	{
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		$form_actions = array(
+			'init' => '_initTopicSettingsForm',
+			'display' => 'action_topicSettings_display');
+
+		// lets just do it!
+
+		// initialize the form
+		$this->{$form_actions['init']}();
+
+		// call the action handler
+		// this is hardcoded now, to be fixed
+		$this->{$form_actions['display']}();
+	}
+
+	/**
 	 * Adminstration page for topics: allows to display and set settings related to topics.
 	 *
 	 * Requires the admin_forum permission.
@@ -25,12 +50,12 @@ class ManageTopics_Controller
 
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	function action_settings()
+	function action_topicSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl;
 
 		// retrieve the current config settings
-		$config_vars = $this->settings();
+		$config_vars = $this->_topicSettings->settings();
 
 		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
 
@@ -63,6 +88,42 @@ class ManageTopics_Controller
 
 		// Prepare the settings
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize topicSettings form with the configuration settings for topics.
+	 */
+	function _initTopicSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the form
+		$this->_topicSettings = new Settings_Form();
+
+		// initialize it with our settings
+		$config_vars = array(
+				// Some simple bools...
+				array('check', 'enableStickyTopics'),
+				array('check', 'enableParticipation'),
+			'',
+				// Pagination etc...
+				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
+				array('int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']),
+				array('int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']),
+				array('check', 'disable_print_topic'),
+			'',
+				// Hot topics (etc)...
+				array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
+				array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
+			'',
+				// All, next/prev...
+				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
+				array('check', 'disableCustomPerPage'),
+				array('check', 'enablePreviousNext'),
+
+		);
+
+		return $this->_topicSettings->settings($config_vars);
 	}
 
 	/**

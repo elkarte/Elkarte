@@ -22,7 +22,7 @@ class ManageAvatars_Controller
 	 * Avatars settings form
 	 * @var Settings_Form
 	 */
-	protected $_avatarSettingsForm;
+	protected $_avatarSettings;
 
 	function action_index()
 	{
@@ -53,7 +53,7 @@ class ManageAvatars_Controller
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
-		$config_vars = $this->_avatarSettingsForm->settings();
+		$config_vars = $this->_avatarSettings->settings();
 
 		call_integration_hook('integrate_modify_avatar_settings');
 
@@ -99,7 +99,7 @@ class ManageAvatars_Controller
 		global $txt, $context, $modSettings;
 
 		// instantiate the form
-		$this->_avatarSettingsForm = new Settings_Form();
+		$this->_avatarSettings = new Settings_Form();
 
 		// initialize it with our settings
 
@@ -159,7 +159,7 @@ class ManageAvatars_Controller
 				array('text', 'custom_avatar_url', 40),
 		);
 
-		return $this->_avatarSettingsForm->settings($config_vars);
+		return $this->_avatarSettings->settings($config_vars);
 	}
 
 	/**

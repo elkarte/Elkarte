@@ -18,6 +18,31 @@ if (!defined('ELKARTE'))
 class ManageBBC_Controller
 {
 	/**
+	 * BBC settings form
+	 * @var Settings_Form
+	 */
+	protected $_bbcSettings;
+
+	function action_index()
+	{
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		$form_actions = array(
+			'init' => '_initBBCSettingsForm',
+			'display' => 'action_bbcSettings_display');
+
+		// lets just do it!
+
+		// initialize the form
+		$this->{$form_actions['init']}();
+
+		// call the action handler
+		// this is hardcoded now, to be fixed
+		$this->{$form_actions['display']}();
+	}
+
+	/**
 	 * Administration page in Posts and Topics > BBC.
 	 * This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
@@ -26,11 +51,11 @@ class ManageBBC_Controller
 	 *
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
-	function action_settings()
+	function action_bbcSettings_display()
 	{
 		global $context, $txt, $modSettings, $helptxt, $scripturl;
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_bbcSettings->settings();
 
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
 		$context['settings_post_javascript'] = '
@@ -82,7 +107,33 @@ class ManageBBC_Controller
 	}
 
 	/**
+	 * Initializes the form with the current BBC settings of the forum.
+	 *
+	 * @return array
+	 */
+	function _initBBCSettingsForm()
+	{
+		// instantiate the form
+		$this->_bbcSettings = new Settings_Form();
+
+		// initialize it with our settings
+
+		$config_vars = array(
+				array('check', 'enableBBC'),
+				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
+				array('check', 'enablePostHTML'),
+				array('check', 'autoLinkUrls'),
+			'',
+				array('bbc', 'disabledBBC'),
+		);
+
+		return $this->_bbcSettings->settings($config_vars);
+	}
+
+	/**
 	 * Return the BBC settings of the forum.
+	 * Used by admin search.
+	 * @deprecated
 	 *
 	 * @return array
 	 */
