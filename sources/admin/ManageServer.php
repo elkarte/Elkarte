@@ -62,6 +62,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+// We're working with them settings here.
+require_once(SUBSDIR . '/Settings.class.php');
+
 /**
  * ManageServer administration pages controller.
  * This handles several screens, with low-level essential settings such as
@@ -128,9 +131,6 @@ class ManageServer_Controller
 
 		// The settings are in here, I swear!
 		loadLanguage('ManageSettings');
-
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		$context['page_title'] = $txt['admin_server_settings'];
 		$context['sub_template'] = 'show_settings';
@@ -227,7 +227,8 @@ class ManageServer_Controller
 			array('cachedir', $txt['cachedir'], 'file', 'text', 36),
 		);
 
-		$this->_databaseSettingsForm->settings($config_vars);
+		// Set them vars for our settings form
+		return $this->_databaseSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -254,7 +255,8 @@ class ManageServer_Controller
 			array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
-		$this->_generalSettingsForm->settings($config_vars);
+		// Set them vars for our settings form
+		return $this->_generalSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -283,7 +285,8 @@ class ManageServer_Controller
 			array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
 		);
 
-		$this->_cookieSettingsForm->settings($config_vars);
+		// Set them vars for our settings form
+		return $this->_cookieSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -335,7 +338,8 @@ class ManageServer_Controller
 			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 		);
 
-		$this->_cacheSettingsForm->settings($config_vars);
+		// Set them vars for our settings form
+		return $this->_cacheSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -399,8 +403,8 @@ class ManageServer_Controller
 			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
 		}
 
-		// Set them for the settings form
-		$this->_balancingSettingsForm->settings($config_vars);
+		// Set them vars for our settings form
+		return $this->_balancingSettingsForm->settings($config_vars);
 	}
 
 	/**

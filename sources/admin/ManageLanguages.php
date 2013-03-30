@@ -1133,7 +1133,7 @@ class ManageLanguages_Controller
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
 		// initialize the little form
-		$this->_languageSettings->settings($config_vars);
+		return $this->_languageSettings->settings($config_vars);
 	}
 }
 

@@ -110,8 +110,9 @@ function AdminMain()
 			'areas' => array(
 				'corefeatures' => array(
 					'label' => $txt['core_settings_title'],
-					'file' => 'ManageSettings.php',
-					'function' => 'ModifyCoreFeatures',
+					'file' => 'ManageCoreFeatures.php',
+					'controller' => 'ManageCoreFeatures_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_corefeatures',
 				),
@@ -742,14 +743,15 @@ function AdminSearchInternal()
 
 	// All the files we need to include.
 	$include_files = array(
-		'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail', 'ManagePaid', 'ManagePermissions',
-		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages', 'ManageBBC', 'ManageTopics'
+		'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
+		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
+		'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures'
 	);
 
 	// This is a special array of functions that contain setting data
 	// - we query all these to simply pull all setting bits!
 	$settings_search = array(
-		array('ModifyCoreFeatures', 'area=corefeatures'),
+		array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
 		array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
 		array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
 		array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
@@ -770,11 +772,11 @@ function AdminSearchInternal()
 		array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 		array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-		array('settings', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-		array('settings', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-		array('ModifyCookieSettings', 'area=serversettings;sa=cookie'),
-		array('ModifyCacheSettings', 'area=serversettings;sa=cache'),
-		array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
+		array('_initGeneralSettingsForm', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+		array('_initDatabaseSettingsForm', 'area=serversettings;sa=database', 'ManageServer_Controller'),
+		array('_initCookieSettingsForm', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
+		array('_initCacheSettingsForm', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
+		array('_initLanguageSettingsForm', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 		array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
 		array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 		array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
