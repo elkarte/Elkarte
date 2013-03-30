@@ -81,6 +81,7 @@ class ManageLanguages_Controller
 			$this->{$subActions[$_REQUEST['sa']]['init']}();
 
 			// call the action handler
+			// this is hardcoded now, to be fixed
 			$this->{$subActions[$_REQUEST['sa']]['display']}();
 		}
 		else

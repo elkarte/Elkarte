@@ -42,7 +42,7 @@ class AdminLog_Controller
 			'modlog' => array('Modlog.php', 'action_modlog', 'disabled' => !in_array('ml', $context['admin_features']), 'controller' => 'Modlog_Controller'),
 			'badbehaviorlog' => array('ManageBadBehavior.php', 'action_badbehaviorlog', 'disabled' => empty($modSettings['badbehavior_enabled']), 'controller' => 'ManageBadBehavior_Controller'),
 			'banlog' => array('ManageBans.php', 'action_log', 'controller' => 'ManageBans_Controller'),
-			'spiderlog' => array('ManageSearchEngines.php', 'SpiderLogs'),
+			'spiderlog' => array('ManageSearchEngines.php', 'action_logs', 'ManageSearchEngines_Controller'),
 			'action_log' => array('ManageScheduledTasks.php', 'action_log', 'controller' => 'ManageScheduledTasks_Controller'),
 			'pruning' => array('ManageSettings.php', 'ModifyPruningSettings'),
 		);

@@ -25,6 +25,12 @@ if (!defined('ELKARTE'))
 class ManageAttachments_Controller
 {
 	/**
+	 * Attachments settings form
+	 * @var Settings_Form
+	 */
+	protected $_attachSettingsForm;
+
+	/**
 	 * The main 'Attachments and Avatars' management function.
 	 * This function is the entry point for index.php?action=admin;area=manageattachments
 	 * and it calls a function based on the sub-action.
@@ -35,7 +41,7 @@ class ManageAttachments_Controller
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
 	 */
-	function ManageAttachments()
+	function action_index()
 	{
 		global $txt, $modSettings, $scripturl, $context, $options;
 
@@ -45,11 +51,19 @@ class ManageAttachments_Controller
 		// Setup the template stuff we'll probably need.
 		loadTemplate('ManageAttachments');
 
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
-			'attachments' => 'action_attachments',
+			'attachments' => array(
+				'init' => '_initAttachSettingsForm',
+				'display' => 'action_attachSettings_display'),
+			'avatars' => array(
+				'file' => 'ManageAvatars.php',
+				'controller' => 'ManageAvatars_Controller',
+				'function' => 'action_index'),
 			'attachpaths' => 'action_attachpaths',
-			'avatars' => array('action_avatars', 'ManageAvatars.php', 'ManageAvatars_Controller'),
 			'browse' => 'action_browse',
 			'byAge' => 'action_byAge',
 			'bySize' => 'action_bySize',
@@ -82,12 +96,24 @@ class ManageAttachments_Controller
 		// Finally fall through to what we are doing.
 		if (is_array($subActions[$context['sub_action']]))
 		{
-			// we have a different controller to call.
+			// we may have a different controller to call.
 			// @todo refactor to call avatars directly.
-			require_once(ADMINDIR . '/' . $subActions[$context['sub_action']][1]);
-			$controller_name = $subActions[$context['sub_action']][2];
-			$controller = new $controller_name();
-			$controller->{$subActions[$context['sub_action']][0]}();
+			if (isset($subActions[$context['sub_action']]['file']))
+			{
+				require_once(ADMINDIR . '/' . $subActions[$context['sub_action']]['file']);
+				$controller_name = $subActions[$context['sub_action']]['controller'];
+				$controller = new $controller_name();
+				$controller->{$subActions[$context['sub_action']]['function']}();
+			}
+			else
+			{
+				// initialize the form
+				$this->{$subActions[$_REQUEST['sa']]['init']}();
+
+				// call the action handler
+				// this is hardcoded now, to be fixed
+				$this->{$subActions[$_REQUEST['sa']]['display']}();
+			}
 		}
 		else
 		{
@@ -103,7 +129,7 @@ class ManageAttachments_Controller
 	 *
 	 * @uses 'attachments' sub template.
 	 */
-	function action_attachments()
+	function action_attachSettings_display()
 	{
 		global $modSettings, $scripturl, $context, $options;
 
@@ -124,7 +150,7 @@ class ManageAttachments_Controller
 			else
 				$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_attachSettingsForm->settings();
 
 		$context['settings_post_javascript'] = '
 	var storing_type = document.getElementById(\'automanage_attachments\');
@@ -136,7 +162,7 @@ class ManageAttachments_Controller
 	base_dir.addEventListener("change", toggleSubDir, false);
 	toggleSubDir();';
 
-		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.php');
@@ -208,8 +234,115 @@ class ManageAttachments_Controller
 	}
 
 	/**
+	 * Initialize attachmentForm.
+	 * Retrieve and return the administration settings for attachments.
+	 */
+	function _initAttachSettingsForm()
+	{
+		global $modSettings, $txt;
+
+		// instantiate the form
+		$this->_attachSettingsForm = new Settings_Form();
+
+		// initialize settings
+
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		// Get the current attachment directory.
+		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
+
+		// First time here?
+		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1)
+			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
+
+		// If not set, show a default path for the base directory
+		if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
+			if (is_dir($modSettings['attachmentUploadDir'][1]))
+				$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];
+			else
+				$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
+
+		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
+
+		if (!empty($modSettings['automanage_attachments']))
+			$context['valid_basedirectory'] =  !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+		else
+			$context['valid_basedirectory'] = true;
+
+		// A bit of razzle dazzle with the $txt strings. :)
+		$txt['attachment_path'] = $context['attachmentUploadDir'];
+		$txt['basedirectory_for_attachments_path']= isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
+		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
+		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
+		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
+		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
+
+		// Perform a test to see if the GD module or ImageMagick are installed.
+		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
+
+		// See if we can find if the server is set up to support the attacment limits
+		$post_max_size = ini_get('post_max_size');
+		$upload_max_filesize = ini_get('upload_max_filesize');
+		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
+		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
+
+		$config_vars = array(
+			array('title', 'attachment_manager_settings'),
+				// Are attachments enabled?
+				array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
+			'',
+				// Extension checks etc.
+				array('check', 'attachmentRecodeLineEndings'),
+			'',
+				// Directory and size limits.
+				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
+				array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
+				(empty($modSettings['attachment_basedirectories']) ? array('text', 'basedirectory_for_attachments', 40,) : array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory']) ? $txt['basedirectory_for_attachments_current'] : $txt['basedirectory_for_attachments_warning']))),
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1	? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']) : array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir']) ? $txt['attach_current_dir'] : $txt['attach_current_dir_warning'])),
+				array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+			'',
+				// Posting limits
+				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+				// Security Items
+			array('title', 'attachment_security_settings'),
+				// Extension checks etc.
+				array('check', 'attachmentCheckExtensions'),
+				array('text', 'attachmentExtensions', 40),
+			'',
+				// Image checks.
+				array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
+				array('check', 'attachment_image_reencode'),
+			'',
+				array('warning', 'attachment_image_paranoid_warning'),
+				array('check', 'attachment_image_paranoid'),
+				// Thumbnail settings.
+			array('title', 'attachment_thumbnail_settings'),
+				array('check', 'attachmentShowImages'),
+				array('check', 'attachmentThumbnails'),
+				array('check', 'attachment_thumb_png'),
+				array('check', 'attachment_thumb_memory', 'subtext' => $txt['attachment_thumb_memory_note1'], 'postinput' => $txt['attachment_thumb_memory_note2']),
+				array('warning', 'attachment_thumb_memory_note'),
+				array('text', 'attachmentThumbWidth', 6),
+				array('text', 'attachmentThumbHeight', 6),
+			'',
+				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+		);
+
+		return $this->_attachSettingsForm->settings($config_vars);
+	}
+
+	/**
 	 * Retrieve and return the administration settings
 	 *  for attachments.
+	 *  @deprecated
 	 */
 	function settings()
 	{

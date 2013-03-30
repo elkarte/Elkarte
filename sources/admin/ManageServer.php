@@ -186,6 +186,7 @@ class ManageServer_Controller
 			$this->{$subActions[$_REQUEST['sa']]['init']}();
 
 			// call the action handler
+			// this is hardcoded now, to be fixed
 			$this->{$subActions[$_REQUEST['sa']]['display']}();
 		}
 		else
@@ -427,10 +428,7 @@ class ManageServer_Controller
 		// lets accept this for now :P
 		$config_vars = $this->_generalSettingsForm->settings();
 
-		call_integration_hook('integrate_general_settings', array(&$config_vars));
-
-		// update...
-		$this->_generalSettingsForm->settings($config_vars);
+		call_integration_hook('integrate_general_settings');
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
@@ -468,10 +466,7 @@ class ManageServer_Controller
 
 		$config_vars = $this->_databaseSettingsForm->settings();
 
-		call_integration_hook('integrate_database_settings', array(&$config_vars));
-
-		// update...
-		$this->_databaseSettingsForm->settings($config_vars);
+		call_integration_hook('integrate_database_settings');
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
@@ -502,10 +497,7 @@ class ManageServer_Controller
 
 		$config_vars = $this->_cookieSettingsForm->settings();
 
-		call_integration_hook('integrate_cookie_settings', array(&$config_vars));
-
-		// update...
-		$this->_cookieSettingsForm->settings($config_vars);
+		call_integration_hook('integrate_cookie_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
@@ -561,10 +553,7 @@ class ManageServer_Controller
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();';
 
-		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
-
-		// update...
-		$this->_cacheSettingsForm->settings($config_vars);
+		call_integration_hook('integrate_modify_cache_settings');
 
 		// Saving again?
 		if (isset($_GET['save']))
@@ -607,10 +596,7 @@ class ManageServer_Controller
 
 		$config_vars = $this->_balancingSettingsForm->settings();
 
-		call_integration_hook('integrate_loadavg_settings', array(&$config_vars));
-
-		// update...
-		$this->_balancingSettingsForm->settings($config_vars);
+		call_integration_hook('integrate_loadavg_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
 		$context['settings_title'] = $txt['load_balancing_settings'];
@@ -640,6 +626,39 @@ class ManageServer_Controller
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
 		$this->_balancingSettingsForm->prepare_db();
+	}
+
+	/**
+	 * Handles the submission of new/changed load balancing settings.
+	 * Uses the _balancingSettings form.
+	 */
+	function action_balancingSettings_save()
+	{
+		global $txt, $scripturl, $context, $settings, $modSettings;
+
+		$config_vars = $this->_balancingSettingsForm->settings();
+
+		// Double-check ourselves, we are about to save
+		if (isset($_GET['save']))
+		{
+			// Stupidity is not allowed.
+			foreach ($_POST as $key => $value)
+			{
+				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
+					continue;
+				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
+					$_POST['loadavg_auto_opt'] = '1.0';
+				elseif ($key == 'loadavg_forum' && $value < 10)
+					$_POST['loadavg_forum'] = '10.0';
+				elseif ($value < 2)
+					$_POST[$key] = '2.0';
+			}
+
+			call_integration_hook('integrate_save_loadavg_settings');
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
+		}
 	}
 
 	/**
