@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 class Packages_Controller
 {
-	function Packages()
+	function action_index()
 	{
 		global $txt, $scripturl, $context;
 
@@ -51,20 +51,20 @@ class Packages_Controller
 
 		// Delegation makes the world... that is, the package manager go 'round.
 		$subActions = array(
-			'browse' => 'PackageBrowse',
-			'remove' => 'PackageRemove',
-			'list' => 'PackageList',
-			'ftptest' => 'PackageFTPTest',
-			'install' => 'PackageInstallTest',
-			'install2' => 'PackageInstall',
-			'uninstall' => 'PackageInstallTest',
-			'uninstall2' => 'PackageInstall',
-			'installed' => 'PackageBrowse',
-			'options' => 'PackageOptions',
-			'perms' => 'PackagePermissions',
-			'flush' => 'FlushInstall',
-			'examine' => 'ExamineFile',
-			'showoperations' => 'ViewOperations',
+			'browse' => 'action_browse',
+			'remove' => 'action_remove',
+			'list' => 'action_list',
+			'ftptest' => 'action_ftptest',
+			'install' => 'action_installtest',
+			'install2' => 'action_install2',
+			'uninstall' => 'action_installtest',
+			'uninstall2' => 'action_install2',
+			'installed' => 'action_browse',
+			'options' => 'action_options',
+			'perms' => 'action_perms',
+			'flush' => 'action_flush',
+			'examine' => 'action_examine',
+			'showoperations' => 'action_showoperations',
 		);
 
 		// Work out exactly who it is we are calling.
@@ -103,7 +103,7 @@ class Packages_Controller
 	/**
 	 * Test install a package.
 	 */
-	function PackageInstallTest()
+	function action_installtest()
 	{
 		global $txt, $context, $scripturl, $modSettings, $smcFunc, $settings;
 
@@ -769,7 +769,7 @@ class Packages_Controller
 	/**
 	 * Apply another type of (avatar, language, etc.) package.
 	 */
-	function PackageInstall()
+	function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
 		global $user_info, $smcFunc;
@@ -1219,7 +1219,7 @@ class Packages_Controller
 	/**
 	 * List the files in a package.
 	 */
-	function PackageList()
+	function action_list()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1249,7 +1249,7 @@ class Packages_Controller
 	/**
 	 * Display one of the files in a package.
 	 */
-	function ExamineFile()
+	function action_examine()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1309,6 +1309,8 @@ class Packages_Controller
 	{
 		global $txt, $scripturl, $context;
 
+		// @todo this isn't used, why
+
 		$context['page_title'] .= ' - ' . $txt['installed_packages'];
 		$context['sub_template'] = 'view_installed';
 
@@ -1319,7 +1321,7 @@ class Packages_Controller
 	/**
 	 * Empty out the installed list.
 	 */
-	function FlushInstall()
+	function action_flush()
 	{
 		global $smcFunc;
 
@@ -1346,7 +1348,7 @@ class Packages_Controller
 	/**
 	 * Delete a package.
 	 */
-	function PackageRemove()
+	function action_remove()
 	{
 		global $scripturl;
 
@@ -1378,7 +1380,7 @@ class Packages_Controller
 	/**
 	 * Browse a list of installed packages.
 	 */
-	function PackageBrowse()
+	function action_browse()
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
@@ -1523,7 +1525,7 @@ class Packages_Controller
 	/**
 	 * Test an FTP connection.
 	 */
-	function PackageFTPTest()
+	function action_ftptest()
 	{
 		global $context, $txt, $package_ftp;
 
@@ -1556,7 +1558,7 @@ class Packages_Controller
 	/**
 	 * Used when a temp FTP access is needed to package functions
 	 */
-	function PackageOptions()
+	function action_options()
 	{
 		global $txt, $scripturl, $context, $modSettings, $smcFunc;
 
@@ -1593,7 +1595,7 @@ class Packages_Controller
 	/**
 	 * List operations
 	 */
-	function ViewOperations()
+	function action_showoperations()
 	{
 		global $context, $txt, $smcFunc, $modSettings;
 
@@ -1680,7 +1682,7 @@ class Packages_Controller
 	/**
 	 * Allow the admin to reset permissions on files.
 	 */
-	function PackagePermissions()
+	function action_perms()
 	{
 		global $context, $txt, $modSettings, $smcFunc, $package_ftp;
 
@@ -1917,7 +1919,7 @@ class Packages_Controller
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($_POST['action_changes']))
-			return PackagePermissionsAction();
+			return action_perms_save();
 
 		$context['look_for'] = array();
 		// Are we looking for a particular tree - normally an expansion?
@@ -1993,7 +1995,7 @@ class Packages_Controller
 	/**
 	 * Actually action the permission changes they want.
 	 */
-	function PackagePermissionsAction()
+	function action_perms_save()
 	{
 		global $context, $txt, $time_start, $package_ftp;
 
@@ -2087,7 +2089,7 @@ class Packages_Controller
 
 				// See if we're out of time?
 				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-					pausePackagePermissionsAction();
+					pausePermsSave();
 			}
 		}
 		// If predefined this is a little different.
@@ -2207,7 +2209,7 @@ class Packages_Controller
 				if ($dont_chmod)
 				{
 					$context['total_files'] = $file_count;
-					pausePackagePermissionsAction();
+					pausePermsSave();
 				}
 
 				// Do the actual directory.
@@ -2220,7 +2222,7 @@ class Packages_Controller
 
 				// See if we're out of time?
 				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-					pausePackagePermissionsAction();
+					pausePermsSave();
 			}
 		}
 
@@ -2681,10 +2683,10 @@ function fetchPerms__recursive($path, &$data, $level)
 
 /**
  * Function called to briefly pause execution of directory/file chmod actions
- * Called by PackagePermissionsAction().
+ * Called by action_perms_save().
  *
  */
-function pausePackagePermissionsAction()
+function pausePermsSave()
 {
 	global $context, $txt;
 

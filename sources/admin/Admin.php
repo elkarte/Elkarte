@@ -49,13 +49,15 @@ function AdminMain()
 			'areas' => array(
 				'index' => array(
 					'label' => $txt['admin_center'],
-					'function' => 'AdminHome',
+					'controller' => 'Admin_Controller',
+					'function' => 'action_home',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_administration',
 				),
 				'credits' => array(
 					'label' => $txt['support_credits_title'],
-					'function' => 'AdminHome',
+					'controller' => 'Admin_Controller',
+					'function' => 'action_credits',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_support',
 				),
@@ -77,7 +79,7 @@ function AdminMain()
 					'label' => $txt['package'],
 					'file' => 'Packages.php',
 					'controller' => 'Packages_Controller',
-					'function' => 'Packages',
+					'function' => 'action_index',
 					'permission' => array('admin_forum'),
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_packages',
@@ -90,7 +92,8 @@ function AdminMain()
 					),
 				),
 				'search' => array(
-					'function' => 'AdminSearch',
+					'controller' => 'Admin_Controller',
+					'function' => 'action_search',
 					'permission' => array('admin_forum'),
 					'select' => 'index'
 				),
@@ -565,60 +568,67 @@ function AdminMain()
 }
 
 /**
- * The main administration section.
- * It prepares all the data necessary for the administration front page.
- * It uses the Admin template along with the admin sub template.
- * It requires the moderate_forum, manage_membergroups, manage_bans,
- *  admin_forum, manage_permissions, manage_attachments, manage_smileys,
- *  manage_boards, edit_news, or send_mail permission.
- *  It uses the index administrative area.
- *  It can be found by going to ?action=admin.
-*/
-function AdminHome()
+ * Admin controller class.
+ * This class handles the first general admin screen: home,
+ * also admin search actions and end admin session.
+ */
+class Admin_Controller
 {
-	global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
-
-	// You have to be able to do at least one of the below to see this page.
-	isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
-
-	// Find all of this forum's administrators...
-	require_once(SUBSDIR . '/Membergroups.subs.php');
-	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
+	/**
+	 * The main administration section.
+	 * It prepares all the data necessary for the administration front page.
+	 * It uses the Admin template along with the admin sub template.
+	 * It requires the moderate_forum, manage_membergroups, manage_bans,
+	 *  admin_forum, manage_permissions, manage_attachments, manage_smileys,
+	 *  manage_boards, edit_news, or send_mail permission.
+	 *  It uses the index administrative area.
+	 *
+	 *  It can be found by going to ?action=admin.
+	*/
+	function action_home()
 	{
-		// Add a 'more'-link if there are more than 32.
-		$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
-	}
+		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
 
-	// Load the credits stuff.
-	require_once(CONTROLLERDIR . '/Who.controller.php');
-	action_credits(true);
+		// You have to be able to do at least one of the below to see this page.
+		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
-	// This makes it easier to get the latest news with your time format.
-	$context['time_format'] = urlencode($user_info['time_format']);
-	$context['forum_version'] = $forum_version;
+		// Find all of this forum's administrators...
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
+		{
+			// Add a 'more'-link if there are more than 32.
+			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
+		}
 
-	// Get a list of current server versions.
-	require_once(SUBSDIR . '/Admin.subs.php');
-	$checkFor = array(
-		'gd',
-		'imagick',
-		'db_server',
-		'mmcache',
-		'eaccelerator',
-		'phpa',
-		'apc',
-		'memcache',
-		'xcache',
-		'php',
-		'server',
-	);
-	$context['current_versions'] = getServerVersions($checkFor);
+		// Load the credits stuff.
+		require_once(CONTROLLERDIR . '/Who.controller.php');
+		action_credits(true);
 
-	$context['can_admin'] = allowedTo('admin_forum');
+		// This makes it easier to get the latest news with your time format.
+		$context['time_format'] = urlencode($user_info['time_format']);
+		$context['forum_version'] = $forum_version;
 
-	$context['sub_template'] = $context['admin_area'] == 'credits' ? 'credits' : 'admin';
-	$context['page_title'] = $context['admin_area'] == 'credits' ? $txt['support_credits_title'] : $txt['admin_center'];
-	if ($context['admin_area'] != 'credits')
+		// Get a list of current server versions.
+		require_once(SUBSDIR . '/Admin.subs.php');
+		$checkFor = array(
+			'gd',
+			'imagick',
+			'db_server',
+			'mmcache',
+			'eaccelerator',
+			'phpa',
+			'apc',
+			'memcache',
+			'xcache',
+			'php',
+			'server',
+		);
+		$context['current_versions'] = getServerVersions($checkFor);
+
+		$context['can_admin'] = allowedTo('admin_forum');
+
+		$context['sub_template'] = 'admin';
+		$context['page_title'] = $txt['admin_center'];
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['admin_center'],
 			'help' => '',
@@ -627,346 +637,456 @@ function AdminHome()
 				' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
 		);
 
+		// The format of this array is: permission, action, title, description, icon.
+		$quick_admin_tasks = array(
+			array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
+			array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
+			array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
+			array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
+			array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
+			array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
+			array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
+			array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
+		);
 
-	// The format of this array is: permission, action, title, description, icon.
-	$quick_admin_tasks = array(
-		array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
-		array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
-		array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
-		array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
-		array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
-		array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
-		array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
-		array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
-	);
+		$context['quick_admin_tasks'] = array();
+		foreach ($quick_admin_tasks as $task)
+		{
+			if (!empty($task[0]) && !allowedTo($task[0]))
+				continue;
 
-	$context['quick_admin_tasks'] = array();
-	foreach ($quick_admin_tasks as $task)
-	{
-		if (!empty($task[0]) && !allowedTo($task[0]))
-			continue;
+			$context['quick_admin_tasks'][] = array(
+				'href' => $scripturl . '?action=admin;area=' . $task[1],
+				'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
+				'title' => $txt[$task[2]],
+				'description' => $txt[$task[3]],
+				'icon' => $task[4],
+				'is_last' => false
+			);
+		}
 
-		$context['quick_admin_tasks'][] = array(
-			'href' => $scripturl . '?action=admin;area=' . $task[1],
-			'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
-			'title' => $txt[$task[2]],
-			'description' => $txt[$task[3]],
-			'icon' => $task[4],
-			'is_last' => false
+		if (count($context['quick_admin_tasks']) % 2 == 1)
+		{
+			$context['quick_admin_tasks'][] = array(
+				'href' => '',
+				'link' => '',
+				'title' => '',
+				'description' => '',
+				'is_last' => true
+			);
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
+		}
+		elseif (count($context['quick_admin_tasks']) != 0)
+		{
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 1]['is_last'] = true;
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
+		}
+
+		// Lastly, fill in the blanks in the support resources paragraphs.
+		$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
+			'https://github.com/elkarte/Elkarte/wiki',
+			'https://github.com/elkarte/Elkarte/wiki/features',
+			'https://github.com/elkarte/Elkarte/wiki/options',
+			'https://github.com/elkarte/Elkarte/wiki/themes',
+			'https://github.com/elkarte/Elkarte/wiki/packages'
+		);
+		$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
+			'http://www.elkarte.net/',
+			'http://www.elkarte.net/redirect/support',
+			'http://www.elkarte.net/redirect/customize_support'
 		);
 	}
 
-	if (count($context['quick_admin_tasks']) % 2 == 1)
-	{
-		$context['quick_admin_tasks'][] = array(
-			'href' => '',
-			'link' => '',
-			'title' => '',
-			'description' => '',
-			'is_last' => true
-		);
-		$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-	}
-	elseif (count($context['quick_admin_tasks']) != 0)
-	{
-		$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 1]['is_last'] = true;
-		$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-	}
-
-	// Lastly, fill in the blanks in the support resources paragraphs.
-	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-		'https://github.com/elkarte/Elkarte/wiki',
-		'https://github.com/elkarte/Elkarte/wiki/features',
-		'https://github.com/elkarte/Elkarte/wiki/options',
-		'https://github.com/elkarte/Elkarte/wiki/themes',
-		'https://github.com/elkarte/Elkarte/wiki/packages'
-	);
-	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-		'http://www.elkarte.net/',
-		'http://www.elkarte.net/redirect/support',
-		'http://www.elkarte.net/redirect/customize_support'
-	);
-}
-
-/**
- * This function allocates out all the search stuff.
- */
-function AdminSearch()
-{
-	global $txt, $context, $smcFunc;
-
-	isAllowedTo('admin_forum');
-
-	// What can we search for?
-	$subactions = array(
-		'internal' => 'AdminSearchInternal',
-		'online' => 'AdminSearchOM',
-		'member' => 'AdminSearchMember',
-	);
-
-	$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subactions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
-	$context['search_term'] = isset($_REQUEST['search_term']) ? $smcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
-
-	$context['sub_template'] = 'admin_search_results';
-	$context['page_title'] = $txt['admin_search_results'];
-
-	// Keep track of what the admin wants.
-	if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $context['search_type'])
-	{
-		$context['admin_preferences']['sb'] = $context['search_type'];
-
-		// Update the preferences.
-		require_once(SUBSDIR . '/Admin.subs.php');
-		updateAdminPreferences();
-	}
-
-	if (trim($context['search_term']) == '')
-		$context['search_results'] = array();
-	else
-		$subactions[$context['search_type']]();
-}
-
-/**
- * A complicated but relatively quick internal search.
- */
-function AdminSearchInternal()
-{
-	global $context, $txt, $helptxt, $scripturl;
-
-	// Try to get some more memory.
-	setMemoryLimit('128M');
-
-	// Load a lot of language files.
-	$language_files = array(
-		'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
-		'Login', 'ManageSmileys',
-	);
-
-	// All the files we need to include.
-	$include_files = array(
-		'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
-		'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-		'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog'
-	);
-
-	// This is a special array of functions that contain setting data
-	// - we query all these to simply pull all setting bits!
-	$settings_search = array(
-		array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-		array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
-		array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
-		array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
-		array('ModifySignatureSettings', 'area=featuresettings;sa=sig'),
-		array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general'),
-		array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
-		array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
-		array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
-		array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
-		array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
-		array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-		array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-		array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
-		array('settings', 'area=news;sa=settings', 'ManageNews_Controller'),
-		array('settings', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
-		array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
-		array('settings', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
-		array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
-		array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
-		array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-		array('_initGeneralSettingsForm', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-		array('_initDatabaseSettingsForm', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-		array('_initCookieSettingsForm', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-		array('_initCacheSettingsForm', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-		array('_initLanguageSettingsForm', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
-		array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
-		array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
-		array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
-		array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
-	);
-
-	call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
-
-	loadLanguage(implode('+', $language_files));
-
-	foreach ($include_files as $file)
-		require_once(ADMINDIR . '/' . $file . '.php');
-
-	/* This is the huge array that defines everything... it's a huge array of items formatted as follows:
-		0 = Language index (Can be array of indexes) to search through for this setting.
-		1 = URL for this indexes page.
-		2 = Help index for help associated with this item (If different from 0)
+	/**
+	 * The credits section in admin panel.
+	 *
+	 *  Accessed by ?action=admin;area=credits
 	*/
-
-	$search_data = array(
-		// All the major sections of the forum.
-		'sections' => array(
-		),
-		'settings' => array(
-			array('COPPA', 'area=regcenter;sa=settings'),
-			array('CAPTCHA', 'area=securitysettings;sa=spam'),
-		),
-	);
-
-	// Go through the admin menu structure trying to find suitably named areas!
-	foreach ($context[$context['admin_menu_name']]['sections'] as $section)
+	function action_credits()
 	{
-		foreach ($section['areas'] as $menu_key => $menu_item)
+		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+
+		// You have to be able to do at least one of the below to see this page.
+		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
+
+		// Find all of this forum's administrators...
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
-			$search_data['sections'][] = array($menu_item['label'], 'area=' . $menu_key);
-			if (!empty($menu_item['subsections']))
-				foreach ($menu_item['subsections'] as $key => $sublabel)
-				{
-					if (isset($sublabel['label']))
-						$search_data['sections'][] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
-				}
+			// Add a 'more'-link if there are more than 32.
+			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
 		}
+
+		// Load the credits stuff.
+		require_once(CONTROLLERDIR . '/Who.controller.php');
+		action_credits(true);
+
+		// This makes it easier to get the latest news with your time format.
+		$context['time_format'] = urlencode($user_info['time_format']);
+		$context['forum_version'] = $forum_version;
+
+		// Get a list of current server versions.
+		require_once(SUBSDIR . '/Admin.subs.php');
+		$checkFor = array(
+			'gd',
+			'imagick',
+			'db_server',
+			'mmcache',
+			'eaccelerator',
+			'phpa',
+			'apc',
+			'memcache',
+			'xcache',
+			'php',
+			'server',
+		);
+		$context['current_versions'] = getServerVersions($checkFor);
+
+		$context['can_admin'] = allowedTo('admin_forum');
+
+		$context['sub_template'] = 'credits';
+		$context['page_title'] = $txt['support_credits_title'];
+
+		// The format of this array is: permission, action, title, description, icon.
+		$quick_admin_tasks = array(
+			array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
+			array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
+			array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
+			array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
+			array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
+			array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
+			array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
+			array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
+		);
+
+		$context['quick_admin_tasks'] = array();
+		foreach ($quick_admin_tasks as $task)
+		{
+			if (!empty($task[0]) && !allowedTo($task[0]))
+				continue;
+
+			$context['quick_admin_tasks'][] = array(
+				'href' => $scripturl . '?action=admin;area=' . $task[1],
+				'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
+				'title' => $txt[$task[2]],
+				'description' => $txt[$task[3]],
+				'icon' => $task[4],
+				'is_last' => false
+			);
+		}
+
+		if (count($context['quick_admin_tasks']) % 2 == 1)
+		{
+			$context['quick_admin_tasks'][] = array(
+				'href' => '',
+				'link' => '',
+				'title' => '',
+				'description' => '',
+				'is_last' => true
+			);
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
+		}
+		elseif (count($context['quick_admin_tasks']) != 0)
+		{
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 1]['is_last'] = true;
+			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
+		}
+
+		// Lastly, fill in the blanks in the support resources paragraphs.
+		$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
+			'https://github.com/elkarte/Elkarte/wiki',
+			'https://github.com/elkarte/Elkarte/wiki/features',
+			'https://github.com/elkarte/Elkarte/wiki/options',
+			'https://github.com/elkarte/Elkarte/wiki/themes',
+			'https://github.com/elkarte/Elkarte/wiki/packages'
+		);
+		$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
+			'http://www.elkarte.net/',
+			'http://www.elkarte.net/redirect/support',
+			'http://www.elkarte.net/redirect/customize_support'
+		);
 	}
 
-	foreach ($settings_search as $setting_area)
+	/**
+	 * This function allocates out all the search stuff.
+	 */
+	function action_search()
 	{
-		// Get a list of their variables.
-		if (isset($setting_area[2]))
+		global $txt, $context, $smcFunc;
+
+		isAllowedTo('admin_forum');
+
+		// What can we search for?
+		$subactions = array(
+			'internal' => 'action_search_internal',
+			'online' => 'action_search_doc',
+			'member' => 'action_search_member',
+		);
+
+		$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subactions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
+		$context['search_term'] = isset($_REQUEST['search_term']) ? $smcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
+
+		$context['sub_template'] = 'admin_search_results';
+		$context['page_title'] = $txt['admin_search_results'];
+
+		// Keep track of what the admin wants.
+		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $context['search_type'])
 		{
-			// an OOP controller: get the settings from the settings method.
-			$controller = new $setting_area[2]();
-			$config_vars = $controller->{$setting_area[0]}();
+			$context['admin_preferences']['sb'] = $context['search_type'];
+
+			// Update the preferences.
+			require_once(SUBSDIR . '/Admin.subs.php');
+			updateAdminPreferences();
 		}
+
+		if (trim($context['search_term']) == '')
+			$context['search_results'] = array();
 		else
-		{
-			// a good ole' procedural controller: get the settings from the function.
-			$config_vars = $setting_area[0](true);
-		}
-
-		foreach ($config_vars as $var)
-			if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch')))
-				$search_data['settings'][] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
+			$this->{$subactions[$context['search_type']]}();
 	}
 
-	$context['page_title'] = $txt['admin_search_results'];
-	$context['search_results'] = array();
-
-	$search_term = strtolower(un_htmlspecialchars($context['search_term']));
-	// Go through all the search data trying to find this text!
-	foreach ($search_data as $section => $data)
+	/**
+	 * A complicated but relatively quick internal search.
+	 */
+	function action_search_internal()
 	{
-		foreach ($data as $item)
+		global $context, $txt, $helptxt, $scripturl;
+
+		// Try to get some more memory.
+		setMemoryLimit('128M');
+
+		// Load a lot of language files.
+		$language_files = array(
+			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Login', 'ManageSmileys',
+		);
+
+		// All the files we need to include.
+		$include_files = array(
+			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
+			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
+			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog'
+		);
+
+		// This is a special array of functions that contain setting data
+		// - we query all these to simply pull all setting bits!
+		$settings_search = array(
+			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
+			array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
+			array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
+			array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
+			array('ModifySignatureSettings', 'area=featuresettings;sa=sig'),
+			array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general'),
+			array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
+			array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
+			array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
+			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
+			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
+			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
+			array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
+			array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
+			array('settings', 'area=news;sa=settings', 'ManageNews_Controller'),
+			array('settings', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
+			array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
+			array('settings', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
+			array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
+			array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
+			array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
+			array('_initGeneralSettingsForm', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+			array('_initDatabaseSettingsForm', 'area=serversettings;sa=database', 'ManageServer_Controller'),
+			array('_initCookieSettingsForm', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
+			array('_initCacheSettingsForm', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
+			array('_initLanguageSettingsForm', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
+			array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
+			array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
+			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
+			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
+		);
+
+		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
+
+		loadLanguage(implode('+', $language_files));
+
+		foreach ($include_files as $file)
+			require_once(ADMINDIR . '/' . $file . '.php');
+
+		/* This is the huge array that defines everything... it's a huge array of items formatted as follows:
+			0 = Language index (Can be array of indexes) to search through for this setting.
+			1 = URL for this indexes page.
+			2 = Help index for help associated with this item (If different from 0)
+		*/
+
+		$search_data = array(
+			// All the major sections of the forum.
+			'sections' => array(
+			),
+			'settings' => array(
+				array('COPPA', 'area=regcenter;sa=settings'),
+				array('CAPTCHA', 'area=securitysettings;sa=spam'),
+			),
+		);
+
+		// Go through the admin menu structure trying to find suitably named areas!
+		foreach ($context[$context['admin_menu_name']]['sections'] as $section)
 		{
-			$found = false;
-			if (!is_array($item[0]))
-				$item[0] = array($item[0]);
-			foreach ($item[0] as $term)
+			foreach ($section['areas'] as $menu_key => $menu_item)
 			{
-				if (stripos($term, $search_term) !== false || (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false) || (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false))
-				{
-					$found = $term;
-					break;
-				}
+				$search_data['sections'][] = array($menu_item['label'], 'area=' . $menu_key);
+				if (!empty($menu_item['subsections']))
+					foreach ($menu_item['subsections'] as $key => $sublabel)
+					{
+						if (isset($sublabel['label']))
+							$search_data['sections'][] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
+					}
+			}
+		}
+
+		foreach ($settings_search as $setting_area)
+		{
+			// Get a list of their variables.
+			if (isset($setting_area[2]))
+			{
+				// an OOP controller: get the settings from the settings method.
+				$controller = new $setting_area[2]();
+				$config_vars = $controller->{$setting_area[0]}();
+			}
+			else
+			{
+				// a good ole' procedural controller: get the settings from the function.
+				$config_vars = $setting_area[0](true);
 			}
 
-			if ($found)
-			{
-				// Format the name - and remove any descriptions the entry may have.
-				$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
-				$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
+			foreach ($config_vars as $var)
+				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch')))
+					$search_data['settings'][] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
+		}
 
-				$context['search_results'][] = array(
-					'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
-					'name' => $name,
-					'type' => $section,
-					'help' => shorten_subject(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+		$context['page_title'] = $txt['admin_search_results'];
+		$context['search_results'] = array();
+
+		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
+		// Go through all the search data trying to find this text!
+		foreach ($search_data as $section => $data)
+		{
+			foreach ($data as $item)
+			{
+				$found = false;
+				if (!is_array($item[0]))
+					$item[0] = array($item[0]);
+				foreach ($item[0] as $term)
+				{
+					if (stripos($term, $search_term) !== false || (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false) || (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false))
+					{
+						$found = $term;
+						break;
+					}
+				}
+
+				if ($found)
+				{
+					// Format the name - and remove any descriptions the entry may have.
+					$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
+					$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
+
+					$context['search_results'][] = array(
+						'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
+						'name' => $name,
+						'type' => $section,
+						'help' => shorten_subject(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * All this does is pass through to manage members.
+	 */
+	function action_search_member()
+	{
+		global $context;
+
+		require_once(ADMINDIR . '/ManageMembers.php');
+		$_REQUEST['sa'] = 'query';
+
+		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
+		$_POST['types'] = '';
+
+		action_index();
+	}
+
+	/**
+	 * This file allows the user to search the wiki documentation
+	 *  for a little help.
+	 */
+	function action_search_doc()
+	{
+		global $context;
+
+		$context['doc_apiurl'] = 'https://github.com/elkarte/Elkarte/wiki/api.php';
+		$context['doc_scripturl'] = 'https://github.com/elkarte/Elkarte/wiki/';
+
+		// Set all the parameters search might expect.
+		$postVars = explode(' ', $context['search_term']);
+
+		// Encode the search data.
+		foreach ($postVars as $k => $v)
+			$postVars[$k] = urlencode($v);
+
+		// This is what we will send.
+		$postVars = implode('+', $postVars);
+
+		// Get the results from the doc site.
+		require_once(SUBSDIR . '/Package.subs.php');
+		// Demo URL:
+		// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
+		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
+
+		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
+		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) != true)
+			fatal_lang_error('cannot_connect_doc_site');
+
+		$search_results = $matches[1];
+
+		// Otherwise we simply walk through the XML and stick it in context for display.
+		$context['search_results'] = array();
+		require_once(SUBSDIR . '/XmlArray.class.php');
+
+		// Get the results loaded into an array for processing!
+		$results = new Xml_Array($search_results, false);
+
+		// Move through the api layer.
+		if (!$results->exists('api'))
+			fatal_lang_error('cannot_connect_doc_site');
+
+		// Are there actually some results?
+		if ($results->exists('api/query/search/p'))
+		{
+			$relevance = 0;
+			foreach ($results->set('api/query/search/p') as $result)
+			{
+				$context['search_results'][$result->fetch('@title')] = array(
+					'title' => $result->fetch('@title'),
+					'relevance' => $relevance++,
+					'snippet' => str_replace('class=\'searchmatch\'', 'class="highlight"', un_htmlspecialchars($result->fetch('@snippet'))),
 				);
 			}
 		}
 	}
-}
 
-/**
- * All this does is pass through to manage members.
- */
-function AdminSearchMember()
-{
-	global $context;
-
-	require_once(ADMINDIR . '/ManageMembers.php');
-	$_REQUEST['sa'] = 'query';
-
-	$_POST['membername'] = un_htmlspecialchars($context['search_term']);
-	$_POST['types'] = '';
-
-	action_index();
-}
-
-/**
- * This file allows the user to search the wiki documentation
- *  for a little help.
- */
-function AdminSearchOM()
-{
-	global $context;
-
-	$context['doc_apiurl'] = 'https://github.com/elkarte/Elkarte/wiki/api.php';
-	$context['doc_scripturl'] = 'https://github.com/elkarte/Elkarte/wiki/';
-
-	// Set all the parameters search might expect.
-	$postVars = explode(' ', $context['search_term']);
-
-	// Encode the search data.
-	foreach ($postVars as $k => $v)
-		$postVars[$k] = urlencode($v);
-
-	// This is what we will send.
-	$postVars = implode('+', $postVars);
-
-	// Get the results from the doc site.
-	require_once(SUBSDIR . '/Package.subs.php');
-	// Demo URL:
-	// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
-	$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
-
-	// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
-	if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) != true)
-		fatal_lang_error('cannot_connect_doc_site');
-
-	$search_results = $matches[1];
-
-	// Otherwise we simply walk through the XML and stick it in context for display.
-	$context['search_results'] = array();
-	require_once(SUBSDIR . '/XmlArray.class.php');
-
-	// Get the results loaded into an array for processing!
-	$results = new Xml_Array($search_results, false);
-
-	// Move through the api layer.
-	if (!$results->exists('api'))
-		fatal_lang_error('cannot_connect_doc_site');
-
-	// Are there actually some results?
-	if ($results->exists('api/query/search/p'))
+	/**
+	 * This ends a admin session, requiring authentication to access the ACP again.
+	 */
+	function AdminEndSession()
 	{
-		$relevance = 0;
-		foreach ($results->set('api/query/search/p') as $result)
-		{
-			$context['search_results'][$result->fetch('@title')] = array(
-				'title' => $result->fetch('@title'),
-				'relevance' => $relevance++,
-				'snippet' => str_replace('class=\'searchmatch\'', 'class="highlight"', un_htmlspecialchars($result->fetch('@snippet'))),
-			);
-		}
+		// This is so easy!
+		unset($_SESSION['admin_time']);
+
+		// Clean any admin tokens as well.
+		foreach ($_SESSION['token'] as $key => $token)
+			if (strpos($key, '-admin') !== false)
+				unset($_SESSION['token'][$key]);
+
+		redirectexit('action=admin');
 	}
-}
-
-/**
- * This ends a admin session, requiring authentication to access the ACP again.
- */
-function AdminEndSession()
-{
-	// This is so easy!
-	unset($_SESSION['admin_time']);
-
-	// Clean any admin tokens as well.
-	foreach ($_SESSION['token'] as $key => $token)
-		if (strpos($key, '-admin') !== false)
-			unset($_SESSION['token'][$key]);
-
-	redirectexit('action=admin');
 }

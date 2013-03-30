@@ -40,12 +40,12 @@ class PackageServers_Controller
 
 		// Here is a list of all the potentially valid actions.
 		$subActions = array(
-			'servers' => 'action_servers',
-			'add' => 'action_addserver',
-			'browse' => 'action_browseserver',
-			'download' => 'action_downloadpackage',
-			'remove' => 'action_removeserver',
-			'upload' => 'action_uploadpackage',
+			'servers' => 'action_list',
+			'add' => 'action_add',
+			'browse' => 'action_browse',
+			'download' => 'action_download',
+			'remove' => 'action_remove',
+			'upload' => 'action_update',
 		);
 
 		// Now let's decide where we are taking this...
@@ -89,7 +89,7 @@ class PackageServers_Controller
 	/**
 	 * Load a list of package servers.
 	 */
-	function action_servers()
+	function action_list()
 	{
 		global $txt, $scripturl, $context, $modSettings, $smcFunc;
 
@@ -184,7 +184,7 @@ class PackageServers_Controller
 	/**
 	 * Browse a server's list of packages.
 	 */
-	function action_browseserver()
+	function action_browse()
 	{
 		global $txt, $boardurl, $context, $scripturl, $forum_version, $context, $smcFunc;
 
@@ -516,7 +516,7 @@ class PackageServers_Controller
 	/**
 	 * Download a package.
 	 */
-	function action_downloadpackage()
+	function action_download()
 	{
 		global $txt, $scripturl, $context, $smcFunc;
 
@@ -625,7 +625,7 @@ class PackageServers_Controller
 	/**
 	 * Upload a new package to the directory.
 	 */
-	function action_uploadpackage()
+	function action_update()
 	{
 		global $txt, $scripturl, $context;
 
@@ -712,7 +712,7 @@ class PackageServers_Controller
 	/**
 	 * Add a package server to the list.
 	 */
-	function action_addserver()
+	function action_add()
 	{
 		global $smcFunc;
 
@@ -748,7 +748,7 @@ class PackageServers_Controller
 	/**
 	 * Remove a server from the list.
 	 */
-	function action_removeserver()
+	function action_remove()
 	{
 		global $smcFunc;
 
