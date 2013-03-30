@@ -53,40 +53,36 @@ class ManageMaintenance_Controller
 		$subActions = array(
 			'routine' => array(
 				'function' => 'action_routine',
-				'template' => 'maintain_routine',
 				'activities' => array(
-					'version' => 'VersionDetail',
-					'repair' => 'MaintainFindFixErrors',
-					'recount' => 'AdminBoardRecount',
-					'logs' => 'MaintainEmptyUnimportantLogs',
-					'cleancache' => 'MaintainCleanCache',
+					'version' => 'action_version_display',
+					'repair' => 'action_repair_display',
+					'recount' => 'action_recount_display',
+					'logs' => 'action_logs_display',
+					'cleancache' => 'action_cleancache_display',
 				),
 			),
 			'database' => array(
 				'function' => 'action_database',
-				'template' => 'maintain_database',
 				'activities' => array(
-					'optimize' => 'OptimizeTables',
-					'backup' => 'MaintainDownloadBackup',
-					'convertmsgbody' => 'ConvertMsgBody',
+					'optimize' => 'action_optimize_display',
+					'backup' => 'action_backup_display',
+					'convertmsgbody' => 'action_convertmsgbody_display',
 				),
 			),
 			'members' => array(
 				'function' => 'action_members',
-				'template' => 'maintain_members',
 				'activities' => array(
-					'reattribute' => 'MaintainReattributePosts',
-					'purgeinactive' => 'MaintainPurgeInactiveMembers',
-					'recountposts' => 'MaintainRecountPosts',
+					'reattribute' => 'action_reattribute_display',
+					'purgeinactive' => 'action_purgeinactive_display',
+					'recountposts' => 'action_recountposts_display',
 				),
 			),
 			'topics' => array(
 				'function' => 'action_topics',
-				'template' => 'maintain_topics',
 				'activities' => array(
-					'massmove' => 'MaintainMassMoveTopics',
-					'pruneold' => 'MaintainRemoveOldPosts',
-					'olddrafts' => 'MaintainRemoveOldDrafts',
+					'massmove' => 'action_massmove_display',
+					'pruneold' => 'action_pruneold_display',
+					'olddrafts' => 'action_olddrafts_display',
 				),
 			),
 		);
@@ -106,7 +102,6 @@ class ManageMaintenance_Controller
 		// Set a few things.
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
-		$context['sub_template'] = !empty($subActions[$subAction]['template']) ? $subActions[$subAction]['template'] : '';
 
 		// Finally fall through to what we are doing.
 		$this->{$subActions[$subAction]['function']}();
@@ -125,6 +120,9 @@ class ManageMaintenance_Controller
 	function action_database()
 	{
 		global $context, $db_type, $db_character_set, $modSettings, $smcFunc, $txt, $maintenance;
+
+		// set up the sub-template
+		$context['sub_template'] = 'maintain_database';
 
 		if ($db_type == 'mysql')
 		{
@@ -201,6 +199,9 @@ class ManageMaintenance_Controller
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recount')
 			$context['maintenance_finished'] = $txt['maintain_recount'];
+
+		// set up the sub-template
+		$context['sub_template'] = 'maintain_routine';
 	}
 
 	/**
@@ -234,6 +235,9 @@ class ManageMaintenance_Controller
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
+
+		// set up the sub-template
+		$context['sub_template'] = 'maintain_members';
 	}
 
 	/**
@@ -251,12 +255,15 @@ class ManageMaintenance_Controller
 			$context['maintenance_finished'] = $txt['maintain_old'];
 		elseif (isset($_GET['done']) && $_GET['done'] == 'massmove')
 			$context['maintenance_finished'] = $txt['move_topics_maintenance'];
+
+		// set up the sub-template
+		$context['sub_template'] = 'maintain_topics';
 	}
 
 	/**
 	 * Find and fix all errors on the forum.
 	 */
-	function MaintainFindFixErrors()
+	function action_repair_display()
 	{
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
@@ -270,7 +277,7 @@ class ManageMaintenance_Controller
 	 * Wipes the current cache entries as best it can.
 	 * This only applies to our own cache entries, opcache and data
 	 */
-	function MaintainCleanCache()
+	function action_cleancache_display()
 	{
 		global $context, $txt;
 
@@ -286,7 +293,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Empties all uninmportant logs
 	 */
-	function MaintainEmptyUnimportantLogs()
+	function action_logs_display()
 	{
 		global $context, $smcFunc, $txt;
 
@@ -338,7 +345,7 @@ class ManageMaintenance_Controller
 	 *
 	 * @uses the convert_msgbody sub template of the Admin template.
 	 */
-	function ConvertMsgBody()
+	function action_convertmsgbody_display()
 	{
 		global $scripturl, $context, $txt, $language, $db_character_set, $db_type;
 		global $modSettings, $user_info, $smcFunc, $db_prefix, $time_start;
@@ -479,7 +486,7 @@ class ManageMaintenance_Controller
 
 	 * @uses the rawdata sub template (built in.)
 	 */
-	function OptimizeTables()
+	function action_optimize_display()
 	{
 		global $db_type, $db_name, $db_prefix, $txt, $context, $scripturl, $smcFunc;
 
@@ -554,7 +561,7 @@ class ManageMaintenance_Controller
 	 * The function redirects back to ?action=admin;area=maintain when complete.
 	 * It is accessed via ?action=admin;area=maintain;sa=database;activity=recount.
 	 */
-	function AdminBoardRecount()
+	function action_recount_display()
 	{
 		global $txt, $context, $scripturl, $modSettings;
 		global $time_start, $smcFunc;
@@ -1077,7 +1084,7 @@ class ManageMaintenance_Controller
 	 * Accessed through ?action=admin;area=maintain;sa=routine;activity=version.
 	 * @uses Admin template, view_versions sub-template.
 	 */
-	function VersionDetail()
+	function action_version_display()
 	{
 		global $forum_version, $txt, $context;
 
@@ -1115,7 +1122,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Re-attribute posts.
 	 */
-	function MaintainReattributePosts()
+	function action_reattribute_display()
 	{
 		global $context, $txt;
 
@@ -1144,7 +1151,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Handling function for the backup stuff.
 	 */
-	function MaintainDownloadBackup()
+	function action_backup_display()
 	{
 		validateToken('admin-maint');
 
@@ -1156,7 +1163,7 @@ class ManageMaintenance_Controller
 	 * Removing old members. Done and out!
 	 * @todo refactor
 	 */
-	function MaintainPurgeInactiveMembers()
+	function action_purgeinactive_display()
 	{
 		global $context, $smcFunc, $txt;
 
@@ -1242,7 +1249,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Removing old posts doesn't take much as we really pass through.
 	 */
-	function MaintainRemoveOldPosts()
+	function action_pruneold_display()
 	{
 		global $context, $txt;
 
@@ -1256,7 +1263,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Removing old drafts
 	 */
-	function MaintainRemoveOldDrafts()
+	function action_olddrafts_display()
 	{
 		global $smcFunc;
 
@@ -1291,7 +1298,7 @@ class ManageMaintenance_Controller
 	 *
 	 * @uses not_done template to pause the process.
 	 */
-	function MaintainMassMoveTopics()
+	function action_massmove_display()
 	{
 		global $smcFunc, $context, $txt;
 
@@ -1409,7 +1416,7 @@ class ManageMaintenance_Controller
 	 * The function redirects back to action=admin;area=maintain;sa=members when complete.
 	 * It is accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
 	 */
-	function MaintainRecountPosts()
+	function action_recountposts_display()
 	{
 		global $txt, $context, $modSettings, $smcFunc;
 
