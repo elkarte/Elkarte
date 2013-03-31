@@ -122,8 +122,9 @@ function AdminMain()
 				),
 				'featuresettings' => array(
 					'label' => $txt['modSettings_title'],
-					'file' => 'ManageSettings.php',
-					'function' => 'ModifyFeatureSettings',
+					'file' => 'ManageFeatures.php',
+					'controller' => 'ManageFeatures_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_features',
 					'subsections' => array(
@@ -876,10 +877,10 @@ class Admin_Controller
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
 			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-			array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
-			array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
-			array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
-			array('ModifySignatureSettings', 'area=featuresettings;sa=sig'),
+			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic'),
+			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout'),
+			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma'),
+			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig'),
 			array('_initSecuritySettingsForm', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('_initSpamSettingsForm', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
 			array('_initModerationSettingsForm', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
