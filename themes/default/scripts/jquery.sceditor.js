@@ -1,15 +1,16 @@
+/*! SCEditor | (C) 2011-2013, Sam Clarke | sceditor.com/license */
 /**
  * SCEditor
- * http://www.samclarke.com/2011/07/sceditor/
+ * http://www.sceditor.com/
  *
- * Copyright (C) 2011-2012, Sam Clarke (samclarke.com)
+ * Copyright (C) 2011-2013, Sam Clarke (samclarke.com)
  *
  * SCEditor is licensed under the MIT license:
  *	http://www.opensource.org/licenses/mit-license.php
  *
  * @fileoverview SCEditor - A lightweight WYSIWYG BBCode and HTML editor
  * @author Sam Clarke
- * @version 1.4.1
+ * @version 1.4.2
  * @requires jQuery
  */
 
@@ -19,6 +20,7 @@
 // ==/ClosureCompiler==
 
 /*jshint smarttabs: true, scripturl: true, jquery: true, devel:true, eqnull:true, curly: false */
+/*global Range: true*/
 
 ;(function ($, window, document) {
 	'use strict';
@@ -274,7 +276,8 @@
 			appendNewLine,
 			checkSelectionChanged,
 			checkNodeChanged,
-			autofocus;
+			autofocus,
+			emoticonsKeyPress;
 
 		/**
 		 * All the commands supported by the editor
@@ -283,6 +286,13 @@
 		 */
 		base.commands = $.extend(true, {}, (options.commands || $.sceditor.commands));
 
+		/**
+		 * Options for this editor instance
+		 * @name opts
+		 * @memberOf jQuery.sceditor.prototype
+		 */
+		base.opts = options = $.extend({}, $.sceditor.defaultOptions, options);
+
 
 		/**
 		 * Creates the editor iframe and textarea
@@ -290,62 +300,67 @@
 		 */
 		init = function () {
 			$original.data("sceditor", base);
-			base.opts = $.extend({}, $.sceditor.defaultOptions, options);
+
+			// Clone any objects in options
+			$.each(options, function(key, val) {
+				if($.isPlainObject(val))
+					options[key] = $.extend(true, {}, val);
+			});
 
 			// Load locale
-			if(base.opts.locale && base.opts.locale !== "en")
+			if(options.locale && options.locale !== "en")
 				initLocale();
 
-			$editorContainer = $('<div class="sceditor-container" />').insertAfter($original);
-
-			if(base.opts.zIndex !== null)
-				$editorContainer.css('z-index', base.opts.zIndex);
+			$editorContainer = $('<div class="sceditor-container" />')
+				.insertAfter($original)
+				.css('z-index', options.zIndex);
 
 			// Add IE version to the container to allow IE specific CSS
 			// fixes without using CSS hacks or conditional comments
 			if($.sceditor.ie)
-				$editorContainer.addClass('ie').addClass('ie' + $.sceditor.ie);
+				$editorContainer.addClass('ie ie' + $.sceditor.ie);
 
 			isRequired = !!$original.attr('required');
 			$original.removeAttr('required');
 
 			// create the editor
 			initPlugins();
+			initEmoticons();
+
 			initToolBar();
 			initEditor();
 			initCommands();
 			initOptions();
 			initEvents();
 
-			if(base.opts.autofocus)
-				autofocus();
-
 			// force into source mode if is a browser that can't handle
 			// full editing
 			if(!$.sceditor.isWysiwygSupported)
 				base.toggleSourceMode();
 
-			initEmoticons();
+			var loaded = function() {
+				$(window).unbind('load', loaded);
 
-			// Can't use load event as it gets fired before the CSS
-			// is loaded in some browsers
-			if(base.opts.autoExpand)
-			{
-				var interval = setInterval(function() {
-					if (!document.readyState || document.readyState === "complete")
-					{
-						base.expandToContent();
-						clearInterval(interval);
-					}
-				}, 10);
-			}
+				if(options.autofocus)
+					autofocus();
+
+				if(options.autoExpand)
+					base.expandToContent();
+
+				// Page width might have changed after CSS is loaded so
+				// call handleWindowResize to update any % based dimensions
+				handleWindowResize();
+			};
+			$(window).load(loaded);
+			if(document.readyState && document.readyState === 'complete')
+				loaded();
 
 			updateActiveButtons();
-			pluginManager.call("ready");
+			pluginManager.call('ready');
 		};
 
 		initPlugins = function() {
-			var plugins   = base.opts.plugins;
+			var plugins   = options.plugins;
 			plugins       = plugins ? plugins.toString().split(',') : [];
 			pluginManager = new $.sceditor.PluginManager(base);
 
@@ -362,18 +377,18 @@
 		initLocale = function() {
 			var lang;
 
-			if($.sceditor.locale[base.opts.locale])
-				locale = $.sceditor.locale[base.opts.locale];
+			if($.sceditor.locale[options.locale])
+				locale = $.sceditor.locale[options.locale];
 			else
 			{
-				lang = base.opts.locale.split("-");
+				lang = options.locale.split("-");
 
 				if($.sceditor.locale[lang[0]])
 					locale = $.sceditor.locale[lang[0]];
 			}
 
 			if(locale && locale.dateFormat)
-				base.opts.dateFormat = locale.dateFormat;
+				options.dateFormat = locale.dateFormat;
 		};
 
 		/**
@@ -394,40 +409,43 @@
 			wysiwygEditor = $wysiwygEditor[0];
 			sourceEditor  = $sourceEditor[0];
 
-			base.width(base.opts.width || $original.width());
-			base.height(base.opts.height || $original.height());
+			base.width(options.width || $original.width());
+			base.height(options.height || $original.height());
 
 			doc  = getWysiwygDoc();
 			$doc = $(doc);
 
 			doc.open();
-			doc.write(_tmpl("html", { charset: base.opts.charset, style: base.opts.style }));
+			doc.write(_tmpl("html", { charset: options.charset, style: options.style }));
 			doc.close();
 
-			base.readOnly(!!base.opts.readOnly);
+			base.readOnly(!!options.readOnly);
 
 			$body = $doc.find("body");
 
 			// Add IE version class to the HTML element so can apply
 			// conditional styling without CSS hacks
 			if($.sceditor.ie)
-				$doc.find("html").addClass("ie").addClass("ie" + $.sceditor.ie);
+				$doc.find("html").addClass("ie ie" + $.sceditor.ie);
 
 			// iframe overflow fix for iOS, also fixes an IE issue with the
 			// editor not getting focus when clicking inside
 			if(/iPhone|iPod|iPad| wosbrowser\//i.test(navigator.userAgent) || $.sceditor.ie)
+			{
 				$body.height("100%");
+
+				if(!$.sceditor.ie)
+					$body.bind('touchend', base.focus);
+			}
 
 			rangeHelper = new $.sceditor.rangeHelper(wysiwygEditor.contentWindow);
 
 			// load any textarea value into the editor
 			base.val($original.hide().val());
 
-			if(typeof (tabIndex = $original.attr("tabindex")) !== "undefined")
-			{
-				$sourceEditor.attr('tabindex', tabIndex);
-				$wysiwygEditor.attr('tabindex', tabIndex);
-			}
+			tabIndex = $original.attr("tabindex");
+			$sourceEditor.attr('tabindex', tabIndex);
+			$wysiwygEditor.attr('tabindex', tabIndex);
 		};
 
 		/**
@@ -439,26 +457,25 @@
 				$body = $doc.find("body");
 
 			// auto-update original textbox on blur if option set to true
-			if(base.opts.autoUpdate)
+			if(options.autoUpdate)
 			{
 				$body.bind("blur", base.updateOriginal);
 				$sourceEditor.bind("blur", base.updateOriginal);
 			}
 
-			if(base.opts.rtl === null)
-				base.opts.rtl = $sourceEditor.css('direction') === 'rtl';
+			if(options.rtl === null)
+				options.rtl = $sourceEditor.css('direction') === 'rtl';
 
-			if(base.opts.rtl)
-				base.rtl(true);
+			base.rtl(!!options.rtl);
 
-			if(base.opts.autoExpand)
+			if(options.autoExpand)
 				$doc.bind("keyup", base.expandToContent);
 
-			if(base.opts.resizeEnabled)
+			if(options.resizeEnabled)
 				initResize();
 
-			if(base.opts.id)
-				$editorContainer.attr('id', base.opts.id);
+			$editorContainer.attr('id', options.id);
+			base.emoticons(options.emoticonsEnabled);
 		};
 
 		/**
@@ -507,54 +524,50 @@
 		 * @private
 		 */
 		initToolBar = function () {
-			var	$group, $button, buttons, i, x, buttonClick,
-				groups = base.opts.toolbar.split("|");
-
-			buttonClick = function () {
-				var $this = $(this);
-
-				if(!$this.hasClass('disabled'))
-					handleCommand($this, base.commands[$this.data("sceditor-command")]);
-
-				updateActiveButtons();
-
-				return false;
-			};
+			var	$group, $button,
+				groups = options.toolbar.split("|");
 
 			$toolbar = $('<div class="sceditor-toolbar" unselectable="on" />');
-			for (i=0; i < groups.length; i++)
-			{
+			$.each(groups, function(idx, group) {
 				$group  = $('<div class="sceditor-group" />');
-				buttons = groups[i].split(",");
 
-				for (x=0; x < buttons.length; x++)
-				{
+				$.each(group.split(","), function(idx, button) {
 					// the button must be a valid command otherwise ignore it
-					if(!base.commands[buttons[x]])
-						continue;
+					if(!base.commands[button])
+						return;
 
 					$button = _tmpl("toolbarButton", {
-							name: buttons[x],
-							dispName: base.commands[buttons[x]].tooltip || buttons[x]
-						}, true)
-						.click(buttonClick)
-						.data('sceditor-txtmode', !!base.commands[buttons[x]].txtExec)
-						.data('sceditor-wysiwygmode', !!base.commands[buttons[x]].exec);
+							name: button,
+							dispName: base.commands[button].tooltip || button
+						}, true);
 
-					if(base.commands[buttons[x]].tooltip)
-						$button.attr('title', base._(base.commands[buttons[x]].tooltip));
+					$button.data('sceditor-txtmode', !!base.commands[button].txtExec);
+					$button.data('sceditor-wysiwygmode', !!base.commands[button].exec);
+					$button.click(function () {
+						var $this = $(this);
 
-					if(!base.commands[buttons[x]].exec)
+						if(!$this.hasClass('disabled'))
+							handleCommand($this, base.commands[button]);
+
+						updateActiveButtons();
+						return false;
+					});
+
+					if(base.commands[button].tooltip)
+						$button.attr('title', base._(base.commands[button].tooltip));
+
+					if(!base.commands[button].exec)
 						$button.addClass('disabled');
 
 					$group.append($button);
-				}
+				});
+
 				$toolbar.append($group);
-			}
+			});
 
 			// append the toolbar to the toolbarContainer option if given
-			if(base.opts.toolbarContainer)
-				$(base.opts.toolbarContainer).append($toolbar);
+			if(options.toolbarContainer)
+				$(options.toolbarContainer).append($toolbar);
 			else
 				$editorContainer.append($toolbar);
 		};
@@ -598,10 +611,10 @@
 				dragging    = false,
 				rtl         = base.rtl();
 
-			minHeight = base.opts.resizeMinHeight || origHeight / 1.5;
-			maxHeight = base.opts.resizeMaxHeight || origHeight * 2.5;
-			minWidth  = base.opts.resizeMinWidth  || origWidth  / 1.25;
-			maxWidth  = base.opts.resizeMaxWidth  || origWidth  * 1.25;
+			minHeight = options.resizeMinHeight || origHeight / 1.5;
+			maxHeight = options.resizeMaxHeight || origHeight * 2.5;
+			minWidth  = options.resizeMinWidth  || origWidth  / 1.25;
+			maxWidth  = options.resizeMaxWidth  || origWidth  * 1.25;
 
 			mouseMoveFunc = function (e) {
 				// iOS must use window.event
@@ -617,11 +630,17 @@
 				if(maxHeight > 0 && newHeight > maxHeight)
 					newHeight = maxHeight;
 
-				if(base.opts.resizeWidth && newWidth >= minWidth && (maxWidth < 0 || newWidth <= maxWidth))
+				if(options.resizeWidth && newWidth >= minWidth && (maxWidth < 0 || newWidth <= maxWidth))
 					base.width(newWidth);
 
-				if(base.opts.resizeHeight && newHeight >= minHeight && (maxHeight < 0 || newHeight <= maxHeight))
+				if(options.resizeHeight && newHeight >= minHeight && (maxHeight < 0 || newHeight <= maxHeight))
+				{
 					base.height(newHeight);
+
+					// The resize cover will not fill the container in IE6 unless a height is specified.
+					if($.sceditor.ie < 7)
+						$editorContainer.height(newHeight);
+				}
 
 				e.preventDefault();
 			};
@@ -633,7 +652,7 @@
 				dragging = false;
 
 				$cover.hide();
-				$editorContainer.removeClass('resizing');
+				$editorContainer.removeClass('resizing').height('auto');
 				$(document).unbind('touchmove mousemove', mouseMoveFunc);
 				$(document).unbind('touchend mouseup', mouseUpFunc);
 
@@ -659,36 +678,45 @@
 				$(document).bind('touchmove mousemove', mouseMoveFunc);
 				$(document).bind('touchend mouseup', mouseUpFunc);
 
+				// The resize cover will not fill the container in IE6 unless a height is specified.
+				if($.sceditor.ie < 7)
+					$editorContainer.height(startHeight);
+
 				e.preventDefault();
 			});
 		};
 
 		/**
-		 * Preloads the emoticon images
-		 * Idea from: http://engineeredweb.com/blog/09/12/preloading-images-jquery-and-javascript
+		 * Prefixes and preloads the emoticon images
 		 * @private
 		 */
 		initEmoticons = function () {
-			if(base.opts.toolbar.indexOf('emoticon') < 0)
+			var	emoticon,
+				emoticons = options.emoticons,
+				root      = options.emoticonsRoot;
+
+			if(!$.isPlainObject(emoticons))
 				return;
 
-			// prefix emoticon root to emoticon urls
-			if(base.opts.emoticonsRoot && base.opts.emoticons)
-			{
-				$.each(base.opts.emoticons, function (idx, emoticons) {
-					$.each(emoticons, function (key, url) {
-						base.opts.emoticons[idx][key] = base.opts.emoticonsRoot + (url.url || url);
-					});
+			$.each(emoticons, function (idx, val) {
+				$.each(val, function (key, url) {
+					// Prefix emoticon root to emoticon urls
+					if(root)
+					{
+						url = {
+							url: root + (url.url || url),
+							tooltip: url.tooltip || key
+						};
+
+						emoticons[idx][key] = url;
+					}
+
+					// Preload the emoticon
+					// Idea from: http://engineeredweb.com/blog/09/12/preloading-images-jquery-and-javascript
+					emoticon     = document.createElement('img');
+					emoticon.src = url.url || url;
+					preLoadCache.push(emoticon);
 				});
-			}
-
-			var	emoticons = $.extend({}, base.opts.emoticons.more, base.opts.emoticons.dropdown, base.opts.emoticons.hidden),
-				emoticon;
-
-			$.each(emoticons, function (key, url) {
-				emoticon     = document.createElement('img');
-				emoticon.src = url.url || url;
-				preLoadCache.push(emoticon);
 			});
 		};
 
@@ -697,22 +725,55 @@
 		 * @private
 		 */
 		autofocus = function() {
-			var	rng,
-				doc  = wysiwygEditor.contentWindow.document,
-				body = doc.body;
+			var	rng, elm, txtPos,
+				doc      = getWysiwygDoc(),
+				body     = doc.body,
+				focusEnd = !!options.autofocusEnd;
 
-			if(!doc.createRange)
-				return base.focus();
-
-			if(body.firstChild)
+			if(base.sourceMode())
 			{
-				rng = doc.createRange();
-				rng.setStart(body.firstChild, 0);
-				rng.setEnd(body.firstChild, 0);
+				txtPos = sourceEditor.value.length;
 
-				rangeHelper.selectRange(rng);
-				body.focus();
+				if(sourceEditor.setSelectionRange)
+					sourceEditor.setSelectionRange(txtPos, txtPos);
+				else if (sourceEditor.createTextRange)
+				{
+					rng = sourceEditor.createTextRange();
+					rng.moveEnd('character', txtPos);
+					rng.moveStart('character', txtPos);
+					rangeHelper.selectRange(rng);
+				}
 			}
+			else // WYSIWYG mode
+			{
+				if(focusEnd)
+					$(body).append((elm = doc.createElement('div')));
+				else
+					elm = body.firstChild;
+
+				if(doc.createRange)
+				{
+
+					rng = doc.createRange();
+					rng.setStart(elm, 0);
+					rng.setEnd(elm, 0);
+				}
+				else
+				{
+					rng = body.createTextRange();
+					rng.moveToElementText(elm);
+					rng.collapse(false);
+				}
+				rangeHelper.selectRange(rng);
+
+				if(focusEnd)
+				{
+					$(doc).scrollTop(body.scrollHeight);
+					$(body).scrollTop(body.scrollHeight);
+				}
+			}
+
+			base.focus();
 		};
 
 		/**
@@ -903,25 +964,30 @@
 			if(width !== false && width !== base.width())
 			{
 				if(save !== false)
-					base.opts.width = width;
+					options.width = width;
 
 				width = $editorContainer.width(width).width();
 				wysiwygEditor.style.width = width - $wysiwygEditor.data('outerWidthOffset') + 'px';
 				sourceEditor.style.width  = width - $sourceEditor.data('outerWidthOffset') + 'px';
 
 				// If the toolbar height has changed then wysiwyg and source editor heights will need to be updated
-				toolbarHeight = !base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0;
-				updateheight  = toolbarHeight !== (!base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0);
-				height        = height !== false ? height:  base.height();
+				toolbarHeight = !options.toolbarContainer ? $toolbar.outerHeight(true) : 0;
+				updateheight  = toolbarHeight !== (!options.toolbarContainer ? $toolbar.outerHeight(true) : 0);
 			}
 
 			if(height !== false && height !== base.height())
 			{
 				if(save !== false)
-					base.opts.height = height;
+					options.height = height;
 
-				height  = $editorContainer.height(height).height();
-				height -= !base.opts.toolbarContainer ? $toolbar.outerHeight(true) : 0;
+				// Convert % based heights to px
+				if(height && height.toString().indexOf('%'))
+				{
+					height = $editorContainer.height(height).height();
+					$editorContainer.height('auto');
+				}
+
+				height -= !options.toolbarContainer ? $toolbar.outerHeight(true) : 0;
 				updateheight = true;
 			}
 
@@ -1024,8 +1090,8 @@
 				$('html, body').toggleClass('sceditor-maximize', maximize);
 
 			$editorContainer.toggleClass('sceditor-maximize', maximize);
-			base.width(maximize ? '100%' : base.opts.width, false);
-			base.height(maximize ? '100%' : base.opts.height, false);
+			base.width(maximize ? '100%' : options.width, false);
+			base.height(maximize ? '100%' : options.height, false);
 
 			return this;
 		};
@@ -1048,7 +1114,7 @@
 				currentHeight = $editorContainer.height(),
 				height        = doc.body.scrollHeight || doc.documentElement.scrollHeight,
 				padding       = (currentHeight - $wysiwygEditor.height()),
-				maxHeight     = base.opts.resizeMaxHeight || ((base.opts.height || $original.height()) * 2);
+				maxHeight     = options.resizeMaxHeight || ((options.height || $original.height()) * 2);
 
 			height += padding;
 
@@ -1077,11 +1143,11 @@
 			pluginManager = null;
 
 			$(document).unbind('click', handleDocumentClick);
-			$(window).unbind('resize', handleWindowResize);
+			$(window).unbind('resize orientationChanged', handleWindowResize);
 
 			$(original.form)
-				.unbind("reset", handleFormReset)
-				.unbind("submit", base.updateOriginal);
+				.unbind('reset', handleFormReset)
+				.unbind('submit', base.updateOriginal);
 
 			$(getWysiwygDoc().body).unbind();
 			$(getWysiwygDoc()).unbind().find('*').remove();
@@ -1091,8 +1157,8 @@
 			$editorContainer.remove();
 
 			$original
-				.removeData("sceditor")
-				.removeData("sceditorbbcode")
+				.removeData('sceditor')
+				.removeData('sceditorbbcode')
 				.show();
 
 			if(isRequired)
@@ -1104,14 +1170,19 @@
 		 *
 		 * @param {HTMLElement}	menuItem		The button to align the drop down with
 		 * @param {string}	dropDownName		Used for styling the dropown, will be a class sceditor-dropDownName
-		 * @param {string}	content			The HTML content of the dropdown
+		 * @param {HTMLElement}	content			The HTML content of the dropdown
 		 * @param {bool}	[ieUnselectable=true]	If to add the unselectable attribute to all the contents elements. Stops IE from deselecting the text in the editor
 		 * @function
 		 * @name createDropDown
 		 * @memberOf jQuery.sceditor.prototype
 		 */
 		base.createDropDown = function (menuItem, dropDownName, content, ieUnselectable) {
+			// first click for create second click for close
+			var onlyclose = $dropdown && $dropdown.is('.sceditor-' + dropDownName);
+
 			base.closeDropDown();
+
+			if(onlyclose) return;
 
 			// IE needs unselectable attr to stop it from unselecting the text in the editor.
 			// The editor can cope if IE does unselect the text it's just not nice.
@@ -1131,7 +1202,7 @@
 				marginTop: menuItem.outerHeight()
 			};
 
-			$.extend(css, base.opts.dropDownCss);
+			$.extend(css, options.dropDownCss);
 
 			$dropdown = $('<div class="sceditor-dropdown sceditor-' + dropDownName + '" />')
 				.css(css)
@@ -1164,10 +1235,10 @@
 				pastearea       = elm.ownerDocument.createElement('div'),
 				prePasteContent = elm.ownerDocument.createDocumentFragment();
 
-			if(base.opts.disablePasting)
+			if(options.disablePasting)
 				return false;
 
-			if(!base.opts.enablePasteFiltering)
+			if(!options.enablePasteFiltering)
 				return;
 
 			rangeHelper.saveRange();
@@ -1248,7 +1319,7 @@
 				pasteddata = pluginManager.callOnlyFirst("toWysiwyg", pasteddata, true);
 
 			rangeHelper.restoreRange();
-			rangeHelper.insertHTML(pasteddata);
+			rangeHelper.insertHTML(replaceEmoticons(pasteddata));
 		};
 
 		/**
@@ -1558,10 +1629,11 @@
 				base.focus();
 
 			rangeHelper.saveRange();
+
 			$.sceditor.dom.fixNesting($body.get(0));
-			html = $body.html();
 
 			// filter the HTML and DOM through any plugins
+			html = $body.html();
 			if(filter !== false && pluginManager.hasHandler("toSource"))
 				html = pluginManager.callOnlyFirst("toSource", html, $body);
 
@@ -1644,10 +1716,10 @@
 		 * @private
 		 */
 		replaceEmoticons = function (html) {
-			if(base.opts.toolbar.indexOf('emoticon') === -1)
+			if(!options.emoticonsEnabled)
 				return html;
 
-			var emoticons = $.extend({}, base.opts.emoticons.more, base.opts.emoticons.dropdown, base.opts.emoticons.hidden);
+			var emoticons = $.extend({}, options.emoticons.more, options.emoticons.dropdown, options.emoticons.hidden);
 
 			$.each(emoticons, function (key, url) {
 				// escape the key before using it as a regex
@@ -1657,7 +1729,7 @@
 					group = '';
 
 				// Make sure the emoticon is surrounded by whitespace or is at the start/end of a string or html tag
-				if(base.opts.emoticonsCompat)
+				if(options.emoticonsCompat)
 				{
 					reg   = "((>|^|\\s|\xA0|\u2002|\u2003|\u2009|&nbsp;))" + reg + "(?=(\\s|$|<|\xA0|\u2002|\u2003|\u2009|&nbsp;))";
 					group = '$1';
@@ -2030,19 +2102,19 @@
 		 * @ignore
 		 */
 		handleWindowResize = function() {
-			if(base.maximize())
+			var	height = options.height,
+				width  = options.width;
+
+			if(!base.maximize())
 			{
-				base.height('100%', false).width('100%', false);
-				return;
+				if(height && height.toString().indexOf("%") > -1)
+					base.height(height);
+
+				if(width && width.toString().indexOf("%") > -1)
+					base.width(width);
 			}
-
-			if(base.opts.height && base.opts.height.toString().indexOf("%") > -1)
-				base.height($editorContainer.parent().height() *
-					(parseFloat(base.opts.height) / 100));
-
-			if(base.opts.width && base.opts.width.toString().indexOf("%") > -1)
-				base.width($editorContainer.parent().width() *
-					(parseFloat(base.opts.width) / 100));
+			else
+				base.height('100%', false).width('100%', false);
 		};
 
 		/**
@@ -2250,6 +2322,7 @@
 				if(!base.inSourceMode())
 				{
 					wysiwygEditor.contentWindow.focus();
+					getWysiwygDoc().body.focus();
 
 					// Needed for IE < 9
 					if(lastRange)
@@ -2347,6 +2420,98 @@
 		 */
 		base.selectionChanged = function(handler) {
 			return base.bind('selectionchanged', handler, false, true);
+		};
+
+		/**
+		 * Emoticons keypress handler
+		 * @private
+		 */
+		emoticonsKeyPress = function (e) {
+			var	pos     = 0,
+				curChar = String.fromCharCode(e.which);
+
+			if(!base.emoticonsCache) {
+				base.emoticonsCache = [];
+
+				$.each($.extend({}, options.emoticons.more, options.emoticons.dropdown, options.emoticons.hidden), function(key, url) {
+					base.emoticonsCache[pos++] = [
+						key,
+						_tmpl("emoticon", {
+							key: key,
+							url: url.url || url,
+							tooltip: url.tooltip || key
+						})
+					];
+				});
+
+				base.emoticonsCache.sort(function(a, b){
+					return a[0].length - b[0].length;
+				});
+			}
+
+			if(!base.longestEmoticonCode)
+				base.longestEmoticonCode = base.emoticonsCache[base.emoticonsCache.length - 1][0].length;
+
+			if(base.getRangeHelper().raplaceKeyword(base.emoticonsCache, true, true, base.longestEmoticonCode, options.emoticonsCompat, curChar))
+			{
+				if(/^\s$/.test(curChar) && options.emoticonsCompat)
+					return true;
+
+				e.preventDefault();
+				e.stopPropagation();
+				return false;
+			}
+		};
+
+		/**
+		 * Gets if emoticons are currently enabled
+		 * @return {boolean}
+		 * @function
+		 * @name emoticons
+		 * @memberOf jQuery.sceditor.prototype
+		 * @since 1.4.2
+		 */
+		/**
+		 * Enables/disables emoticons
+		 *
+		 * @param {boolean} enable
+		 * @return {this}
+		 * @function
+		 * @name emoticons^2
+		 * @memberOf jQuery.sceditor.prototype
+		 * @since 1.4.2
+		 */
+		base.emoticons = function(enable) {
+			if(!enable && enable !== false)
+				return options.emoticonsEnabled;
+
+			var $body = $(getWysiwygDoc().body);
+
+			options.emoticonsEnabled = enable;
+
+			if(enable)
+			{
+				$body.keypress(emoticonsKeyPress);
+
+				if(!base.sourceMode())
+				{
+					rangeHelper.saveRange();
+
+					$body.html(replaceEmoticons($body.html()));
+
+					rangeHelper.restoreRange();
+				}
+			}
+			else
+			{
+				$body.find('img[data-sceditor-emoticon]').replaceWith(function() {
+					return $(this).data('sceditor-emoticon');
+				});
+
+				$body.unbind('keypress', emoticonsKeyPress);
+			}
+
+			return this;
 		};
 
 		// run the initializer
@@ -2961,102 +3126,58 @@
 		// START_COMMAND: Emoticons
 		emoticon: {
 			exec: function (caller) {
-				var	appendEmoticon,
-					editor  = this,
-					end     = (editor.opts.emoticonsCompat ? ' ' : ''),
-					content = $('<div />'),
-					line    = $('<div />');
+				var editor = this;
 
-				appendEmoticon = function (code, emoticon) {
-					line.append($('<img />')
+				var createContent = function(includeMore) {
+					var	endSpace  = (editor.opts.emoticonsCompat ? ' ' : ''),
+						$content  = $('<div />'),
+						$line     = $('<div />').appendTo($content),
+						emoticons = $.extend({}, editor.opts.emoticons.dropdown, includeMore ? editor.opts.emoticons.more : {}),
+						perLine   = 0;
+
+					for(var prop in emoticons)
+					{
+						if(emoticons.hasOwnProperty(prop))
+							perLine++;
+					}
+
+					perLine = Math.sqrt(perLine);
+
+					$.each(emoticons, function(code, emoticon) {
+						$line.append($('<img />')
 							.attr({
-								src: $.isPlainObject(emoticon) ? emoticon.url : emoticon,
+								src: emoticon.url || emoticon,
 								alt: code,
-								title: $.isPlainObject(emoticon) ? emoticon.tooltip || code : code
+								title: emoticon.tooltip || code
 							})
-							.click(function (e) {
-								editor.insert($(this).attr('alt') + end);
-								editor.closeDropDown(true);
-								e.preventDefault();
+							.click(function() {
+								editor.insert($(this).attr('alt') + endSpace).closeDropDown(true);
+
+								return false;
 							})
 						);
 
-					if(line.children().length > 3) {
-						content.append(line);
-						line = $('<div />');
-					}
-				};
-
-				$.each(editor.opts.emoticons.dropdown, appendEmoticon);
-
-				if(line.children().length > 0)
-					content.append(line);
-
-				if(editor.opts.emoticons.more) {
-					var more = $(
-						this._('<a class="sceditor-more">{0}</a>', this._("More"))
-					).click(function () {
-						var	emoticons = $.extend({}, editor.opts.emoticons.dropdown, editor.opts.emoticons.more);
-							content   = $('<div />');
-
-						$.each(emoticons, appendEmoticon);
-
-						if(line.children().length > 0)
-							content.append(line);
-
-						editor.createDropDown(caller, "insertemoticon", content);
-						return false;
+						if($line.children().length >= perLine)
+							$line = $('<div />').appendTo($content);
 					});
 
-					content.append(more);
-				}
+					if(!includeMore)
+					{
+						$content.append($(
+							editor._('<a class="sceditor-more">{0}</a>', editor._("More"))
+						).click(function () {
+							editor.createDropDown(caller, "more-emoticons", createContent(true));
+							return false;
+						}));
+					}
 
-				editor.createDropDown(caller, "insertemoticon", content);
+					return $content;
+				};
+
+				editor.createDropDown(caller, "emoticons", createContent(false));
 			},
 			txtExec: function(caller) {
 				$.sceditor.command.get('emoticon').exec.call(this, caller);
-			},
-			keyPress: function (e)
-			{
-				// make sure emoticons command is in the toolbar before running
-				if(this.opts.toolbar.indexOf('emoticon') === -1)
-					return;
-
-				var	editor  = this,
-					pos     = 0,
-					curChar = String.fromCharCode(e.which);
-
-				if(!editor.EmoticonsCache) {
-					editor.EmoticonsCache = [];
-
-					$.each($.extend({}, editor.opts.emoticons.more, editor.opts.emoticons.dropdown, editor.opts.emoticons.hidden), function(key, url) {
-						editor.EmoticonsCache[pos++] = [
-							key,
-							_tmpl("emoticon", {
-								key: key,
-								url: url.url || url,
-								tooltip: url.tooltip || key
-							})
-						];
-					});
-
-					editor.EmoticonsCache.sort(function(a, b){
-						return a[0].length - b[0].length;
-					});
-				}
-
-				if(!editor.longestEmoticonCode)
-					editor.longestEmoticonCode = editor.EmoticonsCache[editor.EmoticonsCache.length - 1][0].length;
-
-				if(editor.getRangeHelper().raplaceKeyword(editor.EmoticonsCache, true, true, editor.longestEmoticonCode, editor.opts.emoticonsCompat, curChar))
-				{
-					if(/^\s$/.test(curChar) && editor.opts.emoticonsCompat)
-						return true;
-
-					e.preventDefault();
-					e.stopPropagation();
-					return false;
-				}
 			},
 			tooltip: "Insert an emoticon"
 		},
@@ -3531,7 +3652,8 @@
 		 * @memberOf jQuery.sceditor.rangeHelper.prototype
 		 */
 		base.insertNodeAt = function(start, node) {
-			var range = base.cloneSelected();
+			var	currentRange = base.selectedRange(),
+				range        = base.cloneSelected();
 
 			if(!range)
 				return false;
@@ -3542,6 +3664,10 @@
 				range.insertNode(node);
 			else
 				range.pasteHTML(node.outerHTML);
+
+			// Reselect the current range.
+			// Fixes issue with Chrome losing the selection. Issue#82
+			base.selectRange(currentRange);
 		};
 
 		/**
@@ -3558,7 +3684,7 @@
 			marker.id               = id;
 			marker.style.lineHeight = "0";
 			marker.style.display    = "none";
-			marker.className        = "sceditor-selection";
+			marker.className        = "sceditor-selection sceditor-ignore";
 
 			return marker;
 		};
@@ -3925,6 +4051,8 @@
 			if(!elm || elm.nodeType !== 1)
 				return true;
 
+
+
 			elm = elm.tagName.toLowerCase();
 
 			if(elm === 'code')
@@ -4002,15 +4130,20 @@
 		removeWhiteSpace: function(root) {
 			// 00A0 is non-breaking space which should not be striped
 			var	nodeValue,
-				regex = /[^\S|\u00A0]+/g;
+				multiWhitespace = /[^\S|\u00A0]+/g;
 
 			this.traverse(root, function(node) {
 				nodeValue = node.nodeValue;
 // TODO: have proper white-space checking for pre formatted text instead of checking for code and pre tags.
 				if(node.nodeType === 3 && $(node).parents('code, pre').length === 0 && nodeValue)
 				{
-					// new lines in text nodes are always ignored in normal handling
-					nodeValue = nodeValue.replace(/[\r\n]+/, "");
+					if(!node.previousSibling || !$.sceditor.dom.isInline(node.previousSibling))
+						nodeValue = nodeValue.replace(/^[\r\n]+/, "");
+
+					if(!node.nextSibling || !$.sceditor.dom.isInline(node.nextSibling))
+						nodeValue = nodeValue.replace(/[\r\n]+$/, "");
+
+					nodeValue = nodeValue.replace(/[\r\n]+/, " ");
 
 					//remove empty nodes
 					if(!nodeValue.length)
@@ -4021,10 +4154,12 @@
 
 					// If entirely whitespace then just set to a single space
 					if(!/\S|\u00A0/.test(nodeValue))
-						node.nodeValue = " ";
+						nodeValue = " ";
 					// replace multiple spaces inbetween non-white space with a single space
-					else if(regex.test(nodeValue))
-						node.nodeValue = nodeValue.replace(regex, " ");
+					else if(multiWhitespace.test(nodeValue))
+						nodeValue = nodeValue.replace(multiWhitespace, " ");
+
+					node.nodeValue = nodeValue;
 				}
 			});
 		},
@@ -4491,6 +4626,13 @@
 		emoticonsCompat: false,
 
 		/**
+		 * If to enable emoticons. Can be changes at runtime using the emoticons() method.
+		 * @type {Boolean}
+		 * @since 1.4.2
+		 */
+		emoticonsEnabled: true,
+
+		/**
 		 * Emoticon root URL
 		 * @type {String}
 		 */
@@ -4634,6 +4776,12 @@
 		 * @type {Boolean}
 		 */
 		autofocus: false,
+
+		/**
+		 * If to auto focus the editor to the end of the content
+		 * @type {Boolean}
+		 */
+		autofocusEnd: true,
 
 		/**
 		 * If to auto expand the editor to fix the content
