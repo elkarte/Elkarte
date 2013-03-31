@@ -80,9 +80,11 @@ class ManageAttachments_Controller
 
 		// Pick the correct sub-action.
 		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$context['sub_action'] = $_REQUEST['sa'];
+			$subAction = $_REQUEST['sa'];
 		else
-			$context['sub_action'] = 'browse';
+			$subAction = 'browse';
+
+		$context['sub_action'] = $subAction;
 
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
@@ -95,7 +97,7 @@ class ManageAttachments_Controller
 		);
 
 		// Finally go to where we want to go
-		$action->dispatch($context['sub_action']);
+		$action->dispatch($subAction);
 	}
 
 	/**

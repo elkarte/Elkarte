@@ -202,8 +202,9 @@ function AdminMain()
 				),
 				'modsettings' => array(
 					'label' => $txt['admin_modifications'],
-					'file' => 'ManageSettings.php',
-					'function' => 'ModifyModSettings',
+					'file' => 'ManageAddonSettings.php',
+					'controller' => 'ManageAddonSettings_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_modifications',
 					'subsections' => array(
@@ -866,7 +867,8 @@ class Admin_Controller
 		$include_files = array(
 			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts'
+			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
+			'ManageAddonSettings'
 		);
 
 		// This is a special array of functions that contain setting data
@@ -880,7 +882,7 @@ class Admin_Controller
 			array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general'),
 			array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
 			array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
-			array('ModifyGeneralModSettings', 'area=modsettings;sa=general'),
+			array('settings', 'area=modsettings;sa=general'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),

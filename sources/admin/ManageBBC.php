@@ -116,7 +116,6 @@ class ManageBBC_Controller
 		$this->_bbcSettings = new Settings_Form();
 
 		// initialize it with our settings
-
 		$config_vars = array(
 				array('check', 'enableBBC'),
 				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
