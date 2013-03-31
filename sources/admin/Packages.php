@@ -27,6 +27,9 @@ if (!defined('ELKARTE'))
  */
 class Packages_Controller
 {
+	/**
+	 * Entry point, the default method of this controller.
+	 */
 	function action_index()
 	{
 		global $txt, $scripturl, $context;
@@ -51,27 +54,33 @@ class Packages_Controller
 
 		// Delegation makes the world... that is, the package manager go 'round.
 		$subActions = array(
-			'browse' => 'action_browse',
-			'remove' => 'action_remove',
-			'list' => 'action_list',
-			'ftptest' => 'action_ftptest',
-			'install' => 'action_installtest',
-			'install2' => 'action_install2',
-			'uninstall' => 'action_installtest',
-			'uninstall2' => 'action_install2',
-			'installed' => 'action_browse',
-			'options' => 'action_options',
-			'perms' => 'action_perms',
-			'flush' => 'action_flush',
-			'examine' => 'action_examine',
-			'showoperations' => 'action_showoperations',
+			'browse' => array($this, 'action_browse'),
+			'remove' => array($this, 'action_remove'),
+			'list' => array($this, 'action_list'),
+			'ftptest' => array($this, 'action_ftptest'),
+			'install' => array($this, 'action_install'),
+			'install2' => array($this, 'action_install2'),
+			'uninstall' => array($this, 'action_install'),
+			'uninstall2' => array($this, 'action_install2'),
+			'installed' => array($this, 'action_browse'),
+			'options' => array($this, 'action_options'),
+			'perms' => array($this, 'action_perms'),
+			'flush' => array($this, 'action_flush'),
+			'examine' => array($this, 'action_examine'),
+			'showoperations' => array($this, 'action_showoperations'),
 		);
 
 		// Work out exactly who it is we are calling.
 		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$context['sub_action'] = $_REQUEST['sa'];
+			$subAction = $_REQUEST['sa'];
 		else
-			$context['sub_action'] = 'browse';
+			$subAction = 'browse';
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		$context['sub_action'] = $subAction;
 
 		// Set up some tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -96,14 +105,14 @@ class Packages_Controller
 			),
 		);
 
-		// Call the function we're handing control to.
-		$this->{$subActions[$context['sub_action']]}();
+		// lets just do it!
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Test install a package.
 	 */
-	function action_installtest()
+	function action_install()
 	{
 		global $txt, $context, $scripturl, $modSettings, $smcFunc, $settings;
 

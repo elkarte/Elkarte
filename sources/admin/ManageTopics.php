@@ -25,17 +25,23 @@ class ManageTopics_Controller
 
 	function action_index()
 	{
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		// Only admins are allowed around here.
+		isAllowedTo('admin_forum');
 
 		$subActions = array(
-			'display' => array ($this, 'action_topicSettings_display'));
+			'display' => array (
+				'controller' => $this,
+				'function' => 'action_topicSettings_display',
+				'default' => true));
 
+		$subAction = 'display';
+
+		// Set up action/subaction stuff.
 		$action = new Action();
 		$action->initialize($subActions);
 
 		// lets just do it!
-		$action->dispatch('display');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -56,10 +62,7 @@ class ManageTopics_Controller
 		// retrieve the current config settings
 		$config_vars = $this->_topicSettings->settings();
 
-		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
-
-		// Get the settings ready.
-		require_once(SUBSDIR . '/Settings.class.php');
+		call_integration_hook('integrate_modify_topic_settings');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_topic_settings'];
@@ -95,6 +98,9 @@ class ManageTopics_Controller
 	function _initTopicSettingsForm()
 	{
 		global $txt;
+
+		// we're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_topicSettings = new Settings_Form();

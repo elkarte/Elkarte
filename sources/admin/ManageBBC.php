@@ -25,6 +25,8 @@ class ManageBBC_Controller
 
 	function action_index()
 	{
+		isAllowedTo('admin_forum');
+
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 

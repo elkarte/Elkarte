@@ -20,8 +20,23 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Repair boards controller handles a special admin action:
+ * boards and categories attempt to repair, from maintenance.
+ */
 class RepairBoards_Controller
 {
+	/**
+	 * Default method.
+	 */
+	function action_index()
+	{
+		isAllowedTo('admin_forum');
+
+		// we do nothing... our one and only method does. :P
+		$this->action_repairboards();
+	}
+
 	/**
 	 * Finds or repairs errors in the database to fix possible problems.
 	 * Requires the admin_forum permission.

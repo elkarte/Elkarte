@@ -29,6 +29,15 @@ if (!defined('ELKARTE'))
 class Modlog_Controller
 {
 	/**
+	 * Default method for this controller.
+	 */
+	function action_index()
+	{
+		// we haz nothing to do. :P
+		$this->action_modlog();
+	}
+
+	/**
 	 * Prepares the information from the moderation log for viewing.
 	 * Show the moderation log, or admin log...
 	 * Disallows the deletion of events within twenty-four hours of now.

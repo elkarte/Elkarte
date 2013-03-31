@@ -20,6 +20,10 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * PackageServers controller handles browsing, adding and removing
+ * package servers, and download of a package from them.
+ */
 class PackageServers_Controller
 {
 	/**
@@ -40,22 +44,28 @@ class PackageServers_Controller
 
 		// Here is a list of all the potentially valid actions.
 		$subActions = array(
-			'servers' => 'action_list',
-			'add' => 'action_add',
-			'browse' => 'action_browse',
-			'download' => 'action_download',
-			'remove' => 'action_remove',
-			'upload' => 'action_update',
+			'servers' => array($this, 'action_list'),
+			'add' => array($this, 'action_add'),
+			'browse' => array($this, 'action_browse'),
+			'download' => array($this, 'action_download'),
+			'remove' => array($this, 'action_remove'),
+			'upload' => array($this, 'action_update'),
 		);
 
 		// Now let's decide where we are taking this...
 		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$context['sub_action'] = $_REQUEST['sa'];
+			$subAction = $_REQUEST['sa'];
 		// We need to support possible old javascript links...
 		elseif (isset($_GET['pgdownload']))
-			$context['sub_action'] = 'download';
+			$subAction = 'download';
 		else
-			$context['sub_action'] = 'servers';
+			$subAction = 'servers';
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		$context['sub_action'] = $subAction;
 
 		// We need to force the "Download" tab as selected.
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'packageget';
@@ -83,7 +93,8 @@ class PackageServers_Controller
 			),
 		);
 
-		$this->{$subActions[$context['sub_action']]}();
+		// lets just do it!
+		$action->dispatch($subAction);
 	}
 
 	/**
