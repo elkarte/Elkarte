@@ -45,6 +45,8 @@ class ManageCoreFeatures_Controller
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
 
+		loadTemplate('ManageCoreFeatures');
+
 		$core_features = $this->settings();
 
 		$this->loadGeneralSettingParameters();

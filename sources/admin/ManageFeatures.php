@@ -753,6 +753,7 @@ class ManageFeatures_Controller
 		global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
 		global $modSettings;
 
+		loadTemplate('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
 		$context['sub_template'] = 'show_custom_profile';
 
@@ -981,6 +982,8 @@ class ManageFeatures_Controller
 	function action_profileedit()
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
+
+		loadTemplate('ManageFeatures');
 
 		// Sort out the context!
 		$context['fid'] = isset($_GET['fid']) ? (int) $_GET['fid'] : 0;

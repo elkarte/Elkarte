@@ -720,7 +720,9 @@ function template_view_versions()
 		// ]]></script>';
 }
 
-// Form for stopping people using naughty words, etc.
+/**
+ * Form for stopping people using naughty words, etc.
+ */
 function template_edit_censored()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
@@ -799,7 +801,11 @@ function template_edit_censored()
 	</div>';
 }
 
-// Maintenance is a lovely thing, isn't it?
+/**
+ * Template to show that a task is in progress
+ * (not done yet).
+ * Maintenance is a lovely thing, isn't it?
+ */
 function template_not_done()
 {
 	global $context, $settings, $options, $txt, $scripturl;
@@ -847,7 +853,9 @@ function template_not_done()
 	// ]]></script>';
 }
 
-// Template for showing settings (Of any kind really!)
+/**
+ * Template for showing settings (Of any kind really!)
+ */
 function template_show_settings()
 {
 	global $context, $txt, $settings, $scripturl;
@@ -1102,255 +1110,9 @@ function template_show_settings()
 		echo $context['settings_insert_below'];
 }
 
-// Template for showing custom profile fields.
-function template_show_custom_profile()
-{
-	global $context, $txt, $settings, $scripturl;
-
-	// Standard fields.
-	template_show_list('standard_profile_fields');
-
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var iNumChecks = document.forms.standardProfileFields.length;
-		for (var i = 0; i < iNumChecks; i++)
-			if (document.forms.standardProfileFields[i].id.indexOf(\'reg_\') == 0)
-				document.forms.standardProfileFields[i].disabled = document.forms.standardProfileFields[i].disabled || !document.getElementById(\'active_\' + document.forms.standardProfileFields[i].id.substr(4)).checked;
-	// ]]></script><br />';
-
-	// Custom fields.
-	template_show_list('custom_profile_fields');
-}
-
-// Edit a profile field?
-function template_edit_profile_field()
-{
-	global $context, $txt, $settings, $scripturl;
-
-	// All the javascript for this page - quite a bit in script.js!
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var startOptID = ', count($context['field']['options']), ';
-	// ]]></script>';
-
-	// any errors messages to show?
-	if (isset($_GET['msg']))
-	{
-		loadLanguage('Errors');
-		if (isset($txt['custom_option_' . $_GET['msg']]))
-			echo '
-	<div class="errorbox">',
-		$txt['custom_option_' . $_GET['msg']], '
-	</div>';
-	}
-
-	echo '
-	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<fieldset>
-						<legend>', $txt['custom_edit_general'], '</legend>
-
-						<dl class="settings">
-							<dt>
-								<strong><label for="field_name">', $txt['custom_edit_name'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="text" name="field_name" id="field_name" value="', $context['field']['name'], '" size="20" maxlength="40" class="input_text" />
-							</dd>
-							<dt>
-								<strong><label for="field_desc">', $txt['custom_edit_desc'], ':</label></strong>
-							</dt>
-							<dd>
-								<textarea name="field_desc" id="field_desc" rows="3" cols="40">', $context['field']['desc'], '</textarea>
-							</dd>
-							<dt>
-								<strong><label for="profile_area">', $txt['custom_edit_profile'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_profile_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="profile_area" id="profile_area">
-									<option value="none"', $context['field']['profile_area'] == 'none' ? ' selected="selected"' : '', '>', $txt['custom_edit_profile_none'], '</option>
-									<option value="account"', $context['field']['profile_area'] == 'account' ? ' selected="selected"' : '', '>', $txt['account'], '</option>
-									<option value="forumprofile"', $context['field']['profile_area'] == 'forumprofile' ? ' selected="selected"' : '', '>', $txt['forumprofile'], '</option>
-									<option value="theme"', $context['field']['profile_area'] == 'theme' ? ' selected="selected"' : '', '>', $txt['theme'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<strong><label for="reg">', $txt['custom_edit_registration'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="reg" id="reg">
-									<option value="0"', $context['field']['reg'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_disable'], '</option>
-									<option value="1"', $context['field']['reg'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_allow'], '</option>
-									<option value="2"', $context['field']['reg'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_registration_require'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<strong><label for="display">', $txt['custom_edit_display'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-
-							<dt>
-								<strong><label for="placement">', $txt['custom_edit_placement'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="placement" id="placement">
-									<option value="0"', $context['field']['placement'] == '0' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_standard'], '</option>
-									<option value="1"', $context['field']['placement'] == '1' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_withicons'], '</option>
-									<option value="2"', $context['field']['placement'] == '2' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_abovesignature'], '</option>
-								</select>
-							</dd>
-							<dt>
-								<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="enclose">', $txt['custom_edit_enclose'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
-							</dt>
-							<dd>
-								<textarea name="enclose" id="enclose" rows="10" cols="50">', @$context['field']['enclose'], '</textarea>
-							</dd>
-						</dl>
-					</fieldset>
-					<fieldset>
-						<legend>', $txt['custom_edit_input'], '</legend>
-						<dl class="settings">
-							<dt>
-								<strong><label for="field_type">', $txt['custom_edit_picktype'], ':</label></strong>
-							</dt>
-							<dd>
-								<select name="field_type" id="field_type" onchange="updateInputBoxes();">
-									<option value="text"', $context['field']['type'] == 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
-									<option value="textarea"', $context['field']['type'] == 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
-									<option value="select"', $context['field']['type'] == 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
-									<option value="radio"', $context['field']['type'] == 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>
-									<option value="check"', $context['field']['type'] == 'check' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_check'], '</option>
-								</select>
-							</dd>
-							<dt id="max_length_dt">
-								<strong><label for="max_length_dd">', $txt['custom_edit_max_length'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_max_length_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="text" name="max_length" id="max_length_dd" value="', $context['field']['max_length'], '" size="7" maxlength="6" class="input_text" />
-							</dd>
-							<dt id="dimension_dt">
-								<strong><label for="dimension_dd">', $txt['custom_edit_dimension'], ':</label></strong>
-							</dt>
-							<dd id="dimension_dd">
-								<strong>', $txt['custom_edit_dimension_row'], ':</strong> <input type="text" name="rows" value="', $context['field']['rows'], '" size="5" maxlength="3" class="input_text" />
-								<strong>', $txt['custom_edit_dimension_col'], ':</strong> <input type="text" name="cols" value="', $context['field']['cols'], '" size="5" maxlength="3" class="input_text" />
-							</dd>
-							<dt id="bbc_dt">
-								<strong><label for="bbc_dd">', $txt['custom_edit_bbc'], '</label></strong>
-							</dt>
-							<dd >
-								<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt id="options_dt">
-								<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="options_dd">', $txt['custom_edit_options'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
-							</dt>
-							<dd id="options_dd">
-								<div>';
-
-	foreach ($context['field']['options'] as $k => $option)
-	{
-		echo '
-								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
-	}
-	echo '
-								<span id="addopt"></span>
-								[<a href="" onclick="addOption(); return false;">', $txt['custom_edit_options_more'], '</a>]
-								</div>
-							</dd>
-							<dt id="default_dt">
-								<strong><label for="default_dd">', $txt['custom_edit_default'], ':</label></strong>
-							</dt>
-							<dd>
-								<input type="checkbox" name="default_check" id="default_dd"', $context['field']['default_check'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-						</dl>
-					</fieldset>
-					<fieldset>
-						<legend>', $txt['custom_edit_advanced'], '</legend>
-						<dl class="settings">
-							<dt id="mask_dt">
-								<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
-								<strong><label for="mask">', $txt['custom_edit_mask'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="mask" id="mask" onchange="updateInputBoxes();">
-									<option value="nohtml"', $context['field']['mask'] == 'nohtml' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_nohtml'], '</option>
-									<option value="email"', $context['field']['mask'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_email'], '</option>
-									<option value="number"', $context['field']['mask'] == 'number' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_number'], '</option>
-									<option value="regex"', strpos($context['field']['mask'], 'regex') === 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_regex'], '</option>
-								</select>
-								<br />
-								<span id="regex_div">
-									<input type="text" name="regex" value="', $context['field']['regex'], '" size="30" class="input_text" />
-								</span>
-							</dd>
-							<dt>
-								<strong><label for="private">', $txt['custom_edit_privacy'], ':</label></strong>
-								<span class="smalltext">', $txt['custom_edit_privacy_desc'], '</span>
-							</dt>
-							<dd>
-								<select name="private" id="private" onchange="updateInputBoxes();" style="width: 100%">
-									<option value="0"', $context['field']['private'] == 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_all'], '</option>
-									<option value="1"', $context['field']['private'] == 1 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_see'], '</option>
-									<option value="2"', $context['field']['private'] == 2 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_owner'], '</option>
-									<option value="3"', $context['field']['private'] == 3 ? ' selected="selected"' : '', '>', $txt['custom_edit_privacy_none'], '</option>
-								</select>
-							</dd>
-							<dt id="can_search_dt">
-								<strong><label for="can_search_dd">', $txt['custom_edit_can_search'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_can_search_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="checkbox" name="can_search" id="can_search_dd"', $context['field']['can_search'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
-								<strong><label for="can_search_check">', $txt['custom_edit_active'], ':</label></strong><br />
-								<span class="smalltext">', $txt['custom_edit_active_desc'], '</span>
-							</dt>
-							<dd>
-								<input type="checkbox" name="active" id="can_search_check"', $context['field']['active'] ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-						</dl>
-					</fieldset>
-					<hr class="hrcolor" />
-						<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />';
-
-	if ($context['fid'])
-		echo '
-						<input type="submit" name="delete" value="', $txt['delete'], '" onclick="return confirm(\'', $txt['custom_edit_delete_sure'], '\');" class="button_submit" />';
-
-	echo '
-				</div>
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-ecp_token_var'], '" value="', $context['admin-ecp_token'], '" />
-		</form>
-	</div>';
-
-	// Get the javascript bits right!
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		updateInputBoxes();
-	// ]]></script>';
-}
-
-// Results page for an admin search.
+/**
+ * Results page for an admin search.
+ */
 function template_admin_search_results()
 {
 	global $context, $txt, $settings, $options, $scripturl;
@@ -1419,162 +1181,9 @@ function template_admin_search_results()
 	</div>';
 }
 
-// Turn on and off certain key features.
-function template_core_features()
-{
-	global $context, $txt, $settings, $options, $scripturl;
-
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var token_name,
-			token_value,
-			feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), ',
-			feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), ';
-
-		$(document).ready(function() {
-			$(".core_features_hide").css(\'display\', \'none\');
-			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'\'}).each(function() {
-				var sImageText = $(this).hasClass(\'on\') ? feature_on_text : feature_off_text;
-				$(this).attr({ title: sImageText, alt: sImageText });
-			});
-			$("#core_features_submit").css(\'display\', \'none\');
-
-			if (!token_name)
-				token_name = $("#core_features_token").attr("name")
-
-			if (!token_value)
-				token_value = $("#core_features_token").attr("value")
-
-			$(".core_features_img").click(function(){
-				var cc = $(this),
-					cf = $(this).attr("id").substring(7),
-					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
-					new_state = !$("#feature_" + cf).attr("checked"),
-					ajax_infobar = document.createElement(\'div\');
-
-				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\'});
-				$("body").append(ajax_infobar);
-				$(ajax_infobar).slideUp();
-				$("#feature_" + cf).attr("checked", new_state);
-
-				data = {save: "save", feature_id: cf};
-				data[$("#core_features_session").attr("name")] = $("#core_features_session").attr("value");
-				data[token_name] = token_value;
-				$(".core_features_status_box").each(function(){
-					data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
-				});
-
-				// Launch AJAX request.
-				$.ajax({
-					// The link we are accessing.
-					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
-
-					// The type of request.
-					type: "post",
-
-					// The type of data that is getting returned.
-					data: data,
-					error: function(error){
-							$(ajax_infobar).html(error).slideDown(\'fast\');
-					},
-
-					success: function(request){
-						if ($(request).find("errors").find("error").length !== 0)
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
-						}
-						else if ($(request).find("smf").length !== 0)
-						{
-							$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
-							cc.attr({
-								"src": imgs[new_state ? 1 : 0],
-								"title": new_state ? feature_on_text : feature_off_text,
-								"alt": new_state ? feature_on_text : feature_off_text
-							});
-							$("#feature_link_" + cf).fadeOut().fadeIn();
-							$(ajax_infobar).attr(\'class\', \'infobox\');
-							var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-							$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
-							setTimeout(function() {
-								$(ajax_infobar).slideUp();
-							}, 5000);
-
-							token_name = $(request).find("tokens").find(\'[type="token"]\').text();
-							token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
-						}
-						else
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
-						}
-					}
-				});
-			});
-		});
-	// ]]></script>
-	<div id="admincenter">';
-
-	if ($context['is_new_install'])
-	{
-		echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['core_settings_welcome_msg'], '
-				</h3>
-			</div>
-			<div class="information">
-				', $txt['core_settings_welcome_msg_desc'], '
-			</div>';
-	}
-
-	echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">';
-
-	template_admin_quick_search();
-
-	echo $txt['core_settings_title'], '
-				</h3>
-
-			</div>
-		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
-			<div style="display:none" id="activation_message" class="errorbox"></div>';
-
-	$alternate = true;
-	$num = 0;
-	$num_features = count($context['features']);
-	foreach ($context['features'] as $id => $feature)
-	{
-		$num++;
-		echo '
-			<div class="windowbg', $alternate ? '2' : '', '">
-				<div class="content features">
-					<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
-					<div class="features_switch" id="js_feature_', $id, '">
-							<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-							<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" id="switch_', $id, '" style="margin-top: 1.3em;display:none" alt="', $txt['core_settings_switch_' . $feature['state']], '" title="', $txt['core_settings_switch_' . $feature['state']], '" />
-					</div>
-					<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
-					<p>', $feature['desc'], '</p>
-				</div>
-
-			</div>';
-
-		$alternate = !$alternate;
-	}
-
-	echo '
-			<div class="righttext">
-				<input id="core_features_session" type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input id="core_features_token" type="hidden" name="', $context['admin-core_token_var'], '" value="', $context['admin-core_token'], '" />
-				<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="button_submit" />
-			</div>
-		</form>
-	</div>';
-}
-
-// This little beauty shows questions and answer from the captcha type feature.
+/**
+ * This little beauty shows questions and answer from the captcha type feature.
+ */
 function template_callback_question_answer_list()
 {
 	global $txt, $context, $settings;
@@ -1620,7 +1229,9 @@ function template_callback_question_answer_list()
 	';
 }
 
-// Repairing boards.
+/**
+ * Repairing boards.
+ */
 function template_repair_boards()
 {
 	global $context, $txt, $scripturl;
@@ -1707,7 +1318,9 @@ function template_repair_boards()
 	}
 }
 
-// Retrieves info from the php_info function, scrubs and preps it for display
+/**
+ * Retrieves info from the php_info function, scrubs and preps it for display
+ */
 function template_php_info()
 {
 	global $context, $txt;
@@ -1802,6 +1415,9 @@ function template_clean_cache_button_below()
 	</div>';
 }
 
+/**
+ * Admin quick search box.
+ */
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;
