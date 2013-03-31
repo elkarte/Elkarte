@@ -1,15 +1,16 @@
+/*!pl SCEditor | (C) 2011-2013, Sam Clarke | sceditor.com/license */
 /**
  * SCEditor BBCode Plugin
- * http://www.samclarke.com/2011/07/sceditor/
+ * http://www.sceditor.com/
  *
- * Copyright (C) 2011-2012, Sam Clarke (samclarke.com)
+ * Copyright (C) 2011-2013, Sam Clarke (samclarke.com)
  *
  * SCEditor is licensed under the MIT license:
  *	http://www.opensource.org/licenses/mit-license.php
  *
  * @fileoverview SCEditor BBCode Plugin
  * @author Sam Clarke
- * @version 1.4.1
+ * @version 1.4.2
  * @requires jQuery
  */
 
@@ -125,22 +126,22 @@
 				var	clone,
 					base          = this,
 					splitAtLength = 0,
-					i             = base.children.length;
+					childrenLen   = base.children.length;
 
 				if(typeof object !== "number")
 					splitAt = $.inArray(splitAt, base.children);
 
-				if(splitAt < 0 || splitAt > i)
+				if(splitAt < 0 || splitAt > childrenLen)
 					return null;
 
 				// Work out how many items are on the right side of the split
 				// to pass to splice()
-				while(i--)
+				while(childrenLen--)
 				{
-					if(i >= splitAt)
+					if(childrenLen >= splitAt)
 						splitAtLength++;
 					else
-						i = false;
+						childrenLen = 0;
 				}
 
 				clone          = base.clone();
@@ -152,7 +153,7 @@
 
 		init = function() {
 			base.opts    = $.extend({}, $.sceditor.BBCodeParser.defaults, options);
-			base.bbcodes = $.sceditorBBCodePlugin.bbcodes;
+			base.bbcodes = $.sceditor.plugins.bbcode.bbcodes;
 		};
 
 		/**
@@ -237,40 +238,24 @@
 
 			// Extract the name and attributes from opening tags and
 			// just the name from closing tags.
-			if(type === "open")
+			if(type === "open" && (matches = val.match(/\[([^\]\s=]+)(?:([^\]]+))?\]/)))
 			{
-				matches = val.match(/\[([^\]\s=]+)(?:([^\]]+))?\]/);
+				name = lower(matches[1]);
 
-				// Make sure there was a match otherwise it must be content
-				if(matches)
-				{
-					name = lower(matches[1]);
-
-					if(matches[2] && (matches[2] = $.trim(matches[2])))
-						attrs = tokenizeAttrs(matches[2]);
-				}
-				else
-				{
-					type = 'content';
-					name = '#';
-				}
+				if(matches[2] && (matches[2] = $.trim(matches[2])))
+					attrs = tokenizeAttrs(matches[2]);
 			}
-			else if(type === "close")
-			{
-				matches = val.match(/\[\/([^\[\]]+)\]/);
-
-				if(!matches)
-				{
-					type = 'content';
-					name = '#';
-				}
-				else
-					name = lower(matches[1]);
-			}
+			else if(type === "close" && (matches = val.match(/\[\/([^\[\]]+)\]/)))
+				name = lower(matches[1]);
 			else if(type === "newline")
 				name = '#newline';
-			else
+
+			// Treat all tokens without a name and all unknown BBCodes as content
+			if(!name || (type === "open" || type === "close") && !$.sceditor.plugins.bbcode.bbcodes[name])
+			{
+				type = 'content';
 				name = '#';
+			}
 
 			return new TokenizeToken(type, name, val, attrs);
 		};
@@ -284,7 +269,7 @@
 		 * @private
 		 */
 		tokenizeAttrs = function(attrs) {
-			var	matches, unquote,
+			var	matches,
 				/*
 				([^\s=]+)					Anything that's not a space or equals
 				=						Equals =
@@ -301,21 +286,14 @@
 						(?:.(?!\s\S+=))*.?		Anything that isn't part of [space][non-space][=] which would be a new attribute
 					)
 				)
-				 */
+				*/
 				atribsRegex = /([^\s=]+)=(?:(?:(["'])((?:\\\2|[^\2])*?)\2)|((?:.(?!\s\S+=))*.))/g,
+				unquote     = $.sceditor.plugins.bbcode.stripQuotes,
 				ret         = {};
 
-			//
-			unquote = function(str, quote) {
-				if(quote)
-					str = str.replace('\\\\', '\\').replace('\\' + quote, quote);
-
-				return str;
-			};
-
 			// if only one attribute then remove the = from the start and strip any quotes
-			if(attrs.charAt(0) === "=" && attrs.split("=").length <= 2)
-				ret.defaultattr = $.sceditorBBCodePlugin.stripQuotes(attrs.substr(1));
+			if(attrs.charAt(0) === "=" && attrs.indexOf('=', 1) < 0)
+				ret.defaultattr = unquote(attrs.substr(1));
 			else
 			{
 				if(attrs.charAt(0) === "=")
@@ -323,7 +301,7 @@
 
 				// No need to strip quotes here, the regex will do that.
 				while((matches = atribsRegex.exec(attrs)))
-					ret[lower(matches[1])] = unquote(matches[3], matches[2]) || matches[4];
+					ret[lower(matches[1])] = unquote(matches[3]) || matches[4];
 			}
 
 			return ret;
@@ -402,7 +380,7 @@
 			return true;
 		};
 
-		// TODO: Tidy this parseTokens() function up a bit.
+// TODO: Tidy this parseTokens() function up a bit.
 		/**
 		 * Parses an array of tokens created by tokenize()
 		 *
@@ -589,13 +567,13 @@
 		 * @return {void}
 		 */
 		normaliseNewLines = function(children, parent, onlyRemoveBreakAfter) {
-			var	token, left, right, bbcode, leftBBCode, rightBBCode,
+			var	token, left, right, parentBBCode, bbcode,
 				removedBreakEnd, removedBreakBefore, remove,
 				childrenLength = children.length,
 				i              = childrenLength;
 
 			if(parent)
-				bbcode = base.bbcodes[parent.name];
+				parentBBCode = base.bbcodes[parent.name];
 
 			while(i--)
 			{
@@ -609,25 +587,25 @@
 					remove = false;
 
 					// Handle the start and end new lines e.g. [tag]\n and \n[/tag]
-					if(!onlyRemoveBreakAfter && bbcode && bbcode.isSelfClosing !== true)
+					if(!onlyRemoveBreakAfter && parentBBCode && parentBBCode.isSelfClosing !== true)
 					{
 						// First child of parent so must be opening line break (breakStartBlock, breakStart) e.g. [tag]\n
-						if(i === 0)
+						if(!left)
 						{
-							if(bbcode.isInline === false && base.opts.breakStartBlock && bbcode.breakStart !== false)
+							if(parentBBCode.isInline === false && base.opts.breakStartBlock && parentBBCode.breakStart !== false)
 								remove = true;
 
-							if(bbcode.breakStart)
+							if(parentBBCode.breakStart)
 								remove = true;
 						}
 						// Last child of parent so must be end line break (breakEndBlock, breakEnd) e.g. \n[/tag]
 						// remove last line break (breakEndBlock, breakEnd)
-						else if (!removedBreakEnd && childrenLength - 1 === i)
+						else if (!removedBreakEnd && !right)
 						{
-							if(bbcode.isInline === false && base.opts.breakEndBlock && bbcode.breakEnd !== false)
+							if(parentBBCode.isInline === false && base.opts.breakEndBlock && parentBBCode.breakEnd !== false)
 								remove = true;
 
-							if(bbcode.breakEnd)
+							if(parentBBCode.breakEnd)
 								remove = true;
 
 							removedBreakEnd = remove;
@@ -636,29 +614,29 @@
 
 					if(left && left.type === tokenType.open)
 					{
-						if((leftBBCode = base.bbcodes[left.name]))
+						if((bbcode = base.bbcodes[left.name]))
 						{
 							if(!onlyRemoveBreakAfter)
 							{
-								if(leftBBCode.isInline === false && base.opts.breakAfterBlock && leftBBCode.breakAfter !== false)
+								if(bbcode.isInline === false && base.opts.breakAfterBlock && bbcode.breakAfter !== false)
 									remove = true;
 
-								if(leftBBCode.breakAfter)
+								if(bbcode.breakAfter)
 									remove = true;
 							}
-							else if(leftBBCode.isInline === false)
+							else if(bbcode.isInline === false)
 								remove = true;
 						}
 					}
 
 					if(!onlyRemoveBreakAfter && !removedBreakBefore && right && right.type === tokenType.open)
 					{
-						if((rightBBCode = base.bbcodes[right.name]))
+						if((bbcode = base.bbcodes[right.name]))
 						{
-							if(rightBBCode.isInline === false && base.opts.breakBeforeBlock && rightBBCode.breakBefore !== false)
+							if(bbcode.isInline === false && base.opts.breakBeforeBlock && bbcode.breakBefore !== false)
 								remove = true;
 
-							if(rightBBCode.breakBefore)
+							if(bbcode.breakBefore)
 								remove = true;
 
 							removedBreakBefore = remove;
@@ -812,8 +790,30 @@
 		 * @private
 		 */
 		removeEmpty = function(tokens) {
-			var	token, bbcode,
+			var	token, bbcode, allWhiteSpace,
 				i = tokens.length;
+
+			/**
+			 * Checks if all children are whitespace or not
+			 * @private
+			 */
+			allWhiteSpace = function(children) {
+				var j = children.length;
+
+				while(j--)
+				{
+					if(children[j].type === tokenType.open)
+						return false;
+
+					if(children[j].type === tokenType.close)
+						return false;
+
+					if(children[j].type === tokenType.content && children[j].val && /\S|\u00A0/.test(children[j].val))
+						return false;
+				}
+
+				return true;
+			};
 
 			while(i--)
 			{
@@ -827,15 +827,15 @@
 				// removed this one doesn't think it's not empty.
 				removeEmpty(token.children);
 
-				if(token.children.length < 1 && bbcode && !bbcode.isSelfClosing && !bbcode.allowsEmpty)
+				if(allWhiteSpace(token.children) && bbcode && !bbcode.isSelfClosing && !bbcode.allowsEmpty)
 					tokens.splice(i, 1);
 			}
 		};
 
 		/**
 		 * Converts a BBCode string to HTML
-		 * @param  {String} str
-		 * @param {Bool} preserveNewLines If to preserve all new lines, not strip any based on the passed formatting options
+		 * @param {String} str
+		 * @param {Bool}   preserveNewLines If to preserve all new lines, not strip any based on the passed formatting options
 		 * @return {String}
 		 * @memberOf jQuery.sceditor.BBCodeParser.prototype
 		 */
@@ -843,10 +843,17 @@
 			return convertToHTML(base.parse(str, preserveNewLines), true);
 		};
 
+		/**
+		 * @private
+		 */
 		convertToHTML = function(tokens, isRoot) {
-			var	token, bbcode, content, html, needsBlockWrap,
-				blockWrapOpen, isInline, addLineBreak,
+			var	token, bbcode, content, html, needsBlockWrap, blockWrapOpen,
+				isInline, lastChild,
 				ret = [];
+
+			isInline = function(bbcode) {
+				return (!bbcode || (typeof bbcode.isHtmlInline !== "undefined" ? bbcode.isHtmlInline : bbcode.isInline)) !== false;
+			};
 
 			while(tokens.length > 0)
 			{
@@ -855,24 +862,26 @@
 
 				if(token.type === tokenType.open)
 				{
+					lastChild      = token.children[token.children.length - 1] || {};
 					bbcode         = base.bbcodes[token.name];
-					isInline       = !bbcode || (typeof bbcode.isHtmlInline !== "undefined" ? bbcode.isHtmlInline : bbcode.isInline);
-					needsBlockWrap = isRoot && (!bbcode || isInline !== false);
+					needsBlockWrap = isRoot && isInline(bbcode);
 					content        = convertToHTML(token.children, false);
 
 					if(bbcode && bbcode.html)
 					{
-						addLineBreak = isInline === false && !bbcode.isPreFormatted && !bbcode.skipLastLineBreak;
-
-						// Add placeholder br to end of block level elements in all browsers apart from IE < 9 which
-						// handle new lines diffrently and don't need one.
-						if(addLineBreak && !$.sceditor.ie)
-							content += "<br />";
+						// Only add a line break to the end if this is blocklevel and the last child wasn't block-level
+						if(!isInline(bbcode) && isInline(base.bbcodes[lastChild.name]) && !bbcode.isPreFormatted && !bbcode.skipLastLineBreak)
+						{
+							// Add placeholder br to end of block level elements in all browsers apart from IE < 9 which
+							// handle new lines diffrently and doesn't need one.
+							if(!$.sceditor.ie)
+								content += "<br />";
+						}
 
 						if($.isFunction(bbcode.html))
 							html = bbcode.html.call(base, token, token.attrs, content);
 						else
-							html = $.sceditorBBCodePlugin.formatString(bbcode.html, content);
+							html = $.sceditor.plugins.bbcode.formatString(bbcode.html, content);
 					}
 					else
 						html = token.val + content + (token.closing ? token.closing.val : '');
@@ -1212,13 +1221,12 @@
 			handleTags,
 			formatString,
 			getStyle,
-			isEmpty,
 			mergeSourceModeCommands,
 			removeFirstLastDiv;
 
-		formatString     = $.sceditorBBCodePlugin.formatString;
-		base.bbcodes     = $.sceditorBBCodePlugin.bbcodes;
-		base.stripQuotes = $.sceditorBBCodePlugin.stripQuotes;
+		formatString     = $.sceditor.plugins.bbcode.formatString;
+		base.bbcodes     = $.sceditor.plugins.bbcode.bbcodes;
+		base.stripQuotes = $.sceditor.plugins.bbcode.stripQuotes;
 
 		/**
 		 * cache of all the tags pointing to their bbcodes to enable
@@ -1363,7 +1371,7 @@
 		 */
 		buildBbcodeCache = function() {
 			$.each(base.bbcodes, function(bbcode) {
-				if(typeof base.bbcodes[bbcode].tags !== "undefined")
+				if(base.bbcodes[bbcode].tags)
 					$.each(base.bbcodes[bbcode].tags, function(tag, values) {
 						var isBlock = base.bbcodes[bbcode].isInline === false;
 						tagsToBbcodes[tag] = (tagsToBbcodes[tag] || {});
@@ -1371,7 +1379,7 @@
 						tagsToBbcodes[tag][isBlock][bbcode] = values;
 					});
 
-				if(typeof base.bbcodes[bbcode].styles !== "undefined")
+				if(base.bbcodes[bbcode].styles)
 					$.each(base.bbcodes[bbcode].styles, function(style, values) {
 						var isBlock = base.bbcodes[bbcode].isInline === false;
 						stylesToBbcodes[isBlock] = (stylesToBbcodes[isBlock] || {});
@@ -1381,6 +1389,10 @@
 			});
 		};
 
+		/**
+		 * Gets the value of a style property on the passed element
+		 * @private
+		 */
 		getStyle = function(element, property) {
 			var	$elm, ret, dir, textAlign, name,
 				style = element.style;
@@ -1413,23 +1425,6 @@
 
 			return style[name];
 		};
-// TODO: remove duplicated by parser empty removal
-		isEmpty = function(element) {
-			var	childNodes = element.childNodes,
-				i          = childNodes.length;
-
-			if(element.nodeValue && /\S|\u00A0/.test(element.nodeValue))
-				return false;
-
-			if(childNodes.length === 0 || (childNodes.length === 1 && (/br/i.test(childNodes[0].nodeName) || isEmpty(childNodes[0]))))
-				return true;
-
-			while(i--)
-				if(!isEmpty(childNodes[i]))
-					return false;
-
-			return true;
-		};
 
 		/**
 		 * Checks if any bbcode styles match the elements styles
@@ -1454,12 +1449,10 @@
 				// so you don't end up with [i]parent[i]child[/i][/i]
 				if(!elementPropVal || getStyle(element.parent()[0], property) === elementPropVal)
 					return;
-// TODO: remove allows empty handling here
-				$.each(bbcodes, function(bbcode, values) {
-					if(!/\S|\u00A0/.test(content) && !base.bbcodes[bbcode].allowsEmpty && isEmpty(element[0]))
-						return;
 
-					if(!values || $.inArray(elementPropVal.toString(), values) > -1) {
+				$.each(bbcodes, function(bbcode, values) {
+					if(!values || $.inArray(elementPropVal.toString(), values) > -1)
+					{
 						if($.isFunction(base.bbcodes[bbcode].format))
 							content = base.bbcodes[bbcode].format.call(base, element, content);
 						else
@@ -1481,8 +1474,8 @@
 		 * @return {String} Content with any matching bbcode tags wrapped around it.
 		 * @Private
 		 */
-		handleTags = function(element, content, blockLevel) {
-			var tag = element[0].nodeName.toLowerCase();
+		handleTags = function($element, content, blockLevel) {
+			var tag = $element[0].nodeName.toLowerCase();
 
 			// convert blockLevel to boolean
 			blockLevel = !!blockLevel;
@@ -1490,20 +1483,16 @@
 			if(tagsToBbcodes[tag] && tagsToBbcodes[tag][blockLevel]) {
 				// loop all bbcodes for this tag
 				$.each(tagsToBbcodes[tag][blockLevel], function(bbcode, bbcodeAttribs) {
-					if(!/\S|\u00A0/.test(content) && !base.bbcodes[bbcode].allowsEmpty && isEmpty(element[0]))
-						return;
-// TODO: remove, duplicated by parser empty removal
 					// if the bbcode requires any attributes then check this has
 					// all needed
 					if(bbcodeAttribs) {
 						var runBbcode = false;
 
 						// loop all the bbcode attribs
-						$.each(bbcodeAttribs, function(attrib, values)
-						{
-							// if the element has the bbcodes attribute and the bbcode attribute
+						$.each(bbcodeAttribs, function(attrib, values) {
+							// if the $element has the bbcodes attribute and the bbcode attribute
 							// has values check one of the values matches
-							if(!element.attr(attrib) || (values && $.inArray(element.attr(attrib), values) < 0))
+							if(!$element.attr(attrib) || (values && $.inArray($element.attr(attrib), values) < 0))
 								return;
 
 							// break this loop as we have matched this bbcode
@@ -1516,28 +1505,31 @@
 					}
 
 					if($.isFunction(base.bbcodes[bbcode].format))
-						content = base.bbcodes[bbcode].format.call(base, element, content);
+						content = base.bbcodes[bbcode].format.call(base, $element, content);
 					else
 						content = formatString(base.bbcodes[bbcode].format, content);
 				});
 			}
 
-			if(blockLevel && (!$.sceditor.dom.isInline(element[0], true) || tag === "br"))
+			if(blockLevel && (!$.sceditor.dom.isInline($element[0], true) || tag === "br"))
 			{
-				var	parent		= element[0].parentNode,
-					previousSibling = element[0].previousSibling,
+				var	parent		= $element[0].parentNode,
+					previousSibling = $element[0].previousSibling,
 					parentIsInline	= $.sceditor.dom.isInline(parent, true) || parent.nodeName.toLowerCase() === "body";
 
-				// If this br/block element inside an inline element. Or this is an li element.
-				// Or this is not the last block level as the last block level is collapsed.
-				// Or this is IE and the tag is BR
-				if(parentIsInline || tag === "li" || parent.lastChild !== element[0] || (tag === "br" && $.sceditor.ie))
+				// skips selection makers and other ignored items
+				while(previousSibling && $(previousSibling).hasClass('sceditor-ignore'))
+					previousSibling = previousSibling.previousSibling;
+
+				// If this br/block element inside an inline element.
+				// If this is not the last block level as the last block level is collapsed.
+				// If this is an li element.
+				// If IE and the tag is BR. IE never collapses BR's
+				if(parentIsInline || parent.lastChild !== $element[0] || tag === "li" || (tag === "br" && $.sceditor.ie))
 					content += "\n";
 
-				// needed for browsers which when inside a textnode, if return is pressed they put the right half
-				// in a div instead of just inserting a br i.e.:
-				// text<div>line 2</div>
-				if("br" !== tag && !parentIsInline && previousSibling && previousSibling.nodeType === 3)
+				// Check for <div>text<div>This needs a newline prepended</div></div>
+				if("br" !== tag && previousSibling && previousSibling.nodeName.toLowerCase() != 'br' && $.sceditor.dom.isInline(previousSibling, true))
 					content = "\n" + content;
 			}
 
@@ -1549,7 +1541,7 @@
 		 * @param string	html	Html string, this function ignores this, it works off domBody
 		 * @param HtmlElement	domBody	Editors dom body object to convert
 		 * @return string BBCode which has been converted from HTML
-		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
+		 * @memberOf jQuery.plugins.bbcode.prototype
 		 */
 		base.signalToSource = function(html, domBody) {
 			var parser = new $.sceditor.BBCodeParser(base.opts.parserOptions);
@@ -1567,15 +1559,16 @@
 		 * @param HtmlElement	element		The element to convert to BBCode
 		 * @param array		vChildren	Valid child tags allowed
 		 * @return string BBCode
-		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
+		 * @memberOf jQuery.plugins.bbcode.prototype
 		 */
 		base.elementToBbcode = function($element) {
 			return (function toBBCode(node, vChildren) {
 				var ret = '';
-
+// TODO: Move to BBCode class?
 				$.sceditor.dom.traverse(node, function(node) {
 					var	$node		= $(node),
 						curTag		= '',
+						nodeType        = node.nodeType,
 						tag		= node.nodeName.toLowerCase(),
 						vChild		= validChildren[tag],
 						isValidChild	= true;
@@ -1591,8 +1584,12 @@
 							vChild = vChildren;
 					}
 
-					// 3 is text element
-					if(node.nodeType !== 3)
+					// 3 = text
+					// 1 = element
+					if(nodeType !== 3 && nodeType !== 1)
+						return;
+
+					if(nodeType === 1)
 					{
 						// skip ignored elments
 						if($node.hasClass("sceditor-ignore"))
@@ -1601,7 +1598,7 @@
 						// don't loop inside iframes
 						if(tag !== 'iframe')
 							curTag = toBBCode(node, vChild);
-// TODO: isValidChild no longer needed? If it is needs to be editable
+// TODO: isValidChild is no longer needed. Should use valid children bbcodes instead
 						if(isValidChild)
 						{
 							// code tags should skip most styles
@@ -1622,7 +1619,7 @@
 					}
 					else if(node.wholeText && (!node.previousSibling || node.previousSibling.nodeType !== 3))
 					{
-// TODO:This should check for CSS white-space, should pass it int the function to reduce css lookups which are SLOW!
+// TODO:This should check for CSS white-space, should pass it in the function to reduce css lookups which are SLOW!
 						if($node.parents('code').length === 0)
 							ret += node.wholeText.replace(/ +/g, " ");
 						else
@@ -1642,7 +1639,7 @@
 		 * @param {String} text
 		 * @param {Bool} asFragment
 		 * @return {String} HTML
-		 * @memberOf jQuery.sceditorBBCodePlugin.prototype
+		 * @memberOf jQuery.plugins.bbcode.prototype
 		 */
 		base.signalToWysiwyg = function(text, asFragment) {
 			var	parser = new $.sceditor.BBCodeParser(base.opts.parserOptions),
@@ -1659,30 +1656,32 @@
 		 * @return {String}
 		 * @private
 		 */
-		removeFirstLastDiv = function(html)
-		{
-			var	node, next,
+		removeFirstLastDiv = function(html) {
+			var	node, next, removeDiv,
 				$output = $('<div />').hide().appendTo(document.body),
 				output  = $output[0];
 
-			var removeDiv = function(node) {
+			removeDiv = function(node, isFirst) {
 				while((next = node.firstChild))
 					output.insertBefore(next, node);
 
-				if($.sceditor.ie >= 9)
-					output.insertBefore(document.createElement('br'), node);
+				if(isFirst)
+				{
+					var lastChild = output.lastChild;
+
+					if(node !== lastChild && $(lastChild).is("div") && node.nextSibling === lastChild)
+						output.insertBefore(document.createElement('br'), node);
+				}
 
 				output.removeChild(node);
 			};
 
 			output.innerHTML = html.replace(/<\/div>\n/g, '</div>');
 
-			node = output.firstChild;
-			if(node && node.nodeName.toLowerCase() === "div")
-				removeDiv(node);
+			if((node = output.firstChild) && $(node).is("div"))
+				removeDiv(node, true);
 
-			node = output.lastChild;
-			if(node && node.nodeName.toLowerCase() === "div")
+			if((node = output.lastChild) && $(node).is("div"))
 				removeDiv(node);
 
 			output = output.innerHTML;
@@ -1698,8 +1697,8 @@
 	 * @return string
 	 * @since v1.4.0
 	 */
-	$.sceditorBBCodePlugin.stripQuotes = function(str) {
-		return str.replace(/^(["'])(.*?)\1$/, "$2");
+	$.sceditor.plugins.bbcode.stripQuotes = function(str) {
+		return str ? str.replace(/\\(.)/g, "$1").replace(/^(["'])(.*?)\1$/, "$2") : str;
 	};
 
 	/**
@@ -1711,7 +1710,7 @@
 	 * @return {String}
 	 * @since v1.4.0
 	 */
-	$.sceditorBBCodePlugin.formatString = function() {
+	$.sceditor.plugins.bbcode.formatString = function() {
 		var args = arguments;
 		return args[0].replace(/\{(\d+)\}/g, function(str, p1) {
 			return typeof args[p1-0+1] !== "undefined" ?
@@ -1727,7 +1726,7 @@
 	 * @param {String} color
 	 * @return {String}
 	 */
-	$.sceditorBBCodePlugin.normaliseColour = function(color) {
+	$.sceditor.plugins.bbcode.normaliseColour = function(color) {
 		var m;
 
 		function toHex(n) {
@@ -1752,7 +1751,7 @@
 		return color;
 	};
 
-	$.sceditorBBCodePlugin.bbcodes = {
+	$.sceditor.plugins.bbcode.bbcodes = {
 		// START_COMMAND: Bold
 		b: {
 			tags: {
@@ -1918,7 +1917,7 @@
 				if(element.nodeName.toLowerCase() !== "font" || !(color = $element.attr('color')))
 					color = element.style.color || $element.css('color');
 
-				return '[color=' + $.sceditorBBCodePlugin.normaliseColour(color) + ']' + content + '[/color]';
+				return '[color=' + $.sceditor.plugins.bbcode.normaliseColour(color) + ']' + content + '[/color]';
 			},
 			html: function(token, attrs, content) {
 				return '<font color="' + attrs.defaultattr + '">' + content + '</font>';
@@ -2268,10 +2267,10 @@
 	/**
 	 * Static BBCode helper class
 	 * @class command
-	 * @name jQuery.sceditorBBCodePlugin.bbcode
+	 * @name jQuery.plugins.bbcode.bbcode
 	 */
-	$.sceditorBBCodePlugin.bbcode =
-	/** @lends jQuery.sceditorBBCodePlugin.bbcode */
+	$.sceditor.plugins.bbcode.bbcode =
+	/** @lends jQuery.plugins.bbcode.bbcode */
 	{
 		/**
 		 * Gets a BBCode
@@ -2281,7 +2280,7 @@
 		 * @since v1.3.5
 		 */
 		get: function(name) {
-			return $.sceditorBBCodePlugin.bbcodes[name] || null;
+			return $.sceditor.plugins.bbcode.bbcodes[name] || null;
 		},
 
 		/**
@@ -2298,10 +2297,10 @@
 				return false;
 
 			// merge any existing command properties
-			bbcode        = $.extend($.sceditorBBCodePlugin.bbcodes[name] || {}, bbcode);
-			bbcode.remove = function() { $.sceditorBBCodePlugin.bbcode.remove(name); };
+			bbcode        = $.extend($.sceditor.plugins.bbcode.bbcodes[name] || {}, bbcode);
+			bbcode.remove = function() { $.sceditor.plugins.bbcode.bbcode.remove(name); };
 
-			$.sceditorBBCodePlugin.bbcodes[name] = bbcode;
+			$.sceditor.plugins.bbcode.bbcodes[name] = bbcode;
 
 			return this;
 		},
@@ -2337,13 +2336,22 @@
 		 * @since v1.3.5
 		 */
 		remove: function(name) {
-			if($.sceditorBBCodePlugin.bbcodes[name])
-				delete $.sceditorBBCodePlugin.bbcodes[name];
+			if($.sceditor.plugins.bbcode.bbcodes[name])
+				delete $.sceditor.plugins.bbcode.bbcodes[name];
 
 			return this;
 		}
 	};
 
+	/**
+	 * Deprecated, use plugins: option instead. I.e.:
+	 *
+	 * $('textarea').sceditor({
+	 *      plugins: 'bbcode'
+	 * });
+	 *
+	 * @deprecated
+	 */
 	$.fn.sceditorBBCodePlugin = function (options) {
 		options = options || {};
 
