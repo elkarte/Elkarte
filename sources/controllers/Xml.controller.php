@@ -155,8 +155,9 @@ function action_corefeatures()
 	$validation = validateSession();
 	if (empty($validation))
 	{
-		require_once(ADMINDIR . '/ManageSettings.php');
-		$result = ModifyCoreFeatures();
+		require_once(ADMINDIR . '/ManageCoreFeatures.php');
+		$controller = new ManageCoreFeatures_Controller();
+		$result = $controller->settings();
 
 		// Load up the core features of the system
 		if (empty($result))
