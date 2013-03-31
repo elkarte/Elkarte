@@ -24,6 +24,12 @@ if (!defined('ELKARTE'))
 class ManageMembergroups_Controller
 {
 	/**
+	 * Groups Settings form
+	 * @var Settings_Form
+	 */
+	protected $_groupSettings;
+
+	/**
 	 * Main dispatcher, the entrance point for all 'Manage Membergroup' actions.
 	 * It forwards to a function based on the given subaction, default being subaction 'index', or, without manage_membergroup
 	 * permissions, then 'settings'.
@@ -33,30 +39,47 @@ class ManageMembergroups_Controller
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
 	*/
-	function action_main()
+	function action_index()
 	{
 		global $context, $txt, $scripturl;
 
 		$subActions = array(
-			'add' => array('action_add', 'manage_membergroups'),
-			'delete' => array('action_delete', 'manage_membergroups'),
-			'edit' => array('action_edit', 'manage_membergroups'),
-			'index' => array('action_index', 'manage_membergroups'),
-			'members' => array('action_groupmembers', 'manage_membergroups', 'controllers/Groups.controller.php'),
-			'settings' => array('action_settings', 'admin_forum'),
+			'add' => array(
+				'controller' => $this,
+				'function' => 'action_add',
+				'permission' => 'manage_membergroups'),
+			'delete' => array(
+				'controller' => $this,
+				'function' => 'action_delete',
+				'permission' => 'manage_membergroups'),
+			'edit' => array(
+				'controller' => $this,
+				'function' => 'action_edit',
+				'permission' => 'manage_membergroups'),
+			'index' => array(
+				'controller' => $this,
+				'function' => 'action_list',
+				'permission' => 'manage_membergroups'),
+			'members' => array(
+				'function' => 'action_groupmembers',
+				'permission' => 'manage_membergroups',
+				'file' => 'controllers/Groups.controller.php'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_groupSettings_display',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_membergroups', array(&$subActions));
 
 		// Default to sub action 'index' or 'settings' depending on permissions.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
-		// Is it elsewhere?
-		if (isset($subActions[$_REQUEST['sa']][2]))
-			require_once(SOURCEDIR . '/' . $subActions[$_REQUEST['sa']][2]);
+		$action = new Action();
+		$action->initialize($subActions);
 
-		// Do the permission check, you might not be allowed her.
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
 
 		// Language and template stuff, the usual.
 		loadLanguage('ManageMembers');
@@ -70,7 +93,7 @@ class ManageMembergroups_Controller
 		);
 
 		// Call the right function.
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -82,7 +105,7 @@ class ManageMembergroups_Controller
 	 *
 	 * @uses ManageMembergroups template, main.
 	 */
-	function action_index()
+	function action_list()
 	{
 		global $txt, $scripturl, $context, $settings, $smcFunc, $user_info;
 
@@ -1007,7 +1030,7 @@ class ManageMembergroups_Controller
 	 *
 	 * @uses membergroup_settings sub template of ManageMembergroups.
 	 */
-	function action_settings()
+	function action_groupSettings_display()
 	{
 		global $context, $scripturl, $modSettings, $txt;
 
@@ -1017,10 +1040,13 @@ class ManageMembergroups_Controller
 		// Needed for the settings functions.
 		require_once(SUBSDIR . '/Settings.class.php');
 
+		// initialize the form
+		$this->_initGroupSettingsForm();
+
 		// Don't allow assignment of guests.
 		$context['permissions_excluded'] = array(-1);
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_groupSettings->settings();
 
 		call_integration_hook('integrate_modify_membergroup_settings', array(&$config_vars));
 
@@ -1042,6 +1068,22 @@ class ManageMembergroups_Controller
 		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Return the configuration settings for membergroups management.
+	 */
+	function _initGroupSettingsForm()
+	{
+		// instantiate the form
+		$this->_groupSettings = new Settings_Form();
+
+		// Only one thing here!
+		$config_vars = array(
+				array('permissions', 'manage_membergroups'),
+		);
+
+		return $this->_groupSettings->settings($config_vars);
 	}
 
 	/**

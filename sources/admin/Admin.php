@@ -344,7 +344,7 @@ function AdminMain()
 					'label' => $txt['admin_groups'],
 					'file' => 'ManageMembergroups.php',
 					'controller' => 'ManageMembergroups_Controller',
-					'function' => 'action_main',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_membergroups',
 					'permission' => array('manage_membergroups'),

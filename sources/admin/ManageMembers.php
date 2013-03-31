@@ -40,20 +40,38 @@ class ManageMembers_Controller
 		global $txt, $scripturl, $context, $modSettings, $smcFunc;
 
 		$subActions = array(
-			'all' => array('action_list', 'moderate_forum'),
-			'approve' => array('action_approve', 'moderate_forum'),
-			'browse' => array('action_browse', 'moderate_forum'),
-			'search' => array('action_search', 'moderate_forum'),
-			'query' => array('action_list', 'moderate_forum'),
+			'all' => array(
+				'controller' => $this,
+				'function' => 'action_list',
+				'permission' => 'moderate_forum'),
+			'approve' => array(
+				'controller' => $this,
+				'function' => 'action_approve',
+				'permission' => 'moderate_forum'),
+			'browse' => array(
+				'controller' => $this,
+				'function' => 'action_browse',
+				'permission' => 'moderate_forum'),
+			'search' => array(
+				'controller' => $this,
+				'function' => 'action_search',
+				'permission' => 'moderate_forum'),
+			'query' => array(
+				'controller' => $this,
+				'function' => 'action_list',
+				'permission' => 'moderate_forum'),
 		);
 
 		call_integration_hook('integrate_manage_members', array(&$subActions));
 
 		// Default to sub action 'index' or 'settings' depending on permissions.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'all';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'all';
 
-		// We know the sub action, now we know what you're allowed to do.
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You can't pass!
+		$action->isAllowedTo($subAction); // this isn't the simplest way, but lets accept it
 
 		// Load the essentials.
 		loadLanguage('ManageMembers');
@@ -103,13 +121,13 @@ class ManageMembers_Controller
 				'label' => $txt['view_all_members'],
 				'description' => $txt['admin_members_list'],
 				'url' => $scripturl . '?action=admin;area=viewmembers;sa=all',
-				'is_selected' => $_REQUEST['sa'] == 'all',
+				'is_selected' => $subAction == 'all',
 			),
 			'search' => array(
 				'label' => $txt['mlist_search'],
 				'description' => $txt['admin_members_list'],
 				'url' => $scripturl . '?action=admin;area=viewmembers;sa=search',
-				'is_selected' => $_REQUEST['sa'] == 'search' || $_REQUEST['sa'] == 'query',
+				'is_selected' => $subAction == 'search' || $subAction == 'query',
 			),
 			'approve' => array(
 				'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
@@ -127,21 +145,21 @@ class ManageMembers_Controller
 		);
 
 		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($_REQUEST['sa'] != 'browse' || $_REQUEST['type'] != 'activate'))
+		if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))
 		{
 			$context['tabs']['approve']['is_last'] = true;
 			unset($context['tabs']['activate']);
 		}
 
 		// Unset approval tab if it shouldn't be there.
-		if (!$context['show_approve'] && ($_REQUEST['sa'] != 'browse' || $_REQUEST['type'] != 'approve'))
+		if (!$context['show_approve'] && ($subAction != 'browse' || $_REQUEST['type'] != 'approve'))
 		{
-			if (!$context['show_activate'] && ($_REQUEST['sa'] != 'browse' || $_REQUEST['type'] != 'activate'))
+			if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))
 				$context['tabs']['search']['is_last'] = true;
 			unset($context['tabs']['approve']);
 		}
 
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		$action->dispatch($subAction);
 	}
 
 	/**

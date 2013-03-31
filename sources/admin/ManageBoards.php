@@ -88,8 +88,15 @@ class ManageBoards_Controller
 
 		call_integration_hook('integrate_manage_boards', array(&$subActions));
 
-		// Default to sub action 'main' or 'settings' depending on permissions.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
+		// Default to sub-action 'main' or 'settings' depending on permissions.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -108,9 +115,7 @@ class ManageBoards_Controller
 		);
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->dispatch($subAction);
 	}
 
 	/**

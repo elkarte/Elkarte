@@ -24,6 +24,12 @@ if (!defined('ELKARTE'))
 class ManageNews_Controller
 {
 	/**
+	 * News settings form.
+	 * @var Settings_Form
+	 */
+	protected $_newsSettings;
+
+	/**
 	 * The news dispatcher; doesn't do anything, just delegates.
 	 * This is the entrance point for all News and Newsletter screens.
 	 * Called by ?action=admin;area=news.
@@ -34,27 +40,43 @@ class ManageNews_Controller
 	{
 		global $context, $txt;
 
-		// First, let's do a quick permissions check for the best error message possible.
-		isAllowedTo(array('edit_news', 'send_mail', 'admin_forum'));
-
-		loadTemplate('ManageNews');
-
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
-			'editnews' => array('action_editnews', 'edit_news'),
-			'mailingmembers' => array('action_mailingmembers', 'send_mail'),
-			'mailingcompose' => array('action_mailingcompose', 'send_mail'),
-			'mailingsend' => array('action_mailingsend', 'send_mail'),
-			'settings' => array('action_settings', 'admin_forum'),
+			'editnews' => array(
+				'controller' => $this,
+				'function' => 'action_editnews',
+				'permission' => 'edit_news'),
+			'mailingmembers' => array(
+				'controller' => $this,
+				'function' => 'action_mailingmembers',
+				'permission' => 'send_mail'),
+			'mailingcompose' => array(
+				'controller' => $this,
+				'function' => 'action_mailingcompose',
+				'permission' => 'send_mail'),
+			'mailingsend' => array(
+				'controller' => $this,
+				'function' => 'action_mailingsend',
+				'permission' => 'send_mail'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_newsSettings_display',
+				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_news', array(&$subActions));
+		call_integration_hook('integrate_manage_news');
 
 		// Default to sub action 'main' or 'settings' depending on permissions.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
 
-		// Have you got the proper permissions?
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
+
+		loadTemplate('ManageNews');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,10 +96,11 @@ class ManageNews_Controller
 		);
 
 		// Force the right area...
-		if (substr($_REQUEST['sa'], 0, 7) == 'mailing')
+		if (substr($subAction, 0, 7) == 'mailing')
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -919,19 +942,19 @@ class ManageNews_Controller
 	 *
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
-	function action_settings()
+	function action_newsSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initNewsSettingsForm();
 
-		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
+		$config_vars = $this->_newsSettings->settings();
+
+		call_integration_hook('integrate_modify_news_settings');
 
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-
-		// Needed for the settings template.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
@@ -957,6 +980,36 @@ class ManageNews_Controller
 		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize the news settings screen in admin area for the forum.
+	 *
+	 * @return array
+	 */
+	function _initNewsSettingsForm()
+	{
+		global $txt;
+
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_newsSettings = new Settings_Form();
+
+		$config_vars = array(
+			array('title', 'settings'),
+				// Inline permissions.
+				array('permissions', 'edit_news', 'help' => ''),
+				array('permissions', 'send_mail'),
+			'',
+				// Just the remaining settings.
+				array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
+				array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
+				array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
+		);
+
+		return $this->_newsSettings->settings($config_vars);
 	}
 
 	/**

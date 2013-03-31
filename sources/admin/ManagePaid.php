@@ -27,6 +27,12 @@ if (!defined('ELKARTE'))
 class ManagePaid_Controller
 {
 	/**
+	 * Paid subscriptions settings form.
+	 * @var Settings_Form
+	 */
+	protected $_paidSettings;
+
+	/**
 	 * The main entrance point for the 'Paid Subscription' screen, calling
 	 * the right function based on the given sub-action.
 	 * It defaults to sub-action 'view'.
@@ -88,7 +94,10 @@ class ManagePaid_Controller
 	{
 		global $context, $txt, $modSettings, $smcFunc, $scripturl;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_init_paidSettingsForm();
+
+		$config_vars = $this->_paidSettings->settings();
 
 		// Now load all the other gateway settings.
 		$gateways = loadPaymentGateways();
@@ -102,9 +111,6 @@ class ManagePaid_Controller
 				$config_vars = array_merge($config_vars, $setting_data);
 			}
 		}
-
-		// Get the settings template fired up.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
@@ -171,6 +177,38 @@ class ManagePaid_Controller
 	}
 
 	/**
+	 * Retrieve subscriptions settings and initialize the form.
+	 */
+	function _init_paidSettingsForm()
+	{
+		global $modSettings, $txt;
+
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_paidSettings = new Settings_Form();
+
+		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
+		$modSettings['paid_currency'] = !empty($modSettings['paid_currency_code']) ? $modSettings['paid_currency_code'] : '';
+		if (!empty($modSettings['paid_currency_code']) && !in_array($modSettings['paid_currency_code'], array('usd', 'eur', 'gbp')))
+			$modSettings['paid_currency'] = 'other';
+
+		// These are all the default settings.
+		$config_vars = array(
+				array('select', 'paid_email', array(0 => $txt['paid_email_no'], 1 => $txt['paid_email_error'], 2 => $txt['paid_email_all']), 'subtext' => $txt['paid_email_desc']),
+				array('text', 'paid_email_to', 'subtext' => $txt['paid_email_to_desc'], 'size' => 60),
+			'',
+				'dummy_currency' => array('select', 'paid_currency', array('usd' => $txt['usd'], 'eur' => $txt['eur'], 'gbp' => $txt['gbp'], 'other' => $txt['other']), 'javascript' => 'onchange="toggleOther();"'),
+				array('text', 'paid_currency_code', 'subtext' => $txt['paid_currency_code_desc'], 'size' => 5, 'force_div_id' => 'custom_currency_code_div'),
+				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
+				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
+		);
+
+		return $this->_paidSettings->settings($config_vars);
+	}
+
+	/**
 	 * Retrieve subscriptions settings.
 	 */
 	function settings()
@@ -192,6 +230,8 @@ class ManagePaid_Controller
 				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
+
+		return $config_vars;
 	}
 
 	/**

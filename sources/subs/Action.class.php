@@ -64,12 +64,8 @@ class Action
 		// for our sanity...
 		if (!key_exists($sa, $this->_subActions))
 		{
-			global $txt;
-
-			loadLanguage('Errors');
-
 			// send an error and get out of here
-			fatal_lang_error($txt['error_sa_not_set']);
+			fatal_lang_error('error_sa_not_set');
 		}
 
 		$subAction = $this->_subActions[$sa];
@@ -119,5 +115,30 @@ class Action
 					$subAction();
 			}
 		}
+	}
+
+	/**
+	 * Security check: verify that the user has the permission to perform the given action.
+	 * Verifies if the user has the permission set for the given action.
+	 * Return true if no permission was set for the action.
+	 * Results in a fatal_lang_error() if the user doesn't have permission,
+	 * or this instance wasn't initialized, or the action cannot be found in it.
+	 *
+	 * @param string $sa
+	 */
+	function isAllowedTo($sa)
+	{
+		if (is_array($this->_subActions) && key_exists($sa, $this->_subActions))
+		{
+			if (isset($this->_subActions[$sa]['permission']))
+				isAllowedTo($this->_subActions[$sa]['permission']);
+			return true;
+		}
+
+		// can't let you continue, sorry.
+		fatal_lang_error('error_sa_not_set');
+
+		// I said... can't.
+		trigger_error('No access...', E_USER_ERROR);
 	}
 }
