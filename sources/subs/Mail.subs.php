@@ -616,7 +616,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 
 /**
  * Prepare subject and message of an email for the preview box
- * Used in ComposeMailing and RetrievePreview (Xml.controller.php)
+ * Used in action_mailingcompose and RetrievePreview (Xml.controller.php)
  */
 function prepareMailingForPreview()
 {
