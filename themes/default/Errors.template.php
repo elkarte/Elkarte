@@ -193,7 +193,7 @@ function template_show_file()
 	<head>
 		<title>', $context['file_data']['file'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 	</head>
 	<body>
 		<table class="errorfile_table">';

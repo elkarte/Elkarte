@@ -56,7 +56,7 @@ function template_folder()
 
 	// The every helpful javascript!
 	echo '
-						<script type="text/javascript"><!-- // --><![CDATA[
+						<script><!-- // --><![CDATA[
 							var allLabels = {};
 							var currentLabels = {};
 							var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
@@ -600,7 +600,7 @@ function template_subject_list()
 		echo '
 							<tr class="', $next_alternate ? 'windowbg' : 'windowbg2', '">
 								<td class="centertext" style="width:4%">
-									<script type="text/javascript"><!-- // --><![CDATA[
+									<script><!-- // --><![CDATA[
 										currentLabels[', $message['id'], '] = {';
 
 		if (!empty($message['labels']))
@@ -816,7 +816,7 @@ function template_search()
 
 			// Some javascript for the advanced toggling
 			echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
@@ -1156,7 +1156,7 @@ function template_send()
 
 	// The vars used to preview a personal message without loading a new page.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var post_box_name = "', $context['post_box_name'], '";
 			var form_name = "postmodify";
 			var preview_area = "pm";
@@ -1220,7 +1220,7 @@ function template_send()
 	</div><br class="clear" />';
 
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var oPersonalMessageSend = new smf_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
 				sSessionId: smf_session_id,
@@ -1548,7 +1548,7 @@ function template_add_rule()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var criteriaNum = 0;
 		var actionNum = 0;
 		var groups = new Array()
@@ -1728,7 +1728,7 @@ function template_add_rule()
 
 	// Now setup all the bits!
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 	foreach ($context['rule']['criteria'] as $k => $c)
 		echo '

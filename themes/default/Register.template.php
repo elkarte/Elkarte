@@ -60,8 +60,8 @@ function template_registration_form()
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/register.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
+		<script><!-- // --><![CDATA[
 			function verifyAgree()
 			{
 				if (currentAuthMethod == \'passwd\' && document.forms.registration.smf_autov_pwmain.value != document.forms.registration.smf_autov_pwverify.value)
@@ -360,7 +360,7 @@ function template_registration_form()
 			<input type="hidden" name="step" value="2" />
 		</form>
 
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var regTextStrings = {
 				"username_valid": "', $txt['registration_username_available'], '",
 				"username_invalid": "', $txt['registration_username_unavailable'], '",
@@ -488,8 +488,8 @@ function template_verification_sound()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
-		<style type="text/css">';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<style>';
 
 	// Just show the help text and a "close window" link.
 	echo '

@@ -36,7 +36,7 @@ function template_editsets()
 		</div>
 	</div>
 
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		window.smfForum_scripturl = smf_scripturl;
 		window.smfForum_sessionid = smf_session_id;
 		window.smfForum_sessionvar = smf_session_var;
@@ -44,10 +44,10 @@ function template_editsets()
 
 	if (empty($modSettings['disable_elk_js']))
 		echo '
-	<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
+	<script src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		function smfSetLatestSmileys()
 		{
 			if (typeof(window.smfLatestSmileys) != "undefined")
@@ -246,7 +246,7 @@ function template_modifysmiley()
 		</form>
 	</div>
 
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		function updatePreview()
 		{
 			var currentImage = document.getElementById("preview");

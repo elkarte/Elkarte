@@ -217,8 +217,8 @@ function template_main()
 		}
 
 		echo '
-					<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+					<script><!-- // --><![CDATA[
 						createEventListener(window);
 						window.addEventListener("load", initSearch, false);
 
@@ -545,7 +545,7 @@ function template_results()
 	echo '
 				<br class="clear" />
 				<div class="smalltext righttext" id="search_jump_to">&nbsp;</div>
-				<script type="text/javascript"><!-- // --><![CDATA[';
+				<script><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		echo '
