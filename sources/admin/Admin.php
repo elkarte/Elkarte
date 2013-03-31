@@ -122,8 +122,9 @@ function AdminMain()
 				),
 				'featuresettings' => array(
 					'label' => $txt['modSettings_title'],
-					'file' => 'ManageSettings.php',
-					'function' => 'ModifyFeatureSettings',
+					'file' => 'ManageFeatures.php',
+					'controller' => 'ManageFeatures_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_features',
 					'subsections' => array(
@@ -866,7 +867,7 @@ class Admin_Controller
 
 		// All the files we need to include.
 		$include_files = array(
-			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
+			'ManageFeatures', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
 			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
 			'ManageAddonSettings', 'ManageSecurity'
@@ -876,13 +877,13 @@ class Admin_Controller
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
 			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-			array('ModifyBasicSettings', 'area=featuresettings;sa=basic'),
-			array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
-			array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
-			array('ModifySignatureSettings', 'area=featuresettings;sa=sig'),
-			array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('ModifySpamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('ModifyModerationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
+			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
+			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
+			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
+			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
+			array('_initSecuritySettingsForm', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
+			array('_initSpamSettingsForm', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
+			array('_initModerationSettingsForm', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
 			array('settings', 'area=modsettings;sa=general', 'ManageAddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
