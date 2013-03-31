@@ -105,13 +105,13 @@ function template_admin()
 	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_elk_js']))
 		echo '
-					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
+					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-					<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
+					<script><!-- // --><![CDATA[
 						var oAdminIndex = new smf_AdminIndex({
 							sSelf: \'oAdminCenter\',
 
@@ -278,7 +278,7 @@ function template_credits()
 
 	// This makes all the support information available to the support script...
 	echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						var ourSupportVersions = {};
 
 						ourSupportVersions.forum = "', $context['forum_version'], '";';
@@ -291,13 +291,13 @@ function template_credits()
 	// Now we just have to include the script and wait ;).
 	echo '
 					// ]]></script>
-					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
-					<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
+					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
+					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+					<script src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						function ourCurrentVersion()
 						{
 							var ourVer, yourVer;
@@ -696,8 +696,8 @@ function template_view_versions()
 	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	   file categories. (sources, languages, and templates.) */
 	echo '
-						<script type="text/javascript" src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
-						<script type="text/javascript"><!-- // --><![CDATA[
+						<script src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
+						<script><!-- // --><![CDATA[
 							var oViewVersions = new smf_ViewVersions({
 								aKnownLanguages: [
 									\'.', implode('\',
@@ -750,7 +750,7 @@ function template_edit_censored()
 					<div id="moreCensoredWords"></div><div style="margin-top: 1ex; display: none;" id="moreCensoredWords_link">
 						<a class="button_link" style="float: left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 					</div>
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						document.getElementById("moreCensoredWords_link").style.display = "";
 					// ]]></script>
 					<hr class="hrcolor clear" style="width:100%; height:1px" />
@@ -833,7 +833,7 @@ function template_not_done()
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var countdown = ', $context['continue_countdown'], ';
 		var txt_message = "', $txt['not_done_continue'], '";
 		doAutoSubmit();
@@ -847,7 +847,7 @@ function template_show_settings()
 
 	if (!empty($context['settings_pre_javascript']))
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[', $context['settings_pre_javascript'], '// ]]></script>';
+	<script><!-- // --><![CDATA[', $context['settings_pre_javascript'], '// ]]></script>';
 
 	if (!empty($context['settings_insert_above']))
 		echo $context['settings_insert_above'];
@@ -1087,7 +1087,7 @@ function template_show_settings()
 
 	if (!empty($context['settings_post_javascript']))
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 	', $context['settings_post_javascript'], '
 	// ]]></script>';
 
@@ -1102,7 +1102,7 @@ function template_show_custom_profile()
 	template_show_list('standard_profile_fields');
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var iNumChecks = document.forms.standardProfileFields.length;
 		for (var i = 0; i < iNumChecks; i++)
 			if (document.forms.standardProfileFields[i].id.indexOf(\'reg_\') == 0)
@@ -1120,7 +1120,7 @@ function template_edit_profile_field()
 
 	// All the javascript for this page - quite a bit in script.js!
 	echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						var startOptID = ', count($context['field']['options']), ';
 					// ]]></script>';
 
@@ -1335,7 +1335,7 @@ function template_edit_profile_field()
 
 	// Get the javascript bits right!
 	echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						updateInputBoxes();
 					// ]]></script>';
 }
@@ -1415,7 +1415,7 @@ function template_core_features()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var token_name,
 			token_value,
 			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
@@ -1677,7 +1677,7 @@ function template_repair_boards()
 	if (!empty($context['redirect_to_recount']))
 	{
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var countdown = 5;
 		var txt_message = "', $txt['errors_recount_now'], '";
 		var formName = "recount_form";

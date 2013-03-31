@@ -2210,6 +2210,9 @@ div#pollmoderation {
 .poster img {
 	vertical-align: middle;
 }
+.avatar img {
+	border: 0;
+}
 
 /* End nifty new flyout. */
 

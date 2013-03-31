@@ -58,7 +58,7 @@ function template_main()
 						</a>
 					</td>
 					<td class="info">
-						<a class="subject" href="', $board['href'], '" name="b', $board['id'], '">', $board['name'], '</a>';
+						<a class="subject" href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 
 			// Has it outstanding posts for approval?
 			if ($board['can_approve_posts'] && ($board['unapproved_posts'] || $board['unapproved_topics']))
@@ -404,7 +404,7 @@ function template_main()
 			</p>';
 
 	echo '
-			<script type="text/javascript"><!-- // --><![CDATA[';
+			<script><!-- // --><![CDATA[';
 
 	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		echo '
@@ -446,7 +446,7 @@ function template_main()
 
 	// Javascript for inline editing.
 	echo '
-<script type="text/javascript"><!-- // --><![CDATA[
+<script><!-- // --><![CDATA[
 	var oQuickModifyTopic = new QuickModifyTopic({
 		aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
 		bMouseOnDiv: false,

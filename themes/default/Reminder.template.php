@@ -91,7 +91,7 @@ function template_set_password()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/register.js"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" id="reminder_form" method="post" accept-charset="UTF-8">
 		<div class="tborder login">
@@ -123,7 +123,7 @@ function template_set_password()
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		<input type="hidden" name="', $context['remind-sp_token_var'], '" value="', $context['remind-sp_token'], '" />
 	</form>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 	var regTextStrings = {
 		"password_short": "', $txt['registration_password_short'], '",
 		"password_reserved": "', $txt['registration_password_reserved'], '",
@@ -140,7 +140,7 @@ function template_ask()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/register.js"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator" id="creator">
 		<div class="tborder login">
@@ -186,7 +186,7 @@ function template_ask()
 
 	if ($context['account_type'] == 'password')
 		echo '
-<script type="text/javascript"><!-- // --><![CDATA[
+<script><!-- // --><![CDATA[
 	var regTextStrings = {
 		"password_short": "', $txt['registration_password_short'], '",
 		"password_reserved": "', $txt['registration_password_reserved'], '",

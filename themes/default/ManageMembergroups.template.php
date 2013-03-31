@@ -141,7 +141,7 @@ function template_new_group()
 	if ($context['undefined_group'])
 	{
 		echo '
-			<script type="text/javascript"><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[
 				function swapPostGroup(isChecked)
 				{
 					var min_posts_text = document.getElementById(\'min_posts_text\');
@@ -327,7 +327,7 @@ function template_edit_group()
 			<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
 		</form>
 	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		aIconLists[aIconLists.length] = new IconList({
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
@@ -350,8 +350,8 @@ function template_edit_group()
 			sItemBackgroundHover: "#e0e0f0"
 		});
 	// ]]></script>
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script><!-- // --><![CDATA[
 		var oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
 			sSessionId: smf_session_id,
@@ -380,7 +380,7 @@ function template_edit_group()
 
 	if ($context['group']['allow_post_group'])
 		echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			function swapPostGroup(isChecked)
 			{
 				var min_posts_text = document.getElementById(\'min_posts_text\');
@@ -472,7 +472,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 									<input type="radio" name="select_all" id="deny_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'deny\');" /> <label for="deny_all">', $txt['board_perms_deny'], '</label>
 								</span>
 							</fieldset>
-							<script type="text/javascript"><!-- // --><![CDATA[
+							<script><!-- // --><![CDATA[
 								$(document).ready(function () {
 									$(".select_all_box").each(function () {
 										$(this).removeClass(\'select_all_box\');
@@ -483,7 +483,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	if ($collapse)
 		echo '
 							<a href="javascript:void(0);" onclick="document.getElementById(\'visible_boards\').style.display = \'block\'; document.getElementById(\'visible_boards_link\').style.display = \'none\'; return false;" id="visible_boards_link" style="display: none;">[ ', $txt['membergroups_select_visible_boards'], ' ]</a>
-							<script type="text/javascript"><!-- // --><![CDATA[
+							<script><!-- // --><![CDATA[
 								document.getElementById("visible_boards_link").style.display = "";
 								document.getElementById("visible_boards").style.display = "none";
 							// ]]></script>';
@@ -671,8 +671,8 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+		<script><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: smf_session_id,

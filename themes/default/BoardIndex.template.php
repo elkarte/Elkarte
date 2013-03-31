@@ -43,8 +43,8 @@ function template_main()
 			</li>
 		</ul>
 	</div>
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
+	<script><!-- // --><![CDATA[
 
 		// Create a news fader object.
 		var oNewsFader = new smc_NewsFader({
@@ -151,7 +151,7 @@ function template_main()
 						</a>
 					</td>
 					<td class="info">
-						<a class="subject" href="', $board['href'], '" name="b', $board['id'], '">', $board['name'], '</a>';
+						<a class="subject" href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 
 				// Has it outstanding posts for approval?
 				if ($board['can_approve_posts'] && ($board['unapproved_posts'] || $board['unapproved_topics']))
@@ -437,7 +437,7 @@ function template_info_center()
 
 	// Info center collapse object.
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var oInfoCenterToggle = new smc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',

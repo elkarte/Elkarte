@@ -2628,7 +2628,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style=' . $max_avatar_width . $max_avatar_height . '" alt="" border="0" />',
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style=' . $max_avatar_width . $max_avatar_height . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -2641,7 +2641,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" border="0" />',
+			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2661,7 +2661,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		$avatar = array(
 			'name' => '',
-			'image' => '<img src="' . $modSettings['avatar_url'] . '/default_avatar.png' . '" alt="" class="avatar" border="0" />',
+			'image' => '<img src="' . $modSettings['avatar_url'] . '/default_avatar.png' . '" alt="" class="avatar" />',
 			'href' => $modSettings['avatar_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);

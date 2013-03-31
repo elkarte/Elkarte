@@ -178,7 +178,7 @@ function template_ban_edit()
 
 	echo '
 	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var fUpdateStatus = function ()
 		{
 			document.getElementById("expire_date").disabled = !document.getElementById("expires_one_day").checked;
@@ -290,8 +290,8 @@ function template_ban_edit_trigger()
 		</form>
 	</div>
 
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: smf_session_id,

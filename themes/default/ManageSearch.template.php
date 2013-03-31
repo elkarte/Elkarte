@@ -284,7 +284,7 @@ function template_create_index_progress()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var countdown = 10;
 		var txt_message = "', $txt['search_create_index_continue'], '";
 		doAutoSubmit();
