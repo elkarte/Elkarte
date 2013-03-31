@@ -96,7 +96,7 @@ function unlinkMessages($msg, $topic)
 	global $smcFunc;
 
 	$smcFunc['db_query']('', '
-		DELERE FROM {db_prefix}follow_ups
+		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from = {int:id_msg}
 			AND follow_up = {int:id_topic}
 		LIMIT 1',
@@ -115,7 +115,7 @@ function removeFollowUpsByTopic($topics)
 	global $smcFunc;
 
 	$smcFunc['db_query']('', '
-		DELERE FROM {db_prefix}follow_ups
+		DELETE FROM {db_prefix}follow_ups
 		WHERE follow_up IN ({array_int:id_topics})',
 		array(
 			'id_topics' => is_array($topics) ? $topics : array($topics),
@@ -131,7 +131,7 @@ function removeFollowUpsByMessage($msgs)
 	global $smcFunc;
 
 	$smcFunc['db_query']('', '
-		DELERE FROM {db_prefix}follow_ups
+		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from IN ({array_int:id_msgs})',
 		array(
 			'id_msgs' => is_array($msgs) ? $msgs : array($msgs),
