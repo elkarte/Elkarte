@@ -28,6 +28,12 @@ if (!defined('ELKARTE'))
 class ManageSearchEngines_Controller
 {
 	/**
+	 * Search engines settings form
+	 * @var Settings_Form
+	 */
+	protected $_engineSettings;
+
+	/**
  	* Entry point for this section.
  	*/
 	function action_index()
@@ -40,18 +46,24 @@ class ManageSearchEngines_Controller
 		loadTemplate('ManageSearch');
 
 		$subActions = array(
-			'editspiders' => 'action_editspiders',
-			'logs' => 'action_logs',
-			'settings' => 'action_settings',
-			'spiders' => 'action_spiders',
-			'stats' => 'action_stats',
+			'editspiders' => array($this, 'action_editspiders'),
+			'logs' => array($this, 'action_logs'),
+			'settings' => array($this, 'action_engineSettings_display'),
+			'spiders' => array($this, 'action_spiders'),
+			'stats' => array($this, 'action_stats'),
 		);
 
 		call_integration_hook('integrate_manage_search_engines', array(&$subActions));
 
 		// Ensure we have a valid subaction.
-		$context['sub_action'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
 
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// Some contextual data for the template.
+		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['search_engines'];
 
 		// Some more tab data.
@@ -60,18 +72,21 @@ class ManageSearchEngines_Controller
 			'description' => $txt['search_engines_description'],
 		);
 
-		// Call the right method...
-		$this->{$subActions[$context['sub_action']]}();
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * This is the admin settings page for search engines.
 	 */
-	function action_settings()
+	function action_engineSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl, $smcFunc;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initEngineSettingsForm();
+
+		$config_vars = $this->_engineSettings->settings();
 
 		// Set up a message.
 		$context['settings_message'] = '<span class="smalltext">' . sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']) . '</span>';
@@ -151,8 +166,34 @@ class ManageSearchEngines_Controller
 		Settings_Form::prepare_db($config_vars);
 	}
 
+/**
+	 * Initialize the form with configuration settings for search engines
+	 *
+	 * @return array
+	 */
+	function _initEngineSettingsForm()
+	{
+		global $txt;
+
+		// This is really quite wanting.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Instantiate the form
+		$this->_engineSettings = new Settings_Form();
+
+		$config_vars = array(
+			// How much detail?
+			array('select', 'spider_mode', 'subtext' => $txt['spider_mode_note'], array($txt['spider_mode_off'], $txt['spider_mode_standard'], $txt['spider_mode_high'], $txt['spider_mode_vhigh']), 'onchange' => 'disableFields();'),
+			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'], $txt['membergroups_members'])),
+			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
+		);
+
+		return $this->_engineSettings->settings($config_vars);
+	}
+
 	/**
 	 * Return configuration settings for search engines
+	 * Used by admin search.
 	 *
 	 * @return array
 	 */
