@@ -75,31 +75,31 @@ require_once(SUBSDIR . '/Settings.class.php');
 class ManageServer_Controller
 {
 	/**
-	 * Database settings form controller
+	 * Database settings form
 	 * @var Settings_Form
 	 */
 	protected $_databaseSettingsForm;
 
 	/**
-	 * General settings form controller
+	 * General settings form
 	 * @var Settings_Form
 	 */
 	protected $_generalSettingsForm;
 
 	/**
-	 * Cache settings form controller
+	 * Cache settings form
 	 * @var Settings_Form
 	 */
 	protected $_cacheSettingsForm;
 
 	/**
-	 * Cookies settings form controller
+	 * Cookies settings form
 	 * @var Settings_Form
 	 */
 	protected $_cookieSettingsForm;
 
 	/**
-	 * Load balancing settings form controller
+	 * Load balancing settings form
 	 * @var Settings_Form
 	 */
 	protected $_balancingSettingsForm;
@@ -153,14 +153,19 @@ class ManageServer_Controller
 		call_integration_hook('integrate_server_settings', array(&$subActions));
 
 		// By default we're editing the core settings
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		$context['sub_action'] = $subAction;
 
 		// Any messages to speak of?
 		$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
-		if ($_REQUEST['sa'] != 'cache')
+		if ($subAction != 'cache')
 		{
 			// Warn the user if the backup of Settings.php failed.
 			$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -175,9 +180,7 @@ class ManageServer_Controller
 		}
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->dispatch($subAction);
 	}
 
 	/**

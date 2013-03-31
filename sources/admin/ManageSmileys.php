@@ -27,6 +27,12 @@ if (!defined('ELKARTE'))
 class ManageSmileys_Controller
 {
 	/**
+	 * Smileys configuration settings form
+	 * @var Settings_Form
+	 */
+	protected $_smileySettings;
+
+	/**
 	 * This is the dispatcher of smileys administration.
 	 */
 	function action_index()
@@ -39,17 +45,17 @@ class ManageSmileys_Controller
 		loadTemplate('ManageSmileys');
 
 		$subActions = array(
-			'addsmiley' => 'action_addsmiley',
-			'editicon' => 'action_editicon',
-			'editicons' => 'action_editicon',
-			'editsets' => 'action_edit',
-			'editsmileys' => 'action_editsmiley',
-			'import' => 'action_edit',
-			'modifyset' => 'action_edit',
-			'modifysmiley' => 'action_editsmiley',
-			'setorder' => 'action_setorder',
-			'settings' => 'action_settings',
-			'install' => 'action_install'
+			'addsmiley' => array($this, 'action_addsmiley'),
+			'editicon' => array($this, 'action_editicon'),
+			'editicons' => array($this, 'action_editicon'),
+			'editsets' => array($this, 'action_edit'),
+			'editsmileys' => array($this, 'action_editsmiley'),
+			'import' => array($this, 'action_edit'),
+			'modifyset' => array($this, 'action_edit'),
+			'modifysmiley' => array($this, 'action_editsmiley'),
+			'setorder' => array($this, 'action_setorder'),
+			'settings' => array($this, 'action_smileySettings_display'),
+			'install' => array($this, 'action_install')
 		);
 
 		call_integration_hook('integrate_manage_smileys', array(&$subActions));
@@ -70,10 +76,15 @@ class ManageSmileys_Controller
 		}
 
 		// Default the sub-action to 'edit smiley settings'.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
 
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// Set up template stuff
 		$context['page_title'] = $txt['smileys_manage'];
-		$context['sub_action'] = $_REQUEST['sa'];
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -113,19 +124,22 @@ class ManageSmileys_Controller
 		}
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Displays and allows to modify smileys settings.
 	 */
-	function action_settings()
+	function action_smileySettings_display()
 	{
 		global $modSettings, $context, $settings, $txt, $scripturl;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initSmileySettingsForm();
 
-		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
+		$config_vars = $this->_smileySettings->settings();
+
+		call_integration_hook('integrate_modify_smiley_settings');
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -161,6 +175,50 @@ class ManageSmileys_Controller
 		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Retrieve and initialize the form with smileys administration settings.
+	 */
+	function _initSmileySettingsForm()
+	{
+		global $txt, $modSettings;
+
+		// This is really quite wanting.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Instantiate the form
+		$this->_smileySettings = new Settings_Form();
+
+		// The directories...
+		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
+		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
+
+		// Get the names of the smiley sets.
+		$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
+		$set_names = explode("\n", $modSettings['smiley_sets_names']);
+
+		$smiley_context = array();
+		foreach ($smiley_sets as $i => $set)
+			$smiley_context[$set] = $set_names[$i];
+
+		// All the settings for the page...
+		$config_vars = array(
+			array('title', 'settings'),
+				// Inline permissions.
+				array('permissions', 'manage_smileys'),
+			'',
+				array('select', 'smiley_sets_default', $smiley_context),
+				array('check', 'smiley_sets_enable'),
+				array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
+				array('text', 'smileys_url', 40),
+				array('text', 'smileys_dir', 'invalid' => !$context['smileys_dir_found'], 40),
+			'',
+				// Message icons.
+				array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
+		);
+
+		return $this->_smileySettings->settings($config_vars);
 	}
 
 	/**

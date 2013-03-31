@@ -62,7 +62,7 @@ class Action
 	function dispatch($sa)
 	{
 		// for our sanity...
-		if (!key_exists($sa, $this->_subActions))
+		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
 			// send an error and get out of here
 			fatal_lang_error('error_sa_not_set');

@@ -21,7 +21,7 @@ $txt['smiley_sets_url'] = 'URL';
 $txt['smiley_sets_default'] = 'Default';
 
 $txt['smiley_sets_latest'] = 'Smileys of the moment';
-$txt['smiley_sets_latest_fetch'] = 'Loading smiley information from simplemachines.org...';
+$txt['smiley_sets_latest_fetch'] = 'Loading smiley information...';
 
 $txt['smileys_add_method'] = 'Image Source';
 $txt['smileys_add_existing'] = 'Use existing file';
