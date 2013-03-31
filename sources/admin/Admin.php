@@ -867,7 +867,7 @@ class Admin_Controller
 
 		// All the files we need to include.
 		$include_files = array(
-			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
+			'ManageFeatures', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
 			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
 			'ManageAddonSettings', 'ManageSecurity'
@@ -877,10 +877,10 @@ class Admin_Controller
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
 			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic'),
-			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout'),
-			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma'),
-			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig'),
+			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
+			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
+			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
+			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
 			array('_initSecuritySettingsForm', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('_initSpamSettingsForm', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
 			array('_initModerationSettingsForm', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
