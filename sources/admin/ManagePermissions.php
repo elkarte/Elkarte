@@ -48,21 +48,55 @@ class ManagePermissions_Controller
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(
-			'board' => array('action_board', 'manage_permissions'),
-			'index' => array('action_list', 'manage_permissions'),
-			'modify' => array('action_modify', 'manage_permissions'),
-			'modify2' => array('action_modify2', 'manage_permissions'),
-			'quick' => array('action_quick', 'manage_permissions'),
-			'quickboard' => array('action_quickboard', 'manage_permissions'),
-			'postmod' => array('action_postmod', 'manage_permissions', 'disabled' => !in_array('pm', $context['admin_features'])),
-			'profiles' => array('action_profiles', 'manage_permissions'),
-			'settings' => array('action_permSettings_display', 'admin_forum'),
+			'board' => array(
+				'controller' => $this,
+				'function' => 'action_board',
+				'permission' => 'manage_permissions'),
+			'index' => array(
+				'controller' => $this,
+				'function' => 'action_list',
+				'permission' => 'manage_permissions'),
+			'modify' => array(
+				'controller' => $this,
+				'function' => 'action_modify',
+				'permission' => 'manage_permissions'),
+			'modify2' => array(
+				'controller' => $this,
+				'function' => 'action_modify2',
+				'permission' => 'manage_permissions'),
+			'quick' => array(
+				'controller' => $this,
+				'function' => 'action_quick',
+				'permission' => 'manage_permissions'),
+			'quickboard' => array(
+				'controller' => $this,
+				'function' => 'action_quickboard',
+				'permission' => 'manage_permissions'),
+			'postmod' => array(
+				'controller' => $this,
+				'function' => 'action_postmod',
+				'permission' => 'manage_permissions',
+				'disabled' => !in_array('pm', $context['admin_features'])),
+			'profiles' => array(
+				'controller' => $this,
+				'function' => 'action_profiles',
+				'permission' => 'manage_permissions'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_permSettings_display',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_permissions', array(&$subActions));
 
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -88,7 +122,8 @@ class ManagePermissions_Controller
 			),
 		);
 
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**

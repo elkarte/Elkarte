@@ -48,20 +48,39 @@ class ManagePaid_Controller
 		loadTemplate('ManagePaid');
 
 		$subActions = array(
-			'modify' => array('action_modify', 'admin_forum'),
-			'modifyuser' => array('action_modifyuser', 'admin_forum'),
-			'settings' => array('action_settings', 'admin_forum'),
-			'view' => array('action_view', 'admin_forum'),
-			'viewsub' => array('action_viewsub', 'admin_forum'),
+			'modify' => array(
+				'controller' => $this,
+				'function' => 'action_modify',
+				'permission' => 'admin_forum'),
+			'modifyuser' => array(
+				'controller' => $this,
+				'function' => 'action_modifyuser',
+				'permission' => 'admin_forum'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_paidSettings_display',
+				'permission' => 'admin_forum'),
+			'view' => array(
+				'controller' => $this,
+				'function' => 'action_view',
+				'permission' => 'admin_forum'),
+			'viewsub' => array(
+				'controller' => $this,
+				'function' => 'action_viewsub',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_subscriptions', array(&$subActions));
 
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
-		// Make sure you can do this.
-		isAllowedTo($subActions[$_REQUEST['sa']][1]);
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
 
 		$context['page_title'] = $txt['paid_subscriptions'];
 
@@ -81,7 +100,7 @@ class ManagePaid_Controller
 		);
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -90,7 +109,7 @@ class ManagePaid_Controller
 	 * It requires the moderate_forum permission
 	 * Accessed from ?action=admin;area=paidsubscribe;sa=settings.
 	 */
-	function action_settings()
+	function action_paidSettings_display()
 	{
 		global $context, $txt, $modSettings, $smcFunc, $scripturl;
 
