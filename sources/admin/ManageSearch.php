@@ -25,6 +25,12 @@ if (!defined('ELKARTE'))
 class ManageSearch_Controller
 {
 	/**
+	 * Search settings form
+	 * @var Settings_Form
+	 */
+	protected $_searchSettings;
+
+	/**
 	 * Main entry point for the admin search settings screen.
 	 * It checks permissions, and it forwards to the appropriate function based on
 	 * the given sub-action.
@@ -47,22 +53,26 @@ class ManageSearch_Controller
 		db_extend('search');
 
 		$subActions = array(
-			'settings' => 'action_settings',
-			'weights' => 'action_weight',
-			'method' => 'action_edit',
-			'createfulltext' => 'action_edit',
-			'removecustom' => 'action_edit',
-			'removefulltext' => 'action_edit',
-			'createmsgindex' => 'action_create',
-			'managesphinx' => 'action_managesphinx',
+			'settings' => array($this, 'action_searchSettings_display'),
+			'weights' => array($this, 'action_weight'),
+			'method' => array($this, 'action_edit'),
+			'createfulltext' => array($this, 'action_edit'),
+			'removecustom' => array($this, 'action_edit'),
+			'removefulltext' => array($this, 'action_edit'),
+			'createmsgindex' => array($this, 'action_create'),
+			'managesphinx' => array($this, 'action_managesphinx'),
 		);
 
 		call_integration_hook('integrate_manage_search', array(&$subActions));
 
 		// Default the sub-action to 'edit search settings'.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
 
-		$context['sub_action'] = $_REQUEST['sa'];
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		$context['sub_action'] = $subAction;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -83,7 +93,7 @@ class ManageSearch_Controller
 		);
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -93,11 +103,14 @@ class ManageSearch_Controller
 	 *
 	 * @uses ManageSearch template, 'modify_settings' sub-template.
 	 */
-	function action_settings()
+	function action_searchSettings_display()
 	{
 		global $txt, $context, $scripturl, $modSettings, $smcFunc;
 
-		$config_vars = $this->settings();
+		// initialize the form
+		$this->_initSearchSettingsForm();
+
+		$config_vars = $this->_searchSettings->settings();
 
 		if (!isset($context['settings_post_javascript']))
 			$context['settings_post_javascript'] = '';
@@ -123,9 +136,6 @@ class ManageSearch_Controller
 				'url' => '',
 				'separator' => '',
 			);
-
-		// We'll need this for the settings.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// A form was submitted.
 		if (isset($_REQUEST['save']))
@@ -163,6 +173,41 @@ class ManageSearch_Controller
 		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize admin searchSettings form with the existing forum settings
+	 * for search.
+	 *
+	 * @return array
+	 */
+	function _initSearchSettingsForm()
+	{
+		global $txt;
+
+		// This is really quite wanting.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Instantiate the form
+		$this->_searchSettings = new Settings_Form();
+
+		// What are we editing anyway?
+		$config_vars = array(
+				// Permission...
+				array('permissions', 'search_posts'),
+				// Some simple settings.
+				array('check', 'simpleSearch'),
+				array('check', 'search_dropdown'),
+				array('int', 'search_results_per_page'),
+				array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
+			'',
+				// Some limitations.
+				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
+			array('title', 'additiona_search_engines'),
+				array('callback', 'external_search_engines'),
+		);
+
+		return $this->_searchSettings->settings($config_vars);
 	}
 
 	/**
