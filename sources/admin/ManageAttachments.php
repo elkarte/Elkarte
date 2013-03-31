@@ -226,7 +226,6 @@ class ManageAttachments_Controller
 		$this->_attachSettingsForm = new Settings_Form();
 
 		// initialize settings
-
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Get the current attachment directory.

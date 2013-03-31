@@ -136,8 +136,9 @@ function AdminMain()
 				),
 				'securitysettings' => array(
 					'label' => $txt['admin_security_moderation'],
-					'file' => 'ManageSettings.php',
-					'function' => 'ModifySecuritySettings',
+					'file' => 'ManageSecurity.php',
+					'controller' => 'ManageSecurity_Controller',
+					'function' => 'action_index',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_security',
 					'subsections' => array(
@@ -868,7 +869,7 @@ class Admin_Controller
 			'ManageSettings', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
 			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
-			'ManageAddonSettings'
+			'ManageAddonSettings', 'ManageSecurity'
 		);
 
 		// This is a special array of functions that contain setting data
@@ -879,10 +880,10 @@ class Admin_Controller
 			array('ModifyLayoutSettings', 'area=featuresettings;sa=layout'),
 			array('ModifyKarmaSettings', 'area=featuresettings;sa=karma'),
 			array('ModifySignatureSettings', 'area=featuresettings;sa=sig'),
-			array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general'),
-			array('ModifySpamSettings', 'area=securitysettings;sa=spam'),
-			array('ModifyModerationSettings', 'area=securitysettings;sa=moderation'),
-			array('settings', 'area=modsettings;sa=general'),
+			array('ModifyGeneralSecuritySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
+			array('ModifySpamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
+			array('ModifyModerationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
+			array('settings', 'area=modsettings;sa=general', 'ManageAddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
@@ -905,6 +906,7 @@ class Admin_Controller
 			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
 			array('settings', 'area=managedrafts', 'ManageDrafts_Controller'),
+			array('_initBBSettingsForm', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller')
 		);
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
