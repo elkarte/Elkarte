@@ -30,6 +30,12 @@ if (!defined('ELKARTE'))
 class ManageRegistration_Controller
 {
 	/**
+	 * Registration settings form
+	 * @var Settings_Form
+	 */
+	protected $_registerSettings;
+
+	/**
 	 * Entrance point for the registration center, it checks permisions and forwards
 	 * to the right method based on the subaction.
 	 * Accessed by ?action=admin;area=regcenter.
@@ -42,24 +48,36 @@ class ManageRegistration_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
-		// Old templates might still request this.
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'browse')
-			redirectexit('action=admin;area=viewmembers;sa=browse' . (isset($_REQUEST['type']) ? ';type=' . $_REQUEST['type'] : ''));
-
 		$subActions = array(
-			'register' => array('action_register', 'moderate_forum'),
-			'agreement' => array('action_agreement', 'admin_forum'),
-			'reservednames' => array('action_reservednames', 'admin_forum'),
-			'settings' => array('action_settings', 'admin_forum'),
+			'register' => array(
+				'controller' => $this,
+				'function' => 'action_register',
+				'permission' => 'moderate_forum'),
+			'agreement' => array(
+				'controller' => $this,
+				'function' => 'action_agreement',
+				'permission' => 'admin_forum'),
+			'reservednames' => array(
+				'controller' => $this,
+				'function' => 'action_reservednames',
+				'permission' => 'admin_forum'),
+			'settings' => array(
+				'controller' => $this,
+				'function' => 'action_registerSettings_display',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_registrations', array(&$subActions));
 
 		// Work out which to call...
-		$context['sub_action'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('moderate_forum') ? 'register' : 'settings');
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('moderate_forum') ? 'register' : 'settings');
 
-		// Must have sufficient permissions.
-		isAllowedTo($subActions[$context['sub_action']][1]);
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions);
+
+		// You way will end here if you don't have permission.
+		$action->isAllowedTo($subAction);
 
 		// Loading, always loading.
 		loadLanguage('Login');
@@ -85,9 +103,11 @@ class ManageRegistration_Controller
 				)
 			)
 		);
+		// @todo is this useless?
+		$context['sub_action'] = $subAction;
 
-		// Finally, get around to calling the function...
-		$this->{$subActions[$context['sub_action']][0]}();
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -281,16 +301,16 @@ class ManageRegistration_Controller
 	 * Accessed by ?action=admin;area=regcenter;sa=settings.
 	 * Requires the admin_forum permission.
 	 */
-	function action_settings()
+	function action_registerSettings_display()
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
-		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		// initialize the form
+		$this->_init_registerSettingsForm();
 
-		$config_vars = $this->settings();
+		$config_vars = $this->_registerSettings->settings();
 
-		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_registration_settings');
 
 		// Setup the template
 		$context['sub_template'] = 'show_settings';
@@ -335,6 +355,38 @@ class ManageRegistration_Controller
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
 		Settings_Form::prepare_db($config_vars);
+	}
+
+ 	/**
+ 	 * Initialize settings form with the configuration settings
+ 	 *  for new members registration.
+	 *
+	 * @return array;
+	 */
+	function _init_registerSettingsForm()
+	{
+		global $txt;
+
+		// This is really quite wanting.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Instantiate the form
+		$this->_registerSettings = new Settings_Form();
+
+		$config_vars = array(
+				array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
+				array('check', 'enableOpenID'),
+				array('check', 'notify_new_registration'),
+				array('check', 'send_welcomeEmail'),
+			'',
+				array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
+				array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
+				array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
+				array('text', 'coppaFax'),
+				array('text', 'coppaPhone'),
+		);
+
+		return $this->_registerSettings->settings($config_vars);
 	}
 
 	/**

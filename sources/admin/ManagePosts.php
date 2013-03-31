@@ -67,7 +67,7 @@ class ManagePosts_Controller
 		call_integration_hook('integrate_manage_posts', array(&$subActions));
 
 		// Default the sub-action to 'posts'.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'posts';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'posts';
 
 		$context['page_title'] = $txt['manageposts_title'];
 
@@ -95,7 +95,7 @@ class ManagePosts_Controller
 		// Call the right function for this sub-action.
 		$action = new Action();
 		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->dispatch($subAction);
 	}
 
 	/**
