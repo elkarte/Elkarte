@@ -429,3 +429,6 @@ $txt['restore_not_found'] = 'The following messages could not be restored; the o
 $txt['error_invalid_dir'] = 'The directory you entered is invalid.';
 
 $txt['error_sqlite_optimizing'] = 'Sqlite is optimizing the database, the forum can not be accessed until it has finished.  Please try refreshing this page momentarily.';
+
+// Admin/dispatching strings
+$txt['error_sa_not_set'] = 'Sub-action not set';

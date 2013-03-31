@@ -21,89 +21,107 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Finds or repairs errors in the database to fix possible problems.
- * Requires the admin_forum permission.
- * Calls createSalvageArea() to create a new board, if necesary.
- * Accessed by ?action=admin;area=repairboards.
- *
- * @uses raw_data sub-template.
+ * Repair boards controller handles a special admin action:
+ * boards and categories attempt to repair, from maintenance.
  */
-function action_repairboards()
+class RepairBoards_Controller
 {
-	global $txt, $context, $salvageBoardID;
-
-	isAllowedTo('admin_forum');
-
-	// Try secure more memory.
-	setMemoryLimit('128M');
-
-	// Print out the top of the webpage.
-	$context['page_title'] = $txt['admin_repair'];
-	$context['sub_template'] = 'repair_boards';
-	$context[$context['admin_menu_name']]['current_subsection'] = 'general';
-
-	// Load the language file.
-	loadLanguage('ManageMaintenance');
-
-	// Make sure the tabs stay nice.
-	$context[$context['admin_menu_name']]['tab_data'] = array(
-		'title' => $txt['maintain_title'],
-		'help' => '',
-		'description' => $txt['maintain_info'],
-		'tabs' => array(),
-	);
-
-	// Start displaying errors without fixing them.
-	if (isset($_GET['fixErrors']))
-		checkSession('get');
-
-	// Will want this.
-	loadForumTests();
-
-	// Giant if/else. The first displays the forum errors if a variable is not set and asks
-	// if you would like to continue, the other fixes the errors.
-	if (!isset($_GET['fixErrors']))
+	/**
+	 * Default method.
+	 */
+	function action_index()
 	{
-		$context['error_search'] = true;
-		$context['repair_errors'] = array();
-		$context['to_fix'] = findForumErrors();
+		isAllowedTo('admin_forum');
 
-		if (!empty($context['to_fix']))
-		{
-			$_SESSION['repairboards_to_fix'] = $context['to_fix'];
-			$_SESSION['repairboards_to_fix2'] = null;
-
-			if (empty($context['repair_errors']))
-				$context['repair_errors'][] = '???';
-		}
+		// we do nothing... our one and only method does. :P
+		$this->action_repairboards();
 	}
-	else
+
+	/**
+	 * Finds or repairs errors in the database to fix possible problems.
+	 * Requires the admin_forum permission.
+	 * Calls createSalvageArea() to create a new board, if necesary.
+	 * Accessed by ?action=admin;area=repairboards.
+	 *
+	 * @uses raw_data sub-template.
+	 */
+	function action_repairboards()
 	{
-		$context['error_search'] = false;
-		$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
+		global $txt, $context, $salvageBoardID;
 
-		require_once(SUBSDIR . '/Boards.subs.php');
+		isAllowedTo('admin_forum');
 
-		// Actually do the fix.
-		findForumErrors(true);
+		// Try secure more memory.
+		setMemoryLimit('128M');
 
-		// Note that we've changed everything possible ;)
-		updateSettings(array(
-			'settings_updated' => time(),
-		));
-		updateStats('message');
-		updateStats('topic');
-		updateSettings(array(
-			'calendar_updated' => time(),
-		));
+		// Print out the top of the webpage.
+		$context['page_title'] = $txt['admin_repair'];
+		$context['sub_template'] = 'repair_boards';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
-		if (!empty($salvageBoardID))
+		// Load the language file.
+		loadLanguage('ManageMaintenance');
+
+		// Make sure the tabs stay nice.
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['maintain_title'],
+			'help' => '',
+			'description' => $txt['maintain_info'],
+			'tabs' => array(),
+		);
+
+		// Start displaying errors without fixing them.
+		if (isset($_GET['fixErrors']))
+			checkSession('get');
+
+		// Will want this.
+		loadForumTests();
+
+		// Giant if/else. The first displays the forum errors if a variable is not set and asks
+		// if you would like to continue, the other fixes the errors.
+		if (!isset($_GET['fixErrors']))
 		{
-			$context['redirect_to_recount'] = true;
-		}
+			$context['error_search'] = true;
+			$context['repair_errors'] = array();
+			$context['to_fix'] = findForumErrors();
 
-		$_SESSION['repairboards_to_fix'] = null;
-		$_SESSION['repairboards_to_fix2'] = null;
+			if (!empty($context['to_fix']))
+			{
+				$_SESSION['repairboards_to_fix'] = $context['to_fix'];
+				$_SESSION['repairboards_to_fix2'] = null;
+
+				if (empty($context['repair_errors']))
+					$context['repair_errors'][] = '???';
+			}
+		}
+		else
+		{
+			$context['error_search'] = false;
+			$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
+
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			// Actually do the fix.
+			findForumErrors(true);
+
+			// Note that we've changed everything possible ;)
+			updateSettings(array(
+				'settings_updated' => time(),
+			));
+			updateStats('message');
+			updateStats('topic');
+			updateSettings(array(
+				'calendar_updated' => time(),
+			));
+
+			if (!empty($salvageBoardID))
+			{
+				$context['redirect_to_recount'] = true;
+			}
+
+			$_SESSION['repairboards_to_fix'] = null;
+			$_SESSION['repairboards_to_fix2'] = null;
+		}
 	}
 }
 

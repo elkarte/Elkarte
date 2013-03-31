@@ -544,14 +544,14 @@ function smf_db_error($db_string, $connection = null)
 		// Check for errors like 145... only fix it once every three days, and send an email. (can't use empty because it might not be set yet...)
 		if (!empty($fix_tables))
 		{
-			// subs/Admin.subs.php for updateSettingsFile(), subs/Mail.subs.php for sendmail().
+			// subs/Admin.subs.php for updateDbLastError(), subs/Mail.subs.php for sendmail().
 			require_once(SUBSDIR . '/Admin.subs.php');
 			require_once(SUBSDIR . '/Mail.subs.php');
 
 			// Make a note of the REPAIR...
 			cache_put_data('db_last_error', time(), 600);
 			if (($temp = cache_get_data('db_last_error', 600)) === null)
-				updateSettingsFile(array('db_last_error' => time()));
+				updateDbLastError(time());
 
 			// Attempt to find and repair the broken table.
 			foreach ($fix_tables as $table)

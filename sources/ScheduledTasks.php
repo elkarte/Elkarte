@@ -1073,7 +1073,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
  * @param array $tasks = array() the tasks
  * @param boolean $forceUpdate
  */
-function CalculateNextTrigger($tasks = array(), $forceUpdate = false)
+function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 {
 	global $modSettings, $smcFunc;
 
