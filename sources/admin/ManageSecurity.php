@@ -31,6 +31,24 @@ class ManageSecurity_Controller
 	protected $_bbSettings;
 
 	/**
+	 * Security settings form.
+	 * @var Settings_Form
+	 */
+	protected $_securitySettings;
+
+	/**
+	 * Moderation settings form.
+	 * @var Settings_Form
+	 */
+	protected $_moderationSettings;
+
+	/**
+	 * Spam settings form.
+	 * @var Settings_Form
+	 */
+	protected $_spamSettings;
+
+	/**
 	 * This function passes control through to the relevant security tab.
 	 */
 	function action_index()
@@ -40,10 +58,10 @@ class ManageSecurity_Controller
 		$context['page_title'] = $txt['admin_security_moderation'];
 
 		$subActions = array(
-			'general' => array($this, 'ModifyGeneralSecuritySettings'),
-			'spam' => array($this, 'ModifySpamSettings'),
+			'general' => array($this, 'action_securitySettings_display'),
+			'spam' => array($this, 'action_spamSettings_display'),
 			'badbehavior' => array($this, 'action_bbSettings_display'),
-			'moderation' => array($this, 'ModifyModerationSettings'),
+			'moderation' => array($this, 'action_moderationSettings_display'),
 		);
 
 		call_integration_hook('integrate_modify_security', array(&$subActions));
@@ -98,14 +116,53 @@ class ManageSecurity_Controller
 	}
 
 	/**
-	 * Settings really associated with general security aspects.
+	 * Handle settings regarding general security of the site.
+	 * Uses a settings form for security options.
 	 *
-	 * @param $return_config
 	 */
-	function ModifyGeneralSecuritySettings($return_config = false)
+	function action_securitySettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
 
+		// initialize the form
+		$this->_initSecuritySettingsForm();
+
+		// retrieve the current config settings
+		$config_vars = $this->_securitySettings->settings();
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			Settings_Form::save_db($config_vars);
+
+			call_integration_hook('integrate_save_general_security_settings');
+
+			writeLog();
+			redirectexit('action=admin;area=securitysettings;sa=general');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
+		$context['settings_title'] = $txt['mods_cat_security_general'];
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initializes security settings admin screen data.
+	 */
+	function _initSecuritySettingsForm()
+	{
+		global $txt;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_securitySettings = new Settings_Form();
+
+		// initialize it with our settings
 		$config_vars = array(
 				array('check', 'guest_hideContacts'),
 				array('check', 'make_email_viewable'),
@@ -133,54 +190,23 @@ class ManageSecurity_Controller
 
 		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
 
-		if ($return_config)
-			return $config_vars;
-
-		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
-
-		// Saving?
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			Settings_Form::save_db($config_vars);
-
-			call_integration_hook('integrate_save_general_security_settings');
-
-			writeLog();
-			redirectexit('action=admin;area=securitysettings;sa=general');
-		}
-
-		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
-		$context['settings_title'] = $txt['mods_cat_security_general'];
-
-		Settings_Form::prepare_db($config_vars);
+		return $this->_securitySettings->settings($config_vars);
 	}
 
 	/**
-	 * Moderation type settings - although there are fewer than we have you believe ;)
+	 * Allows to display and eventually change the moderation settings of the forum.
+	 * Uses the moderation settings form.
 	 *
-	 * @param bool $return_config = false
 	 */
-	function ModifyModerationSettings($return_config = false)
+	function action_moderationSettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
 
-		$config_vars = array(
-				// Warning system?
-				array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
-				'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
-				array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
-				'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
-				'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
-				array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
-		);
+		// initialize the form
+		$this->_initModerationSettingsForm();
 
-		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
-
-		if ($return_config)
-			return $config_vars;
+		// retrieve the current config settings
+		$config_vars = $this->_moderationSettings->settings();
 
 		// Cannot use moderation if post moderation is not enabled.
 		if (!$modSettings['postmod_active'])
@@ -230,46 +256,53 @@ class ManageSecurity_Controller
 	}
 
 	/**
-	 * Let's try keep the spam to a minimum ah Thantos?
-	 * @param bool $return_config = false
+	 * Initialize moderation settings form with the current configuration options.
+	 *
+	 * @return array
 	 */
-	function ModifySpamSettings($return_config = false)
+	function _initModerationSettingsForm()
+	{
+		global $txt;
+
+		// we're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_moderationSettings = new Settings_Form();
+
+		$config_vars = array(
+			// Warning system?
+			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
+			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
+			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
+			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
+			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
+			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
+		);
+
+		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+
+		return $this->_moderationSettings->settings($config_vars);
+	}
+
+	/**
+	 * Handles admin security spam settings.
+	 * Displays a page with settings and eventually allows the admin to change them.
+	 */
+	function action_spamSettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc;
+
+		// Let's try keep the spam to a minimum ah Thantos?
+		// initialize the form
+		$this->_initSpamSettingsForm();
+
+		// retrieve the current config settings
+		$config_vars = $this->_spamSettings->settings();
 
 		// Generate a sample registration image.
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 		$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
-
-		// Build up our options array
-		$config_vars = array(
-			array('title', 'antispam_Settings'),
-				array('check', 'reg_verification'),
-				array('check', 'search_enable_captcha'),
-				// This, my friend, is a cheat :p
-				'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
-				array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
-				array('check', 'guests_report_require_captcha'),
-			// PM Settings
-			array('title', 'antispam_PM'),
-				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-			// Visual verification.
-			array('title', 'configure_verification_means'),
-				array('desc', 'configure_verification_means_desc'),
-				'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
-			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
-			array('title', 'setup_verification_questions'),
-				array('desc', 'setup_verification_questions_desc'),
-				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
-				array('callback', 'question_answer_list'),
-		);
-
-		call_integration_hook('integrate_spam_settings', array(&$config_vars));
-
-		if ($return_config)
-			return $config_vars;
 
 		// Load any question and answers!
 		$context['question_answers'] = array();
@@ -290,9 +323,6 @@ class ManageSecurity_Controller
 			);
 		}
 		$smcFunc['db_free_result']($request);
-
-		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -424,6 +454,49 @@ class ManageSecurity_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initializes spam settings with the current configuration saved.
+	 */
+	function _initSpamSettingsForm()
+	{
+		global $txt;
+
+		// we're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_spamSettings = new Settings_Form();
+
+		// Build up our options array
+		$config_vars = array(
+			array('title', 'antispam_Settings'),
+				array('check', 'reg_verification'),
+				array('check', 'search_enable_captcha'),
+				// This, my friend, is a cheat :p
+				'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
+				array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+				array('check', 'guests_report_require_captcha'),
+			// PM Settings
+			array('title', 'antispam_PM'),
+				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+			// Visual verification.
+			array('title', 'configure_verification_means'),
+				array('desc', 'configure_verification_means_desc'),
+				'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
+			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
+			array('title', 'setup_verification_questions'),
+				array('desc', 'setup_verification_questions_desc'),
+				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
+				array('callback', 'question_answer_list'),
+		);
+
+		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+
+		return $this->_spamSettings->settings($config_vars);
 	}
 
 	/**
