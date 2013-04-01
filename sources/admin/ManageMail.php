@@ -89,7 +89,7 @@ class ManageMail_Controller
 		if (isset($_REQUEST['delete']))
 		{
 			checkSession('post');
-			deleteMaiQueueItems($_REQUEST['delete']);			
+			deleteMailQueueItems($_REQUEST['delete']);			
 		}
 
 		$status = list_MailQueueStatus();
