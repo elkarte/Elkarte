@@ -831,7 +831,7 @@ function shorten_subject($subject, $len)
  * - returns the shortened string.
  *
  * @param string $text
- * @param int $len 
+ * @param int $len
  * @param int $buffer maximum length overflow to allow cutting on a word boundary
  */
 function shorten_text($text, $len = 384, $buffer = 12)
@@ -846,7 +846,7 @@ function shorten_text($text, $len = 384, $buffer = 12)
 		// Look for len characters and cut on first word boundary after
 		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
 
-		// Always one clown in the audience who like long words or not using the spacebar
+		// Always one clown in the audience who likes long words or not using the spacebar
 		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
 			$matches[1] = substr($matches[1], 0, $len);
 
