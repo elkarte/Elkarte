@@ -4131,7 +4131,7 @@ function fixchar__callback($matches)
  * strpos, strlen, substr etc
  *
  * @param array $matches
- * @return string $string
+ * @return string
 */
 function entity_fix__callback($matches)
 {
@@ -4147,6 +4147,11 @@ function entity_fix__callback($matches)
 		return '&#' . $num . ';';
 }
 
+/**
+ * Retrieve additional search engines, if there are any,as an array.
+ *
+ * @return array array of engines
+*/
 function prepareSearchEngines()
 {
 	global $modSettings;
