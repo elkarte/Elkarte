@@ -1950,6 +1950,9 @@ p#whoisviewing {
 	vertical-align: bottom;
 	padding: 0 2px;
 }
+.avatar img {
+	border: 0;
+}
 .messageicon {
 	float: left;
 	margin: 0 6px 0 0;
