@@ -35,7 +35,7 @@ class ManageMail_Controller
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through to the relevant section.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
@@ -78,38 +78,24 @@ class ManageMail_Controller
 	/**
 	 * Display the mail queue...
 	 */
-	function action_browse()
+	public function action_browse()
 	{
-		global $scripturl, $context, $modSettings, $txt, $smcFunc;
+		global $scripturl, $context, $txt;
 
+		require_once(SUBSDIR . '/Mail.subs.php');
 		loadTemplate('ManageMail');
 
 		// First, are we deleting something from the queue?
 		if (isset($_REQUEST['delete']))
 		{
 			checkSession('post');
-
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}mail_queue
-				WHERE id_mail IN ({array_int:mail_ids})',
-				array(
-					'mail_ids' => $_REQUEST['delete'],
-				)
-			);
+			deleteMaiQueueItems($_REQUEST['delete']);			
 		}
 
-		// How many items do we have?
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*) AS queue_size, MIN(time_sent) AS oldest
-			FROM {db_prefix}mail_queue',
-			array(
-			)
-		);
-		list ($mailQueueSize, $mailOldest) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$status = list_MailQueueStatus();
 
-		$context['oldest_mail'] = empty($mailOldest) ? $txt['mailqueue_oldest_not_available'] : time_since(time() - $mailOldest);
-		$context['mail_queue_size'] = comma_format($mailQueueSize);
+		$context['oldest_mail'] = empty($status['mailOldest']) ? $txt['mailqueue_oldest_not_available'] : $this->_time_since(time() - $status['mailOldest']);
+		$context['mail_queue_size'] = comma_format($status['mailQueueSize']);
 
 		$listOptions = array(
 			'id' => 'mail_queue',
@@ -186,7 +172,7 @@ class ManageMail_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return time_since(time() - $rowData[\'time_sent\']);
+							return $this->_time_since(time() - $rowData[\'time_sent\']);
 						'),
 						'class' => 'smalltext',
 					),
@@ -227,9 +213,9 @@ class ManageMail_Controller
 	/**
 	 * Allows to view and modify the mail settings.
 	 */
-	function action_mailSettings_display()
+	public function action_mailSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings, $txtBirthdayEmails;
+		global $txt, $scripturl, $context, $settings, $txtBirthdayEmails;
 
 		loadLanguage('EmailTemplates');
 
@@ -302,7 +288,7 @@ class ManageMail_Controller
 	/**
 	 * Initialize mail administration settings.
 	 */
-	function _initMailSettingsForm()
+	private function _initMailSettingsForm()
 	{
 		global $txt, $modSettings;
 
@@ -347,7 +333,7 @@ class ManageMail_Controller
 	/**
 	 * Retrieve and return mail administration settings.
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt, $modSettings;
 
@@ -389,28 +375,18 @@ class ManageMail_Controller
 	/**
 	 * This function clears the mail queue of all emails, and at the end redirects to browse.
 	 */
-	function action_clear()
+	public function action_clear()
 	{
-		global $smcFunc;
-
 		checkSession('get');
 
 		// This is certainly needed!
 		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// If we don't yet have the total to clear, find it.
 		if (!isset($_GET['te']))
-		{
-			// How many items do we have?
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(*) AS queue_size
-				FROM {db_prefix}mail_queue',
-				array(
-				)
-			);
-			list ($_GET['te']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-		}
+			$_GET['te'] = list_getMailQueueSize((int) $_GET['te']);
+
 		else
 			$_GET['te'] = (int) $_GET['te'];
 
@@ -421,138 +397,79 @@ class ManageMail_Controller
 		{
 			// Sent another 50.
 			$_GET['sent'] += 50;
-			pauseMailQueueClear();
+			$this->_pauseMailQueueClear();
 		}
 
 		return $this->action_browse();
 	}
-}
 
-/**
- * Used for pausing the mail queue.
- */
-function pauseMailQueueClear()
-{
-	global $context, $txt, $time_start;
-
-	// Try get more time...
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
-
-	// Have we already used our maximum time?
-	if (time() - array_sum(explode(' ', $time_start)) < 5)
-		return;
-
-	$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $_GET['te'] . ';sent=' . $_GET['sent'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-	$context['page_title'] = $txt['not_done_title'];
-	$context['continue_post_data'] = '';
-	$context['continue_countdown'] = '2';
-	$context['sub_template'] = 'not_done';
-
-	// Keep browse selected.
-	$context['selected'] = 'browse';
-
-	// What percent through are we?
-	$context['continue_percent'] = round(($_GET['sent'] / $_GET['te']) * 100, 1);
-
-	// Never more than 100%!
-	$context['continue_percent'] = min($context['continue_percent'], 100);
-
-	obExit();
-}
-
-/**
- * Little utility function to calculate how long ago a time was.
- *
- * @param long $time_diff
- * @return string
- */
-function time_since($time_diff)
-{
-	global $txt;
-
-	if ($time_diff < 0)
-		$time_diff = 0;
-
-	// Just do a bit of an if fest...
-	if ($time_diff > 86400)
+	/**
+	* Used for pausing the mail queue.
+	*/
+	private function _pauseMailQueueClear()
 	{
-		$days = round($time_diff / 86400, 1);
-		return sprintf($days == 1 ? $txt['mq_day'] : $txt['mq_days'], $time_diff / 86400);
+		global $context, $txt, $time_start;
+
+		// Try get more time...
+		@set_time_limit(600);
+		if (function_exists('apache_reset_timeout'))
+			@apache_reset_timeout();
+
+		// Have we already used our maximum time?
+		if (time() - array_sum(explode(' ', $time_start)) < 5)
+			return;
+
+		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $_GET['te'] . ';sent=' . $_GET['sent'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['page_title'] = $txt['not_done_title'];
+		$context['continue_post_data'] = '';
+		$context['continue_countdown'] = '2';
+		$context['sub_template'] = 'not_done';
+
+		// Keep browse selected.
+		$context['selected'] = 'browse';
+
+		// What percent through are we?
+		$context['continue_percent'] = round(($_GET['sent'] / $_GET['te']) * 100, 1);
+
+		// Never more than 100%!
+		$context['continue_percent'] = min($context['continue_percent'], 100);
+
+		obExit();
 	}
-	// Hours?
-	elseif ($time_diff > 3600)
+
+	/**
+	* Little utility function to calculate how long ago a time was.
+	*
+	* @param long $time_diff
+	* @return string
+	*/
+	private function _time_since($time_diff)
 	{
-		$hours = round($time_diff / 3600, 1);
-		return sprintf($hours == 1 ? $txt['mq_hour'] : $txt['mq_hours'], $hours);
+		global $txt;
+
+		if ($time_diff < 0)
+			$time_diff = 0;
+
+		// Just do a bit of an if fest...
+		if ($time_diff > 86400)
+		{
+			$days = round($time_diff / 86400, 1);
+			return sprintf($days == 1 ? $txt['mq_day'] : $txt['mq_days'], $time_diff / 86400);
+		}
+		// Hours?
+		elseif ($time_diff > 3600)
+		{
+			$hours = round($time_diff / 3600, 1);
+			return sprintf($hours == 1 ? $txt['mq_hour'] : $txt['mq_hours'], $hours);
+		}
+		// Minutes?
+		elseif ($time_diff > 60)
+		{
+			$minutes = (int) ($time_diff / 60);
+			return sprintf($minutes == 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
+		}
+		// Otherwise must be second
+		else
+			return sprintf($time_diff == 1 ? $txt['mq_second'] : $txt['mq_seconds'], $time_diff);
 	}
-	// Minutes?
-	elseif ($time_diff > 60)
-	{
-		$minutes = (int) ($time_diff / 60);
-		return sprintf($minutes == 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
-	}
-	// Otherwise must be second
-	else
-		return sprintf($time_diff == 1 ? $txt['mq_second'] : $txt['mq_seconds'], $time_diff);
-}
-
-/**
- * This function grabs the mail queue items from the database, according to the params given.
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
- */
-function list_getMailQueue($start, $items_per_page, $sort)
-{
-	global $smcFunc, $txt;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			id_mail, time_sent, recipient, priority, private, subject
-		FROM {db_prefix}mail_queue
-		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:items_per_page}',
-		array(
-			'start' => $start,
-			'sort' => $sort,
-			'items_per_page' => $items_per_page,
-		)
-	);
-	$mails = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
-		if (!empty($row['private']))
-			$row['subject'] = $txt['personal_message'];
-
-		$mails[] = $row;
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $mails;
-}
-
-/**
- * Returns the total count of items in the mail queue.
- * @return int
- */
-function list_getMailQueueSize()
-{
-	global $smcFunc;
-
-	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*) AS queue_size
-		FROM {db_prefix}mail_queue',
-		array(
-		)
-	);
-	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $mailQueueSize;
 }

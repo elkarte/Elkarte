@@ -707,3 +707,103 @@ function user_info_callback($matches)
 
 	return $use_ref ? $ref : $matches[0];
 }
+
+/**
+ * This function grabs the mail queue items from the database, according to the params given.
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @return array
+ */
+function list_getMailQueue($start, $items_per_page, $sort)
+{
+	global $smcFunc, $txt;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			id_mail, time_sent, recipient, priority, private, subject
+		FROM {db_prefix}mail_queue
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:items_per_page}',
+		array(
+			'start' => $start,
+			'sort' => $sort,
+			'items_per_page' => $items_per_page,
+		)
+	);
+	$mails = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
+		if (!empty($row['private']))
+			$row['subject'] = $txt['personal_message'];
+
+		$mails[] = $row;
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $mails;
+}
+
+/**
+ * Returns the total count of items in the mail queue.
+ * @param int $mailQueueSize
+ * @return int
+ */
+function list_getMailQueueSize($mailQueueSize = null)
+{
+	global $smcFunc;
+
+	// How many items do we have?
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*) AS queue_size
+		FROM {db_prefix}mail_queue',
+		array(
+		)
+	);
+	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $mailQueueSize;
+}
+
+/**
+ * Deletes items from the mail queue
+ * @param array $items 
+ */
+function deleteMailQueueItems($items)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}mail_queue
+		WHERE id_mail IN ({array_int:mail_ids})',
+		array(
+			'mail_ids' => $items,
+		)
+	);
+}
+
+/**
+ * get the current mail queue status
+ * @return array 
+ */
+function list_MailQueueStatus()
+{
+	global $smcFunc;
+
+	$items = array();
+
+	// How many items do we have?
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*) AS queue_size, MIN(time_sent) AS oldest
+		FROM {db_prefix}mail_queue',
+		array(
+		)
+	);
+	list ($items['mailQueueSize'], $items['mailOldest']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $items;
+}
