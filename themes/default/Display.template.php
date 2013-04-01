@@ -228,6 +228,7 @@ function template_main()
 								<ul class="follow_ups quickbuttons">
 									<li>', $txt['follow_ups'], '
 										<ul>';
+
 				foreach($context['follow_ups'][$message['id']] as $follow_up)
 				{
 					echo '
@@ -376,7 +377,7 @@ function template_main()
 
 		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
-			// Let show them the other options they may have in a nice pulldown
+			// Show them the other options they may have in a nice pulldown
 			echo '
 									<ul>';
 
@@ -435,10 +436,11 @@ function template_main()
 			echo '
 								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a>';
 
+		// Can they quote to a new topic?
 		if ($context['can_follow_up'])
 			echo '
 									<ul>
-										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '">', $txt['quote_new'], '</a></li>
+										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="qutotonew_button">', $txt['quote_new'], '</a></li>
 									</ul>
 								</li>';
 
