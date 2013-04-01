@@ -412,8 +412,9 @@ class ManageFeatures_Controller
 			checkSession('get');
 
 			$sig_start = time();
+
 			// This is horrid - but I suppose some people will want the option to do it.
-			$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
+			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 			$done = false;
 
 			$request = $smcFunc['db_query']('', '
@@ -432,7 +433,7 @@ class ManageFeatures_Controller
 				$request = $smcFunc['db_query']('', '
 					SELECT id_member, signature
 					FROM {db_prefix}members
-					WHERE id_member BETWEEN ' . $_GET['step'] . ' AND ' . $_GET['step'] . ' + 49
+					WHERE id_member BETWEEN ' . $applied_sigs . ' AND ' . $applied_sigs . ' + 49
 						AND id_group != {int:admin_group}
 						AND FIND_IN_SET({int:admin_group}, additional_groups) = 0',
 					array(
@@ -633,9 +634,9 @@ class ManageFeatures_Controller
 						);
 				}
 
-				$_GET['step'] += 50;
+				$applied_sigs += 50;
 				if (!$done)
-					pauseSignatureApplySettings();
+					pauseSignatureApplySettings($applied_sigs);
 			}
 			$settings_applied = true;
 		}
@@ -1460,7 +1461,7 @@ function list_getProfileFieldSize()
 /**
  * Just pause the signature applying thing.
  */
-function pauseSignatureApplySettings()
+function pauseSignatureApplySettings($applied_sigs)
 {
 	global $context, $txt, $sig_start;
 
@@ -1473,7 +1474,7 @@ function pauseSignatureApplySettings()
 	if (time() - array_sum(explode(' ', $sig_start)) < 3)
 		return;
 
-	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $_GET['step'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $applied_sigs . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
 	$context['continue_post_data'] = '';
 	$context['continue_countdown'] = '2';
@@ -1483,7 +1484,7 @@ function pauseSignatureApplySettings()
 	$context[$context['admin_menu_name']]['current_subsection'] = 'sig';
 
 	// Get the right percent.
-	$context['continue_percent'] = round(($_GET['step'] / $context['max_member']) * 100);
+	$context['continue_percent'] = round(($applied_sigs / $context['max_member']) * 100);
 
 	// Never more than 100%!
 	$context['continue_percent'] = min($context['continue_percent'], 100);
