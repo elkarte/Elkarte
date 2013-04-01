@@ -385,7 +385,7 @@ class ManageMail_Controller
 
 		// If we don't yet have the total to clear, find it.
 		if (!isset($_GET['te']))
-			$_GET['te'] = list_getMailQueueSize((int) $_GET['te']);
+			$_GET['te'] = list_getMailQueueSize();
 
 		else
 			$_GET['te'] = (int) $_GET['te'];

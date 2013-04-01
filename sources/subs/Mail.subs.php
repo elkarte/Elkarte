@@ -751,7 +751,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
  * @param int $mailQueueSize
  * @return int
  */
-function list_getMailQueueSize($mailQueueSize = null)
+function list_getMailQueueSize()
 {
 	global $smcFunc;
 
