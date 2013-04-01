@@ -51,7 +51,7 @@ function template_main()
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
-					<th scope="col" class="', isset($column['class']) ? ' ' . $column['class'] : '', '" style="width: auto;"' . (isset($column['colspan']) ? ' colspan="' . $column['colspan'] . '"' : '') . ' nowrap="nowrap">
+					<th scope="col" class="', isset($column['class']) ? ' ' . $column['class'] : '', '" style="width: auto;white-space: nowrap"' . (isset($column['colspan']) ? ' colspan="' . $column['colspan'] . '"' : '') . '>
 						<a href="' . $column['href'] . '" rel="nofollow">' . $column['label'] . '</a><img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" /></th>';
 		// This is just some column... show the link and be done with it.
 		else
