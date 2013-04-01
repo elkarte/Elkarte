@@ -19,10 +19,10 @@
  */
 function template_core_features()
 {
-	global $context, $txt, $settings, $options, $scripturl;
+	global $context, $txt, $settings, $scripturl;
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var token_name,
 			token_value,
 			feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), ',
@@ -37,10 +37,10 @@ function template_core_features()
 			$("#core_features_submit").css(\'display\', \'none\');
 
 			if (!token_name)
-				token_name = $("#core_features_token").attr("name")
+				token_name = $("#core_features_token").attr("name");
 
 			if (!token_value)
-				token_value = $("#core_features_token").attr("value")
+				token_value = $("#core_features_token").attr("value");
 
 			$(".core_features_img").click(function(){
 				var cc = $(this),
@@ -55,8 +55,9 @@ function template_core_features()
 				$("#feature_" + cf).attr("checked", new_state);
 
 				data = {save: "save", feature_id: cf};
-				data[$("#core_features_session").attr("name")] = $("#core_features_session").attr("value");
+				data[$("#core_features_session").attr("name")] = $("#core_features_session").val();
 				data[token_name] = token_value;
+
 				$(".core_features_status_box").each(function(){
 					data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
 				});
@@ -64,7 +65,7 @@ function template_core_features()
 				// Launch AJAX request.
 				$.ajax({
 					// The link we are accessing.
-					url: "', $scripturl, '?action=xmlhttp;sa=corefeatures;xml",
+					url: smf_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
 
 					// The type of request.
 					type: "post",
@@ -126,36 +127,27 @@ function template_core_features()
 	}
 
 	echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">';
-
-	template_admin_quick_search();
-
-	echo $txt['core_settings_title'], '
-				</h3>
-
-			</div>
-		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
+			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
 	$alternate = true;
 	$num = 0;
-	$num_features = count($context['features']);
+
 	foreach ($context['features'] as $id => $feature)
 	{
 		$num++;
-		echo '
-			<div class="windowbg', $alternate ? '2' : '', '">
-				<div class="content features">
-					<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
-					<div class="features_switch" id="js_feature_', $id, '">
-							<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-							<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" id="switch_', $id, '" style="margin-top: 1.3em;display:none" alt="', $txt['core_settings_switch_' . $feature['state']], '" title="', $txt['core_settings_switch_' . $feature['state']], '" />
-					</div>
-					<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
-					<p>', $feature['desc'], '</p>
-				</div>
 
+		echo '
+			<div class="content features">
+				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
+				<div class="features_switch" id="js_feature_', $id, '">
+					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
+					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="margin-top: 1.3em;display:none" />
+				</div>
+				<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
+				<p>', $feature['desc'], '</p>
+
+				<hr />
 			</div>';
 
 		$alternate = !$alternate;

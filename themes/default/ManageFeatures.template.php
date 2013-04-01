@@ -17,13 +17,11 @@
 // Template for showing custom profile fields.
 function template_show_custom_profile()
 {
-	global $context, $txt, $settings, $scripturl;
-
 	// Standard fields.
 	template_show_list('standard_profile_fields');
 
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var iNumChecks = document.forms.standardProfileFields.length;
 		for (var i = 0; i < iNumChecks; i++)
 			if (document.forms.standardProfileFields[i].id.indexOf(\'reg_\') == 0)
@@ -41,7 +39,7 @@ function template_edit_profile_field()
 
 	// All the javascript for this page - quite a bit in script.js!
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		var startOptID = ', count($context['field']['options']), ';
 	// ]]></script>';
 
@@ -68,7 +66,6 @@ function template_edit_profile_field()
 				<div class="content">
 					<fieldset>
 						<legend>', $txt['custom_edit_general'], '</legend>
-
 						<dl class="settings">
 							<dt>
 								<strong><label for="field_name">', $txt['custom_edit_name'], ':</label></strong>
@@ -110,7 +107,6 @@ function template_edit_profile_field()
 							<dd>
 								<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
-
 							<dt>
 								<strong><label for="placement">', $txt['custom_edit_placement'], ':</label></strong>
 							</dt>
@@ -127,7 +123,7 @@ function template_edit_profile_field()
 								<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
 							</dt>
 							<dd>
-								<textarea name="enclose" id="enclose" rows="10" cols="50">', @$context['field']['enclose'], '</textarea>
+								<textarea name="enclose" id="enclose" rows="10" cols="50">' . (isset($context['field']['enclose']) ? $context['field']['enclose'] : '') . '</textarea>
 							</dd>
 						</dl>
 					</fieldset>
@@ -179,6 +175,7 @@ function template_edit_profile_field()
 		echo '
 								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
 	}
+
 	echo '
 								<span id="addopt"></span>
 								[<a href="" onclick="addOption(); return false;">', $txt['custom_edit_options_more'], '</a>]
@@ -240,7 +237,6 @@ function template_edit_profile_field()
 							</dd>
 						</dl>
 					</fieldset>
-					<hr class="hrcolor" />
 						<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />';
 
 	if ($context['fid'])
