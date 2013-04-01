@@ -748,7 +748,6 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 /**
  * Returns the total count of items in the mail queue.
- * @param int $mailQueueSize
  * @return int
  */
 function list_getMailQueueSize()
