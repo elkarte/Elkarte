@@ -440,7 +440,7 @@ function template_main()
 		if ($context['can_follow_up'])
 			echo '
 									<ul>
-										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="qutotonew_button">', $txt['quote_new'], '</a></li>
+										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="quotetonew_button">', $txt['quote_new'], '</a></li>
 									</ul>
 								</li>';
 
