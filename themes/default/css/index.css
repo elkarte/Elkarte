@@ -2380,6 +2380,9 @@ ul.quickbuttons li a.report_button {
 ul.quickbuttons li a.warn_button {
 	background: url(../images/theme/quickbuttons.png) no-repeat 1px -336px;
 }
+ul.quickbuttons li a.qutotonew_button {
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -360px;
+}
 ul.quickbuttons li.inline_mod_check {
 	padding: 1px 1px 1px 1px;
 }
@@ -2453,7 +2456,8 @@ ul.quickbuttons li.inline_mod_check {
 	border-left: solid 1px #aaa;
 	border-top: solid 1px #bbb;
 	border-radius: 4px 2px 4px 0;
-	box-shadow: 2px 3px 3px rgba(0,0,0,0.2);
+	box-shadow: 2px 3px 3px rgba(0, 0 ,0, 0.2);
+	white-space: nowrap;
 }
 .quickbuttons li:hover ul, .quickbuttons li.sfhover ul {
 	left: auto;
@@ -2464,7 +2468,7 @@ ul.quickbuttons li.inline_mod_check {
 	background: none;
 	border: none;
 	box-shadow: none;
-	width: 12em;
+	width: 12.5em;
 	border: 1px solid transparent;
 	border-radius: 3px;
 }
@@ -2478,24 +2482,21 @@ ul.quickbuttons li.inline_mod_check {
 	padding: 0 6px 0 26px;
 	display: block;
 	line-height: 2.0em;
-	width: 12em;
+	width: 12.5em;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 li.quote, .follow_ups li {
 	position: relative;
-	padding: 0 6px;
+	padding: 0 4px;
 	line-height: 2.0em;
 }
 .follow_ups li:first-child {
 	border-radius: 4px;
+	margin-right: 0.75em;
 }
-ul.quickbuttons li.quote ul a, ul.follow_ups li a,
-ul.quickbuttons li.quote ul a:hover, ul.follow_ups li a:hover {
+ul.follow_ups li a, ul.follow_ups li a:hover {
 	padding: 0;
-}
-ul.quickbuttons li.quote ul li, ul.quickbuttons li.quote ul a {
-	width: auto;
-	white-space:nowrap;
+	white-space: normal;
 }
 ul.follow_ups {
 	float: none;

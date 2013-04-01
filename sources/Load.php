@@ -2628,7 +2628,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style=' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
