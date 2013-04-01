@@ -3,12 +3,12 @@
 
 global $scripturl, $modSettings;
 
-$txt['no_access'] = 'You are not allowed to access this section';
+$txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['wireless_error_notyet'] = 'Sorry, this section isn\'t available for wireless users at this time.';
 
 $txt['mods_only'] = 'Only Moderators can use the direct remove function, please remove this message through the modify feature.';
-$txt['no_name'] = 'You didn\'t fill the name field out.  It is required.';
-$txt['no_email'] = 'You didn\'t fill the email field out.  It is required.';
+$txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you without a name, sorry.';
+$txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you without an email, sorry.';
 $txt['topic_locked'] = 'This topic is locked, you are not allowed to post or modify messages...';
 $txt['no_password'] = 'Password field empty';
 $txt['already_a_user'] = 'The username you tried to use already exists.';
@@ -27,7 +27,7 @@ $txt['not_approved_topic'] = 'This topic has not been approved yet.';
 $txt['email_in_use'] = 'That email address (%1$s) is being used by a registered member already. If you feel this is a mistake, go to the login page and use the password reminder with that address.';
 
 $txt['didnt_select_vote'] = 'You didn\'t select a vote option.';
-$txt['poll_error'] = 'Either that poll doesn\'t exist, the poll has been locked, or you tried to vote twice.';
+$txt['poll_error'] = 'Something isn\'t working, sorry: either that poll doesn\'t exist, the poll has been locked, or you tried to vote twice.';
 $txt['members_only'] = 'This option is only available to registered members.';
 $txt['locked_by_admin'] = 'This was locked by an administrator.  You cannot unlock it.';
 $txt['not_enough_posts_karma'] = 'Sorry, you don\'t have enough posts to modify karma - you need at least %1$d.';
@@ -136,7 +136,7 @@ $txt['cannot_view_mlist'] = 'You can\'t view the memberlist because you don\'t h
 $txt['cannot_view_stats'] = 'You aren\'t allowed to view the forum statistics.';
 $txt['cannot_who_view'] = 'Sorry - you don\'t have the proper permissions to view the Who\'s Online list.';
 
-$txt['no_theme'] = 'That theme does not exist.';
+$txt['no_theme'] = ' We can\'t find that theme.';
 $txt['theme_dir_wrong'] = 'The default theme\'s directory is wrong, please correct it by clicking this text.';
 $txt['registration_disabled'] = 'Sorry, registration is currently disabled.';
 $txt['registration_agreement_missing'] = 'The registration agreement file, agreement.txt, is either missing or empty.  Registrations have been disable until this is fixed';
@@ -174,7 +174,7 @@ $txt['invalid_days_numb'] = 'Invalid number of days to span.';
 $txt['moveto_noboards'] = 'There are no boards to move this topic to!';
 $txt['topic_already_moved'] = 'This topic %1$s has been moved to the board %2$s, please check its new location before moving it again.';
 
-$txt['already_activated'] = 'Your account has already been activated.';
+$txt['already_activated'] = 'We\'d love to process your request, but your account has already been activated.';
 $txt['still_awaiting_approval'] = 'Your account is still awaiting admin approval.';
 
 $txt['invalid_email'] = 'Invalid email address / email address range.<br />Example of a valid email address: evil.user@badsite.com.<br />Example of a valid email address range: *@*.badsite.com';
@@ -184,14 +184,14 @@ $txt['invalid_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address:
 $txt['invalid_tracking_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address: 127.0.0.1<br />Example of a valid IP range: 127.0.0.*';
 $txt['invalid_username'] = 'Member name not found';
 $txt['no_user_selected'] = 'Member not found';
-$txt['no_ban_admin'] = 'You may not ban an admin - You must demote them first!';
+$txt['no_ban_admin'] = 'Hey! We can\'t let you ban an admin. If you are certain about this, demote them first!';
 $txt['no_bantype_selected'] = 'No ban type was selected';
 $txt['ban_not_found'] = 'Ban not found';
 $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
 $txt['ban_name_empty'] = 'The name of the ban was left empty';
-$txt['ban_id_empty'] = 'Ban id not found';
-$txt['ban_group_id_empty'] = 'Ban group id missing';
-$txt['ban_no_triggers'] = 'No ban triggers specified';
+$txt['ban_id_empty'] = 'Dang, sorry. We tried to find this ban id, but it can\'t be found.';
+$txt['ban_group_id_empty'] = 'A ban group needs a group id, and this group didn\'t have any.';
+$txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at least one, and we haven\'t got any.';
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
 
@@ -205,10 +205,10 @@ $txt['post_already_deleted'] = 'The topic or message has already been moved to t
 $txt['login_threshold_fail'] = 'Sorry, you are out of login chances.  Please come back and try again later.';
 $txt['login_threshold_brute_fail'] = 'Sorry, but you\'ve reached your login attempts threshold.  Please wait 30 seconds and try again later.';
 
-$txt['who_off'] = 'You cannot access Who\'s Online right now because it is disabled.';
+$txt['who_off'] = 'We would love to let you peek at Who\'s Online, but unfortunately right now it\'s disabled.';
 
-$txt['merge_create_topic_failed'] = 'Error creating a new topic.';
-$txt['merge_need_more_topics'] = 'Merge topics require at least two topics to merge.';
+$txt['merge_create_topic_failed'] = 'Dang, sorry. We tried, we really did, but creating a new topic failed.';
+$txt['merge_need_more_topics'] = 'Merge topics requires at least two topics to merge, but we didn\'t get two. Please try again.';
 
 $txt['post_WaitTime_broken'] = 'The last posting from your IP was less than %1$d seconds ago. Please try again later.';
 $txt['register_WaitTime_broken'] = 'You already registered just %1$d seconds ago!';
@@ -220,12 +220,12 @@ $txt['sendmail_WaitTime_broken'] = 'The last email sent from your IP was less th
 $txt['search_WaitTime_broken'] = 'Your last search was less than %1$d seconds ago. Please try again later.';
 $txt['remind_WaitTime_broken'] = 'Your last reminder was less than %1$d seconds ago. Please try again later.';
 
-$txt['email_missing_data'] = 'You must enter something in both the subject and message boxes.';
+$txt['email_missing_data'] = 'We need something in both the subject and message boxes.';
 
-$txt['topic_gone'] = 'The topic or board you are looking for appears to be either missing or off limits to you.';
-$txt['theme_edit_missing'] = 'The file you are trying to edit can\'t be found.';
+$txt['topic_gone'] = 'We tried very hard to find the topic or board you are looking for, but it\'s nowhere to be found. It appears to be either missing or off limits to you.';
+$txt['theme_edit_missing'] = 'We tried very hard to find the file you are trying to edit, but it can\'t be found.';
 
-$txt['no_dump_database'] = 'Only administrators can make database backups.';
+$txt['no_dump_database'] = 'Sorry, we can\'t let you make database backups. Only administrators can.';
 $txt['pm_not_yours'] = 'The personal message you\'re trying to quote is not your own or does not exist, please go back and try again.';
 $txt['mangled_post'] = 'Mangled form data - please go back and try again.';
 $txt['too_many_groups'] = 'Sorry, you selected too many groups, please remove some.';
