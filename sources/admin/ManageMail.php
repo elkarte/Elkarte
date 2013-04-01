@@ -89,7 +89,7 @@ class ManageMail_Controller
 		if (isset($_REQUEST['delete']))
 		{
 			checkSession('post');
-			deleteMailQueueItems($_REQUEST['delete']);			
+			deleteMailQueueItems($_REQUEST['delete']);
 		}
 
 		$status = list_MailQueueStatus();
@@ -384,29 +384,29 @@ class ManageMail_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// If we don't yet have the total to clear, find it.
-		if (!isset($_GET['te']))
-			$_GET['te'] = list_getMailQueueSize();
+		$all_emails = isset($_GET['te']) ? (int) $_GET['te'] : list_getMailQueueSize();
 
-		else
-			$_GET['te'] = (int) $_GET['te'];
-
-		$_GET['sent'] = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
+		// If we don't know how many we sent, it must be because... we didn't send any!
+		$sent_emails = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
 
 		// Send 50 at a time, then go for a break...
 		while (ReduceMailQueue(50, true, true) === true)
 		{
 			// Sent another 50.
-			$_GET['sent'] += 50;
-			$this->_pauseMailQueueClear();
+			$sent_emails += 50;
+			$this->_pauseMailQueueClear($all_emails, $sent_emails);
 		}
 
 		return $this->action_browse();
 	}
 
 	/**
-	* Used for pausing the mail queue.
-	*/
-	private function _pauseMailQueueClear()
+	 * Used for pausing the mail queue.
+	 *
+	 * @param int $all_emails total emails to be sent
+	 * @param int $sent_emails number of emails sent so far
+	 */
+	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{
 		global $context, $txt, $time_start;
 
@@ -419,7 +419,7 @@ class ManageMail_Controller
 		if (time() - array_sum(explode(' ', $time_start)) < 5)
 			return;
 
-		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $_GET['te'] . ';sent=' . $_GET['sent'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $all_emails . ';sent=' . $sent_emails . ';' . $context['session_var'] . '=' . $context['session_id'];
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_post_data'] = '';
 		$context['continue_countdown'] = '2';
@@ -429,7 +429,7 @@ class ManageMail_Controller
 		$context['selected'] = 'browse';
 
 		// What percent through are we?
-		$context['continue_percent'] = round(($_GET['sent'] / $_GET['te']) * 100, 1);
+		$context['continue_percent'] = round(($sent_emails / $all_emails) * 100, 1);
 
 		// Never more than 100%!
 		$context['continue_percent'] = min($context['continue_percent'], 100);
