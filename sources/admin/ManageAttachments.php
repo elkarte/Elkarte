@@ -843,6 +843,7 @@ class ManageAttachments_Controller
 
 	/**
 	 * This function should find attachments in the database that no longer exist and clear them, and fix filesize issues.
+	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_repair()
 	{
@@ -1366,6 +1367,7 @@ class ManageAttachments_Controller
 
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
+	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_attachpaths()
 	{
@@ -1884,6 +1886,7 @@ class ManageAttachments_Controller
 
 	/**
 	 * Maintance function to move attachments from one directory to another
+	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_transfer()
 	{
@@ -2111,6 +2114,7 @@ class ManageAttachments_Controller
  *
  * @param array $to_fix attachments to fix
  * @param int $max_substep = 0
+ * @todo Move to ManageAttachments.subs.php
  */
 function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 {
