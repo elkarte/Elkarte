@@ -24,7 +24,7 @@ class ManageAvatars_Controller
 	 */
 	protected $_avatarSettings;
 
-	function action_index()
+	public function action_index()
 	{
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -45,7 +45,7 @@ class ManageAvatars_Controller
 	 *
 	 * @uses 'avatars' sub-template.
 	 */
-	function action_avatarSettings_display()
+	public function action_avatarSettings_display()
 	{
 		global $txt, $context, $scripturl;
 
@@ -93,7 +93,7 @@ class ManageAvatars_Controller
 	 *
 	 * Initializes the avatarSettings form.
 	 */
-	function _initAvatarSettingsForm()
+	private function _initAvatarSettingsForm()
 	{
 		global $txt, $context, $modSettings;
 
@@ -167,7 +167,7 @@ class ManageAvatars_Controller
 	 * 	profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 * @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt, $context, $modSettings;
 
