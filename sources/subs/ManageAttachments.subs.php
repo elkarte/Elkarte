@@ -286,3 +286,47 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 
 	return $files;
 }
+
+function list_AllAttachmentsSize()
+{
+	global $smcFunc;
+	
+	// Check the size of all the directories.
+	$request = $smcFunc['db_query']('', '
+		SELECT SUM(size)
+		FROM {db_prefix}attachments
+		WHERE attachment_type != {int:type}',
+		array(
+			'type' => 1,
+		)
+	);
+	list ($attachmentDirSize) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	// Divide it into kilobytes.
+	$attachmentDirSize /= 1024;
+	return comma_format($attachmentDirSize, 2);		
+}
+
+function list_currentAttachDirProperties()
+{
+	global $smcFunc, $modSettings;
+	
+	$current_dir = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*), SUM(size)
+		FROM {db_prefix}attachments
+		WHERE id_folder = {int:folder_id}
+			AND attachment_type != {int:type}',
+		array(
+			'folder_id' => $modSettings['currentAttachmentUploadDir'],
+			'type' => 1,
+		)
+	);
+	list ($current_dir['files'], $current_dir['size']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+	$current_dir['size'] /= 1024;
+
+	return $current_dir;
+}

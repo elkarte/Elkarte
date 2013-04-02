@@ -644,12 +644,13 @@ class ManageAttachments_Controller
 	 */
 	public function action_maintenance()
 	{
-		global $context, $modSettings, $smcFunc;
+		global $context, $modSettings;
 
 		$context['sub_template'] = 'maintenance';
 
 		// We're working with them attachments here!
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// we need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
@@ -660,44 +661,20 @@ class ManageAttachments_Controller
 		// Also get the avatar amount...
 		$context['num_avatars'] = comma_format(getAvatarCount(), 0);
 
-		// Check the size of all the directories.
-		$request = $smcFunc['db_query']('', '
-			SELECT SUM(size)
-			FROM {db_prefix}attachments
-			WHERE attachment_type != {int:type}',
-			array(
-				'type' => 1,
-			)
-		);
-		list ($attachmentDirSize) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		// Total size of attachments
+		$context['attachment_total_size'] = list_AllAttachmentsSize();
 
-		// Divide it into kilobytes.
-		$attachmentDirSize /= 1024;
-		$context['attachment_total_size'] = comma_format($attachmentDirSize, 2);
-
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*), SUM(size)
-			FROM {db_prefix}attachments
-			WHERE id_folder = {int:folder_id}
-				AND attachment_type != {int:type}',
-			array(
-				'folder_id' => $modSettings['currentAttachmentUploadDir'],
-				'type' => 1,
-			)
-		);
-		list ($current_dir_files, $current_dir_size) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-		$current_dir_size /= 1024;
+		// Total size and files from the current attachments dir.
+		$current_dir = list_currentAttachDirProperties();
 
 		// If they specified a limit only....
 		if (!empty($modSettings['attachmentDirSizeLimit']))
-			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir_size, 0), 2);
-		$context['attachment_current_size'] = comma_format($current_dir_size, 2);
+			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir['size'], 0), 2);
+		$context['attachment_current_size'] = comma_format($current_dir['size'], 2);
 
 		if (!empty($modSettings['attachmentDirFileLimit']))
-			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir_files, 0), 0);
-		$context['attachment_current_files'] = comma_format($current_dir_files, 0);
+			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);
+		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
 
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 		$context['attach_dirs'] = $attach_dirs;
