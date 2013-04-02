@@ -270,6 +270,7 @@ class AdminLog_Controller
 		);
 
 		call_integration_hook('integrate_modify_pruning_settings', array(&$config_vars));
+
 		return $this->_pruningSettings->settings($config_vars);
 	}
 }
