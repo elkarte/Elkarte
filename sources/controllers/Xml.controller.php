@@ -157,7 +157,7 @@ function action_corefeatures()
 	{
 		require_once(ADMINDIR . '/ManageCoreFeatures.php');
 		$controller = new ManageCoreFeatures_Controller();
-		$result = $controller->settings();
+		$result = $controller->action_index();
 
 		// Load up the core features of the system
 		if (empty($result))
