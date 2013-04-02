@@ -196,8 +196,9 @@ class AdminDebug_Controller
 	 */
 	public function action_viewadminfile()
 	{
-		global $context, $modSettings, $smcFunc;
+		global $context, $modSettings;
 
+		require_once(SUBSDIR . '/AdminDebug.subs.php');
 		// Don't allow non-administrators.
 		isAllowedTo('admin_forum');
 
@@ -206,29 +207,15 @@ class AdminDebug_Controller
 		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
 			fatal_lang_error('no_access', false);
 
-		$request = $smcFunc['db_query']('', '
-			SELECT data, filetype
-			FROM {db_prefix}admin_info_files
-			WHERE filename = {string:current_filename}
-			LIMIT 1',
-			array(
-				'current_filename' => $_REQUEST['filename'],
-			)
-		);
-
-		if ($smcFunc['db_num_rows']($request) == 0)
-			fatal_lang_error('admin_file_not_found', true, array($_REQUEST['filename']));
-
-		list ($file_data, $filetype) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$file = list_getAdminInfoFile($_REQUEST['filename']);
 
 		// @todo Temp
 		// Figure out if sesc is still being used.
-		if (strpos($file_data, ';sesc=') !== false)
-			$file_data = '
+		if (strpos($file['file_data'], ';sesc=') !== false)
+			$file['file_data'] = '
 if (!(\'smfForum_sessionvar\' in window))
 	window.smfForum_sessionvar = \'sesc\';
-' . strtr($file_data, array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
+' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
 
 		$context['template_layers'] = array();
 		// Lets make sure we aren't going to output anything nasty.
@@ -239,8 +226,8 @@ if (!(\'smfForum_sessionvar\' in window))
 			@ob_start();
 
 		// Make sure they know what type of file we are.
-		header('Content-Type: ' . $filetype);
-		echo $file_data;
+		header('Content-Type: ' . $file['filetype']);
+		echo $file['file_data'];
 		obExit(false);
 	}
 }
