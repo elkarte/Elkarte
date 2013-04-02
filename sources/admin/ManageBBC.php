@@ -49,7 +49,7 @@ class ManageBBC_Controller
 	 */
 	function action_bbcSettings_display()
 	{
-		global $context, $txt, $modSettings, $helptxt, $scripturl;
+		global $context, $txt, $modSettings, $scripturl;
 
 		// initialize the form
 		$this->_initBBCSettingsForm();
