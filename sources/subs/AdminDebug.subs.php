@@ -13,9 +13,11 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains functions that are specifically done by administrators.
- *
  */
+
+if (!defined('ELKARTE'))
+	die('No access...');
+
 /**
  *
  * get the admin info file from the database
