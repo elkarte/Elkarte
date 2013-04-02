@@ -662,7 +662,7 @@ class ManageAttachments_Controller
 		$context['num_avatars'] = comma_format(getAvatarCount(), 0);
 
 		// Total size of attachments
-		$context['attachment_total_size'] = list_AllAttachmentsSize();
+		$context['attachment_total_size'] = list_OverallAttachmentsSize();
 
 		// Total size and files from the current attachments dir.
 		$current_dir = list_currentAttachDirProperties();

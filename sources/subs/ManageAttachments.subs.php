@@ -287,7 +287,11 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 	return $files;
 }
 
-function list_AllAttachmentsSize()
+/**
+ * List the overall attachments size
+ * @return string 
+ */
+function list_OverallAttachmentsSize()
 {
 	global $smcFunc;
 	
@@ -308,6 +312,10 @@ function list_AllAttachmentsSize()
 	return comma_format($attachmentDirSize, 2);		
 }
 
+/**
+ * Get files and size from the current attachments dir
+ * @return int 
+ */
 function list_currentAttachDirProperties()
 {
 	global $smcFunc, $modSettings;
@@ -331,6 +339,9 @@ function list_currentAttachDirProperties()
 	return $current_dir;
 }
 
+/**
+ * Move avatars to their new directory.
+ */
 function moveAvatars()
 {
 	global $smcFunc, $modSettings;
@@ -367,6 +378,11 @@ function moveAvatars()
 		);
 }
 
+/**
+ * Extend the message body with a removal message.
+ * @param string $messages
+ * @param string $notice 
+ */
 function setRemovalNotice($messages, $notice)
 {
 	global $smcFunc;
