@@ -160,7 +160,7 @@ class AdminLog_Controller
 	 */
 	public function action_pruningSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Make sure we understand what's going on.
 		loadLanguage('ManageSettings');
