@@ -43,7 +43,7 @@ class ManageAttachments_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $modSettings, $scripturl, $context, $options;
+		global $txt, $context;
 
 		// You have to be able to moderate the forum to do this.
 		isAllowedTo('manage_attachments');
@@ -109,7 +109,7 @@ class ManageAttachments_Controller
 	 */
 	function action_attachSettings_display()
 	{
-		global $modSettings, $scripturl, $context, $options;
+		global $modSettings, $scripturl, $context;
 
 		// initialize the form
 		$this->_initAttachSettingsForm();
@@ -432,8 +432,7 @@ class ManageAttachments_Controller
 	 */
 	function action_browse()
 	{
-		global $context, $txt, $scripturl, $options, $modSettings;
-		global $smcFunc;
+		global $context, $txt, $scripturl, $modSettings;
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
@@ -642,7 +641,7 @@ class ManageAttachments_Controller
 	 */
 	function action_maintenance()
 	{
-		global $context, $modSettings, $txt, $smcFunc;
+		global $context, $modSettings, $smcFunc;
 
 		$context['sub_template'] = 'maintenance';
 
@@ -771,7 +770,7 @@ class ManageAttachments_Controller
 	 */
 	function action_byAge()
 	{
-		global $modSettings, $smcFunc;
+		global $smcFunc;
 
 		checkSession('post', 'admin');
 
@@ -815,7 +814,7 @@ class ManageAttachments_Controller
 	 */
 	function action_bySize()
 	{
-		global $modSettings, $smcFunc;
+		global $smcFunc;
 
 		checkSession('post', 'admin');
 
@@ -847,7 +846,7 @@ class ManageAttachments_Controller
 	 */
 	function action_remove()
 	{
-		global $txt, $smcFunc, $language;
+		global $txt, $smcFunc, $language, $user_info;
 
 		checkSession('post');
 
@@ -1967,7 +1966,7 @@ class ManageAttachments_Controller
 	 */
 	function action_transfer()
 	{
-		global $modSettings, $context, $smcFunc, $txt;
+		global $modSettings, $smcFunc, $txt;
 
 		checkSession();
 
@@ -2415,7 +2414,7 @@ function list_getAttachDirs()
  */
 function list_getBaseDirs()
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $txt;
 
 	if (empty($modSettings['attachment_basedirectories']))
 		return;
@@ -2468,8 +2467,6 @@ function list_getBaseDirs()
  */
 function attachDirStatus($dir, $expected_files)
 {
-	global $context;
-
 	if (!is_dir($dir))
 		return array('does_not_exist', true, '');
 	elseif (!is_writable($dir))
