@@ -31,7 +31,7 @@ class AdminDebug_Controller
 	 * - Is accessed via ?action=viewquery.
 	 * - Strings in this function have not been internationalized.
 	 */
-	function action_viewquery()
+	public function action_viewquery()
 	{
 		global $scripturl, $settings, $context, $db_connection, $smcFunc, $txt, $db_show_debug;
 
@@ -194,7 +194,7 @@ class AdminDebug_Controller
 	 * Get admin information from the database.
 	 * Accessed by ?action=viewadminfile.
 	 */
-	function action_viewadminfile()
+	public function action_viewadminfile()
 	{
 		global $context, $modSettings, $smcFunc;
 
