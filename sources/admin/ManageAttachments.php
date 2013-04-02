@@ -693,7 +693,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_moveAvatars()
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		// First make sure the custom avatar dir is writable.
 		if (!is_writable($modSettings['custom_avatar_dir']))
@@ -706,36 +706,9 @@ class ManageAttachments_Controller
 				fatal_lang_error('attachments_no_write', 'critical');
 		}
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_attach, id_folder, id_member, filename, file_hash
-			FROM {db_prefix}attachments
-			WHERE attachment_type = {int:attachment_type}
-				AND id_member > {int:guest_id_member}',
-			array(
-				'attachment_type' => 0,
-				'guest_id_member' => 0,
-			)
-		);
-		$updatedAvatars = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
-			if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
-				$updatedAvatars[] = $row['id_attach'];
-		}
-		$smcFunc['db_free_result']($request);
-
-		if (!empty($updatedAvatars))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}attachments
-				SET attachment_type = {int:attachment_type}
-				WHERE id_attach IN ({array_int:updated_avatars})',
-				array(
-					'updated_avatars' => $updatedAvatars,
-					'attachment_type' => 1,
-				)
-			);
+		// Finally move the attachments..
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		moveAvatars();
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
@@ -750,14 +723,13 @@ class ManageAttachments_Controller
 	 */
 	public function action_byAge()
 	{
-		global $smcFunc;
-
 		checkSession('post', 'admin');
 
 		// @todo Ignore messages in topics that are stickied?
 
 		// someone has to do the dirty work
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Deleting an attachment?
 		if ($_REQUEST['type'] != 'avatars')
@@ -767,15 +739,7 @@ class ManageAttachments_Controller
 
 			// Update the messages to reflect the change.
 			if (!empty($messages) && !empty($_POST['notice']))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}messages
-					SET body = CONCAT(body, {string:notice})
-					WHERE id_msg IN ({array_int:messages})',
-					array(
-						'messages' => $messages,
-						'notice' => '<br /><br />' . $_POST['notice'],
-					)
-				);
+				setRemovalNotice($messages, $_POST['notice']);
 		}
 		else
 		{
@@ -794,27 +758,18 @@ class ManageAttachments_Controller
 	 */
 	public function action_bySize()
 	{
-		global $smcFunc;
-
 		checkSession('post', 'admin');
 
 		// we'll need this
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
 
 		// And make a note on the post.
 		if (!empty($messages) && !empty($_POST['notice']))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET body = CONCAT(body, {string:notice})
-				WHERE id_msg IN ({array_int:messages})',
-				array(
-					'messages' => $messages,
-					'notice' => '<br /><br />' . $_POST['notice'],
-				)
-			);
+			setRemovalNotice($messages, $_POST['notice']);
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}

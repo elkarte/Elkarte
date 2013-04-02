@@ -330,3 +330,54 @@ function list_currentAttachDirProperties()
 
 	return $current_dir;
 }
+
+function moveAvatars()
+{
+	global $smcFunc, $modSettings;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_attach, id_folder, id_member, filename, file_hash
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:attachment_type}
+			AND id_member > {int:guest_id_member}',
+		array(
+			'attachment_type' => 0,
+			'guest_id_member' => 0,
+		)
+	);
+	$updatedAvatars = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+
+		if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
+			$updatedAvatars[] = $row['id_attach'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	if (!empty($updatedAvatars))
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET attachment_type = {int:attachment_type}
+			WHERE id_attach IN ({array_int:updated_avatars})',
+			array(
+				'updated_avatars' => $updatedAvatars,
+				'attachment_type' => 1,
+			)
+		);
+}
+
+function setRemovalNotice($messages, $notice)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}messages
+		SET body = CONCAT(body, {string:notice})
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+			'notice' => '<br /><br />' . $notice,
+		)
+	);
+}
