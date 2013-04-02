@@ -37,7 +37,7 @@ class AdminLog_Controller
  	 * This method decides which log to load.
  	 * Accessed by ?action=admin;area=logs
  	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
@@ -158,7 +158,7 @@ class AdminLog_Controller
 	 *
 	 * Uses the _pruningSettings form.
 	 */
-	function action_pruningSettings_display()
+	public function action_pruningSettings_display()
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
 
@@ -216,8 +216,9 @@ class AdminLog_Controller
 	 * Returns the configuration settings for pruning logs.
 	 *
 	 * @return array in the format of config_vars expected by admin search
+	 * @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
@@ -243,7 +244,7 @@ class AdminLog_Controller
 	/**
 	 * Initializes the _pruningSettings form.
 	 */
-	function _initPruningSettingsForm()
+	private function _initPruningSettingsForm()
 	{
 		global $txt;
 
