@@ -47,7 +47,7 @@ class ManageAvatars_Controller
 	 */
 	function action_avatarSettings_display()
 	{
-		global $txt, $context, $modSettings, $scripturl;
+		global $txt, $context, $scripturl;
 
 		// initialize the form
 		$this->_initAvatarSettingsForm();
