@@ -100,7 +100,6 @@ function template_main()
 						<input type="submit" name="save" value="' . $txt['save'] . '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
-						<input type="hidden" value="0" name="options[theme_allow]" />
 					</div>
 				</div>
 			</form>';
