@@ -41,7 +41,7 @@ class ManageAttachments_Controller
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $txt, $context;
 
@@ -107,7 +107,7 @@ class ManageAttachments_Controller
 	 *
 	 * @uses 'attachments' sub template.
 	 */
-	function action_attachSettings_display()
+	public function action_attachSettings_display()
 	{
 		global $modSettings, $scripturl, $context;
 
@@ -218,7 +218,7 @@ class ManageAttachments_Controller
 	 * Initialize attachmentForm.
 	 * Retrieve and return the administration settings for attachments.
 	 */
-	function _initAttachSettingsForm()
+	private function _initAttachSettingsForm()
 	{
 		global $modSettings, $txt;
 
@@ -324,7 +324,7 @@ class ManageAttachments_Controller
 	 *  for attachments.
 	 *  @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		global $modSettings, $txt;
 
@@ -430,9 +430,12 @@ class ManageAttachments_Controller
 	 *
 	 *  @uses the 'browse' sub template
 	 */
-	function action_browse()
+	public function action_browse()
 	{
 		global $context, $txt, $scripturl, $modSettings;
+
+		// We're working with them attachments here!
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');		
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
@@ -639,7 +642,7 @@ class ManageAttachments_Controller
 	 *
 	 * @uses the 'maintain' sub template.
 	 */
-	function action_maintenance()
+	public function action_maintenance()
 	{
 		global $context, $modSettings, $smcFunc;
 
@@ -711,7 +714,7 @@ class ManageAttachments_Controller
 	 * Move avatars from their current location, to the custom_avatar_dir folder.
 	 * Called from the maintenance screen by ?action=admin;area=manageattachments;sa=action_moveAvatars.
 	 */
-	function action_moveAvatars()
+	public function action_moveAvatars()
 	{
 		global $modSettings, $smcFunc;
 
@@ -768,7 +771,7 @@ class ManageAttachments_Controller
 	 *  were removed from.
 	 *  @todo refactor this silly superglobals use...
 	 */
-	function action_byAge()
+	public function action_byAge()
 	{
 		global $smcFunc;
 
@@ -812,7 +815,7 @@ class ManageAttachments_Controller
 	 * Optionally adds a certain text to the messages the attachments were
 	 * 	removed from.
 	 */
-	function action_bySize()
+	public function action_bySize()
 	{
 		global $smcFunc;
 
@@ -844,7 +847,7 @@ class ManageAttachments_Controller
 	 * Called from the browse screen as submitted form by
 	 *  ?action=admin;area=manageattachments;sa=remove
 	 */
-	function action_remove()
+	public function action_remove()
 	{
 		global $txt, $smcFunc, $language, $user_info;
 
@@ -893,7 +896,7 @@ class ManageAttachments_Controller
 	 * Called from the maintenance screen by
 	 *  ?action=admin;area=manageattachments;sa=removeall.
 	 */
-	function action_removeall()
+	public function action_removeall()
 	{
 		global $txt, $smcFunc;
 
@@ -925,7 +928,7 @@ class ManageAttachments_Controller
 	/**
 	 * This function should find attachments in the database that no longer exist and clear them, and fix filesize issues.
 	 */
-	function action_repair()
+	public function action_repair()
 	{
 		global $modSettings, $context, $txt, $smcFunc;
 
@@ -1448,9 +1451,11 @@ class ManageAttachments_Controller
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
 	 */
-	function action_attachpaths()
+	public function action_attachpaths()
 	{
 		global $modSettings, $scripturl, $context, $txt, $smcFunc;
+
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
@@ -1964,7 +1969,7 @@ class ManageAttachments_Controller
 	/**
 	 * Maintance function to move attachments from one directory to another
 	 */
-	function action_transfer()
+	public function action_transfer()
 	{
 		global $modSettings, $smcFunc, $txt;
 
@@ -2184,109 +2189,6 @@ class ManageAttachments_Controller
 
 }
 /**
- * Returns the list of attachments files (avatars or not), recorded
- * in the database, per the parameters received.
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @param string $browse_type can be on eof 'avatars' or ... not. :P
- */
-function list_getFiles($start, $items_per_page, $sort, $browse_type)
-{
-	global $smcFunc, $txt;
-
-	// Choose a query depending on what we are viewing.
-	if ($browse_type === 'avatars')
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				{string:blank_text} AS id_msg, IFNULL(mem.real_name, {string:not_applicable_text}) AS poster_name,
-				mem.last_login AS poster_time, 0 AS id_topic, a.id_member, a.id_attach, a.filename, a.file_hash, a.attachment_type,
-				a.size, a.width, a.height, a.downloads, {string:blank_text} AS subject, 0 AS id_board
-			FROM {db_prefix}attachments AS a
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
-			WHERE a.id_member != {int:guest_id}
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:per_page}',
-			array(
-				'guest_id' => 0,
-				'blank_text' => '',
-				'not_applicable_text' => $txt['not_applicable'],
-				'sort' => $sort,
-				'start' => $start,
-				'per_page' => $items_per_page,
-			)
-		);
-	else
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				m.id_msg, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.id_topic, m.id_member,
-				a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board
-			FROM {db_prefix}attachments AS a
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE a.attachment_type = {int:attachment_type}
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:per_page}',
-			array(
-				'attachment_type' => $browse_type == 'thumbs' ? '3' : '0',
-				'sort' => $sort,
-				'start' => $start,
-				'per_page' => $items_per_page,
-			)
-		);
-	$files = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$files[] = $row;
-	$smcFunc['db_free_result']($request);
-
-	return $files;
-}
-
-/**
- * Return the number of files of the specified type recorded in the database.
- * (the specified type being attachments or avatars).
- *
- * @param string $browse_type can be one of 'avatars' or not. (in which case they're attachments)
- */
-function list_getNumFiles($browse_type)
-{
-	global $smcFunc;
-
-	// Depending on the type of file, different queries are used.
-	if ($browse_type === 'avatars')
-		$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}attachments
-		WHERE id_member != {int:guest_id_member}',
-		array(
-			'guest_id_member' => 0,
-		)
-	);
-	else
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*) AS num_attach
-			FROM {db_prefix}attachments AS a
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-			WHERE a.attachment_type = {int:attachment_type}
-				AND a.id_member = {int:guest_id_member}',
-			array(
-				'attachment_type' => $browse_type === 'thumbs' ? '3' : '0',
-				'guest_id_member' => 0,
-			)
-		);
-
-	list ($num_files) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $num_files;
-}
-
-/**
  * Function called in-between each round of attachments and avatar repairs.
  * Called by repairAttachments().
  * If repairAttachments() has more steps added, this function needs updated!
@@ -2329,168 +2231,4 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
 
 	obExit();
-}
-
-/**
- * Prepare the actual attachment directories to be displayed in the list.
- */
-function list_getAttachDirs()
-{
-	global $smcFunc, $modSettings, $context, $txt;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_folder, COUNT(id_attach) AS num_attach, SUM(size) AS size_attach
-		FROM {db_prefix}attachments
-		WHERE attachment_type != {int:type}
-		GROUP BY id_folder',
-		array(
-			'type' => 1,
-		)
-	);
-
-	$expected_files = array();
-	$expected_size = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$expected_files[$row['id_folder']] = $row['num_attach'];
-		$expected_size[$row['id_folder']] = $row['size_attach'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	$attachdirs = array();
-	foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
-	{
-		// If there aren't any attachments in this directory this won't exist.
-		if (!isset($expected_files[$id]))
-			$expected_files[$id] = 0;
-
-		// Check if the directory is doing okay.
-		list ($status, $error, $files) = attachDirStatus($dir, $expected_files[$id]);
-
-		// If it is one, let's show that it's a base directory.
-		$sub_dirs = 0;
-		$is_base_dir = false;
-		if (!empty($modSettings['attachment_basedirectories']))
-		{
-			$is_base_dir = in_array($dir, $modSettings['attachment_basedirectories']);
-
-			// Count any sub-folders.
-			foreach ($modSettings['attachmentUploadDir'] as $sid => $sub)
-				if (strpos($sub, $dir . DIRECTORY_SEPARATOR) !== false)
-				{
-					$expected_files[$id]++;
-					$sub_dirs++;
-				}
-		}
-
-		$attachdirs[] = array(
-			'id' => $id,
-			'current' => $id == $modSettings['currentAttachmentUploadDir'],
-			'disable_current' => isset($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] > 1,
-			'disable_base_dir' =>  $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error) && empty($save_errors),
-			'path' => $dir,
-			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
-			'num_files' => comma_format($expected_files[$id] - $sub_dirs, 0) . ($sub_dirs > 0 ? ' (' . $sub_dirs . ')' : ''),
-			'status' => ($is_base_dir ? $txt['attach_dir_basedir'] . '<br />' : '') . ($error ? '<div class="error">' : '') . sprintf($txt['attach_dir_' . $status], $context['session_id'], $context['session_var']) . ($error ? '</div>' : ''),
-		);
-	}
-
-	// Just stick a new directory on at the bottom.
-	if (isset($_REQUEST['new_path']))
-		$attachdirs[] = array(
-			'id' => max(array_merge(array_keys($expected_files), array_keys($modSettings['attachmentUploadDir']))) + 1,
-			'current' => false,
-			'path' => '',
-			'current_size' => '',
-			'num_files' => '',
-			'status' => '',
-		);
-
-	return $attachdirs;
-}
-
-/**
- * Prepare the base directories to be displayed in a list.
- */
-function list_getBaseDirs()
-{
-	global $modSettings, $txt;
-
-	if (empty($modSettings['attachment_basedirectories']))
-		return;
-
-	$basedirs = array();
-	// Get a list of the base directories.
-	foreach ($modSettings['attachment_basedirectories'] as $id => $dir)
-	{
-		// Loop through the attach directory array to count any sub-directories
-		$expected_dirs = 0;
-		foreach ($modSettings['attachmentUploadDir'] as $sid => $sub)
-			if (strpos($sub, $dir . DIRECTORY_SEPARATOR) !== false)
-				$expected_dirs++;
-
-		if (!is_dir($dir))
-			$status = 'does_not_exist';
-		elseif (!is_writeable($dir))
-			$status = 'not_writable';
-		else
-			$status = 'ok';
-
-		$basedirs[] = array(
-			'id' => $id,
-			'current' => $dir == $modSettings['basedirectory_for_attachments'],
-			'path' => $expected_dirs > 0 ? $dir : ('<input type="text" name="base_dir[' . $id . ']" value="' . $dir . '" size="40" />'),
-			'num_dirs' => $expected_dirs,
-			'status' => $status == 'ok' ? $txt['attach_dir_ok'] : ('<span class="error">' . $txt['attach_dir_' . $status] . '</span>'),
-		);
-	}
-
-	if (isset($_REQUEST['new_base_path']))
-		$basedirs[] = array(
-			'id' => '',
-			'current' => false,
-			'path' => '<input type="text" name="new_base_dir" value="" size="40" />',
-			'num_dirs' => '',
-			'status' => '',
-		);
-
-	return $basedirs;
-}
-
-/**
- * Checks the status of an attachment directory and returns an array
- *  of the status key, if that status key signifies an error, and
- *  the file count.
- *
- * @param string $dir
- * @param int $expected_files
- */
-function attachDirStatus($dir, $expected_files)
-{
-	if (!is_dir($dir))
-		return array('does_not_exist', true, '');
-	elseif (!is_writable($dir))
-		return array('not_writable', true, '');
-
-	// Everything is okay so far, start to scan through the directory.
-	$num_files = 0;
-	$dir_handle = dir($dir);
-	while ($file = $dir_handle->read())
-	{
-		// Now do we have a real file here?
-		if (in_array($file, array('.', '..', '.htaccess', 'index.php')))
-			continue;
-
-		$num_files++;
-	}
-	$dir_handle->close();
-
-	if ($num_files < $expected_files)
-		return array('files_missing', true, $num_files);
-	// Empty?
-	elseif ($expected_files == 0)
-		return array('unused', false, $num_files);
-	// All good!
-	else
-		return array('ok', false, $num_files);
 }
