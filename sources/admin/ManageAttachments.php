@@ -781,7 +781,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_remove()
 	{
-		global $txt, $smcFunc, $language, $user_info;
+		global $txt, $language, $user_info;
 
 		checkSession('post');
 
@@ -789,6 +789,7 @@ class ManageAttachments_Controller
 		{
 			// we'll need this
 			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 			$attachments = array();
 			// There must be a quicker way to pass this safety test??
@@ -805,15 +806,7 @@ class ManageAttachments_Controller
 				if (!empty($messages))
 				{
 					loadLanguage('index', $language, true);
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}messages
-						SET body = CONCAT(body, {string:deleted_message})
-						WHERE id_msg IN ({array_int:messages_affected})',
-						array(
-							'messages_affected' => $messages,
-							'deleted_message' => '<br /><br />' . $txt['attachment_delete_admin'],
-						)
-					);
+					setRemovalNotice($messages, $txt['attachment_delete_admin']);
 					loadLanguage('index', $user_info['language'], true);
 				}
 			}
@@ -830,7 +823,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_removeall()
 	{
-		global $txt, $smcFunc;
+		global $txt;
 
 		checkSession('get', 'admin');
 
@@ -839,20 +832,11 @@ class ManageAttachments_Controller
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
-		if (!isset($_POST['notice']))
-			$_POST['notice'] = $txt['attachment_delete_admin'];
+		$notice = isset($_POST['notice']) ? $_POST['notice'] : $txt['attachment_delete_admin'];
 
 		// Add the notice on the end of the changed messages.
 		if (!empty($messages))
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}messages
-				SET body = CONCAT(body, {string:deleted_message})
-				WHERE id_msg IN ({array_int:messages})',
-				array(
-					'messages' => $messages,
-					'deleted_message' => '<br /><br />' . $_POST['notice'],
-				)
-			);
+			setRemovalNotice($messages, $notice);
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
