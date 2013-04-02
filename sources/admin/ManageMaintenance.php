@@ -261,7 +261,8 @@ class ManageMaintenance_Controller
 	}
 
 	/**
-	 * Find and fix all errors on the forum.
+	 * Find and try to fix all errors on the forum.
+	 * Forwards to repair boards controller.
 	 */
 	function action_repair_display()
 	{
@@ -275,7 +276,9 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Wipes the current cache entries as best it can.
-	 * This only applies to our own cache entries, opcache and data
+	 * This only applies to our own cache entries, opcache and data.
+	 * This action, like other maintenance tasks, may be called automatically
+	 * by the task scheduler or manually by the admin in Maintenance area.
 	 */
 	function action_cleancache_display()
 	{
@@ -291,7 +294,9 @@ class ManageMaintenance_Controller
 	}
 
 	/**
-	 * Empties all uninmportant logs
+	 * Empties all uninmportant logs.
+	 * This action may be called periodically, by the tasks scheduler,
+	 * or manually by the admin in Maintenance area.
 	 */
 	function action_logs_display()
 	{
@@ -300,7 +305,9 @@ class ManageMaintenance_Controller
 		checkSession();
 		validateToken('admin-maint');
 
-		// No one's online now.... MUHAHAHAHA :P.
+		// Maintenance time was scheduled!
+		// When there is no intelligent life on this planet.
+		// Apart from me, I mean.
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_online');
 
@@ -1077,7 +1084,7 @@ class ManageMaintenance_Controller
 	 * Perform a detailed version check.  A very good thing ;).
 	 * The function parses the comment headers in all files for their version information,
 	 * and outputs that for some javascript to check with simplemachines.org.
-	 * It does not connect directly with simplemachines.org, but rather expects the client to.
+	 * It does not connect directly with elkarte.net, but rather expects the client to.
 	 *
 	 * It requires the admin_forum permission.
 	 * Uses the view_versions admin area.
@@ -1120,7 +1127,7 @@ class ManageMaintenance_Controller
 	}
 
 	/**
-	 * Re-attribute posts.
+	 * Re-attribute posts to the user sent from the maintenance page.
 	 */
 	function action_reattribute_display()
 	{
@@ -1150,6 +1157,7 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Handling function for the backup stuff.
+	 * This method simply forwards to DumpDatabase2().
 	 */
 	function action_backup_display()
 	{
@@ -1160,7 +1168,7 @@ class ManageMaintenance_Controller
 	}
 
 	/**
-	 * Removing old members. Done and out!
+	 * Removing old and inactive members.
 	 * @todo refactor
 	 */
 	function action_purgeinactive_display()
@@ -1247,7 +1255,8 @@ class ManageMaintenance_Controller
 	}
 
 	/**
-	 * Removing old posts doesn't take much as we really pass through.
+	 * This method takes care of removal of old posts.
+	 * They're very very old, perhaps even older.
 	 */
 	function action_pruneold_display()
 	{
@@ -1255,13 +1264,12 @@ class ManageMaintenance_Controller
 
 		validateToken('admin-maint');
 
-		// Actually do what we're told!
 		require_once(SUBSDIR . '/Topic.subs.php');
 		removeOldTopics();
 	}
 
 	/**
-	 * Removing old drafts
+	 * This method removes old drafts.
 	 */
 	function action_olddrafts_display()
 	{

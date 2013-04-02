@@ -24,8 +24,9 @@ if (!defined('ELKARTE'))
 /**
  * Check if the user is who he/she says he is
  * Makes sure the user is who they claim to be by requiring a password to be typed in every hour.
- * Is turned on and off by the securityDisable setting.
- * Uses the adminLogin() function of subs/Auth.subs.php if they need to login, which saves all request (post and get) data.
+ * This check can be turned on and off by the securityDisable setting.
+ * Uses the adminLogin() function of subs/Auth.subs.php if they need to login, which saves all request
+ *  (POST and GET) data.
  *
  * @param string $type = admin
  */
@@ -168,8 +169,8 @@ function is_not_guest($message = '')
 }
 
 /**
- * Do banning related stuff.  (ie. disallow access....)
- * Checks if the user is banned, and if so dies with an error.
+ * Apply restrictions for banned users. For example, disallow access.
+ * If he user is banned, it dies with an error.
  * Caches this information for optimization purposes.
  * Forces a recheck if force_check is true.
  *
@@ -893,13 +894,12 @@ function checkSubmitOnce($action, $is_fatal = true)
 }
 
 /**
- * Check the user's permissions.
- * checks whether the user is allowed to do permission. (ie. post_new.)
- * If boards is specified, checks those boards instead of the current one.
+ * This function checks whether the user is allowed to do permission. (ie. post_new.)
+ * If boards parameter is specified, checks those boards instead of the current one (if applicable).
  * Always returns true if the user is an administrator.
  *
- * @param string $permission
- * @param array $boards = null
+ * @param string $permission permission
+ * @param array $boards = null array of board IDs
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -967,7 +967,7 @@ function allowedTo($permission, $boards = null)
 }
 
 /**
- * Fatal error if they cannot.
+ * This function returns fatal error if the user doesn't have the respective permission.
  * Uses allowedTo() to check if the user is allowed to do permission.
  * Checks the passed boards or current board for the permission.
  * If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
@@ -1052,7 +1052,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	 * state of play that you're used to.
 	 */
 
-	// Administrators are all powerful, sorry.
+	// I am the master, the master of the universe!
 	if ($user_info['is_admin'])
 	{
 		if ($simple)
