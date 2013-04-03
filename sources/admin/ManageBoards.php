@@ -36,9 +36,9 @@ class ManageBoards_Controller
 	 *
 	 * uses ManageBoards language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Everything's gonna need this.
 		loadLanguage('ManageBoards');
@@ -126,7 +126,7 @@ class ManageBoards_Controller
 	 *
 	 * @uses ManageBoards template, main sub-template.
 	 */
-	function action_main()
+	public function action_main()
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $txt;
 
@@ -261,7 +261,7 @@ class ManageBoards_Controller
 	 *
 	 * @uses ManageBoards template, modify_category sub-template.
 	 */
-	function action_cat()
+	public function action_cat()
 	{
 		global $txt, $context, $cat_tree, $boardList, $boards;
 
@@ -352,7 +352,7 @@ class ManageBoards_Controller
 	 * Called by ?action=admin;area=manageboards;sa=cat2
 	 * Redirects to ?action=admin;area=manageboards.
 	 */
-	function action_cat2()
+	public function action_cat2()
 	{
 		checkSession();
 		validateToken('admin-bc-' . $_REQUEST['cat']);
@@ -415,12 +415,13 @@ class ManageBoards_Controller
 	 * also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
 
 	 */
-	function action_board()
+	public function action_board()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $smcFunc, $modSettings;
+		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/ManageBoards.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -500,31 +501,7 @@ class ManageBoards_Controller
 			)
 		);
 
-		// Load membergroups.
-		$request = $smcFunc['db_query']('', '
-			SELECT group_name, id_group, min_posts
-			FROM {db_prefix}membergroups
-			WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
-			ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
-			array(
-				'moderator_group' => 3,
-				'global_moderator' => 2,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if ($_REQUEST['sa'] == 'newboard' && $row['min_posts'] == -1)
-				$curBoard['member_groups'][] = $row['id_group'];
-
-			$context['groups'][(int) $row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => trim($row['group_name']),
-				'allow' => in_array($row['id_group'], $curBoard['member_groups']),
-				'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
-				'is_post_group' => $row['min_posts'] != -1,
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$context['groups'] = getOtherGroups($curBoard);
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))
@@ -573,38 +550,13 @@ class ManageBoards_Controller
 				'selected' => $catID == $curBoard['category']
 			);
 
-		$request = $smcFunc['db_query']('', '
-			SELECT mem.id_member, mem.real_name
-			FROM {db_prefix}moderators AS mods
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
-			WHERE mods.id_board = {int:current_board}',
-			array(
-				'current_board' => $_REQUEST['boardid'],
-			)
-		);
-		$context['board']['moderators'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['board']['moderators'][$row['id_member']] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
-
+		$context['board']['moderators'] = getBoardModerators($_REQUEST['boardid']);
 		$context['board']['moderator_list'] = empty($context['board']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['board']['moderators']) . '&quot;';
 
 		if (!empty($context['board']['moderators']))
 			list ($context['board']['last_moderator_id']) = array_slice(array_keys($context['board']['moderators']), -1);
 
-		// Get all the themes...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme AS id, value AS name
-			FROM {db_prefix}themes
-			WHERE variable = {string:name}',
-			array(
-				'name' => 'name',
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['themes'][] = $row;
-		$smcFunc['db_free_result']($request);
+		$context['themes'] = getAllThemes();
 
 		if (!isset($_REQUEST['delete']))
 		{
@@ -631,15 +583,16 @@ class ManageBoards_Controller
 	 * Redirects to ?action=admin;area=manageboards.
 	 * It requires manage_boards permission.
 	 */
-	function action_board2()
+	public function action_board2()
 	{
-		global $txt, $modSettings, $smcFunc, $context;
+		global $context;
 
 		$_POST['boardid'] = (int) $_POST['boardid'];
 		checkSession();
 		validateToken('admin-be-' . $_REQUEST['boardid']);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/ManageBoards.subs.php');
 
 		// Mode: modify aka. don't delete.
 		if (isset($_POST['edit']) || isset($_POST['add']))
@@ -705,22 +658,13 @@ class ManageBoards_Controller
 			// We need to know what used to be case in terms of redirection.
 			if (!empty($_POST['boardid']))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT redirect, num_posts
-					FROM {db_prefix}boards
-					WHERE id_board = {int:current_board}',
-					array(
-						'current_board' => $_POST['boardid'],
-					)
-				);
-				list ($oldRedirect, $numPosts) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
+				$properties = getBoardProperties($_POST['boardid']);
+				
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
-				if ($boardOptions['redirect'] && empty($oldRedirect) && $numPosts)
+				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
 					unset($boardOptions['redirect']);
 				// Reset the redirection count when switching on/off.
-				elseif (empty($boardOptions['redirect']) != empty($oldRedirect))
+				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
 					$boardOptions['num_posts'] = 0;
 				// Resetting the count?
 				elseif ($boardOptions['redirect'] && !empty($_POST['reset_redirect']))
@@ -774,9 +718,9 @@ class ManageBoards_Controller
 	 *
 	 * @uses modify_general_settings sub-template.
 	 */
-	function action_boardSettings_display()
+	public function action_boardSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initBoardSettingsForm();
@@ -824,7 +768,7 @@ class ManageBoards_Controller
 	 * Initialize the boardSettings form, with the current configuration
 	 * options for admin board settings screen.
 	 */
-	function _initBoardSettingsForm()
+	private function _initBoardSettingsForm()
 	{
 		// instantiate the form
 		$this->_boardSettings = new Settings_Form();
@@ -856,7 +800,7 @@ class ManageBoards_Controller
 	/**
 	 * Retrieve and return all admin settings for boards management.
 	 */
-	function settings()
+	public function settings()
 	{
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/MessageIndex.subs.php');

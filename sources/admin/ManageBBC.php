@@ -23,7 +23,7 @@ class ManageBBC_Controller
 	 */
 	protected $_bbcSettings;
 
-	function action_index()
+	public function action_index()
 	{
 		isAllowedTo('admin_forum');
 
@@ -47,9 +47,9 @@ class ManageBBC_Controller
 	 *
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
-	function action_bbcSettings_display()
+	public function action_bbcSettings_display()
 	{
-		global $context, $txt, $modSettings, $helptxt, $scripturl;
+		global $context, $txt, $modSettings, $scripturl;
 
 		// initialize the form
 		$this->_initBBCSettingsForm();
@@ -110,7 +110,7 @@ class ManageBBC_Controller
 	 *
 	 * @return array
 	 */
-	function _initBBCSettingsForm()
+	private function _initBBCSettingsForm()
 	{
 		// instantiate the form
 		$this->_bbcSettings = new Settings_Form();

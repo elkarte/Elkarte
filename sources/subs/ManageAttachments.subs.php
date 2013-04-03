@@ -291,7 +291,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
  * List the overall attachments size
  * @return string 
  */
-function list_OverallAttachmentsSize()
+function OverallAttachmentsSize()
 {
 	global $smcFunc;
 	
@@ -316,7 +316,7 @@ function list_OverallAttachmentsSize()
  * Get files and size from the current attachments dir
  * @return int 
  */
-function list_currentAttachDirProperties()
+function currentAttachDirProperties()
 {
 	global $smcFunc, $modSettings;
 	
