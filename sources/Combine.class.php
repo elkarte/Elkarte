@@ -80,7 +80,7 @@ class Site_Combiner
 	 */
 	public function __construct()
 	{
-		global $boardurl, $settings;
+		global $boardurl;
 
 		// init
 		$this->_archive_dir = CACHEDIR;
@@ -95,8 +95,6 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		global $modSettings;
-
 		// No files or missing directory then we are done
 		if (empty($files) || !file_exists($this->_archive_dir))
 			return false;
@@ -150,8 +148,6 @@ class Site_Combiner
 	 */
 	public function site_css_combine($files)
 	{
-		global $settings, $boardurl;
-
 		// No files or missing dir then we are done
 		if (empty($files) || !file_exists($this->_archive_dir))
 			return false;

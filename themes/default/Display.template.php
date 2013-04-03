@@ -371,7 +371,7 @@ function template_main()
 								<li class="inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Maybe they can modify the post (this is the more button)
-		if ($message['can_modify'])
+		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
 								<li class="post_options"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '">', $txt['post_options'], '</a>';
 
