@@ -66,7 +66,6 @@ function postbyemail_imap()
 		// for every email...
 		foreach($emails as $email_number)
 		{
-			$output = '';
 			$email_number = (int) trim($email_number);
 
 			// Get the headers and prefetch the body as well to avoid a second request
@@ -77,7 +76,7 @@ function postbyemail_imap()
 			if (!empty($headers) && !empty($message))
 			{
 				$email = $headers . "\n" . $message;
-				$result = pbe_main($email);
+				action_pbe_post($email);
 
 				// mark it for deletion?
 				if (!empty($modSettings['maillist_imap_delete']))

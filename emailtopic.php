@@ -26,7 +26,7 @@ $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
 require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-$result = pbe_topic();
+action_pbe_topic();
 
 // Always exit as successful
 exit(0);

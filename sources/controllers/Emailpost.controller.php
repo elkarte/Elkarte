@@ -15,7 +15,7 @@ if (!defined('ELKARTE'))
 
 /**
  * Main email posting controller, reads, parses, checks and posts an email message or PM
- * Allows a user to reply to a topic on the board by emailing a replying to a
+ * Allows a user to reply to a topic on the board by emailing a reply to a
  * notification messages.
  * - It must have the security key in the email or it will be rejected
  * - It must be from the email of a registered user
@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  * @param type $force used to override common failure errors
  * @param type $key used to supply a lost key
  */
-function pbe_main($data = null, $force = false, $key = null)
+function action_pbe_post($data = null, $force = false, $key = null)
 {
 	global $txt, $modSettings, $language, $user_info;
 
@@ -91,7 +91,7 @@ function pbe_main($data = null, $force = false, $key = null)
 		return pbe_emailError('error_in_maintenance_mode', $email_message);
 
 	// The email looks valid, now on to check the actual user trying to make the post/pm
-	// lets load the topic/message/pm info and any additional permissions we need
+	// lets load the topic/message info and any additional permissions we need
 	if ($email_message->message_type === 't' || $email_message->message_type === 'm')
 	{
 		// Load the message/topic details
@@ -174,7 +174,7 @@ function pbe_main($data = null, $force = false, $key = null)
  * @param string $data used to supply a full body+headers email
  * @param type $force used to override common failure errors
  */
-function pbe_topic($data = null, $force = false)
+function action_pbe_topic($data = null, $force = false)
 {
 	global $modSettings, $user_info;
 
@@ -511,7 +511,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * @param type $data
  * @return boolean
  */
-function pbe_preview($data = null)
+function action_pbe_preview($data = null)
 {
 	global $txt, $modSettings;
 

@@ -289,7 +289,7 @@ class ManageMaillist_Controller
 
 					// Read/parse this message for viewing
 					require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$result = pbe_preview($data);
+					$result = action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
 				}
@@ -384,7 +384,7 @@ class ManageMaillist_Controller
 
 					// Lets TRY AGAIN to make a post!
 					include_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$text = pbe_main($data, $force, $key);
+					$text = action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
 					if ($text === true)
