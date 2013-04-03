@@ -5,15 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
  * @version 1.0 Alpha
- *
- * Manage and maintain the boards and categories of the forum.
  *
  */
 
@@ -90,7 +82,7 @@ function getBoardModerators($idboard)
 }
 
 /**
- * g
+ * Get all available themes 
  * @return array
  */
 function getAllThemes()
@@ -114,4 +106,29 @@ function getAllThemes()
 	$smcFunc['db_free_result']($request);
 
 	return $themes;
+}
+
+/**
+ * Gets redirect infos and post count from a selected board.
+ * @param int $idboard
+ * @return array
+ */
+function getBoardProperties($idboard)
+{
+	global $smcFunc;
+
+	$properties = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT redirect, num_posts
+		FROM {db_prefix}boards
+		WHERE id_board = {int:current_board}',
+		array(
+			'current_board' => $idboard,
+		)
+	);
+	list ($properties['oldRedirect'], $properties['numPosts']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $properties;
 }
