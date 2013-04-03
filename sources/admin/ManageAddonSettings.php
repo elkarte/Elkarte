@@ -115,7 +115,7 @@ class ManageAddonSettings_Controller
 	 */
 	function _initAddonSettingsForm()
 	{
-		global $context;
+		global $context, $txt, $scripturl;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');

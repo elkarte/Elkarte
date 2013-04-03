@@ -37,7 +37,7 @@ class ManageMail_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
@@ -215,7 +215,7 @@ class ManageMail_Controller
 	 */
 	public function action_mailSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $txtBirthdayEmails;
+		global $txt, $scripturl, $context, $txtBirthdayEmails;
 
 		loadLanguage('EmailTemplates');
 
@@ -290,7 +290,7 @@ class ManageMail_Controller
 	 */
 	private function _initMailSettingsForm()
 	{
-		global $txt, $modSettings;
+		global $txt, $modSettings, $txtBirthdayEmails;;
 
 		// instantiate the form
 		$this->_mailSettings = new Settings_Form();
@@ -335,7 +335,7 @@ class ManageMail_Controller
 	 */
 	public function settings()
 	{
-		global $txt, $modSettings;
+		global $txt, $modSettings, $txtBirthdayEmails;;
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
