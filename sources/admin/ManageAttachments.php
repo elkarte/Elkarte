@@ -662,10 +662,10 @@ class ManageAttachments_Controller
 		$context['num_avatars'] = comma_format(getAvatarCount(), 0);
 
 		// Total size of attachments
-		$context['attachment_total_size'] = list_OverallAttachmentsSize();
+		$context['attachment_total_size'] = OverallAttachmentsSize();
 
 		// Total size and files from the current attachments dir.
-		$current_dir = list_currentAttachDirProperties();
+		$current_dir = currentAttachDirProperties();
 
 		// If they specified a limit only....
 		if (!empty($modSettings['attachmentDirSizeLimit']))
