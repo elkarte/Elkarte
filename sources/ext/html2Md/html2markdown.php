@@ -262,7 +262,7 @@ class Convert_Md
 				$markdown = '_' . $value . '_';
 				break;
 			case 'hr':
-				$markdown = str_repeat('-', 3) . $this->line_break;
+				$markdown = $this->line_end . str_repeat('-', 3) . $this->line_end;
 				break;
 			case 'h1':
 			case 'h2':
@@ -291,7 +291,7 @@ class Convert_Md
 				$markdown = $value . $this->line_break;
 				break;
 			case 'div':
-				$markdown = $value;
+				$markdown = $value . $this->line_end;
 				if (!$node->hasChildNodes())
 					$markdown = $this->_escape_text($markdown);
 				break;
@@ -310,12 +310,12 @@ class Convert_Md
 			case 'tfoot':
 			case 'thead':
 				// Just skip over these as we handle them in the table tag itself
-				$markdown = '`skip`';
+				$markdown = '~`skip`~';
 				break;
 			case 'root':
 			case 'span':
 				// remove these tags and simply replace with the text inside the tags
-				$markdown = $this->_innerHTML($node);
+				$markdown = $this->_get_innerHTML($node);
 				break;
 			default:
 				// Don't know you, so just preserve whats there
@@ -323,7 +323,7 @@ class Convert_Md
 		}
 
 		// Replace the node with our markdown replacement, or with the node itself if none was found
-		if ($markdown !== '`skip`')
+		if ($markdown !== '~`skip`~')
 		{
 			if ($this->_parser)
 			{
