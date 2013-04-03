@@ -121,7 +121,7 @@ function template_main()
 				</tr>';
 			}
 		}
-		
+
 		echo '
 			</tbody>
 			<tbody class="divider">
@@ -395,7 +395,7 @@ function template_main()
 	if (!$context['no_topic_listing'])
 		echo '
 			<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] . '<br />' : '', '
+				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
 				'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
 			</p>
 			<p>
