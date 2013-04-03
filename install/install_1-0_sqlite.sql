@@ -695,13 +695,13 @@ INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Memorial 
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2010-09-06');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2011-09-05');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2012-09-03');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2013-09-09');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2014-09-08');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2013-09-02');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2014-09-01');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2015-09-07');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2016-09-05');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2017-09-04');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2018-09-03');
-INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2019-09-09');
+INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2019-09-02');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('Labor Day', '2020-09-07');
 INSERT INTO {$db_prefix}calendar_holidays (title, event_date) VALUES ('D-Day', '0004-06-06');
 COMMIT;
