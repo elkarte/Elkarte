@@ -38,7 +38,7 @@ class ManageBoards_Controller
 	 */
 	function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Everything's gonna need this.
 		loadLanguage('ManageBoards');
@@ -633,7 +633,7 @@ class ManageBoards_Controller
 	 */
 	function action_board2()
 	{
-		global $txt, $modSettings, $smcFunc, $context;
+		global $smcFunc, $context;
 
 		$_POST['boardid'] = (int) $_POST['boardid'];
 		checkSession();
@@ -776,7 +776,7 @@ class ManageBoards_Controller
 	 */
 	function action_boardSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initBoardSettingsForm();
