@@ -677,13 +677,13 @@ VALUES ('Independence Day', '0004-07-04'),
 	('Labor Day', '2010-09-06'),
 	('Labor Day', '2011-09-05'),
 	('Labor Day', '2012-09-03'),
-	('Labor Day', '2013-09-09'),
-	('Labor Day', '2014-09-08'),
+	('Labor Day', '2013-09-02'),
+	('Labor Day', '2014-09-01'),
 	('Labor Day', '2015-09-07'),
 	('Labor Day', '2016-09-05'),
 	('Labor Day', '2017-09-04'),
 	('Labor Day', '2018-09-03'),
-	('Labor Day', '2019-09-09'),
+	('Labor Day', '2019-09-02'),
 	('Labor Day', '2020-09-07'),
 	('D-Day', '0004-06-06');
 # --------------------------------------------------------
@@ -2026,6 +2026,7 @@ VALUES (1, 'name', '{$default_theme_name}'),
 
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
+INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 
 #
