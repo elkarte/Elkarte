@@ -585,13 +585,14 @@ class ManageBoards_Controller
 	 */
 	public function action_board2()
 	{
-		global $smcFunc, $context;
+		global $context;
 
 		$_POST['boardid'] = (int) $_POST['boardid'];
 		checkSession();
 		validateToken('admin-be-' . $_REQUEST['boardid']);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/ManageBoards.subs.php');
 
 		// Mode: modify aka. don't delete.
 		if (isset($_POST['edit']) || isset($_POST['add']))
@@ -657,22 +658,13 @@ class ManageBoards_Controller
 			// We need to know what used to be case in terms of redirection.
 			if (!empty($_POST['boardid']))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT redirect, num_posts
-					FROM {db_prefix}boards
-					WHERE id_board = {int:current_board}',
-					array(
-						'current_board' => $_POST['boardid'],
-					)
-				);
-				list ($oldRedirect, $numPosts) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
+				$properties = getBoardProperties($_POST['boardid']);
+				
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
-				if ($boardOptions['redirect'] && empty($oldRedirect) && $numPosts)
+				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
 					unset($boardOptions['redirect']);
 				// Reset the redirection count when switching on/off.
-				elseif (empty($boardOptions['redirect']) != empty($oldRedirect))
+				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
 					$boardOptions['num_posts'] = 0;
 				// Resetting the count?
 				elseif ($boardOptions['redirect'] && !empty($_POST['reset_redirect']))
