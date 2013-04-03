@@ -2176,8 +2176,8 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'enable_ne
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'forum_width', '90%');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
+INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 COMMIT;
-
 # --------------------------------------------------------
 
 #
@@ -2232,7 +2232,7 @@ VALUES (1, 1, 1, 1, 0, 0);
 #
 
 CREATE TABLE {$db_prefix}user_drafts (
-  id_draft int primary key,
+  id_draft integer primary key,
   id_topic int unsigned NOT NULL default '0',
   id_board smallint unsigned NOT NULL default '0',
   id_reply int unsigned NOT NULL default '0',
@@ -2261,7 +2261,7 @@ CREATE UNIQUE INDEX {$db_prefix}id_member ON {$db_prefix}user_drafts (id_member,
 #
 
 CREATE TABLE {$db_prefix}log_badbehavior (
-	id int primary key,
+	id integer primary key,
 	ip char NOT NULL,
 	date int NOT NULL default '0',
 	request_method varchar(255) NOT NULL,
