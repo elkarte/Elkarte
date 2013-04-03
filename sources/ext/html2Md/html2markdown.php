@@ -53,10 +53,10 @@ class Convert_Md
 	 */
 	public function __construct($html)
 	{
-		// Remove whitespace between html tags
+		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 
-		// Use PHP built in functions ...
+		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))
 		{
 			$this->_parser = true;
@@ -69,7 +69,7 @@ class Convert_Md
 			$this->doc->encoding = 'UTF-8';
 			libxml_clear_errors();
 		}
-		// Or use the simple html parser
+		// Or using the external simple html parser
 		else
 		{
 			$this->_parser = false;
@@ -77,7 +77,8 @@ class Convert_Md
 			$this->doc = str_get_html($html, true, true, 'UTF-8', false);
 		}
 
-		// Initialize the regex array to escape text only areas
+		// Initialize the regex array to escape text areas so markdown does
+		// not interpret plain text as markdown syntax
 		$this->_textEscapeRegex = array(
 			// Things that may convert to an hr --- or - - - etc
 			'([-*_])([ ]{0,2}\1){2,}' => '\\\\$0|',
@@ -96,7 +97,8 @@ class Convert_Md
 	}
 
 	/**
-	 * Loads the html body and sends it to the parsing loop to convert all nodes
+	 * Loads the html body and sends it to the parsing loop to convert all
+	 * DOM nodes to markup
 	 *
 	 * @return string
 	 */
@@ -106,18 +108,18 @@ class Convert_Md
 		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
 		$this->_convert_childNodes($body);
 
-		// Done replacing HTML elements, so we get the internal DOM tree back into a string
+		// Done replacing HTML elements, now get the converted DOM tree back into a string
 		$markdown = ($this->_parser) ? $this->doc->saveHTML() : $this->doc->save();
 
 		if ($this->_parser)
 		{
-			// Using the internal method we need to do a little extra work
+			// Using the internal DOM methods we need to do a little extra work
 			$markdown =  html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			if (preg_match('~<body>(.*)</body>~s', $markdown, $body))
 				$markdown = $body[1];
 		}
 
-		// Remove non breakable spaces that may be hidding in here
+		// Remove non breakable spaces that may be hiding in here
 		$markdown = str_replace("\xC2\xA0\x20", ' ', $markdown);
 		$markdown = str_replace("\xC2\xA0", ' ', $markdown);
 
@@ -133,7 +135,7 @@ class Convert_Md
 	}
 
 	/**
-	 * For a given node, checks if it is anywhere inside a code block
+	 * For a given node, checks if it is anywhere nested inside of a code block
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param type $node
@@ -211,7 +213,7 @@ class Convert_Md
 
 	/**
 	 * Convert the supplied node into its markdown equivalent
-	 * Supports some markdown extra tags, namely: table, abbr & dl
+	 *  - Supports *some* markdown extra tags, namely: table, abbr & dl in a limited fashion
 	 *
 	 * @param object $node
 	 */
@@ -649,7 +651,6 @@ class Convert_Md
 			return count($node);
 	}
 
-
 	/**
 	 * Helper function for getting a node value
 	 *
@@ -786,7 +787,7 @@ class Convert_Md
 		$ticks = '';
 		$code_parent = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
 
-		// inside of a pre, we don't do anything
+		// Inside of a pre, we don't do anything
 		if ($code_parent === 'pre')
 			return $value;
 
