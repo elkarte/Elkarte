@@ -417,10 +417,11 @@ class ManageBoards_Controller
 	 */
 	public function action_board()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $smcFunc, $modSettings;
+		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/ManageBoards.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -500,31 +501,7 @@ class ManageBoards_Controller
 			)
 		);
 
-		// Load membergroups.
-		$request = $smcFunc['db_query']('', '
-			SELECT group_name, id_group, min_posts
-			FROM {db_prefix}membergroups
-			WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
-			ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
-			array(
-				'moderator_group' => 3,
-				'global_moderator' => 2,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if ($_REQUEST['sa'] == 'newboard' && $row['min_posts'] == -1)
-				$curBoard['member_groups'][] = $row['id_group'];
-
-			$context['groups'][(int) $row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => trim($row['group_name']),
-				'allow' => in_array($row['id_group'], $curBoard['member_groups']),
-				'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
-				'is_post_group' => $row['min_posts'] != -1,
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$context['groups'] = getOtherGroups($curBoard);
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))
@@ -573,38 +550,13 @@ class ManageBoards_Controller
 				'selected' => $catID == $curBoard['category']
 			);
 
-		$request = $smcFunc['db_query']('', '
-			SELECT mem.id_member, mem.real_name
-			FROM {db_prefix}moderators AS mods
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
-			WHERE mods.id_board = {int:current_board}',
-			array(
-				'current_board' => $_REQUEST['boardid'],
-			)
-		);
-		$context['board']['moderators'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['board']['moderators'][$row['id_member']] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
-
+		$context['board']['moderators'] = getBoardModerators($_REQUEST['boardid']);
 		$context['board']['moderator_list'] = empty($context['board']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['board']['moderators']) . '&quot;';
 
 		if (!empty($context['board']['moderators']))
 			list ($context['board']['last_moderator_id']) = array_slice(array_keys($context['board']['moderators']), -1);
 
-		// Get all the themes...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme AS id, value AS name
-			FROM {db_prefix}themes
-			WHERE variable = {string:name}',
-			array(
-				'name' => 'name',
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['themes'][] = $row;
-		$smcFunc['db_free_result']($request);
+		$context['themes'] = getAllThemes();
 
 		if (!isset($_REQUEST['delete']))
 		{
