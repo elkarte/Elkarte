@@ -36,7 +36,7 @@ class ManageBoards_Controller
 	 *
 	 * uses ManageBoards language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt;
 
@@ -126,7 +126,7 @@ class ManageBoards_Controller
 	 *
 	 * @uses ManageBoards template, main sub-template.
 	 */
-	function action_main()
+	public function action_main()
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $txt;
 
@@ -261,7 +261,7 @@ class ManageBoards_Controller
 	 *
 	 * @uses ManageBoards template, modify_category sub-template.
 	 */
-	function action_cat()
+	public function action_cat()
 	{
 		global $txt, $context, $cat_tree, $boardList, $boards;
 
@@ -352,7 +352,7 @@ class ManageBoards_Controller
 	 * Called by ?action=admin;area=manageboards;sa=cat2
 	 * Redirects to ?action=admin;area=manageboards.
 	 */
-	function action_cat2()
+	public function action_cat2()
 	{
 		checkSession();
 		validateToken('admin-bc-' . $_REQUEST['cat']);
@@ -415,7 +415,7 @@ class ManageBoards_Controller
 	 * also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
 
 	 */
-	function action_board()
+	public function action_board()
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $smcFunc, $modSettings;
 
@@ -631,7 +631,7 @@ class ManageBoards_Controller
 	 * Redirects to ?action=admin;area=manageboards.
 	 * It requires manage_boards permission.
 	 */
-	function action_board2()
+	public function action_board2()
 	{
 		global $smcFunc, $context;
 
@@ -774,7 +774,7 @@ class ManageBoards_Controller
 	 *
 	 * @uses modify_general_settings sub-template.
 	 */
-	function action_boardSettings_display()
+	public function action_boardSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
@@ -824,7 +824,7 @@ class ManageBoards_Controller
 	 * Initialize the boardSettings form, with the current configuration
 	 * options for admin board settings screen.
 	 */
-	function _initBoardSettingsForm()
+	private function _initBoardSettingsForm()
 	{
 		// instantiate the form
 		$this->_boardSettings = new Settings_Form();
@@ -856,7 +856,7 @@ class ManageBoards_Controller
 	/**
 	 * Retrieve and return all admin settings for boards management.
 	 */
-	function settings()
+	public function settings()
 	{
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
