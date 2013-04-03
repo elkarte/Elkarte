@@ -413,7 +413,7 @@ class Convert_Md
 	private function _convert_code($node)
 	{
 		$markdown = '';
-		$value = $this->_innerHTML($node);
+		$value = $this->_get_innerHTML($node);
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -445,7 +445,7 @@ class Convert_Md
 		else
 		{
 			// Account for backticks in the single line
-			$ticks = $this->_got_ticks($node, $value);
+			$ticks = $this->_has_ticks($node, $value);
 			if (!empty($ticks))
 			{
 				// If the ticks were at the start/end of the word space it off
@@ -742,7 +742,7 @@ class Convert_Md
 	 * @param object $node
 	 * @return string
 	 */
-	private function _innerHTML($node)
+	private function _get_innerHTML($node)
 	{
 		if ($this->_parser)
 		{
@@ -781,7 +781,7 @@ class Convert_Md
 	 * @param type $node
 	 * @param string $value
 	 */
-	private function _got_ticks($node, $value)
+	private function _has_ticks($node, $value)
 	{
 		$ticks = '';
 		$code_parent = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
