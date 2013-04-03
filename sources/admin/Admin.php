@@ -65,7 +65,8 @@ function AdminMain()
 				'maillist' => array(
 					'label' => $txt['mail_center'],
 					'file' => 'ManageMaillist.php',
-					'function' => 'action_managemaillist',
+					'controller' => 'ManageMaillist_Controller',
+					'function' => 'action_index',
 					'icon' => 'mail.png',
 					'class' => 'admin_img_mail',
 					'permission' => array('approve_emails', 'admin_forum'),
