@@ -38,7 +38,12 @@ class Convert_Md
 	public $line_break = "\n\n";
 
 	/**
-	 * regex to run on plain text to prevent markdown for acting on
+	 * wordwrap output, set to 0 to skip wrapping
+	 */
+	public $body_width = 75;
+
+	/**
+	 * regex to run on plain text to prevent markdown from erroneously converting
 	 */
 	private $_textEscapeRegex = array();
 
@@ -119,6 +124,10 @@ class Convert_Md
 		// Strip the chaff and any excess blank lines we may have produced
 		$markdown = trim($markdown);
 		$markdown = preg_replace("~(\n){3,}~", "\n\n", $markdown);
+
+		// Wordwrap?
+		if (!empty($this->body_width))
+			$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end);
 
 		return $markdown;
 	}
@@ -800,5 +809,40 @@ class Convert_Md
 		}
 
 		return $ticks;
+	}
+
+	/**
+	 * Breaks a string up so its no more than width characters long
+	 *  - Will break at word boundaries
+	 *  - If no natural space is found will break mid-word
+	 *
+	 * @param string $string
+	 * @param int $width
+	 * @param string $break
+	 */
+	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
+	{
+		global $smcFunc;
+
+		$lines = array();
+		while (!empty($string))
+		{
+			// Get the next #width characts before a break (space, tab etc)
+			if (preg_match('~^(.{1,' . $width . '})(?:\s|$)~', $string, $matches))
+			{
+				// Add the #width to the output and set up for the next pass
+				$lines[] = $matches[1];
+				$string = $smcFunc['substr']($string, $smcFunc['strlen']($matches[0]));
+			}
+			// Humm just a long word with no place to break, so we simply cut it after width characters
+			else
+			{
+				$lines[] = $smcFunc['substr']($string, 0, $width);
+				$string = $smcFunc['substr']($string, $width);
+			}
+		}
+
+		// join it all the shortened sections up on our break characters
+		return implode($break, $lines);
 	}
 }
