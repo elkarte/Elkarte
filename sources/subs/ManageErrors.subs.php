@@ -8,6 +8,9 @@
  * @version 1.0 Alpha
  */
 
+if (!defined('ELKARTE'))
+	die('No access...');
+
 /**
  * Delete all or some of the errors in the error log.
  * It applies any necessary filters to deletion.
