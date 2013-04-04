@@ -197,53 +197,13 @@ function action_mlall()
 
 		// Only update the cache if something changed or no cache existed yet.
 		if (empty($memberlist_cache) || empty($modSettings['memberlist_updated']) || $memberlist_cache['last_update'] < $modSettings['memberlist_updated'])
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT real_name
-				FROM {db_prefix}members
-				WHERE is_activated = {int:is_activated}
-				ORDER BY real_name',
-				array(
-					'is_activated' => 1,
-				)
-			);
-
-			$memberlist_cache = array(
-				'last_update' => time(),
-				'num_members' => $smcFunc['db_num_rows']($request),
-				'index' => array(),
-			);
-
-			for ($i = 0, $n = $smcFunc['db_num_rows']($request); $i < $n; $i += $cache_step_size)
-			{
-				$smcFunc['db_data_seek']($request, $i);
-				list($memberlist_cache['index'][$i]) = $smcFunc['db_fetch_row']($request);
-			}
-			$smcFunc['db_data_seek']($request, $memberlist_cache['num_members'] - 1);
-			list ($memberlist_cache['index'][$i]) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
-			// Now we've got the cache...store it.
-			updateSettings(array('memberlist_cache' => serialize($memberlist_cache)));
-		}
+			$memberlist_cache = ml_memberCache($cache_step_size);
 
 		$context['num_members'] = $memberlist_cache['num_members'];
 	}
-
 	// Without cache we need an extra query to get the amount of members.
 	else
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}members
-			WHERE is_activated = {int:is_activated}',
-			array(
-				'is_activated' => 1,
-			)
-		);
-		list ($context['num_members']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-	}
+		$context['num_members'] = ml_memberCount();
 
 	// Set defaults for sort (real_name) and start. (0)
 	if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]))
@@ -254,20 +214,7 @@ function action_mlall()
 		if (preg_match('~^[^\'\\\\/]~u', $smcFunc['strtolower']($_REQUEST['start']), $match) === 0)
 			fatal_error('Hacker?', false);
 
-		$_REQUEST['start'] = $match[0];
-
-		$request = $smcFunc['db_query']('substring', '
-			SELECT COUNT(*)
-			FROM {db_prefix}members
-			WHERE LOWER(SUBSTRING(real_name, 1, 1)) < {string:first_letter}
-				AND is_activated = {int:is_activated}',
-			array(
-				'is_activated' => 1,
-				'first_letter' => $_REQUEST['start'],
-			)
-		);
-		list ($_REQUEST['start']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$_REQUEST['start'] = ml_alphaStart($match[0]);
 	}
 
 	// Build out the letter selection link bar
@@ -345,19 +292,7 @@ function action_mlall()
 		$query_parameters += $context['custom_profile_fields']['parameters'];
 
 	// Select the members from the database.
-	$request = $smcFunc['db_query']('', '
-		SELECT mem.id_member
-		FROM {db_prefix}members AS mem' . ($_REQUEST['sort'] === 'is_online' ? '
-			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : '') . ($_REQUEST['sort'] === 'id_group' ? '
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' : '') . '
-		WHERE mem.is_activated = {int:is_activated}' . (empty($where) ? '' : '
-			AND ' . $where) . '
-		ORDER BY {raw:sort}
-		LIMIT ' . $limit . ', ' . $modSettings['defaultMaxMembers'],
-		$query_parameters
-	);
-	printMemberListRows($request);
-	$smcFunc['db_free_result']($request);
+	ml_selectMembers($query_parameters, $where, $limit, $_REQUEST['sort']);
 
 	// Add anchors at the start of each letter.
 	if ($_REQUEST['sort'] === 'real_name')
@@ -388,30 +323,8 @@ function action_mlsearch()
 	$context['page_title'] = $txt['mlist_search'];
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
-	// Can they search custom fields?
-	$request = $smcFunc['db_query']('', '
-		SELECT col_name, field_name, field_desc
-		FROM {db_prefix}custom_fields
-		WHERE active = {int:active}
-			' . (allowedTo('admin_forum') ? '' : ' AND private < {int:private_level}') . '
-			AND can_search = {int:can_search}
-			AND (field_type = {string:field_type_text} OR field_type = {string:field_type_textarea})',
-		array(
-			'active' => 1,
-			'can_search' => 1,
-			'private_level' => 2,
-			'field_type_text' => 'text',
-			'field_type_textarea' => 'textarea',
-		)
-	);
-	$context['custom_search_fields'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context['custom_search_fields'][$row['col_name']] = array(
-			'colname' => $row['col_name'],
-			'name' => $row['field_name'],
-			'desc' => $row['field_desc'],
-		);
-	$smcFunc['db_free_result']($request);
+	// Are there custom fields they can search?
+	ml_findSearchableCustomFields();
 
 	// They're searching..
 	if (isset($_REQUEST['search']) && isset($_REQUEST['fields']))
@@ -502,38 +415,11 @@ function action_mlsearch()
 		}
 
 		$query = $_POST['search'] == '' ? '= {string:blank_string}' : ($smcFunc['db_case_sensitive'] ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
-
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}members AS mem
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
-				(empty($customJoin) ? '' : implode('
-				', $customJoin)) . '
-			WHERE (' . implode( ' ' . $query . ' OR ', $fields) . ' ' . $query . $condition . ')
-				AND mem.is_activated = {int:is_activated}',
-			$query_parameters
-		);
-		list ($numResults) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
+		$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 		// Find the members from the database.
-		$request = $smcFunc['db_query']('', '
-			SELECT mem.id_member
-			FROM {db_prefix}members AS mem
-				LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
-				(empty($customJoin) ? '' : implode('
-				', $customJoin)) . '
-			WHERE (' . implode( ' ' . $query . ' OR ', $fields) . ' ' . $query . $condition . ')
-				AND mem.is_activated = {int:is_activated}
-			ORDER BY {raw:sort}
-			LIMIT ' . $_REQUEST['start'] . ', ' . $modSettings['defaultMaxMembers'],
-			$query_parameters
-		);
-		printMemberListRows($request);
-		$smcFunc['db_free_result']($request);
+		$numResults = ml_searchMembers($query_parameters, $customJoin, $where, $_REQUEST['start']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 	}
 	else
 	{
@@ -563,48 +449,4 @@ function action_mlsearch()
 	// Highlight the correct button, too!
 	unset($context['memberlist_buttons']['view_all_members']['active']);
 	$context['memberlist_buttons']['mlist_search']['active'] = true;
-}
-
-/**
- * Retrieves results of the request passed to it
- * Puts results of request into the context for the sub template.
- *
- * @param resource $request
- */
-function printMemberListRows($request)
-{
-	global $scripturl, $txt, $user_info, $modSettings;
-	global $context, $settings, $memberContext, $smcFunc;
-
-	// Get the most posts.
-	$result = $smcFunc['db_query']('', '
-		SELECT MAX(posts)
-		FROM {db_prefix}members',
-		array(
-		)
-	);
-	list ($most_posts) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
-
-	// Avoid division by zero...
-	if ($most_posts == 0)
-		$most_posts = 1;
-
-	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$members[] = $row['id_member'];
-
-	// Load all the members for display.
-	loadMemberData($members);
-
-	$context['members'] = array();
-	foreach ($members as $member)
-	{
-		if (!loadMemberContext($member))
-			continue;
-
-		$context['members'][$member] = $memberContext[$member];
-		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
-		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
-	}
 }
