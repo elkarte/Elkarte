@@ -213,7 +213,7 @@ class ManageErrors_Controller
 	 */
 	public function action_viewfile()
 	{
-		global $context, $sc;
+		global $context;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
