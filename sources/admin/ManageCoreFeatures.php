@@ -43,7 +43,7 @@ class ManageCoreFeatures_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context, $settings, $modSettings;
 
 		loadTemplate('ManageCoreFeatures');
 
@@ -159,8 +159,6 @@ class ManageCoreFeatures_Controller
 	 */
 	function settings()
 	{
-		global $txt;
-
 		$core_features = array(
 			// cd = calendar.
 			'cd' => array(
@@ -351,6 +349,8 @@ class ManageCoreFeatures_Controller
 	 */
 	function config_vars()
 	{
+		global $txt;
+
 		$core_features = $this->settings();
 
 		$return_data = array();
@@ -367,7 +367,7 @@ class ManageCoreFeatures_Controller
 	 */
 	function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
-		global $context, $txt;
+		global $context;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
@@ -385,4 +385,3 @@ class ManageCoreFeatures_Controller
 		$context['sub_action'] = $_REQUEST['sa'];
 	}
 }
-
