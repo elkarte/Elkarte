@@ -30,6 +30,7 @@ class Action
 	 *  - 'sub_action name' => array ('controller object, i.e. $this', 'method name'), or
 	 *  - 'sub_action name' => array (
 	 *  	'file' => 'file name',
+	 *		'dir' => 'controller file location', if not set ADMINDIR is assumed
 	 *  	'controller' => 'controller name',
 	 *  	'function' => 'method name')
 	 * @var array
@@ -76,7 +77,10 @@ class Action
 		// is it in a file we need to load?
 		if (isset($subAction['file']))
 		{
-			require_once(ADMINDIR . '/' . $subAction['file']);
+			if (isset($subAction['dir']))
+				require_once($subAction['dir'] . '/' . $subAction['file']);
+			else
+				require_once(ADMINDIR . '/' . $subAction['file']);
 
 			// a brand new controller... so be it.
 			if (isset($subAction['controller']))

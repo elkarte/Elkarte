@@ -63,7 +63,8 @@ class ManageMembergroups_Controller
 			'members' => array(
 				'function' => 'action_groupmembers',
 				'permission' => 'manage_membergroups',
-				'file' => 'controllers/Groups.controller.php'),
+				'file' => 'Groups.controller.php',
+				'dir' => CONTROLLERDIR),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_groupSettings_display',
