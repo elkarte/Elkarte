@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-	global $scripturl, $modSettings, $smcFunc;
+	global $smcFunc;
 
 	// We need to search for any birthday in this range, and whatever year that birthday is on.
 	$year_low = (int) substr($low_date, 0, 4);
@@ -526,7 +526,8 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	{
 		$first_day_of_year = (int) strftime('%w', mktime(0, 0, 0, 1, 1, $year));
 		$first_day_of_next_year = (int) strftime('%w', mktime(0, 0, 0, 1, 1, $year + 1));
-		$last_day_of_last_year = (int) strftime('%w', mktime(0, 0, 0, 12, 31, $year - 1));
+		// this one is not used in its scope
+		// $last_day_of_last_year = (int) strftime('%w', mktime(0, 0, 0, 12, 31, $year - 1));
 
 		// All this is as getCalendarGrid.
 		if ($calendarOptions['start_day'] === 0)
@@ -623,8 +624,6 @@ function cache_getOffsetIndependentEvents($days_to_index)
  */
 function cache_getRecentEvents($eventOptions)
 {
-	global $modSettings, $user_info, $scripturl;
-
 	// With the 'static' cached data we can calculate the user-specific data.
 	$cached_data = cache_quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
@@ -741,7 +740,7 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, $txt, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	if (!isset($_POST['deleteevent']))
 	{
@@ -835,7 +834,7 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global $modSettings, $smcFunc;
+	global $smcFunc;
 
 	// Add special chars to the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
