@@ -38,6 +38,8 @@ class ManageErrors_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
 
+		require_once(SUBSDIR . '/ManageErrors.subs.php');
+
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
 			return $this->action_viewfile();
@@ -75,20 +77,11 @@ class ManageErrors_Controller
 			unset($_GET['filter'], $_GET['value']);
 
 		// Deleting, are we?
-		if (isset($_POST['delall']) || isset($_POST['delete']))
-			deleteErrors();
+		$type = isset($_POST['delall']) ? 'delall' : (isset($_POST['delete']) ? 'delete' : false);
+		if (isset($type))
+			deleteErrors($filter, $type);
 
-		// Just how many errors are there?
-		$result = $smcFunc['db_query']('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_errors' . (isset($filter) ? '
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
-			array(
-				'filter' => isset($filter) ? $filter['value']['sql'] : '',
-			)
-		);
-		list ($num_errors) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$num_errors = numErrors();
 
 		// If this filter is empty...
 		if ($num_errors == 0 && isset($filter))
@@ -172,26 +165,8 @@ class ManageErrors_Controller
 		// Load the member data.
 		if (!empty($members))
 		{
-			// Get some additional member info...
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, member_name, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:member_list})
-				LIMIT ' . count($members),
-				array(
-					'member_list' => $members,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$members[$row['id_member']] = $row;
-			$smcFunc['db_free_result']($request);
-
-			// This is a guest...
-			$members[0] = array(
-				'id_member' => 0,
-				'member_name' => '',
-				'real_name' => $txt['guest_title']
-			);
+			require_once(SUBSDIR . '/Members.subs.php');
+			$members = getBasicMemberData($members);
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)
@@ -293,7 +268,7 @@ class ManageErrors_Controller
 	 */
 	public function action_viewfile()
 	{
-		global $context;
+		global $context, $sc;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
@@ -339,54 +314,4 @@ class ManageErrors_Controller
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'show_file';
 	}
-}
-
-/**
- * Delete all or some of the errors in the error log.
- * It applies any necessary filters to deletion.
- * This should only be called by ManageErrors::action_log().
- * It attempts to TRUNCATE the table to reset the auto_increment.
- * Redirects back to the error log when done.
- */
-function deleteErrors()
-{
-	global $filter, $smcFunc;
-
-	// Make sure the session exists and is correct; otherwise, might be a hacker.
-	checkSession();
-	validateToken('admin-el');
-
-	// Delete all or just some?
-	if (isset($_POST['delall']) && !isset($filter))
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_errors',
-			array(
-			)
-		);
-	// Deleting all with a filter?
-	elseif (isset($_POST['delall']) && isset($filter))
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_errors
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
-			array(
-				'filter' => $filter['value']['sql'],
-			)
-		);
-	// Just specific errors?
-	elseif (!empty($_POST['delete']))
-	{
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_errors
-			WHERE id_error IN ({array_int:error_list})',
-			array(
-				'error_list' => array_unique($_POST['delete']),
-			)
-		);
-
-		// Go back to where we were.
-		redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
-	}
-
-	// Back to the error log!
-	redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 }
