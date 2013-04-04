@@ -15,6 +15,7 @@
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  */
+
 function deleteErrors($type, $filter)
 {
 	global $smcFunc;
@@ -54,6 +55,11 @@ function deleteErrors($type, $filter)
 	redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 }
 
+/**
+ * Counts error log entries 
+ *
+ * @return int
+ */
 function numErrors()
 {
 	global $smcFunc;
@@ -73,14 +79,15 @@ function numErrors()
 
 	return $num_errors;
 }
+
 /**
- *
+ * Gets data from the error log
  * 
  * @param int $start
  * @param string $sort_direction
  * @param array $filter
+ * @return array
  */
-
 function getErrorLogData($start, $sort_direction, $filter)
 {
 	global $smcFunc, $modSettings, $scripturl, $txt;
