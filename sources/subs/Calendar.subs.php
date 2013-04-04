@@ -1102,3 +1102,88 @@ function removeHolidays($holiday_ids)
 		'calendar_updated' => time(),
 	));
 }
+
+/**
+ * Updates a calendar holiday
+ * 
+ * @param int $holiday
+ * @param int $date
+ * @param string $title
+ */
+function editHoliday($holiday, $date, $title)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}calendar_holidays
+		SET event_date = {date:holiday_date}, title = {string:holiday_title}
+		WHERE id_holiday = {int:selected_holiday}',
+		array(
+			'holiday_date' => $date,
+			'selected_holiday' => $holiday,
+			'holiday_title' => $title,
+		)
+	);
+
+	updateSettings(array(
+		'calendar_updated' => time(),
+	));
+}
+
+/**
+ * Insert a new holiday
+ * 
+ * @param int $date
+ * @param type $title
+ */
+function insert_holiday($date, $title)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('',
+		'{db_prefix}calendar_holidays',
+		array(
+			'event_date' => 'date', 'title' => 'string-60',
+		),
+		array(
+			$date, $title,
+		),
+		array('id_holiday')
+	);
+
+	updateSettings(array(
+		'calendar_updated' => time(),
+	));
+}
+
+/**
+ * Get a specific holiday
+ * 
+ * @param int $id_holiday
+ * @return array 
+ */
+function getHoliday($id_holiday)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
+		FROM {db_prefix}calendar_holidays
+		WHERE id_holiday = {int:selected_holiday}
+		LIMIT 1',
+			array(
+				'selected_holiday' => $id_holiday,
+			)
+		);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$holiday = array(
+			'id' => $row['id_holiday'],
+			'day' => $row['day'],
+			'month' => $row['month'],
+			'year' => $row['year'] <= 4 ? 0 : $row['year'],
+			'title' => $row['title']
+		);
+	$smcFunc['db_free_result']($request);
+
+	return $holiday;
+}

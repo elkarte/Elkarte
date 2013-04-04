@@ -36,7 +36,7 @@ class ManageCalendar_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 
@@ -198,6 +198,9 @@ class ManageCalendar_Controller
 	{
 		global $txt, $context, $smcFunc;
 
+		//We need this, really..
+		require_once(SUBSDIR . '/Calendar.subs.php');
+
 		loadTemplate('ManageCalendar');
 
 		$context['is_new'] = !isset($_REQUEST['holiday']);
@@ -216,45 +219,17 @@ class ManageCalendar_Controller
 			// Not too long good sir?
 			$_REQUEST['title'] =  $smcFunc['substr']($_REQUEST['title'], 0, 60);
 			$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
-
+		
 			if (isset($_REQUEST['delete']))
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}calendar_holidays
-					WHERE id_holiday = {int:selected_holiday}',
-					array(
-						'selected_holiday' => $_REQUEST['holiday'],
-					)
-				);
+				removeHolidays($_REQUEST['holiday']);
 			else
 			{
 				$date = strftime($_REQUEST['year'] <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $_REQUEST['month'], $_REQUEST['day'], $_REQUEST['year']));
 				if (isset($_REQUEST['edit']))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}calendar_holidays
-						SET event_date = {date:holiday_date}, title = {string:holiday_title}
-						WHERE id_holiday = {int:selected_holiday}',
-						array(
-							'holiday_date' => $date,
-							'selected_holiday' => $_REQUEST['holiday'],
-							'holiday_title' => $_REQUEST['title'],
-						)
-					);
+					editHoliday($_REQUEST['holiday'], $date, $_REQUEST['title']);
 				else
-					$smcFunc['db_insert']('',
-						'{db_prefix}calendar_holidays',
-						array(
-							'event_date' => 'date', 'title' => 'string-60',
-						),
-						array(
-							$date, $_REQUEST['title'],
-						),
-						array('id_holiday')
-					);
+					insertHoliday($date, $_REQUEST['title']);
 			}
-
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
 
 			redirectexit('action=admin;area=managecalendar;sa=holidays');
 		}
@@ -272,26 +247,7 @@ class ManageCalendar_Controller
 		}
 		// If it's not new load the data.
 		else
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
-				FROM {db_prefix}calendar_holidays
-				WHERE id_holiday = {int:selected_holiday}
-				LIMIT 1',
-					array(
-						'selected_holiday' => $_REQUEST['holiday'],
-					)
-				);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['holiday'] = array(
-				'id' => $row['id_holiday'],
-				'day' => $row['day'],
-				'month' => $row['month'],
-				'year' => $row['year'] <= 4 ? 0 : $row['year'],
-				'title' => $row['title']
-			);
-			$smcFunc['db_free_result']($request);
-		}
+			$context['holiday'] = getHoliday($_REQUEST['holiday']);
 
 		// Last day for the drop down?
 		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
