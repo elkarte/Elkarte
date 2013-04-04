@@ -26,7 +26,7 @@ class ManageDrafts_Controller
 	/**
 	 * Default method.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
@@ -44,7 +44,7 @@ class ManageDrafts_Controller
 	 *
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	function action_draftSettings_display()
+	public function action_draftSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
@@ -107,7 +107,7 @@ class ManageDrafts_Controller
 	/**
 	 * Initialize drafts settings with the current forum settings
 	 */
-	function _initDraftSettingsForm()
+	private function _initDraftSettingsForm()
 	{
 		global $txt;
 
@@ -136,7 +136,7 @@ class ManageDrafts_Controller
 	 * Used by admin search.
 	 * @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
