@@ -34,9 +34,9 @@ class ManageErrors_Controller
 	 *
 	 * @uses the Errors template and error_log sub template.
 	 */
-	function action_log()
+	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $themedir, $smcFunc;
+		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
 
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
@@ -291,9 +291,9 @@ class ManageErrors_Controller
 	 * The line number number is specified by $_REQUEST['line']...
 	 * The function will try to get the 20 lines before and after the specified line.
 	 */
-	function action_viewfile()
+	public function action_viewfile()
 	{
-		global $context, $txt;
+		global $context;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
