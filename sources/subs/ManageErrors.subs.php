@@ -19,10 +19,6 @@ function deleteErrors($type, $filter)
 {
 	global $smcFunc;
 
-	// Make sure the session exists and is correct; otherwise, might be a hacker.
-	checkSession();
-	validateToken('admin-el');
-
 	// Delete all or just some?
 	if ($type == 'delall' && !isset($filter))
 		$smcFunc['db_query']('truncate_table', '

@@ -78,9 +78,14 @@ class ManageErrors_Controller
 
 		// Deleting, are we?
 		$type = isset($_POST['delall']) ? 'delall' : (isset($_POST['delete']) ? 'delete' : false);
-		if (isset($type))
-			deleteErrors($filter, $type);
+		if ($type != false)
+		{
+			// Make sure the session exists and is correct; otherwise, might be a hacker.
+			checkSession();
+			validateToken('admin-el');
 
+			deleteErrors($type, $filter);
+		}
 		$num_errors = numErrors();
 
 		// If this filter is empty...
