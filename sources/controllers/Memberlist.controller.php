@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function pre_memberlist()
 {
-	global $scripturl, $txt, $modSettings, $context, $settings, $modSettings;
+	global $scripturl, $txt, $modSettings, $context;
 
 	// Make sure they can view the memberlist.
 	isAllowedTo('view_mlist');
@@ -60,12 +60,12 @@ function pre_memberlist()
 
 	$context['num_members'] = $modSettings['totalMembers'];
 
-	// Set up the columns...
+	// Set up the standard columns...
 	$context['columns'] = array(
 		'is_online' => array(
 			'label' => $txt['status'],
 			'width' => 60,
-			'class' => 'first_th',
+			'class' => 'first_th centertext',
 			'sort' => array(
 				'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
 				'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
@@ -80,7 +80,7 @@ function pre_memberlist()
 		),
 		'email_address' => array(
 			'label' => $txt['email'],
-			'width' => 25,
+			'class' => "centertext",
 			'sort' => array(
 				'down' => allowedTo('moderate_forum') ? 'mem.email_address DESC' : 'mem.hide_email DESC, mem.email_address DESC',
 				'up' => allowedTo('moderate_forum') ? 'mem.email_address ASC' : 'mem.hide_email ASC, mem.email_address ASC'
@@ -88,7 +88,7 @@ function pre_memberlist()
 		),
 		'website_url' => array(
 			'label' => $txt['website'],
-			'width' => 70,
+			'class' => "centertext",
 			'link_with' => 'website',
 			'sort' => array(
 				'down' => 'LENGTH(mem.website_url) > 0 ASC, IFNULL(mem.website_url, 1=1) DESC, mem.website_url DESC',
@@ -111,8 +111,6 @@ function pre_memberlist()
 		),
 		'posts' => array(
 			'label' => $txt['posts'],
-			'width' => 115,
-			'colspan' => 2,
 			'default_sort_rev' => true,
 			'sort' => array(
 				'down' => 'mem.posts DESC',
@@ -121,6 +119,12 @@ function pre_memberlist()
 		)
 	);
 
+	// Add in any custom profile columns
+	require_once(SUBSDIR . '/Memberlist.subs.php');
+	if (ml_CustomProfile())
+		$context['columns'] += $context['custom_profile_fields']['columns'];
+
+	// The template may appreciate how many columns it needs to display
 	$context['colspan'] = 0;
 	$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 	foreach ($context['columns'] as $key => $column)
@@ -134,7 +138,7 @@ function pre_memberlist()
 		$context['colspan'] += isset($column['colspan']) ? $column['colspan'] : 1;
 	}
 
-	// Aesthetic stuff.
+	// Define the last column of those that remain
 	end($context['columns']);
 	$context['columns'][key($context['columns'])]['class'] = 'last_th';
 
@@ -170,18 +174,18 @@ function pre_memberlist()
  */
 function action_mlall()
 {
-	global $txt, $scripturl, $user_info;
-	global $modSettings, $context, $smcFunc;
+	global $txt, $scripturl, $modSettings, $context, $smcFunc;
 
 	// The chunk size for the cached index.
 	$cache_step_size = 500;
+
+	require_once(SUBSDIR . '/Memberlist.subs.php');
 
 	// Only use caching if:
 	// 1. there are at least 2k members,
 	// 2. the default sorting method (real_name) is being used,
 	// 3. the page shown is high enough to make a DB filesort unprofitable.
 	$use_cache = $modSettings['totalMembers'] > 2000 && (!isset($_REQUEST['sort']) || $_REQUEST['sort'] === 'real_name') && isset($_REQUEST['start']) && $_REQUEST['start'] > $cache_step_size;
-
 	if ($use_cache)
 	{
 		// Maybe there's something cached already.
@@ -266,9 +270,10 @@ function action_mlall()
 		$smcFunc['db_free_result']($request);
 	}
 
+	// Build out the letter selection link bar
 	$context['letter_links'] = '';
 	for ($i = 97; $i < 123; $i++)
-		$context['letter_links'] .= '<a href="' . $scripturl . '?action=memberlist;sa=all;start=' . chr($i) . '#letter' . chr($i) . '">' . strtoupper(chr($i)) . '</a> ';
+		$context['letter_links'] .= '<a href="' . $scripturl . '?action=memberlist;sa=all;start=' . chr($i) . '#letter' . chr($i) . '">' . chr($i - 32) . '</a> ';
 
 	// Sort out the column information.
 	foreach ($context['columns'] as $col => $column_details)
@@ -302,6 +307,7 @@ function action_mlall()
 	);
 
 	$limit = $_REQUEST['start'];
+	$where = '';
 	$query_parameters = array(
 		'regular_id_group' => 0,
 		'is_activated' => 1,
@@ -334,6 +340,10 @@ function action_mlall()
 		$limit = $second_offset - ($memberlist_cache['num_members'] - $_REQUEST['start']) - ($second_offset > $memberlist_cache['num_members'] ? $cache_step_size - ($memberlist_cache['num_members'] % $cache_step_size) : 0);
 	}
 
+	// Add custom fields paramters too.
+	if (!empty($context['custom_profile_fields']['parameters']))
+		$query_parameters += $context['custom_profile_fields']['parameters'];
+
 	// Select the members from the database.
 	$request = $smcFunc['db_query']('', '
 		SELECT mem.id_member
@@ -350,7 +360,7 @@ function action_mlall()
 	$smcFunc['db_free_result']($request);
 
 	// Add anchors at the start of each letter.
-	if ($_REQUEST['sort'] == 'real_name')
+	if ($_REQUEST['sort'] === 'real_name')
 	{
 		$last_letter = '';
 		foreach ($context['members'] as $i => $dummy)
@@ -373,7 +383,7 @@ function action_mlall()
  */
 function action_mlsearch()
 {
-	global $txt, $scripturl, $context, $user_info, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $smcFunc;
 
 	$context['page_title'] = $txt['mlist_search'];
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -452,12 +462,15 @@ function action_mlsearch()
 			$fields = allowedTo('moderate_forum') ? array('member_name', 'real_name') : array('real_name');
 		else
 			$fields = array();
+
 		// Search for websites.
 		if (in_array('website', $_POST['fields']))
 			$fields += array(7 => 'website_title', 'website_url');
+
 		// Search for groups.
 		if (in_array('group', $_POST['fields']))
 			$fields += array(9 => 'IFNULL(group_name, {string:blank_string})');
+
 		// Search for an email address?
 		if (in_array('email', $_POST['fields']))
 		{
@@ -468,8 +481,10 @@ function action_mlsearch()
 			$condition = '';
 
 		if ($smcFunc['db_case_sensitive'])
+		{
 			foreach ($fields as $key => $field)
 				$fields[$key] = 'LOWER(' . $field . ')';
+		}
 
 		$customJoin = array();
 		$customCount = 10;
@@ -478,7 +493,7 @@ function action_mlsearch()
 		foreach ($_POST['fields'] as $field)
 		{
 			$curField = substr($field, 5);
-			if (substr($field, 0, 5) == 'cust_' && isset($context['custom_search_fields'][$curField]))
+			if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 			{
 				$customJoin[] = 'LEFT JOIN {db_prefix}themes AS t' . $curField . ' ON (t' . $curField . '.variable = {string:t' . $curField . '} AND t' . $curField . '.id_theme = 1 AND t' . $curField . '.id_member = mem.id_member)';
 				$query_parameters['t' . $curField] = $curField;
