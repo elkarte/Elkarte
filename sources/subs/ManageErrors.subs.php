@@ -18,7 +18,6 @@ if (!defined('ELKARTE'))
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  */
-
 function deleteErrors($type, $filter)
 {
 	global $smcFunc;
