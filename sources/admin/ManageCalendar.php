@@ -34,7 +34,7 @@ class ManageCalendar_Controller
 	 *
 	 * uses ManageCalendar language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt, $scripturl;
 
@@ -83,7 +83,7 @@ class ManageCalendar_Controller
 	/**
 	 * The function that handles adding, and deleting holiday data
 	 */
-	function action_holidays()
+	public function action_holidays()
 	{
 		global $scripturl, $txt, $context;
 
@@ -194,7 +194,7 @@ class ManageCalendar_Controller
 	/**
 	 * This function is used for adding/editing a specific holiday
 	 */
-	function action_editholiday()
+	public function action_editholiday()
 	{
 		global $txt, $context, $smcFunc;
 
@@ -301,9 +301,9 @@ class ManageCalendar_Controller
 	 * Show and allow to modify calendar settings.
 	 * The method uses a Settings_Form to do the work.
 	 */
-	function action_calendarSettings_display()
+	public function action_calendarSettings_display()
 	{
-		global $context, $settings, $txt, $scripturl;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initCalendarSettingsForm();
@@ -344,7 +344,7 @@ class ManageCalendar_Controller
 	/**
 	 * Retrieve and return all admin settings for the calendar.
 	 */
-	function _initCalendarSettingsForm()
+	private function _initCalendarSettingsForm()
 	{
 		global $txt, $context;
 
@@ -398,7 +398,7 @@ class ManageCalendar_Controller
 	/**
 	 * Retrieve and return all admin settings for the calendar.
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
