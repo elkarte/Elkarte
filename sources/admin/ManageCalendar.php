@@ -36,7 +36,7 @@ class ManageCalendar_Controller
 	 */
 	function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl;
 
 		isAllowedTo('admin_forum');
 
@@ -196,7 +196,7 @@ class ManageCalendar_Controller
 	 */
 	function action_editholiday()
 	{
-		global $txt, $context, $scripturl, $smcFunc;
+		global $txt, $context, $smcFunc;
 
 		loadTemplate('ManageCalendar');
 
@@ -303,7 +303,7 @@ class ManageCalendar_Controller
 	 */
 	function action_calendarSettings_display()
 	{
-		global $modSettings, $context, $settings, $txt, $scripturl, $smcFunc;
+		global $context, $settings, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initCalendarSettingsForm();
