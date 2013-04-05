@@ -192,10 +192,7 @@ function savePMDraft($recipientList)
 	// otherwise creating a new PM draft.
 	else
 	{
-		create_pm_draft($draft, $recipientList);
-
-		// get the new id
-		$id_pm_draft = $smcFunc['db_insert_id']('{db_prefix}user_drafts', 'id_draft');
+		$id_pm_draft = create_pm_draft($draft, $recipientList);
 
 		// everything go as expected, if not toss back an error
 		if (!empty($id_pm_draft))
@@ -315,7 +312,8 @@ function action_showDrafts($member_id, $topic = false, $draft_type = 0)
 
 	// load all the drafts for this user that meet the criteria
 	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-	$user_drafts = load_user_drafts($member_id, $topic, $draft_type, $drafts_keep_days);
+	$order = 'poster_time DESC';
+	$user_drafts = load_user_drafts($member_id, $draft_type, $topic, $drafts_keep_days, $order);
 
 	// add them to the context draft array for template display
 	foreach ($user_drafts as $draft)
@@ -357,8 +355,8 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 	if (!empty($_REQUEST['delete']))
 	{
 		checkSession('get');
-		$id_delete = (int) $_REQUEST['delete'];
 
+		$id_delete = (int) $_REQUEST['delete'];
 		deleteDrafts($id_delete, $memID);
 		redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 	}
@@ -367,9 +365,9 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
 		$_REQUEST['viewscount'] = 10;
 
-	// Get the count of applicable drafts
+	// Get things started
+	$user_drafts = array();
 	$msgCount = draftsCount($memID, $draft_type);
-
 	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 	// Make sure the starting place makes sense and construct our friend the page index.
@@ -386,28 +384,15 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 	}
 
 	// Find this user's drafts
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			b.id_board, b.name AS bname,
-			ud.id_member, ud.id_draft, ud.body, ud.smileys_enabled, ud.subject, ud.poster_time, ud.icon, ud.id_topic, ud.locked, ud.is_sticky
-		FROM {db_prefix}user_drafts AS ud
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)
-		WHERE ud.id_member = {int:current_member}
-			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : '') . '
-		ORDER BY ud.id_draft ' . ($reverse ? 'ASC' : 'DESC') . '
-		LIMIT ' . $start . ', ' . $maxIndex,
-		array(
-			'current_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
+	$limit = $start . ', ' . $maxIndex;
+	$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+	$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
 
 	// Start counting at the number of the first message displayed.
 	$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 	$context['posts'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($user_drafts as $row)
 	{
 		// Censor....
 		if (empty($row['body']))
@@ -447,7 +432,6 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 			'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
 		);
 	}
-	$smcFunc['db_free_result']($request);
 
 	// If the drafts were retrieved in reverse order, get them right again.
 	if ($reverse)
@@ -480,11 +464,9 @@ function action_showPMDrafts($memID = -1)
 	if (!empty($_REQUEST['delete']))
 	{
 		checkSession('get');
+
 		$id_delete = (int) $_REQUEST['delete'];
-
 		deleteDrafts($id_delete, $memID);
-
-		// now redirect back to the list
 		redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
 	}
 
@@ -498,6 +480,8 @@ function action_showPMDrafts($memID = -1)
 
 	// init
 	$draft_type = 1;
+	$user_drafts = array();
+	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 	// Default to 10.
 	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
@@ -505,8 +489,6 @@ function action_showPMDrafts($memID = -1)
 
 	// Get the count of applicable drafts
 	$msgCount = draftsCount($memID, $draft_type);
-
-	$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 	// Make sure the starting place makes sense and construct our friend the page index.
 	$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
@@ -521,27 +503,16 @@ function action_showPMDrafts($memID = -1)
 		$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
 	}
 
-	// Load in this user's PM drafts
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			ud.id_member, ud.id_draft, ud.body, ud.subject, ud.poster_time, ud.outbox, ud.id_reply, ud.to_list
-		FROM {db_prefix}user_drafts AS ud
-		WHERE ud.id_member = {int:current_member}
-			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
-			AND poster_time > {int:time}' : '') . '
-		ORDER BY ud.id_draft ' . ($reverse ? 'ASC' : 'DESC') . '
-		LIMIT ' . $start . ', ' . $maxIndex,
-		array(
-			'current_member' => $memID,
-			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
-		)
-	);
+	// go get em'
+	$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+	$limit = $start . ', ' . $maxIndex;
+	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+	$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
 
 	// Start counting at the number of the first message displayed.
 	$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 	$context['posts'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($user_drafts as $row)
 	{
 		// Censor....
 		if (empty($row['body']))
@@ -564,28 +535,13 @@ function action_showPMDrafts($memID = -1)
 		);
 		$recipient_ids = (!empty($row['to_list'])) ? unserialize($row['to_list']) : array();
 
-		// @todo ... this is a bit ugly since it runs an extra query for every message, do we want this?
-		// at least its only for draft PM's and only the user can see them ... so not heavily used .. still
+		// Get nice names to show the user, the id's are not that great to see!
 		if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
 		{
 			$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);
 			$recipient_ids['bcc'] = array_map('intval', $recipient_ids['bcc']);
 			$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
-
-			$request_2 = $smcFunc['db_query']('', '
-				SELECT id_member, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:member_list})',
-				array(
-					'member_list' => $allRecipients,
-				)
-			);
-			while ($result = $smcFunc['db_fetch_assoc']($request_2))
-			{
-				$recipientType = in_array($result['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
-				$recipients[$recipientType][] = $result['real_name'];
-			}
-			$smcFunc['db_free_result']($request_2);
+			$recipients = draftsRecipients($allRecipients, $recipient_ids);
 		}
 
 		// Add the items to the array for template use
@@ -602,7 +558,6 @@ function action_showPMDrafts($memID = -1)
 			'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
 		);
 	}
-	$smcFunc['db_free_result']($request);
 
 	// if the drafts were retrieved in reverse order, then put them in the right order again.
 	if ($reverse)
