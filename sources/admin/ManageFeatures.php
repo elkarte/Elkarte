@@ -55,7 +55,7 @@ class ManageFeatures_Controller
 	 */
 	function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings, $settings;
+		global $context, $txt, $settings;
 
 		// You need to be an admin around here.
 		isAllowedTo('admin_forum');
@@ -139,7 +139,7 @@ class ManageFeatures_Controller
 	 */
 	function action_basicSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initBasicSettingsForm();
@@ -249,7 +249,7 @@ class ManageFeatures_Controller
 	 */
 	function action_layoutSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initLayoutSettingsForm();
@@ -321,7 +321,7 @@ class ManageFeatures_Controller
 	 */
 	function action_karmaSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initKarmaSettingsForm();
@@ -385,7 +385,7 @@ class ManageFeatures_Controller
 	 */
 	function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $smcFunc, $helptxt, $scripturl;
+		global $context, $txt, $modSettings, $sig_start, $smcFunc, $scripturl;
 
 		// initialize the form
 		$this->_initSignatureSettingsForm();
