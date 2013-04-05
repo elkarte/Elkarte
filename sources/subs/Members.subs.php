@@ -1444,3 +1444,39 @@ function admins($id_admin = 0)
 
 	return $admins;
 }
+
+/**
+ * Load some basic member infos
+ * 
+ * @param array $members
+ * @return array
+ */
+function getBasicMemberData($member_data)
+{
+	global $smcFunc, $txt;
+
+	$members = array();
+
+	// This is a guest...
+	$members[0] = array(
+		'id_member' => 0,
+		'member_name' => '',
+		'real_name' => $txt['guest_title']
+	);
+
+	// Get some additional member info...
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, member_name, real_name
+		FROM {db_prefix}members
+		WHERE id_member IN ({array_int:member_list})
+		LIMIT ' . count($member_data),
+		array(
+			'member_list' => $member_data,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$members[$row['id_member']] = $row;
+	$smcFunc['db_free_result']($request);
+
+	return $members;
+}

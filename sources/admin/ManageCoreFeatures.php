@@ -41,9 +41,9 @@ class ManageCoreFeatures_Controller
 	 * 		save_callback	- Function called on save, takes state as parameter.
 	 *
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context, $settings, $modSettings;
 
 		loadTemplate('ManageCoreFeatures');
 
@@ -157,10 +157,8 @@ class ManageCoreFeatures_Controller
 	/**
 	 * Return the configuration settings available for core features page.
 	 */
-	function settings()
+	public function settings()
 	{
-		global $txt;
-
 		$core_features = array(
 			// cd = calendar.
 			'cd' => array(
@@ -349,8 +347,10 @@ class ManageCoreFeatures_Controller
 	 *
 	 * @return array
 	 */
-	function config_vars()
+	public function config_vars()
 	{
+		global $txt;
+
 		$core_features = $this->settings();
 
 		$return_data = array();
@@ -365,9 +365,9 @@ class ManageCoreFeatures_Controller
 	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
-	function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
-		global $context, $txt;
+		global $context;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
@@ -385,4 +385,3 @@ class ManageCoreFeatures_Controller
 		$context['sub_action'] = $_REQUEST['sa'];
 	}
 }
-

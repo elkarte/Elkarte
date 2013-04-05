@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-	global $scripturl, $modSettings, $smcFunc;
+	global $smcFunc;
 
 	// We need to search for any birthday in this range, and whatever year that birthday is on.
 	$year_low = (int) substr($low_date, 0, 4);
@@ -526,7 +526,8 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	{
 		$first_day_of_year = (int) strftime('%w', mktime(0, 0, 0, 1, 1, $year));
 		$first_day_of_next_year = (int) strftime('%w', mktime(0, 0, 0, 1, 1, $year + 1));
-		$last_day_of_last_year = (int) strftime('%w', mktime(0, 0, 0, 12, 31, $year - 1));
+		// this one is not used in its scope
+		// $last_day_of_last_year = (int) strftime('%w', mktime(0, 0, 0, 12, 31, $year - 1));
 
 		// All this is as getCalendarGrid.
 		if ($calendarOptions['start_day'] === 0)
@@ -623,8 +624,6 @@ function cache_getOffsetIndependentEvents($days_to_index)
  */
 function cache_getRecentEvents($eventOptions)
 {
-	global $modSettings, $user_info, $scripturl;
-
 	// With the 'static' cached data we can calculate the user-specific data.
 	$cached_data = cache_quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
@@ -741,7 +740,7 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, $txt, $smcFunc;
+	global $modSettings, $smcFunc;
 
 	if (!isset($_POST['deleteevent']))
 	{
@@ -835,7 +834,7 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global $modSettings, $smcFunc;
+	global $smcFunc;
 
 	// Add special chars to the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
@@ -1101,4 +1100,89 @@ function removeHolidays($holiday_ids)
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
+}
+
+/**
+ * Updates a calendar holiday
+ * 
+ * @param int $holiday
+ * @param int $date
+ * @param string $title
+ */
+function editHoliday($holiday, $date, $title)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}calendar_holidays
+		SET event_date = {date:holiday_date}, title = {string:holiday_title}
+		WHERE id_holiday = {int:selected_holiday}',
+		array(
+			'holiday_date' => $date,
+			'selected_holiday' => $holiday,
+			'holiday_title' => $title,
+		)
+	);
+
+	updateSettings(array(
+		'calendar_updated' => time(),
+	));
+}
+
+/**
+ * Insert a new holiday
+ * 
+ * @param int $date
+ * @param type $title
+ */
+function insert_holiday($date, $title)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('',
+		'{db_prefix}calendar_holidays',
+		array(
+			'event_date' => 'date', 'title' => 'string-60',
+		),
+		array(
+			$date, $title,
+		),
+		array('id_holiday')
+	);
+
+	updateSettings(array(
+		'calendar_updated' => time(),
+	));
+}
+
+/**
+ * Get a specific holiday
+ * 
+ * @param int $id_holiday
+ * @return array 
+ */
+function getHoliday($id_holiday)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
+		FROM {db_prefix}calendar_holidays
+		WHERE id_holiday = {int:selected_holiday}
+		LIMIT 1',
+			array(
+				'selected_holiday' => $id_holiday,
+			)
+		);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$holiday = array(
+			'id' => $row['id_holiday'],
+			'day' => $row['day'],
+			'month' => $row['month'],
+			'year' => $row['year'] <= 4 ? 0 : $row['year'],
+			'title' => $row['title']
+		);
+	$smcFunc['db_free_result']($request);
+
+	return $holiday;
 }

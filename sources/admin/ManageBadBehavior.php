@@ -92,26 +92,8 @@ class ManageBadBehavior_Controller
 		// Load the member data so we have more information available
 		if (!empty($members))
 		{
-			// Get some additional member info...
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, member_name, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:member_list})
-				LIMIT ' . count($members),
-				array(
-					'member_list' => $members,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$members[$row['id_member']] = $row;
-			$smcFunc['db_free_result']($request);
-
-			// This is a spammer or a guest :D
-			$members[0] = array(
-				'id_member' => 0,
-				'member_name' => '',
-				'real_name' => $txt['guest_title']
-			);
+			require_once(SUBSDIR . '/Members.subs.php');
+			$members = getBasicMemberData($members);
 
 			// Go through each entry and add the member data.
 			foreach ($context['bb_entries'] as $id => $dummy)

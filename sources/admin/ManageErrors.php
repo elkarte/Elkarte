@@ -34,9 +34,11 @@ class ManageErrors_Controller
 	 *
 	 * @uses the Errors template and error_log sub template.
 	 */
-	function action_log()
+	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $themedir, $smcFunc;
+		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
+
+		require_once(SUBSDIR . '/ManageErrors.subs.php');
 
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
@@ -75,20 +77,25 @@ class ManageErrors_Controller
 			unset($_GET['filter'], $_GET['value']);
 
 		// Deleting, are we?
-		if (isset($_POST['delall']) || isset($_POST['delete']))
-			deleteErrors();
+		$type = isset($_POST['delall']) ? 'delall' : (isset($_POST['delete']) ? 'delete' : false);
+		$error_list = isset($_POST['delete']) ? $_POST['delete'] : null;
 
-		// Just how many errors are there?
-		$result = $smcFunc['db_query']('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_errors' . (isset($filter) ? '
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
-			array(
-				'filter' => isset($filter) ? $filter['value']['sql'] : '',
-			)
-		);
-		list ($num_errors) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		if ($type != false)
+		{
+			// Make sure the session exists and is correct; otherwise, might be a hacker.
+			checkSession();
+			validateToken('admin-el');
+
+			deleteErrors($type, $filter, $error_list);
+
+			// // Go back to where we were.
+			if ($type == 'delete')
+				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
+		
+			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+
+		}
+		$num_errors = numErrors();
 
 		// If this filter is empty...
 		if ($num_errors == 0 && isset($filter))
@@ -105,93 +112,15 @@ class ManageErrors_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter) ? $filter['href'] : ''), $_GET['start'], $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $_GET['start'];
 
-		// Find and sort out the errors.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
-			FROM {db_prefix}log_errors' . (isset($filter) ? '
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
-			ORDER BY id_error ' . ($context['sort_direction'] == 'down' ? 'DESC' : '') . '
-			LIMIT ' . $_GET['start'] . ', ' . $modSettings['defaultMaxMessages'],
-			array(
-				'filter' => isset($filter) ? $filter['value']['sql'] : '',
-			)
-		);
-		$context['errors'] = array();
-		$members = array();
-
-		for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
-		{
-			$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $smcFunc['db_escape_wildcard_string']($row['message']));
-			if ($search_message == $filter['value']['sql'])
-				$search_message = $smcFunc['db_escape_wildcard_string']($row['message']);
-			$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
-
-			$context['errors'][$row['id_error']] = array(
-				'alternate' => $i %2 == 0,
-				'member' => array(
-					'id' => $row['id_member'],
-					'ip' => $row['ip'],
-					'session' => $row['session']
-				),
-				'time' => timeformat($row['log_time']),
-				'timestamp' => $row['log_time'],
-				'url' => array(
-					'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url']),
-					'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['url']))
-				),
-				'message' => array(
-					'html' => $show_message,
-					'href' => base64_encode($search_message)
-				),
-				'id' => $row['id_error'],
-				'error_type' => array(
-					'type' => $row['error_type'],
-					'name' => isset($txt['errortype_'.$row['error_type']]) ? $txt['errortype_'.$row['error_type']] : $row['error_type'],
-				),
-				'file' => array(),
-			);
-			if (!empty($row['file']) && !empty($row['line']))
-			{
-				// Eval'd files rarely point to the right location and cause havoc for linking, so don't link them.
-				$linkfile = strpos($row['file'], 'eval') === false || strpos($row['file'], '?') === false; // De Morgan's Law.  Want this true unless both are present.
-
-				$context['errors'][$row['id_error']]['file'] = array(
-					'file' => $row['file'],
-					'line' => $row['line'],
-					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
-					'link' => $linkfile ? '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
-					'search' => base64_encode($row['file']),
-				);
-			}
-
-			// Make a list of members to load later.
-			$members[$row['id_member']] = $row['id_member'];
-		}
-		$smcFunc['db_free_result']($request);
-
+		$logdata = getErrorLogData($_GET['start'], $context['sort_direction'], $filter);
+		$context['errors'] = $logdata['errors'];
+		$members = $logdata['members'];
+		
 		// Load the member data.
 		if (!empty($members))
 		{
-			// Get some additional member info...
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, member_name, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:member_list})
-				LIMIT ' . count($members),
-				array(
-					'member_list' => $members,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$members[$row['id_member']] = $row;
-			$smcFunc['db_free_result']($request);
-
-			// This is a guest...
-			$members[0] = array(
-				'id_member' => 0,
-				'member_name' => '',
-				'real_name' => $txt['guest_title']
-			);
+			require_once(SUBSDIR . '/Members.subs.php');
+			$members = getBasicMemberData($members);
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)
@@ -291,9 +220,9 @@ class ManageErrors_Controller
 	 * The line number number is specified by $_REQUEST['line']...
 	 * The function will try to get the 20 lines before and after the specified line.
 	 */
-	function action_viewfile()
+	public function action_viewfile()
 	{
-		global $context, $txt;
+		global $context;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
@@ -339,54 +268,4 @@ class ManageErrors_Controller
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'show_file';
 	}
-}
-
-/**
- * Delete all or some of the errors in the error log.
- * It applies any necessary filters to deletion.
- * This should only be called by ManageErrors::action_log().
- * It attempts to TRUNCATE the table to reset the auto_increment.
- * Redirects back to the error log when done.
- */
-function deleteErrors()
-{
-	global $filter, $smcFunc;
-
-	// Make sure the session exists and is correct; otherwise, might be a hacker.
-	checkSession();
-	validateToken('admin-el');
-
-	// Delete all or just some?
-	if (isset($_POST['delall']) && !isset($filter))
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_errors',
-			array(
-			)
-		);
-	// Deleting all with a filter?
-	elseif (isset($_POST['delall']) && isset($filter))
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_errors
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
-			array(
-				'filter' => $filter['value']['sql'],
-			)
-		);
-	// Just specific errors?
-	elseif (!empty($_POST['delete']))
-	{
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_errors
-			WHERE id_error IN ({array_int:error_list})',
-			array(
-				'error_list' => array_unique($_POST['delete']),
-			)
-		);
-
-		// Go back to where we were.
-		redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
-	}
-
-	// Back to the error log!
-	redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 }
