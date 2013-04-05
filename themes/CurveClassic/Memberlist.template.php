@@ -92,17 +92,29 @@ function template_main()
 		if (!isset($context['disabled_fields']['posts']))
 		{
 			echo '
-					<td style="white-space: nowrap" width="15">', $member['posts'], '</td>
-					<td class="statsbar" width="120">';
+					<td class="statsbar">';
 
-			if (!empty($member['post_percent']))
+			// show a relative bar graph of posts
+			if (isset($member['post_percent']))
 				echo '
-						<div class="bar" style="width: ', $member['post_percent'] + 4, 'px;">
-							<div style="width: ', $member['post_percent'], 'px;"></div>
+						<div class="postsbar">
+							<div class="bar" style="width: ', $member['post_percent'] * 0.6, '%;"></div>
+							<span class="righttext" style="white-space: nowrap;">', $member['posts'], '</span>
 						</div>';
+			else
+				echo '
+						<span class="righttext" style="white-space: nowrap;">', $member['posts'], '</span>';
 
 			echo '
 					</td>';
+		}
+
+		// Any custom fields on display?
+		if (!empty($context['custom_profile_fields']['columns']))
+		{
+			foreach ($context['custom_profile_fields']['columns'] as $key => $column)
+				echo '
+					<td class="lefttext">', $member['options'][substr($key, 5)], '</td>';
 		}
 
 		echo '
