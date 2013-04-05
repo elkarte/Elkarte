@@ -78,13 +78,22 @@ class ManageErrors_Controller
 
 		// Deleting, are we?
 		$type = isset($_POST['delall']) ? 'delall' : (isset($_POST['delete']) ? 'delete' : false);
+		$error_list = isset($_POST['delete']) ? $_POST['delete'] : null;
+
 		if ($type != false)
 		{
 			// Make sure the session exists and is correct; otherwise, might be a hacker.
 			checkSession();
 			validateToken('admin-el');
 
-			deleteErrors($type, $filter);
+			deleteErrors($type, $filter, $error_list);
+
+			// // Go back to where we were.
+			if ($type == 'delete')
+				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
+		
+			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+
 		}
 		$num_errors = numErrors();
 
