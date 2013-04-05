@@ -287,7 +287,7 @@ function action_mlall()
 		$limit = $second_offset - ($memberlist_cache['num_members'] - $_REQUEST['start']) - ($second_offset > $memberlist_cache['num_members'] ? $cache_step_size - ($memberlist_cache['num_members'] % $cache_step_size) : 0);
 	}
 
-	// Add custom fields paramters too.
+	// Add custom fields parameters too.
 	if (!empty($context['custom_profile_fields']['parameters']))
 		$query_parameters += $context['custom_profile_fields']['parameters'];
 

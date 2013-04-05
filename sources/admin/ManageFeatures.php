@@ -751,7 +751,7 @@ class ManageFeatures_Controller
 	 */
 	function action_profile()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $scripturl, $context;
 
 		loadTemplate('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
@@ -1340,6 +1340,7 @@ class ManageFeatures_Controller
 					'current_column' => $context['field']['colname'],
 				)
 			);
+
 			// Finally - the field itself is gone!
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}custom_fields
