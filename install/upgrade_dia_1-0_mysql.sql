@@ -202,6 +202,14 @@ ADD COLUMN disregarded tinyint(3) NOT NULL DEFAULT '0';
 ---#
 
 /******************************************************************************/
+--- Adding support for custom profile fields on memberlist
+/******************************************************************************/
+---# Adding new columns to boards...
+ALTER TABLE {$db_prefix}custom_fields
+ADD COLUMN show_memberlist tinyint(3) NOT NULL DEFAULT '0';
+---#
+
+/******************************************************************************/
 --- Fixing mail queue for long messages
 /******************************************************************************/
 ---# Altering mil_queue table...
