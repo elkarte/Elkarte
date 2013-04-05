@@ -3123,8 +3123,10 @@ dl {
 	padding-left: 20px;
 }
 #basicinfo ul li.cf_icon {
-	margin: 4px 0 0 0;
-	vertical-align: middle;
+	display: block;
+    float: left;
+    height: 20px;
+    margin: 4px 5px 0 0;
 }
 #detailedinfo {
 	width: 79.5%;
@@ -3565,7 +3567,7 @@ dl.stats dd {
 	text-align: right;
 	background: none repeat scroll 0 0 #fff;
 	border: 1px solid #aaa;
-	border-radius: 2px 2px 2px 2px;
+	border-radius: 2px;
 	line-height: 1.4em;
 	margin: 1px 0;
 	min-height: 1.4em;
