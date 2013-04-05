@@ -18,7 +18,7 @@ if (!defined('ELKARTE'))
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  */
-function deleteErrors($type, $filter = null)
+function deleteErrors($type, $filter = null, $error_list = null)
 {
 	global $smcFunc;
 
@@ -40,21 +40,13 @@ function deleteErrors($type, $filter = null)
 		);
 	// Just specific errors?
 	elseif ($type == 'delete')
-	{
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE id_error IN ({array_int:error_list})',
 			array(
-				'error_list' => array_unique($_POST['delete']),
+				'error_list' => array_unique($error_list),
 			)
 		);
-
-		// Go back to where we were.
-		redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
-	}
-
-	// Back to the error log!
-	redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 }
 
 /**
