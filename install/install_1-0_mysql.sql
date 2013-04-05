@@ -33,6 +33,21 @@ VALUES
 # --------------------------------------------------------
 
 #
+# Table structure for table `antispam_questions`
+#
+
+CREATE TABLE {$db_prefix}antispam_questions (
+  id_question tinyint(4) unsigned NOT NULL auto_increment,
+  question text NOT NULL default '',
+  answer text NOT NULL default '',
+  language varchar(50) NOT NULL default '',
+  PRIMARY KEY (id_question),
+  KEY language (language(30))
+) ENGINE=MyISAM;
+
+# --------------------------------------------------------
+
+#
 # Table structure for table `approval_queue`
 #
 

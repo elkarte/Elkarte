@@ -307,19 +307,17 @@ class ManageSecurity_Controller
 		// Load any question and answers!
 		$context['question_answers'] = array();
 		$request = $smcFunc['db_query']('', '
-			SELECT id_comment, body AS question, recipient_name AS answer
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:ver_test}',
-			array(
-				'ver_test' => 'ver_test',
-			)
+			SELECT id_question, question, answer, language
+			FROM {db_prefix}antispam_questions',
+			array()
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			$context['question_answers'][$row['id_comment']] = array(
-				'id' => $row['id_comment'],
+			$context['question_answers'][$row['id_question']] = array(
+				'id' => $row['id_question'],
 				'question' => $row['question'],
-				'answer' => $row['answer'],
+				'answer' => unserialize($row['answer']),
+				'language' => $row['language'],
 			);
 		}
 		$smcFunc['db_free_result']($request);
@@ -359,25 +357,21 @@ class ManageSecurity_Controller
 						if ($question == '' || $answer == '')
 						{
 							$smcFunc['db_query']('', '
-								DELETE FROM {db_prefix}log_comments
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
+								DELETE FROM {db_prefix}antispam_questions
+								WHERE id_question = {int:id}',
 								array(
 									'id' => $id,
-									'ver_test' => 'ver_test',
 								)
 							);
 							$count_questions--;
 						}
 						else
 							$request = $smcFunc['db_query']('', '
-								UPDATE {db_prefix}log_comments
-								SET body = {string:question}, recipient_name = {string:answer}
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
+								UPDATE {db_prefix}antispam_questions
+								SET question = {string:question}, answer = {string:answer}
+								WHERE id_question = {int:id}',
 								array(
 									'id' => $id,
-									'ver_test' => 'ver_test',
 									'question' => $question,
 									'answer' => $answer,
 								)
@@ -388,9 +382,8 @@ class ManageSecurity_Controller
 				elseif ($question != '' && $answer != '')
 				{
 					$questionInserts[] = array(
-						'comment_type' => 'ver_test',
-						'body' => $question,
-						'recipient_name' => $answer,
+						'question' => $question,
+						'answer' => $answer,
 					);
 				}
 			}
@@ -399,10 +392,10 @@ class ManageSecurity_Controller
 			if (!empty($questionInserts))
 			{
 				$smcFunc['db_insert']('',
-					'{db_prefix}log_comments',
-					array('comment_type' => 'string', 'body' => 'string-65535', 'recipient_name' => 'string-80'),
+					'{db_prefix}antispam_questions',
+					array('question' => 'string-65535', 'answer' => 'string-255'),
 					$questionInserts,
-					array('id_comment')
+					array('id_question')
 				);
 				$count_questions++;
 			}

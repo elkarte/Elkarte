@@ -179,6 +179,25 @@ INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, d
 # --------------------------------------------------------
 
 #
+# Table structure for table `antispam_questions`
+#
+
+CREATE TABLE {$db_prefix}antispam_questions (
+  id_question integer primary key,
+  question text NOT NULL,
+  answer text NOT NULL,
+  language varchar(50) NOT NULL
+);
+
+#
+# Indexes for table `admin_info_files`
+#
+
+CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
+
+# --------------------------------------------------------
+
+#
 # Table structure for table `approval_queue`
 #
 

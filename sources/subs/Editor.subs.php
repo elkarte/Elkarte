@@ -750,16 +750,13 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
 		{
 			$request = $smcFunc['db_query']('', '
-				SELECT id_comment
-				FROM {db_prefix}log_comments
-				WHERE comment_type = {string:ver_test}',
-				array(
-					'ver_test' => 'ver_test',
-				)
+				SELECT id_question
+				FROM {db_prefix}antispam_questions',
+				array()
 			);
 			$modSettings['question_id_cache'] = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$modSettings['question_id_cache'][] = $row['id_comment'];
+				$modSettings['question_id_cache'][] = $row['id_question'];
 			$smcFunc['db_free_result']($request);
 
 			if (!empty($modSettings['cache_enable']))
@@ -798,20 +795,18 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		{
 			// Get the answers and see if they are all right!
 			$request = $smcFunc['db_query']('', '
-				SELECT id_comment, recipient_name AS answer
-				FROM {db_prefix}log_comments
-				WHERE comment_type = {string:ver_test}
-					AND id_comment IN ({array_int:comment_ids})',
+				SELECT id_question, answer
+				FROM {db_prefix}antispam_questions
+				WHERE id_question IN ({array_int:question_ids})',
 				array(
-					'ver_test' => 'ver_test',
-					'comment_ids' => $_SESSION[$verificationOptions['id'] . '_vv']['q'],
+					'question_ids' => $_SESSION[$verificationOptions['id'] . '_vv']['q'],
 				)
 			);
 			$incorrectQuestions = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 			{
-				if (!isset($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_comment']]) || trim($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_comment']]) == '' || trim($smcFunc['htmlspecialchars'](strtolower($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_comment']]))) != strtolower($row['answer']))
-					$incorrectQuestions[] = $row['id_comment'];
+				if (!isset($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) == '' || trim($smcFunc['htmlspecialchars'](strtolower($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]))) != strtolower($row['answer']))
+					$incorrectQuestions[] = $row['id_question'];
 			}
 			$smcFunc['db_free_result']($request);
 
@@ -876,26 +871,24 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	if (!empty($questionIDs))
 	{
 		$request = $smcFunc['db_query']('', '
-			SELECT id_comment, body AS question
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:ver_test}
-				AND id_comment IN ({array_int:comment_ids})',
+			SELECT id_question, question
+			FROM {db_prefix}antispam_questions
+			WHERE id_question IN ({array_int:question_ids})',
 			array(
-				'ver_test' => 'ver_test',
-				'comment_ids' => $questionIDs,
+				'question_ids' => $questionIDs,
 			)
 		);
 		$_SESSION[$verificationOptions['id'] . '_vv']['q'] = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			$thisVerification['questions'][] = array(
-				'id' => $row['id_comment'],
+				'id' => $row['id_question'],
 				'q' => parse_bbc($row['question']),
-				'is_error' => !empty($incorrectQuestions) && in_array($row['id_comment'], $incorrectQuestions),
+				'is_error' => !empty($incorrectQuestions) && in_array($row['id_question'], $incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$verificationOptions['id'] . '_vv'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_comment']]) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_comment']]) : '',
+				'a' => isset($_REQUEST[$verificationOptions['id'] . '_vv'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
-			$_SESSION[$verificationOptions['id'] . '_vv']['q'][] = $row['id_comment'];
+			$_SESSION[$verificationOptions['id'] . '_vv']['q'][] = $row['id_question'];
 		}
 		$smcFunc['db_free_result']($request);
 	}
