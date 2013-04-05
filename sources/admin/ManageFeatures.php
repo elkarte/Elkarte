@@ -751,8 +751,7 @@ class ManageFeatures_Controller
 	 */
 	function action_profile()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
-		global $modSettings;
+		global $txt, $scripturl, $context;
 
 		loadTemplate('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
@@ -778,6 +777,7 @@ class ManageFeatures_Controller
 					if (isset($disable_fields[$value]))
 						unset($disable_fields[$value]);
 			}
+
 			// What we have left!
 			$changes['disabled_profile_fields'] = empty($disable_fields) ? '' : implode(',', array_keys($disable_fields));
 
@@ -789,6 +789,7 @@ class ManageFeatures_Controller
 					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
 						$reg_fields[] = $value;
 			}
+
 			// What we have left!
 			$changes['registration_fields'] = empty($reg_fields) ? '' : implode(',', $reg_fields);
 
@@ -982,7 +983,7 @@ class ManageFeatures_Controller
 	 */
 	function action_profileedit()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $smcFunc;
+		global $txt, $scripturl, $context, $smcFunc;
 
 		loadTemplate('ManageFeatures');
 
@@ -1000,7 +1001,7 @@ class ManageFeatures_Controller
 			$request = $smcFunc['db_query']('', '
 				SELECT
 					id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
-					show_reg, show_display, show_profile, private, active, default_value, can_search,
+					show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
 					bbc, mask, enclose, placement
 				FROM {db_prefix}custom_fields
 				WHERE id_field = {int:current_field}',
@@ -1026,6 +1027,7 @@ class ManageFeatures_Controller
 					'profile_area' => $row['show_profile'],
 					'reg' => $row['show_reg'],
 					'display' => $row['show_display'],
+					'memberlist' => $row['show_memberlist'],
 					'type' => $row['field_type'],
 					'max_length' => $row['field_length'],
 					'rows' => $rows,
@@ -1055,6 +1057,7 @@ class ManageFeatures_Controller
 				'profile_area' => 'forumprofile',
 				'reg' => false,
 				'display' => false,
+				'memberlist' => false,
 				'type' => 'text',
 				'max_length' => 255,
 				'rows' => 4,
@@ -1092,6 +1095,7 @@ class ManageFeatures_Controller
 			// Checkboxes...
 			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
 			$show_display = isset($_POST['display']) ? 1 : 0;
+			$show_memberlist = isset($_POST['memberlist']) ? 1 : 0;
 			$bbc = isset($_POST['bbc']) ? 1 : 0;
 			$show_profile = $_POST['profile_area'];
 			$active = isset($_POST['active']) ? 1 : 0;
@@ -1246,8 +1250,9 @@ class ManageFeatures_Controller
 						field_name = {string:field_name}, field_desc = {string:field_desc},
 						field_type = {string:field_type}, field_length = {int:field_length},
 						field_options = {string:field_options}, show_reg = {int:show_reg},
-						show_display = {int:show_display}, show_profile = {string:show_profile},
-						private = {int:private}, active = {int:active}, default_value = {string:default_value},
+						show_display = {int:show_display}, show_memberlist = {int:show_memberlist},
+						show_profile = {string:show_profile}, private = {int:private},
+						active = {int:active}, default_value = {string:default_value},
 						can_search = {int:can_search}, bbc = {int:bbc}, mask = {string:mask},
 						enclose = {string:enclose}, placement = {int:placement}
 					WHERE id_field = {int:current_field}',
@@ -1255,6 +1260,7 @@ class ManageFeatures_Controller
 						'field_length' => $field_length,
 						'show_reg' => $show_reg,
 						'show_display' => $show_display,
+						'show_memberlist' => $show_memberlist,
 						'private' => $private,
 						'active' => $active,
 						'can_search' => $can_search,
@@ -1294,14 +1300,14 @@ class ManageFeatures_Controller
 					array(
 						'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',
 						'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
-						'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string',
+						'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
 						'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
 						'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int',
 					),
 					array(
 						$colname, $_POST['field_name'], $_POST['field_desc'],
 						$_POST['field_type'], $field_length, $field_options,
-						$show_reg, $show_display, $show_profile,
+						$show_reg, $show_display, $show_memberlist, $show_profile,
 						$private, $active, $default, $can_search,
 						$bbc, $mask, $enclose, $placement,
 					),
@@ -1334,6 +1340,7 @@ class ManageFeatures_Controller
 					'current_column' => $context['field']['colname'],
 				)
 			);
+
 			// Finally - the field itself is gone!
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}custom_fields

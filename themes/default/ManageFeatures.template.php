@@ -108,6 +108,12 @@ function template_edit_profile_field()
 								<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
+								<strong><label for="memberlist">', $txt['custom_edit_memberlist'], ':</label></strong>
+							</dt>
+							<dd>
+								<input type="checkbox" name="memberlist" id="memberlist"', $context['field']['memberlist'] ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
 								<strong><label for="placement">', $txt['custom_edit_placement'], ':</label></strong>
 							</dt>
 							<dd>

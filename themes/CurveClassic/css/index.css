@@ -3137,6 +3137,14 @@ dl.stats dd {
 	border-right: 1px solid #fff;
 	border-bottom: 1px solid #fff;
 }
+.postsbar {
+	width: 110px;
+	text-align: right;
+	border-radius: 4px;
+	line-height: 1.4em;
+	margin: 1px 0;
+	min-height: 1.4em;
+}
 tr.windowbg2 th.stats_month {
 	width: 25%;
 	padding: 0 2em;
