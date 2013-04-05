@@ -10,11 +10,10 @@
  * Should be run from a cron job to fetch messages from an imap mailbox
  * Can be called from scheduled tasks (fake-cron) if needed
  */
-
 // Any output here is not good
 error_reporting(0);
 
-// SSI needed to get Elkarte functions
+// SSI needed to get ElkArte functions
 require_once(dirname(__FILE__) . '/SSI.php');
 
 // Get and save the latest emails
@@ -35,36 +34,40 @@ function postbyemail_imap()
 {
 	global $modSettings;
 
-	// no imap, why bother?
+	// No imap, why bother?
 	if (!function_exists('imap_open'))
 		return false;
 
-	// values used for the connections
-	// @todo add ssl and tls connections?
+	// Values used for the connection
 	$hostname = !empty($modSettings['maillist_imap_host']) ? $modSettings['maillist_imap_host'] : '';
 	$username = !empty($modSettings['maillist_imap_uid']) ? $modSettings['maillist_imap_uid'] : '';
 	$password = !empty($modSettings['maillist_imap_pass']) ? $modSettings['maillist_imap_pass'] : '';
+	$type = !empty($modSettings['maillist_imap_types']) ? $modSettings['maillist_imap_types'] : '';
 
-	// try to connect
-	$inbox = @imap_open($hostname, $username, $password);
+	// Based on the type selected get/set the additonal connection details
+	$connection = port_type($type);
+	$hostname .= (strpos($hostname, ':') === false) ? ':'. $connection['port'] : '';
+	$mailbox = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}INBOX';
+
+	// Connect and search for e-mail messages.
+	$inbox = @imap_open($mailbox, $username, $password);
 	if ($inbox === false)
 		return false;
 
-	// grab all unseen emails
+	// Grab all unseen emails
 	$emails = imap_search($inbox, 'UNSEEN');
-	$to_post = array();
 
-	// if emails are returned, cycle through each...
+	// If emails are returned, cycle through each...
 	if ($emails)
 	{
 		// You've got mail
 		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
 
-		// make sure we work from the oldest to the newest message
+		// Make sure we work from the oldest to the newest message
 		sort($emails);
 
-		// for every email...
-		foreach($emails as $email_number)
+		// For every email...
+		foreach ($emails as $email_number)
 		{
 			$email_number = (int) trim($email_number);
 
@@ -72,13 +75,13 @@ function postbyemail_imap()
 			$headers = imap_fetchheader($inbox, $email_number, FT_PREFETCHTEXT);
 			$message = imap_body($inbox, $email_number, 0);
 
-			// create the save-as email
+			// Create the save-as email
 			if (!empty($headers) && !empty($message))
 			{
 				$email = $headers . "\n" . $message;
 				action_pbe_post($email);
 
-				// mark it for deletion?
+				// Mark it for deletion?
 				if (!empty($modSettings['maillist_imap_delete']))
 				{
 					maillist_imap_delete($inbox, $email_number);
@@ -88,11 +91,65 @@ function postbyemail_imap()
 			}
 		}
 
-		// close the connection
+		// Close the connection
 		imap_close($inbox);
-
 		return true;
 	}
 	else
 		return false;
+}
+
+/**
+ * Sets port and flags based on the chosen protocol
+ *
+ */
+function port_type($type)
+{
+	switch ($type)
+	{
+		case 'POP3':
+			// Standard POP3 mailbox.
+			$protocol = 'POP3';
+			$port = 110;
+			$flags = '/novalidate-cert';
+			break;
+		case 'POP3TLS':
+			// POP3, TLS mode.
+			$protocol = 'POP3';
+			$port = 110;
+			$flags = '/tls/novalidate-cert';
+			break;
+		case 'POP3SSL':
+			// POP3, SSL mode.
+			$protocol = 'POP3SSL';
+			$port = 995;
+			$flags = '/ssl/novalidate-cert';
+			break;
+		case 'IMAP':
+			// Standard IMAP mailbox.
+			$protocol = 'IMAP';
+			$port = 143;
+			$flags = '/novalidate-cert';
+			break;
+		case 'IMAPTLS':
+			// IMAP in TLS mode.
+			$protocol = 'IMAPTLS';
+			$port = 143;
+			$flags = '/tls/novalidate-cert';
+			break;
+		case 'IMAPSSL':
+			// IMAP in SSL mode.
+			$protocol = 'IMAP';
+			$port = 993;
+			$flags = '/ssl/novalidate-cert';
+			break;
+		default:
+			// Somethings wrong, so use a standard POP3 mailbox.
+			$protocol = 'POP3';
+			$port = 110;
+			$flags = '/novalidate-cert';
+			break;
+	}
+
+	return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
 }
