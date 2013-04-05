@@ -53,7 +53,7 @@ class ManageFeatures_Controller
 	/**
 	 * This function passes control through to the relevant tab.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt, $settings;
 
@@ -137,7 +137,7 @@ class ManageFeatures_Controller
 	 * Config array for changing the basic forum settings
 	 * Accessed  from ?action=admin;area=featuresettings;sa=basic;
 	 */
-	function action_basicSettings_display()
+	public function action_basicSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
@@ -173,7 +173,7 @@ class ManageFeatures_Controller
 	/**
 	 * Initialize basic settings form.
 	 */
-	function _initBasicSettingsForm()
+	private function _initBasicSettingsForm()
 	{
 		global $txt;
 
@@ -247,7 +247,7 @@ class ManageFeatures_Controller
 	 * Allows modifying the global layout settings in the forum
 	 * Accessed through ?action=admin;area=featuresettings;sa=layout;
 	 */
-	function action_layoutSettings_display()
+	public function action_layoutSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
@@ -279,7 +279,7 @@ class ManageFeatures_Controller
 	/**
 	 * Initialize the layout settings screen from features and options admin area.
 	 */
-	function _initLayoutSettingsForm()
+	private function _initLayoutSettingsForm()
 	{
 		global $txt;
 
@@ -319,7 +319,7 @@ class ManageFeatures_Controller
 	 * Accessed  from ?action=admin;area=featuresettings;sa=karma;
 	 *
 	 */
-	function action_karmaSettings_display()
+	public function action_karmaSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
@@ -349,7 +349,7 @@ class ManageFeatures_Controller
 	/**
 	 * Initializes the karma settings admin page.
 	 */
-	function _initKarmaSettingsForm()
+	private function _initKarmaSettingsForm()
 	{
 		global $txt;
 
@@ -383,7 +383,7 @@ class ManageFeatures_Controller
 	 * Display configuration settings for signatures on forum.
 	 *
 	 */
-	function action_signatureSettings_display()
+	public function action_signatureSettings_display()
 	{
 		global $context, $txt, $modSettings, $sig_start, $smcFunc, $scripturl;
 
@@ -712,7 +712,7 @@ class ManageFeatures_Controller
 	/**
 	 * Initializes signature settings form.
 	 */
-	function _initSignatureSettingsForm()
+	private function _initSignatureSettingsForm()
 	{
 		global $txt;
 
@@ -749,7 +749,7 @@ class ManageFeatures_Controller
 	/**
 	 * Show all the custom profile fields available to the user.
 	 */
-	function action_profile()
+	private function action_profile()
 	{
 		global $txt, $scripturl, $context;
 
@@ -981,7 +981,7 @@ class ManageFeatures_Controller
 	/**
 	 * Edit some profile fields?
 	 */
-	function action_profileedit()
+	public function action_profileedit()
 	{
 		global $txt, $scripturl, $context, $smcFunc;
 
