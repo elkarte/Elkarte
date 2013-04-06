@@ -27,9 +27,55 @@ if (!defined('ELKARTE'))
  * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
  * It is accessed via ?action=karma, sa=smite or sa=applaud.
  */
-function action_karma()
+function action_applaud()
 {
-	global $modSettings, $txt, $user_info, $topic, $smcFunc, $context;
+	global $user_info;
+
+	$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+
+	// Start off with no change in karma.
+	$action = prepare_karma($id_target);
+
+	give_karma($user_info['id'], $id_target, $action, 1);
+
+	redirect_karma();
+}
+
+function action_smite()
+{
+	global $user_info;
+
+	// The user ID _must_ be a number, no matter what.
+	$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+
+	// Start off with no change in karma.
+	$action = prepare_karma($id_target);
+
+	give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
+
+	redirect_karma();
+}
+
+function give_karma($id_executor, $id_target, $action, $dir)
+{
+	global $modSettings, $txt;
+
+	// They haven't, not before now, anyhow.
+	if (empty($action) || empty($modSettings['karmaWaitTime']))
+		addKarma($id_executor, $id_target, $dir);
+	else
+	{
+		// If you are gonna try to repeat.... don't allow it.
+		if ($action == $dir)
+			fatal_lang_error('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+
+		updateKarma($id_executor, $id_target, $dir);
+	}
+}
+
+function prepare_karma($id_target)
+{
+	global $modSettings, $user_info;
 
 	// If the mod is disabled, show an error.
 	if (empty($modSettings['karmaMode']))
@@ -51,38 +97,28 @@ function action_karma()
 		fatal_lang_error('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
 
 	// And you can't modify your own, punk! (use the profile if you need to.)
-	if (empty($_REQUEST['uid']) || (int) $_REQUEST['uid'] == $user_info['id'])
+	if (empty($id_target) || $id_target == $user_info['id'])
 		fatal_lang_error('cant_change_own_karma', false);
-
-	// The user ID _must_ be a number, no matter what.
-	$_REQUEST['uid'] = (int) $_REQUEST['uid'];
 
 	// Applauding or smiting?
 	$dir = $_REQUEST['sa'] != 'applaud' ? -1 : 1;
 
 	clearKarma($modSettings['karmaWaitTime']);
 
-	// Start off with no change in karma.
 	$action = 0;
-
 	// Not an administrator... or one who is restricted as well.
 	if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
 	{
 		// Find out if this user has done this recently...
-		$action = lastActionOn($user_info['id'], $_REQUEST['uid']);
+		$action = lastActionOn($user_info['id'], $id_target);
 	}
 
-	// They haven't, not before now, anyhow.
-	if (empty($action) || empty($modSettings['karmaWaitTime']))
-		addKarma($user_info['id'], $_REQUEST['uid'], $dir);
-	else
-	{
-		// If you are gonna try to repeat.... don't allow it.
-		if ($action == $dir)
-			fatal_lang_error('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+	return $action;
+}
 
-		updateKarma($user_info['id'], $_REQUEST['uid'], $dir);
-	}
+function redirect_karma()
+{
+	global $context, $topic;
 
 	// Figure out where to go back to.... the topic?
 	if (!empty($topic))
