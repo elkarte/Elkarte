@@ -126,14 +126,16 @@ function action_register($reg_errors = array())
 
 	if (!empty($modSettings['userLanguage']))
 	{
+		// Do we have any languages?
+		$languages = getLanguages();
+
+		if (isset($_POST['lngfile']) && isset($languages[$_POST['lngfile']]))
+			$_SESSION['language'] = $_POST['lngfile'];
+
 		$selectedLanguage = empty($_SESSION['language']) ? $language : $_SESSION['language'];
 
-		// Do we have any languages?
-		if (empty($context['languages']))
-			getLanguages();
-
 		// Try to find our selected language.
-		foreach ($context['languages'] as $key => $lang)
+		foreach ($languages as $key => $lang)
 		{
 			$context['languages'][$key]['name'] = $lang['name'];
 
@@ -340,8 +342,7 @@ function action_register2($verifiedOpenID = false)
 	if (isset($_POST['lngfile']) && !empty($modSettings['userLanguage']))
 	{
 		// Do we have any languages?
-		if (empty($context['languages']))
-			getLanguages();
+		$context['languages'] = getLanguages();
 
 		// Did we find it?
 		if (isset($context['languages'][$_POST['lngfile']]))

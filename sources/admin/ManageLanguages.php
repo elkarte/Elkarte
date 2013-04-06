@@ -166,7 +166,8 @@ class ManageLanguages_Controller
 			validateToken('admin-lang');
 
 			$lang_exists = false;
-			foreach ($context['languages'] as $lang)
+			$available_langs = getLanguages();
+			foreach ($available_langs as $lang)
 			{
 				if ($_POST['def_language'] == $lang['filename'])
 				{
@@ -1117,8 +1118,8 @@ class ManageLanguages_Controller
 		call_integration_hook('integrate_language_settings', array(&$config_vars));
 
 		// Get our languages. No cache.
-		getLanguages(false);
-		foreach ($context['languages'] as $lang)
+		$languages = getLanguages(false);
+		foreach ($languages as $lang)
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
 		// initialize the little form
@@ -1132,7 +1133,7 @@ class ManageLanguages_Controller
  */
 function list_getNumLanguages()
 {
-	return count(getLanguages(true, false));
+	return count(getLanguages());
 }
 
 /**
@@ -1153,7 +1154,7 @@ function list_getLanguages()
 
 	// Override these for now.
 	$settings['actual_theme_dir'] = $settings['base_theme_dir'] = $settings['default_theme_dir'];
-	getLanguages(true);
+	$all_languages = getLanguages();
 
 	// Put them back.
 	$settings['actual_theme_dir'] = $backup_actual_theme_dir;
@@ -1163,7 +1164,7 @@ function list_getLanguages()
 		unset($settings['base_theme_dir']);
 
 	// Get the language files and data...
-	foreach ($context['languages'] as $lang)
+	foreach ($all_languages as $lang)
 	{
 		// Load the file to get the character set.
 		require($settings['default_theme_dir'] . '/languages/index.' . $lang['filename'] . '.php');
