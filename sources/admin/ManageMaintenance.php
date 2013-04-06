@@ -26,7 +26,7 @@ class ManageMaintenance_Controller
 	 * Main dispatcher, the maintenance access point.
 	 * This, as usual, checks permissions, loads language files, and forwards to the actual workers.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $txt, $context;
 
@@ -117,9 +117,9 @@ class ManageMaintenance_Controller
 	/**
 	 * Supporting function for the database maintenance area.
 	 */
-	function action_database()
+	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $smcFunc, $txt, $maintenance;
+		global $context, $db_type, $modSettings, $smcFunc, $maintenance;
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_database';
@@ -193,7 +193,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Supporting function for the routine maintenance area.
 	 */
-	function action_routine()
+	public function action_routine()
 	{
 		global $context, $txt;
 
@@ -207,7 +207,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Supporting function for the members maintenance area.
 	 */
-	function action_members()
+	public function action_members()
 	{
 		global $context, $smcFunc, $txt;
 
@@ -243,7 +243,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Supporting function for the topics maintenance area.
 	 */
-	function action_topics()
+	public function action_topics()
 	{
 		global $context, $txt;
 
@@ -264,7 +264,7 @@ class ManageMaintenance_Controller
 	 * Find and try to fix all errors on the forum.
 	 * Forwards to repair boards controller.
 	 */
-	function action_repair_display()
+	public function action_repair_display()
 	{
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
@@ -280,7 +280,7 @@ class ManageMaintenance_Controller
 	 * This action, like other maintenance tasks, may be called automatically
 	 * by the task scheduler or manually by the admin in Maintenance area.
 	 */
-	function action_cleancache_display()
+	public function action_cleancache_display()
 	{
 		global $context, $txt;
 
@@ -298,7 +298,7 @@ class ManageMaintenance_Controller
 	 * This action may be called periodically, by the tasks scheduler,
 	 * or manually by the admin in Maintenance area.
 	 */
-	function action_logs_display()
+	public function action_logs_display()
 	{
 		global $context, $smcFunc, $txt;
 
@@ -352,7 +352,7 @@ class ManageMaintenance_Controller
 	 *
 	 * @uses the convert_msgbody sub template of the Admin template.
 	 */
-	function action_convertmsgbody_display()
+	public function action_convertmsgbody_display()
 	{
 		global $scripturl, $context, $txt, $db_type;
 		global $modSettings, $smcFunc, $time_start;
@@ -493,7 +493,7 @@ class ManageMaintenance_Controller
 
 	 * @uses the rawdata sub template (built in.)
 	 */
-	function action_optimize_display()
+	public function action_optimize_display()
 	{
 		global $db_type, $db_prefix, $txt, $context, $smcFunc;
 
@@ -568,7 +568,7 @@ class ManageMaintenance_Controller
 	 * The function redirects back to ?action=admin;area=maintain when complete.
 	 * It is accessed via ?action=admin;area=maintain;sa=database;activity=recount.
 	 */
-	function action_recount_display()
+	public function action_recount_display()
 	{
 		global $txt, $context, $modSettings;
 		global $time_start, $smcFunc;
@@ -1091,7 +1091,7 @@ class ManageMaintenance_Controller
 	 * Accessed through ?action=admin;area=maintain;sa=routine;activity=version.
 	 * @uses Admin template, view_versions sub-template.
 	 */
-	function action_version_display()
+	public function action_version_display()
 	{
 		global $forum_version, $txt, $context;
 
@@ -1129,7 +1129,7 @@ class ManageMaintenance_Controller
 	/**
 	 * Re-attribute posts to the user sent from the maintenance page.
 	 */
-	function action_reattribute_display()
+	public function action_reattribute_display()
 	{
 		global $context, $txt;
 
@@ -1159,7 +1159,7 @@ class ManageMaintenance_Controller
 	 * Handling function for the backup stuff.
 	 * This method simply forwards to DumpDatabase2().
 	 */
-	function action_backup_display()
+	public function action_backup_display()
 	{
 		validateToken('admin-maint');
 
@@ -1171,7 +1171,7 @@ class ManageMaintenance_Controller
 	 * Removing old and inactive members.
 	 * @todo refactor
 	 */
-	function action_purgeinactive_display()
+	public function action_purgeinactive_display()
 	{
 		global $context, $smcFunc, $txt;
 
@@ -1258,7 +1258,7 @@ class ManageMaintenance_Controller
 	 * This method takes care of removal of old posts.
 	 * They're very very old, perhaps even older.
 	 */
-	function action_pruneold_display()
+	public function action_pruneold_display()
 	{
 		validateToken('admin-maint');
 
@@ -1269,7 +1269,7 @@ class ManageMaintenance_Controller
 	/**
 	 * This method removes old drafts.
 	 */
-	function action_olddrafts_display()
+	public function action_olddrafts_display()
 	{
 		global $smcFunc;
 
@@ -1304,7 +1304,7 @@ class ManageMaintenance_Controller
 	 *
 	 * @uses not_done template to pause the process.
 	 */
-	function action_massmove_display()
+	public function action_massmove_display()
 	{
 		global $smcFunc, $context, $txt;
 
@@ -1422,7 +1422,7 @@ class ManageMaintenance_Controller
 	 * The function redirects back to action=admin;area=maintain;sa=members when complete.
 	 * It is accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
 	 */
-	function action_recountposts_display()
+	public function action_recountposts_display()
 	{
 		global $txt, $context, $modSettings, $smcFunc;
 
