@@ -111,10 +111,14 @@ class ManageErrors_Controller
 		// Set the page listing up.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter) ? $filter['href'] : ''), $_GET['start'], $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $_GET['start'];
+		$context['errors'] = array();
 
 		$logdata = getErrorLogData($_GET['start'], $context['sort_direction'], $filter);
-		$context['errors'] = $logdata['errors'];
-		$members = $logdata['members'];
+		if (!empty($logdata))
+		{
+			$context['errors'] = $logdata['errors'];
+			$members = $logdata['members'];
+		}
 		
 		// Load the member data.
 		if (!empty($members))

@@ -176,7 +176,7 @@ class ManageMembers_Controller
 		global $txt, $scripturl, $context, $modSettings, $smcFunc, $user_info;
 
 		// Set the current sub action.
-		$context['sub_action'] = $_REQUEST['sa'];
+		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
 
 		// Are we performing a delete?
 		if (isset($_POST['delete_members']) && !empty($_POST['delete']) && allowedTo('profile_remove_any'))
