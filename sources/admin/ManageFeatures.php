@@ -1099,7 +1099,7 @@ class ManageFeatures_Controller
 					|| (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
 					|| ($context['field']['type'] == 'check' && $_POST['field_type'] != 'check'))
 				{
-					deleteProfileField($context['field']['colname']);
+					deleteProfileFieldUserData($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
 				elseif ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio')

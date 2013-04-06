@@ -43,6 +43,13 @@ function getMaxMember()
 	return $max_member;
 }
 
+/**
+ * Loads the signature from 50 members per request
+ * Used in ManageFeatures to apply signature settings to all members
+ *
+ * @param type $start_member
+ * @return array
+ */
 function getSignatureFromMembers($start_member)
 {
 	global $smcFunc;
@@ -68,6 +75,12 @@ function getSignatureFromMembers($start_member)
 	return $members;
 }
 
+/**
+ * Updates the signature from a given member
+ *
+ * @param type $id_member
+ * @param type $signature
+ */
 function updateSignature($id_member, $signature)
 {
 	global $smcFunc;
@@ -155,6 +168,12 @@ function list_getProfileFieldSize()
 	return $numProfileFields;
 }
 
+/**
+ * Loads the profile field properties from a given field id
+ *
+ * @param type $id_field
+ * @return array $field
+ */
 function getProfileField($id_field)
 {
 	global $smcFunc;
@@ -213,6 +232,14 @@ function getProfileField($id_field)
 	return($field);
 }
 
+/**
+ * Make sure a profile field is unique
+ *
+ * @param string $colname
+ * @param string $initial_colname
+ * @param boolean $unique
+ * @return boolean
+ */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
 	global $smcFunc;
@@ -238,21 +265,14 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 	return $unique;
 }
 
-function deleteProfileField($name)
-{
-	global $smcFunc;
-
-	$smcFunc['db_query']('', '
-	DELETE FROM {db_prefix}themes
-	WHERE variable = {string:current_column}
-		AND id_member > {int:no_member}',
-	array(
-		'no_member' => 0,
-		'current_column' => $name,
-		)
-	);
-}
-
+/**
+ * Update the profile fields name
+ *
+ * @param string $key
+ * @param string $newOptions
+ * @param string $name
+ * @param string $option
+ */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
 	global $smcFunc;
@@ -272,6 +292,11 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 	);
 }
 
+/**
+ * Update the profile field
+ *
+ * @param type $field_data
+ */
 function updateProfileField($field_data)
 {
 	global $smcFunc;
@@ -311,6 +336,12 @@ function updateProfileField($field_data)
 	);
 }
 
+/**
+ * Deletes selected values from old profile field selects
+ *
+ * @param type $newOptions
+ * @param type $fieldname
+ */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
 	global $smcFunc;
@@ -328,6 +359,11 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 	);
 }
 
+/**
+ * Used to add a new custom profile field
+ *
+ * @param array $field
+ */
 function addProfileField($field)
 {
 	global $smcFunc;
@@ -352,6 +388,10 @@ function addProfileField($field)
 	);
 }
 
+/**
+ * Reorder the custom profile fields by alphabet
+ */
+
 function reOrderProfileFields()
 {
 	global $smcFunc;
@@ -365,6 +405,11 @@ function reOrderProfileFields()
 	);
 }
 
+/**
+ * Delete all user data for a specified custom profile field
+ *
+  * @param string $name
+ */
 function deleteProfileFieldUserData($name)
 {
 	global $smcFunc;
@@ -381,6 +426,11 @@ function deleteProfileFieldUserData($name)
 	);
 }
 
+/**
+ * Deletes a custom profile field.
+ *
+ * @param int $id
+ */
 function deleteProfileField($id)
 {
 	global $smcFunc;
@@ -394,6 +444,9 @@ function deleteProfileField($id)
 	);	
 }
 
+/**
+ * Update the display cache, needed after editing or deleting a custom profile field
+ */
 function updateDisplayCache()
 {
 	global $smcFunc;
