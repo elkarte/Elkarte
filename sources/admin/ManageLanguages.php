@@ -292,7 +292,7 @@ class ManageLanguages_Controller
 	 */
 	public function action_downloadlang()
 	{
-		global $context, $forum_version, $txt, $smcFunc, $scripturl, $modSettings;
+		global $context, $forum_version, $txt, $scripturl, $modSettings;
 
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -480,6 +480,7 @@ class ManageLanguages_Controller
 		$context['theme_names'] = array();
 		if (!empty($indexes))
 		{
+			require_once(SUBSDIR . '/ManageLanguages.subs.php');
 			$value_data = array(
 				'query' => array(),
 				'params' => array(),
@@ -491,50 +492,11 @@ class ManageLanguages_Controller
 				$value_data['params']['value_' . $k] = '%' . $index;
 			}
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_theme, value
-				FROM {db_prefix}themes
-				WHERE id_member = {int:no_member}
-					AND variable = {string:theme_dir}
-					AND (' . implode(' OR ', $value_data['query']) . ')',
-				array_merge($value_data['params'], array(
-					'no_member' => 0,
-					'theme_dir' => 'theme_dir',
-					'index_compare_explode' => 'value LIKE \'%' . implode('\' OR value LIKE \'%', $indexes) . '\'',
-				))
-			);
-			$themes = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				// Find the right one.
-				foreach ($indexes as $index)
-					if (strpos($row['value'], $index) !== false)
-						$themes[$row['id_theme']] = $index;
-			}
-			$smcFunc['db_free_result']($request);
+			$themes = validateThemeName($indexes, $value_data);
 
 			if (!empty($themes))
-			{
 				// Now we have the id_theme we can get the pretty description.
-				$request = $smcFunc['db_query']('', '
-					SELECT id_theme, value
-					FROM {db_prefix}themes
-					WHERE id_member = {int:no_member}
-						AND variable = {string:name}
-						AND id_theme IN ({array_int:theme_list})',
-					array(
-						'theme_list' => array_keys($themes),
-						'no_member' => 0,
-						'name' => 'name',
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-				{
-					// Now we have it...
-					$context['theme_names'][$themes[$row['id_theme']]] = $row['value'];
-				}
-				$smcFunc['db_free_result']($request);
-			}
+				$context['themes'] = getBasicThemeInfos($themes);
 		}
 
 		// Before we go to far can we make anything writable, eh, eh?
@@ -659,6 +621,7 @@ class ManageLanguages_Controller
 	{
 		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
 
+		require_once(SUBSDIR . '/ManageLanguages.subs.php');
 		loadLanguage('ManageSettings');
 
 		// Select the languages tab.
@@ -674,28 +637,7 @@ class ManageLanguages_Controller
 		$context['lang_id'] = $matches[1];
 
 		// Get all the theme data.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE id_theme != {int:default_theme}
-				AND id_member = {int:no_member}
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'default_theme' => 1,
-				'no_member' => 0,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$themes = array(
-			1 => array(
-				'name' => $txt['dvc_default'],
-				'theme_dir' => $settings['default_theme_dir'],
-			),
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$themes[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$themes = getAllThemes();
 
 		// This will be where we look
 		$lang_dirs = array();
@@ -781,15 +723,7 @@ class ManageLanguages_Controller
 					deltree($curPath);
 
 			// Members can no longer use this language.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET lngfile = {string:empty_string}
-				WHERE lngfile = {string:current_language}',
-				array(
-					'empty_string' => '',
-					'current_language' => $context['lang_id'],
-				)
-			);
+			removeLanguageFromMember($context['lang_id']);
 
 			// Fifth, update getLanguages() cache.
 			if (!empty($modSettings['cache_enable']))
