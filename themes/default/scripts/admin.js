@@ -466,24 +466,25 @@ function createNamedElement(type, name, customFields)
 
 function addAnotherQuestion()
 {
-	var newDT = document.createElement("dt");
-	var newInput = createNamedElement("input", "question[]");
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "50";
-	newInput.setAttribute("class", "verification_question");
-	newDT.appendChild(newInput);
+	setOuterHTML(placeHolder, add_question_template.easyReplace({
+		question_last_blank: question_last_blank,
+		setup_verification_add_more_answers: txt_add_another_answer
+	}));
 
-	var newDD = document.createElement("dd");
-	newInput = createNamedElement("input", "answer[]");
+	question_last_blank++;
+}
+
+function addAnotherAnswer(elem, question_name)
+{
+	var newInput = createNamedElement("input", "answer[" + question_name + "][]");
+	var br = document.createElement("br");
 	newInput.type = "text";
 	newInput.className = "input_text";
 	newInput.size = "50";
 	newInput.setAttribute("class", "verification_answer");
-	newDD.appendChild(newInput);
 
-	placeHolder.parentNode.insertBefore(newDT, placeHolder);
-	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+	elem.parentNode.insertBefore(br, elem);
+	elem.parentNode.insertBefore(newInput, elem);
 }
 
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)

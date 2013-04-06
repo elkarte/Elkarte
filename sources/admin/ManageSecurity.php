@@ -342,48 +342,53 @@ class ManageSecurity_Controller
 			// Handle verification questions.
 			$questionInserts = array();
 			$count_questions = 0;
+
 			foreach ($_POST['question'] as $id => $question)
 			{
 				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
-				$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT)));
+				$answers = array();
+				if (!empty($_POST['answer'][$id]))
+					foreach ($_POST['answer'][$id] as $answer)
+					{
+						$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($answer, ENT_COMPAT)));
+						if ($answer != '')
+							$answers[] = $answer;
+					}
 
 				// Already existed?
 				if (isset($context['question_answers'][$id]))
 				{
 					$count_questions++;
 					// Changed?
-					if ($context['question_answers'][$id]['question'] != $question || $context['question_answers'][$id]['answer'] != $answer)
+					if ($question == '' || empty($answers))
 					{
-						if ($question == '' || $answer == '')
-						{
-							$smcFunc['db_query']('', '
-								DELETE FROM {db_prefix}antispam_questions
-								WHERE id_question = {int:id}',
-								array(
-									'id' => $id,
-								)
-							);
-							$count_questions--;
-						}
-						else
-							$request = $smcFunc['db_query']('', '
-								UPDATE {db_prefix}antispam_questions
-								SET question = {string:question}, answer = {string:answer}
-								WHERE id_question = {int:id}',
-								array(
-									'id' => $id,
-									'question' => $question,
-									'answer' => $answer,
-								)
-							);
+						$smcFunc['db_query']('', '
+							DELETE FROM {db_prefix}antispam_questions
+							WHERE id_question = {int:id}',
+							array(
+								'id' => $id,
+							)
+						);
+						$count_questions--;
 					}
+					else
+						$request = $smcFunc['db_query']('', '
+							UPDATE {db_prefix}antispam_questions
+							SET question = {string:question}, answer = {string:answer}
+							WHERE id_question = {int:id}',
+							array(
+								'id' => $id,
+								'question' => $question,
+								'answer' => serialize($answers),
+							)
+						);
 				}
 				// It's so shiney and new!
-				elseif ($question != '' && $answer != '')
+				elseif ($question != '' && !empty($answers))
 				{
 					$questionInserts[] = array(
 						'question' => $question,
-						'answer' => $answer,
+						'answer' => serialize($answers),
 					);
 				}
 			}
