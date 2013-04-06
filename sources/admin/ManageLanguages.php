@@ -38,9 +38,9 @@ class ManageLanguages_Controller
 	 *
 	 * @uses ManageSettings language file
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt;
 
 		loadTemplate('ManageLanguages');
 		loadLanguage('ManageSettings');
@@ -81,9 +81,9 @@ class ManageLanguages_Controller
 	 *
 	 * @uses ManageLanguages template, add_language sub-template.
 	 */
-	function action_add()
+	public function action_add()
 	{
-		global $context, $forum_version, $txt, $smcFunc, $scripturl;
+		global $context, $txt;
 
 		// Are we searching for new languages on the site?
 		if (!empty($_POST['lang_add_sub']))
@@ -154,10 +154,9 @@ class ManageLanguages_Controller
 	/**
 	 * This lists all the current languages and allows editing of them.
 	 */
-	function action_edit()
+	public function action_edit()
 	{
-		global $txt, $context, $scripturl;
-		global $user_info, $smcFunc, $language, $forum_version;
+		global $txt, $context, $scripturl, $language;
 
 		// Setting a new default?
 		if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -291,7 +290,7 @@ class ManageLanguages_Controller
 	 * @uses ManageLanguages template, download_language sub-template.
 	 * @uses Admin template, show_list sub-template.
 	 */
-	function action_downloadlang()
+	public function action_downloadlang()
 	{
 		global $context, $forum_version, $txt, $smcFunc, $scripturl, $modSettings;
 
@@ -656,7 +655,7 @@ class ManageLanguages_Controller
 	/**
 	 * Edit a particular set of language entries.
 	 */
-	function action_editlang()
+	public function action_editlang()
 	{
 		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
 
@@ -1045,9 +1044,9 @@ class ManageLanguages_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
 	 */
-	function action_languageSettings_display()
+	public function action_languageSettings_display()
 	{
-		global $scripturl, $context, $txt, $settings, $smcFunc;
+		global $scripturl, $context, $txt;
 
 		// initialize the form
 		$this->_initLanguageSettingsForm();
@@ -1095,7 +1094,7 @@ class ManageLanguages_Controller
 	 *
 	 * Initialize _languageSettings form.
 	 */
-	function _initLanguageSettingsForm()
+	private function _initLanguageSettingsForm()
 	{
 		global $txt, $context;
 
