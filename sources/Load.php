@@ -1230,8 +1230,8 @@ function isBrowser($browser)
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	global $user_info, $user_settings, $board_info, $sc;
-	global $txt, $boardurl, $scripturl, $mbname, $modSettings, $language;
+	global $user_info, $user_settings, $board_info;
+	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
 	global $context, $settings, $options, $ssi_theme, $smcFunc;
 
 	// The theme was specified by parameter.
@@ -1316,6 +1316,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 		$smcFunc['db_free_result']($result);
 
+		// Set the defaults if the user has not chosen on their own
 		if (!empty($themeData[-1]))
 		{
 			foreach ($themeData[-1] as $k => $v)
@@ -1336,12 +1337,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$options = $themeData[$member];
 
 	$settings['theme_id'] = $id_theme;
-
 	$settings['actual_theme_url'] = $settings['theme_url'];
 	$settings['actual_images_url'] = $settings['images_url'];
 	$settings['actual_theme_dir'] = $settings['theme_dir'];
-
 	$settings['template_dirs'] = array();
+
 	// This theme first.
 	$settings['template_dirs'][] = $settings['theme_dir'];
 
@@ -1365,13 +1365,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 		if ($temp != '/')
 			$detected_url .= $temp;
 	}
+
 	if (isset($detected_url) && $detected_url != $boardurl)
 	{
 		// Try #1 - check if it's in a list of alias addresses.
 		if (!empty($modSettings['forum_alias_urls']))
 		{
 			$aliases = explode(',', $modSettings['forum_alias_urls']);
-
 			foreach ($aliases as $alias)
 			{
 				// Rip off all the boring parts, spaces, etc.
@@ -1389,7 +1389,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 			else
 			{
 				list ($k, $v) = each($_GET);
-
 				if ($k != 'wwwRedirect')
 					redirectexit('wwwRedirect;' . $k . '=' . $v);
 			}
@@ -1431,10 +1430,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 					$board_info['moderators'][$k]['link'] = strtr($dummy['link'], array('"' . $oldurl => '"' . $boardurl));
 				}
 			}
+
 			foreach ($context['linktree'] as $k => $dummy)
 				$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
 		}
 	}
+
 	// Set up the contextual user array.
 	$context['user'] = array(
 		'id' => $user_info['id'],
@@ -1449,6 +1450,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'email' => $user_info['email'],
 		'ignoreusers' => $user_info['ignoreusers'],
 	);
+
+	// Something for the guests
 	if (!$context['user']['is_guest'])
 		$context['user']['name'] = $user_info['name'];
 	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
@@ -1457,6 +1460,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Set up some additional interface preference context
 	if ($user_info['is_admin'])
 		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+
 	if (!$user_info['is_guest'])
 		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
 
@@ -1502,6 +1506,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
 		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
 	);
+
 	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
 	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
 
@@ -1519,6 +1524,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!isset($txt))
 		$txt = array();
+
 	$simpleActions = array(
 		'findmember',
 		'quickhelp',
@@ -1582,9 +1588,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 		// Overriding - for previews and that ilk.
 		if (!empty($_REQUEST['variant']))
 			$_SESSION['id_variant'] = $_REQUEST['variant'];
+
 		// User selection?
 		if (empty($settings['disable_user_variant']) || allowedTo('admin_forum'))
 			$context['theme_variant'] = !empty($_SESSION['id_variant']) ? $_SESSION['id_variant'] : (!empty($options['theme_variant']) ? $options['theme_variant'] : '');
+
 		// If not a user variant, select the default.
 		if ($context['theme_variant'] == '' || !in_array($context['theme_variant'], $settings['theme_variants']))
 			$context['theme_variant'] = !empty($settings['default_variant']) && in_array($settings['default_variant'], $settings['theme_variants']) ? $settings['default_variant'] : $settings['theme_variants'][0];
@@ -1608,13 +1616,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$settings['images_url'] = $settings['default_images_url'];
 		$settings['theme_dir'] = $settings['default_theme_dir'];
 	}
+
 	// Make a special URL for the language.
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
 	// Set the character set from the template.
 	$context['character_set'] = 'UTF-8';
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
-
 	$context['tabindex'] = 1;
 
 	// Compatibility.
@@ -1671,7 +1679,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 			tempImage.src = smf_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
 		}
 		window.setTimeout("smfAutoTask();", 1);');
-
 		}
 	}
 

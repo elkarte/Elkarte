@@ -387,7 +387,7 @@ function template_main()
 							<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
 						</h4>
 					</div>
-					<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>>
+					<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
 						<dl class="settings">
 							<dt><strong>', $txt['subject'], '</strong></dt>
 							<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';

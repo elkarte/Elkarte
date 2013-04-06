@@ -231,21 +231,23 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param int $drafts_keep_days - number of days to consider a draft is still valid
  * @return type
  */
-function load_user_drafts($member_id, $topic = false, $draft_type = 0, $drafts_keep_days = 0)
+function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
 {
 	global $smcFunc;
 
 	// load the drafts that the user has available for the given type & action
 	$user_drafts = array();
 	$request = $smcFunc['db_query']('', '
-		SELECT *
-		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}' . ((!empty($topic) && $draft_type === 0) ? '
+		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
+		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
+		WHERE ud.id_member = {int:id_member}' . ((!empty($topic) && $draft_type === 0) ? '
 			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
 			AND id_reply = {int:id_topic}' : '')) . '
 			AND type = {int:draft_type}' . (!empty($drafts_keep_days) ? '
-			AND poster_time > {int:time}' : '') . '
-		ORDER BY poster_time DESC',
+			AND poster_time > {int:time}' : '') . (!empty($order) ? '
+		ORDER BY ' . $order : '') . (!empty($limit) ? '
+		LIMIT ' . $limit : ''),
 		array(
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
@@ -322,4 +324,42 @@ function draftsCount($member_id, $draft_type)
 	$smcFunc['db_free_result']($request);
 
 	return $msgCount;
+}
+
+/**
+ * Given a list of userid's for a PM, finds the member name associated with the ID
+ * so it can be presented to the user.
+ *  - keeps track of bcc and to names for the PM
+ *
+ * @todo this is the same as whats in PersonalMessage.controller, when that gets refractored
+ *       this should go away and use the refractored PM subs
+ */
+function draftsRecipients($allRecipients, $recipient_ids)
+{
+	global $smcFunc;
+
+	// holds our results
+	$recipients = array(
+		'to' => array(),
+		'bcc' => array(),
+	);
+
+	// get all the member names that this PM is goign to
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name
+		FROM {db_prefix}members
+		WHERE id_member IN ({array_int:member_list})',
+		array(
+			'member_list' => $allRecipients,
+		)
+	);
+	while ($result = $smcFunc['db_fetch_assoc']($request))
+	{
+		// load the to/bcc name array
+		$recipientType = in_array($result['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
+		$recipients[$recipientType][] = $result['real_name'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $recipients;
 }

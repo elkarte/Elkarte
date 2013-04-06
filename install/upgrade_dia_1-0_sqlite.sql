@@ -244,6 +244,25 @@ $smcFunc['db_alter_table']('{db_prefix}log_topics', array(
 ---#
 
 /******************************************************************************/
+--- Adding support for custom profile fields on memberlist
+/******************************************************************************/
+---# Adding new columns to boards...
+---{
+$smcFunc['db_alter_table']('{db_prefix}custom_fields', array(
+	'add' => array(
+		'show_memberlist' => array(
+			'name' => 'show_memberlist',
+			'null' => false,
+			'default' => 0,
+			'type' => 'smallint',
+			'auto' => false,
+		),
+	)
+));
+---}
+---#
+
+/******************************************************************************/
 --- Adding new settings
 /******************************************************************************/
 ---# Adding new settings ...
