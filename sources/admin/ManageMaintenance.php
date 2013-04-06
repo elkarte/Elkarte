@@ -121,6 +121,9 @@ class ManageMaintenance_Controller
 	{
 		global $context, $db_type, $modSettings, $smcFunc, $maintenance;
 
+		// We need this, really..
+		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_database';
 
@@ -141,13 +144,7 @@ class ManageMaintenance_Controller
 		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
 		$context['safe_mode_enable'] = @ini_get('safe_mode');
 		// This is just a...guess
-		$result = $smcFunc['db_query']('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}messages',
-			array()
-		);
-		list($messages) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$messages = countMessages();
 
 		// 256 is what we use in the backup script
 		setMemoryLimit('256M');
@@ -209,29 +206,12 @@ class ManageMaintenance_Controller
 	 */
 	public function action_members()
 	{
-		global $context, $smcFunc, $txt;
+		global $context, $txt;
+
+		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
 
 		// Get membergroups - for deleting members and the like.
-		$result = $smcFunc['db_query']('', '
-			SELECT id_group, group_name
-			FROM {db_prefix}membergroups',
-			array(
-			)
-		);
-		$context['membergroups'] = array(
-			array(
-				'id' => 0,
-				'name' => $txt['maintain_members_ungrouped']
-			),
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-		{
-			$context['membergroups'][] = array(
-				'id' => $row['id_group'],
-				'name' => $row['group_name']
-			);
-		}
-		$smcFunc['db_free_result']($result);
+		$context['membergroups'] = getMembergroups;
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
@@ -300,7 +280,9 @@ class ManageMaintenance_Controller
 	 */
 	public function action_logs_display()
 	{
-		global $context, $smcFunc, $txt;
+		global $context, $txt;
+
+		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
 
 		checkSession();
 		validateToken('admin-maint');
@@ -308,34 +290,7 @@ class ManageMaintenance_Controller
 		// Maintenance time was scheduled!
 		// When there is no intelligent life on this planet.
 		// Apart from me, I mean.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_online');
-
-		// Dump the banning logs.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_banned');
-
-		// Start id_error back at 0 and dump the error log.
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_errors');
-
-		// Clear out the spam log.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_floodcontrol');
-
-		// Clear out the karma actions.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_karma');
-
-		// Last but not least, the search logs!
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_search_topics');
-
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_search_messages');
-
-		$smcFunc['db_query']('truncate_table', '
-			TRUNCATE {db_prefix}log_search_results');
+		flushLogTables();
 
 		updateSettings(array('search_pointer' => 0));
 
@@ -363,9 +318,7 @@ class ManageMaintenance_Controller
 		if ($db_type != 'mysql')
 			return;
 
-		db_extend('packages');
-
-		$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+		$colData = getMessageTableColumns();
 		foreach ($colData as $column)
 			if ($column['name'] == 'body')
 				$body_type = $column['type'];
@@ -379,12 +332,12 @@ class ManageMaintenance_Controller
 
 			// Make it longer so we can do their limit.
 			if ($body_type == 'text')
-				$smcFunc['db_change_column']('{db_prefix}messages', 'body', array('type' => 'mediumtext'));
+				 resizeMessageTableBody('mediumtext');
 			// Shorten the column so we can have a bit (literally per record) less space occupied
 			else
-				$smcFunc['db_change_column']('{db_prefix}messages', 'body', array('type' => 'text'));
+				resizeMessageTableBody('text');
 
-			$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+			$colData = getMessageTableColumns();
 			foreach ($colData as $column)
 				if ($column['name'] == 'body')
 					$body_type = $column['type'];
@@ -411,32 +364,14 @@ class ManageMaintenance_Controller
 			$increment = 500;
 			$id_msg_exceeding = isset($_POST['id_msg_exceeding']) ? explode(',', $_POST['id_msg_exceeding']) : array();
 
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(*) as count
-				FROM {db_prefix}messages',
-				array()
-			);
-			list($max_msgs) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$max_msgs = countMessages();
 
 			// Try for as much time as possible.
 			@set_time_limit(600);
 
 			while ($_REQUEST['start'] < $max_msgs)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ id_msg
-					FROM {db_prefix}messages
-					WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
-						AND LENGTH(body) > 65535',
-					array(
-						'start' => $_REQUEST['start'],
-						'increment' => $increment - 1,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$id_msg_exceeding[] = $row['id_msg'];
-				$smcFunc['db_free_result']($request);
+				$id_msg_exceeding = detectExceedingMessages($_REQUEST['start'], $increment);
 
 				$_REQUEST['start'] += $increment;
 
@@ -468,18 +403,7 @@ class ManageMaintenance_Controller
 				else
 					$query_msg = $id_msg_exceeding;
 
-				$context['exceeding_messages'] = array();
-				$request = $smcFunc['db_query']('', '
-					SELECT id_msg, id_topic, subject
-					FROM {db_prefix}messages
-					WHERE id_msg IN ({array_int:messages})',
-					array(
-						'messages' => $query_msg,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$context['exceeding_messages'][] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
-				$smcFunc['db_free_result']($request);
+				$context['exceeding_messages'] = getExceedingMessages($query_msg);
 			}
 		}
 	}
@@ -503,34 +427,25 @@ class ManageMaintenance_Controller
 		validateToken('admin-maint');
 
 		ignore_user_abort(true);
-		db_extend();
 
-		// Start with no tables optimized.
-		$opttab = 0;
+		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
 
 		$context['page_title'] = $txt['database_optimize'];
 		$context['sub_template'] = 'optimize';
 
-		// Only optimize the tables related to this installation, not all the tables in the db
-		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
-
-		// Get a list of tables, as well as how many there are.
-		$temp_tables = $smcFunc['db_list_tables'](false, $real_prefix . '%');
-		$tables = array();
-		foreach ($temp_tables as $table)
-			$tables[] = array('table_name' => $table);
+		$tables = getOurTables();
 
 		// If there aren't any tables then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
 		if ($context['num_tables'] == 0)
-			fatal_error('You appear to be running ELKARTE in a flat file mode... fantastic!', false);
+			fatal_error('You appear to be running ElkArte in a flat file mode... fantastic!', false);
 
 		// For each table....
 		$context['optimized_tables'] = array();
 		foreach ($tables as $table)
 		{
 			// Optimize the table!  We use backticks here because it might be a custom table.
-			$data_freed = $smcFunc['db_optimize_table']($table['table_name']);
+			$data_freed = optimizeTable($table['table_name']);
 
 			// Optimizing one sqlite table optimizes them all.
 			if ($db_type == 'sqlite')
