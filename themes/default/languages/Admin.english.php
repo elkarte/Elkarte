@@ -312,8 +312,8 @@ $txt['support_versions_gd'] = 'GD version';
 $txt['support_versions_imagick'] = 'Imagick version';
 $txt['support_versions'] = 'Version Information';
 $txt['support_resources'] = 'Support Resources';
-$txt['support_resources_p1'] = 'Our <a href="%1$s">Documentation Wiki</a> provides the main documentation for ELKARTE. The ELKARTE Online Manual has many documents to help answer support questions and explain <a href="%2$s">Features</a>, <a href="%3$s">Settings</a>, <a href="%4$s">Themes</a>, <a href="%5$s">Packages</a>, etc. The Online Manual documents each area of ELKARTE thoroughly and should answer most questions quickly.';
-$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s">Support Community</a> or ask for assistance in our support boards. The ELKARTE Support Community can be used for <a href="%2$s">support</a>, <a href="%3$s">customization</a>, and many other things such as discussing ELKARTE, finding a host, and discussing administrative issues with other forum administrators.';
+$txt['support_resources_p1'] = 'Our <a href="%1$s">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s">Features</a>, <a href="%3$s">Settings</a>, <a href="%4$s">Themes</a>, <a href="%5$s">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
+$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s">support</a>, <a href="%3$s">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
 
 $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
@@ -425,7 +425,7 @@ $txt['max_image_width'] = 'Max display width of posted or attached images';
 $txt['max_image_height'] = 'Max display height of posted or attached images';
 
 $txt['automanage_attachments'] = 'Choose the method for the management of the attachment directories';
-$txt['attachments_normal'] = '(Manual) ELKARTE default behaviour';
+$txt['attachments_normal'] = '(Manual) ElkArte default behaviour';
 $txt['attachments_auto_years'] = '(Auto) Subdivide by years';
 $txt['attachments_auto_months'] = '(Auto) Subdivide by years and months';
 $txt['attachments_auto_days'] = '(Auto) Subdivide by years, months and days';
@@ -539,7 +539,7 @@ $txt['logs'] = 'Logs';
 $txt['generate_reports'] = 'Reports';
 
 $txt['update_available'] = 'Update Available';
-$txt['update_message'] = 'You\'re using an outdated version of ELKARTE, which contains some bugs which have since been fixed.
+$txt['update_message'] = 'You\'re using an outdated version of ElkArte, which contains some bugs which have since been fixed.
 	It is recommended that you <a href="#" id="update-link">update your forum</a> to the latest version as soon as possible. It only takes a minute!';
 
 $txt['manageposts'] = 'Posts and Topics';
