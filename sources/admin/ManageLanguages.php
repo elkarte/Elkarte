@@ -473,7 +473,7 @@ class ManageLanguages_Controller
 		}
 
 		// So, I'm a perfectionist - let's get the theme names.
-		$theme_indexes = array();
+		$indexes = array();
 		foreach ($context['files']['images'] as $k => $dummy)
 			$indexes[] = $k;
 
