@@ -217,10 +217,10 @@ class ManageRegistration_Controller
 		);
 
 		// Get our languages.
-		getLanguages();
+		$languages = getLanguages();
 
 		// Try to figure out if we have more agreements.
-		foreach ($context['languages'] as $lang)
+		foreach ($languages as $lang)
 		{
 			if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
 			{

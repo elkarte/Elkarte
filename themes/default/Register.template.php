@@ -24,7 +24,25 @@ function template_registration_agreement()
 	echo '
 		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['registration_agreement'], '</h3>
+				<h3 class="catbg">', $txt['registration_agreement'];
+	if (!empty($context['languages']))
+	{
+		if (count($context['languages']) === 1)
+			foreach ($context['languages'] as $lang_key => $lang_val)
+				echo '
+				<input type="hidden" name="lngfile" value="', $lang_key, '" />';
+		else
+		{
+			echo '
+				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
+			foreach ($context['languages'] as $lang_key => $lang_val)
+				echo '
+					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>',  $lang_val['name'], '</option>';
+			echo '
+				</select>';
+		}
+	}
+	echo '</h3>
 			</div>
 			<div class="roundframe">
 				<p>', $context['agreement'], '</p>
