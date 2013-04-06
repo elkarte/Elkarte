@@ -37,7 +37,7 @@ function removeLanguageFromMember($lang_id)
  */
 function list_getNumLanguages()
 {
-	return count(getLanguages(true, false));
+	return count(getLanguages());
 }
 
 /**
@@ -58,7 +58,7 @@ function list_getLanguages()
 
 	// Override these for now.
 	$settings['actual_theme_dir'] = $settings['base_theme_dir'] = $settings['default_theme_dir'];
-	getLanguages(true);
+	$all_languages = getLanguages();
 
 	// Put them back.
 	$settings['actual_theme_dir'] = $backup_actual_theme_dir;
@@ -68,7 +68,7 @@ function list_getLanguages()
 		unset($settings['base_theme_dir']);
 
 	// Get the language files and data...
-	foreach ($context['languages'] as $lang)
+	foreach ($all_languages as $lang)
 	{
 		// Load the file to get the character set.
 		require($settings['default_theme_dir'] . '/languages/index.' . $lang['filename'] . '.php');

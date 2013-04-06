@@ -1669,10 +1669,10 @@ function profileLoadLanguages()
 	$context['profile_languages'] = array();
 
 	// Get our languages!
-	getLanguages(true);
+	$languages = getLanguages();
 
 	// Setup our languages.
-	foreach ($context['languages'] as $lang)
+	foreach ($languages as $lang)
 		$context['profile_languages'][$lang['filename']] = $lang['name'];
 
 	ksort($context['profile_languages']);

@@ -168,7 +168,8 @@ class ManageLanguages_Controller
 			validateToken('admin-lang');
 
 			$lang_exists = false;
-			foreach ($context['languages'] as $lang)
+			$available_langs = getLanguages();
+			foreach ($available_langs as $lang)
 			{
 				if ($_POST['def_language'] == $lang['filename'])
 				{
@@ -1054,12 +1055,11 @@ class ManageLanguages_Controller
 		call_integration_hook('integrate_language_settings', array(&$config_vars));
 
 		// Get our languages. No cache.
-		getLanguages(false);
-		foreach ($context['languages'] as $lang)
+		$languages = getLanguages(false);
+		foreach ($languages as $lang)
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
 		// initialize the little form
 		return $this->_languageSettings->settings($config_vars);
 	}
 }
-
