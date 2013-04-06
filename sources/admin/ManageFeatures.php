@@ -411,36 +411,24 @@ class ManageFeatures_Controller
 			// Security!
 			checkSession('get');
 
+			require_once(SUBSDIR . '/ManageFeatures.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
 			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 			$done = false;
 
-			$request = $smcFunc['db_query']('', '
-				SELECT MAX(id_member)
-				FROM {db_prefix}members',
-				array(
-				)
-			);
-			list ($context['max_member']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$context['max_member'] = getMaxMember();
 
 			while (!$done)
 			{
 				$changes = array();
+				$update_sigs =  getSignatureFromMembers($applied_sigs);
 
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member, signature
-					FROM {db_prefix}members
-					WHERE id_member BETWEEN ' . $applied_sigs . ' AND ' . $applied_sigs . ' + 49
-						AND id_group != {int:admin_group}
-						AND FIND_IN_SET({int:admin_group}, additional_groups) = 0',
-					array(
-						'admin_group' => 1,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				if(empty($update_sigs))
+					$done = true;
+
+				foreach($update_sigs as $row)
 				{
 					// Apply all the rules we can realistically do.
 					$sig = strtr($row['signature'], array('<br />' => "\n"));
@@ -615,23 +603,12 @@ class ManageFeatures_Controller
 					if ($sig != $row['signature'])
 						$changes[$row['id_member']] = $sig;
 				}
-				if ($smcFunc['db_num_rows']($request) == 0)
-					$done = true;
-				$smcFunc['db_free_result']($request);
 
 				// Do we need to delete what we have?
 				if (!empty($changes))
 				{
 					foreach ($changes as $id => $sig)
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}members
-							SET signature = {string:signature}
-							WHERE id_member = {int:id_member}',
-							array(
-								'id_member' => $id,
-								'signature' => $sig,
-							)
-						);
+						updateSignature($id, $sig);
 				}
 
 				$applied_sigs += 50;
@@ -800,6 +777,7 @@ class ManageFeatures_Controller
 		createToken('admin-scp');
 
 		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		$listOptions = array(
 			'id' => 'standard_profile_fields',
@@ -985,6 +963,7 @@ class ManageFeatures_Controller
 	{
 		global $txt, $scripturl, $context, $smcFunc;
 
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');
 
 		// Sort out the context!
@@ -997,56 +976,7 @@ class ManageFeatures_Controller
 		loadLanguage('Profile');
 
 		if ($context['fid'])
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT
-					id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
-					show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
-					bbc, mask, enclose, placement
-				FROM {db_prefix}custom_fields
-				WHERE id_field = {int:current_field}',
-				array(
-					'current_field' => $context['fid'],
-				)
-			);
-			$context['field'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if ($row['field_type'] == 'textarea')
-					@list ($rows, $cols) = explode(',', $row['default_value']);
-				else
-				{
-					$rows = 3;
-					$cols = 30;
-				}
-
-				$context['field'] = array(
-					'name' => $row['field_name'],
-					'desc' => $row['field_desc'],
-					'colname' => $row['col_name'],
-					'profile_area' => $row['show_profile'],
-					'reg' => $row['show_reg'],
-					'display' => $row['show_display'],
-					'memberlist' => $row['show_memberlist'],
-					'type' => $row['field_type'],
-					'max_length' => $row['field_length'],
-					'rows' => $rows,
-					'cols' => $cols,
-					'bbc' => $row['bbc'] ? true : false,
-					'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
-					'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
-					'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
-					'active' => $row['active'],
-					'private' => $row['private'],
-					'can_search' => $row['can_search'],
-					'mask' => $row['mask'],
-					'regex' => substr($row['mask'], 0, 5) == 'regex' ? substr($row['mask'], 5) : '',
-					'enclose' => $row['enclose'],
-					'placement' => $row['placement'],
-				);
-			}
-			$smcFunc['db_free_result']($request);
-		}
+			$context['field'] = getProfileField($context['fid']);
 
 		// Setup the default values as needed.
 		if (empty($context['field']))
@@ -1156,26 +1086,7 @@ class ManageFeatures_Controller
 				else
 					$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
 
-				// Make sure this is unique.
-				// @todo This may not be the most efficient way to do this.
-				$unique = false;
-				for ($i = 0; !$unique && $i < 9; $i ++)
-				{
-					$request = $smcFunc['db_query']('', '
-						SELECT id_field
-						FROM {db_prefix}custom_fields
-						WHERE col_name = {string:current_column}',
-						array(
-							'current_column' => $colname,
-						)
-					);
-					if ($smcFunc['db_num_rows']($request) == 0)
-						$unique = true;
-					else
-						$colname = $initial_colname . $i;
-					$smcFunc['db_free_result']($request);
-				}
-
+				$unique = ensureUniqueProfileField($colname, $initial_colname);
 				// Still not a unique colum name? Leave it up to the user, then.
 				if (!$unique)
 					fatal_lang_error('custom_option_not_unique');
@@ -1188,15 +1099,7 @@ class ManageFeatures_Controller
 					|| (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
 					|| ($context['field']['type'] == 'check' && $_POST['field_type'] != 'check'))
 				{
-					$smcFunc['db_query']('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:current_column}
-							AND id_member > {int:no_member}',
-						array(
-							'no_member' => 0,
-							'current_column' => $context['field']['colname'],
-						)
-					);
+					deleteProfileField($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
 				elseif ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio')
@@ -1223,19 +1126,7 @@ class ManageFeatures_Controller
 					{
 						// Just been renamed?
 						if (!in_array($k, $takenKeys) && !empty($newOptions[$k]))
-							$smcFunc['db_query']('', '
-								UPDATE {db_prefix}themes
-								SET value = {string:new_value}
-								WHERE variable = {string:current_column}
-									AND value = {string:old_value}
-									AND id_member > {int:no_member}',
-								array(
-									'no_member' => 0,
-									'new_value' => $newOptions[$k],
-									'current_column' => $context['field']['colname'],
-									'old_value' => $option,
-								)
-							);
+							updateRenamedProfileField($k, $newOptions, $context['field']['colname'], $option);
 					}
 				}
 				// @todo Maybe we should adjust based on new text length limits?
@@ -1244,85 +1135,49 @@ class ManageFeatures_Controller
 			// Updating an existing field?
 			if ($context['fid'])
 			{
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}custom_fields
-					SET
-						field_name = {string:field_name}, field_desc = {string:field_desc},
-						field_type = {string:field_type}, field_length = {int:field_length},
-						field_options = {string:field_options}, show_reg = {int:show_reg},
-						show_display = {int:show_display}, show_memberlist = {int:show_memberlist},
-						show_profile = {string:show_profile}, private = {int:private},
-						active = {int:active}, default_value = {string:default_value},
-						can_search = {int:can_search}, bbc = {int:bbc}, mask = {string:mask},
-						enclose = {string:enclose}, placement = {int:placement}
-					WHERE id_field = {int:current_field}',
-					array(
-						'field_length' => $field_length,
-						'show_reg' => $show_reg,
-						'show_display' => $show_display,
-						'show_memberlist' => $show_memberlist,
-						'private' => $private,
-						'active' => $active,
-						'can_search' => $can_search,
-						'bbc' => $bbc,
-						'current_field' => $context['fid'],
-						'field_name' => $_POST['field_name'],
-						'field_desc' => $_POST['field_desc'],
-						'field_type' => $_POST['field_type'],
-						'field_options' => $field_options,
-						'show_profile' => $show_profile,
-						'default_value' => $default,
-						'mask' => $mask,
-						'enclose' => $enclose,
-						'placement' => $placement,
-					)
+				
+				$field_data = array(
+					'field_length' => $field_length,
+					'show_reg' => $show_reg,
+					'show_display' => $show_display,
+					'show_memberlist' => $show_memberlist,
+					'private' => $private,
+					'active' => $active,
+					'can_search' => $can_search,
+					'bbc' => $bbc,
+					'current_field' => $context['fid'],
+					'field_name' => $_POST['field_name'],
+					'field_desc' => $_POST['field_desc'],
+					'field_type' => $_POST['field_type'],
+					'field_options' => $field_options,
+					'show_profile' => $show_profile,
+					'default_value' => $default,
+					'mask' => $mask,
+					'enclose' => $enclose,
+					'placement' => $placement,
 				);
+				
+				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
 				if (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && !empty($newOptions))
-					$smcFunc['db_query']('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:current_column}
-							AND value NOT IN ({array_string:new_option_values})
-							AND id_member > {int:no_member}',
-						array(
-							'no_member' => 0,
-							'new_option_values' => $newOptions,
-							'current_column' => $context['field']['colname'],
-						)
-					);
+					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
 			}
 			// Otherwise creating a new one
 			else
 			{
-				$smcFunc['db_insert']('',
-					'{db_prefix}custom_fields',
-					array(
-						'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',
-						'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
-						'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
-						'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
-						'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int',
-					),
-					array(
-						$colname, $_POST['field_name'], $_POST['field_desc'],
-						$_POST['field_type'], $field_length, $field_options,
-						$show_reg, $show_display, $show_memberlist, $show_profile,
-						$private, $active, $default, $can_search,
-						$bbc, $mask, $enclose, $placement,
-					),
-					array('id_field')
+				$new_field = array(
+					$colname, $_POST['field_name'], $_POST['field_desc'],
+					$_POST['field_type'], $field_length, $field_options,
+					$show_reg, $show_display, $show_memberlist, $show_profile,
+					$private, $active, $default, $can_search,
+					$bbc, $mask, $enclose, $placement
 				);
+				addProfileField($new_field);
 			}
 
 			// As there's currently no option to priorize certain fields over others, let's order them alphabetically.
-			$smcFunc['db_query']('alter_table_boards', '
-				ALTER TABLE {db_prefix}custom_fields
-				ORDER BY field_name',
-				array(
-					'db_error_skip' => true,
-				)
-			);
+			reorderProfileFields();
 		}
 		// Deleting?
 		elseif (isset($_POST['delete']) && $context['field']['colname'])
@@ -1330,139 +1185,22 @@ class ManageFeatures_Controller
 			checkSession();
 			validateToken('admin-ecp');
 
-			// Delete the user data first.
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}themes
-				WHERE variable = {string:current_column}
-					AND id_member > {int:no_member}',
-				array(
-					'no_member' => 0,
-					'current_column' => $context['field']['colname'],
-				)
-			);
-
-			// Finally - the field itself is gone!
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}custom_fields
-				WHERE id_field = {int:current_field}',
-				array(
-					'current_field' => $context['fid'],
-				)
-			);
+			//Delete the old data first, then the field.
+			deleteProfileFieldUserData($context['field']['colname']);
+			deleteProfileField($context['fid']);
 		}
 
 		// Rebuild display cache etc.
 		if (isset($_POST['delete']) || isset($_POST['save']))
 		{
 			checkSession();
-
-			$request = $smcFunc['db_query']('', '
-				SELECT col_name, field_name, field_type, bbc, enclose, placement
-				FROM {db_prefix}custom_fields
-				WHERE show_display = {int:is_displayed}
-					AND active = {int:active}
-					AND private != {int:not_owner_only}
-					AND private != {int:not_admin_only}',
-				array(
-					'is_displayed' => 1,
-					'active' => 1,
-					'not_owner_only' => 2,
-					'not_admin_only' => 3,
-				)
-			);
-
-			$fields = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$fields[] = array(
-					'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
-					'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
-					'type' => $row['field_type'],
-					'bbc' => $row['bbc'] ? 1 : 0,
-					'placement' => !empty($row['placement']) ? $row['placement'] : 0,
-					'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
-				);
-			}
-			$smcFunc['db_free_result']($request);
-
-			updateSettings(array('displayFields' => serialize($fields)));
+			// Update the display cache
+			updateDisplayCache();
 			redirectexit('action=admin;area=featuresettings;sa=profile');
 		}
 
 		createToken('admin-ecp');
 	}
-}
-
-/**
- * Callback for createList().
- *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $standardFields
- */
-function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
-{
-	global $txt, $modSettings, $smcFunc;
-
-	$list = array();
-
-	if ($standardFields)
-	{
-		$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
-		$fields_no_registration = array('posts', 'warning_status');
-		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
-		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
-
-		foreach ($standard_fields as $field)
-			$list[] = array(
-				'id' => $field,
-				'label' => isset($txt['standard_profile_field_' . $field]) ? $txt['standard_profile_field_' . $field] : (isset($txt[$field]) ? $txt[$field] : $field),
-				'disabled' => in_array($field, $disabled_fields),
-				'on_register' => in_array($field, $registration_fields) && !in_array($field, $fields_no_registration),
-				'can_show_register' => !in_array($field, $fields_no_registration),
-			);
-	}
-	else
-	{
-		// Load all the fields.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement
-			FROM {db_prefix}custom_fields
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:items_per_page}',
-			array(
-				'sort' => $sort,
-				'start' => $start,
-				'items_per_page' => $items_per_page,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$list[] = $row;
-		$smcFunc['db_free_result']($request);
-	}
-
-	return $list;
-}
-
-/**
- * Callback for createList().
- */
-function list_getProfileFieldSize()
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}custom_fields',
-		array(
-		)
-	);
-
-	list ($numProfileFields) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $numProfileFields;
 }
 
 /**
