@@ -104,3 +104,105 @@ function themeUrl($id_theme)
 
 	return $theme_url;
 }
+
+/**
+ * validates a theme name
+ *
+ * @param string $indexes
+ * @param array $value_data
+ * @return type
+ */
+function validateThemeName($indexes, $value_data)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_theme, value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:no_member}
+			AND variable = {string:theme_dir}
+			AND (' . implode(' OR ', $value_data['query']) . ')',
+		array_merge($value_data['params'], array(
+			'no_member' => 0,
+			'theme_dir' => 'theme_dir',
+			'index_compare_explode' => 'value LIKE \'%' . implode('\' OR value LIKE \'%', $indexes) . '\'',
+		))
+	);
+	$themes = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		// Find the right one.
+		foreach ($indexes as $index)
+			if (strpos($row['value'], $index) !== false)
+				$themes[$row['id_theme']] = $index;
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $themes;
+}
+
+/**
+ * Get a basic list of themes
+ * 
+ * @param array $themes
+ * @return array
+ */
+function getBasicThemeInfos($themes)
+{
+	global $smcFunc;
+
+	$themelist = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_theme, value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:no_member}
+			AND variable = {string:name}
+			AND id_theme IN ({array_int:theme_list})',
+		array(
+			'theme_list' => array_keys($themes),
+			'no_member' => 0,
+			'name' => 'name',
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$themelist[$themes[$row['id_theme']]] = $row['value'];
+
+	$smcFunc['db_free_result']($request);
+
+	return $themelist;
+}
+
+/**
+ * Gets a list of all themes from the database
+ * @return array $themes
+ */
+function getCustomThemes()
+{
+	global $smcFunc, $txt;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_theme, variable, value
+		FROM {db_prefix}themes
+		WHERE id_theme != {int:default_theme}
+			AND id_member = {int:no_member}
+			AND variable IN ({string:name}, {string:theme_dir})',
+		array(
+			'default_theme' => 1,
+			'no_member' => 0,
+			'name' => 'name',
+			'theme_dir' => 'theme_dir',
+		)
+	);
+	$themes = array(
+		1 => array(
+			'name' => $txt['dvc_default'],
+			'theme_dir' => $settings['default_theme_dir'],
+		),
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$themes[$row['id_theme']][$row['variable']] = $row['value'];
+	$smcFunc['db_free_result']($request);
+
+	return $themes;
+}
