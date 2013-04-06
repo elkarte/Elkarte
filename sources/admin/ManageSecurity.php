@@ -293,16 +293,16 @@ class ManageSecurity_Controller
 	{
 		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc;
 
+		// Generate a sample registration image.
+		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
+		$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+
 		// Let's try keep the spam to a minimum ah Thantos?
 		// initialize the form
 		$this->_initSpamSettingsForm();
 
 		// retrieve the current config settings
 		$config_vars = $this->_spamSettings->settings();
-
-		// Generate a sample registration image.
-		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
-		$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
 
 		// Load any question and answers!
 		$context['question_answers'] = array();
@@ -461,7 +461,7 @@ class ManageSecurity_Controller
 	 */
 	function _initSpamSettingsForm()
 	{
-		global $txt;
+		global $txt, $context;
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
