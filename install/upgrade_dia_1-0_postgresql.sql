@@ -260,6 +260,16 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
+--- Adding support for custom profile fields on memberlist
+/******************************************************************************/
+---# Adding new columns to boards...
+---{
+ALTER TABLE {$db_prefix}custom_fields
+ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0';
+---}
+---#
+
+/******************************************************************************/
 --- Adding new settings
 /******************************************************************************/
 ---# Adding new settings ...
