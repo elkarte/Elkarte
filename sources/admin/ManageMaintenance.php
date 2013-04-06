@@ -28,7 +28,7 @@ class ManageMaintenance_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $modSettings, $scripturl, $context, $options;
+		global $txt, $context;
 
 		// You absolutely must be an admin by here!
 		isAllowedTo('admin_forum');
@@ -119,7 +119,7 @@ class ManageMaintenance_Controller
 	 */
 	function action_database()
 	{
-		global $context, $db_type, $db_character_set, $modSettings, $smcFunc, $txt, $maintenance;
+		global $context, $db_type, $modSettings, $smcFunc, $txt, $maintenance;
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_database';
@@ -245,7 +245,7 @@ class ManageMaintenance_Controller
 	 */
 	function action_topics()
 	{
-		global $context, $smcFunc, $txt;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
 		// Let's load up the boards in case they are useful.
@@ -354,8 +354,8 @@ class ManageMaintenance_Controller
 	 */
 	function action_convertmsgbody_display()
 	{
-		global $scripturl, $context, $txt, $language, $db_character_set, $db_type;
-		global $modSettings, $user_info, $smcFunc, $db_prefix, $time_start;
+		global $scripturl, $context, $txt, $db_type;
+		global $modSettings, $smcFunc, $time_start;
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
@@ -495,7 +495,7 @@ class ManageMaintenance_Controller
 	 */
 	function action_optimize_display()
 	{
-		global $db_type, $db_name, $db_prefix, $txt, $context, $scripturl, $smcFunc;
+		global $db_type, $db_prefix, $txt, $context, $smcFunc;
 
 		isAllowedTo('admin_forum');
 
@@ -570,7 +570,7 @@ class ManageMaintenance_Controller
 	 */
 	function action_recount_display()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 		global $time_start, $smcFunc;
 
 		isAllowedTo('admin_forum');
@@ -1260,8 +1260,6 @@ class ManageMaintenance_Controller
 	 */
 	function action_pruneold_display()
 	{
-		global $context, $txt;
-
 		validateToken('admin-maint');
 
 		require_once(SUBSDIR . '/Topic.subs.php');
