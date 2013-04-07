@@ -314,7 +314,7 @@ function updateProfileField($field_data)
 			enclose = {string:enclose}, placement = {int:placement}
 		WHERE id_field = {int:current_field}',
 		array(
-			'field_length' => $$field_data['field_length'],
+			'field_length' => $field_data['field_length'],
 			'show_reg' => $field_data['show_reg'],
 			'show_display' => $field_data['show_display'],
 			'show_memberlist' => $field_data['show_memberlist'],
@@ -329,7 +329,7 @@ function updateProfileField($field_data)
 			'field_options' => $field_data['field_options'],
 			'show_profile' => $field_data['show_profile'],
 			'default_value' => $field_data['default_value'],
-			'mask' => $field_data['maks'],
+			'mask' => $field_data['mask'],
 			'enclose' => $field_data['enclose'],
 			'placement' => $field_data['placement'],
 		)
