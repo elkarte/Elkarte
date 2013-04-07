@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
 
 /**
  * get the last id_member
- * 
+ *
  * @return int
  */
 function getMaxMember()
@@ -434,14 +434,14 @@ function deleteProfileFieldUserData($name)
 function deleteProfileField($id)
 {
 	global $smcFunc;
-	
+
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
 			'current_field' => $id,
 		)
-	);	
+	);
 }
 
 /**

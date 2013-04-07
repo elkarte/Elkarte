@@ -4140,7 +4140,7 @@ function entity_fix__callback($matches)
 }
 
 /**
- * Retrieve additional search engines, if there are any,as an array.
+ * Retrieve additional search engines, if there are any, as an array.
  *
  * @return array array of engines
 */
