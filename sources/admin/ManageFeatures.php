@@ -1167,11 +1167,24 @@ class ManageFeatures_Controller
 			else
 			{
 				$new_field = array(
-					$colname, $_POST['field_name'], $_POST['field_desc'],
-					$_POST['field_type'], $field_length, $field_options,
-					$show_reg, $show_display, $show_memberlist, $show_profile,
-					$private, $active, $default, $can_search,
-					$bbc, $mask, $enclose, $placement
+					'col_name' => $colname,
+					'field_name' => $_POST['field_name'],
+					'field_desc' => $_POST['field_desc'],
+					'field_type' => $_POST['field_type'],
+					'field_length' => $field_length,
+					'field_options' => $field_options,
+					'show_reg' => $show_reg,
+					'show_display' => $show_display,
+					'show_memberlist' => $show_memberlist,
+					'show_profile' => $show_profile,
+					'private' => $private,
+					'active' => $active,
+					'default' => $default,
+					'can_search' => $can_search,
+					'bbc' => $bbc,
+					'mask' => $mask,
+					'enclose' => $enclose,
+					'placement' => $placement
 				);
 				addProfileField($new_field);
 			}
