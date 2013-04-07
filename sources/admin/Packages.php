@@ -122,7 +122,9 @@ class Packages_Controller
 		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
+		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Load up the package FTP information?
 		create_chmod_control();
@@ -189,22 +191,7 @@ class Packages_Controller
 			fatal_lang_error('no_access', false);
 
 		// Load up any custom themes we may want to install into...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'known_theme_list' => explode(',', $modSettings['knownThemes']),
-				'default_theme' => 1,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID();
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
@@ -852,22 +839,7 @@ class Packages_Controller
 		}
 
 		// Now load up the paths of the themes that we need to know about.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE id_theme IN ({array_int:custom_themes})
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'custom_themes' => $custom_themes,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		$themes_installed = array(1);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID($custom_themes);
 
 		// Are there any theme copying that we want to take place?
 		$context['theme_copies'] = array(
@@ -1605,6 +1577,7 @@ class Packages_Controller
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . 'Themes.subs.php');
 
 		// Uninstalling the mod?
 		$reverse = isset($_REQUEST['reverse']) ? true : false;
@@ -1637,22 +1610,7 @@ class Packages_Controller
 		}
 
 		// Load up any custom themes we may want to install into...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'known_theme_list' => explode(',', $modSettings['knownThemes']),
-				'default_theme' => 1,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID();
 
 		// Boardmod?
 		if (isset($_REQUEST['boardmod']))
@@ -1874,23 +1832,16 @@ class Packages_Controller
 		}
 
 		// Load up any custom themes.
-		$request = $smcFunc['db_query']('', '
-			SELECT value
-			FROM {db_prefix}themes
-			WHERE id_theme > {int:default_theme_id}
-				AND id_member = {int:guest_id}
-				AND variable = {string:theme_dir}
-			ORDER BY value ASC',
-			array(
-				'default_theme_id' => 1,
-				'guest_id' => 0,
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$themes = getCustomThemes();
+		foreach ($themes as $id => $theme)
 		{
-			if (substr(strtolower(strtr($row['value'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) == strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
-				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($row['value'], strlen(BOARDDIR) + 8)] = array(
+			// Skip the default
+			if ($id == 1)
+				continue;
+
+			if (substr(strtolower(strtr($theme['theme_dir'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) === strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
+				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($theme['theme_dir'], strlen(BOARDDIR) + 8)] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
 					'contents' => array(
@@ -1902,7 +1853,7 @@ class Packages_Controller
 				);
 			else
 			{
-				$context['file_tree'][strtr($row['value'], array('\\' => '/'))] = array(
+				$context['file_tree'][strtr($theme['theme_dir'], array('\\' => '/'))] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
 					'contents' => array(
@@ -1914,7 +1865,6 @@ class Packages_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($_POST['action_changes']))
