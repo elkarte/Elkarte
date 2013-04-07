@@ -1276,22 +1276,15 @@ function reapplySubscriptions($users)
 
 	// Get all the members current groups.
 	$groups = array();
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, id_group, additional_groups
-		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:user_list})',
-		array(
-			'user_list' => $users,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	require_once(SUBSDIR . '/Members.subs.php');
+	$members = getBasicMemberData($users, array('moderation' => true));
+	foreach ($members as $row)
 	{
 		$groups[$row['id_member']] = array(
 			'primary' => $row['id_group'],
 			'additional' => explode(',', $row['additional_groups']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
 
 	$request = $smcFunc['db_query']('', '
 		SELECT ls.id_member, ls.old_id_group, s.id_group, s.add_groups
@@ -1437,24 +1430,12 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	$smcFunc['db_free_result']($request);
 
 	// If we're here, that means we don't have an active subscription - that means we need to do some work!
-	$request = $smcFunc['db_query']('', '
-		SELECT m.id_group, m.additional_groups
-		FROM {db_prefix}members AS m
-		WHERE m.id_member = {int:current_member}',
-		array(
-			'current_member' => $id_member,
-		)
-	);
-	// Just in case the member doesn't exist.
-	if ($smcFunc['db_num_rows']($request) == 0)
-		return;
-
-	list ($old_id_group, $additional_groups) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$member = getBasicMemberData($id_member, array('moderation' => true));
 
 	// Prepare additional groups.
 	$newAddGroups = explode(',', $curSub['add_groups']);
-	$curAddGroups = explode(',', $additional_groups);
+	$curAddGroups = explode(',', $member['additional_groups']);
 
 	$newAddGroups = array_merge($newAddGroups, $curAddGroups);
 
@@ -1464,11 +1445,11 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 		$id_group = $curSub['prim_group'];
 
 		// Ensure their old privileges are maintained.
-		if ($old_id_group != 0)
-			$newAddGroups[] = $old_id_group;
+		if ($member['id_group'] != 0)
+			$newAddGroups[] = $member['id_group'];
 	}
 	else
-		$id_group = $old_id_group;
+		$id_group = $member['id_group'];
 
 	// Yep, make sure it's unique, and no empties.
 	foreach ($newAddGroups as $k => $v)
@@ -1526,7 +1507,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 			array(
 				'start_time' => $starttime,
 				'end_time' => $endtime,
-				'old_id_group' => $old_id_group,
+				'old_id_group' => $member['id_group'],
 				'is_active' => 1,
 				'no_reminder_sent' => 0,
 				'current_subscription_item' => $id_sublog,
@@ -1554,7 +1535,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 			'end_time' => 'int', 'status' => 'int', 'pending_details' => 'string',
 		),
 		array(
-			$id_subscribe, $id_member, $old_id_group, $starttime,
+			$id_subscribe, $id_member, $member['id_group'], $starttime,
 			$endtime, 1, '',
 		),
 		array('id_sublog')
@@ -1575,17 +1556,11 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	loadSubscriptions();
 
 	// Load the user core bits.
-	$request = $smcFunc['db_query']('', '
-		SELECT m.id_group, m.additional_groups
-		FROM {db_prefix}members AS m
-		WHERE m.id_member = {int:current_member}',
-		array(
-			'current_member' => $id_member,
-		)
-	);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$member_info = getBasicMemberData($id_member, array('moderation' => true));
 
 	// Just in case of errors.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if (empty($member_info))
 	{
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_subscribed
@@ -1596,8 +1571,6 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 		);
 		return;
 	}
-	list ($id_group, $additional_groups) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Get all of the subscriptions for this user that are active - it will be necessary!
 	$request = $smcFunc['db_query']('', '
@@ -1614,7 +1587,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	// These variables will be handy, honest ;)
 	$removals = array();
 	$allowed = array();
-	$old_id_group = 0;
+	$member['id_group'] = 0;
 	$new_id_group = -1;
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1627,7 +1600,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 			$removals = explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']);
 			if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
 				$removals[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
-			$old_id_group = $row['old_id_group'];
+			$member['id_group'] = $row['old_id_group'];
 		}
 		// Otherwise things we allow.
 		else
@@ -1643,17 +1616,17 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	$smcFunc['db_free_result']($request);
 
 	// Now, for everything we are removing check they defintely are not allowed it.
-	$existingGroups = explode(',', $additional_groups);
+	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
 		if (empty($group) || (in_array($group, $removals) && !in_array($group, $allowed)))
 			unset($existingGroups[$key]);
 
 	// Finally, do something with the current primary group.
-	if (in_array($id_group, $removals))
+	if (in_array($member_info['id_group'], $removals))
 	{
 		// If this primary group is actually allowed keep it.
-		if (in_array($id_group, $allowed))
-			$existingGroups[] = $id_group;
+		if (in_array($member_info['id_group'], $allowed))
+			$existingGroups[] = $member_info['id_group'];
 
 		// Either way, change the id_group back.
 		if ($new_id_group < 1)
@@ -1661,13 +1634,13 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 			// If we revert to the old id-group we need to ensure it wasn't from a subscription.
 			foreach ($context['subscriptions'] as $id => $group)
 				// It was? Make them a regular member then!
-				if ($group['prim_group'] == $old_id_group)
-					$old_id_group = 0;
+				if ($group['prim_group'] == $member['id_group'])
+					$member['id_group'] = 0;
 
-			$id_group = $old_id_group;
+			$member_info['id_group'] = $member['id_group'];
 		}
 		else
-			$id_group = $new_id_group;
+			$member_info['id_group'] = $new_id_group;
 	}
 
 	// Crazy stuff, we seem to have our groups fixed, just make them unique
@@ -1680,7 +1653,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 		SET id_group = {int:primary_group}, additional_groups = {string:existing_groups}
 		WHERE id_member = {int:current_member}',
 		array(
-			'primary_group' => $id_group,
+			'primary_group' => $member_info['id_group'],
 			'current_member' => $id_member,
 			'existing_groups' => $existingGroups,
 		)

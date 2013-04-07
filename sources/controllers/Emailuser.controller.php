@@ -451,21 +451,14 @@ function action_reporttm2()
 	// Get a list of members with the moderate_board permission.
 	require_once(SUBSDIR . '/Members.subs.php');
 	$moderators = membersAllowedTo('moderate_board', $board);
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, email_address, lngfile, mod_prefs
-		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:moderator_list})
-			AND notify_types != {int:notify_types}
-		ORDER BY lngfile',
-		array(
-			'moderator_list' => $moderators,
-			'notify_types' => 4,
-		)
-	);
+	$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+	$mod_to_notify = array();
+	foreach ($result as $row)
+		if ($row['notify_types'] != 4)
+			$mod_to_notify[] = $row;
 
 	// Check that moderators do exist!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if (empty($mod_to_notify))
 		fatal_lang_error('no_mods', false);
 
 	// If we get here, I believe we should make a record of this, for historical significance, yabber.
@@ -557,7 +550,7 @@ function action_reporttm2()
 	$smcFunc['db_free_result']($request2);
 
 	// Send every moderator an email.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($mod_to_notify as $row)
 	{
 		// Maybe they don't want to know?!
 		if (!empty($row['mod_prefs']))

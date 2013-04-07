@@ -747,7 +747,7 @@ class Reports_Controller
 		// Get each member!
 		require_once(SUBSDIR . '/Members.subs.php');
 		// Get the latest activated member's display name.
-		$result = getBasicMemberData($allStaff, array('sort' => 'real_name'));
+		$result = getBasicMemberData($allStaff, array('moderation' => true, 'sort' => 'real_name'));
 		foreach ($result as $row)
 		{
 			// Each member gets their own table!.

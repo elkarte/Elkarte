@@ -890,19 +890,10 @@ class ManageMembergroups_Controller
 					$group_moderators = array();
 					if (!empty($moderators))
 					{
-						$request = $smcFunc['db_query']('', '
-							SELECT id_member
-							FROM {db_prefix}members
-							WHERE id_member IN ({array_int:moderators})
-							LIMIT {int:num_moderators}',
-							array(
-								'moderators' => $moderators,
-								'num_moderators' => count($moderators),
-							)
-						);
-						while ($row = $smcFunc['db_fetch_assoc']($request))
+						require_once(SUBSDIR . '/Members.subs.php');
+						$result = getBasicMemberData($moderators);
+						foreach ($result as $row)
 							$group_moderators[] = $row['id_member'];
-						$smcFunc['db_free_result']($request);
 					}
 				}
 

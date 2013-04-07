@@ -1044,19 +1044,11 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	// Get any member names.
 	if (!empty($members))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:members})',
-			array(
-				'members' => $members,
-			)
-		);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($members);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		foreach ($result as $row)
 			$members[$row['id_member']] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
 
 		foreach ($edits as $key => $value)
 			if (isset($members[$value['id_member']]))

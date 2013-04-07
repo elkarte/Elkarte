@@ -1100,17 +1100,10 @@ class Themes_Controller
 		{
 			$context['current_member'] = (int) $_REQUEST['u'];
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_theme
-				FROM {db_prefix}members
-				WHERE id_member = {int:current_member}
-				LIMIT 1',
-				array(
-					'current_member' => $context['current_member'],
-				)
-			);
-			list ($context['current_theme']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Members.subs.php');
+			$member = getBasicMemberData($context['current_member']);
+
+			$context['current_theme']) = $member['id_theme'];
 		}
 
 		// Get the theme name and descriptions.

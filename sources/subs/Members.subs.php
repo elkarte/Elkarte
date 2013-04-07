@@ -1444,8 +1444,12 @@ function admins($id_admin = 0)
  * @param mixed $member_ids an array of member IDs or a single ID
  * @param array $options an array of possible little alternatives, can be:
  *                - 'add_guest' (set or not) to add a guest user to the returned array
+ *                - 'limit' int if set overrides the default query limit
  *                - 'sort' (string) a column to sort the results
- *                - 'identification' (set or not) includes secret_answer/question and openid_uri
+ *                - 'moderation' (set or not) includes member_ip, id_group, additional_groups, last_login
+ *                - 'authentication' (set or not) includes secret_answer, secret_question, openid_uri,
+ *                                                         is_activated, validation_code, passwd_flood
+ *                - 'preferences' (set or not) includes lngfile, mod_prefs, notify_types, signature
  * @return array
  */
 function getBasicMemberData($member_ids, $options = array())
@@ -1477,15 +1481,17 @@ function getBasicMemberData($member_ids, $options = array())
 
 	// Get some additional member info...
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, member_name, real_name, member_ip, email_address, hide_email, id_group, lngfile,
-			posts, last_login' . (isset($options['identification']) ? ', secret_answer, secret_question, openid_uri' : '') . '
+		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (isset($options['moderation']) ? ',
+		member_ip, id_group, additional_groups, last_login' : '') . (isset($options['authentication']) ? ',
+		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (isset($options['preferences']) ? ',
+		lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
 		LIMIT {int:limit}' . (isset($options['sort']) ? '
 		ORDER BY {string:sort}' : ''),
 		array(
 			'member_list' => $member_ids,
-			'limit' => count($member_ids),
+			'limit' => isset($options['limit']) ? $options['limit'] : count($member_ids),
 			'sort' => isset($options['sort']) ? $options['sort'] : '',
 		)
 	);

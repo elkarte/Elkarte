@@ -932,7 +932,7 @@ function getMemberData($id)
 
 	$suggestions = array();
 	require_once(SUBSDIR . '/Members.subs.php');
-	$result = getBasicMemberData($id);
+	$result = getBasicMemberData($id, array('moderation' => true));
 	if (!empty($result))
 		$suggestions = array(
 			'member' => array(

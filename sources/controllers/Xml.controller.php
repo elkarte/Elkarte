@@ -322,21 +322,12 @@ function action_sig_preview()
 	$errors = array();
 	if (!empty($user) && $can_change)
 	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		// Get the current signature
-		$request = $smcFunc['db_query']('', '
-			SELECT signature
-			FROM {db_prefix}members
-			WHERE id_member = {int:id_member}
-			LIMIT 1',
-			array(
-				'id_member' => $user,
-			)
-		);
-		list($current_signature) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$member = getBasicMemberData($user, array('preferences' => true));
 
-		censorText($current_signature);
-		$current_signature = parse_bbc($current_signature, true, 'sig' . $user);
+		censorText($member['signature']);
+		$member['signature'] = parse_bbc($member['signature'], true, 'sig' . $user);
 
 		// And now what they want it to be
 		$preview_signature = !empty($_POST['signature']) ? $_POST['signature'] : '';
@@ -366,9 +357,9 @@ function action_sig_preview()
 		'children' => array()
 	);
 
-	if (isset($current_signature))
+	if (isset($member['signature']))
 		$context['xml_data']['signatures']['children'][] = array(
-			'value' => $current_signature,
+			'value' => $member['signature'],
 			'attributes' => array('type' => 'current'),
 		);
 
