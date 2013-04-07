@@ -593,16 +593,10 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($members))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT real_name, id_member
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:member_list})
-			LIMIT ' . count(array_keys($members)),
-			array(
-				'member_list' => array_keys($members),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData(array_keys($members));
+		foreach ($result as $row)
 		{
 			foreach ($members[$row['id_member']] as $action)
 			{
@@ -617,7 +611,6 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				$entries[$action]['extra']['member'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Do some formatting of the action string.

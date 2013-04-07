@@ -221,57 +221,43 @@ function action_setpassword2()
 	loadLanguage('Login');
 
 	// Get the code as it should be from the database.
-	$request = $smcFunc['db_query']('', '
-		SELECT validation_code, member_name, email_address, passwd_flood
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-			AND is_activated = {int:is_activated}
-			AND validation_code != {string:blank_string}
-		LIMIT 1',
-		array(
-			'id_member' => $_POST['u'],
-			'is_activated' => 1,
-			'blank_string' => '',
-		)
-	);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$member = getBasicMemberData((int) $_POST['u'], array('authentication' => true));
 
-	// Does this user exist at all?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	// Does this user exist at all? Is he activated? Does he have a validation code?
+	if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] == '')
 		fatal_lang_error('invalid_userid', false);
-
-	list ($realCode, $username, $email, $flood_value) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Is the password actually valid?
 	require_once(SUBSDIR . '/Auth.subs.php');
-	$passwordError = validatePassword($_POST['passwrd1'], $username, array($email));
+	$passwordError = validatePassword($_POST['passwrd1'], $member['member_name'], array($member['email_address']));
 
 	// What - it's not?
 	if ($passwordError != null)
 		fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 	// Quit if this code is not right.
-	if (empty($_POST['code']) || substr($realCode, 0, 10) !== substr(md5($_POST['code']), 0, 10))
+	if (empty($_POST['code']) || substr($member['validation_code'], 0, 10) !== substr(md5($_POST['code']), 0, 10))
 	{
 		// Stop brute force attacks like this.
-		validatePasswordFlood($_POST['u'], $flood_value, false);
+		validatePasswordFlood($_POST['u'], $member['passwd_flood'], false);
 
 		fatal_error($txt['invalid_activation_code'], false);
 	}
 
 	// Just in case, flood control.
-	validatePasswordFlood($_POST['u'], $flood_value, true);
+	validatePasswordFlood($_POST['u'], $member['passwd_flood'], true);
 
 	// User validated.  Update the database!
-	updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => sha1(strtolower($username) . $_POST['passwrd1'])));
+	updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => sha1(strtolower($member['member_name']) . $_POST['passwrd1'])));
 
-	call_integration_hook('integrate_reset_pass', array($username, $username, $_POST['passwrd1']));
+	call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
 
 	loadTemplate('Login');
 	$context += array(
 		'page_title' => $txt['reminder_password_set'],
 		'sub_template' => 'login',
-		'default_username' => $username,
+		'default_username' => $member['member_name'],
 		'default_password' => $_POST['passwrd1'],
 		'never_expire' => false,
 		'description' => $txt['reminder_password_set']
@@ -296,20 +282,10 @@ function SecretAnswerInput()
 		fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name, member_name, secret_question, openid_uri
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-		LIMIT 1',
-		array(
-			'id_member' => (int) $_REQUEST['uid'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Members.subs.php');
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
+	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
-
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	$context['account_type'] = !empty($row['openid_uri']) ? 'openid' : 'password';
 
@@ -344,20 +320,10 @@ function action_secret2()
 	loadLanguage('Login');
 
 	// Get the information from the database.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name, member_name, secret_answer, secret_question, openid_uri, email_address
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-		LIMIT 1',
-		array(
-			'id_member' => $_REQUEST['uid'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Members.subs.php');
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
+	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
-
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Check if the secret answer is correct.
 	if ($row['secret_question'] == '' || $row['secret_answer'] == '' || md5($_POST['secret_answer']) !== $row['secret_answer'])

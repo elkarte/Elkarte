@@ -255,18 +255,11 @@ function action_trackactivity($memID)
 		// Fetch their names, cause of the GROUP BY doesn't like giving us that normally.
 		if (!empty($message_members))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:message_members})',
-				array(
-					'message_members' => $message_members,
-					'ip_list' => $ips,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			require_once(SUBSDIR . '/Members.subs.php');
+			// Get the latest activated member's display name.
+			$result = getBasicMemberData($message_members);
+			foreach ($result as $row)
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-			$smcFunc['db_free_result']($request);
 		}
 
 		$request = $smcFunc['db_query']('', '
@@ -1051,19 +1044,11 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	// Get any member names.
 	if (!empty($members))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:members})',
-			array(
-				'members' => $members,
-			)
-		);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($members);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		foreach ($result as $row)
 			$members[$row['id_member']] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
 
 		foreach ($edits as $key => $value)
 			if (isset($members[$value['id_member']]))

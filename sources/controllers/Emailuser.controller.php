@@ -158,21 +158,16 @@ function action_email()
 	$context['form_hidden_vars'] = array();
 	if (isset($_REQUEST['uid']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT email_address AS email, real_name AS name, id_member, hide_email
-			FROM {db_prefix}members
-			WHERE id_member = {int:id_member}',
-			array(
-				'id_member' => (int) $_REQUEST['uid'],
-			)
-		);
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$row = getBasicMemberData((int) $_REQUEST['uid']);
 
 		$context['form_hidden_vars']['uid'] = (int) $_REQUEST['uid'];
 	}
 	elseif (isset($_REQUEST['msg']))
 	{
 		$request = $smcFunc['db_query']('', '
-			SELECT IFNULL(mem.email_address, m.poster_email) AS email, IFNULL(mem.real_name, m.poster_name) AS name, IFNULL(mem.id_member, 0) AS id_member, hide_email
+			SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			WHERE m.id_msg = {int:id_msg}',
@@ -180,6 +175,8 @@ function action_email()
 				'id_msg' => (int) $_REQUEST['msg'],
 			)
 		);
+		$row = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
 
 		$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 	}
@@ -187,11 +184,8 @@ function action_email()
 	if (empty($request) || $smcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('cant_find_user_email');
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
-
 	// Are you sure you got the address?
-	if (empty($row['email']))
+	if (empty($row['email_address']))
 		fatal_lang_error('cant_find_user_email');
 
 	// Can they actually do this?
@@ -202,10 +196,10 @@ function action_email()
 	// Setup the context!
 	$context['recipient'] = array(
 		'id' => $row['id_member'],
-		'name' => $row['name'],
-		'email' => $row['email'],
-		'email_link' => ($context['show_email_address'] == 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email'] . '">' . $row['email'] . '</a>' . ($context['show_email_address'] == 'yes_permission_override' ? '</em>' : ''),
-		'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['name'] . '</a>' : $row['name'],
+		'name' => $row['real_name'],
+		'email' => $row['email_address'],
+		'email_link' => ($context['show_email_address'] == 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email_address'] . '">' . $row['email_address'] . '</a>' . ($context['show_email_address'] == 'yes_permission_override' ? '</em>' : ''),
+		'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>' : $row['real_name'],
 	);
 
 	// Can we see this person's email address?
@@ -457,21 +451,14 @@ function action_reporttm2()
 	// Get a list of members with the moderate_board permission.
 	require_once(SUBSDIR . '/Members.subs.php');
 	$moderators = membersAllowedTo('moderate_board', $board);
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, email_address, lngfile, mod_prefs
-		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:moderator_list})
-			AND notify_types != {int:notify_types}
-		ORDER BY lngfile',
-		array(
-			'moderator_list' => $moderators,
-			'notify_types' => 4,
-		)
-	);
+	$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+	$mod_to_notify = array();
+	foreach ($result as $row)
+		if ($row['notify_types'] != 4)
+			$mod_to_notify[] = $row;
 
 	// Check that moderators do exist!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if (empty($mod_to_notify))
 		fatal_lang_error('no_mods', false);
 
 	// If we get here, I believe we should make a record of this, for historical significance, yabber.
@@ -563,7 +550,7 @@ function action_reporttm2()
 	$smcFunc['db_free_result']($request2);
 
 	// Send every moderator an email.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($mod_to_notify as $row)
 	{
 		// Maybe they don't want to know?!
 		if (!empty($row['mod_prefs']))

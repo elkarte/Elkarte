@@ -80,18 +80,10 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
 			$smcFunc['db_free_result']($result);
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			// Get the latest activated member's display name.
-			$result = $smcFunc['db_query']('', '
-				SELECT real_name
-				FROM {db_prefix}members
-				WHERE id_member = {int:id_member}
-				LIMIT 1',
-				array(
-					'id_member' => (int) $changes['latestMember'],
-				)
-			);
-			list ($changes['latestRealName']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$result = getBasicMemberData((int) $changes['latestMember']);
+			$changes['latestRealName'] = $result['real_name'];
 
 			// Are we using registration approval?
 			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))

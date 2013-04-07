@@ -1115,27 +1115,18 @@ function action_sendmessage()
 		}
 		else
 		{
-			$_REQUEST['u'] = explode(',', $_REQUEST['u']);
-			foreach ($_REQUEST['u'] as $key => $uID)
-				$_REQUEST['u'][$key] = (int) $uID;
+			$users = array_map('intval', explode(',', $_REQUEST['u']));
+			$users = array_unique($users);
 
-			$_REQUEST['u'] = array_unique($_REQUEST['u']);
+			require_once(SUBSDIR . '/Members.subs.php');
+			// Get the latest activated member's display name.
+			$result = getBasicMemberData($users);
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, real_name
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:member_list})
-				LIMIT ' . count($_REQUEST['u']),
-				array(
-					'member_list' => $_REQUEST['u'],
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			foreach ($result as $row)
 				$context['recipients']['to'][] = array(
 					'id' => $row['id_member'],
 					'name' => $row['real_name'],
 				);
-			$smcFunc['db_free_result']($request);
 		}
 
 		// Get a literal name list in case the user has JavaScript disabled.
@@ -1253,15 +1244,10 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	{
 		$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:member_list})',
-			array(
-				'member_list' => $allRecipients,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData($allRecipients);
+		foreach ($result as $row)
 		{
 			$recipientType = in_array($row['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
 			$context['recipients'][$recipientType][] = array(
@@ -1269,7 +1255,6 @@ function messagePostError($named_recipients, $recipient_ids = array())
 				'name' => $row['real_name'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Set everything up like before....
@@ -2421,17 +2406,10 @@ function action_messagerules()
 
 			if (!empty($members))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member, member_name
-					FROM {db_prefix}members
-					WHERE id_member IN ({array_int:member_list})',
-					array(
-						'member_list' => array_keys($members),
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				require_once(SUBSDIR . '/Members.subs.php');
+				$result = getBasicMemberData(array_keys($members));
+				foreach ($result as $row)
 					$context['rule']['criteria'][$members[$row['id_member']]]['v'] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
 			}
 		}
 		else

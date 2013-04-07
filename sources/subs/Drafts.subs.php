@@ -344,22 +344,15 @@ function draftsRecipients($allRecipients, $recipient_ids)
 		'bcc' => array(),
 	);
 
+	require_once(SUBSDIR . '/Members.subs.php');
 	// get all the member names that this PM is goign to
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name
-		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:member_list})',
-		array(
-			'member_list' => $allRecipients,
-		)
-	);
-	while ($result = $smcFunc['db_fetch_assoc']($request))
+	$results = getBasicMemberData($allRecipients);
+	foreach ($results as $result)
 	{
 		// load the to/bcc name array
 		$recipientType = in_array($result['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
 		$recipients[$recipientType][] = $result['real_name'];
 	}
-	$smcFunc['db_free_result']($request);
 
 	return $recipients;
 }
