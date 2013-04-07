@@ -208,33 +208,14 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// See if it is installed?
-		$request = $smcFunc['db_query']('', '
-			SELECT version, themes_installed, db_changes
-			FROM {db_prefix}log_packages
-			WHERE package_id = {string:current_package}
-				AND install_state != {int:not_installed}
-			ORDER BY time_installed DESC
-			LIMIT 1',
-			array(
-				'not_installed'	=> 0,
-				'current_package' => $packageInfo['id'],
-			)
-		);
-
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$old_themes = explode(',', $row['themes_installed']);
-			$old_version = $row['version'];
-			$db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-		}
-		$smcFunc['db_free_result']($request);
+		$package_installed = isPackageInsalled($packageInfo['id']);
 
 		$context['database_changes'] = array();
 		if (isset($packageInfo['uninstall']['database']))
 			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		elseif (!empty($db_changes))
+		elseif (!empty($package_installed['db_changes']))
 		{
-			foreach ($db_changes as $change)
+			foreach ($package_installed['db_changes'] as $change)
 			{
 				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
 					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
@@ -249,7 +230,7 @@ class Packages_Controller
 		if ($context['uninstalling'])
 		{
 			// Wait, it's not installed yet!
-			if (!isset($old_version) && $context['uninstalling'])
+			if (!isset($package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
 				fatal_lang_error('package_cant_uninstall', false);
@@ -269,13 +250,15 @@ class Packages_Controller
 
 			// Only let them uninstall themes it was installed into.
 			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $old_themes))
+			{
+				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 					unset($theme_paths[$id]);
+			}
 		}
-		elseif (isset($old_version) && $old_version != $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $old_version);
+			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($actions))
@@ -284,14 +267,16 @@ class Packages_Controller
 			{
 				// Otherwise they can only upgrade themes from the first time around.
 				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $old_themes))
+				{
+					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 						unset($theme_paths[$id]);
+				}
 			}
 		}
-		elseif (isset($old_version) && $old_version == $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
 			$context['is_installed'] = true;
 
-		if (!isset($old_version) || $context['is_installed'])
+		if (!isset($package_installed['old_version']) || $context['is_installed'])
 			$actions = parsePackageInfo($packageInfo['xml'], true, 'install');
 
 		$context['actions'] = array();
@@ -541,8 +526,8 @@ class Packages_Controller
 			}
 			elseif ($action['type'] == 'requires')
 			{
-				$installed = false;
-				$version = true;
+				$installed_version = false;
+				$version_check = true;
 
 				// package missing required values?
 				if (!isset($action['id']))
@@ -550,31 +535,15 @@ class Packages_Controller
 				else
 				{
 					// See if this dependancy is installed
-					$request = $smcFunc['db_query']('', '
-						SELECT version
-						FROM {db_prefix}log_packages
-						WHERE package_id = {string:current_package}
-							AND install_state != {int:not_installed}
-						ORDER BY time_installed DESC
-						LIMIT 1',
-						array(
-							'not_installed'	=> 0,
-							'current_package' => $action['id'],
-						)
-					);
-					$installed = ($smcFunc['db_num_rows']($request) !== 0);
-					if ($installed)
-						list($version) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$installed_version = checkPackageDependancy();
 
-					// do a version level check (if requested) in the most basic way
-					$version = (isset($action['version']) ? $version == $action['version'] : true);
+					// Do a version level check (if requested) in the most basic way
+					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
 				}
 
 				// Set success or failure information
-				$action['description'] = ($installed && $version) ? $txt['package_action_success'] : $txt['package_action_failure'];
-				$context['has_failure'] = !($installed && $version);
-
+				$action['description'] = ($installed_version && $version_check) ? $txt['package_action_success'] : $txt['package_action_failure'];
+				$context['has_failure'] = !($installed_version && $version_check);
 				$thisAction = array(
 					'type' => $txt['package_requires'],
 					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
@@ -883,29 +852,11 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// Is it actually installed?
-		$request = $smcFunc['db_query']('', '
-			SELECT version, themes_installed, db_changes
-			FROM {db_prefix}log_packages
-			WHERE package_id = {string:current_package}
-				AND install_state != {int:not_installed}
-			ORDER BY time_installed DESC
-			LIMIT 1',
-			array(
-				'not_installed'	=> 0,
-				'current_package' => $packageInfo['id'],
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$old_themes = explode(',', $row['themes_installed']);
-			$old_version = $row['version'];
-			$db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-		}
-		$smcFunc['db_free_result']($request);
+		$package_installed = isPackageInsalled($packageInfo['id']);
 
 		// Wait, it's not installed yet!
 		// @todo Replace with a better error message!
-		if (!isset($old_version) && $context['uninstalling'])
+		if (!isset($package_installed['old_version']) && $context['uninstalling'])
 		{
 			deltree(BOARDDIR . '/packages/temp');
 			fatal_error('Hacker?', false);
@@ -921,13 +872,13 @@ class Packages_Controller
 
 			// They can only uninstall from what it was originally installed into.
 			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $old_themes))
+				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 					unset($theme_paths[$id]);
 		}
-		elseif (isset($old_version) && $old_version != $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $old_version);
+			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($install_log))
@@ -936,14 +887,14 @@ class Packages_Controller
 			{
 				// Upgrade previous themes only!
 				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $old_themes))
+					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 						unset($theme_paths[$id]);
 			}
 		}
-		elseif (isset($old_version) && $old_version == $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
 			$context['is_installed'] = true;
 
-		if (!isset($old_version) || $context['is_installed'])
+		if (!isset($package_installed['old_version']) || $context['is_installed'])
 			$install_log = parsePackageInfo($packageInfo['xml'], false, 'install');
 
 		$context['install_finished'] = false;
@@ -1045,56 +996,14 @@ class Packages_Controller
 			package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 			// See if this is already installed, and change it's state as required.
-			$request = $smcFunc['db_query']('', '
-				SELECT package_id, install_state, db_changes
-				FROM {db_prefix}log_packages
-				WHERE install_state != {int:not_installed}
-					AND package_id = {string:current_package}
-					' . ($context['install_id'] ? ' AND id_install = {int:install_id} ' : '') . '
-				ORDER BY time_installed DESC
-				LIMIT 1',
-				array(
-					'not_installed' => 0,
-					'install_id' => $context['install_id'],
-					'current_package' => $packageInfo['id'],
-				)
-			);
-			$is_upgrade = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				// Uninstalling?
-				if ($context['uninstalling'])
-				{
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}log_packages
-						SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
-							time_removed = {int:current_time}
-						WHERE package_id = {string:package_id}
-							AND id_install = {int:install_id}',
-						array(
-							'current_member' => $user_info['id'],
-							'not_installed' => 0,
-							'current_time' => time(),
-							'package_id' => $row['package_id'],
-							'member_name' => $user_info['name'],
-							'install_id' => $context['install_id'],
-						)
-					);
-				}
-				// Otherwise must be an upgrade.
-				else
-				{
-					$is_upgrade = true;
-					$old_db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-				}
-			}
+			$package_state = setPackageState($packageInfo['id']);
 
 			// Assuming we're not uninstalling, add the entry.
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
-				if (!empty($old_db_changes))
-					$db_package_log = empty($db_package_log) ? $old_db_changes : array_merge($old_db_changes, $db_package_log);
+				if (!empty($package_state['old_db_changes']))
+					$db_package_log = empty($db_package_log) ? $package_state['old_db_changes'] : array_merge($package_state['old_db_changes'], $db_package_log);
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
@@ -1124,10 +1033,10 @@ class Packages_Controller
 						elseif (in_array($log[1], $tables))
 							unset($db_package_log[$k]);
 					}
-					$db_changes = serialize($db_package_log);
+					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
-					$db_changes = '';
+					$package_installed['db_changes'] = '';
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($themes_installed);
@@ -1138,35 +1047,20 @@ class Packages_Controller
 
 				// Credits tag?
 				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_packages',
-					array(
-						'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
-						'id_member_installed' => 'int', 'member_installed' => 'string','time_installed' => 'int',
-						'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
-						'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
-					),
-					array(
-						$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
-						$user_info['id'], $user_info['name'], time(),
-						$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
-						0, $db_changes, $credits_tag,
-					),
-					array('id_install')
-				);
-			}
-			$smcFunc['db_free_result']($request);
 
+				// Add to the log packages
+				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $package_state['is_upgrade'], $credits_tag);
+			}
 			$context['install_finished'] = true;
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($db_changes) && !empty($_POST['do_db_changes']))
+		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
 		{
 			// We're gonna be needing the package db functions!
 			db_extend('packages');
 
-			foreach ($db_changes as $change)
+			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
 					$smcFunc['db_drop_table']($change[1]);
@@ -1182,7 +1076,7 @@ class Packages_Controller
 			deltree(BOARDDIR . '/packages/temp');
 
 		// Log what we just did.
-		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
+		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($package_state['is_upgrade']) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		clean_cache();
@@ -1306,13 +1200,7 @@ class Packages_Controller
 		package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 		// Set everything as uninstalled.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}log_packages
-			SET install_state = {int:not_installed}',
-			array(
-				'not_installed' => 0,
-			)
-		);
+		setPackagesAsUninstalled();
 
 		redirectexit('action=admin;area=packages;sa=installed');
 	}
