@@ -697,20 +697,11 @@ function action_coppa()
 		fatal_lang_error('no_access', false);
 
 	// Get the user details...
-	$request = $smcFunc['db_query']('', '
-		SELECT member_name
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-			AND is_activated = {int:is_coppa}',
-		array(
-			'id_member' => (int) $_GET['member'],
-			'is_coppa' => 5,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Members.subs.php');
+	$member = getBasicMemberData((int) $_GET['member'], array('authentication' => true));
+	// If doesn't exist or pending coppa
+	if (empty($member) || $member['is_activated'] == 5)
 		fatal_lang_error('no_access', false);
-	list ($username) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
 
 	if (isset($_GET['form']))
 	{
@@ -726,7 +717,7 @@ function action_coppa()
 			$context['template_layers'] = array();
 			$context['sub_template'] = 'coppa_form';
 			$context['page_title'] = $txt['coppa_form_title'];
-			$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $username), $txt['coppa_form_body']);
+			$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $member['member_name']), $txt['coppa_form_body']);
 		}
 		// Downloading.
 		else
@@ -735,7 +726,7 @@ function action_coppa()
 			$ul = '                ';
 			$crlf = "\r\n";
 			$data = $context['forum_contacts'] . $crlf . $txt['coppa_form_address'] . ':' . $crlf . $txt['coppa_form_date'] . ':' . $crlf . $crlf . $crlf . $txt['coppa_form_body'];
-			$data = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}', '<br>', '<br />'), array($ul, $ul, $username, $crlf, $crlf), $data);
+			$data = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}', '<br>', '<br />'), array($ul, $ul, $member['member_name'], $crlf, $crlf), $data);
 
 			// Send the headers.
 			header('Connection: close');

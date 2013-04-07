@@ -482,16 +482,9 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load member names for the profile.
 	if (!empty($profile_ids) && (allowedTo('profile_view_any') || allowedTo('profile_view_own')))
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:member_list})
-			LIMIT ' . count($profile_ids),
-			array(
-				'member_list' => array_keys($profile_ids),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData(array_keys($profile_ids));
+		foreach ($result as $row)
 		{
 			// If they aren't allowed to view this person's profile, skip it.
 			if (!allowedTo('profile_view_any') && $user_info['id'] != $row['id_member'])
@@ -501,7 +494,6 @@ function determineActions($urls, $preferred_prefix = false)
 			foreach ($profile_ids[$row['id_member']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_member'], $row['real_name']);
 		}
-		$smcFunc['db_free_result']($result);
 	}
 
 	if (!is_array($urls))

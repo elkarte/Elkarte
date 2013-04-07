@@ -28,6 +28,8 @@ require_once(ADMINDIR . '/ManagePaid.php');
 // For any admin emailing.
 require_once(SUBSDIR . '/Admin.subs.php');
 
+require_once(SUBSDIR . '/Members.subs.php');
+
 loadLanguage('ManagePaid');
 
 // If there's literally nothing coming in, let's take flight!
@@ -83,19 +85,10 @@ if (empty($member_id))
 	generateSubscriptionError($txt['paid_empty_member']);
 
 // Verify the member.
-$request = $smcFunc['db_query']('', '
-	SELECT id_member, member_name, real_name, email_address
-	FROM {db_prefix}members
-	WHERE id_member = {int:current_member}',
-	array(
-		'current_member' => $member_id,
-	)
-);
+$member_info = getBasicMemberData($member_id);
 // Didn't find them?
-if ($smcFunc['db_num_rows']($request) === 0)
+if (empty($member_info))
 	generateSubscriptionError(sprintf($txt['paid_could_not_find_member'], $member_id));
-$member_info = $smcFunc['db_fetch_assoc']($request);
-$smcFunc['db_free_result']($request);
 
 // Get the subscription details.
 $request = $smcFunc['db_query']('', '

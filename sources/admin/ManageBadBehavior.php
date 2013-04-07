@@ -93,7 +93,7 @@ class ManageBadBehavior_Controller
 		if (!empty($members))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$members = getBasicMemberData($members);
+			$members = getBasicMemberData($members, array('add_guest' => true));
 
 			// Go through each entry and add the member data.
 			foreach ($context['bb_entries'] as $id => $dummy)

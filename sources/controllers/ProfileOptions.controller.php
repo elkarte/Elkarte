@@ -151,20 +151,10 @@ function action_editBuddies($memID)
 
 	if (!empty($buddiesArray))
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT id_member
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:buddy_list})
-			ORDER BY real_name
-			LIMIT {int:buddy_list_count}',
-			array(
-				'buddy_list' => $buddiesArray,
-				'buddy_list_count' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1));
+		foreach ($result as $row)
 			$buddies[] = $row['id_member'];
-		$smcFunc['db_free_result']($result);
 	}
 
 	$context['buddy_count'] = count($buddies);
@@ -269,20 +259,10 @@ function action_editIgnoreList($memID)
 
 	if (!empty($ignoreArray))
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT id_member
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:ignore_list})
-			ORDER BY real_name
-			LIMIT {int:ignore_list_count}',
-			array(
-				'ignore_list' => $ignoreArray,
-				'ignore_list_count' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1);
+		foreach ($result as $row)
 			$ignored[] = $row['id_member'];
-		$smcFunc['db_free_result']($result);
 	}
 
 	$context['ignore_count'] = count($ignored);
@@ -1195,19 +1175,15 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 
 		if (!empty($moderators))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member, email_address, lngfile, member_name, mod_prefs
-				FROM {db_prefix}members
-				WHERE id_member IN ({array_int:moderator_list})
-					AND notify_types != {int:no_notifications}
-				ORDER BY lngfile',
-				array(
-					'moderator_list' => $moderators,
-					'no_notifications' => 4,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			require_once(SUBSDIR . '/Members.subs.php');
+			$moderators = membersAllowedTo('moderate_board', $board);
+			$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+
+			foreach ($result as $row)
 			{
+				if ($row['notify_types'] != 4)
+					continue;
+
 				// Check whether they are interested.
 				if (!empty($row['mod_prefs']))
 				{
@@ -1227,7 +1203,6 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 				$emaildata = loadEmailTemplate('request_membership', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
 				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
 			}
-			$smcFunc['db_free_result']($request);
 		}
 
 		return $changeType;

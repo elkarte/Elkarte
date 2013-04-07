@@ -422,16 +422,11 @@ function resetPassword($memID, $username = null)
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get some important details.
-	$request = $smcFunc['db_query']('', '
-		SELECT member_name, email_address, lngfile
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}',
-		array(
-			'id_member' => $memID,
-		)
-	);
-	list ($user, $email, $lngfile) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$result = getBasicMemberData($memID, array('preferences' => true));
+	$user = $result['member_name'];
+	$email = $result['email_address'];
+	$lngfile = $result['lngfile'];
 
 	if ($username !== null)
 	{
@@ -738,19 +733,8 @@ function isFirstLogin($id_member)
 	$isFirstLogin = false;
 
 	// First login?
-	$request = $smcFunc['db_query']('', '
-		SELECT last_login
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-			AND last_login = 0',
-		array(
-			'id_member' => $id_member,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 1)
-		$isFirstLogin = true;
+	require_once(SUBSDIR . '/Members.subs.php');
+	$member = getBasicMemberData($id_member, array('moderation' => true));
 
-	$smcFunc['db_free_result']($request);
-
-	return $isFirstLogin;
+	return !empty($member) && $member['last_login'] == 0;
 }

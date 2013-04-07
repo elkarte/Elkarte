@@ -931,18 +931,17 @@ function getMemberData($id)
 	global $smcFunc;
 
 	$suggestions = array();
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name, member_ip, email_address
-		FROM {db_prefix}members
-		WHERE id_member = {int:current_user}
-		LIMIT 1',
-		array(
-			'current_user' => $id,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) > 0)
-		list ($suggestions['member']['id'], $suggestions['member']['name'], $suggestions['main_ip'], $suggestions['email']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$result = getBasicMemberData($id, array('moderation' => true));
+	if (!empty($result))
+		$suggestions = array(
+			'member' => array(
+				'id' => $result['id_member'],
+				'name' => $result['real_name'],
+			),
+			'main_ip' => $result['member_ip'],
+			'email' => $result['email_address'],
+		);
 
 	return $suggestions;
 }

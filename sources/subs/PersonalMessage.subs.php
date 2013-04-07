@@ -740,17 +740,10 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	$to_names = array();
 	if (count($to_list) > 1)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:to_members})',
-			array(
-				'to_members' => $to_list,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($to_list);
+		foreach ($result as $row)
 			$to_names[] = un_htmlspecialchars($row['real_name']);
-		$smcFunc['db_free_result']($request);
 	}
 
 	$replacements = array(
