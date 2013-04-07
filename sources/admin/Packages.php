@@ -1755,16 +1755,16 @@ class Packages_Controller
 						'type' => 'dir',
 						'writable_on' => 'restrictive',
 					),
-					'Smileys' => array(
+					'smileys' => array(
 						'type' => 'dir_recursive',
 						'writable_on' => 'standard',
 					),
-					'Sources' => array(
+					'sources' => array(
 						'type' => 'dir',
 						'list_contents' => true,
 						'writable_on' => 'standard',
 					),
-					'Themes' => array(
+					'themes' => array(
 						'type' => 'dir_recursive',
 						'writable_on' => 'standard',
 						'contents' => array(
@@ -1780,7 +1780,7 @@ class Packages_Controller
 							),
 						),
 					),
-					'Packages' => array(
+					'packages' => array(
 						'type' => 'dir',
 						'writable_on' => 'standard',
 						'contents' => array(
@@ -1803,7 +1803,7 @@ class Packages_Controller
 		// Directories that can move.
 		if (substr(SOURCEDIR, 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Sources']);
+			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['sources']);
 			$context['file_tree'][strtr(SOURCEDIR, array('\\' => '/'))] = array(
 				'type' => 'dir',
 				'list_contents' => true,
@@ -1889,8 +1889,8 @@ class Packages_Controller
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			if (substr(strtolower(strtr($row['value'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) == strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/Themes'))
-				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Themes']['contents'][substr($row['value'], strlen(BOARDDIR) + 8)] = array(
+			if (substr(strtolower(strtr($row['value'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) == strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
+				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($row['value'], strlen(BOARDDIR) + 8)] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
 					'contents' => array(
