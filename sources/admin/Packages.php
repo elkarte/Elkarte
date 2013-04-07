@@ -30,9 +30,9 @@ class Packages_Controller
 	/**
 	 * Entry point, the default method of this controller.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// @todo Remove this!
 		if (isset($_GET['get']) || isset($_GET['pgdownload']))
@@ -112,9 +112,9 @@ class Packages_Controller
 	/**
 	 * Test install a package.
 	 */
-	function action_install()
+	public function action_install()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc, $settings;
+		global $txt, $context, $scripturl, $smcFunc, $settings;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -778,7 +778,7 @@ class Packages_Controller
 	/**
 	 * Apply another type of (avatar, language, etc.) package.
 	 */
-	function action_install2()
+	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
 		global $user_info, $smcFunc;
@@ -1228,7 +1228,7 @@ class Packages_Controller
 	/**
 	 * List the files in a package.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1258,7 +1258,7 @@ class Packages_Controller
 	/**
 	 * Display one of the files in a package.
 	 */
-	function action_examine()
+	public function action_examine()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1314,9 +1314,9 @@ class Packages_Controller
 	/**
 	 * List the installed packages.
 	 */
-	function InstalledList()
+	public function InstalledList()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// @todo this isn't used, why
 
@@ -1330,7 +1330,7 @@ class Packages_Controller
 	/**
 	 * Empty out the installed list.
 	 */
-	function action_flush()
+	public function action_flush()
 	{
 		global $smcFunc;
 
@@ -1357,7 +1357,7 @@ class Packages_Controller
 	/**
 	 * Delete a package.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
 		global $scripturl;
 
@@ -1389,7 +1389,7 @@ class Packages_Controller
 	/**
 	 * Browse a list of installed packages.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
@@ -1534,7 +1534,7 @@ class Packages_Controller
 	/**
 	 * Test an FTP connection.
 	 */
-	function action_ftptest()
+	public function action_ftptest()
 	{
 		global $context, $txt, $package_ftp;
 
@@ -1567,9 +1567,9 @@ class Packages_Controller
 	/**
 	 * Used when a temp FTP access is needed to package functions
 	 */
-	function action_options()
+	public function action_options()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings, $smcFunc;
 
 		if (isset($_POST['save']))
 		{
@@ -1604,9 +1604,9 @@ class Packages_Controller
 	/**
 	 * List operations
 	 */
-	function action_showoperations()
+	public function action_showoperations()
 	{
-		global $context, $txt, $smcFunc, $modSettings;
+		global $context, $txt;
 
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
@@ -1691,9 +1691,9 @@ class Packages_Controller
 	/**
 	 * Allow the admin to reset permissions on files.
 	 */
-	function action_perms()
+	public function action_perms()
 	{
-		global $context, $txt, $modSettings, $smcFunc, $package_ftp;
+		global $context, $txt, $modSettings, $package_ftp;
 
 		// Let's try and be good, yes?
 		checkSession('get');
@@ -2004,7 +2004,7 @@ class Packages_Controller
 	/**
 	 * Actually action the permission changes they want.
 	 */
-	function action_perms_save()
+	public function action_perms_save()
 	{
 		global $context, $txt, $time_start, $package_ftp;
 
