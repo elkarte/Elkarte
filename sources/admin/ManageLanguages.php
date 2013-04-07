@@ -323,7 +323,7 @@ class ManageLanguages_Controller
 			foreach ($_POST['copy_file'] as $file)
 			{
 				// Check it's not very bad.
-				if (strpos($file, '..') !== false || (strpos($file, 'Themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
+				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
 					fatal_error($txt['languages_download_illegal_paths']);
 
 				$chmod_files[] = BOARDDIR . '/' . $file;
@@ -462,7 +462,7 @@ class ManageLanguages_Controller
 			else
 			{
 				// If we think it's a theme thing, work out what the theme is.
-				if (strpos($dirname, 'Themes') === 0 && preg_match('~Themes[\\/]([^\\/]+)[\\/]~', $dirname, $match))
+				if (strpos($dirname, 'themes') === 0 && preg_match('~themes[\\/]([^\\/]+)[\\/]~', $dirname, $match))
 					$theme_name = $match[1];
 				else
 					$theme_name = 'misc';
@@ -646,6 +646,7 @@ class ManageLanguages_Controller
 
 		// This will be where we look
 		$lang_dirs = array();
+
 		// Check we have themes with a path and a name - just in case - and add the path.
 		foreach ($themes as $id => $data)
 		{
