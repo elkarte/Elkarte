@@ -357,6 +357,11 @@ function draftsRecipients($allRecipients, $recipient_ids)
 	return $recipients;
 }
 
+/**
+ * Gets all old drafts older than x days
+ * @param int $days
+ * @return array
+ */
 function getOldDrafts($days)
 {
 	global $smcFunc;

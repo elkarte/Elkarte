@@ -1,6 +1,30 @@
 <?php
 
+/**
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This software is a derived product, based on:
+ *
+ * Simple Machines Forum (SMF)
+ * 
+copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0 Alpha
+ *
+ * Forum maintenance. Important stuff.
+ *
+ */
+if (!defined('ELKARTE'))
+	die('No access...');
 
+/**
+ * counts the messages
+ *
+ * @return int
+ */
 function countMessages()
 {
 	global $smcFunc;
@@ -16,6 +40,11 @@ function countMessages()
 	return $messages;
 }
 
+/**
+ * gets all membergroups
+ * 
+ * @return array
+ */
 function getMembergroups()
 {
 	global $smcFunc, $txt;
@@ -44,6 +73,10 @@ function getMembergroups()
 	return $membergroups;
 }
 
+/**
+ * flushes all log tables
+ *  
+ */
 function flushLogTables()
 {
 	global $smcFunc;
@@ -78,6 +111,11 @@ function flushLogTables()
 		TRUNCATE {db_prefix}log_search_results');
 }
 
+/**
+ * gets the table columns from the messages table, just a wrapper function
+ * 
+ * @return array 
+ */
 function getMessageTableColumns()
 {
 	global $smcFunc;
@@ -88,6 +126,11 @@ function getMessageTableColumns()
 	return $colData;
 }
 
+/**
+ * resizes the body column from the messages table
+ *
+ * @param string $type 
+ */
 function resizeMessageTableBody($type)
 {
 	global $smcFunc;
@@ -96,6 +139,13 @@ function resizeMessageTableBody($type)
 	$smcFunc['db_change_column']('{db_prefix}messages', 'body', array('type' => $type));
 }
 
+/**
+ * detects messages, which exceed the max length
+ *
+ * @param type $start
+ * @param type $increment
+ * @return type 
+ */
 function detectExceedingMessages($start, $increment)
 {
 	global $smcFunc;
@@ -119,6 +169,12 @@ function detectExceedingMessages($start, $increment)
 	return $id_msg_exceeding;
 }
 
+/**
+ * loads messages, which exceed the lenght
+ *
+ * @param type $msg
+ * @return array
+ */
 function getExceedingMessages($msg)
 {
 	global $smcFunc, $scripturl;
@@ -140,6 +196,12 @@ function getExceedingMessages($msg)
 	return $exceeding_messages;
 }
 
+/**
+ * lists all the tables from our ElkArte installation.
+ * Additional tables from modifications are also included.
+ * 
+ * @return array 
+ */
 function getOurTables()
 {
 	global $smcFunc, $db_prefix;
@@ -159,6 +221,11 @@ function getOurTables()
 	return $tables;
 }
 
+/**
+ * Wrapper function for db_optimize_table
+ *
+ * @param string $tablename 
+ */
 function optimizeTable($tablename)
 {
 	global $smcFunc;
@@ -167,6 +234,11 @@ function optimizeTable($tablename)
 	$smcFunc['db_optimize_table']($tablename);
 }
 
+/**
+ * gets the last topics id.
+ * 
+ * @return int 
+ */
 function getMaxTopicID()
 {
 	global $smcFunc;
@@ -183,6 +255,12 @@ function getMaxTopicID()
 	return $id_topic;
 }
 
+/**
+ * Recounts all approved messages
+ *
+ * @param int $start
+ * @param int $increment
+ */
 function recountApprovedMessages($start, $increment)
 {
 	global $smcFunc;
@@ -216,6 +294,12 @@ function recountApprovedMessages($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Recounts all unapproved messages
+ *
+ * @param int $start
+ * @param int $increment
+ */
 function recountUnapprovedMessages($start, $increment)
 {
 	global $smcFunc;
@@ -249,6 +333,12 @@ function recountUnapprovedMessages($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Reset the boards tables counter for posts, topics, unapproved posts and
+ * unapproved topics
+ * 
+ * @param string $column
+ */
 function resetBoardsCounter($column)
 {
 	global $smcFunc;
@@ -264,6 +354,12 @@ function resetBoardsCounter($column)
 	);
 }
 
+/**
+ * Update the boards table's post counter
+ * 
+ * @param int $start
+ * @param int $increment 
+ */
 function updateBoardsPostCounter($start, $increment)
 {
 	global $smcFunc;
@@ -294,6 +390,12 @@ function updateBoardsPostCounter($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Update the boards table's topic counter
+ * 
+ * @param int $start
+ * @param int $increment 
+ */
 function updateBoardsTopicCounter($start, $increment)
 {
 	global $smcFunc;
@@ -324,6 +426,12 @@ function updateBoardsTopicCounter($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Update the boards table's unapproved post counter
+ * 
+ * @param int $start
+ * @param int $increment 
+ */
 function updateBoardsUnapprovedPostCounter($start, $increment)
 {
 	global $smcFunc;
@@ -354,6 +462,12 @@ function updateBoardsUnapprovedPostCounter($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Update the boards table's unapproved topic counter
+ * 
+ * @param int $start
+ * @param int $increment 
+ */
 function updateBoardsUnapprovedTopicCounter($start, $increment)
 {
 	global $smcFunc;
@@ -384,6 +498,9 @@ function updateBoardsUnapprovedTopicCounter($start, $increment)
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Update the personal messages counter
+ */
 function updatePersonalMessagesCounter()
 {
 	global $smcFunc;
@@ -421,6 +538,12 @@ function updatePersonalMessagesCounter()
 	$smcFunc['db_free_result']($request);
 }
 
+/**
+ * Fixes the column id_board from the messages table.
+ * 
+ * @param int $start
+ * @param int $increment
+ */
 function updateMessagesBoardID($start, $increment)
 {
 	global $smcFunc;
@@ -453,6 +576,9 @@ function updateMessagesBoardID($start, $increment)
 		);
 }
 
+/**
+ * Updates the latest message of each board.
+ */
 function updateBoardsLastMessage()
 {
 	global $smcFunc;
@@ -518,6 +644,11 @@ function updateBoardsLastMessage()
 		}
 }
 
+/**
+ * Counts topics from a given board.
+ * @param int $id_board
+ * @return int 
+ */
 function countTopicsFromBoard($id_board)
 {
 	global $smcFunc;
@@ -536,6 +667,12 @@ function countTopicsFromBoard($id_board)
 	return $total_topics;
 }
 
+/**
+ * Gets a list of topics which should be moved to a different board.
+ * 
+ * @param type $id_board
+ * @return type 
+ */
 function getTopicsToMove($id_board)
 {
 	global $smcFunc;
@@ -560,6 +697,11 @@ function getTopicsToMove($id_board)
 	return $topics;
 }
 
+/**
+ * Count our members
+ *
+ * @return int
+ */
 function getTotalMembers()
 {
 	global $smcFunc;
@@ -581,6 +723,13 @@ function getTotalMembers()
 	return $total_members;
 }
 
+/**
+ * Recount the members posts.
+ *
+ * @param type $start
+ * @param type $increment
+ * @return int
+ */
 function updateMembersPostCount($start, $increment)
 {
 	global $smcFunc, $modSettings;
