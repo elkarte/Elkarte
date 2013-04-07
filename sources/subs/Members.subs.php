@@ -1449,7 +1449,10 @@ function admins($id_admin = 0)
  * Load some basic member infos
  * 
  * @param mixed $member_ids an array of member IDs or a single ID
- * @param bool $add_guest if true adds an entry representing a guest
+ * @param array $options an array of possible little alternatives, can be:
+ *                - 'add_guest' (set or not) to add a guest user to the returned array
+ *                - 'sort' (string) a column to sort the results
+ *                - 'identification' (set or not) includes secret_answer/question and openid_uri
  * @return array
  */
 function getBasicMemberData($member_ids, $options = array())
