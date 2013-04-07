@@ -260,7 +260,7 @@ function action_editIgnoreList($memID)
 	if (!empty($ignoreArray))
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
-		$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1);
+		$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1));
 		foreach ($result as $row)
 			$ignored[] = $row['id_member'];
 	}
