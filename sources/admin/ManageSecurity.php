@@ -596,7 +596,7 @@ class ManageSecurity_Controller
 	 */
 	function _initBBSettingsForm()
 	{
-		global $txt;
+		global $txt, $context;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
