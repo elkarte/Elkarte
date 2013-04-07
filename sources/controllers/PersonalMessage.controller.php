@@ -2406,17 +2406,10 @@ function action_messagerules()
 
 			if (!empty($members))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member, member_name
-					FROM {db_prefix}members
-					WHERE id_member IN ({array_int:member_list})',
-					array(
-						'member_list' => array_keys($members),
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				require_once(SUBSDIR . '/Members.subs.php');
+				$result = getBasicMemberData(array_keys($members));
+				foreach ($result as $row)
 					$context['rule']['criteria'][$members[$row['id_member']]]['v'] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
 			}
 		}
 		else

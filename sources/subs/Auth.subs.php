@@ -422,16 +422,11 @@ function resetPassword($memID, $username = null)
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get some important details.
-	$request = $smcFunc['db_query']('', '
-		SELECT member_name, email_address, lngfile
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}',
-		array(
-			'id_member' => $memID,
-		)
-	);
-	list ($user, $email, $lngfile) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Members.subs.php');
+	$result = getBasicMemberData($memID);
+	$user = $result['member_name'];
+	$email = $result['email_address'];
+	$lngfile = $result['lngfile'];
 
 	if ($username !== null)
 	{

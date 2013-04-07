@@ -1099,17 +1099,10 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	// Firstly, if email and username aren't passed find out the members email address and name.
 	if ($email === false && $membername === false)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT email_address, member_name
-			FROM {db_prefix}members
-			WHERE id_member = {int:memID}
-			LIMIT 1',
-			array(
-				'memID' => $memID,
-			)
-		);
-		list ($email, $membername) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$result = getBasicMemberData($memID);
+		$email = $result['email_address'];
+		$membername = $result['member_name'];
 	}
 
 	// If they want the post count restored then we need to do some research.
@@ -1484,7 +1477,7 @@ function getBasicMemberData($member_ids, $options = array())
 
 	// Get some additional member info...
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, member_name, real_name, member_ip, email_address, hide_email, id_group,
+		SELECT id_member, member_name, real_name, member_ip, email_address, hide_email, id_group, lngfile,
 			posts, last_login' . (isset($options['identification']) ? ', secret_answer, secret_question, openid_uri' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})

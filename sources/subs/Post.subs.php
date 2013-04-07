@@ -782,17 +782,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 		elseif ($posterOptions['id'] != $user_info['id'])
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT member_name, email_address
-				FROM {db_prefix}members
-				WHERE id_member = {int:id_member}
-				LIMIT 1',
-				array(
-					'id_member' => $posterOptions['id'],
-				)
-			);
+			require_once(SUBSDIR . '/Members.subs.php');
+			$result = getBasicMemberData($posterOptions['id']);
 			// Couldn't find the current poster?
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if (empty($result))
 			{
 				trigger_error('createPost(): Invalid member id ' . $posterOptions['id'], E_USER_NOTICE);
 				$posterOptions['id'] = 0;
@@ -800,8 +793,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				$posterOptions['email'] = '';
 			}
 			else
-				list ($posterOptions['name'], $posterOptions['email']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			{
+				$posterOptions['name'] = $result['member_name'];
+				$posterOptions['email'] = $result['email_address'];
+			}
 		}
 		else
 		{
