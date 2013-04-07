@@ -49,7 +49,6 @@ class Packages_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 		loadLanguage('Packages');
 		loadTemplate('Packages', 'admin');
-
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
@@ -79,7 +78,6 @@ class Packages_Controller
 		// Set up action/subaction stuff.
 		$action = new Action();
 		$action->initialize($subActions);
-
 		$context['sub_action'] = $subAction;
 
 		// Set up some tabs...
@@ -147,15 +145,13 @@ class Packages_Controller
 			}
 		}
 
-		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall';
-
 		// Change our last link tree item for more information on this Packages area.
+		$context['uninstalling'] = $_REQUEST['sa'] === 'uninstall';
 		$context['linktree'][count($context['linktree']) - 1] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
 			'name' => $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']);
-
 		$context['sub_template'] = 'view_package';
 
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
@@ -168,14 +164,17 @@ class Packages_Controller
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
+				{
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+				}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -209,7 +208,6 @@ class Packages_Controller
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
-
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
@@ -371,7 +369,6 @@ class Packages_Controller
 				if (!file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
 				{
 					$context['has_failure'] = true;
-
 					$context['actions'][] = array(
 						'type' => $txt['execute_modification'],
 						'action' => $smcFunc['htmlspecialchars'](strtr($action['filename'], array(BOARDDIR => '.'))),
@@ -381,7 +378,6 @@ class Packages_Controller
 				}
 				else
 				{
-
 					if ($action['boardmod'])
 						$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
 					else
@@ -409,9 +405,7 @@ class Packages_Controller
 							$failed = true;
 						}
 						elseif ($mod_action['type'] == 'chmod')
-						{
 							$chmod_files[] = $mod_action['filename'];
-						}
 						elseif ($mod_action['type'] == 'saved')
 						{
 							if (!empty($mod_action['is_custom']))
@@ -443,8 +437,8 @@ class Packages_Controller
 							}
 							else
 							{
-									$context['actions'][$actual_filename]['failed'] |= $failed;
-									$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
+								$context['actions'][$actual_filename]['failed'] |= $failed;
+								$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
 							}
 						}
 						elseif ($mod_action['type'] == 'skipping')
@@ -548,14 +542,14 @@ class Packages_Controller
 
 				$thisAction = array(
 					'type' => $action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-					'action' => sprintf($txt['execute_hook_action'],  $smcFunc['htmlspecialchars']($action['hook'])),
+					'action' => sprintf($txt['execute_hook_action'], $smcFunc['htmlspecialchars']($action['hook'])),
 				);
 			}
 			elseif ($action['type'] == 'credits')
 			{
 				$thisAction = array(
 					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'],  $smcFunc['htmlspecialchars']($action['title'])),
+					'action' => sprintf($txt['execute_credits_action'], $smcFunc['htmlspecialchars']($action['title'])),
 				);
 			}
 			elseif ($action['type'] == 'requires')
@@ -612,6 +606,7 @@ class Packages_Controller
 				{
 					// Is the action already stated?
 					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
+
 					// If it's not auto do we think we have something we can act upon?
 					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
 						$theme_action = '';
@@ -642,7 +637,6 @@ class Packages_Controller
 				// Could this be theme related?
 				if (!empty($action['unparsed_filename']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_filename'], $matches))
 				{
-
 					// Is the action already stated?
 					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
 					$action['unparsed_destination'] = $action['unparsed_filename'];
@@ -669,7 +663,7 @@ class Packages_Controller
 			if ($context['uninstalling'])
 				$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 			else
-				$file =  BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
+				$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 
 			if (isset($action['filename']) && !file_exists($file))
 			{
@@ -771,7 +765,7 @@ class Packages_Controller
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
-		$context['post_url'] = $scripturl .'?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
+		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
 		checkSubmitOnce('register');
 	}
 
@@ -798,7 +792,6 @@ class Packages_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// @todo Perhaps do it in steps, if necessary?
-
 		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall2';
 
 		// Set up the linktree for other.
@@ -807,7 +800,6 @@ class Packages_Controller
 			'name' => $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']
 		);
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
-
 		$context['sub_template'] = 'extract_package';
 
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
@@ -828,12 +820,14 @@ class Packages_Controller
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
 			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -899,7 +893,6 @@ class Packages_Controller
 		$packageInfo = getPackageInfo($context['filename']);
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
-
 		$packageInfo['filename'] = $context['filename'];
 
 		// Set the type of extraction...
@@ -909,6 +902,7 @@ class Packages_Controller
 		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
 		{
 			$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
+
 			// @todo Internationalize this?
 			package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
 		}
@@ -983,7 +977,6 @@ class Packages_Controller
 		$context['install_finished'] = false;
 
 		// @todo Make a log of any errors that occurred and output them?
-
 		if (!empty($install_log))
 		{
 			$failed_steps = array();
@@ -992,7 +985,6 @@ class Packages_Controller
 			foreach ($install_log as $action)
 			{
 				$failed_count++;
-
 				if ($action['type'] == 'modification' && !empty($action['filename']))
 				{
 					if ($action['boardmod'])
@@ -1137,6 +1129,7 @@ class Packages_Controller
 				{
 					// We're really just checking for entries which are create table AND add columns (etc).
 					$tables = array();
+
 					/**
 					 * Table sorting function used in usort
 					 *
@@ -1151,6 +1144,7 @@ class Packages_Controller
 						return $a[0] == 'remove_table' ? -1 : 1;
 					}
 					usort($db_package_log, 'sort_table_first');
+
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] == 'remove_table')
@@ -1319,7 +1313,6 @@ class Packages_Controller
 		global $txt, $context;
 
 		// @todo this isn't used, why
-
 		$context['page_title'] .= ' - ' . $txt['installed_packages'];
 		$context['sub_template'] = 'view_installed';
 
@@ -1332,8 +1325,6 @@ class Packages_Controller
 	 */
 	public function action_flush()
 	{
-		global $smcFunc;
-
 		// Always check the session.
 		checkSession('get');
 
@@ -1510,8 +1501,7 @@ class Packages_Controller
 				'additional_rows' => array(
 					array(
 						'position' => 'bottom_of_list',
-						'value' => ($context['sub_action'] == 'browse' ? '<div class="padding smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ' . $txt['package_installed_old'] . '</div>' :
-						'<a class="button_link" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+						'value' => ($context['sub_action'] == 'browse' ? '<div class="padding smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="button_link" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1529,7 +1519,6 @@ class Packages_Controller
 		$context['available_other'] = array();
 		$context['available_all'] = array();
 	}
-
 
 	/**
 	 * Test an FTP connection.
@@ -1593,7 +1582,6 @@ class Packages_Controller
 
 		$context['page_title'] = $txt['package_settings'];
 		$context['sub_template'] = 'install_options';
-
 		$context['package_ftp_server'] = isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost';
 		$context['package_ftp_port'] = isset($modSettings['package_port']) ? $modSettings['package_port'] : '21';
 		$context['package_ftp_username'] = isset($modSettings['package_username']) ? $modSettings['package_username'] : $default_username;
@@ -1628,14 +1616,15 @@ class Packages_Controller
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -1705,7 +1694,7 @@ class Packages_Controller
 			fatal_lang_error('no_access', false);
 		}
 
-		// This is a memory eat.
+		// This is a time and memory eating ...
 		setMemoryLimit('128M');
 		@set_time_limit(600);
 
@@ -1844,10 +1833,9 @@ class Packages_Controller
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
 				$context['file_tree'][strtr($dir, array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'writable_on' => 'restrictive',
-			);
-
+					'type' => 'dir',
+					'writable_on' => 'restrictive',
+				);
 		}
 		elseif (substr($modSettings['attachmentUploadDir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
@@ -1866,6 +1854,7 @@ class Packages_Controller
 				'writable_on' => 'standard',
 			);
 		}
+
 		if (substr($modSettings['avatar_directory'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['avatars']);
@@ -1874,6 +1863,7 @@ class Packages_Controller
 				'writable_on' => 'standard',
 			);
 		}
+
 		if (isset($modSettings['custom_avatar_dir']) && substr($modSettings['custom_avatar_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['custom_avatar_dir']);
@@ -1931,9 +1921,11 @@ class Packages_Controller
 			return action_perms_save();
 
 		$context['look_for'] = array();
+
 		// Are we looking for a particular tree - normally an expansion?
 		if (!empty($_REQUEST['find']))
 			$context['look_for'][] = base64_decode($_REQUEST['find']);
+
 		// Only that tree?
 		$context['only_find'] = isset($_GET['xml']) && !empty($_REQUEST['onlyfind']) ? $_REQUEST['onlyfind'] : '';
 		if ($context['only_find'])
@@ -1946,6 +1938,7 @@ class Packages_Controller
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
+
 		// ... maybe posted?
 		if (!empty($_POST['back_look']))
 			$context['only_find'] = array_merge($context['only_find'], $_POST['back_look']);
@@ -1954,6 +1947,7 @@ class Packages_Controller
 
 		// Are we finding more files than first thought?
 		$context['file_offset'] = !empty($_REQUEST['fileoffset']) ? (int) $_REQUEST['fileoffset'] : 0;
+
 		// Don't list more than this many files in a directory.
 		$context['file_limit'] = 150;
 
@@ -2105,10 +2099,8 @@ class Packages_Controller
 		else
 		{
 			$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
-
 			$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
 			$context['directory_list'] = isset($_POST['dirList']) ? unserialize(base64_decode($_POST['dirList'])) : array();
-
 			$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
 
 			// Haven't counted the items yet?
@@ -2245,11 +2237,11 @@ class Packages_Controller
  * Determines if the package is a mod, avatar, language package
  * Determines if the package has been installed or not
  *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
- * @param type $params
- * @param type $installed
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param array $params
+ * @param bool $installed
  * @return type
  */
 function list_getPackages($start, $items_per_page, $sort, $params, $installed)
@@ -2279,11 +2271,13 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		elseif ($_GET['version_emulate'] !== 0)
 			$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
 	}
+
 	if (!empty($_SESSION['version_emulate']))
 	{
 		$context['forum_version'] = $the_brand . ' ' . $_SESSION['version_emulate'];
 		$the_version = $_SESSION['version_emulate'];
 	}
+
 	if (isset($_SESSION['single_version_emulate']))
 		unset($_SESSION['single_version_emulate']);
 
@@ -2375,12 +2369,10 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 			if (!empty($packageInfo))
 			{
 				$packageInfo['installed_id'] = isset($installed_mods[$packageInfo['id']]) ? $installed_mods[$packageInfo['id']]['id'] : 0;
-
 				$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
 				$packageInfo['is_installed'] = isset($installed_mods[$packageInfo['id']]);
 				$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] == $packageInfo['version']);
 				$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] > $packageInfo['version']);
-
 				$packageInfo['can_install'] = false;
 				$packageInfo['can_uninstall'] = false;
 				$packageInfo['can_upgrade'] = false;
@@ -2476,7 +2468,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 					}
 					else
 					{
-						$packages['modification'][strtolower($packageInfo[$sort]) .  '_' . $sort_id['mod']] = md5($package);
+						$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package);
 						$context['available_modification'][md5($package)] = $packageInfo;
 					}
 				}
@@ -2517,13 +2509,12 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 	return $packages[$params];
 }
 
-
 /**
  * Checkes the permissions of all the areas that will be affected by the package
  *
- * @param type $path
- * @param type $data
- * @param type $level
+ * @param string $path
+ * @param array $data
+ * @param int $level
  * @return type
  */
 function fetchPerms__recursive($path, &$data, $level)
@@ -2650,6 +2641,7 @@ function fetchPerms__recursive($path, &$data, $level)
 		// Have we reached our offset?
 		if ($context['file_offset'] > $counter)
 			continue;
+
 		// Gone too far?
 		if ($counter > ($context['file_offset'] + $context['file_limit']))
 			continue;
@@ -2688,7 +2680,6 @@ function fetchPerms__recursive($path, &$data, $level)
 		}
 	}
 }
-
 
 /**
  * Function called to briefly pause execution of directory/file chmod actions
