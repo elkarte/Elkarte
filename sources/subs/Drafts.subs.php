@@ -356,3 +356,26 @@ function draftsRecipients($allRecipients, $recipient_ids)
 
 	return $recipients;
 }
+
+function getOldDrafts($days)
+{
+	global $smcFunc;
+
+	$drafts = array();
+
+	// Find all of the old drafts
+	$request = $smcFunc['db_query']('', '
+		SELECT id_draft
+		FROM {db_prefix}user_drafts
+		WHERE poster_time <= {int:poster_time_old}',
+		array(
+			'poster_time_old' => time() - (86400 * $days),
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_row']($request))
+		$drafts[] = (int) $row[0];
+	$smcFunc['db_free_result']($request);
+
+	return $drafts;
+}

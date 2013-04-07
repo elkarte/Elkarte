@@ -309,8 +309,8 @@ class ManageMaintenance_Controller
 	 */
 	public function action_convertmsgbody_display()
 	{
-		global $scripturl, $context, $txt, $db_type;
-		global $modSettings, $smcFunc, $time_start;
+		global $context, $txt, $db_type;
+		global $modSettings, $time_start;
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
@@ -419,7 +419,7 @@ class ManageMaintenance_Controller
 	 */
 	public function action_optimize_display()
 	{
-		global $db_type, $db_prefix, $txt, $context, $smcFunc;
+		global $db_type, $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -491,6 +491,8 @@ class ManageMaintenance_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
+		require_once(SUSBSIR . '/ManageMaintenance.subs.php');
+
 		// validate the request or the loop
 		if (!isset($_REQUEST['step']))
 			validateToken('admin-maint');
@@ -506,14 +508,7 @@ class ManageMaintenance_Controller
 		@set_time_limit(600);
 
 		// Step the number of topics at a time so things don't time out...
-		$request = $smcFunc['db_query']('', '
-			SELECT MAX(id_topic)
-			FROM {db_prefix}topics',
-			array(
-			)
-		);
-		list ($max_topics) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$max_topics = getMaxTopicID();
 
 		$increment = min(max(50, ceil($max_topics / 4)), 2000);
 		if (empty($_REQUEST['start']))
@@ -528,61 +523,8 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				// Recount approved messages
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
-						CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END AS real_num_replies
-					FROM {db_prefix}topics AS t
-						LEFT JOIN {db_prefix}messages AS ma ON (ma.id_topic = t.id_topic AND ma.approved = {int:is_approved})
-					WHERE t.id_topic > {int:start}
-						AND t.id_topic <= {int:max_id}
-					GROUP BY t.id_topic
-					HAVING CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END != MAX(t.num_replies)',
-					array(
-						'is_approved' => 1,
-						'start' => $_REQUEST['start'],
-						'max_id' => $_REQUEST['start'] + $increment,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}topics
-						SET num_replies = {int:num_replies}
-						WHERE id_topic = {int:id_topic}',
-						array(
-							'num_replies' => $row['real_num_replies'],
-							'id_topic' => $row['id_topic'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
-
-				// Recount unapproved messages
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
-						COUNT(mu.id_msg) AS real_unapproved_posts
-					FROM {db_prefix}topics AS t
-						LEFT JOIN {db_prefix}messages AS mu ON (mu.id_topic = t.id_topic AND mu.approved = {int:not_approved})
-					WHERE t.id_topic > {int:start}
-						AND t.id_topic <= {int:max_id}
-					GROUP BY t.id_topic
-					HAVING COUNT(mu.id_msg) != MAX(t.unapproved_posts)',
-					array(
-						'not_approved' => 0,
-						'start' => $_REQUEST['start'],
-						'max_id' => $_REQUEST['start'] + $increment,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}topics
-						SET unapproved_posts = {int:unapproved_posts}
-						WHERE id_topic = {int:id_topic}',
-						array(
-							'unapproved_posts' => $row['real_unapproved_posts'],
-							'id_topic' => $row['id_topic'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
+				recountApprovedMessages($_REQUEST['start'], $increment);
+				recountUnapprovedMessages($_REQUEST['start'], $increment);
 
 				$_REQUEST['start'] += $increment;
 
@@ -605,43 +547,12 @@ class ManageMaintenance_Controller
 		if ($_REQUEST['step'] <= 1)
 		{
 			if (empty($_REQUEST['start']))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET num_posts = {int:num_posts}
-					WHERE redirect = {string:redirect}',
-					array(
-						'num_posts' => 0,
-						'redirect' => '',
-					)
-				);
+				resetBoardsCounter('num_posts');
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
-					FROM {db_prefix}messages AS m
-					WHERE m.id_topic > {int:id_topic_min}
-						AND m.id_topic <= {int:id_topic_max}
-						AND m.approved = {int:is_approved}
-					GROUP BY m.id_board',
-					array(
-						'id_topic_min' => $_REQUEST['start'],
-						'id_topic_max' => $_REQUEST['start'] + $increment,
-						'is_approved' => 1,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET num_posts = num_posts + {int:real_num_posts}
-						WHERE id_board = {int:id_board}',
-						array(
-							'id_board' => $row['id_board'],
-							'real_num_posts' => $row['real_num_posts'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
-
+				// Recount the posts
+				updateBoardsPostCounter($_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -663,41 +574,11 @@ class ManageMaintenance_Controller
 		if ($_REQUEST['step'] <= 2)
 		{
 			if (empty($_REQUEST['start']))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET num_topics = {int:num_topics}',
-					array(
-						'num_topics' => 0,
-					)
-				);
+				resetBoardsCounter('num_topics');
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
-					FROM {db_prefix}topics AS t
-					WHERE t.approved = {int:is_approved}
-						AND t.id_topic > {int:id_topic_min}
-						AND t.id_topic <= {int:id_topic_max}
-					GROUP BY t.id_board',
-					array(
-						'is_approved' => 1,
-						'id_topic_min' => $_REQUEST['start'],
-						'id_topic_max' => $_REQUEST['start'] + $increment,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET num_topics = num_topics + {int:real_num_topics}
-						WHERE id_board = {int:id_board}',
-						array(
-							'id_board' => $row['id_board'],
-							'real_num_topics' => $row['real_num_topics'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
-
+				updateBoardsTopicCounter($_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -719,40 +600,11 @@ class ManageMaintenance_Controller
 		if ($_REQUEST['step'] <= 3)
 		{
 			if (empty($_REQUEST['start']))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET unapproved_posts = {int:unapproved_posts}',
-					array(
-						'unapproved_posts' => 0,
-					)
-				);
+				resetBoardsCounter('unapproved_posts');
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
-					FROM {db_prefix}messages AS m
-					WHERE m.id_topic > {int:id_topic_min}
-						AND m.id_topic <= {int:id_topic_max}
-						AND m.approved = {int:is_approved}
-					GROUP BY m.id_board',
-					array(
-						'id_topic_min' => $_REQUEST['start'],
-						'id_topic_max' => $_REQUEST['start'] + $increment,
-						'is_approved' => 0,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
-						WHERE id_board = {int:id_board}',
-						array(
-							'id_board' => $row['id_board'],
-							'unapproved_posts' => $row['real_unapproved_posts'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
+				updateBoardsUnapprovedPostCounter($_REQUEST['start'], $increment);
 
 				$_REQUEST['start'] += $increment;
 
@@ -775,41 +627,11 @@ class ManageMaintenance_Controller
 		if ($_REQUEST['step'] <= 4)
 		{
 			if (empty($_REQUEST['start']))
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}boards
-					SET unapproved_topics = {int:unapproved_topics}',
-					array(
-						'unapproved_topics' => 0,
-					)
-				);
+				resetBoardsCounter('unapproved_topics');
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
-					FROM {db_prefix}topics AS t
-					WHERE t.approved = {int:is_approved}
-						AND t.id_topic > {int:id_topic_min}
-						AND t.id_topic <= {int:id_topic_max}
-					GROUP BY t.id_board',
-					array(
-						'is_approved' => 0,
-						'id_topic_min' => $_REQUEST['start'],
-						'id_topic_max' => $_REQUEST['start'] + $increment,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
-						WHERE id_board = {int:id_board}',
-						array(
-							'id_board' => $row['id_board'],
-							'real_unapproved_topics' => $row['real_unapproved_topics'],
-						)
-					);
-				$smcFunc['db_free_result']($request);
-
+				updateBoardsUnapprovedTopicCounter($_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -830,36 +652,7 @@ class ManageMaintenance_Controller
 		// Get all members with wrong number of personal messages.
 		if ($_REQUEST['step'] <= 5)
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
-					MAX(mem.instant_messages) AS instant_messages
-				FROM {db_prefix}members AS mem
-					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted})
-				GROUP BY mem.id_member
-				HAVING COUNT(pmr.id_pm) != MAX(mem.instant_messages)',
-				array(
-					'is_not_deleted' => 0,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				updateMemberData($row['id_member'], array('instant_messages' => $row['real_num']));
-			$smcFunc['db_free_result']($request);
-
-			$request = $smcFunc['db_query']('', '
-				SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
-					MAX(mem.unread_messages) AS unread_messages
-				FROM {db_prefix}members AS mem
-					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted} AND pmr.is_read = {int:is_not_read})
-				GROUP BY mem.id_member
-				HAVING COUNT(pmr.id_pm) != MAX(mem.unread_messages)',
-				array(
-					'is_not_deleted' => 0,
-					'is_not_read' => 0,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
-			$smcFunc['db_free_result']($request);
+			updatePersonalMessagesCounter();
 
 			if (microtime(true) - $time_start > 3)
 			{
@@ -878,32 +671,7 @@ class ManageMaintenance_Controller
 		{
 			while ($_REQUEST['start'] < $modSettings['maxMsgID'])
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT /*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
-					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_board != m.id_board)
-					WHERE m.id_msg > {int:id_msg_min}
-						AND m.id_msg <= {int:id_msg_max}',
-					array(
-						'id_msg_min' => $_REQUEST['start'],
-						'id_msg_max' => $_REQUEST['start'] + $increment,
-					)
-				);
-				$boards = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$boards[$row['id_board']][] = $row['id_msg'];
-				$smcFunc['db_free_result']($request);
-
-				foreach ($boards as $board_id => $messages)
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}messages
-						SET id_board = {int:id_board}
-						WHERE id_msg IN ({array_int:id_msg_array})',
-						array(
-							'id_msg_array' => $messages,
-							'id_board' => $board_id,
-						)
-					);
+				updateMessagesBoardID($_REQUEST['start'], $increment);
 
 				$_REQUEST['start'] += $increment;
 
@@ -922,66 +690,7 @@ class ManageMaintenance_Controller
 			$_REQUEST['start'] = 0;
 		}
 
-		// Update the latest message of each board.
-		$request = $smcFunc['db_query']('', '
-			SELECT m.id_board, MAX(m.id_msg) AS local_last_msg
-			FROM {db_prefix}messages AS m
-			WHERE m.approved = {int:is_approved}
-			GROUP BY m.id_board',
-			array(
-				'is_approved' => 1,
-			)
-		);
-		$realBoardCounts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
-		$smcFunc['db_free_result']($request);
-
-		$request = $smcFunc['db_query']('', '
-			SELECT /*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
-			FROM {db_prefix}boards',
-			array(
-			)
-		);
-		$resort_me = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
-			$resort_me[$row['child_level']][] = $row;
-		}
-		$smcFunc['db_free_result']($request);
-
-		krsort($resort_me);
-
-		$lastModifiedMsg = array();
-		foreach ($resort_me as $rows)
-			foreach ($rows as $row)
-			{
-				// The latest message is the latest of the current board and its children.
-				if (isset($lastModifiedMsg[$row['id_board']]))
-					$curLastModifiedMsg = max($row['local_last_msg'], $lastModifiedMsg[$row['id_board']]);
-				else
-					$curLastModifiedMsg = $row['local_last_msg'];
-
-				// If what is and what should be the latest message differ, an update is necessary.
-				if ($row['local_last_msg'] != $row['id_last_msg'] || $curLastModifiedMsg != $row['id_msg_updated'])
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}boards
-						SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
-						WHERE id_board = {int:id_board}',
-						array(
-							'id_last_msg' => $row['local_last_msg'],
-							'id_msg_updated' => $curLastModifiedMsg,
-							'id_board' => $row['id_board'],
-						)
-					);
-
-				// Parent boards inherit the latest modified message of their children.
-				if (isset($lastModifiedMsg[$row['id_parent']]))
-					$lastModifiedMsg[$row['id_parent']] = max($row['local_last_msg'], $lastModifiedMsg[$row['id_parent']]);
-				else
-					$lastModifiedMsg[$row['id_parent']] = $row['local_last_msg'];
-			}
+		updateBoardsLastMessage();
 
 		// Update all the basic statistics.
 		updateStats('member');
@@ -1186,32 +895,15 @@ class ManageMaintenance_Controller
 	 */
 	public function action_olddrafts_display()
 	{
-		global $smcFunc;
-
 		validateToken('admin-maint');
 
-		$drafts = array();
+		require_once(SUBSDIR . '/Drafts.subs.php');
+		$drafts = getOldDrafts($_POST['draftdays']);
 
-		// Find all of the old drafts
-		$request = $smcFunc['db_query']('', '
-			SELECT id_draft
-			FROM {db_prefix}user_drafts
-			WHERE poster_time <= {int:poster_time_old}',
-			array(
-				'poster_time_old' => time() - (86400 * $_POST['draftdays']),
-			)
-		);
-
-		while ($row = $smcFunc['db_fetch_row']($request))
-			$drafts[] = (int) $row[0];
-		$smcFunc['db_free_result']($request);
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
-		{
-			require_once(SUBSDIR . '/Drafts.subs.php');
 			deleteDrafts($drafts, -1, false);
-		}
 	}
 
 	/**
@@ -1221,7 +913,7 @@ class ManageMaintenance_Controller
 	 */
 	public function action_massmove_display()
 	{
-		global $smcFunc, $context, $txt;
+		global $context, $txt;
 
 		// Only admins.
 		isAllowedTo('admin_forum');
@@ -1248,18 +940,8 @@ class ManageMaintenance_Controller
 
 		// How many topics are we converting?
 		if (!isset($_REQUEST['totaltopics']))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}topics
-				WHERE id_board = {int:id_board_from}',
-				array(
-					'id_board_from' => $id_board_from,
-				)
-			);
-			list ($total_topics) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-		}
+			$total_topics = countTopicsFromBoard($id_board_from);
+
 		else
 			$total_topics = (int) $_REQUEST['totaltopics'];
 
@@ -1272,21 +954,8 @@ class ManageMaintenance_Controller
 			while ($context['start'] <= $total_topics)
 			{
 				// Lets get the topics.
-				$request = $smcFunc['db_query']('', '
-					SELECT id_topic
-					FROM {db_prefix}topics
-					WHERE id_board = {int:id_board_from}
-					LIMIT 10',
-					array(
-						'id_board_from' => $id_board_from,
-					)
-				);
-
-				// Get the ids.
-				$topics = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$topics[] = $row['id_topic'];
-
+				$topics = getTopicsToMove($id_board_from);
+	
 				// Just return if we don't have any topics left to move.
 				if (empty($topics))
 				{
@@ -1362,57 +1031,13 @@ class ManageMaintenance_Controller
 		if (!isset($_SESSION['total_members']))
 		{
 			validateToken('admin-maint');
-
-			$request = $smcFunc['db_query']('', '
-				SELECT COUNT(DISTINCT m.id_member)
-				FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
-				WHERE m.id_member != 0
-					AND b.count_posts = 0
-					AND m.id_board = b.id_board',
-				array(
-				)
-			);
-
-			// save it so we don't do this again for this task
-			list ($_SESSION['total_members']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$_SESSION['total_members'] = getTotalMembers();
 		}
 		else
 			validateToken('admin-recountposts');
 
 		// Lets get a group of members and determine their post count (from the boards that have post count enabled of course).
-		$request = $smcFunc['db_query']('', '
-			SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
-			FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
-			WHERE m.id_member != {int:zero}
-				AND b.count_posts = {int:zero}
-				AND m.id_board = b.id_board ' . (!empty($modSettings['recycle_enable']) ? '
-				AND b.id_board != {int:recycle}' : '') . '
-			GROUP BY m.id_member
-			LIMIT {int:start}, {int:number}',
-			array(
-				'start' => $_REQUEST['start'],
-				'number' => $increment,
-				'recycle' => $modSettings['recycle_board'],
-				'zero' => 0,
-			)
-		);
-		$total_rows = $smcFunc['db_num_rows']($request);
-
-		// Update the post count for this group
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET posts = {int:posts}
-				WHERE id_member = {int:row}',
-				array(
-					'row' => $row['id_member'],
-					'posts' => $row['posts'],
-				)
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$total_rows = updateMembersPostCount($_REQUEST['start'], $increment);
 
 		// Continue?
 		if ($total_rows == $increment)
