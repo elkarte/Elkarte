@@ -321,7 +321,7 @@ function action_secret2()
 
 	// Get the information from the database.
 	require_once(SUBSDIR . '/Members.subs.php');
-	$row = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true);
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
 	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
 

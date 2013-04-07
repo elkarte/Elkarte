@@ -152,7 +152,7 @@ function action_editBuddies($memID)
 	if (!empty($buddiesArray))
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
-		$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1);
+		$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1));
 		foreach ($result as $row)
 			$buddies[] = $row['id_member'];
 	}

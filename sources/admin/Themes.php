@@ -1103,7 +1103,7 @@ class Themes_Controller
 			require_once(SUBSDIR . '/Members.subs.php');
 			$member = getBasicMemberData($context['current_member']);
 
-			$context['current_theme']) = $member['id_theme'];
+			$context['current_theme'] = $member['id_theme'];
 		}
 
 		// Get the theme name and descriptions.
