@@ -82,7 +82,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			// Get the latest activated member's display name.
-			$result = getBasicMemberData((int) $changes['latestMember'])
+			$result = getBasicMemberData((int) $changes['latestMember']);
 			$changes['latestRealName'] = $result['real_name'];
 
 			// Are we using registration approval?

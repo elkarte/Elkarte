@@ -297,7 +297,7 @@ function SecretAnswerInput()
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
-	$row = getBasicMemberData((int) $_REQUEST['uid'], array('identification' => true);
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('identification' => true));
 	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
 
