@@ -1448,35 +1448,57 @@ function admins($id_admin = 0)
 /**
  * Load some basic member infos
  * 
- * @param array $members
+ * @param mixed $member_ids an array of member IDs or a single ID
+ * @param bool $add_guest if true adds an entry representing a guest
  * @return array
  */
-function getBasicMemberData($member_data)
+function getBasicMemberData($member_ids, $options = array())
 {
 	global $smcFunc, $txt;
 
 	$members = array();
 
-	// This is a guest...
-	$members[0] = array(
-		'id_member' => 0,
-		'member_name' => '',
-		'real_name' => $txt['guest_title']
-	);
+	if (empty($member_ids))
+		return false;
+
+	if (!is_array($member_ids))
+	{
+		$single = true;
+		$member_ids = array($member_ids);
+	}
+
+	if (!empty($options['add_guest']))
+	{
+		$single = false;
+		// This is a guest...
+		$members[0] = array(
+			'id_member' => 0,
+			'member_name' => '',
+			'real_name' => $txt['guest_title'],
+			'email_address' => '',
+		);
+	}
 
 	// Get some additional member info...
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, member_name, real_name
+		SELECT id_member, member_name, real_name, member_ip, email_address, hide_email, id_group,
+			posts, last_login' . (isset($options['identification']) ? ', secret_answer, secret_question, openid_uri' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
-		LIMIT ' . count($member_data),
+		LIMIT {int:limit}' . (isset($options['sort']) ? '
+		ORDER BY {string:sort}' : ''),
 		array(
-			'member_list' => $member_data,
+			'member_list' => $member_ids,
+			'limit' => count($member_ids),
+			'sort' => isset($options['sort']) ? $options['sort'] : '',
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$members[$row['id_member']] = $row;
 	$smcFunc['db_free_result']($request);
 
-	return $members;
+	if (!empty($single))
+		return $members[$row['id_member']];
+	else
+		return $members;
 }

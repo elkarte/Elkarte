@@ -124,7 +124,7 @@ class ManageErrors_Controller
 		if (!empty($members))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$members = getBasicMemberData($members);
+			$members = getBasicMemberData($members, array('add_guest'=> true));
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)

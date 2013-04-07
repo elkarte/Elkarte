@@ -1782,18 +1782,10 @@ function adminNotify($type, $memberID, $member_name = null)
 
 	if ($member_name == null)
 	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		// Get the new user's name....
-		$request = $smcFunc['db_query']('', '
-			SELECT real_name
-			FROM {db_prefix}members
-			WHERE id_member = {int:id_member}
-			LIMIT 1',
-			array(
-				'id_member' => $memberID,
-			)
-		);
-		list ($member_name) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$member_info = getBasicMemberData($memberID);
+		$member_name = $member_info['real_name'];
 	}
 
 	$toNotify = array();

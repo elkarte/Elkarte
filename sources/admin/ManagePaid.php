@@ -1061,16 +1061,10 @@ class ManagePaid_Controller
 
 			if (isset($_GET['uid']))
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT real_name
-					FROM {db_prefix}members
-					WHERE id_member = {int:current_member}',
-					array(
-						'current_member' => (int) $_GET['uid'],
-					)
-				);
-				list ($context['sub']['username']) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				require_once(SUBSDIR . '/Members.subs.php');
+				// Get the latest activated member's display name.
+				$result = getBasicMemberData((int) $_GET['uid']);
+				$context['sub']['username'] = $result['real_name'];
 			}
 			else
 				$context['sub']['username'] = '';

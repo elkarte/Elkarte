@@ -296,20 +296,10 @@ function SecretAnswerInput()
 		fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name, member_name, secret_question, openid_uri
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-		LIMIT 1',
-		array(
-			'id_member' => (int) $_REQUEST['uid'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Members.subs.php');
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('identification' => true);
+	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
-
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	$context['account_type'] = !empty($row['openid_uri']) ? 'openid' : 'password';
 
@@ -344,20 +334,10 @@ function action_secret2()
 	loadLanguage('Login');
 
 	// Get the information from the database.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, real_name, member_name, secret_answer, secret_question, openid_uri, email_address
-		FROM {db_prefix}members
-		WHERE id_member = {int:id_member}
-		LIMIT 1',
-		array(
-			'id_member' => $_REQUEST['uid'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	require_once(SUBSDIR . '/Members.subs.php');
+	$row = getBasicMemberData((int) $_REQUEST['uid'], array('identification' => true);
+	if (empty($row))
 		fatal_lang_error('username_no_exist', false);
-
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
 
 	// Check if the secret answer is correct.
 	if ($row['secret_question'] == '' || $row['secret_answer'] == '' || md5($_POST['secret_answer']) !== $row['secret_answer'])

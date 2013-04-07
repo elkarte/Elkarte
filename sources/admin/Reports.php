@@ -745,16 +745,10 @@ class Reports_Controller
 		setKeys('cols');
 
 		// Get each member!
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, real_name, id_group, posts, last_login
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:staff_list})
-			ORDER BY real_name',
-			array(
-				'staff_list' => $allStaff,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData($allStaff, array('sort' => 'real_name'));
+		foreach ($result as $row)
 		{
 			// Each member gets their own table!.
 			newTable($row['real_name'], '', 'left', 'auto', 'left', 200, 'center');
