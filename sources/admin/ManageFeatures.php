@@ -726,7 +726,7 @@ class ManageFeatures_Controller
 	/**
 	 * Show all the custom profile fields available to the user.
 	 */
-	private function action_profile()
+	public function action_profile()
 	{
 		global $txt, $scripturl, $context;
 
