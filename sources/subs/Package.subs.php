@@ -3210,30 +3210,39 @@ if (!function_exists('crc32_compat'))
 
 /**
  * Checks if a package is installed or not
- * If installed reutrnes an array of themes, db changes and versions associatd with
+ * If installed returns an array of themes, db changes and versions associated with
  * the package id
  *
  * @param string $id of package to check
  */
-function isPackageInsalled($id)
+function isPackageInstalled($id)
 {
-	global $smcFunc;
+	global $smcFunc, $context;
 
-	$result = array('old_themes' => '', 'old_version' => '', 'db_changes' => '');
+	$result = array(
+		'package_id' => '',
+		'install_state' => '',
+		'old_themes' => '',
+		'old_version' => '',
+		'db_changes' => ''
+	);
+
 	if (empty($id))
 		return $result;
 
 	// See if it is installed?
 	$request = $smcFunc['db_query']('', '
-		SELECT version, themes_installed, db_changes
+		SELECT version, themes_installed, db_changes, package_id, install_state
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
+			' . (!empty($context['install_id']) ? ' AND id_install = {int:install_id} ' : '') . '
 		ORDER BY time_installed DESC
 		LIMIT 1',
 		array(
 			'not_installed' => 0,
-			'current_package' => $packageInfo['id'],
+			'current_package' => $id,
+			'install_id' => $context['install_id'],
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -3241,7 +3250,9 @@ function isPackageInsalled($id)
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),
 			'old_version' => $row['version'],
-			'db_changes' => empty($row['db_changes']) ? array() : unserialize($row['db_changes'])
+			'db_changes' => empty($row['db_changes']) ? array() : unserialize($row['db_changes']),
+			'package_id' => $row['package_id'],
+			'install_state' => $row['install_state'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -3249,59 +3260,30 @@ function isPackageInsalled($id)
 	return $result;
 }
 
+/**
+ * For uninstalling action, updates the log_packages install_state state to 0 (uninstalled)
+ *
+ * @param string $id package_id to update
+ */
 function setPackageState($id)
 {
 	global $smcFunc, $context, $user_info;
 
-	$is_upgrade = false;
-	$old_db_changes = array();
-
-	// See if this is already installed, and change it's state as required.
-	$request = $smcFunc['db_query']('', '
-		SELECT package_id, install_state, db_changes
-		FROM {db_prefix}log_packages
-		WHERE install_state != {int:not_installed}
-			AND package_id = {string:current_package}
-			' . ($context['install_id'] ? ' AND id_install = {int:install_id} ' : '') . '
-		ORDER BY time_installed DESC
-		LIMIT 1',
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_packages
+		SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
+			time_removed = {int:current_time}
+		WHERE package_id = {string:package_id}
+			AND id_install = {int:install_id}',
 		array(
+			'current_member' => $user_info['id'],
 			'not_installed' => 0,
+			'current_time' => time(),
+			'package_id' => $id,
+			'member_name' => $user_info['name'],
 			'install_id' => $context['install_id'],
-			'current_package' => $id,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Uninstalling?
-		if ($context['uninstalling'])
-		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_packages
-				SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
-					time_removed = {int:current_time}
-				WHERE package_id = {string:package_id}
-					AND id_install = {int:install_id}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_installed' => 0,
-					'current_time' => time(),
-					'package_id' => $row['package_id'],
-					'member_name' => $user_info['name'],
-					'install_id' => $context['install_id'],
-				)
-			);
-		}
-		// Otherwise must be an upgrade.
-		else
-		{
-			$is_upgrade = true;
-			$old_db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-		}
-	}
-	$smcFunc['db_free_result']($request);
-
-	return array('upgrade' => $is_upgrade, 'old_db_changes' => $old_db_changes);
 }
 
 /**
@@ -3309,7 +3291,7 @@ function setPackageState($id)
  *
  * @global type $smcFunc
  */
-function checkPackageDependancy()
+function checkPackageDependency()
 {
 	global $smcFunc;
 

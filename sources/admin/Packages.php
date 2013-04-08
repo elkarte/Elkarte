@@ -995,15 +995,30 @@ class Packages_Controller
 			// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
 			package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
-			// See if this is already installed, and change it's state as required.
-			$package_state = setPackageState($packageInfo['id']);
+			// See if this is already installed
+			$is_upgrade = false;
+			$old_db_changes = array();
+			$package_check = isPackageInstalled($packageInfo['id']);
+
+			// Change the installed state as required.
+			if (!empty($package_check['install_state']))
+			{
+				if ($context['uninstalling'])
+					setPackageState($package_check['package_id']);
+				else
+				{
+					// not uninstalling so must be an upgrade
+					$is_upgrade = true;
+					$old_db_changes = empty($package_check['db_changes']) ? array() : $package_check['db_changes'];
+				}
+			}
 
 			// Assuming we're not uninstalling, add the entry.
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
-				if (!empty($package_state['old_db_changes']))
-					$db_package_log = empty($db_package_log) ? $package_state['old_db_changes'] : array_merge($package_state['old_db_changes'], $db_package_log);
+				if (!empty($old_db_changes))
+					$db_package_log = empty($db_package_log) ? $old_db_changes : array_merge($old_db_changes, $db_package_log);
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
@@ -1049,7 +1064,7 @@ class Packages_Controller
 				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
 
 				// Add to the log packages
-				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $package_state['is_upgrade'], $credits_tag);
+				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
 			}
 			$context['install_finished'] = true;
 		}
@@ -1076,7 +1091,7 @@ class Packages_Controller
 			deltree(BOARDDIR . '/packages/temp');
 
 		// Log what we just did.
-		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($package_state['is_upgrade']) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
+		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		clean_cache();
