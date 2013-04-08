@@ -770,6 +770,23 @@ CREATE TABLE {$db_prefix}custom_fields (
 CREATE UNIQUE INDEX {$db_prefix}custom_fields_col_name ON {$db_prefix}custom_fields (col_name);
 
 #
+# Table structure for table `custom_fields_data`
+#
+
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member int NOT NULL default '0',
+  variable varchar(255) NOT NULL,
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable)
+);
+
+#
+# Indexes for table `custom_fields_data`
+#
+
+CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
+
+#
 # Table structure for table `group_moderators`
 #
 
