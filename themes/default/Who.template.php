@@ -26,23 +26,23 @@ function template_main()
 			<div class="title_bar">
 				<h4 class="titlebg margin_lower">', $txt['who_title'], '</h4>
 			</div>
-			<div class="topic_table" id="mlist">
-				<div class="pagesection">
-					<div class="pagelinks floatleft">', $context['page_index'], '</div>';
+			<div class="pagesection">
+				<div class="pagelinks floatleft">', $context['page_index'], '</div>';
 		echo '
-					<div class="selectbox floatright">', $txt['who_show1'], '
-						<select name="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
+				<div class="selectbox floatright">', $txt['who_show1'], '
+					<select name="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
 		foreach ($context['show_methods'] as $value => $label)
 			echo '
-							<option value="', $value, '" ', $value == $context['show_by'] ? ' selected="selected"' : '', '>', $label, '</option>';
+						<option value="', $value, '" ', $value == $context['show_by'] ? ' selected="selected"' : '', '>', $label, '</option>';
 		echo '
-						</select>
-						<noscript>
-							<input type="submit" name="submit_top" value="', $txt['go'], '" class="button_submit" />
-						</noscript>
-					</div>
+					</select>
+					<noscript>
+						<input type="submit" name="submit_top" value="', $txt['go'], '" class="button_submit" />
+					</noscript>
 				</div>
+			</div>
+			<div class="topic_table" id="mlist">
 				<table class="table_grid" >
 					<thead>
 						<tr class="catbg">
