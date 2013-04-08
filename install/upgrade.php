@@ -2461,7 +2461,7 @@ function parse_sql($filename)
 	return true;
 }
 
-function upgrade_query($string, $unbuffered = false)
+function upgrade_query($string, $unbuffered = false, $identifier = '')
 {
 	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line, $upcontext, $upgradeurl, $modSettings;
 	global $db_name, $db_unbuffered, $smcFunc;
@@ -2469,7 +2469,7 @@ function upgrade_query($string, $unbuffered = false)
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db_unbuffered = $unbuffered;
-	$result = $smcFunc['db_query']('', $string, 'security_override');
+	$result = $smcFunc['db_query']($identifier, $string, 'security_override');
 	$db_unbuffered = false;
 
 	// Failure?!
