@@ -779,6 +779,7 @@ class ManageFeatures_Controller
 		require_once(SUBSDIR . '/List.subs.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
+		// Create a listing for all our standard fields
 		$listOptions = array(
 			'id' => 'standard_profile_fields',
 			'title' => $txt['standard_profile_title'],
@@ -844,6 +845,7 @@ class ManageFeatures_Controller
 		);
 		createList($listOptions);
 
+		// And now we do the same for all of our custom ones
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
@@ -896,17 +898,18 @@ class ManageFeatures_Controller
 						'reverse' => 'field_type DESC',
 					),
 				),
-				'active' => array(
+				'cust' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_active'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt;
-
-							return $rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\'];
+							$isChecked = $rowData[\'active\'] ? \'\' : \' checked="checked"\';
+							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
 						'),
 						'style' => 'width: 8%;',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'active DESC',
@@ -945,14 +948,17 @@ class ManageFeatures_Controller
 			'form' => array(
 				'href' => $scripturl . '?action=admin;area=featuresettings;sa=profileedit',
 				'name' => 'customProfileFields',
+				'token' => 'admin-scp',
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="button_submit" />
+					<input type="submit" name="onoff" value="' . $txt['save'] . '" class="button_submit" />',
 				),
 			),
 		);
+
 		createList($listOptions);
 	}
 
@@ -975,6 +981,7 @@ class ManageFeatures_Controller
 		// Load the profile language for section names.
 		loadLanguage('Profile');
 
+		// Load up the profile field, if one was supplied
 		if ($context['fid'])
 			$context['field'] = getProfileField($context['fid']);
 
@@ -1005,8 +1012,28 @@ class ManageFeatures_Controller
 				'placement' => 0,
 			);
 
+		// Are we toggling which ones are active?
+		if (isset($_POST['onoff']))
+		{
+			checkSession();
+			validateToken('admin-scp');
+
+			// Enable and disable custom fields as required.
+			$enabled = array(0);
+			foreach ($_POST['cust'] as $id)
+				$enabled[] = (int) $id;
+
+			// Do the updates
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}custom_fields
+				SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 0 ELSE 1 END',
+				array(
+					'id_cust_enable' => $enabled,
+				)
+			);
+		}
 		// Are we saving?
-		if (isset($_POST['save']))
+		elseif (isset($_POST['save']))
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1087,6 +1114,7 @@ class ManageFeatures_Controller
 					$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
+
 				// Still not a unique colum name? Leave it up to the user, then.
 				if (!$unique)
 					fatal_lang_error('custom_option_not_unique');
@@ -1135,7 +1163,6 @@ class ManageFeatures_Controller
 			// Updating an existing field?
 			if ($context['fid'])
 			{
-				
 				$field_data = array(
 					'field_length' => $field_length,
 					'show_reg' => $show_reg,
@@ -1156,7 +1183,7 @@ class ManageFeatures_Controller
 					'enclose' => $enclose,
 					'placement' => $placement,
 				);
-				
+
 				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
@@ -1198,15 +1225,16 @@ class ManageFeatures_Controller
 			checkSession();
 			validateToken('admin-ecp');
 
-			//Delete the old data first, then the field.
+			// Delete the old data first, then the field.
 			deleteProfileFieldUserData($context['field']['colname']);
 			deleteProfileField($context['fid']);
 		}
 
 		// Rebuild display cache etc.
-		if (isset($_POST['delete']) || isset($_POST['save']))
+		if (isset($_POST['delete']) || isset($_POST['save']) || isset($_POST['onoff']))
 		{
 			checkSession();
+
 			// Update the display cache
 			updateDisplayCache();
 			redirectexit('action=admin;area=featuresettings;sa=profile');
@@ -1219,7 +1247,7 @@ class ManageFeatures_Controller
 /**
  * Just pause the signature applying thing.
  * @todo Move to subs file
- * @todo Merge with other pause functions? 
+ * @todo Merge with other pause functions?
  *		pausePermsSave(), pausAttachmentMaintenance()
  *		pauseRepairProcess()
  */
