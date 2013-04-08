@@ -1008,7 +1008,7 @@ class ManageMaintenance_Controller
 	 */
 	public function action_recountposts_display()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context;
 
 		// You have to be allowed in here
 		isAllowedTo('admin_forum');
@@ -1031,7 +1031,7 @@ class ManageMaintenance_Controller
 		if (!isset($_SESSION['total_members']))
 		{
 			validateToken('admin-maint');
-			$_SESSION['total_members'] = getTotalMembers();
+			$_SESSION['total_members'] = countContributors();
 		}
 		else
 			validateToken('admin-recountposts');
@@ -1053,58 +1053,8 @@ class ManageMaintenance_Controller
 				apache_reset_timeout();
 			return;
 		}
-
-		// final steps ... made more difficult since we don't yet support sub-selects on joins
-		// place all members who have posts in the message table in a temp table
-		$createTemporary = $smcFunc['db_query']('', '
-			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
-				id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_member)
-			)
-			SELECT m.id_member
-			FROM ({db_prefix}messages AS m,{db_prefix}boards AS b)
-			WHERE m.id_member != {int:zero}
-				AND b.count_posts = {int:zero}
-				AND m.id_board = b.id_board ' . (!empty($modSettings['recycle_enable']) ? '
-				AND b.id_board != {int:recycle}' : '') . '
-			GROUP BY m.id_member',
-			array(
-				'zero' => 0,
-				'string_zero' => '0',
-				'db_error_skip' => true,
-			)
-		) !== false;
-
-		if ($createTemporary)
-		{
-			// outer join the members table on the temporary table finding the members that have a post count but no posts in the message table
-			$request = $smcFunc['db_query']('', '
-				SELECT mem.id_member, mem.posts
-				FROM {db_prefix}members AS mem
-				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res
-				ON res.id_member = mem.id_member
-				WHERE res.id_member IS null
-					AND mem.posts != {int:zero}',
-				array(
-					'zero' => 0,
-				)
-			);
-
-			// set the post count to zero for any delinquents we may have found
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}members
-					SET posts = {int:zero}
-					WHERE id_member = {int:row}',
-					array(
-						'row' => $row['id_member'],
-						'zero' => 0,
-					)
-				);
-			}
-			$smcFunc['db_free_result']($request);
-		}
+		// No countable posts? set posts counter to 0 
+		 updateZeroPostMembers();
 
 		// all done
 		unset($_SESSION['total_members']);
