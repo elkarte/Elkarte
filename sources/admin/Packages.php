@@ -208,7 +208,7 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// See if it is installed?
-		$package_installed = isPackageInsalled($packageInfo['id']);
+		$package_installed = isPackageInstalled($packageInfo['id']);
 
 		$context['database_changes'] = array();
 		if (isset($packageInfo['uninstall']['database']))
@@ -534,8 +534,8 @@ class Packages_Controller
 					$context['has_failure'] = true;
 				else
 				{
-					// See if this dependancy is installed
-					$installed_version = checkPackageDependancy();
+					// See if this dependency is installed
+					$installed_version = checkPackageDependency();
 
 					// Do a version level check (if requested) in the most basic way
 					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
@@ -852,7 +852,7 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// Is it actually installed?
-		$package_installed = isPackageInsalled($packageInfo['id']);
+		$package_installed = isPackageInstalled($packageInfo['id']);
 
 		// Wait, it's not installed yet!
 		// @todo Replace with a better error message!
@@ -1987,7 +1987,7 @@ class Packages_Controller
 				$context['special_files'] = array();
 
 				/**
-				 * Builds a list of special files recusivly for a given path
+				 * Builds a list of special files recursively for a given path
 				 *
 				 * @param type $path
 				 * @param type $data
@@ -2348,7 +2348,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 }
 
 /**
- * Checkes the permissions of all the areas that will be affected by the package
+ * Checks the permissions of all the areas that will be affected by the package
  *
  * @param string $path
  * @param array $data
