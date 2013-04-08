@@ -697,87 +697,60 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $txt, $modSettings, $options, $smcFunc;
+	global $txt, $modSettings, $options, $smcFunc, $language;
 	global $context, $settings, $user_info, $scripturl;
+	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
+	static $all_instances;
 
-	// First verification means we need to set up some bits...
-	if (empty($context['controls']['verification']))
-	{
-		// The template
-		loadTemplate('GenericControls');
-
-		// Some javascript ma'am?
-		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			loadJavascriptFile('captcha.js');
-
-		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
-
-		// Skip I, J, L, O, Q, S and Z.
-		$context['standard_captcha_range'] = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
-	}
+	// @todo: maybe move the list to $modSettings instead of hooking it?
+	$known_verifications = array(
+		'captcha',
+		'questions',
+	);
+	call_integration_hook('integrate_control_verification', array(&$known_verifications));
 
 	// Always have an ID.
 	assert(isset($verificationOptions['id']));
 	$isNew = !isset($context['controls']['verification'][$verificationOptions['id']]);
 
-	// Log this into our collection.
 	if ($isNew)
 		$context['controls']['verification'][$verificationOptions['id']] = array(
 			'id' => $verificationOptions['id'],
-			'show_visual' => !empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])),
-			'number_questions' => isset($verificationOptions['override_qs']) ? $verificationOptions['override_qs'] : (!empty($modSettings['qa_verification_number']) ? $modSettings['qa_verification_number'] : 0),
 			'max_errors' => isset($verificationOptions['max_errors']) ? $verificationOptions['max_errors'] : 3,
-			'image_href' => $scripturl . '?action=verificationcode;vid=' . $verificationOptions['id'] . ';rand=' . md5(mt_rand()),
-			'text_value' => '',
-			'questions' => array(),
 		);
 	$thisVerification = &$context['controls']['verification'][$verificationOptions['id']];
-
-	// Add javascript for the object.
-	if ($context['controls']['verification'][$verificationOptions['id']]['show_visual'])
-		addInlineJavascript('
-				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');', true);
-
-	// Is there actually going to be anything?
-	if (empty($thisVerification['show_visual']) && empty($thisVerification['number_questions']))
-		return false;
-	elseif (!$isNew && !$do_test)
-		return true;
-
-	// If we want questions do we have a cache of all the IDs?
-	if (!empty($thisVerification['number_questions']) && empty($modSettings['question_id_cache']))
-	{
-		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_question
-				FROM {db_prefix}antispam_questions',
-				array()
-			);
-			$modSettings['question_id_cache'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$modSettings['question_id_cache'][] = $row['id_question'];
-			$smcFunc['db_free_result']($request);
-
-			if (!empty($modSettings['cache_enable']))
-				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
-		}
-	}
 
 	if (!isset($_SESSION[$verificationOptions['id'] . '_vv']))
 		$_SESSION[$verificationOptions['id'] . '_vv'] = array();
 
-	// Do we need to refresh the verification?
-	if (!$do_test && (!empty($_SESSION[$verificationOptions['id'] . '_vv']['did_pass']) || empty($_SESSION[$verificationOptions['id'] . '_vv']['count']) || $_SESSION[$verificationOptions['id'] . '_vv']['count'] > 3) && empty($verificationOptions['dont_refresh']))
-		$force_refresh = true;
-	else
-		$force_refresh = false;
+	$force_refresh = ((!empty($_SESSION[$verificationOptions['id'] . '_vv']['did_pass']) || empty($_SESSION[$verificationOptions['id'] . '_vv']['count']) || $_SESSION[$verificationOptions['id'] . '_vv']['count'] > 3) && empty($verificationOptions['dont_refresh']));
+	if (!isset($all_instances[$verificationOptions['id']]))
+	{
+		$all_instances[$verificationOptions['id']] = array();
 
-	// This can also force a fresh, although unlikely.
-	if (($thisVerification['show_visual'] && empty($_SESSION[$verificationOptions['id'] . '_vv']['code'])) || ($thisVerification['number_questions'] && empty($_SESSION[$verificationOptions['id'] . '_vv']['q'])))
-		$force_refresh = true;
+		$current_instance = null;
+		foreach ($known_verifications as $verification)
+		{
+			$class_name = 'control_verification_' . $verification;
+			$current_instance = new $class_name($verificationOptions);
+
+			// If there is anything to show, otherwise forget it
+			if ($current_instance->showVerification($isNew, $force_refresh))
+				$all_instances[$verificationOptions['id']][$verification] = $current_instance;
+		}
+	}
+
+	$instances = &$all_instances[$verificationOptions['id']];
+	$thisVerification = &$context['controls']['verification'][$verificationOptions['id']];
+
+	// Is there actually going to be anything?
+	if (empty($instances))
+		return false;
+	elseif (!$isNew && !$do_test)
+		return true;
 
 	$verification_errors = error_context::context($verificationOptions['id']);
+	$increase_error_count = false;
 
 	// Start with any testing.
 	if ($do_test)
@@ -785,38 +758,20 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		// This cannot happen!
 		if (!isset($_SESSION[$verificationOptions['id'] . '_vv']['count']))
 			fatal_lang_error('no_access', false);
-		// ... nor this!
-		if ($thisVerification['number_questions'] && (!isset($_SESSION[$verificationOptions['id'] . '_vv']['q']) || !isset($_REQUEST[$verificationOptions['id'] . '_vv']['q'])))
-			fatal_lang_error('no_access', false);
 
-		if ($thisVerification['show_visual'] && (empty($_REQUEST[$verificationOptions['id'] . '_vv']['code']) || empty($_SESSION[$verificationOptions['id'] . '_vv']['code']) || strtoupper($_REQUEST[$verificationOptions['id'] . '_vv']['code']) !== $_SESSION[$verificationOptions['id'] . '_vv']['code']))
-			$verification_errors->addError('wrong_verification_code');
-		if ($thisVerification['number_questions'])
+		foreach ($instances as $instance)
 		{
-			// Get the answers and see if they are all right!
-			$request = $smcFunc['db_query']('', '
-				SELECT id_question, answer
-				FROM {db_prefix}antispam_questions
-				WHERE id_question IN ({array_int:question_ids})',
-				array(
-					'question_ids' => $_SESSION[$verificationOptions['id'] . '_vv']['q'],
-				)
-			);
-			$incorrectQuestions = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			$outcome = $instance->doTest();
+			if ($outcome !== true)
 			{
-				if (!isset($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) == '' || trim($smcFunc['htmlspecialchars'](strtolower($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]))) != strtolower($row['answer']))
-					$incorrectQuestions[] = $row['id_question'];
+				$increase_error_count = true;
+				$verification_errors->addError($outcome);
 			}
-			$smcFunc['db_free_result']($request);
-
-			if (!empty($incorrectQuestions))
-				$verification_errors->addError('wrong_verification_answer');
 		}
 	}
 
 	// Any errors means we refresh potentially.
-	if ($verification_errors->hasError(array('wrong_verification_code', 'wrong_verification_answer')))
+	if ($increase_error_count)
 	{
 		if (empty($_SESSION[$verificationOptions['id'] . '_vv']['errors']))
 			$_SESSION[$verificationOptions['id'] . '_vv']['errors'] = 0;
@@ -835,75 +790,349 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		$_SESSION[$verificationOptions['id'] . '_vv']['count'] = 0;
 		$_SESSION[$verificationOptions['id'] . '_vv']['errors'] = 0;
 		$_SESSION[$verificationOptions['id'] . '_vv']['did_pass'] = false;
-		$_SESSION[$verificationOptions['id'] . '_vv']['q'] = array();
-		$_SESSION[$verificationOptions['id'] . '_vv']['code'] = '';
 
-		// Generating a new image.
-		if ($thisVerification['show_visual'])
+		foreach ($instances as $instance)
 		{
-			// Are we overriding the range?
-			$character_range = !empty($verificationOptions['override_range']) ? $verificationOptions['override_range'] : $context['standard_captcha_range'];
-
-			for ($i = 0; $i < 6; $i++)
-				$_SESSION[$verificationOptions['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
-		}
-
-		// Getting some new questions?
-		if ($thisVerification['number_questions'])
-		{
-			// Pick some random IDs
-			$questionIDs = array();
-			if ($thisVerification['number_questions'] == 1)
-				$questionIDs[] = $modSettings['question_id_cache'][array_rand($modSettings['question_id_cache'], $thisVerification['number_questions'])];
-			else
-				foreach (array_rand($modSettings['question_id_cache'], $thisVerification['number_questions']) as $index)
-					$questionIDs[] = $modSettings['question_id_cache'][$index];
+			$instance->createTest(true);
+			$instance->prepareContext();
 		}
 	}
 	else
 	{
-		// Same questions as before.
-		$questionIDs = !empty($_SESSION[$verificationOptions['id'] . '_vv']['q']) ? $_SESSION[$verificationOptions['id'] . '_vv']['q'] : array();
-		$thisVerification['text_value'] = !empty($_REQUEST[$verificationOptions['id'] . '_vv']['code']) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['code']) : '';
-	}
-
-	// Have we got some questions to load?
-	if (!empty($questionIDs))
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_question, question
-			FROM {db_prefix}antispam_questions
-			WHERE id_question IN ({array_int:question_ids})',
-			array(
-				'question_ids' => $questionIDs,
-			)
-		);
-		$_SESSION[$verificationOptions['id'] . '_vv']['q'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		foreach ($instances as $instance)
 		{
-			$thisVerification['questions'][] = array(
-				'id' => $row['id_question'],
-				'q' => parse_bbc($row['question']),
-				'is_error' => !empty($incorrectQuestions) && in_array($row['id_question'], $incorrectQuestions),
-				// Remember a previous submission?
-				'a' => isset($_REQUEST[$verificationOptions['id'] . '_vv'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$row['id_question']]) : '',
-			);
-			$_SESSION[$verificationOptions['id'] . '_vv']['q'][] = $row['id_question'];
+			$instance->createTest(false);
+			$instance->prepareContext();
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	$_SESSION[$verificationOptions['id'] . '_vv']['count'] = empty($_SESSION[$verificationOptions['id'] . '_vv']['count']) ? 1 : $_SESSION[$verificationOptions['id'] . '_vv']['count'] + 1;
 
 	// Return errors if we have them.
 	if ($verification_errors->hasErrors())
-		return true;
+	{
+		// @todo temporary until the error class is implemented in register
+		$error_codes = array();
+		foreach ($verification_errors->getErrors() as $errors)
+			foreach ($errors as $error)
+				$error_codes[] = $error;
+
+		return $error_codes;
+		}
 	// If we had a test that one, make a note.
 	elseif ($do_test)
 		$_SESSION[$verificationOptions['id'] . '_vv']['did_pass'] = true;
 
 	// Say that everything went well chaps.
 	return true;
+}
+
+interface control_verifications
+{
+     function showVerification($isNew, $force_refresh);
+     function createTest($refresh);
+     function prepareContext();
+     function doTest();
+}
+
+class control_verification_captcha implements control_verifications
+{
+	private $_options = null;
+	private $_thisVerification = null;
+
+	public function __construct($verificationOptions)
+	{
+		global $context;
+
+		$context['controls']['verification'][$verificationOptions['id']]['tests']['captcha'] = array();
+		// A shortcut
+		$this->_thisVerification = &$context['controls']['verification'][$verificationOptions['id']]['tests']['captcha'];
+		$this->_options = $verificationOptions;
+	}
+		
+	public function showVerification($isNew, $force_refresh = true)
+	{
+		global $context, $modSettings, $scripturl;
+
+		// a bit of a trick, just to load only once the js
+		if (!isset($context['captcha_js_loaded']))
+		{
+			$context['captcha_js_loaded'] = false;
+			// The template
+			loadTemplate('GenericControls');
+
+			$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
+
+			// Skip I, J, L, O, Q, S and Z.
+			$context['standard_captcha_range'] = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
+		}
+
+		//Some javascript ma'am? (But load it only once)
+		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visuali_verification_type']) && !isset($this->_options['override_visual'])) && emtpy($context['captcha_js_loaded']))
+		{
+			loadJavascriptFile('captcha.js');
+			$context['captcha_js_loaded'] = true;
+		}
+
+		if ($isNew)
+		{
+			$this->_thisVerification = array(
+				'show_captcha' => !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_option['override_visual'])),
+				'image_href' => $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand()),
+				'text_value' => '',
+			);
+
+			addInlineJavascript('
+				var verification' . $this->_options['id'] . 'Handle = new smfCaptcha("' . $this->_thisVerification['image_href'] . '", "' . $this->_options['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');', true);
+		}
+
+		if ($isNew || $force_refresh)
+			$this->createTest($force_refresh);
+
+		return $this->_thisVerification['show_captcha'];
+	}
+
+	public function createTest($refresh = true)
+	{
+		global $context, $smcFunc;
+
+		if (empty($this->_thisVerification['show_captcha']))
+			return;
+
+		if ($refresh)
+		{
+			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
+			// Are we overriding the range?
+			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $context['standard_captcha_range'];
+
+			for ($i = 0; $i < 6; $i++)
+				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
+		}
+		else
+			$this->_thisVerification['text_value'] = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? $smcFunc['htmlspecialchars']($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+	}
+
+	public function prepareContext()
+	{
+		$this->_thisVerification['display'] = array(
+			'template' => 'template_control_verification_captcha',
+			'values' => array(
+				'image_href' => $this->_thisVerification['image_href'],
+				'text_value' => $this->_thisVerification['text_value'],
+			)
+		);
+	}
+
+	public function doTest()
+	{
+		if ($this->_thisVerification['show_captcha'] && (empty($_REQUEST[$this->_options['id'] . '_vv']['code']) || empty($_SESSION[$this->_options['id'] . '_vv']['code']) || strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) !== $_SESSION[$this->_options['id'] . '_vv']['code']))
+			return 'wrong_verification_code';
+
+		return true;
+	}
+}
+
+class control_verification_questions implements control_verifications
+{
+	private $_options = null;
+	private $_thisVerification = null;
+	private $_questionIDs = array();
+	private $_thisText = null;
+
+	public function __construct($verificationOptions)
+	{
+		global $context;
+
+		$context['controls']['verification'][$verificationOptions['id']]['tests']['questions'] = array();
+		// A shortcut
+		$this->_thisVerification = &$context['controls']['verification'][$verificationOptions['id']]['tests']['questions'];
+		$this->_options = $verificationOptions;
+	}
+
+	public function showVerification($isNew, $force_refresh = true)
+	{
+		global $context, $modSettings, $user_info, $language;
+
+		if ($isNew)
+		{
+			$this->_thisVerification = array(
+				'number_questions' => isset($this->_options['override_qs']) ? $this->_options['override_qs'] : (!empty($modSettings['qa_verification_number']) ? $modSettings['qa_verification_number'] : 0),
+				'questions' => array(),
+			);
+			// If we want questions do we have a cache of all the IDs?
+			if (!empty($this->_thisVerification['number_questions']) && empty($modSettings['question_id_cache']))
+				refreshQuestionsCache();
+
+			// Let's deal with languages
+			// First thing we need to know what language the user wants and if there is at least one question
+			$user_language = !empty($_SESSION[$this->_options['id'] . '_vv']['language']) ? $_SESSION[$this->_options['id'] . '_vv']['language'] : (!empty($user_info['language']) ? $user_info['language'] : $language);
+
+			// No questions in the selected language?
+			if (empty($modSettings['question_id_cache'][$user_language]))
+			{
+				// Not even in the forum default? What the heck are you doing?!
+				if (empty($modSettings['question_id_cache'][$language]))
+				{
+					$this->_thisVerification['number_questions'] = 0;
+				}
+				// Fall back to the default
+				else
+					$user_language = $language;
+			}
+			// Do we have enough questions?
+			if (!empty($this->_thisVerification['number_questions']) && $this->_thisVerification['number_questions'] > count($modSettings['question_id_cache'][$user_language]))
+			{
+				$this->_thisVerification['number_questions'] = count($modSettings['question_id_cache'][$user_language]);
+
+				if ($isNew || $force_refresh)
+					$this->createTest($force_refresh);
+			}
+		}
+
+		return !empty($this->_thisVerification['number_questions']);
+	}
+
+	public function createTest($refresh = true)
+	{
+		global $modSettings;
+
+		if (empty($this->_thisVerification['number_questions']))
+			return;
+
+		// Getting some new questions?
+		if ($refresh)
+		{
+			$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
+
+			// Pick some random IDs
+			if ($this->_thisVerification['number_questions'] == 1)
+				$this->_questionIDs[] = $modSettings['question_id_cache'][array_rand($modSettings['question_id_cache'], $this->_thisVerification['number_questions'])];
+			else
+				foreach (array_rand($modSettings['question_id_cache'], $this->_thisVerification['number_questions']) as $index)
+					$this->_questionIDs[] = $modSettings['question_id_cache'][$index];
+		}
+		// Same questions as before.
+		else
+			$this->_questionIDs = !empty($_SESSION[$this->_options['id'] . '_vv']['q']) ? $_SESSION[$this->_options['id'] . '_vv']['q'] : array();
+	}
+
+	public function prepareContext()
+	{
+		$questions = loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
+		$this->_thisVerification['display'] = array(
+			'template' => 'template_control_verification_questions',
+			'values' => array(),
+		);
+
+		foreach ($questions as $row)
+		{
+			$this->_thisVerification['display']['values'][] = array(
+				'id' => $row['id_question'],
+				'q' => parse_bbc($row['question']),
+				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
+				// Remember a previous submission?
+				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? $smcFunc['htmlspecialchars']($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
+			);
+			$_SESSION[$this->_options['id'] . '_vv']['q'][] = $row['id_question'];
+		}
+	}
+
+	public function doTest()
+	{
+			if ($this->_thisVerification['number_questions'] && (!isset($_SESSION[$this->_options['id'] . '_vv']['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
+			fatal_lang_error('no_access', false);
+
+		if (!$this->_verifyAnswers())
+			return 'wrong_verification_answer';
+
+		return true;
+	}
+
+	/**
+	* Checks if an the answers to anti-spam questions are correct
+	* @param string $verificationId the ID of the verification element
+	* @return mixed true if the answers are correct, an array of id of wrong questions otherwise
+	*/
+	private function _verifyAnswers()
+	{
+		global $smcFunc;
+
+		// Get the answers and see if they are all right!
+		$questions = loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
+		$this->_incorrectQuestions = array();
+		foreach ($questions as $row)
+		{
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || trim($smcFunc['htmlspecialchars'](strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))) != strtolower($row['answer']))
+				$this->_incorrectQuestions[] = $row['id_question'];
+		}
+		$smcFunc['db_free_result']($request);
+
+		return !empty($this->_incorrectQuestions);
+	}
+
+}
+
+/**
+* Updates the cache of questions IDs
+*/
+function refreshQuestionsCache()
+{
+	global $modSettings, $smcFunc;
+
+	if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_question, language
+			FROM {db_prefix}antispam_questions',
+			array()
+		);
+		$modSettings['question_id_cache'] = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$modSettings['question_id_cache']['language'][] = $row['id_question'];
+		$smcFunc['db_free_result']($request);
+
+		if (!empty($modSettings['cache_enable']))
+			cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+	}
+}
+
+/**
+ * Loads all the available antispam questions, or a subset based on a filter
+ * @param array $filter, if specified it myst be an array with two indexes:
+ *              - 'type' => a valid filter, it can be 'language' or 'id_question'
+ *              - 'value' => the value of the filter (i.e. the language)
+ */
+function loadAntispamQuestions($filter = null)
+{
+	global $smcFunc;
+
+	$available_filters = array(
+		'language' => 'language = {string:current_filter}',
+		'id_question' => 'id_question IN ({array_int:current_filter})',
+	);
+
+	// Load any question and answers!
+	$question_answers = array();
+	$request = $smcFunc['db_query']('', '
+		SELECT id_question, question, answer, language
+		FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
+		WHERE ' . $available_filters[$filter['type']]),
+		array(
+			'current_filter' => $filter['value'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$question_answers[$row['id_question']] = array(
+			'id' => $row['id_question'],
+			'question' => $row['question'],
+			'answer' => unserialize($row['answer']),
+			'language' => $row['language'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $question_answers;
 }
 
 /**

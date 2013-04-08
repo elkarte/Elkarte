@@ -305,22 +305,14 @@ class ManageSecurity_Controller
 		$config_vars = $this->_spamSettings->settings();
 
 		// Load any question and answers!
-		$context['question_answers'] = array();
-		$request = $smcFunc['db_query']('', '
-			SELECT id_question, question, answer, language
-			FROM {db_prefix}antispam_questions',
-			array()
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['question_answers'][$row['id_question']] = array(
-				'id' => $row['id_question'],
-				'question' => $row['question'],
-				'answer' => unserialize($row['answer']),
-				'language' => $row['language'],
+		require_once(SUBSDIR . '/Editor.subs.php');
+		$filter = null;
+		if (isset($_GET['language']))
+			$filter = array(
+				'type' => 'language',
+				'value' => $_GET['language'],
 			);
-		}
-		$smcFunc['db_free_result']($request);
+		$context['question_answers'] = loadAntispamQuestions($filter);
 
 		// Saving?
 		if (isset($_GET['save']))
