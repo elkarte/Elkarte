@@ -408,9 +408,9 @@ function action_mlsearch()
 			$curField = substr($field, 5);
 			if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 			{
-				$customJoin[] = 'LEFT JOIN {db_prefix}themes AS t' . $curField . ' ON (t' . $curField . '.variable = {string:t' . $curField . '} AND t' . $curField . '.id_theme = 1 AND t' . $curField . '.id_member = mem.id_member)';
-				$query_parameters['t' . $curField] = $curField;
-				$fields += array($customCount++ => 'IFNULL(t' . $curField . '.value, {string:blank_string})');
+				$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
+				$query_parameters['cfd' . $curField] = $curField;
+				$fields += array($customCount++ => 'IFNULL(cfd' . $curField . '.value, {string:blank_string})');
 			}
 		}
 
