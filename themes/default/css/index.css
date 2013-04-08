@@ -526,7 +526,7 @@ div.windowbg, div.windowbg2 {
 div.pagesection div.floatright input, div.pagesection div.floatright select {
 	margin-top: 3px;
 }
-.pagelinks {
+.selectbox, .pagelinks {
 	margin: 8px 0 0 0;
 }
 .navPages {
