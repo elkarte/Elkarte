@@ -178,7 +178,7 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards, $boardList, $modSettings, $smcFunc;
+	global $cat_tree, $boards, $smcFunc;
 
 	// Get some basic information about all boards and categories.
 	getBoardTree();
@@ -469,7 +469,7 @@ function modifyBoard($board_id, &$boardOptions)
  */
 function createBoard($boardOptions)
 {
-	global $boards, $modSettings, $smcFunc;
+	global $boards, $smcFunc;
 
 	// Trigger an error if one of the required values is not set.
 	if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) == '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
@@ -791,7 +791,7 @@ function fixChildren($parent, $newLevel, $newParent)
  */
 function getBoardTree()
 {
-	global $cat_tree, $boards, $boardList, $txt, $modSettings, $smcFunc;
+	global $cat_tree, $boards, $boardList, $smcFunc;
 
 	// Getting all the board and category information you'd ever wanted.
 	$request = $smcFunc['db_query']('', '
@@ -948,8 +948,6 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
-	global $smcFunc, $user_info, $board;
-
 	// Find out if they have notification set for this board already.
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member
@@ -958,14 +956,14 @@ function hasBoardNotification($id_member, $id_board)
 			AND id_board = {int:current_board}
 		LIMIT 1',
 		array(
-			'current_board' => $board,
-			'current_member' => $user_info['id'],
+			'current_board' => $id_board,
+			'current_member' => $id_member,
 		)
 	);
 	$hasNotification = $smcFunc['db_num_rows']($request) != 0;
 	$smcFunc['db_free_result']($request);
 
-	return hasNotification;
+	return $hasNotification;
 }
 
 /**
@@ -1027,6 +1025,14 @@ function accessibleBoards()
 	return $boards;
 }
 
+/**
+ * Returns the post count and name of a board
+ *  - if supplied a topic id will also return the message subject
+ *  - honors query_see_board to ensure a user can see the information
+ *
+ * @param type $board_id
+ * @param type $topic_id
+ */
 function boardInfo($board_id, $topic_id = null)
 {
 	global $smcFunc;
@@ -1069,5 +1075,6 @@ function boardInfo($board_id, $topic_id = null)
 
 	$returns = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
+
 	return $returns;
 }

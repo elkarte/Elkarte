@@ -136,12 +136,14 @@ function action_summary($memID)
 		);
 		$ban_query[] = 'id_member = ' . $context['member']['id'];
 		$ban_query[] = constructBanQueryIP($memberContext[$memID]['ip']);
+
 		// Do we have a hostname already?
 		if (!empty($context['member']['hostname']))
 		{
 			$ban_query[] = '({string:hostname} LIKE hostname)';
 			$ban_query_vars['hostname'] = $context['member']['hostname'];
 		}
+
 		// Check their email as well...
 		if (strlen($context['member']['email']) != 0)
 		{

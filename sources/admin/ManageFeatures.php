@@ -975,6 +975,7 @@ class ManageFeatures_Controller
 		// Load the profile language for section names.
 		loadLanguage('Profile');
 
+		// Load up the profile field, if one was supplied
 		if ($context['fid'])
 			$context['field'] = getProfileField($context['fid']);
 
@@ -1087,6 +1088,7 @@ class ManageFeatures_Controller
 					$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
+
 				// Still not a unique colum name? Leave it up to the user, then.
 				if (!$unique)
 					fatal_lang_error('custom_option_not_unique');
@@ -1135,7 +1137,6 @@ class ManageFeatures_Controller
 			// Updating an existing field?
 			if ($context['fid'])
 			{
-				
 				$field_data = array(
 					'field_length' => $field_length,
 					'show_reg' => $show_reg,
@@ -1156,7 +1157,7 @@ class ManageFeatures_Controller
 					'enclose' => $enclose,
 					'placement' => $placement,
 				);
-				
+
 				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
@@ -1198,7 +1199,7 @@ class ManageFeatures_Controller
 			checkSession();
 			validateToken('admin-ecp');
 
-			//Delete the old data first, then the field.
+			// Delete the old data first, then the field.
 			deleteProfileFieldUserData($context['field']['colname']);
 			deleteProfileField($context['fid']);
 		}
@@ -1207,6 +1208,7 @@ class ManageFeatures_Controller
 		if (isset($_POST['delete']) || isset($_POST['save']))
 		{
 			checkSession();
+
 			// Update the display cache
 			updateDisplayCache();
 			redirectexit('action=admin;area=featuresettings;sa=profile');
@@ -1219,7 +1221,7 @@ class ManageFeatures_Controller
 /**
  * Just pause the signature applying thing.
  * @todo Move to subs file
- * @todo Merge with other pause functions? 
+ * @todo Merge with other pause functions?
  *		pausePermsSave(), pausAttachmentMaintenance()
  *		pauseRepairProcess()
  */
