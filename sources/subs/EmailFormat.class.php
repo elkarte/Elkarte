@@ -84,9 +84,19 @@ class Email_Format
 
 	/**
 	 * tuning value (fudge) used to decide if a line is short
-	 * change with care
+	 * change with care, used to help figure out wrapping decisions
 	 */
-	private $_maillist_short_line = 33;
+	private $_maillist_short_line = null;
+
+	/**
+	 * Extra items to removed, defined in the acp
+	 */
+	private $_maillist_leftover_remove = null;
+
+	/**
+	 * Items that may indicatte the start of a signature line, defined in the acp
+	 */
+	private $_maillist_sig_keys = null;
 
 	/**
 	 * tuning delta value (fudge) to help indicate the last line in a paragraph
@@ -111,6 +121,13 @@ class Email_Format
 	 */
 	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8')
 	{
+		global $modSettings;
+
+		// load some acp settings in to the class
+		$this->_maillist_short_line = empty($modSettings['maillist_short_line']) ? 33 : $modSettings['maillist_short_line'];
+		$this->_maillist_leftover_remove = empty($modSettings['maillist_leftover_remove']) ? '' : $modSettings['maillist_leftover_remove'];
+		$this->_maillist_sig_keys = empty($modSettings['maillist_sig_keys']) ? '' : $modSettings['maillist_sig_keys'];
+
 		$this->_real_name = $real_name;
 		$this->_prep_data($data);
 		$this->_fix_body($html);
@@ -216,7 +233,7 @@ class Email_Format
 				$this->_found_sig = true;
 			}
 			// Message stuff which should not be here any longer (as defined in the ACP) i.e. To: From: Subject:
-			elseif (!empty($modSettings['maillist_leftover_remove']) && preg_match('~^((\[b\]){0,2}(' . $modSettings['maillist_leftover_remove'] . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
+			elseif (!empty($this->_maillist_leftover_remove) && preg_match('~^((\[b\]){0,2}(' . $this->_maillist_leftover_remove . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
 			{
 				if ($this->_in_quote)
 					$this->_body_array[$i]['content'] = "\n";
@@ -352,10 +369,8 @@ class Email_Format
 	 */
 	private function _in_sig($i)
 	{
-		global $modSettings;
-
 		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and its a short line of text
-		if (!$this->_found_sig && !empty($modSettings['maillist_sig_keys']) && (preg_match('~^(' . $modSettings['maillist_sig_keys'] . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
+		if (!$this->_found_sig && !empty($this->_maillist_sig_keys) && (preg_match('~^(' . $this->_maillist_sig_keys . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
 				return true;
 		// The line is simply just their name
 		elseif (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
