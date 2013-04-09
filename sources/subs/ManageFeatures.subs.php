@@ -278,7 +278,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 	global $smcFunc;
 
 	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}themes
+		UPDATE {db_prefix}custom_fields_data
 		SET value = {string:new_value}
 		WHERE variable = {string:current_column}
 			AND value = {string:old_value}
@@ -347,7 +347,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 	global $smcFunc;
 
 	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
 			AND id_member > {int:no_member}',
@@ -416,7 +416,7 @@ function deleteProfileFieldUserData($name)
 
 	// Delete the user data first.
 	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
 		array(

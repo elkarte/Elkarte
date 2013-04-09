@@ -747,6 +747,18 @@ CREATE TABLE {$db_prefix}custom_fields (
 ) ENGINE=MyISAM;
 
 #
+# Table structure for table `custom_fields_data`
+#
+
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member mediumint(8) NOT NULL default '0',
+  variable varchar(255) NOT NULL default '',
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable(30)),
+  KEY id_member (id_member)
+) ENGINE=MyISAM;
+
+#
 # Table structure for table `group_moderators`
 #
 

@@ -969,11 +969,12 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$smcFunc['db_free_result']($request);
 	}
 
-	if (!empty($new_loaded_ids) && $set !== 'minimal')
+	// Custom profile fields as well
+	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $smcFunc['db_query']('', '
-			SELECT *
-			FROM {db_prefix}themes
+			SELECT id_member, variable, value
+			FROM {db_prefix}custom_fields_data
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
@@ -984,6 +985,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$smcFunc['db_free_result']($request);
 	}
 
+	// For high cache settings, we save this information
 	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
@@ -1028,8 +1030,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
-	global $context, $modSettings, $board_info, $settings;
-	global $smcFunc;
+	global $context, $modSettings, $settings, $smcFunc;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1039,6 +1040,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// We can't load guests or members not loaded by loadMemberData()!
 	if ($user == 0)
 		return false;
+
 	if (!isset($user_profile[$user]))
 	{
 		trigger_error('loadMemberContext(): member id ' . $user . ' not previously loaded by loadMemberData()', E_USER_WARNING);
@@ -1058,9 +1060,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');
 	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
 	$profile['signature'] = parse_bbc($profile['signature'], true, 'sig' . $profile['id_member']);
-
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
 	$profile['icons'] = empty($profile['icons']) ? array('', '') : explode('#', $profile['icons']);
+
 	// Setup the buddy status here (One whole in_array call saved :P)
 	$profile['buddy'] = in_array($profile['id_member'], $user_info['buddies']);
 	$buddy_list = !empty($profile['buddy_list']) ? explode(',', $profile['buddy_list']) : array();

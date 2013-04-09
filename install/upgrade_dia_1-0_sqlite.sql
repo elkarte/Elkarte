@@ -359,6 +359,41 @@ if (@$modSettings['smfVersion'] < '2.1')
 ---#
 
 /******************************************************************************/
+--- Adding support for custom profile fields data
+/******************************************************************************/
+---# Creating custom profile fields data table
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member int NOT NULL default '0',
+  variable varchar(255) NOT NULL default '',
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable),
+);
+---#
+
+---#
+CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
+---#
+
+---# Move existing custom profile values...
+---{
+$request = upgrade_query("
+	INSERT INTO {$db_prefix}custom_fields_data
+		(id_member, variable, value)
+	SELECT id_member, variable, value
+	FROM smf_themes
+	WHERE SUBSTRING(variable, 1, 5) = 'cust_'", false, "substring");
+
+// remove the moved rows from themes
+if (mysql_num_rows($request) != 0)
+{
+		upgrade_query("
+			DELETE FROM {$db_prefix}themes
+			SUBSTRING(variable,1,5) = 'cust_'", false, "substring");
+}
+---}
+---#
+
+/******************************************************************************/
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields

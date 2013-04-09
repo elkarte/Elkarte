@@ -65,18 +65,18 @@ function ml_CustomProfile()
 			// Build the sort queries.
 			if ($row['field_type'] != 'check')
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'LENGTH(t' . $curField . '.value) > 0 ASC, IFNULL(t' . $curField . '.value, 1=1) DESC, t' . $curField . '.value DESC',
-					'up' => 'LENGTH(t' . $curField . '.value) > 0 DESC, IFNULL(t' . $curField . '.value, 1=1) ASC, t' . $curField . '.value ASC'
+					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, IFNULL(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
+					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, IFNULL(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
 				);
 			else
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 't' . $curField . '.value DESC',
-					'up' => 't' . $curField . '.value ASC'
+					'down' => 'cfd' . $curField . '.value DESC',
+					'up' => 'cfd' . $curField . '.value ASC'
 				);
 
 			// Build the join and parameters for the sort query
-			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}themes AS t' . $curField . ' ON (t' . $curField . '.variable = {string:t' . $curField . '} AND t' . $curField . '.id_theme = 1 AND t' . $curField . '.id_member = mem.id_member)';
-			$context['custom_profile_fields']['parameters']['t' . $curField] = $row['col_name'];
+			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_theme = 1 AND cfd' . $curField . '.id_member = mem.id_member)';
+			$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
 		}
 	}
 	$smcFunc['db_free_result']($request);
