@@ -432,7 +432,7 @@ class ManageMaintenance_Controller
 		$context['page_title'] = $txt['database_optimize'];
 		$context['sub_template'] = 'optimize';
 
-		$tables = getOurTables();
+		$tables = getElkTables();
 
 		// If there aren't any tables then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
