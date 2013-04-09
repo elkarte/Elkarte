@@ -28,13 +28,13 @@ function countMessages()
 {
 	global $smcFunc;
 
-	$result = $smcFunc['db_query']('', '
+	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages',
 		array()
 	);
-	list($messages) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list($messages) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
 
 	return $messages;
 }
@@ -48,7 +48,7 @@ function getMembergroups()
 {
 	global $smcFunc, $txt;
 
-	$result = $smcFunc['db_query']('', '
+	$request = $smcFunc['db_query']('', '
 		SELECT id_group, group_name
 		FROM {db_prefix}membergroups',
 		array(
@@ -60,14 +60,14 @@ function getMembergroups()
 			'name' => $txt['maintain_members_ungrouped']
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$membergroups[] = array(
 			'id' => $row['id_group'],
 			'name' => $row['group_name']
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$smcFunc['db_free_result']($request);
 
 	return $membergroups;
 }
@@ -692,12 +692,13 @@ function getTopicsToMove($id_board)
 	// Get the ids.
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$topics[] = $row['id_topic'];
+	$smcFunc['db_free_result']($request);
 
 	return $topics;
 }
 
 /**
- * Counts members with posts > 0
+ * Counts members with posts > 0, we name them contributors
  *
  * @return int
  */
