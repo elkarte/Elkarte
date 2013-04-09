@@ -211,7 +211,7 @@ class ManageMaintenance_Controller
 		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
 
 		// Get membergroups - for deleting members and the like.
-		$context['membergroups'] = getMembergroups;
+		$context['membergroups'] = getMembergroups();
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
@@ -485,8 +485,7 @@ class ManageMaintenance_Controller
 	 */
 	public function action_recount_display()
 	{
-		global $txt, $context, $modSettings;
-		global $time_start, $smcFunc;
+		global $txt, $context, $modSettings, $time_start;
 
 		isAllowedTo('admin_forum');
 		checkSession('request');
