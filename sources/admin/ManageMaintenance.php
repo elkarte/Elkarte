@@ -13,7 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains some useful functions for members and membergroups.
+ * Forum maintenance. Important stuff.
  *
  */
 
