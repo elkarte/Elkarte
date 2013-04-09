@@ -791,11 +791,10 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Removing old and inactive members.
-	 * @todo refactor
 	 */
 	public function action_purgeinactive_display()
 	{
-		global $context, $smcFunc, $txt;
+		global $context, $txt;
 
 		$_POST['maxdays'] = empty($_POST['maxdays']) ? 0 : (int) $_POST['maxdays'];
 		if (!empty($_POST['groups']) && $_POST['maxdays'] > 0)
@@ -807,66 +806,7 @@ class ManageMaintenance_Controller
 			foreach ($_POST['groups'] as $id => $dummy)
 				$groups[] = (int) $id;
 			$time_limit = (time() - ($_POST['maxdays'] * 24 * 3600));
-			$where_vars = array(
-				'time_limit' => $time_limit,
-			);
-			if ($_POST['del_type'] == 'activated')
-			{
-				$where = 'mem.date_registered < {int:time_limit} AND mem.is_activated = {int:is_activated}';
-				$where_vars['is_activated'] = 0;
-			}
-			else
-				$where = 'mem.last_login < {int:time_limit} AND (mem.last_login != 0 OR mem.date_registered < {int:time_limit})';
-
-			// Need to get *all* groups then work out which (if any) we avoid.
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name, min_posts
-				FROM {db_prefix}membergroups',
-				array(
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				// Avoid this one?
-				if (!in_array($row['id_group'], $groups))
-				{
-					// Post group?
-					if ($row['min_posts'] != -1)
-					{
-						$where .= ' AND mem.id_post_group != {int:id_post_group_' . $row['id_group'] . '}';
-						$where_vars['id_post_group_' . $row['id_group']] = $row['id_group'];
-					}
-					else
-					{
-						$where .= ' AND mem.id_group != {int:id_group_' . $row['id_group'] . '} AND FIND_IN_SET({int:id_group_' . $row['id_group'] . '}, mem.additional_groups) = 0';
-						$where_vars['id_group_' . $row['id_group']] = $row['id_group'];
-					}
-				}
-			}
-			$smcFunc['db_free_result']($request);
-
-			// If we have ungrouped unselected we need to avoid those guys.
-			if (!in_array(0, $groups))
-			{
-				$where .= ' AND (mem.id_group != 0 OR mem.additional_groups != {string:blank_add_groups})';
-				$where_vars['blank_add_groups'] = '';
-			}
-
-			// Select all the members we're about to murder/remove...
-			$request = $smcFunc['db_query']('', '
-				SELECT mem.id_member, IFNULL(m.id_member, 0) AS is_mod
-				FROM {db_prefix}members AS mem
-					LEFT JOIN {db_prefix}moderators AS m ON (m.id_member = mem.id_member)
-				WHERE ' . $where,
-				$where_vars
-			);
-			$members = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if (!$row['is_mod'] || !in_array(3, $groups))
-					$members[] = $row['id_member'];
-			}
-			$smcFunc['db_free_result']($request);
+			$members = purgeMembers($_POST['type'], $groups, $time_limit);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($members);

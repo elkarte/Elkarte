@@ -829,3 +829,80 @@ function updateZeroPostMembers()
 			$smcFunc['db_free_result']($request);
 		}
 }
+
+/**
+ * Removing old and inactive members
+ *
+ * @param string $type
+ * @param array $groups
+ * @param int $time_limit
+ * @return array
+ */
+function purgeMembers($type, $groups, $time_limit)
+{
+	global $smcFunc;
+
+	$where_vars = array(
+		'time_limit' => $time_limit,
+	);
+	if ($type == 'activated')
+	{
+		$where = 'mem.date_registered < {int:time_limit} AND mem.is_activated = {int:is_activated}';
+		$where_vars['is_activated'] = 0;
+	}
+	else
+		$where = 'mem.last_login < {int:time_limit} AND (mem.last_login != 0 OR mem.date_registered < {int:time_limit})';
+
+	// Need to get *all* groups then work out which (if any) we avoid.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name, min_posts
+		FROM {db_prefix}membergroups',
+		array(
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		// Avoid this one?
+		if (!in_array($row['id_group'], $groups))
+		{
+			// Post group?
+			if ($row['min_posts'] != -1)
+			{
+				$where .= ' AND mem.id_post_group != {int:id_post_group_' . $row['id_group'] . '}';
+				$where_vars['id_post_group_' . $row['id_group']] = $row['id_group'];
+			}
+			else
+			{
+				$where .= ' AND mem.id_group != {int:id_group_' . $row['id_group'] . '} AND FIND_IN_SET({int:id_group_' . $row['id_group'] . '}, mem.additional_groups) = 0';
+				$where_vars['id_group_' . $row['id_group']] = $row['id_group'];
+			}
+		}
+	}
+	$smcFunc['db_free_result']($request);
+
+	// If we have ungrouped unselected we need to avoid those guys.
+	if (!in_array(0, $groups))
+	{
+		$where .= ' AND (mem.id_group != 0 OR mem.additional_groups != {string:blank_add_groups})';
+		$where_vars['blank_add_groups'] = '';
+	}
+
+	// Select all the members we're about to murder/remove...
+	$request = $smcFunc['db_query']('', '
+		SELECT mem.id_member, IFNULL(m.id_member, 0) AS is_mod
+		FROM {db_prefix}members AS mem
+			LEFT JOIN {db_prefix}moderators AS m ON (m.id_member = mem.id_member)
+		WHERE ' . $where,
+		$where_vars
+	);
+	$members = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if (!$row['is_mod'] || !in_array(3, $groups))
+			$members[] = $row['id_member'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $members;
+
+}
