@@ -251,7 +251,6 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	if (!isset($data_ecr[1]))
 		return false;
 
-
 	$return = array();
 
 	// Get all the basic zip file info since we are here
@@ -305,7 +304,6 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 		}
 		else
 			$write_this = false;
-
 
 		// Get the actual compressed data.
 		$file_info['data'] = substr($data, 26 + $file_info['filename_length'] + $file_info['extrafield_length']);
@@ -1525,7 +1523,6 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  */
 function matchPackageVersion($version, $versions)
 {
-
 	// Make sure everything is lowercase and clean of spaces and unpleasant history.
 	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
 	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
@@ -1766,6 +1763,7 @@ function mktree($strPath, $mode)
 		else
 			return false;
 	}
+
 	// Is this an invalid path and/or we can't make the directory?
 	if ($strPath == dirname($strPath) || !mktree(dirname($strPath), $mode))
 		return false;
@@ -1818,6 +1816,7 @@ function copytree($source, $destination)
 
 	if (!file_exists($destination) || !is_writable($destination))
 		mktree($destination, 0755);
+
 	if (!is_writable($destination))
 		mktree($destination, 0777);
 
@@ -1868,6 +1867,7 @@ function listtree($path, $sub_path = '')
 	$dir = @dir($path . $sub_path);
 	if (!$dir)
 		return array();
+
 	while ($entry = $dir->read())
 	{
 		if ($entry == '.' || $entry == '..')
@@ -1898,7 +1898,7 @@ function listtree($path, $sub_path = '')
  */
 function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
 {
-	global $settings, $txt, $modSettings, $package_ftp;
+	global $txt, $modSettings;
 
 	@set_time_limit(600);
 
@@ -1922,6 +1922,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 	// Use this for holding all the template changes in this mod.
 	$template_changes = array();
+
 	// This is needed to hold the long paths, as they can vary...
 	$long_changes = array();
 
@@ -2070,7 +2071,6 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				{
 					foreach ($actual_operation['searches'] as $i => $search)
 					{
-
 						// Reverse modification of regular expressions are not allowed.
 						if ($search['is_reg_exp'])
 						{
@@ -2281,7 +2281,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
  */
 function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
 {
-	global $settings, $txt, $modSettings;
+	global $settings, $modSettings;
 
 	@set_time_limit(600);
 	$file = strtr($file, array("\r" => ''));
@@ -2290,14 +2290,15 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 	$working_search = null;
 	$working_data = '';
 	$replace_with = null;
-
 	$actions = array();
 	$everything_found = true;
 
 	// This holds all the template changes in the standard mod file.
 	$template_changes = array();
+
 	// This is just the temporary file.
 	$temp_file = $file;
+
 	// This holds the actual changes on a step counter basis.
 	$temp_changes = array();
 	$counter = 0;
@@ -2343,6 +2344,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 
 	// Anything above $counter must be for custom themes.
 	$custom_template_begin = $counter;
+
 	// Reference for what theme ID this action belongs to.
 	$theme_id_ref = array();
 
@@ -2598,7 +2600,6 @@ function package_get_contents($filename)
 
 	if (!isset($package_cache))
 	{
-
 		$mem_check = setMemoryLimit('128M');
 
 		// Windows doesn't seem to care about the memory_limit.
@@ -2960,8 +2961,10 @@ function package_create_backup($id = 'backup')
 
 	if (!file_exists(BOARDDIR . '/packages/backups'))
 		mktree(BOARDDIR . '/packages/backups', 0777);
+
 	if (!is_writable(BOARDDIR . '/packages/backups'))
 		package_chmod(BOARDDIR . '/packages/backups');
+
 	$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
 
@@ -3002,7 +3005,6 @@ function package_create_backup($id = 'backup')
 			$stat['size'] = 0;
 
 		$current = pack('a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12', $file[0], decoct($stat['mode']), sprintf('%06d', decoct($stat['uid'])), sprintf('%06d', decoct($stat['gid'])), decoct($stat['size']), decoct($stat['mtime']), '', 0, '', '', '', '', '', '', '', '', '');
-
 		$checksum = 256;
 		for ($i = 0; $i < 512; $i++)
 			$checksum += ord($current{$i});
@@ -3204,4 +3206,160 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 if (!function_exists('crc32_compat'))
 {
 	require_once(SUBSDIR . '/Compat.subs.php');
+}
+
+/**
+ * Checks if a package is installed or not
+ * If installed returns an array of themes, db changes and versions associated with
+ * the package id
+ *
+ * @param string $id of package to check
+ */
+function isPackageInstalled($id)
+{
+	global $smcFunc, $context;
+
+	$result = array(
+		'package_id' => '',
+		'install_state' => '',
+		'old_themes' => '',
+		'old_version' => '',
+		'db_changes' => ''
+	);
+
+	if (empty($id))
+		return $result;
+
+	// See if it is installed?
+	$request = $smcFunc['db_query']('', '
+		SELECT version, themes_installed, db_changes, package_id, install_state
+		FROM {db_prefix}log_packages
+		WHERE package_id = {string:current_package}
+			AND install_state != {int:not_installed}
+			' . (!empty($context['install_id']) ? ' AND id_install = {int:install_id} ' : '') . '
+		ORDER BY time_installed DESC
+		LIMIT 1',
+		array(
+			'not_installed' => 0,
+			'current_package' => $id,
+			'install_id' => $context['install_id'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$result = array(
+			'old_themes' => explode(',', $row['themes_installed']),
+			'old_version' => $row['version'],
+			'db_changes' => empty($row['db_changes']) ? array() : unserialize($row['db_changes']),
+			'package_id' => $row['package_id'],
+			'install_state' => $row['install_state'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $result;
+}
+
+/**
+ * For uninstalling action, updates the log_packages install_state state to 0 (uninstalled)
+ *
+ * @param string $id package_id to update
+ */
+function setPackageState($id)
+{
+	global $smcFunc, $context, $user_info;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_packages
+		SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
+			time_removed = {int:current_time}
+		WHERE package_id = {string:package_id}
+			AND id_install = {int:install_id}',
+		array(
+			'current_member' => $user_info['id'],
+			'not_installed' => 0,
+			'current_time' => time(),
+			'package_id' => $id,
+			'member_name' => $user_info['name'],
+			'install_id' => $context['install_id'],
+		)
+	);
+}
+
+/**
+ * Checks if a package is installed, and if so returns its version level
+ *
+ * @global type $smcFunc
+ */
+function checkPackageDependency()
+{
+	global $smcFunc;
+
+	$version = false;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT version
+		FROM {db_prefix}log_packages
+		WHERE package_id = {string:current_package}
+			AND install_state != {int:not_installed}
+		ORDER BY time_installed DESC
+		LIMIT 1',
+		array(
+			'not_installed' => 0,
+			'current_package' => $action['id'],
+		)
+	);
+	while ($row = $smcFunc['db_fetch_row']($request));
+		list($version) = $row;
+	$smcFunc['db_free_result']($request);
+
+	return $version;
+}
+
+/**
+ * Adds a record to the log packages table
+ *
+ * @param array $packageInfo
+ * @param string $failed_step_insert
+ * @param string $themes_installed
+ * @param string $db_changes
+ * @param bool $is_upgrade
+ * @param string $credits_tag
+ */
+function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
+{
+	global $smcFunc, $user_info;
+
+	$smcFunc['db_insert']('', '{db_prefix}log_packages',
+		array(
+			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
+			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
+			'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
+			'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
+		),
+		array(
+			$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
+			$user_info['id'], $user_info['name'], time(),
+			$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
+			0, $db_changes, $credits_tag,
+		),
+		array('id_install')
+	);
+}
+
+/**
+ * Called from action_flush, used to flag all packages as uninstalled.
+ */
+function setPackagesAsUninstalled()
+{
+	global $smcFunc;
+
+	// Set everything as uninstalled, just like that
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_packages
+		SET install_state = {int:not_installed}',
+		array(
+			'not_installed' => 0,
+		)
+	);
 }
