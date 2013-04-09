@@ -329,14 +329,14 @@ h3.catbg #quick_search form .button_submit:hover {
 }
 
 /* Browser tweaks. */
-body#chrome #quick_search form input {
+#chrome #quick_search form input {
 	padding: 2px 3px;
 }
-body#chrome #quick_search .button_submit, body#ie #quick_search .button_submit, body#opera #quick_search .button_submit {
+#chrome #quick_search .button_submit, #ie #quick_search .button_submit, #opera #quick_search .button_submit {
 	margin: 0 5px;
 	padding: 5px 9px 4px 9px;
 }
-body#chrome  #quick_search .button_submit {
+#chrome  #quick_search .button_submit {
 	margin: -24px 5px 0 5px;
 	padding: 2px 5px;
 }
@@ -626,11 +626,11 @@ div.quick_tasks {
 .package_section {
 	border: 1px solid #cacdd3;
 }
-ul.packages li {
+.packages {
 	border: none !important;
 	list-style: none;
 }
-code#find_code, code#replace_code {
+#find_code, #replace_code {
 	display: block;
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 	font-size: 0.9em;
@@ -646,7 +646,7 @@ code#find_code, code#replace_code {
 	height: 10em;
 	resize: vertical;
 }
-span.package_server {
+.package_server {
 	padding: 0 3em;
 }
 ul.package_servers {
@@ -656,7 +656,7 @@ ul.package_servers {
 ul.package_servers li {
 	list-style-type: none;
 }
-pre.file_content {
+.file_content {
 	overflow: auto;
 	width: 100%;
 	padding-bottom: 1em;
@@ -767,7 +767,7 @@ pre.file_content {
 	font-weight: bold;
 	padding: 0 6px;
 }
-#manage_boards li#recycle_board {
+#manage_boards #recycle_board {
 	background-color: #dee;
 }
 .move_links {
@@ -812,7 +812,7 @@ pre.file_content {
 #manage_boards dl textarea, #manage_boards dl table{
 	margin: 0 0 8px 0;
 }
-#manage_boards span.post_group, #manage_boards span.regular_members {
+#manage_boards .post_group, #manage_boards .regular_members {
 	border-bottom: 1px dotted #000;
 	cursor: help;
 }
@@ -827,7 +827,7 @@ pre.file_content {
 	display: block;
 	width: 49%;
 }
-dl.right dt {
+.right dt {
 	padding-right: 10px;
 }
 
@@ -852,7 +852,7 @@ dl.right dt {
 	padding: 0 0 10px 0;
 }
 #manage_maintenance p .button_submit{
-	margin: 10px 10px 0px 10px;
+	margin: 10px 10px 0 10px;
 }
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
@@ -894,7 +894,7 @@ dl.settings dt.large_caption {
 dl.settings dd.large_caption {
 	width: 29%;
 }
-span.search_weight {
+.search_weight {
 	width: 40px;
 	padding: 0 0.5em;
 	text-align: right;
@@ -1079,7 +1079,7 @@ ul.moderation_notes li {
 /* Styles for the error log.
 ------------------------------------------------- */
 
-h3.grid_header {
+.grid_header {
 	height: 25px;
 }
 #error_log {
@@ -1106,13 +1106,13 @@ h3.grid_header {
 	line-height: 1.6em;
 	border-top: 1px solid #e3e3e3;
 }
-.error_where a.scope {
+.error_where .scope {
 	display: table-cell;
 	padding: 4px;
 	width: 20px;
 	vertical-align: top;
 }
-#error_log td.checkbox_column {
+#error_log .checkbox_column {
 	width: 15px;
 	vertical-align: top;
 	text-align: center;
@@ -1149,99 +1149,98 @@ h3.grid_header {
 /* Admin menu icons as sprites
 ------------------------------------------------- */
 .admin_img_administration {
-	background: url(../images/admin/admin_sprite.png) no-repeat -0px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat 0 0;
 }
 .admin_img_attachment {
-	background: url(../images/admin/admin_sprite.png) no-repeat -16px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -16px 0;
 }
 .admin_img_ban {
-	background: url(../images/admin/admin_sprite.png) no-repeat -32px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -32px 0;
 }
 .admin_img_boards {
-	background: url(../images/admin/admin_sprite.png) no-repeat -48px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -48px 0;
 }
 .admin_img_calendar {
-	background: url(../images/admin/admin_sprite.png) no-repeat -64px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -64px 0;
 }
 .admin_img_corefeatures {
-	background: url(../images/admin/admin_sprite.png) no-repeat -80px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -80px 0;
 }
 .admin_img_current_theme {
-	background: url(../images/admin/admin_sprite.png) no-repeat -96px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -96px 0;
 }
 .admin_img_engines {
-	background: url(../images/admin/admin_sprite.png) no-repeat -112px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -112px 0;
 }
 .admin_img_exit {
-	background: url(../images/admin/admin_sprite.png) no-repeat -128px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -128px 0;
 }
 .admin_img_features {
-	background: url(../images/admin/admin_sprite.png) no-repeat -144px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -144px 0;
 }
 .admin_img_languages {
-	background: url(../images/admin/admin_sprite.png) no-repeat -160px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -160px 0;
 }
 .admin_img_logs {
-	background: url(../images/admin/admin_sprite.png) no-repeat -176px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -176px 0;
 }
 .admin_img_mail {
-	background: url(../images/admin/admin_sprite.png) no-repeat -192px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -192px 0;
 }
 .admin_img_maintain {
-	background: url(../images/admin/admin_sprite.png) no-repeat -208px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -208px 0;
 }
 .admin_img_membergroups {
-	background: url(../images/admin/admin_sprite.png) no-repeat -224px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -224px 0;
 }
 .admin_img_members {
-	background: url(../images/admin/admin_sprite.png) no-repeat -240px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -240px 0;
 }
 .admin_img_modifications {
-	background: url(../images/admin/admin_sprite.png) no-repeat -256px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -256px 0;
 }
 .admin_img_news {
-	background: url(../images/admin/admin_sprite.png) no-repeat -272px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -272px 0;
 }
 .admin_img_packages {
-	background: url(../images/admin/admin_sprite.png) no-repeat -288px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -288px 0;
 }
 .admin_img_paid {
-	background: url(../images/admin/admin_sprite.png) no-repeat -304px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -304px 0;
 }
 .admin_img_permissions {
-	background: url(../images/admin/admin_sprite.png) no-repeat -320px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -320px 0;
 }
 .admin_img_posts {
-	background: url(../images/admin/admin_sprite.png) no-repeat -336px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -336px 0;
 }
 .admin_img_regcenter {
-	background: url(../images/admin/admin_sprite.png) no-repeat -352px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -352px 0;
 }
 .admin_img_reports {
-	background: url(../images/admin/admin_sprite.png) no-repeat -368px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -368px 0;
 }
 .admin_img_scheduled {
-	background: url(../images/admin/admin_sprite.png) no-repeat -384px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -384px 0;
 }
 .admin_img_search {
-	background: url(../images/admin/admin_sprite.png) no-repeat -400px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -400px 0;
 }
 .admin_img_security {
-	background: url(../images/admin/admin_sprite.png) no-repeat -416px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -416px 0;
 }
 .admin_img_server {
-	background: url(../images/admin/admin_sprite.png) no-repeat -432px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -432px 0;
 }
 .admin_img_smiley {
-	background: url(../images/admin/admin_sprite.png) no-repeat -448px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -448px 0;
 }
 .admin_img_support {
-	background: url(../images/admin/admin_sprite.png) no-repeat -464px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -464px 0;
 }
 .admin_img_themes {
-	background: url(../images/admin/admin_sprite.png) no-repeat -480px -0px;
+	background: url(../images/admin/admin_sprite.png) no-repeat -480px 0;
 }
-
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
 /*@media screen and (max-width: 85em) {
@@ -1257,7 +1256,7 @@ h3.grid_header {
 	body {
 		padding: 0;
 	}
-	#wrapper, #footer_section div.frame {
+	#wrapper, #footer_section .frame {
 		min-width: 100%;
 	}
 	#main_content_section {
@@ -1341,5 +1340,3 @@ h3.grid_header {
 		line-height: 1.6em;
 	}
 }
-/* These kids and their new-fangled thingummys. :P */
-/* When I were a lad, things were different! */
