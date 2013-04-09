@@ -491,7 +491,7 @@ class ManageMaintenance_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
-		require_once(SUSBSIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
 
 		// validate the request or the loop
 		if (!isset($_REQUEST['step']))

@@ -139,7 +139,7 @@ function resizeMessageTableBody($type)
 }
 
 /**
- * detects messages, which exceed the max length
+ * detects messages, which exceed the max message size
  *
  * @param type $start
  * @param type $increment
@@ -333,7 +333,7 @@ function recountUnapprovedMessages($start, $increment)
 }
 
 /**
- * Reset the boards tables counter for posts, topics, unapproved posts and
+ * Reset the boards table's counter for posts, topics, unapproved posts and
  * unapproved topics
  * 
  * @param string $column
