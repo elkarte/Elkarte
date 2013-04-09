@@ -201,7 +201,7 @@ function getExceedingMessages($msg)
  * 
  * @return array 
  */
-function getOurTables()
+function getElkTables()
 {
 	global $smcFunc, $db_prefix;
 
