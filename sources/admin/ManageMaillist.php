@@ -24,6 +24,12 @@ if (!defined('ELKARTE'))
 class ManageMaillist_Controller
 {
 	/**
+	 * Basic feature settings form
+	 * @var Settings_Form
+	 */
+	protected $_maillistSettings;
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control to the sub action.
 	 */
@@ -1055,7 +1061,7 @@ class ManageMaillist_Controller
 	 *
 	 * @param bool $return_config
 	 */
-	public function action_settings($return_config = false)
+	public function action_settings()
 	{
 		global $scripturl, $context, $txt, $modSettings;
 
@@ -1083,60 +1089,11 @@ class ManageMaillist_Controller
 			);
 		}
 
-		// Define the menu
-		$config_vars = array(
-			array('desc', 'maillist_help'),
-			array('check', 'maillist_enabled'),
-			array('check', 'pbe_post_enabled'),
-			array('check', 'pbe_pm_enabled'),
-			array('check', 'pbe_no_mod_notices', 'subtext' => $txt['pbe_no_mod_notices_desc'], 'postinput' => $txt['recommended']),
-			array('title', 'maillist_outbound'),
-			array('desc', 'maillist_outbound_desc'),
-			array('check', 'maillist_group_mode'),
-			array('check', 'maillist_digest_enabled'),
-			array('text', 'maillist_sitename', 40, 'subtext' => $txt['maillist_sitename_desc'], 'postinput' => $txt['maillist_sitename_post']),
-			array('text', 'maillist_sitename_address', 40, 'subtext' => $txt['maillist_sitename_address_desc'], 'postinput' => $txt['maillist_sitename_address_post']),
-			array('text', 'maillist_mail_from', 40, 'subtext' => $txt['maillist_mail_from_desc'], 'postinput' => $txt['maillist_mail_from_post']),
-			array('text', 'maillist_sitename_help', 40, 'subtext' => $txt['maillist_sitename_help_desc'], 'postinput' => $txt['maillist_sitename_help_post']),
-			array('text', 'maillist_sitename_regards', 40, 'subtext' => $txt['maillist_sitename_regards_desc']),
-			array('title', 'maillist_inbound'),
-			array('desc', 'maillist_inbound_desc'),
-			array('check', 'maillist_newtopic_change'),
-			array('check', 'maillist_newtopic_needsapproval', 'subtext' => $txt['maillist_newtopic_needsapproval_desc'], 'postinput' => $txt['recommended']),
-			array('callback', 'maillist_receive_email_list'),
-			array('title', 'misc'),
-			array('check', 'maillist_allow_attachments'),
-			array('int', 'maillist_key_active', 2, 'subtext' => $txt['maillist_key_active_desc']),
-			'',
-			array('text', 'maillist_leftover_remove', 40, 'subtext' => $txt['maillist_leftover_remove_desc']),
-			array('text', 'maillist_sig_keys', 40, 'subtext' => $txt['maillist_sig_keys_desc']),
-			array('int', 'maillist_short_line', 2, 'subtext' => $txt['maillist_short_line_desc']),
-		);
+		// initialize the form
+		$this->_initMaillistSettingsForm();
 
-		// Imap?
-		if (!function_exists('imap_open'))
-			$config_vars = array_merge($config_vars, array(
-				array('title', 'maillist_imap_missing'),
-					)
-			);
-		else
-			$config_vars = array_merge($config_vars, array(
-				array('title', 'maillist_imap'),
-				array('title', 'maillist_imap_reason'),
-				array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
-				array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
-				array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
-				array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
-				array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
-					)
-			);
-
-		if ($return_config)
-			return $config_vars;
-
-		// Need to have these available
-		require_once(ADMINDIR . '/ManagePermissions.php');
-		require_once(ADMINDIR . '/ManageServer.php');
+		// retrieve the config settings
+		$config_vars = $this->_maillistSettings->settings();
 
 		// Saving settings?
 		if (isset($_GET['save']))
@@ -1208,16 +1165,13 @@ class ManageMaillist_Controller
 				// Clear the moderation count cache
 				cache_put_data('num_menu_errors', null, 900);
 
-				// Protect them from themselves
-				$_POST['maillist_short_line'] = empty($_POST['maillist_short_line']) ? 33 : $_POST['maillist_short_line'];
-				$_POST['maillist_key_active'] = empty($_POST['maillist_key_active']) ? 21 : $_POST['maillist_key_active'];
-
 				// Should be off if mail posting is on, we ignore it anyway but this at least updates the ACP
 				if (!empty($_POST['maillist_enabled']))
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				saveDBSettings($config_vars);
+				Settings_Form::save_db($config_vars);
+				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');
 			}
 		}
@@ -1225,8 +1179,85 @@ class ManageMaillist_Controller
 		$context['settings_title'] = $txt['ml_emailsettings'];
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
-		prepareDBSettingContext($config_vars);
 		$context['sub_template'] = 'show_settings';
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize Mailist settings form.
+	 */
+	private function _initMaillistSettingsForm()
+	{
+		global $txt;
+
+		// We need some settings! ..ok, some work with our settings :P
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_maillistSettings = new Settings_Form();
+
+		// Define the menu
+		$config_vars = array(
+			array('desc', 'maillist_help'),
+			array('check', 'maillist_enabled'),
+			array('check', 'pbe_post_enabled'),
+			array('check', 'pbe_pm_enabled'),
+			array('check', 'pbe_no_mod_notices', 'subtext' => $txt['pbe_no_mod_notices_desc'], 'postinput' => $txt['recommended']),
+			array('title', 'maillist_outbound'),
+			array('desc', 'maillist_outbound_desc'),
+			array('check', 'maillist_group_mode'),
+			array('check', 'maillist_digest_enabled'),
+			array('text', 'maillist_sitename', 40, 'subtext' => $txt['maillist_sitename_desc'], 'postinput' => $txt['maillist_sitename_post']),
+			array('text', 'maillist_sitename_address', 40, 'subtext' => $txt['maillist_sitename_address_desc'], 'postinput' => $txt['maillist_sitename_address_post']),
+			array('text', 'maillist_mail_from', 40, 'subtext' => $txt['maillist_mail_from_desc'], 'postinput' => $txt['maillist_mail_from_post']),
+			array('text', 'maillist_sitename_help', 40, 'subtext' => $txt['maillist_sitename_help_desc'], 'postinput' => $txt['maillist_sitename_help_post']),
+			array('text', 'maillist_sitename_regards', 40, 'subtext' => $txt['maillist_sitename_regards_desc']),
+			array('title', 'maillist_inbound'),
+			array('desc', 'maillist_inbound_desc'),
+			array('check', 'maillist_newtopic_change'),
+			array('check', 'maillist_newtopic_needsapproval', 'subtext' => $txt['maillist_newtopic_needsapproval_desc'], 'postinput' => $txt['recommended']),
+			array('callback', 'maillist_receive_email_list'),
+			array('title', 'misc'),
+			array('check', 'maillist_allow_attachments'),
+			array('int', 'maillist_key_active', 2, 'subtext' => $txt['maillist_key_active_desc']),
+			'',
+			array('text', 'maillist_leftover_remove', 40, 'subtext' => $txt['maillist_leftover_remove_desc']),
+			array('text', 'maillist_sig_keys', 40, 'subtext' => $txt['maillist_sig_keys_desc']),
+			array('int', 'maillist_short_line', 2, 'subtext' => $txt['maillist_short_line_desc']),
+		);
+
+		// Imap?
+		if (!function_exists('imap_open'))
+			$config_vars = array_merge($config_vars,
+				array(
+					array('title', 'maillist_imap_missing'),
+				)
+			);
+		else
+			$config_vars = array_merge($config_vars,
+				array(
+					array('title', 'maillist_imap'),
+					array('title', 'maillist_imap_reason'),
+					array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
+					array('text', 'maillist_imap_mailbox', 20, 'postinput' => $txt['maillist_imap_mailbox_desc'], 'disabled' => !function_exists('imap_open')),
+					array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
+					array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
+					array('select', 'maillist_imap_connection',
+						array(
+							'imap' => $txt['maillist_imap_unsecure'],
+							'pop3' => $txt['maillist_pop3_unsecure'],
+							'imaptls' => $txt['maillist_imap_tls'],
+							'imapssl' => $txt['maillist_imap_ssl'],
+							'pop3tls' => $txt['maillist_pop3_tls'],
+							'pop3ssl' => $txt['maillist_pop3_ssl']
+						), 'postinput' => $txt['maillist_imap_connection_desc'], 'disabled' => !function_exists('imap_open'),
+					),
+					array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
+					array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
+				)
+			);
+
+		return $this->_maillistSettings->settings($config_vars);
 	}
 
 	/**

@@ -10,6 +10,7 @@
  * Should be run from a cron job to fetch messages from an imap mailbox
  * Can be called from scheduled tasks (fake-cron) if needed
  */
+
 // Any output here is not good
 error_reporting(0);
 
@@ -17,7 +18,7 @@ error_reporting(0);
 require_once(dirname(__FILE__) . '/SSI.php');
 
 // Get and save the latest emails
-$result = postbyemail_imap();
+postbyemail_imap();
 
 exit(0);
 
@@ -42,12 +43,13 @@ function postbyemail_imap()
 	$hostname = !empty($modSettings['maillist_imap_host']) ? $modSettings['maillist_imap_host'] : '';
 	$username = !empty($modSettings['maillist_imap_uid']) ? $modSettings['maillist_imap_uid'] : '';
 	$password = !empty($modSettings['maillist_imap_pass']) ? $modSettings['maillist_imap_pass'] : '';
-	$type = !empty($modSettings['maillist_imap_types']) ? $modSettings['maillist_imap_types'] : '';
+	$mailbox = !empty($modSettings['maillist_imap_mailbox']) ? $modSettings['maillist_imap_mailbox'] : 'INBOX';
+	$type = !empty($modSettings['maillist_imap_connection']) ? $modSettings['maillist_imap_connection'] : '';
 
 	// Based on the type selected get/set the additonal connection details
 	$connection = port_type($type);
-	$hostname .= (strpos($hostname, ':') === false) ? ':'. $connection['port'] : '';
-	$mailbox = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}INBOX';
+	$hostname .= (strpos($hostname, ':') === false) ? ':' . $connection['port'] : '';
+	$mailbox = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}' . $mailbox;
 
 	// Connect and search for e-mail messages.
 	$inbox = @imap_open($mailbox, $username, $password);
@@ -100,44 +102,44 @@ function postbyemail_imap()
 }
 
 /**
- * Sets port and flags based on the chosen protocol
+ * Sets port and connection flags based on the chosen protocol
  *
  */
 function port_type($type)
 {
 	switch ($type)
 	{
-		case 'POP3':
+		case 'pop3':
 			// Standard POP3 mailbox.
 			$protocol = 'POP3';
 			$port = 110;
 			$flags = '/novalidate-cert';
 			break;
-		case 'POP3TLS':
+		case 'pop3tls':
 			// POP3, TLS mode.
 			$protocol = 'POP3';
 			$port = 110;
 			$flags = '/tls/novalidate-cert';
 			break;
-		case 'POP3SSL':
+		case 'pop3ssl':
 			// POP3, SSL mode.
 			$protocol = 'POP3SSL';
 			$port = 995;
 			$flags = '/ssl/novalidate-cert';
 			break;
-		case 'IMAP':
+		case 'imap':
 			// Standard IMAP mailbox.
 			$protocol = 'IMAP';
 			$port = 143;
 			$flags = '/novalidate-cert';
 			break;
-		case 'IMAPTLS':
+		case 'imaptls':
 			// IMAP in TLS mode.
 			$protocol = 'IMAPTLS';
 			$port = 143;
 			$flags = '/tls/novalidate-cert';
 			break;
-		case 'IMAPSSL':
+		case 'imapssl':
 			// IMAP in SSL mode.
 			$protocol = 'IMAP';
 			$port = 993;
