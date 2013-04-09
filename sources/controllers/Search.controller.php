@@ -203,12 +203,12 @@ function action_plushsearch2()
 	// Coming from quick search box and going to some custome place?
 	if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
 	{
-		$search_engines = prepareSearchEngines();
+		$engines = prepareSearchEngines();
 		if (isset($engines[$_REQUEST['search_selection']]))
 		{
 			$engine = $engines[$_REQUEST['search_selection']];
 			redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $_REQUEST['search']))));
-			}
+		}
 	}
 
 	// if comming from the quick search box, and we want to search on members, well we need to do that ;)
