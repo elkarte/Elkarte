@@ -309,8 +309,7 @@ class ManageMaintenance_Controller
 	 */
 	public function action_convertmsgbody_display()
 	{
-		global $context, $txt, $db_type;
-		global $modSettings, $time_start;
+		global $context, $txt, $db_type, $modSettings, $time_start;
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
