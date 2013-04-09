@@ -30,9 +30,9 @@ class Packages_Controller
 	/**
 	 * Entry point, the default method of this controller.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// @todo Remove this!
 		if (isset($_GET['get']) || isset($_GET['pgdownload']))
@@ -49,7 +49,6 @@ class Packages_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 		loadLanguage('Packages');
 		loadTemplate('Packages', 'admin');
-
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
@@ -79,7 +78,6 @@ class Packages_Controller
 		// Set up action/subaction stuff.
 		$action = new Action();
 		$action->initialize($subActions);
-
 		$context['sub_action'] = $subAction;
 
 		// Set up some tabs...
@@ -112,9 +110,9 @@ class Packages_Controller
 	/**
 	 * Test install a package.
 	 */
-	function action_install()
+	public function action_install()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc, $settings;
+		global $txt, $context, $scripturl, $smcFunc, $settings;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -124,7 +122,9 @@ class Packages_Controller
 		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
+		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Load up the package FTP information?
 		create_chmod_control();
@@ -147,15 +147,13 @@ class Packages_Controller
 			}
 		}
 
-		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall';
-
 		// Change our last link tree item for more information on this Packages area.
+		$context['uninstalling'] = $_REQUEST['sa'] === 'uninstall';
 		$context['linktree'][count($context['linktree']) - 1] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
 			'name' => $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']);
-
 		$context['sub_template'] = 'view_package';
 
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
@@ -168,14 +166,17 @@ class Packages_Controller
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
+				{
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+				}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -190,26 +191,10 @@ class Packages_Controller
 			fatal_lang_error('no_access', false);
 
 		// Load up any custom themes we may want to install into...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'known_theme_list' => explode(',', $modSettings['knownThemes']),
-				'default_theme' => 1,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID();
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
-
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
@@ -223,33 +208,14 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// See if it is installed?
-		$request = $smcFunc['db_query']('', '
-			SELECT version, themes_installed, db_changes
-			FROM {db_prefix}log_packages
-			WHERE package_id = {string:current_package}
-				AND install_state != {int:not_installed}
-			ORDER BY time_installed DESC
-			LIMIT 1',
-			array(
-				'not_installed'	=> 0,
-				'current_package' => $packageInfo['id'],
-			)
-		);
-
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$old_themes = explode(',', $row['themes_installed']);
-			$old_version = $row['version'];
-			$db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-		}
-		$smcFunc['db_free_result']($request);
+		$package_installed = isPackageInstalled($packageInfo['id']);
 
 		$context['database_changes'] = array();
 		if (isset($packageInfo['uninstall']['database']))
 			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		elseif (!empty($db_changes))
+		elseif (!empty($package_installed['db_changes']))
 		{
-			foreach ($db_changes as $change)
+			foreach ($package_installed['db_changes'] as $change)
 			{
 				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
 					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
@@ -264,7 +230,7 @@ class Packages_Controller
 		if ($context['uninstalling'])
 		{
 			// Wait, it's not installed yet!
-			if (!isset($old_version) && $context['uninstalling'])
+			if (!isset($package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
 				fatal_lang_error('package_cant_uninstall', false);
@@ -284,13 +250,15 @@ class Packages_Controller
 
 			// Only let them uninstall themes it was installed into.
 			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $old_themes))
+			{
+				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 					unset($theme_paths[$id]);
+			}
 		}
-		elseif (isset($old_version) && $old_version != $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $old_version);
+			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($actions))
@@ -299,14 +267,16 @@ class Packages_Controller
 			{
 				// Otherwise they can only upgrade themes from the first time around.
 				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $old_themes))
+				{
+					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 						unset($theme_paths[$id]);
+				}
 			}
 		}
-		elseif (isset($old_version) && $old_version == $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
 			$context['is_installed'] = true;
 
-		if (!isset($old_version) || $context['is_installed'])
+		if (!isset($package_installed['old_version']) || $context['is_installed'])
 			$actions = parsePackageInfo($packageInfo['xml'], true, 'install');
 
 		$context['actions'] = array();
@@ -371,7 +341,6 @@ class Packages_Controller
 				if (!file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
 				{
 					$context['has_failure'] = true;
-
 					$context['actions'][] = array(
 						'type' => $txt['execute_modification'],
 						'action' => $smcFunc['htmlspecialchars'](strtr($action['filename'], array(BOARDDIR => '.'))),
@@ -381,7 +350,6 @@ class Packages_Controller
 				}
 				else
 				{
-
 					if ($action['boardmod'])
 						$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
 					else
@@ -409,9 +377,7 @@ class Packages_Controller
 							$failed = true;
 						}
 						elseif ($mod_action['type'] == 'chmod')
-						{
 							$chmod_files[] = $mod_action['filename'];
-						}
 						elseif ($mod_action['type'] == 'saved')
 						{
 							if (!empty($mod_action['is_custom']))
@@ -443,8 +409,8 @@ class Packages_Controller
 							}
 							else
 							{
-									$context['actions'][$actual_filename]['failed'] |= $failed;
-									$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
+								$context['actions'][$actual_filename]['failed'] |= $failed;
+								$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
 							}
 						}
 						elseif ($mod_action['type'] == 'skipping')
@@ -548,52 +514,36 @@ class Packages_Controller
 
 				$thisAction = array(
 					'type' => $action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-					'action' => sprintf($txt['execute_hook_action'],  $smcFunc['htmlspecialchars']($action['hook'])),
+					'action' => sprintf($txt['execute_hook_action'], $smcFunc['htmlspecialchars']($action['hook'])),
 				);
 			}
 			elseif ($action['type'] == 'credits')
 			{
 				$thisAction = array(
 					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'],  $smcFunc['htmlspecialchars']($action['title'])),
+					'action' => sprintf($txt['execute_credits_action'], $smcFunc['htmlspecialchars']($action['title'])),
 				);
 			}
 			elseif ($action['type'] == 'requires')
 			{
-				$installed = false;
-				$version = true;
+				$installed_version = false;
+				$version_check = true;
 
 				// package missing required values?
 				if (!isset($action['id']))
 					$context['has_failure'] = true;
 				else
 				{
-					// See if this dependancy is installed
-					$request = $smcFunc['db_query']('', '
-						SELECT version
-						FROM {db_prefix}log_packages
-						WHERE package_id = {string:current_package}
-							AND install_state != {int:not_installed}
-						ORDER BY time_installed DESC
-						LIMIT 1',
-						array(
-							'not_installed'	=> 0,
-							'current_package' => $action['id'],
-						)
-					);
-					$installed = ($smcFunc['db_num_rows']($request) !== 0);
-					if ($installed)
-						list($version) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					// See if this dependency is installed
+					$installed_version = checkPackageDependency();
 
-					// do a version level check (if requested) in the most basic way
-					$version = (isset($action['version']) ? $version == $action['version'] : true);
+					// Do a version level check (if requested) in the most basic way
+					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
 				}
 
 				// Set success or failure information
-				$action['description'] = ($installed && $version) ? $txt['package_action_success'] : $txt['package_action_failure'];
-				$context['has_failure'] = !($installed && $version);
-
+				$action['description'] = ($installed_version && $version_check) ? $txt['package_action_success'] : $txt['package_action_failure'];
+				$context['has_failure'] = !($installed_version && $version_check);
 				$thisAction = array(
 					'type' => $txt['package_requires'],
 					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
@@ -612,6 +562,7 @@ class Packages_Controller
 				{
 					// Is the action already stated?
 					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
+
 					// If it's not auto do we think we have something we can act upon?
 					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
 						$theme_action = '';
@@ -642,7 +593,6 @@ class Packages_Controller
 				// Could this be theme related?
 				if (!empty($action['unparsed_filename']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_filename'], $matches))
 				{
-
 					// Is the action already stated?
 					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
 					$action['unparsed_destination'] = $action['unparsed_filename'];
@@ -669,7 +619,7 @@ class Packages_Controller
 			if ($context['uninstalling'])
 				$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 			else
-				$file =  BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
+				$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 
 			if (isset($action['filename']) && !file_exists($file))
 			{
@@ -771,14 +721,14 @@ class Packages_Controller
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
-		$context['post_url'] = $scripturl .'?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
+		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
 		checkSubmitOnce('register');
 	}
 
 	/**
 	 * Apply another type of (avatar, language, etc.) package.
 	 */
-	function action_install2()
+	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
 		global $user_info, $smcFunc;
@@ -798,7 +748,6 @@ class Packages_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// @todo Perhaps do it in steps, if necessary?
-
 		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall2';
 
 		// Set up the linktree for other.
@@ -807,7 +756,6 @@ class Packages_Controller
 			'name' => $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']
 		);
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
-
 		$context['sub_template'] = 'extract_package';
 
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
@@ -828,12 +776,14 @@ class Packages_Controller
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
 			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -858,22 +808,7 @@ class Packages_Controller
 		}
 
 		// Now load up the paths of the themes that we need to know about.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE id_theme IN ({array_int:custom_themes})
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'custom_themes' => $custom_themes,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		$themes_installed = array(1);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID($custom_themes);
 
 		// Are there any theme copying that we want to take place?
 		$context['theme_copies'] = array(
@@ -899,7 +834,6 @@ class Packages_Controller
 		$packageInfo = getPackageInfo($context['filename']);
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
-
 		$packageInfo['filename'] = $context['filename'];
 
 		// Set the type of extraction...
@@ -909,6 +843,7 @@ class Packages_Controller
 		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
 		{
 			$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
+
 			// @todo Internationalize this?
 			package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
 		}
@@ -917,29 +852,11 @@ class Packages_Controller
 		$context['is_installed'] = false;
 
 		// Is it actually installed?
-		$request = $smcFunc['db_query']('', '
-			SELECT version, themes_installed, db_changes
-			FROM {db_prefix}log_packages
-			WHERE package_id = {string:current_package}
-				AND install_state != {int:not_installed}
-			ORDER BY time_installed DESC
-			LIMIT 1',
-			array(
-				'not_installed'	=> 0,
-				'current_package' => $packageInfo['id'],
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$old_themes = explode(',', $row['themes_installed']);
-			$old_version = $row['version'];
-			$db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
-		}
-		$smcFunc['db_free_result']($request);
+		$package_installed = isPackageInstalled($packageInfo['id']);
 
 		// Wait, it's not installed yet!
 		// @todo Replace with a better error message!
-		if (!isset($old_version) && $context['uninstalling'])
+		if (!isset($package_installed['old_version']) && $context['uninstalling'])
 		{
 			deltree(BOARDDIR . '/packages/temp');
 			fatal_error('Hacker?', false);
@@ -955,13 +872,13 @@ class Packages_Controller
 
 			// They can only uninstall from what it was originally installed into.
 			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $old_themes))
+				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 					unset($theme_paths[$id]);
 		}
-		elseif (isset($old_version) && $old_version != $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $old_version);
+			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($install_log))
@@ -970,20 +887,19 @@ class Packages_Controller
 			{
 				// Upgrade previous themes only!
 				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $old_themes))
+					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 						unset($theme_paths[$id]);
 			}
 		}
-		elseif (isset($old_version) && $old_version == $packageInfo['version'])
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
 			$context['is_installed'] = true;
 
-		if (!isset($old_version) || $context['is_installed'])
+		if (!isset($package_installed['old_version']) || $context['is_installed'])
 			$install_log = parsePackageInfo($packageInfo['xml'], false, 'install');
 
 		$context['install_finished'] = false;
 
 		// @todo Make a log of any errors that occurred and output them?
-
 		if (!empty($install_log))
 		{
 			$failed_steps = array();
@@ -992,7 +908,6 @@ class Packages_Controller
 			foreach ($install_log as $action)
 			{
 				$failed_count++;
-
 				if ($action['type'] == 'modification' && !empty($action['filename']))
 				{
 					if ($action['boardmod'])
@@ -1080,48 +995,21 @@ class Packages_Controller
 			// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
 			package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
-			// See if this is already installed, and change it's state as required.
-			$request = $smcFunc['db_query']('', '
-				SELECT package_id, install_state, db_changes
-				FROM {db_prefix}log_packages
-				WHERE install_state != {int:not_installed}
-					AND package_id = {string:current_package}
-					' . ($context['install_id'] ? ' AND id_install = {int:install_id} ' : '') . '
-				ORDER BY time_installed DESC
-				LIMIT 1',
-				array(
-					'not_installed' => 0,
-					'install_id' => $context['install_id'],
-					'current_package' => $packageInfo['id'],
-				)
-			);
+			// See if this is already installed
 			$is_upgrade = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			$old_db_changes = array();
+			$package_check = isPackageInstalled($packageInfo['id']);
+
+			// Change the installed state as required.
+			if (!empty($package_check['install_state']))
 			{
-				// Uninstalling?
 				if ($context['uninstalling'])
-				{
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}log_packages
-						SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
-							time_removed = {int:current_time}
-						WHERE package_id = {string:package_id}
-							AND id_install = {int:install_id}',
-						array(
-							'current_member' => $user_info['id'],
-							'not_installed' => 0,
-							'current_time' => time(),
-							'package_id' => $row['package_id'],
-							'member_name' => $user_info['name'],
-							'install_id' => $context['install_id'],
-						)
-					);
-				}
-				// Otherwise must be an upgrade.
+					setPackageState($package_check['package_id']);
 				else
 				{
+					// not uninstalling so must be an upgrade
 					$is_upgrade = true;
-					$old_db_changes = empty($row['db_changes']) ? array() : unserialize($row['db_changes']);
+					$old_db_changes = empty($package_check['db_changes']) ? array() : $package_check['db_changes'];
 				}
 			}
 
@@ -1137,6 +1025,7 @@ class Packages_Controller
 				{
 					// We're really just checking for entries which are create table AND add columns (etc).
 					$tables = array();
+
 					/**
 					 * Table sorting function used in usort
 					 *
@@ -1151,6 +1040,7 @@ class Packages_Controller
 						return $a[0] == 'remove_table' ? -1 : 1;
 					}
 					usort($db_package_log, 'sort_table_first');
+
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] == 'remove_table')
@@ -1158,10 +1048,10 @@ class Packages_Controller
 						elseif (in_array($log[1], $tables))
 							unset($db_package_log[$k]);
 					}
-					$db_changes = serialize($db_package_log);
+					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
-					$db_changes = '';
+					$package_installed['db_changes'] = '';
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($themes_installed);
@@ -1172,35 +1062,20 @@ class Packages_Controller
 
 				// Credits tag?
 				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_packages',
-					array(
-						'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
-						'id_member_installed' => 'int', 'member_installed' => 'string','time_installed' => 'int',
-						'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
-						'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
-					),
-					array(
-						$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
-						$user_info['id'], $user_info['name'], time(),
-						$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
-						0, $db_changes, $credits_tag,
-					),
-					array('id_install')
-				);
-			}
-			$smcFunc['db_free_result']($request);
 
+				// Add to the log packages
+				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
+			}
 			$context['install_finished'] = true;
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($db_changes) && !empty($_POST['do_db_changes']))
+		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
 		{
 			// We're gonna be needing the package db functions!
 			db_extend('packages');
 
-			foreach ($db_changes as $change)
+			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
 					$smcFunc['db_drop_table']($change[1]);
@@ -1228,7 +1103,7 @@ class Packages_Controller
 	/**
 	 * List the files in a package.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1258,7 +1133,7 @@ class Packages_Controller
 	/**
 	 * Display one of the files in a package.
 	 */
-	function action_examine()
+	public function action_examine()
 	{
 		global $txt, $scripturl, $context;
 
@@ -1314,12 +1189,11 @@ class Packages_Controller
 	/**
 	 * List the installed packages.
 	 */
-	function InstalledList()
+	public function InstalledList()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// @todo this isn't used, why
-
 		$context['page_title'] .= ' - ' . $txt['installed_packages'];
 		$context['sub_template'] = 'view_installed';
 
@@ -1330,10 +1204,8 @@ class Packages_Controller
 	/**
 	 * Empty out the installed list.
 	 */
-	function action_flush()
+	public function action_flush()
 	{
-		global $smcFunc;
-
 		// Always check the session.
 		checkSession('get');
 
@@ -1343,13 +1215,7 @@ class Packages_Controller
 		package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 		// Set everything as uninstalled.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}log_packages
-			SET install_state = {int:not_installed}',
-			array(
-				'not_installed' => 0,
-			)
-		);
+		setPackagesAsUninstalled();
 
 		redirectexit('action=admin;area=packages;sa=installed');
 	}
@@ -1357,7 +1223,7 @@ class Packages_Controller
 	/**
 	 * Delete a package.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
 		global $scripturl;
 
@@ -1389,7 +1255,7 @@ class Packages_Controller
 	/**
 	 * Browse a list of installed packages.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
@@ -1510,8 +1376,7 @@ class Packages_Controller
 				'additional_rows' => array(
 					array(
 						'position' => 'bottom_of_list',
-						'value' => ($context['sub_action'] == 'browse' ? '<div class="padding smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ' . $txt['package_installed_old'] . '</div>' :
-						'<a class="button_link" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+						'value' => ($context['sub_action'] == 'browse' ? '<div class="padding smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="button_link" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1530,11 +1395,10 @@ class Packages_Controller
 		$context['available_all'] = array();
 	}
 
-
 	/**
 	 * Test an FTP connection.
 	 */
-	function action_ftptest()
+	public function action_ftptest()
 	{
 		global $context, $txt, $package_ftp;
 
@@ -1567,9 +1431,9 @@ class Packages_Controller
 	/**
 	 * Used when a temp FTP access is needed to package functions
 	 */
-	function action_options()
+	public function action_options()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings, $smcFunc;
 
 		if (isset($_POST['save']))
 		{
@@ -1593,7 +1457,6 @@ class Packages_Controller
 
 		$context['page_title'] = $txt['package_settings'];
 		$context['sub_template'] = 'install_options';
-
 		$context['package_ftp_server'] = isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost';
 		$context['package_ftp_port'] = isset($modSettings['package_port']) ? $modSettings['package_port'] : '21';
 		$context['package_ftp_username'] = isset($modSettings['package_username']) ? $modSettings['package_username'] : $default_username;
@@ -1604,9 +1467,9 @@ class Packages_Controller
 	/**
 	 * List operations
 	 */
-	function action_showoperations()
+	public function action_showoperations()
 	{
-		global $context, $txt, $smcFunc, $modSettings;
+		global $context, $txt;
 
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
@@ -1617,6 +1480,7 @@ class Packages_Controller
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . 'Themes.subs.php');
 
 		// Uninstalling the mod?
 		$reverse = isset($_REQUEST['reverse']) ? true : false;
@@ -1628,14 +1492,15 @@ class Packages_Controller
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			{
 				foreach ($context['extracted_files'] as $file)
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+			}
 
 			if (!isset($context['base_path']))
 				$context['base_path'] = '';
@@ -1648,22 +1513,7 @@ class Packages_Controller
 		}
 
 		// Load up any custom themes we may want to install into...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
-				AND variable IN ({string:name}, {string:theme_dir})',
-			array(
-				'known_theme_list' => explode(',', $modSettings['knownThemes']),
-				'default_theme' => 1,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		$theme_paths = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$theme_paths = getThemesPathbyID();
 
 		// Boardmod?
 		if (isset($_REQUEST['boardmod']))
@@ -1691,9 +1541,9 @@ class Packages_Controller
 	/**
 	 * Allow the admin to reset permissions on files.
 	 */
-	function action_perms()
+	public function action_perms()
 	{
-		global $context, $txt, $modSettings, $smcFunc, $package_ftp;
+		global $context, $txt, $modSettings, $package_ftp;
 
 		// Let's try and be good, yes?
 		checkSession('get');
@@ -1705,7 +1555,7 @@ class Packages_Controller
 			fatal_lang_error('no_access', false);
 		}
 
-		// This is a memory eat.
+		// This is a time and memory eating ...
 		setMemoryLimit('128M');
 		@set_time_limit(600);
 
@@ -1766,16 +1616,16 @@ class Packages_Controller
 						'type' => 'dir',
 						'writable_on' => 'restrictive',
 					),
-					'Smileys' => array(
+					'smileys' => array(
 						'type' => 'dir_recursive',
 						'writable_on' => 'standard',
 					),
-					'Sources' => array(
+					'sources' => array(
 						'type' => 'dir',
 						'list_contents' => true,
 						'writable_on' => 'standard',
 					),
-					'Themes' => array(
+					'themes' => array(
 						'type' => 'dir_recursive',
 						'writable_on' => 'standard',
 						'contents' => array(
@@ -1791,7 +1641,7 @@ class Packages_Controller
 							),
 						),
 					),
-					'Packages' => array(
+					'packages' => array(
 						'type' => 'dir',
 						'writable_on' => 'standard',
 						'contents' => array(
@@ -1814,7 +1664,7 @@ class Packages_Controller
 		// Directories that can move.
 		if (substr(SOURCEDIR, 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Sources']);
+			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['sources']);
 			$context['file_tree'][strtr(SOURCEDIR, array('\\' => '/'))] = array(
 				'type' => 'dir',
 				'list_contents' => true,
@@ -1844,10 +1694,9 @@ class Packages_Controller
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
 				$context['file_tree'][strtr($dir, array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'writable_on' => 'restrictive',
-			);
-
+					'type' => 'dir',
+					'writable_on' => 'restrictive',
+				);
 		}
 		elseif (substr($modSettings['attachmentUploadDir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
@@ -1866,6 +1715,7 @@ class Packages_Controller
 				'writable_on' => 'standard',
 			);
 		}
+
 		if (substr($modSettings['avatar_directory'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['avatars']);
@@ -1874,6 +1724,7 @@ class Packages_Controller
 				'writable_on' => 'standard',
 			);
 		}
+
 		if (isset($modSettings['custom_avatar_dir']) && substr($modSettings['custom_avatar_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['custom_avatar_dir']);
@@ -1884,23 +1735,16 @@ class Packages_Controller
 		}
 
 		// Load up any custom themes.
-		$request = $smcFunc['db_query']('', '
-			SELECT value
-			FROM {db_prefix}themes
-			WHERE id_theme > {int:default_theme_id}
-				AND id_member = {int:guest_id}
-				AND variable = {string:theme_dir}
-			ORDER BY value ASC',
-			array(
-				'default_theme_id' => 1,
-				'guest_id' => 0,
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$themes = getCustomThemes();
+		foreach ($themes as $id => $theme)
 		{
-			if (substr(strtolower(strtr($row['value'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) == strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/Themes'))
-				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['Themes']['contents'][substr($row['value'], strlen(BOARDDIR) + 8)] = array(
+			// Skip the default
+			if ($id == 1)
+				continue;
+
+			if (substr(strtolower(strtr($theme['theme_dir'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) === strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
+				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($theme['theme_dir'], strlen(BOARDDIR) + 8)] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
 					'contents' => array(
@@ -1912,7 +1756,7 @@ class Packages_Controller
 				);
 			else
 			{
-				$context['file_tree'][strtr($row['value'], array('\\' => '/'))] = array(
+				$context['file_tree'][strtr($theme['theme_dir'], array('\\' => '/'))] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
 					'contents' => array(
@@ -1924,16 +1768,17 @@ class Packages_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($_POST['action_changes']))
 			return action_perms_save();
 
 		$context['look_for'] = array();
+
 		// Are we looking for a particular tree - normally an expansion?
 		if (!empty($_REQUEST['find']))
 			$context['look_for'][] = base64_decode($_REQUEST['find']);
+
 		// Only that tree?
 		$context['only_find'] = isset($_GET['xml']) && !empty($_REQUEST['onlyfind']) ? $_REQUEST['onlyfind'] : '';
 		if ($context['only_find'])
@@ -1946,6 +1791,7 @@ class Packages_Controller
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
+
 		// ... maybe posted?
 		if (!empty($_POST['back_look']))
 			$context['only_find'] = array_merge($context['only_find'], $_POST['back_look']);
@@ -1954,6 +1800,7 @@ class Packages_Controller
 
 		// Are we finding more files than first thought?
 		$context['file_offset'] = !empty($_REQUEST['fileoffset']) ? (int) $_REQUEST['fileoffset'] : 0;
+
 		// Don't list more than this many files in a directory.
 		$context['file_limit'] = 150;
 
@@ -2004,7 +1851,7 @@ class Packages_Controller
 	/**
 	 * Actually action the permission changes they want.
 	 */
-	function action_perms_save()
+	public function action_perms_save()
 	{
 		global $context, $txt, $time_start, $package_ftp;
 
@@ -2105,10 +1952,8 @@ class Packages_Controller
 		else
 		{
 			$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
-
 			$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
 			$context['directory_list'] = isset($_POST['dirList']) ? unserialize(base64_decode($_POST['dirList'])) : array();
-
 			$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
 
 			// Haven't counted the items yet?
@@ -2157,7 +2002,7 @@ class Packages_Controller
 				$context['special_files'] = array();
 
 				/**
-				 * Builds a list of special files recusivly for a given path
+				 * Builds a list of special files recursively for a given path
 				 *
 				 * @param type $path
 				 * @param type $data
@@ -2245,11 +2090,11 @@ class Packages_Controller
  * Determines if the package is a mod, avatar, language package
  * Determines if the package has been installed or not
  *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
- * @param type $params
- * @param type $installed
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param array $params
+ * @param bool $installed
  * @return type
  */
 function list_getPackages($start, $items_per_page, $sort, $params, $installed)
@@ -2279,11 +2124,13 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 		elseif ($_GET['version_emulate'] !== 0)
 			$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
 	}
+
 	if (!empty($_SESSION['version_emulate']))
 	{
 		$context['forum_version'] = $the_brand . ' ' . $_SESSION['version_emulate'];
 		$the_version = $_SESSION['version_emulate'];
 	}
+
 	if (isset($_SESSION['single_version_emulate']))
 		unset($_SESSION['single_version_emulate']);
 
@@ -2375,12 +2222,10 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 			if (!empty($packageInfo))
 			{
 				$packageInfo['installed_id'] = isset($installed_mods[$packageInfo['id']]) ? $installed_mods[$packageInfo['id']]['id'] : 0;
-
 				$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
 				$packageInfo['is_installed'] = isset($installed_mods[$packageInfo['id']]);
 				$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] == $packageInfo['version']);
 				$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] > $packageInfo['version']);
-
 				$packageInfo['can_install'] = false;
 				$packageInfo['can_uninstall'] = false;
 				$packageInfo['can_upgrade'] = false;
@@ -2476,7 +2321,7 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 					}
 					else
 					{
-						$packages['modification'][strtolower($packageInfo[$sort]) .  '_' . $sort_id['mod']] = md5($package);
+						$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package);
 						$context['available_modification'][md5($package)] = $packageInfo;
 					}
 				}
@@ -2517,13 +2362,12 @@ function list_getPackages($start, $items_per_page, $sort, $params, $installed)
 	return $packages[$params];
 }
 
-
 /**
- * Checkes the permissions of all the areas that will be affected by the package
+ * Checks the permissions of all the areas that will be affected by the package
  *
- * @param type $path
- * @param type $data
- * @param type $level
+ * @param string $path
+ * @param array $data
+ * @param int $level
  * @return type
  */
 function fetchPerms__recursive($path, &$data, $level)
@@ -2650,6 +2494,7 @@ function fetchPerms__recursive($path, &$data, $level)
 		// Have we reached our offset?
 		if ($context['file_offset'] > $counter)
 			continue;
+
 		// Gone too far?
 		if ($counter > ($context['file_offset'] + $context['file_limit']))
 			continue;
@@ -2688,7 +2533,6 @@ function fetchPerms__recursive($path, &$data, $level)
 		}
 	}
 }
-
 
 /**
  * Function called to briefly pause execution of directory/file chmod actions

@@ -143,7 +143,7 @@ function validateThemeName($indexes, $value_data)
 
 /**
  * Get a basic list of themes
- * 
+ *
  * @param array $themes
  * @return array
  */
@@ -179,7 +179,7 @@ function getBasicThemeInfos($themes)
  */
 function getCustomThemes()
 {
-	global $smcFunc, $txt;
+	global $smcFunc, $settings, $txt;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_theme, variable, value
@@ -194,6 +194,8 @@ function getCustomThemes()
 			'theme_dir' => 'theme_dir',
 		)
 	);
+
+	// Manually add in the default
 	$themes = array(
 		1 => array(
 			'name' => $txt['dvc_default'],
@@ -205,4 +207,41 @@ function getCustomThemes()
 	$smcFunc['db_free_result']($request);
 
 	return $themes;
+}
+
+/**
+ * Returns all named and installed themes paths as an array of theme name => path
+ *
+ * @param array $theme_list
+ */
+function getThemesPathbyID($theme_list = array())
+{
+	global $smcFunc, $modSettings;
+
+	// Nothing passed then we use the defaults
+	if (empty($theme_list))
+		$theme_list = explode(',', $modSettings['knownThemes']);
+
+	if (!is_array($theme_list))
+		$theme_list = array($theme_list);
+
+	// Load up any themes we need the paths for
+	$request = $smcFunc['db_query']('', '
+		SELECT id_theme, variable, value
+		FROM {db_prefix}themes
+		WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
+			AND variable IN ({string:name}, {string:theme_dir})',
+		array(
+			'known_theme_list' => $theme_list,
+			'default_theme' => 1,
+			'name' => 'name',
+			'theme_dir' => 'theme_dir',
+		)
+	);
+	$theme_paths = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
+	$smcFunc['db_free_result']($request);
+
+	return $theme_paths;
 }
