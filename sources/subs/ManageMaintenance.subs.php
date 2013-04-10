@@ -20,7 +20,7 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * counts the messages
+ * Counts the total number of messages
  *
  * @return int
  */
@@ -40,8 +40,8 @@ function countMessages()
 }
 
 /**
- * gets all membergroups
- * 
+ * Gets all membergroups
+ *
  * @return array
  */
 function getMembergroups()
@@ -73,8 +73,8 @@ function getMembergroups()
 }
 
 /**
- * flushes all log tables
- *  
+ * Flushes all log tables
+ *
  */
 function flushLogTables()
 {
@@ -111,8 +111,8 @@ function flushLogTables()
 }
 
 /**
- * gets the table columns from the messages table, just a wrapper function
- * 
+ * Gets the table columns from the messages table, just a wrapper function
+ *
  * @return array 
  */
 function getMessageTableColumns()
@@ -126,7 +126,7 @@ function getMessageTableColumns()
 }
 
 /**
- * resizes the body column from the messages table
+ * Resizes the body column from the messages table
  *
  * @param string $type 
  */
@@ -139,7 +139,7 @@ function resizeMessageTableBody($type)
 }
 
 /**
- * detects messages, which exceed the max message size
+ * Detects messages, which exceed the max message size
  *
  * @param type $start
  * @param type $increment
@@ -196,9 +196,9 @@ function getExceedingMessages($msg)
 }
 
 /**
- * lists all the tables from our ElkArte installation.
+ * Lists all the tables from our ElkArte installation.
  * Additional tables from modifications are also included.
- * 
+ *
  * @return array 
  */
 function getElkTables()
@@ -527,7 +527,7 @@ function updatePersonalMessagesCounter()
 
 /**
  * Fixes the column id_board from the messages table.
- * 
+ *
  * @param int $start
  * @param int $increment
  */
@@ -633,6 +633,7 @@ function updateBoardsLastMessage()
 
 /**
  * Counts topics from a given board.
+ *
  * @param int $id_board
  * @return int 
  */
@@ -656,7 +657,7 @@ function countTopicsFromBoard($id_board)
 
 /**
  * Gets a list of topics which should be moved to a different board.
- * 
+ *
  * @param type $id_board
  * @return type 
  */
@@ -892,5 +893,4 @@ function purgeMembers($type, $groups, $time_limit)
 	$smcFunc['db_free_result']($request);
 
 	return $members;
-
 }
