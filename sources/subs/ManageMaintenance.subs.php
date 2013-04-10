@@ -335,12 +335,18 @@ function recountUnapprovedMessages($start, $increment)
 /**
  * Reset the boards table's counter for posts, topics, unapproved posts and
  * unapproved topics
- * 
+ * Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topcis
+ *
  * @param string $column
  */
 function resetBoardsCounter($column)
 {
 	global $smcFunc;
+
+	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
+	
+	if (!in_array($column, $allowed_columns))
+			return false;
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
