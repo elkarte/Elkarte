@@ -652,7 +652,7 @@ class ManageMaillist_Controller
 		);
 
 		// Set the context values
-		$context['page_title'] = $txt['emailerror_title'];
+		$context['page_title'] = $txt['filters'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'email_filter';
 
@@ -939,7 +939,7 @@ class ManageMaillist_Controller
 		);
 
 		// Set the context values
-		$context['page_title'] = $txt['emailerror_title'];
+		$context['page_title'] = $txt['parsers'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'email_parser';
 
