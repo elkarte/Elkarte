@@ -705,7 +705,7 @@ class ManageMaillist_Controller
 		}
 
 		// Initialize the filer settings form
-		$this->_initParsersSettingsForm();
+		$this->_initFiltersSettingsForm();
 		$config_vars = $this->_filtersSettings->settings();
 
 		// Saving the new or edited entry?
