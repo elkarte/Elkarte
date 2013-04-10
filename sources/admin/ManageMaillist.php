@@ -940,8 +940,10 @@ class ManageMaillist_Controller
 			if (empty($id) || $id < 0)
 				fatal_lang_error('error_no_id_filter');
 
+			// load this filter so we can edit it
 			require_once(SUBSDIR . '/Maillist.subs.php');
 			$row = maillist_load_filter_parser($id, 'parser');
+
 			$modSettings['id_filter'] = $row['id_filter'];
 			$modSettings['filter_type'] = $row['filter_type'];
 			$modSettings['filter_from'] = $row['filter_from'];
@@ -957,24 +959,14 @@ class ManageMaillist_Controller
 			$modSettings['filter_name'] = '';
 			$modSettings['filter_from'] = '';
 
+			// To the template we go
 			$context['page_title'] = $txt['add_parser'];
 			$context['editing'] = false;
 		}
 
-		$config_vars = array(
-			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
-			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
-				array(
-					'regex' => $txt['option_regex'],
-					'standard' => $txt['option_standard'],
-				),
-			),
-			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
-		);
-
-		// Load in some dependencies
-		require_once(ADMINDIR . '/ManagePermissions.php');
-		require_once(ADMINDIR . '/ManageServer.php');
+		// Initialize the mailparser settings form
+		$this->_initParsersSettingsForm();
+		$config_vars = $this->_parsersSettings->settings();
 
 		// Check if they are saving the changes
 		if (isset($_GET['save']))
@@ -988,7 +980,7 @@ class ManageMaillist_Controller
 			// Test the regex
 			if ($_POST['filter_type'] === 'regex' && !empty($_POST['filter_from']))
 			{
-				$valid = (preg_replace($_POST['filter_from'], '', '12@$%^*(09#98&76') === null) ? false : true;
+				$valid = (preg_replace($_POST['filter_from'], '', 'ElkArte') === null) ? false : true;
 				if (!$valid)
 				{
 					// Regex did not compute .. Danger, Will Robinson
@@ -1010,12 +1002,13 @@ class ManageMaillist_Controller
 			// All clear to save?
 			if (empty($context['settings_message']))
 			{
-				// Shhh ... its a parser
+				// Shhh ... its really a parser
 				$config_vars[] = array('text', 'filter_style');
 				$_POST['filter_style'] = 'parser';
 
-				require_once(SUBSDIR . '/Maillist.subs.php');
-				saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				// Save, log, show
+				MaillistSettingsClass::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}
@@ -1035,9 +1028,40 @@ class ManageMaillist_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// prep it, load it, show it
-		prepareDBSettingContext($config_vars);
+		MaillistSettingsClass::prepare_db($config_vars);
 		loadTemplate('Admin', 'admin');
 		$context['sub_template'] = 'show_settings';
+	}
+
+	/**
+	 * Initialize Mailist settings form.
+	 */
+	private function _initParsersSettingsForm()
+	{
+		global $txt;
+
+		// We need some setting options for our maillist
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// We don't save values in settings but in our filters table so we extend the class with our jazz
+		require_once(SUBSDIR . '/EmailSettings.class.php');
+
+		// Instantiate the extended parser form
+		$this->_parsersSettings = new MaillistSettingsClass();
+
+		// Define the menu array
+		$config_vars = array(
+			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
+			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
+				array(
+					'regex' => $txt['option_regex'],
+					'standard' => $txt['option_standard'],
+				),
+			),
+			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
+		);
+
+		return $this->_parsersSettings->settings($config_vars);
 	}
 
 	/**
@@ -1089,7 +1113,7 @@ class ManageMaillist_Controller
 			);
 		}
 
-		// initialize the form
+		// Initialize the maillist settings form
 		$this->_initMaillistSettingsForm();
 
 		// retrieve the config settings
@@ -1112,7 +1136,7 @@ class ManageMaillist_Controller
 			if (!$email_error && !(empty($_POST['maillist_mail_from'])) && preg_match($valid_email_regex, $_POST['maillist_mail_from']) == 0)
 				$email_error = $_POST['maillist_mail_from'];
 
-			// Inbound email set up then we need to check for both basic email and board existence
+			// Inbound email set up then we need to check for both valid email and valid board
 			if (!$email_error && !empty($_POST['emailfrom']))
 			{
 				// Get the board ids for a quick check
