@@ -1075,6 +1075,7 @@ class ManageMaillist_Controller
 			checkSession('get');
 			$id = (int) $_GET['f_id'];
 
+			require_once(SUBSDIR . '/Maillist.subs.php');
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailparser;deleted');
 		}
