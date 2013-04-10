@@ -587,6 +587,7 @@ class ManageMaillist_Controller
 				'to' => array(
 					'header' => array(
 						'value' => $txt['filter_to'],
+						'style' => 'width:10em;',
 					),
 					'data' => array(
 						'db' => 'filter_to',
@@ -616,7 +617,7 @@ class ManageMaillist_Controller
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
 										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
-									</a>&nbsp;
+									</a>
 									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
 										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
 									</a>',
@@ -625,6 +626,7 @@ class ManageMaillist_Controller
 							),
 						),
 						'class' => 'centertext',
+						'style' => 'white-space:nowrap;',
 					),
 				),
 			),
@@ -901,7 +903,7 @@ class ManageMaillist_Controller
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
 										<img title="' . $txt['modify'] . '"src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
-									</a>&nbsp;
+									</a>
 									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
 										<img title="' . $txt['delete'] . '"  src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
 									</a>',
@@ -910,6 +912,7 @@ class ManageMaillist_Controller
 							),
 						),
 						'class' => 'centertext',
+						'style' => 'white-space:nowrap;',
 					),
 				),
 			),
