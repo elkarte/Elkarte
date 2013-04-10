@@ -702,22 +702,9 @@ class ManageMaillist_Controller
 			$context['settings_message'] = array();
 		}
 
-		// Set up the config_vars for the form
-		$config_vars = array(
-			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
-			array('select', 'filter_type',
-				array(
-					'standard' => $txt['option_standard'],
-					'regex' => $txt['option_regex'],
-				),
-			),
-			array('large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']),
-			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
-		);
-
-		// Yup, need to make sure these are available
-		require_once(ADMINDIR . '/ManagePermissions.php');
-		require_once(ADMINDIR . '/ManageServer.php');
+		// Initialize the filer settings form
+		$this->_initParsersSettingsForm();
+		$config_vars = $this->_filtersSettings->settings();
 
 		// Saving the new or edited entry?
 		if (isset($_GET['save']))
@@ -731,7 +718,7 @@ class ManageMaillist_Controller
 			// If its regex we do a quick check to see if its valid or not
 			if ($_POST['filter_type'] === 'regex')
 			{
-				$valid = (@preg_replace($_POST['filter_from'], $_POST['filter_to'], '12@$%^*(09#98&76') === null) ? false : true;
+				$valid = (@preg_replace($_POST['filter_from'], $_POST['filter_to'], 'ElkArte') === null) ? false : true;
 				if (!$valid)
 				{
 					// Seems to be bad ... reload the form, set the message
@@ -758,7 +745,8 @@ class ManageMaillist_Controller
 				$_POST['filter_style'] = 'filter';
 
 				require_once(SUBSDIR . '/Maillist.subs.php');
-				saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				MaillistSettingsClass::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -778,9 +766,41 @@ class ManageMaillist_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Load and show
-		prepareDBSettingContext($config_vars);
+		MaillistSettingsClass::prepare_db($config_vars);
 		loadTemplate('Admin', 'admin');
 		$context['sub_template'] = 'show_settings';
+	}
+
+	/**
+	 * Initialize Mailist settings form.
+	 */
+	private function _initFiltersSettingsForm()
+	{
+		global $txt;
+
+		// We need some setting options for our maillist
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// We don't save values in settings but in our filters table so we extend the class with our jazz
+		require_once(SUBSDIR . '/EmailSettings.class.php');
+
+		// Instantiate the extended parser form
+		$this->_filtersSettings = new MaillistSettingsClass();
+
+		// Set up the config_vars for the form
+		$config_vars = array(
+			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
+			array('select', 'filter_type',
+				array(
+					'standard' => $txt['option_standard'],
+					'regex' => $txt['option_regex'],
+				),
+			),
+			array('large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']),
+			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
+		);
+
+		return $this->_filtersSettings->settings($config_vars);
 	}
 
 	/**
@@ -794,6 +814,7 @@ class ManageMaillist_Controller
 			checkSession('get');
 			$id = (int) $_GET['f_id'];
 
+			require_once(SUBSDIR . '/Maillist.subs.php');
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailfilters;deleted');
 		}
