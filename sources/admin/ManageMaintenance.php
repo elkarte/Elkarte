@@ -550,7 +550,7 @@ class ManageMaintenance_Controller
 			while ($_REQUEST['start'] < $max_topics)
 			{
 				// Recount the posts
-				updateBoardsPostCounter($_REQUEST['start'], $increment);
+				updateBoardsCounter('posts', $_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -576,7 +576,7 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				updateBoardsTopicCounter($_REQUEST['start'], $increment);
+				updateBoardsCounter('topics', $_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -602,7 +602,7 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				updateBoardsUnapprovedPostCounter($_REQUEST['start'], $increment);
+				updateBoardsCounter('unapproved_posts', $_REQUEST['start'], $increment);
 
 				$_REQUEST['start'] += $increment;
 
@@ -629,7 +629,7 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				updateBoardsUnapprovedTopicCounter($_REQUEST['start'], $increment);
+				updateBoardsCounter('unapproved_topcs', $_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)

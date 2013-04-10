@@ -360,147 +360,129 @@ function resetBoardsCounter($column)
 }
 
 /**
- * Update the boards table's post counter
- * 
+ * Recalculates the boards table's counter
+ *
+ * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start
  * @param int $increment 
  */
-function updateBoardsPostCounter($start, $increment)
+function updateBoardsCounter($type, $start, $increment)
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
-		FROM {db_prefix}messages AS m
-		WHERE m.id_topic > {int:id_topic_min}
-			AND m.id_topic <= {int:id_topic_max}
-			AND m.approved = {int:is_approved}
-		GROUP BY m.id_board',
-		array(
-			'id_topic_min' => $start,
-			'id_topic_max' => $start + $increment,
-			'is_approved' => 1,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + {int:real_num_posts}
-			WHERE id_board = {int:id_board}',
+	switch ($type)
+	{
+	case 'posts':
+		$request = $smcFunc['db_query']('', '
+			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
+			FROM {db_prefix}messages AS m
+			WHERE m.id_topic > {int:id_topic_min}
+				AND m.id_topic <= {int:id_topic_max}
+				AND m.approved = {int:is_approved}
+			GROUP BY m.id_board',
 			array(
-				'id_board' => $row['id_board'],
-				'real_num_posts' => $row['real_num_posts'],
+				'id_topic_min' => $start,
+				'id_topic_max' => $start + $increment,
+				'is_approved' => 1,
 			)
 		);
-	$smcFunc['db_free_result']($request);
-}
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET num_posts = num_posts + {int:real_num_posts}
+				WHERE id_board = {int:id_board}',
+				array(
+					'id_board' => $row['id_board'],
+					'real_num_posts' => $row['real_num_posts'],
+				)
+			);
+		$smcFunc['db_free_result']($request);
+		break;
 
-/**
- * Update the boards table's topic counter
- * 
- * @param int $start
- * @param int $increment 
- */
-function updateBoardsTopicCounter($start, $increment)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
-		FROM {db_prefix}topics AS t
-		WHERE t.approved = {int:is_approved}
-			AND t.id_topic > {int:id_topic_min}
-			AND t.id_topic <= {int:id_topic_max}
-		GROUP BY t.id_board',
-		array(
-			'is_approved' => 1,
-			'id_topic_min' => $start,
-			'id_topic_max' => $start + $increment,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET num_topics = num_topics + {int:real_num_topics}
-			WHERE id_board = {int:id_board}',
+	case 'topics':
+		$request = $smcFunc['db_query']('', '
+			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
+			FROM {db_prefix}topics AS t
+			WHERE t.approved = {int:is_approved}
+				AND t.id_topic > {int:id_topic_min}
+				AND t.id_topic <= {int:id_topic_max}
+			GROUP BY t.id_board',
 			array(
-				'id_board' => $row['id_board'],
-				'real_num_topics' => $row['real_num_topics'],
+				'is_approved' => 1,
+				'id_topic_min' => $start,
+				'id_topic_max' => $start + $increment,
 			)
 		);
-	$smcFunc['db_free_result']($request);
-}
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET num_topics = num_topics + {int:real_num_topics}
+				WHERE id_board = {int:id_board}',
+				array(
+					'id_board' => $row['id_board'],
+					'real_num_topics' => $row['real_num_topics'],
+				)
+			);
+		$smcFunc['db_free_result']($request);
+		break;
 
-/**
- * Update the boards table's unapproved post counter
- * 
- * @param int $start
- * @param int $increment 
- */
-function updateBoardsUnapprovedPostCounter($start, $increment)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
-		FROM {db_prefix}messages AS m
-		WHERE m.id_topic > {int:id_topic_min}
-			AND m.id_topic <= {int:id_topic_max}
-			AND m.approved = {int:is_approved}
-		GROUP BY m.id_board',
-		array(
-			'id_topic_min' => $start,
-			'id_topic_max' => $start + $increment,
-			'is_approved' => 0,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
-			WHERE id_board = {int:id_board}',
+	case 'unapproved_posts':
+		$request = $smcFunc['db_query']('', '
+			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
+			FROM {db_prefix}messages AS m
+			WHERE m.id_topic > {int:id_topic_min}
+				AND m.id_topic <= {int:id_topic_max}
+				AND m.approved = {int:is_approved}
+			GROUP BY m.id_board',
 			array(
-				'id_board' => $row['id_board'],
-				'unapproved_posts' => $row['real_unapproved_posts'],
+				'id_topic_min' => $start,
+				'id_topic_max' => $start + $increment,
+				'is_approved' => 0,
 			)
 		);
-	$smcFunc['db_free_result']($request);
-}
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
+				WHERE id_board = {int:id_board}',
+				array(
+					'id_board' => $row['id_board'],
+					'unapproved_posts' => $row['real_unapproved_posts'],
+				)
+			);
+		$smcFunc['db_free_result']($request);
+		break;
 
-/**
- * Update the boards table's unapproved topic counter
- * 
- * @param int $start
- * @param int $increment 
- */
-function updateBoardsUnapprovedTopicCounter($start, $increment)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
-		FROM {db_prefix}topics AS t
-		WHERE t.approved = {int:is_approved}
-			AND t.id_topic > {int:id_topic_min}
-			AND t.id_topic <= {int:id_topic_max}
-		GROUP BY t.id_board',
-		array(
-			'is_approved' => 0,
-			'id_topic_min' => $start,
-			'id_topic_max' => $start + $increment,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}boards
-			SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
-			WHERE id_board = {int:id_board}',
+	case 'unapproved_topics':
+		$request = $smcFunc['db_query']('', '
+			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
+			FROM {db_prefix}topics AS t
+			WHERE t.approved = {int:is_approved}
+				AND t.id_topic > {int:id_topic_min}
+				AND t.id_topic <= {int:id_topic_max}
+			GROUP BY t.id_board',
 			array(
-				'id_board' => $row['id_board'],
-				'real_unapproved_topics' => $row['real_unapproved_topics'],
+				'is_approved' => 0,
+				'id_topic_min' => $start,
+				'id_topic_max' => $start + $increment,
 			)
 		);
-	$smcFunc['db_free_result']($request);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
+				WHERE id_board = {int:id_board}',
+				array(
+					'id_board' => $row['id_board'],
+					'real_unapproved_topics' => $row['real_unapproved_topics'],
+				)
+			);
+		$smcFunc['db_free_result']($request);
+		break;
+
+	default:
+		trigger_error('updateBoardsCounter(): Invalid counter type \'' . $type . '\'', E_USER_NOTICE);
+	}
 }
 
 /**
