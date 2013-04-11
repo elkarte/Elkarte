@@ -212,7 +212,7 @@ function action_groupmembers()
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	// Load up the group details.
-	$context['group'] = membergroupsById($_REQUEST['group'], 1, true, true);
+	$context['group'] = membergroupsById($_REQUEST['group'], 1, true, true, allowedTo('admin_forum'));
 
 	// Doesn't exist?
 	if (empty($context['group']))
