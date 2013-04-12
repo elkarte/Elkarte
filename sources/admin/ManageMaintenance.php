@@ -208,10 +208,10 @@ class ManageMaintenance_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Get membergroups - for deleting members and the like.
-		$context['membergroups'] = getMembergroups();
+		// Get all membergroups - for deleting members and the like.
+		$context['membergroups'] = getBasicMembergroupData('all');
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
@@ -629,7 +629,7 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				updateBoardsCounter('unapproved_topcs', $_REQUEST['start'], $increment);
+				updateBoardsCounter('unapproved_topics', $_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)

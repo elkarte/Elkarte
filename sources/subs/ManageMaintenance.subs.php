@@ -40,39 +40,6 @@ function countMessages()
 }
 
 /**
- * Gets all membergroups
- *
- * @return array
- */
-function getMembergroups()
-{
-	global $smcFunc, $txt;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
-		FROM {db_prefix}membergroups',
-		array(
-		)
-	);
-	$membergroups = array(
-		array(
-			'id' => 0,
-			'name' => $txt['maintain_members_ungrouped']
-		),
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$membergroups[] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name']
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $membergroups;
-}
-
-/**
  * Flushes all log tables
  *
  */
