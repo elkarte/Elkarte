@@ -629,7 +629,7 @@ class ManageMaintenance_Controller
 
 			while ($_REQUEST['start'] < $max_topics)
 			{
-				updateBoardsCounter('unapproved_topcs', $_REQUEST['start'], $increment);
+				updateBoardsCounter('unapproved_topics', $_REQUEST['start'], $increment);
 				$_REQUEST['start'] += $increment;
 
 				if (microtime(true) - $time_start > 3)
