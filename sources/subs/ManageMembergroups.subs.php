@@ -352,6 +352,9 @@ function setGroupToHidden($id_group)
 	);
 }
 
+/**
+ * Make sure the membergroup key on the board index is valid
+ */
 function validateShowGroupMembership()
 {
 	global $smcFunc, $modSettings;
@@ -372,7 +375,11 @@ function validateShowGroupMembership()
 		updateSettings(array('show_group_membership' => $have_joinable ? 1 : 0));
 }
 
-function deleteGroupModerators($id_group)
+/**
+ * Detaches group moderators from a deleted group
+ * @param int $id_group
+ */
+function detachGroupModerators($id_group)
 {
 	global $smcFunc;
 
@@ -385,6 +392,12 @@ function deleteGroupModerators($id_group)
 	);
 }
 
+/**
+ * Get the id_member from the membergroup moderators.
+ *
+ * @param array $moderators
+ * @return array
+ */
 function getIDMemberFromGroupModerators($moderators)
 {
 	global $smcFunc;
@@ -408,6 +421,12 @@ function getIDMemberFromGroupModerators($moderators)
 
 }
 
+/**
+ * Assign members to the membergroup moderators.
+ *
+ * @param int $id_group
+ * @param array $group_moderators
+ */
 function assignGroupModerators($id_group, $group_moderators)
 {
 	global $smcFunc;
@@ -424,6 +443,12 @@ function assignGroupModerators($id_group, $group_moderators)
 		);
 }
 
+/**
+ * List moderators from a given membergroup 
+ *
+ * @param int $id_group
+ * @return array
+ */
 function getGroupModerators($id_group)
 {
 	global $smcFunc;
@@ -446,6 +471,11 @@ function getGroupModerators($id_group)
 	return $moderators;	
 }
 
+/**
+ * Lists all groups which inherit permission profiles from the given group.
+ * @param int $id_group
+ * @return array
+ */
 function getInheritableGroups($id_group)
 {
 	global $smcFunc, $modSettings;
