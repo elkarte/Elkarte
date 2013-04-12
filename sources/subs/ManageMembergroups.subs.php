@@ -189,31 +189,6 @@ function updateInheritedGroup($id_group, $copy_id)
 }
 
 /**
- * Assigns a group to a list of boards.
- *
- * @param array $changed_boards
- * @param int $id_group
- * @param array $board_action
- */
-function assignGroupsToBoards($changed_boards, $id_group, $board_action)
-{
-	global $smcFunc;
-
-	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}boards
-		SET {raw:column} = CASE WHEN {raw:column} = {string:blank_string} THEN {string:group_id_string} ELSE CONCAT({raw:column}, {string:comma_group}) END
-		WHERE id_board IN ({array_int:board_list})',
-		array(
-			'board_list' => $changed_boards[$board_action],
-			'blank_string' => '',
-			'group_id_string' => (string) $id_group,
-			'comma_group' => ',' . $id_group,
-			'column' => $board_action == 'allow' ? 'member_groups' : 'deny_member_groups',
-		)
-	);
-}
-
-/**
  * Updates the membergroup with the given information.
  * @param array $properties
  */

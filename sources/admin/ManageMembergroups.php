@@ -433,7 +433,7 @@ class ManageMembergroups_Controller
 			{
 				// Only do this if they have special access requirements.
 				if (!empty($changed_boards[$board_action]))
-					assignGroupsToBoards($changed_boards, $id_group, $board_action);
+					assignGroupToBoards($changed_boards, $id_group, $board_action);
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
