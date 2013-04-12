@@ -214,40 +214,6 @@ function assignGroupsToBoards($changed_boards, $id_group, $board_action)
 }
 
 /**
- * Get a list of our selfmade groups. Excludes the system groups such as admin, global mod, moderator...
- * @todo: merge with getMembergroups() from ManageMaintenance.subs.php
- * @return array
- */
-function getCustomGroups()
-{
-	global $smcFunc, $modSettings;
-
-	$result = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
-		FROM {db_prefix}membergroups
-		WHERE (id_group > {int:moderator_group} OR id_group = {int:global_mod_group})' . (empty($modSettings['permission_enable_postgroups']) ? '
-			AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
-			AND group_type != {int:is_protected}') . '
-		ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
-		array(
-			'moderator_group' => 3,
-			'global_mod_group' => 2,
-			'min_posts' => -1,
-			'is_protected' => 1,
-		)
-	);
-	$groups = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-		$groups[] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name']
-		);
-	$smcFunc['db_free_result']($result);
-
-	return $groups;
-}
-
-/**
  * Updates the membergroup with the given information.
  * @param array $properties
  */

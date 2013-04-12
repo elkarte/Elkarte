@@ -462,7 +462,8 @@ class ManageMembergroups_Controller
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
 
-		$context['groups'] = getCustomGroups();
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		$context['groups'] = getBasicMembergroupData();
 
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
 		$context += getBoardList(array('use_permissions' => true));

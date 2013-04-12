@@ -208,10 +208,10 @@ class ManageMaintenance_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Get membergroups - for deleting members and the like.
-		$context['membergroups'] = getMembergroups();
+		// Get all membergroups - for deleting members and the like.
+		$context['membergroups'] = getBasicMembergroupData('extended');
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];

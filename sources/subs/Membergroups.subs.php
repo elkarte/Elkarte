@@ -860,3 +860,65 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 	else
 		return $groups[$group_id];
 }
+
+/**
+ * Gets basich membergroup data
+ * type needs to be 'standard' or 'extended' 
+ * - 'standard' lists all self created groups
+ * - 'extended' lists all groups including the system groups such as admin or global moderator.
+ *
+ * @param string $type
+ * @return type
+ */
+function getBasicMembergroupData($type = 'standard')
+{
+	global $smcFunc, $txt, $modSettings;
+
+	$groups = array();
+	
+	switch ($type)
+	{
+		case 'standard':
+			$request = $smcFunc['db_query']('', '
+				SELECT id_group, group_name
+				FROM {db_prefix}membergroups
+				WHERE (id_group > {int:moderator_group} OR id_group = {int:global_mod_group})' . (empty($modSettings['permission_enable_postgroups']) ? '
+					AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
+					AND group_type != {int:is_protected}') . '
+				ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
+				array(
+					'moderator_group' => 3,
+					'global_mod_group' => 2,
+					'min_posts' => -1,
+					'is_protected' => 1,
+				)
+			);
+			break;
+
+		case 'all':
+			$request = $smcFunc['db_query']('', '
+				SELECT id_group, group_name
+				FROM {db_prefix}membergroups',
+				array(
+				)
+			);
+			$groups[] = array(
+				'id' => 0,
+				'name' => $txt['maintain_members_ungrouped']
+			);
+			break;
+		default:
+			trigger_error('getBasicMembergroupData(): Invalid group type \'' . $type . '\'', E_USER_NOTICE);
+	}
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$groups[] = array(
+			'id' => $row['id_group'],
+			'name' => $row['group_name']
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $groups;
+}
