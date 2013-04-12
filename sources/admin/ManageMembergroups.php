@@ -539,7 +539,7 @@ class ManageMembergroups_Controller
 		{
 			// Validate the session.
 			checkSession();
-			//validateToken('admin-mmg');
+			validateToken('admin-mmg');
 
 			// Can they really inherit from this group?
 			if (isset($_POST['group_inherit']) && $_POST['group_inherit'] != -2 && !allowedTo('admin_forum'))
