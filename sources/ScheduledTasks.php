@@ -1177,8 +1177,8 @@ $mail_function = (!empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
 		if ($modSettings['mail_failed_attempts'] > 5)
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}settings
-				SET value = {string:mail_next_send}
-				WHERE variable = {string:next_mail_send}
+				SET value = {string:next_mail_send}
+				WHERE variable = {string:mail_next_send}
 					AND value = {string:last_send}',
 				array(
 					'next_mail_send' => time() + 60,
