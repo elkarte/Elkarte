@@ -161,7 +161,7 @@ class ManageMembers_Controller
 	 *
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $scripturl, $context, $modSettings, $smcFunc, $user_info;
 
@@ -636,9 +636,9 @@ class ManageMembers_Controller
 	 *
 	 * @uses the admin_browse sub template of the ManageMembers template.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
@@ -972,7 +972,7 @@ class ManageMembers_Controller
 	 * Redirects to ?action=admin;area=viewmembers;sa=browse
 	 * with the same parameters as the calling page.
 	 */
-	function action_approve()
+	public function action_approve()
 	{
 		global $scripturl, $modSettings, $language, $smcFunc;
 
