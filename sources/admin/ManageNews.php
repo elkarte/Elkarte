@@ -36,7 +36,7 @@ class ManageNews_Controller
 	 * It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt;
 
@@ -112,7 +112,7 @@ class ManageNews_Controller
 	 * Can be accessed with ?action=admin;sa=editnews.
 	 *
 	 */
-	function action_editnews()
+	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
 		global $smcFunc;
@@ -302,7 +302,7 @@ class ManageNews_Controller
 	 *
 	 * @uses the ManageNews template and email_members sub template.
 	 */
-	function action_mailingmembers()
+	public function action_mailingmembers()
 	{
 		global $txt, $context, $modSettings, $smcFunc;
 
@@ -372,7 +372,7 @@ class ManageNews_Controller
 	 *
 	 * @uses ManageNews template, email_members_compose sub-template.
 	 */
-	function action_mailingcompose()
+	public function action_mailingcompose()
 	{
 		global $txt, $context, $smcFunc;
 
@@ -579,7 +579,7 @@ class ManageNews_Controller
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 * @uses the ManageNews template and email_members_send sub template.
 	 */
-	function action_mailingsend($clean_only = false)
+	public function action_mailingsend($clean_only = false)
 	{
 		global $txt, $context, $smcFunc;
 		global $scripturl, $modSettings, $user_info;
@@ -942,7 +942,7 @@ class ManageNews_Controller
 	 *
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
-	function action_newsSettings_display()
+	public function action_newsSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
@@ -987,7 +987,7 @@ class ManageNews_Controller
 	 *
 	 * @return array
 	 */
-	function _initNewsSettingsForm()
+	private function _initNewsSettingsForm()
 	{
 		global $txt;
 
@@ -1017,7 +1017,7 @@ class ManageNews_Controller
 	 *
 	 * @return array
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
@@ -1064,4 +1064,3 @@ function list_getNews()
 
 	return $admin_current_news;
 }
-
