@@ -922,3 +922,57 @@ function getBasicMembergroupData($type = 'standard')
 
 	return $groups;
 }
+
+/**
+ * Retrieves postgroups and membergroups from the membergroups table
+ * except the moderator and the newbie group
+ *
+ * @todo: merge with getBasicMembergroupData();
+ * @return array
+ */
+function retrieveMembergroups()
+{
+	global $smcFunc, $txt;
+
+	$groups = array(
+		'membergroups' => array(),
+		'postgroups' => array(),
+	);
+
+	// Retrieving the membergroups and postgroups.
+	$groups['membergroups'] = array(
+		array(
+			'id' => 0,
+			'name' => $txt['membergroups_members'],
+			'can_be_additional' => false
+		)
+	);
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name, min_posts
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:moderator_group}
+		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		array(
+			'moderator_group' => 3,
+			'newbie_group' => 4,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if ($row['min_posts'] == -1)
+			$groups['membergroups'][] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+				'can_be_additional' => true
+			);
+		else
+			$groups['postgroups'][] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name']
+			);
+		}
+	$smcFunc['db_free_result']($request);
+
+	return $groups;
+}
