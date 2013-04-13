@@ -1221,12 +1221,6 @@ function template_callback_question_answer_list()
 		<dt id="add_more_link_div" style="display: none;">
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
-
-	// The javascript needs to go at the end but we'll put it in this template for looks.
-	$context['settings_post_javascript'] .= '
-		var placeHolder = document.getElementById(\'add_more_question_placeholder\');
-		document.getElementById(\'add_more_link_div\').style.display = \'\';
-	';
 }
 
 /**

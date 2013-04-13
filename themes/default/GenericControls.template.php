@@ -263,7 +263,7 @@ function template_control_verification_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-			if ($context['use_graphic_library'])
+			if ($verify_context['use_graphic_library'])
 				echo '
 				<img src="', $verify_context['image_href'], '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '" />';
 			else

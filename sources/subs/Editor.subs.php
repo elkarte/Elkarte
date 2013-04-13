@@ -703,6 +703,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	static $all_instances;
 
 	// @todo: maybe move the list to $modSettings instead of hooking it?
+	// Used in ManageSecurity_Controller->action_spamSettings_display too
 	$known_verifications = array(
 		'captcha',
 		'questions',
@@ -824,6 +825,7 @@ interface Control_Verifications
 	function createTest($refresh);
 	function prepareContext();
 	function doTest();
+	function settings();
 }
 
 class Control_Verification_Captcha implements Control_Verifications
@@ -833,10 +835,14 @@ class Control_Verification_Captcha implements Control_Verifications
 	private $_text_value = null;
 	private $_image_href = null;
 	private $_tested = false;
+	private $_use_graphic_library = false;
 
-	public function __construct($verificationOptions)
+	public function __construct($verificationOptions = null)
 	{
-		$this->_options = $verificationOptions;
+		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+
+		if (!empty($verificationOptions))
+			$this->_options = $verificationOptions;
 	}
 		
 	public function showVerification($isNew, $force_refresh = true)
@@ -849,8 +855,6 @@ class Control_Verification_Captcha implements Control_Verifications
 			$context['captcha_js_loaded'] = false;
 			// The template
 			loadTemplate('GenericControls');
-
-			$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 
 			// Skip I, J, L, O, Q, S and Z.
 			$context['standard_captcha_range'] = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
@@ -872,7 +876,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 
 			addInlineJavascript('
-				var verification' . $this->_options['id'] . 'Handle = new smfCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');', true);
+				var verification' . $this->_options['id'] . 'Handle = new smfCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
 		}
 
 		if ($isNew || $force_refresh)
@@ -908,6 +912,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			'values' => array(
 				'image_href' => $this->_image_href,
 				'text_value' => $this->_text_value,
+				'use_graphic_library' => $this->_use_graphic_library,
 				'is_error' => $this->_tested && !$this->_verifyCode(),
 			)
 		);
@@ -923,6 +928,40 @@ class Control_Verification_Captcha implements Control_Verifications
 		return true;
 	}
 
+	public function settings()
+	{
+		global $txt, $context, $scripturl, $modSettings;
+
+		// Generate a sample registration image.
+		$verification_image = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+
+		// Visual verification.
+		$config_vars = array(
+			array('title', 'configure_verification_means'),
+			array('desc', 'configure_verification_means_desc'),
+			'vv' => array('select', 'visual_verification_type',
+				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
+				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : '')
+		);
+
+		// Some javascript for CAPTCHA.
+		if ($this->_use_graphic_library)
+			addInlineJavascript('
+			function refreshImages()
+			{
+				var imageType = document.getElementById(\'visual_verification_type\').value;
+				document.getElementById(\'verification_image\').src = \'' . $verification_image . ';type=\' + imageType;
+			}', true);
+
+		// Show the image itself, or text saying we can't.
+		if ($this->_use_graphic_library)
+			$config_vars['vv']['postinput'] = '<br /><img src="' . $verification_image . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
+		else
+			$config_vars['vv']['postinput'] = '<br /><span class="smalltext">' . $txt['setting_image_verification_nogd'] . '</span>';
+
+		return $config_vars;
+	}
+
 	private function _verifyCode()
 	{
 		return !$this->_show_captcha || (!empty($_REQUEST[$this->_options['id'] . '_vv']['code']) && !empty($_SESSION[$this->_options['id'] . '_vv']['code']) && strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) === $_SESSION[$this->_options['id'] . '_vv']['code']);
@@ -933,14 +972,14 @@ class Control_Verification_Questions implements Control_Verifications
 {
 	private $_options = null;
 	private $_questionIDs = null;
-	private $_thisText = null;
 	private $_number_questions = null;
 	private $_questions_language = null;
 	private $_possible_questions = null;
 
-	public function __construct($verificationOptions)
+	public function __construct($verificationOptions = null)
 	{
-		$this->_options = $verificationOptions;
+		if (!empty($verificationOptions))
+			$this->_options = $verificationOptions;
 	}
 
 	public function showVerification($isNew, $force_refresh = true)
@@ -953,7 +992,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 			// If we want questions do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
-				refreshQuestionsCache();
+				$this->_refreshQuestionsCache();
 
 			// Let's deal with languages
 			// First thing we need to know what language the user wants and if there is at least one question
@@ -1015,7 +1054,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
-		$questions = loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
+		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
 		$asked_questions = array();
 
 		foreach ($questions as $row)
@@ -1047,6 +1086,87 @@ class Control_Verification_Questions implements Control_Verifications
 		return true;
 	}
 
+	public function settings()
+	{
+		global $txt, $context, $smcFunc, $language;
+
+		// Load any question and answers!
+		$filter = null;
+		if (isset($_GET['language']))
+			$filter = array(
+				'type' => 'language',
+				'value' => $_GET['language'],
+			);
+		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
+
+		// The javascript needs to go at the end
+		addInlineJavascript('
+			var placeHolder = document.getElementById(\'add_more_question_placeholder\');
+			document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
+
+		if (isset($_GET['save']))
+		{
+			// Handle verification questions.
+			$questionInserts = array();
+			$count_questions = 0;
+
+			foreach ($_POST['question'] as $id => $question)
+			{
+				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
+				$answers = array();
+				if (!empty($_POST['answer'][$id]))
+					foreach ($_POST['answer'][$id] as $answer)
+					{
+						$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($answer, ENT_COMPAT)));
+						if ($answer != '')
+							$answers[] = $answer;
+					}
+
+				// Already existed?
+				if (isset($context['question_answers'][$id]))
+				{
+					$count_questions++;
+					// Changed?
+					if ($question == '' || empty($answers))
+					{
+						$this->_delete($id);
+						$count_questions--;
+					}
+					else
+						$this->_update($id, $question, $answers);
+				}
+				// It's so shiney and new!
+				elseif ($question != '' && !empty($answers))
+				{
+					$questionInserts[] = array(
+						'question' => $question,
+						// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
+						'answer' => serialize($answers),
+						// @todo: replace with proper language
+						'language' => $language,
+					);
+					$count_questions++;
+				}
+			}
+
+			// Any questions to insert?
+			if (!empty($questionInserts))
+				$this->_insert($questionInserts);
+
+			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
+				$_POST['qa_verification_number'] = $count_questions;
+
+		}
+
+		return array(
+			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
+			array('title', 'setup_verification_questions'),
+				array('desc', 'setup_verification_questions_desc'),
+				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
+				array('callback', 'question_answer_list'),
+		);
+	}
+
 	/**
 	* Checks if an the answers to anti-spam questions are correct
 	* @param string $verificationId the ID of the verification element
@@ -1057,7 +1177,7 @@ class Control_Verification_Questions implements Control_Verifications
 		global $smcFunc;
 
 		// Get the answers and see if they are all right!
-		$questions = loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
+		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
 		$this->_incorrectQuestions = array();
 		foreach ($questions as $row)
 		{
@@ -1073,69 +1193,111 @@ class Control_Verification_Questions implements Control_Verifications
 		return empty($this->_incorrectQuestions);
 	}
 
-}
-
-/**
-* Updates the cache of questions IDs
-*/
-function refreshQuestionsCache()
-{
-	global $modSettings, $smcFunc;
-
-	if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
+	/**
+	* Updates the cache of questions IDs
+	*/
+	private function _refreshQuestionsCache()
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_question, language
-			FROM {db_prefix}antispam_questions',
-			array()
+		global $modSettings, $smcFunc;
+
+		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_question, language
+				FROM {db_prefix}antispam_questions',
+				array()
+			);
+			$modSettings['question_id_cache'] = array();
+			while ($row = $smcFunc['db_fetch_assoc']($request))
+				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
+			$smcFunc['db_free_result']($request);
+
+			if (!empty($modSettings['cache_enable']))
+				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+		}
+	}
+
+	/**
+	* Loads all the available antispam questions, or a subset based on a filter
+	* @param array $filter, if specified it myst be an array with two indexes:
+	*              - 'type' => a valid filter, it can be 'language' or 'id_question'
+	*              - 'value' => the value of the filter (i.e. the language)
+	*/
+	private function _loadAntispamQuestions($filter = null)
+	{
+		global $smcFunc;
+
+		$available_filters = array(
+			'language' => 'language = {string:current_filter}',
+			'id_question' => 'id_question IN ({array_int:current_filter})',
 		);
-		$modSettings['question_id_cache'] = array();
+
+		// Load any question and answers!
+		$question_answers = array();
+		$request = $smcFunc['db_query']('', '
+			SELECT id_question, question, answer, language
+			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
+			WHERE ' . $available_filters[$filter['type']]),
+			array(
+				'current_filter' => $filter['value'],
+			)
+		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
+		{
+			$question_answers[$row['id_question']] = array(
+				'id_question' => $row['id_question'],
+				'question' => $row['question'],
+				'answer' => unserialize($row['answer']),
+				'language' => $row['language'],
+			);
+		}
 		$smcFunc['db_free_result']($request);
 
-		if (!empty($modSettings['cache_enable']))
-			cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+		return $question_answers;
 	}
-}
 
-/**
- * Loads all the available antispam questions, or a subset based on a filter
- * @param array $filter, if specified it myst be an array with two indexes:
- *              - 'type' => a valid filter, it can be 'language' or 'id_question'
- *              - 'value' => the value of the filter (i.e. the language)
- */
-function loadAntispamQuestions($filter = null)
-{
-	global $smcFunc;
-
-	$available_filters = array(
-		'language' => 'language = {string:current_filter}',
-		'id_question' => 'id_question IN ({array_int:current_filter})',
-	);
-
-	// Load any question and answers!
-	$question_answers = array();
-	$request = $smcFunc['db_query']('', '
-		SELECT id_question, question, answer, language
-		FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
-		WHERE ' . $available_filters[$filter['type']]),
-		array(
-			'current_filter' => $filter['value'],
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	private function _delete($id)
 	{
-		$question_answers[$row['id_question']] = array(
-			'id_question' => $row['id_question'],
-			'question' => $row['question'],
-			'answer' => unserialize($row['answer']),
-			'language' => $row['language'],
+		global $smcFunc;
+
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}antispam_questions
+			WHERE id_question = {int:id}',
+			array(
+				'id' => $id,
+			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
 
-	return $question_answers;
+	private function _update($id, $question, $answers)
+	{
+		global $smcFunc;
+
+		$request = $smcFunc['db_query']('', '
+			UPDATE {db_prefix}antispam_questions
+			SET question = {string:question}, answer = {string:answer}
+			WHERE id_question = {int:id}',
+			array(
+				'id' => $id,
+				'question' => $question,
+				// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
+				'answer' => serialize($answers),
+			)
+		);
+	}
+
+	private function _insert($questions)
+	{
+		global $smcFunc;
+
+		$smcFunc['db_insert']('',
+			'{db_prefix}antispam_questions',
+			array('question' => 'string-65535', 'answer' => 'string-65535', 'language' => 'string-50'),
+			$questions,
+			array('id_question')
+		);
+	}
+
 }
 
 /**
