@@ -731,7 +731,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		$current_instance = null;
 		foreach ($known_verifications as $verification)
 		{
-			$class_name = 'control_verification_' . $verification;
+			$class_name = 'Control_Verification_' . $verification;
 			$current_instance = new $class_name($verificationOptions);
 
 			// If there is anything to show, otherwise forget it
@@ -835,7 +835,7 @@ interface control_verifications
      function doTest();
 }
 
-class control_verification_captcha implements control_verifications
+class Control_Verification_captcha implements control_verifications
 {
 	private $_options = null;
 	private $_thisVerification = null;
@@ -932,7 +932,7 @@ class control_verification_captcha implements control_verifications
 	}
 }
 
-class control_verification_questions implements control_verifications
+class Control_Verification_questions implements control_verifications
 {
 	private $_options = null;
 	private $_thisVerification = null;
