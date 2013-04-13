@@ -1506,3 +1506,30 @@ function getBasicMemberData($member_ids, $options = array())
 
 	return $members;
 }
+
+/**
+ * Counts all inactive members
+ * @return array $inactive_members
+ */
+function countInactiveMembers()
+{
+	global $smcFunc;
+
+	$inactive_members = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*) AS total_members, is_activated
+		FROM {db_prefix}members
+		WHERE is_activated != {int:is_activated}
+		GROUP BY is_activated',
+		array(
+			'is_activated' => 1,
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$inactive_members[$row['is_activated']] = $row['total_members'];
+	$smcFunc['db_free_result']($request);
+
+	return $inactive_members;
+}

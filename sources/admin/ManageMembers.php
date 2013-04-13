@@ -35,9 +35,9 @@ class ManageMembers_Controller
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings;
 
 		$subActions = array(
 			'all' => array(
@@ -78,22 +78,12 @@ class ManageMembers_Controller
 		loadTemplate('ManageMembers');
 
 		// Get counts on every type of activation - for sections and filtering alike.
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*) AS total_members, is_activated
-			FROM {db_prefix}members
-			WHERE is_activated != {int:is_activated}
-			GROUP BY is_activated',
-			array(
-				'is_activated' => 1,
-			)
-		);
-		$context['activation_numbers'] = array();
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		$context['awaiting_activation'] = 0;
 		$context['awaiting_approval'] = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['activation_numbers'][$row['is_activated']] = $row['total_members'];
-		$smcFunc['db_free_result']($request);
-
+		$context['activation_numbers'] = getInactiveMembers();
+		
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
 			if (in_array($activation_type, array(0, 2)))
@@ -1041,7 +1031,7 @@ class ManageMembers_Controller
 	 */
 	function action_approve()
 	{
-		global $txt, $context, $scripturl, $modSettings, $language, $user_info, $smcFunc;
+		global $scripturl, $modSettings, $language, $smcFunc;
 
 		// First, check our session.
 		checkSession();
@@ -1052,7 +1042,6 @@ class ManageMembers_Controller
 		loadLanguage('Login');
 
 		// Sort out where we are going...
-		$browse_type = isset($_REQUEST['type']) ? $_REQUEST['type'] : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 		$current_filter = (int) $_REQUEST['orig_filter'];
 
 		// If we are applying a filter do just that - then redirect.
@@ -1253,19 +1242,10 @@ class ManageMembers_Controller
 			}
 		}
 
-		// @todo current_language is never set, no idea what this is for. Remove?
-		// Back to the user's language!
-		if (isset($current_language) && $current_language != $user_info['language'])
-		{
-			loadLanguage('index');
-			loadLanguage('ManageMembers');
-		}
-
 		// Log what we did?
 		if (!empty($modSettings['modlog_enabled']) && in_array($_POST['todo'], array('ok', 'okemail', 'require_activation', 'remind')))
 		{
 			$log_action = $_POST['todo'] == 'remind' ? 'remind_member' : 'approve_member';
-			$log_inserts = array();
 
 			require_once(SOURCEDIR . '/Logging.php');
 			foreach ($member_info as $member)
