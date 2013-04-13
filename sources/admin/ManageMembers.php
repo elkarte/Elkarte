@@ -82,7 +82,7 @@ class ManageMembers_Controller
 
 		$context['awaiting_activation'] = 0;
 		$context['awaiting_approval'] = 0;
-		$context['activation_numbers'] = getInactiveMembers();
+		$context['activation_numbers'] = countInactiveMembers();
 		
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
