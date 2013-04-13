@@ -193,6 +193,7 @@ class ManageMembers_Controller
 		if ($context['sub_action'] == 'query')
 		{
 			// Retrieving the membergroups and postgroups.
+			require_once(SUBSDIR . '/Membergroups.subs.php');
 			$groups = retrieveMembergroups();
 
 			$context['membergroups'] = $groups['membergroups'];
