@@ -519,6 +519,7 @@ class ManageMembers_Controller
 						'function' => create_function('$rowData', '
 							global $txt;
 
+							require_once(SUBSDIR . \'/ManageMembers.subs.php\');
 							// Calculate number of days since last online.
 							if (empty($rowData[\'last_login\']))
 								$difference = $txt[\'never\'];
