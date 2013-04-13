@@ -172,7 +172,7 @@ function action_register($reg_errors = array())
 	}
 
 	// Generate a visual verification code to make sure the user is no bot.
-	if (!empty($modSettings['reg_verification']))
+	if (!empty($modSettings['reg_verification']) && $current_step > 1)
 	{
 		require_once(SUBSDIR . '/Editor.subs.php');
 		$verificationOptions = array(

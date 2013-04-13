@@ -1194,14 +1194,14 @@ function template_callback_question_answer_list()
 		echo '
 
 			<dt>
-				<input type="text" name="question[', $data['id'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
+				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
 			</dt>
 			<dd>';
 		$count = count($data['answer']) - 1;
 		foreach ($data['answer'] as $id => $answer)
 			echo '
-				<input type="text" name="answer[', $data['id'], '][]" value="', $answer, '" size="50" class="input_text verification_answer" />', $id == $count ? '
-				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
+				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="50" class="input_text verification_answer" />', $id == $count ? '
+				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id_question'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
 		echo '
 			</dd>';
 	}

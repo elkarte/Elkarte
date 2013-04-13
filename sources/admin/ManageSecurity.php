@@ -291,7 +291,7 @@ class ManageSecurity_Controller
 	 */
 	function action_spamSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc;
+		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc, $language;
 
 		// Generate a sample registration image.
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
@@ -381,6 +381,7 @@ class ManageSecurity_Controller
 					$questionInserts[] = array(
 						'question' => $question,
 						'answer' => serialize($answers),
+						'language' => $language,
 					);
 				}
 			}
