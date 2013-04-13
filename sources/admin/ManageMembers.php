@@ -193,40 +193,11 @@ class ManageMembers_Controller
 		if ($context['sub_action'] == 'query')
 		{
 			// Retrieving the membergroups and postgroups.
-			$context['membergroups'] = array(
-				array(
-					'id' => 0,
-					'name' => $txt['membergroups_members'],
-					'can_be_additional' => false
-				)
-			);
-			$context['postgroups'] = array();
+			$groups = retrieveMembergroups();
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name, min_posts
-				FROM {db_prefix}membergroups
-				WHERE id_group != {int:moderator_group}
-				ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-				array(
-					'moderator_group' => 3,
-					'newbie_group' => 4,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if ($row['min_posts'] == -1)
-					$context['membergroups'][] = array(
-						'id' => $row['id_group'],
-						'name' => $row['group_name'],
-						'can_be_additional' => true
-					);
-				else
-					$context['postgroups'][] = array(
-						'id' => $row['id_group'],
-						'name' => $row['group_name']
-					);
-			}
-			$smcFunc['db_free_result']($request);
+			$context['membergroups'] = $groups['membergroups'];
+			$context['postgroups'] = $groups['groups'];
+			unset($groups);
 
 			// Some data about the form fields and how they are linked to the database.
 			$params = array(
@@ -641,46 +612,18 @@ class ManageMembers_Controller
 	 */
 	function action_search()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt;
 
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Get a list of all the membergroups and postgroups that can be selected.
-		$context['membergroups'] = array(
-			array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'can_be_additional' => false
-			)
-		);
-		$context['postgroups'] = array();
+		$groups = retrieveMembergroups();
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, min_posts
-			FROM {db_prefix}membergroups
-			WHERE id_group != {int:moderator_group}
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'moderator_group' => 3,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if ($row['min_posts'] == -1)
-				$context['membergroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name'],
-					'can_be_additional' => true
-				);
-			else
-				$context['postgroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name']
-				);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['membergroups'] = $groups['membergroups'];
+		$context['postgroups'] = $groups['groups'];
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'search_members';
+
+		unset($groups);
 	}
 
 	/**
