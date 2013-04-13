@@ -610,7 +610,7 @@ class ManageMembers_Controller
 	 *
 	 * @uses the search_members sub template of the ManageMembers template.
 	 */
-	function action_search()
+	public function action_search()
 	{
 		global $context, $txt;
 
@@ -974,12 +974,13 @@ class ManageMembers_Controller
 	 */
 	public function action_approve()
 	{
-		global $scripturl, $modSettings, $language, $smcFunc;
+		global $scripturl, $modSettings;
 
 		// First, check our session.
 		checkSession();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
+		require_once(SUBSDIR . '/ManageMembers.subs.php');
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
@@ -1012,58 +1013,18 @@ class ManageMembers_Controller
 				AND id_member IN ({array_int:members})';
 		}
 
-		// Get information on each of the members, things that are important to us, like email address...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
-			FROM {db_prefix}members
-			WHERE is_activated = {int:activated_status}' . $condition . '
-			ORDER BY lngfile',
-			array(
-				'activated_status' => $current_filter,
-				'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-				'members' => empty($members) ? array() : $members,
-			)
-		);
-
-		$member_count = $smcFunc['db_num_rows']($request);
-
-		// If no results then just return!
-		if ($member_count == 0)
+		$data = retrieveMemberData($condition, $current_filter, $timeBefore, $members);
+		if($data['member_count'] == 0)
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 
-		$member_info = array();
-		$members = array();
-		// Fill the info array.
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$members[] = $row['id_member'];
-			$member_info[] = array(
-				'id' => $row['id_member'],
-				'username' => $row['member_name'],
-				'name' => $row['real_name'],
-				'email' => $row['email_address'],
-				'language' => empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'],
-				'code' => $row['validation_code']
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$member_info = $data['member_info'];
+		$members = $data['members'];
 
 		// Are we activating or approving the members?
 		if ($_POST['todo'] == 'ok' || $_POST['todo'] == 'okemail')
 		{
-			// Approve/activate this member.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
-				WHERE is_activated = {int:activated_status}' . $condition,
-				array(
-					'is_activated' => 1,
-					'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-					'members' => empty($members) ? array() : $members,
-					'activated_status' => $current_filter,
-					'blank_string' => '',
-				)
-			);
+			// Approve / activate this member.
+			approveMembers($members, $condition, $timeBefore, $current_filter);
 
 			// Do we have to let the integration code know about the activations?
 			if (!empty($modSettings['integrate_activate']))
@@ -1101,21 +1062,7 @@ class ManageMembers_Controller
 				$validation_code = generateValidationCode();
 
 				// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}members
-					SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
-					WHERE is_activated = {int:activated_status}
-						' . $condition . '
-						AND id_member = {int:selected_member}',
-					array(
-						'not_activated' => 0,
-						'activated_status' => $current_filter,
-						'selected_member' => $member['id'],
-						'validation_code' => $validation_code,
-						'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-						'members' => empty($members) ? array() : $members,
-					)
-				);
+				enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code);
 
 				$replacements = array(
 					'USERNAME' => $member['name'],
@@ -1197,7 +1144,7 @@ class ManageMembers_Controller
 
 		// Although updateStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, array(3, 4)))
-			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $member_count ? $modSettings['unapprovedMembers'] - $member_count : 0)));
+			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
 		updateStats('member', false);
@@ -1208,33 +1155,4 @@ class ManageMembers_Controller
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 	}
-}
-
-/**
- * Nifty function to calculate the number of days ago a given date was.
- * Requires a unix timestamp as input, returns an integer.
- * Named in honour of Jeff Lewis, the original creator of...this function.
- *
- * @param $old
- * @return int, the returned number of days, based on the forum time.
- */
-function jeffsdatediff($old)
-{
-	// Get the current time as the user would see it...
-	$forumTime = forum_time();
-
-	// Calculate the seconds that have passed since midnight.
-	$sinceMidnight = date('H', $forumTime) * 60 * 60 + date('i', $forumTime) * 60 + date('s', $forumTime);
-
-	// Take the difference between the two times.
-	$dis = time() - $old;
-
-	// Before midnight?
-	if ($dis < $sinceMidnight)
-		return 0;
-	else
-		$dis -= $sinceMidnight;
-
-	// Divide out the seconds in a day to get the number of days.
-	return ceil($dis / (24 * 60 * 60));
 }
