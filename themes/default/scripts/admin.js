@@ -466,6 +466,8 @@ function createNamedElement(type, name, customFields)
 
 function addAnotherQuestion()
 {
+	var placeHolder = document.getElementById('add_more_question_placeholder');
+
 	setOuterHTML(placeHolder, add_question_template.easyReplace({
 		question_last_blank: question_last_blank,
 		setup_verification_add_more_answers: txt_add_another_answer

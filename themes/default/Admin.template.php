@@ -1231,7 +1231,7 @@ function template_callback_question_answer_list()
 				<input type="text" name="answer[b-%question_last_blank%][]" size="50" class="input_text verification_answer" />
 				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
 			</dd>
-			<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>'), ';
+			<dt id="add_more_question_placeholder" style="display: none;"></dt>'), ';
 			// ]]></script>
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';

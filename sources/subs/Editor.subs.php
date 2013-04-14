@@ -1105,7 +1105,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 		// The javascript needs to go at the end
 		addInlineJavascript('
-			var placeHolder = document.getElementById(\'add_more_question_placeholder\');
 			document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
 
 		if (isset($_GET['save']))
