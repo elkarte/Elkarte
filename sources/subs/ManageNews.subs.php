@@ -47,6 +47,12 @@ function list_getNews()
 	return $admin_current_news;
 }
 
+/**
+ * Get an array with all of our membergroups
+ *
+ * @todo: merge with getBasicMemgergroupData();
+ * @return array
+ */
 function getExtraGroups()
 {
 	global $smcFunc, $modSettings, $txt;
@@ -97,15 +103,18 @@ function getExtraGroups()
 	return $groups;
 }
 
-
+/**
+ * Get a list of all full banned users.  Use their Username and email to find them.
+ * Only get the ones that can't login to turn off notification.
+ *
+ * @return array
+ */
 function excludeBannedMembers()
 {
 	global $smcFunc;
 
 	$excludes = array();
 
-	// Get a list of all full banned users.  Use their Username and email to find them.
-	// Only get the ones that can't login to turn off notification.
 	$request = $smcFunc['db_query']('', '
 		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}ban_groups AS bg
@@ -163,6 +172,11 @@ function excludeBannedMembers()
 	return $excludes;
 }
 
+/**
+ * Get a list of our local board moderators.
+ *
+ * @return array
+ */
 function getModerators()
 {
 	global $smcFunc;
@@ -185,7 +199,16 @@ function getModerators()
 	return $mods;
 }
 
-
+/**
+ * Lists our newsletter recipients, step by step.
+ *
+ * @param string $sendQuery
+ * @param string $sendParams
+ * @param int $start
+ * @param int $increment
+ * @param int $counter
+ * @return array
+ */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
 	global $smcFunc;
