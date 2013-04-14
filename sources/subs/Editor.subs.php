@@ -836,10 +836,13 @@ class Control_Verification_Captcha implements Control_Verifications
 	private $_image_href = null;
 	private $_tested = false;
 	private $_use_graphic_library = false;
+	private $_standard_captcha_range = array();
 
 	public function __construct($verificationOptions = null)
 	{
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+		// Skip I, J, L, O, Q, S and Z.
+		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
 
 		if (!empty($verificationOptions))
 			$this->_options = $verificationOptions;
@@ -855,9 +858,6 @@ class Control_Verification_Captcha implements Control_Verifications
 			$context['captcha_js_loaded'] = false;
 			// The template
 			loadTemplate('GenericControls');
-
-			// Skip I, J, L, O, Q, S and Z.
-			$context['standard_captcha_range'] = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
 		}
 
 		//Some javascript ma'am? (But load it only once)
@@ -896,7 +896,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		{
 			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
 			// Are we overriding the range?
-			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $context['standard_captcha_range'];
+			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
 			for ($i = 0; $i < 6; $i++)
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
@@ -943,6 +943,10 @@ class Control_Verification_Captcha implements Control_Verifications
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
 				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : '')
 		);
+
+		$_SESSION['visual_verification_code'] = '';
+		for ($i = 0; $i < 6; $i++)
+			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
 
 		// Some javascript for CAPTCHA.
 		if ($this->_use_graphic_library)
