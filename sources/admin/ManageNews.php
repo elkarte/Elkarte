@@ -305,55 +305,19 @@ class ManageNews_Controller
 	 */
 	public function action_mailingmembers()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/ManageNews.subs.php');
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
 		$context['groups'] = array();
-		$postGroups = array();
-		$normalGroups = array();
-
-		// If we have post groups disabled then we need to give a "ungrouped members" option.
-		if (empty($modSettings['permission_enable_postgroups']))
-		{
-			$context['groups'][0] = array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'member_count' => 0,
-			);
-			$normalGroups[0] = 0;
-		}
-
-		// Get all the extra groups as well as Administrator and Global Moderator.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, min_posts
-			FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-			WHERE min_posts = {int:min_posts}' : '') . '
-			GROUP BY id_group, min_posts, group_name
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'min_posts' => -1,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['groups'][$row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => $row['group_name'],
-				'member_count' => 0,
-			);
-
-			if ($row['min_posts'] == -1)
-				$normalGroups[$row['id_group']] = $row['id_group'];
-			else
-				$postGroups[$row['id_group']] = $row['id_group'];
-		}
-		$smcFunc['db_free_result']($request);
-
-		$groups = membersInGroups($postGroups, $normalGroups, true, true);
+		
+		$membergroups = getExtraGroups();
+		$context['groups'] = $membergroups['groups'];
+		
+		$groups = membersInGroups($membergroups['postgroups'], $membergroups['membergroups'], true, true);
 		foreach ($groups as $id_group => $member_count)
 		{
 			if (isset($context['groups'][$id_group]['member_count']))
@@ -475,96 +439,29 @@ class ManageNews_Controller
 
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');
-
+		require_once(SUBSDIR . '/ManageNews.subs.php');
 		// Get a list of all full banned users.  Use their Username and email to find them.
 		// Only get the ones that can't login to turn off notification.
-		$request = $smcFunc['db_query']('', '
-			SELECT DISTINCT mem.id_member
-			FROM {db_prefix}ban_groups AS bg
-				INNER JOIN {db_prefix}ban_items AS bi ON (bg.id_ban_group = bi.id_ban_group)
-				INNER JOIN {db_prefix}members AS mem ON (bi.id_member = mem.id_member)
-			WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
-				AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})',
-			array(
-				'cannot_access' => 1,
-				'cannot_login' => 1,
-				'current_time' => time(),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['recipients']['exclude_members'][] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
-
-		$request = $smcFunc['db_query']('', '
-			SELECT DISTINCT bi.email_address
-			FROM {db_prefix}ban_items AS bi
-				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
-			WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
-				AND (COALESCE(bg.expire_time, 1=1) OR bg.expire_time > {int:current_time})
-				AND bi.email_address != {string:blank_string}',
-			array(
-				'cannot_access' => 1,
-				'cannot_login' => 1,
-				'current_time' => time(),
-				'blank_string' => '',
-			)
-		);
-		$condition_array = array();
-		$condition_array_params = array();
-		$count = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$condition_array[] = '{string:email_' . $count . '}';
-			$condition_array_params['email_' . $count++] = $row['email_address'];
-		}
-		$smcFunc['db_free_result']($request);
-
-		if (!empty($condition_array))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE email_address IN(' . implode(', ', $condition_array) .')',
-				$condition_array_params
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$context['recipients']['exclude_members'][] = $row['id_member'];
-			$smcFunc['db_free_result']($request);
-		}
+		$context['recipients']['exclude_members'] = excludeBannedMembers();
 
 		// Did they select moderators - if so add them as specific members...
 		if ((!empty($context['recipients']['groups']) && in_array(3, $context['recipients']['groups'])) || (!empty($context['recipients']['exclude_groups']) && in_array(3, $context['recipients']['exclude_groups'])))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT DISTINCT mem.id_member AS identifier
-				FROM {db_prefix}members AS mem
-					INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
-				WHERE mem.is_activated = {int:is_activated}',
-				array(
-					'is_activated' => 1,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			$mods = getModerators();
+			
+			foreach($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
 					$context['recipients']['exclude_members'][] = $row['identifier'];
 				else
 					$context['recipients']['members'][] = $row['identifier'];
 			}
-			$smcFunc['db_free_result']($request);
 		}
 
+		require_once(SUBSDIR . '/Members.subs.php');
 		// For progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
-		$request = $smcFunc['db_query']('', '
-			SELECT MAX(id_member)
-			FROM {db_prefix}members',
-			array(
-			)
-		);
-		list ($context['max_id_member']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
+		$context['max_id_member'] = maxMemberID();
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
@@ -846,26 +743,10 @@ class ManageNews_Controller
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
-			$result = $smcFunc['db_query']('', '
-				SELECT mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
-				FROM {db_prefix}members AS mem
-				WHERE mem.id_member > {int:min_id_member}
-					AND mem.id_member < {int:max_id_member}
-					AND ' . $sendQuery . '
-					AND mem.is_activated = {int:is_activated}
-				ORDER BY mem.id_member ASC
-				LIMIT {int:atonce}',
-				array_merge($sendParams, array(
-					'min_id_member' => $context['start'],
-					'max_id_member' => $context['start'] + $num_at_once - $i,
-					'atonce' => $num_at_once - $i,
-					'regular_group' => 0,
-					'notify_announcements' => 1,
-					'is_activated' => 1,
-				))
-			);
+			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
+	
 
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];
 
@@ -908,7 +789,6 @@ class ManageNews_Controller
 				else
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
 			}
-			$smcFunc['db_free_result']($result);
 		}
 
 		// If used our batch assume we still have a member.
