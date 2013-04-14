@@ -1439,6 +1439,26 @@ function admins($id_admin = 0)
 }
 
 /**
+ * Get the last known id_member
+ * @return int
+ */
+function maxMemberID()
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT MAX(id_member)
+		FROM {db_prefix}members',
+		array(
+		)
+	);
+	list ($max_id) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $max_id;
+}
+
+/**
  * Load some basic member infos
  * 
  * @param mixed $member_ids an array of member IDs or a single ID
