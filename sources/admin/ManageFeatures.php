@@ -412,13 +412,14 @@ class ManageFeatures_Controller
 			checkSession('get');
 
 			require_once(SUBSDIR . '/ManageFeatures.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
 			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 			$done = false;
 
-			$context['max_member'] = getMaxMember();
+			$context['max_member'] = maxMemberID();
 
 			while (!$done)
 			{
