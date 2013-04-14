@@ -1186,7 +1186,7 @@ function template_admin_search_results()
  */
 function template_callback_question_answer_list()
 {
-	global $txt, $context, $settings;
+	global $txt, $context;
 
 	echo '
 			<dt>
@@ -1197,28 +1197,49 @@ function template_callback_question_answer_list()
 			</dd>';
 
 	foreach ($context['question_answers'] as $data)
+	{
 		echo '
 
 			<dt>
-				<input type="text" name="question[', $data['id'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
+				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
 			</dt>
-			<dd>
-				<input type="text" name="answer[', $data['id'], ']" value="', $data['answer'], '" size="50" class="input_text verification_answer" />
+			<dd>';
+		$count = count($data['answer']) - 1;
+		foreach ($data['answer'] as $id => $answer)
+			echo '
+				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="50" class="input_text verification_answer" />', $id == $count ? '
+				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id_question'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
+		echo '
 			</dd>';
+	}
 
 	// Some blank ones.
 	for ($count = 0; $count < 3; $count++)
 		echo '
 			<dt>
-				<input type="text" name="question[]" size="50" class="input_text verification_question" />
+				<input type="text" name="question[b-', $count, ']" size="50" class="input_text verification_question" />
 			</dt>
 			<dd>
-				<input type="text" name="answer[]" size="50" class="input_text verification_answer" />
+				<input type="text" name="answer[b-', $count, '][]" size="50" class="input_text verification_answer" />
+				<a href="#" onclick="addAnotherAnswer(this, \'b-', $count, '\'); return false;">&#171; ', $txt['setup_verification_add_more_answers'], ' &#187;</a>
 			</dd>';
 
 	echo '
 		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
+			<script type="text/javascript"><!-- // --><![CDATA[
+				var question_last_blank = ', $count, ';
+				var txt_add_another_answer = ', JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;'), '
+				var add_question_template = ', JavaScriptEscape('
+			<dt>
+				<input type="text" name="question[b-%question_last_blank%]" size="50" class="input_text verification_question" />
+			</dt>
+			<dd>
+				<input type="text" name="answer[b-%question_last_blank%][]" size="50" class="input_text verification_answer" />
+				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
+			</dd>
+			<dt id="add_more_question_placeholder" style="display: none;"></dt>'), ';
+			// ]]></script>
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
 }
