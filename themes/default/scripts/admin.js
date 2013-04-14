@@ -491,6 +491,8 @@ function addAnotherAnswer(elem, question_name)
 
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 {
+	var placeHolder = document.getElementById('add_more_searches');
+
 	var newDT = document.createElement("dt");
 	var newInput = createNamedElement("input", "engine_name[]");
 	newInput.type = "text";

@@ -1477,14 +1477,8 @@ function template_callback_external_search_engines()
 			</dd>';
 
 	echo '
-		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
+		<dt id="add_more_searches" style="display: none;"></dt><dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
 			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
-
-	// The javascript needs to go at the end but we'll put it in this template for looks.
-	$context['settings_post_javascript'] .= '
-		var placeHolder = document.getElementById(\'add_more_question_placeholder\');
-		document.getElementById(\'add_more_link_div\').style.display = \'\';
-	';
 }
