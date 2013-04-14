@@ -1192,9 +1192,19 @@ function template_callback_question_answer_list()
 	foreach ($context['question_answers'] as $data)
 	{
 		echo '
-
 			<dt>
-				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
+				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />';
+		if (!empty($context['languages']))
+		{
+			echo '
+				<select name="language[', $data['id_question'], ']">';
+			foreach ($context['languages'] as $lang)
+				echo '
+					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+			echo '
+				</select>';
+		}
+		echo '
 			</dt>
 			<dd>';
 		$count = count($data['answer']) - 1;
@@ -1206,16 +1216,31 @@ function template_callback_question_answer_list()
 			</dd>';
 	}
 
+	$lang_dropdown = '';
+	if (!empty($context['languages']))
+	{
+		$lang_dropdown .= '
+				<select name="language[b-%question_last_blank%]">';
+		foreach ($context['languages'] as $lang)
+			$lang_dropdown .= '
+					<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
+		$lang_dropdown .= '
+				</select>';
+	}
+
 	// Some blank ones.
 	for ($count = 0; $count < 3; $count++)
+	{
 		echo '
 			<dt>
-				<input type="text" name="question[b-', $count, ']" size="50" class="input_text verification_question" />
+				<input type="text" name="question[b-', $count, ']" size="50" class="input_text verification_question" />',
+		str_replace('%question_last_blank%', $count, $lang_dropdown), '
 			</dt>
 			<dd>
 				<input type="text" name="answer[b-', $count, '][]" size="50" class="input_text verification_answer" />
 				<a href="#" onclick="addAnotherAnswer(this, \'b-', $count, '\'); return false;">&#171; ', $txt['setup_verification_add_more_answers'], ' &#187;</a>
 			</dd>';
+	}
 
 	echo '
 		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
@@ -1225,7 +1250,8 @@ function template_callback_question_answer_list()
 				var txt_add_another_answer = ', JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;'), '
 				var add_question_template = ', JavaScriptEscape('
 			<dt>
-				<input type="text" name="question[b-%question_last_blank%]" size="50" class="input_text verification_question" />
+				<input type="text" name="question[b-%question_last_blank%]" size="50" class="input_text verification_question" />' .
+				$lang_dropdown . '
 			</dt>
 			<dd>
 				<input type="text" name="answer[b-%question_last_blank%][]" size="50" class="input_text verification_answer" />

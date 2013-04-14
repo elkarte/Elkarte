@@ -1102,6 +1102,15 @@ class Control_Verification_Questions implements Control_Verifications
 				'value' => $_GET['language'],
 			);
 		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
+		$languages = getLanguages();
+		// Languages dropdown only if we have more than a lang installed, otherwise is plain useless
+		if (count($languages) > 1)
+		{
+			$context['languages'] = $languages;
+			foreach ($context['languages'] as &$lang)
+				if ($lang['filename'] === $language)
+					$lang['selected'] = true;
+		}
 
 		// The javascript needs to go at the end
 		addInlineJavascript('
@@ -1117,6 +1126,7 @@ class Control_Verification_Questions implements Control_Verifications
 			{
 				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
 				$answers = array();
+				$question_lang = isset($_POST['language'][$id]) && isset($languages[$_POST['language'][$id]]) ? $_POST['language'][$id] : $language;
 				if (!empty($_POST['answer'][$id]))
 					foreach ($_POST['answer'][$id] as $answer)
 					{
@@ -1136,7 +1146,7 @@ class Control_Verification_Questions implements Control_Verifications
 						$count_questions--;
 					}
 					else
-						$this->_update($id, $question, $answers);
+						$this->_update($id, $question, $answers, $question_lang);
 				}
 				// It's so shiney and new!
 				elseif ($question != '' && !empty($answers))
@@ -1145,8 +1155,7 @@ class Control_Verification_Questions implements Control_Verifications
 						'question' => $question,
 						// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
 						'answer' => serialize($answers),
-						// @todo: replace with proper language
-						'language' => $language,
+						'language' => $question_lang,
 					);
 					$count_questions++;
 				}
@@ -1272,19 +1281,23 @@ class Control_Verification_Questions implements Control_Verifications
 		);
 	}
 
-	private function _update($id, $question, $answers)
+	private function _update($id, $question, $answers, $language)
 	{
 		global $smcFunc;
 
 		$request = $smcFunc['db_query']('', '
 			UPDATE {db_prefix}antispam_questions
-			SET question = {string:question}, answer = {string:answer}
+			SET
+				question = {string:question},
+				answer = {string:answer},
+				language = {string:language}
 			WHERE id_question = {int:id}',
 			array(
 				'id' => $id,
 				'question' => $question,
 				// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
 				'answer' => serialize($answers),
+				'language' => $language,
 			)
 		);
 	}
