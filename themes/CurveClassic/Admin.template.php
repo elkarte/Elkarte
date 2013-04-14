@@ -1189,59 +1189,88 @@ function template_callback_question_answer_list()
 	global $txt, $context;
 
 	echo '
-			<dt>
+			<dt class="questions">
 				<strong>', $txt['setup_verification_question'], '</strong>
 			</dt>
-			<dd>
+			<dd class="questions">
 				<strong>', $txt['setup_verification_answer'], '</strong>
 			</dd>';
 
 	foreach ($context['question_answers'] as $data)
 	{
 		echo '
-
-			<dt>
-				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="50" class="input_text verification_question" />
+			<dt class="questions">
+				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="40" class="input_text verification_question" />';
+		if (!empty($context['languages']))
+		{
+			echo '
+				<select name="language[', $data['id_question'], ']">';
+			foreach ($context['languages'] as $lang)
+				echo '
+					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+			echo '
+				</select>';
+		}
+		echo '
 			</dt>
-			<dd>';
+			<dd class="questions">';
 		$count = count($data['answer']) - 1;
 		foreach ($data['answer'] as $id => $answer)
 			echo '
-				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="50" class="input_text verification_answer" />', $id == $count ? '
+				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="40" class="input_text verification_answer" />', $id == $count ? '<br />
 				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id_question'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
 		echo '
 			</dd>';
 	}
 
+	$lang_dropdown = '';
+	if (!empty($context['languages']))
+	{
+		$lang_dropdown .= '
+				<select name="language[b-%question_last_blank%]">';
+		foreach ($context['languages'] as $lang)
+			$lang_dropdown .= '
+					<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
+		$lang_dropdown .= '
+				</select>';
+	}
+
 	// Some blank ones.
 	for ($count = 0; $count < 3; $count++)
+	{
 		echo '
-			<dt>
-				<input type="text" name="question[b-', $count, ']" size="50" class="input_text verification_question" />
+			<dt class="questions">
+				<input type="text" name="question[b-', $count, ']" size="40" class="input_text verification_question" />',
+		str_replace('%question_last_blank%', $count, $lang_dropdown), '
 			</dt>
-			<dd>
-				<input type="text" name="answer[b-', $count, '][]" size="50" class="input_text verification_answer" />
+			<dd class="questions">
+				<input type="text" name="answer[b-', $count, '][]" size="40" class="input_text verification_answer" /><br />
 				<a href="#" onclick="addAnotherAnswer(this, \'b-', $count, '\'); return false;">&#171; ', $txt['setup_verification_add_more_answers'], ' &#187;</a>
 			</dd>';
+	}
 
 	echo '
 		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
-			<script type="text/javascript"><!-- // --><![CDATA[
-				var question_last_blank = ', $count, ';
-				var txt_add_another_answer = ', JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;'), '
-				var add_question_template = ', JavaScriptEscape('
-			<dt>
-				<input type="text" name="question[b-%question_last_blank%]" size="50" class="input_text verification_question" />
-			</dt>
-			<dd>
-				<input type="text" name="answer[b-%question_last_blank%][]" size="50" class="input_text verification_answer" />
-				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
-			</dd>
-			<dt id="add_more_question_placeholder" style="display: none;"></dt>'), ';
-			// ]]></script>
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
+
+	addInlineJavascript('
+				var question_last_blank = ' . $count . ';
+				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
+				var add_question_template = ' . JavaScriptEscape('
+			<dt class="questions">
+				<input type="text" name="question[b-%question_last_blank%]" size="40" class="input_text verification_question" />' .
+				$lang_dropdown . '
+			</dt>
+			<dd class="questions">
+				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
+				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
+			</dd>
+			<dt id="add_more_question_placeholder" style="display: none;"></dt>') . ';
+				var add_answer_template = ' . JavaScriptEscape('
+				<input type="text" name="answer[%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
+				<a href="#" onclick="addAnotherAnswer(this, \'%question_last_blank%\'); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>') . ';', true);
 }
 
 /**
@@ -1436,6 +1465,7 @@ function template_clean_cache_button_below()
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;
+
 	if ($context['user']['is_admin'])
 		echo '
 			<object id="quick_search">
@@ -1450,4 +1480,29 @@ function template_admin_quick_search()
 					<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
 				</form>
 			</object>';
+}
+
+/**
+ * A list of urls and "words separators" for new search engines in the dropdown
+ */
+function template_callback_external_search_engines()
+{
+	global $txt, $context;
+
+	if (!empty($context['search_engines']))
+		foreach ($context['search_engines'] as $data)
+			echo '
+			<dt>
+				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
+			</dt>
+			<dd>
+				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
+				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
+			</dd>';
+
+	echo '
+		<dt id="add_more_searches" style="display: none;"></dt><dd></dd>
+		<dt id="add_more_link_div" style="display: none;">
+			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
+		</dt><dd></dd>';
 }

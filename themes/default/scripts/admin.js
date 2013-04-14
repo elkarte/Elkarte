@@ -478,15 +478,10 @@ function addAnotherQuestion()
 
 function addAnotherAnswer(elem, question_name)
 {
-	var newInput = createNamedElement("input", "answer[" + question_name + "][]");
-	var br = document.createElement("br");
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "50";
-	newInput.setAttribute("class", "verification_answer");
-
-	elem.parentNode.insertBefore(br, elem);
-	elem.parentNode.insertBefore(newInput, elem);
+	setOuterHTML(elem, add_answer_template.easyReplace({
+		question_last_blank: question_name,
+		setup_verification_add_more_answers: txt_add_another_answer
+	}));
 }
 
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
