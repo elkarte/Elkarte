@@ -23,27 +23,6 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * get the last id_member
- *
- * @return int
- */
-function getMaxMember()
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT MAX(id_member)
-		FROM {db_prefix}members',
-		array(
-		)
-	);
-	list ($max_member) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $max_member;
-}
-
-/**
  * Loads the signature from 50 members per request
  * Used in ManageFeatures to apply signature settings to all members
  *
