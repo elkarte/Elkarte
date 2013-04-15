@@ -170,7 +170,6 @@ function action_movetopic2()
 	$board_info = boardInfo($toboard, $topic);
 	if (empty($board_info))
 		fatal_lang_error('no_board');
-	list ($pcounter, $board_name, $subject) = $board_info;
 
 	// Remember this for later.
 	$_SESSION['move_to_topic'] = $toboard;
@@ -242,7 +241,7 @@ function action_movetopic2()
 
 		// Add a URL onto the message.
 		$reason = strtr($reason, array(
-			$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $toboard . '.0]' . $board_name . '[/url]',
+			$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $toboard . '.0]' . $board_info['name'] . '[/url]',
 			$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $topic . '.0[/iurl]'
 		));
 
@@ -253,7 +252,7 @@ function action_movetopic2()
 		$redirect_topic = isset($_POST['redirect_topic']) ? $topic : 0;
 
 		$msgOptions = array(
-			'subject' => $txt['moved'] . ': ' . $subject,
+			'subject' => $txt['moved'] . ': ' . $board_info['subject'],
 			'body' => $reason,
 			'icon' => 'moved',
 			'smileys_enabled' => 1,
@@ -267,7 +266,7 @@ function action_movetopic2()
 		);
 		$posterOptions = array(
 			'id' => $user_info['id'],
-			'update_post_count' => empty($pcounter),
+			'update_post_count' => empty($board_info['count_posts']),
 		);
 		createPost($msgOptions, $topicOptions, $posterOptions);
 	}
@@ -284,7 +283,7 @@ function action_movetopic2()
 	list ($pcounter_from) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	if ($pcounter_from != $pcounter)
+	if ($pcounter_from != $board_info['count_posts'])
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT id_member
