@@ -764,58 +764,6 @@ function validateSubscriptionID($id)
 }
 
 /**
- * 
- * @todo: merge withe getBasicMembergroupData !!!
- */
-function getMembergroups()
-{
-	global $smcFunc;
-
-	$groups = array();
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
-		FROM {db_prefix}membergroups
-		WHERE id_group != {int:moderator_group}
-			AND min_posts = {int:min_posts}',
-		array(
-			'moderator_group' => 3,
-			'min_posts' => -1,
-		)
-	);
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$$groups[$row['id_group']] = $row['group_name'];
-	$smcFunc['db_free_result']($request);
-
-	return $groups;
-}
-
-function getMemberByName($name)
-{
-	global $smcFunc;
-
-	$member = array();
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_member, id_group
-		FROM {db_prefix}members
-		WHERE real_name = {string:name}
-		LIMIT 1',
-		array(
-			'name' => $name,
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('error_member_not_found');
-
-	list ($member['id_member'], $member['id_group']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $member;
-}
-
-/**
  * Used to validate if a subscription is already in use.
  *
  * @param int $id_sub

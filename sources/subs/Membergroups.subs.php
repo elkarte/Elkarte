@@ -976,3 +976,31 @@ function retrieveMembergroups()
 
 	return $groups;
 }
+
+/**
+ * 
+ * @todo: merge withe getBasicMembergroupData !!!
+ */
+function getMembergroups()
+{
+	global $smcFunc;
+
+	$groups = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:moderator_group}
+			AND min_posts = {int:min_posts}',
+		array(
+			'moderator_group' => 3,
+			'min_posts' => -1,
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$groups[$row['id_group']] = $row['group_name'];
+	$smcFunc['db_free_result']($request);
+
+	return $groups;
+}

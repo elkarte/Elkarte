@@ -558,6 +558,7 @@ class ManagePaid_Controller
 		}
 
 		// Load up all the groups.
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['groups'] = getMembergroups();
 
 		// This always happens.
@@ -793,6 +794,7 @@ class ManagePaid_Controller
 			if (empty($context['log_id']))
 			{
 				// Find the user...
+				require_once(SUBSDIR . '/Members.subs.php');
 				$member = getMemberByName($_POST['name']);
 		
 				if(alreadySubscribed($context['sub_id'], $member['id_member']))
