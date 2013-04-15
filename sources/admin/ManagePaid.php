@@ -559,7 +559,7 @@ class ManagePaid_Controller
 
 		// Load up all the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = getMembergroups();
+		$context['groups'] = getBasicMembergroupData('permission');
 
 		// This always happens.
 		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
