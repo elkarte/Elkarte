@@ -291,11 +291,7 @@ class ManageSecurity_Controller
 	 */
 	function action_spamSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc;
-
-		// Generate a sample registration image.
-		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
-		$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc, $language;
 
 		// Let's try keep the spam to a minimum ah Thantos?
 		// initialize the form
@@ -303,26 +299,6 @@ class ManageSecurity_Controller
 
 		// retrieve the current config settings
 		$config_vars = $this->_spamSettings->settings();
-
-		// Load any question and answers!
-		$context['question_answers'] = array();
-		$request = $smcFunc['db_query']('', '
-			SELECT id_comment, body AS question, recipient_name AS answer
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:ver_test}',
-			array(
-				'ver_test' => 'ver_test',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['question_answers'][$row['id_comment']] = array(
-				'id' => $row['id_comment'],
-				'question' => $row['question'],
-				'answer' => $row['answer'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -341,75 +317,6 @@ class ManageSecurity_Controller
 
 			$save_vars[] = array('text', 'pm_spam_settings');
 
-			// Handle verification questions.
-			$questionInserts = array();
-			$count_questions = 0;
-			foreach ($_POST['question'] as $id => $question)
-			{
-				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
-				$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT)));
-
-				// Already existed?
-				if (isset($context['question_answers'][$id]))
-				{
-					$count_questions++;
-					// Changed?
-					if ($context['question_answers'][$id]['question'] != $question || $context['question_answers'][$id]['answer'] != $answer)
-					{
-						if ($question == '' || $answer == '')
-						{
-							$smcFunc['db_query']('', '
-								DELETE FROM {db_prefix}log_comments
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
-								array(
-									'id' => $id,
-									'ver_test' => 'ver_test',
-								)
-							);
-							$count_questions--;
-						}
-						else
-							$request = $smcFunc['db_query']('', '
-								UPDATE {db_prefix}log_comments
-								SET body = {string:question}, recipient_name = {string:answer}
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
-								array(
-									'id' => $id,
-									'ver_test' => 'ver_test',
-									'question' => $question,
-									'answer' => $answer,
-								)
-							);
-					}
-				}
-				// It's so shiney and new!
-				elseif ($question != '' && $answer != '')
-				{
-					$questionInserts[] = array(
-						'comment_type' => 'ver_test',
-						'body' => $question,
-						'recipient_name' => $answer,
-					);
-				}
-			}
-
-			// Any questions to insert?
-			if (!empty($questionInserts))
-			{
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_comments',
-					array('comment_type' => 'string', 'body' => 'string-65535', 'recipient_name' => 'string-80'),
-					$questionInserts,
-					array('id_comment')
-				);
-				$count_questions++;
-			}
-
-			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
-				$_POST['qa_verification_number'] = $count_questions;
-
 			call_integration_hook('integrate_save_spam_settings', array(&$save_vars));
 
 			// Now save.
@@ -417,27 +324,6 @@ class ManageSecurity_Controller
 			cache_put_data('verificationQuestionIds', null, 300);
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
-
-		$character_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
-		$_SESSION['visual_verification_code'] = '';
-		for ($i = 0; $i < 6; $i++)
-			$_SESSION['visual_verification_code'] .= $character_range[array_rand($character_range)];
-
-		// Some javascript for CAPTCHA.
-		$context['settings_post_javascript'] = '';
-		if ($context['use_graphic_library'])
-			$context['settings_post_javascript'] .= '
-			function refreshImages()
-			{
-				var imageType = document.getElementById(\'visual_verification_type\').value;
-				document.getElementById(\'verification_image\').src = \'' . $context['verification_image_href'] . ';type=\' + imageType;
-			}';
-
-		// Show the image itself, or text saying we can't.
-		if ($context['use_graphic_library'])
-			$config_vars['vv']['postinput'] = '<br /><img src="' . $context['verification_image_href'] . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
-		else
-			$config_vars['vv']['postinput'] = '<br /><span class="smalltext">' . $txt['setting_image_verification_nogd'] . '</span>';
 
 		// Hack for PM spam settings.
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -448,8 +334,7 @@ class ManageSecurity_Controller
 
 		// Some minor javascript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
-			$context['settings_post_javascript'] .= '
-			document.getElementById(\'guests_require_captcha\').disabled = true;';
+			addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
@@ -465,6 +350,7 @@ class ManageSecurity_Controller
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
@@ -483,17 +369,28 @@ class ManageSecurity_Controller
 				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
 				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-			// Visual verification.
-			array('title', 'configure_verification_means'),
-				array('desc', 'configure_verification_means_desc'),
-				'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
-			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
-			array('title', 'setup_verification_questions'),
-				array('desc', 'setup_verification_questions_desc'),
-				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
-				array('callback', 'question_answer_list'),
 		);
 
+		// @todo: maybe move the list to $modSettings instead of hooking it?
+		// Used in create_control_verification too
+		$known_verifications = array(
+			'captcha',
+			'questions',
+		);
+		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+		$verification_instances = null;
+		foreach ($known_verifications as $verification)
+		{
+			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$current_instance = new $class_name();
+
+			$new_settings = $current_instance->settings();
+			if (!empty($new_settings) && is_array($new_settings))
+				foreach ($new_settings as $new_setting)
+				$config_vars[] = $new_setting;
+		}
+
+		// @todo: it may be removed, it may stay, the two hooks may have different functions
 		call_integration_hook('integrate_spam_settings', array(&$config_vars));
 
 		return $this->_spamSettings->settings($config_vars);

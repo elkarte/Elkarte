@@ -463,3 +463,44 @@ CREATE TABLE {$db_prefix}follow_ups (
   PRIMARY KEY (follow_up, derived_from)
 );
 ---#
+
+/******************************************************************************/
+--- Updating antispam questions.
+/******************************************************************************/
+
+---# Creating antispam questions table...
+CREATE TABLE {$db_prefix}antispam_questions (
+  id_question tinyint(4) unsigned NOT NULL auto_increment,
+  question text NOT NULL default '',
+  answer text NOT NULL default '',
+  language varchar(50) NOT NULL default '',
+  PRIMARY KEY (id_question),
+  KEY language (language(30))
+) ENGINE=MyISAM;
+---#
+
+---# Move existing values...
+---{
+$request = upgrade_query("
+	SELECT id_comment, recipient_name as answer, body as question
+	FROM {$db_prefix}log_comments
+	WHERE comment_type = 'ver_test'");
+if (mysql_num_rows($request) != 0)
+{
+	$values = array();
+	$id_comments = array();
+	while ($row = mysql_fetch_assoc($request))
+	{
+		upgrade_query("
+			INSERT INTO {$db_prefix}antispam_questions
+				(answer, question)
+			VALUES
+				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "')");
+		upgrade_query("
+			DELETE FROM {$db_prefix}log_comments
+			WHERE id_comment  = " . $row['id_comment'] . "
+			LIMIT 1");
+	}
+}
+---}
+---#

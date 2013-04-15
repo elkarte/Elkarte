@@ -265,6 +265,21 @@ pre.file_content {
 	background-color: #eee;
 }
 
+/* Styles for anti-spam questions.
+------------------------------------------------------- */
+dl.settings dt.questions {
+	width: 65%;
+}
+dl.settings dd.questions {
+	width: 35%;
+}
+dl.settings dt.questions input{
+	width: 80%;
+}
+dl.settings dd.questions input {
+	width: 90%;
+}
+
 /* Styles for the BBC permissions
 ------------------------------------------------- */
 .list_bbc {
