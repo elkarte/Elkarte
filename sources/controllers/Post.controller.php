@@ -1416,9 +1416,10 @@ function action_post2()
 	// Posting somewhere else? Are we sure you can?
 	if (!empty($_REQUEST['post_in_board']))
 	{
-		if (!allowedTo('post_new', (int) $_REQUEST['post_in_board']))
+		$new_board = (int) $_REQUEST['post_in_board'];
+		if (!allowedTo('post_new', $new_board))
 		{
-			$post_in_board = boardInfo((int) $_REQUEST['post_in_board']);
+			$post_in_board = boardInfo($new_board);
 			if (!empty($post_in_board))
 				$post_errors->addError(array('post_new_board', array($post_in_board['name'])));
 			else
@@ -1658,8 +1659,8 @@ function action_post2()
 	// This is a new topic or an already existing one. Save it.
 	else
 	{
-		$original_post = (int) $_REQUEST['followup'];
-		$new_board = (int) $_REQUEST['post_in_board'];
+		if (!empty($_REQUEST['followup']))
+			$original_post = (int) $_REQUEST['followup'];
 
 		// We also have to fake the board:
 		// if it's valid and it's not the current, let's forget about the "current" and load the new one
