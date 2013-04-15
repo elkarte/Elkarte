@@ -207,6 +207,9 @@ class ManageSearch_Controller
 				array('callback', 'external_search_engines'),
 		);
 
+		addInlineJavascript('
+		document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
+
 		return $this->_searchSettings->settings($config_vars);
 	}
 

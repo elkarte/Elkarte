@@ -466,28 +466,28 @@ function createNamedElement(type, name, customFields)
 
 function addAnotherQuestion()
 {
-	var newDT = document.createElement("dt");
-	var newInput = createNamedElement("input", "question[]");
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "50";
-	newInput.setAttribute("class", "verification_question");
-	newDT.appendChild(newInput);
+	var placeHolder = document.getElementById('add_more_question_placeholder');
 
-	var newDD = document.createElement("dd");
-	newInput = createNamedElement("input", "answer[]");
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "50";
-	newInput.setAttribute("class", "verification_answer");
-	newDD.appendChild(newInput);
+	setOuterHTML(placeHolder, add_question_template.easyReplace({
+		question_last_blank: question_last_blank,
+		setup_verification_add_more_answers: txt_add_another_answer
+	}));
 
-	placeHolder.parentNode.insertBefore(newDT, placeHolder);
-	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+	question_last_blank++;
+}
+
+function addAnotherAnswer(elem, question_name)
+{
+	setOuterHTML(elem, add_answer_template.easyReplace({
+		question_last_blank: question_name,
+		setup_verification_add_more_answers: txt_add_another_answer
+	}));
 }
 
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 {
+	var placeHolder = document.getElementById('add_more_searches');
+
 	var newDT = document.createElement("dt");
 	var newInput = createNamedElement("input", "engine_name[]");
 	newInput.type = "text";
