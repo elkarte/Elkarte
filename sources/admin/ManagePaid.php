@@ -766,7 +766,7 @@ class ManagePaid_Controller
 
 		// If we haven't been passed the subscription ID get it.
 		if ($context['log_id'] && !$context['sub_id'])
-			$context['sub_id'] = getSubscriptionID($context['log_id']);
+			$context['sub_id'] = validateSubscriptionID($context['log_id']);
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
 			fatal_lang_error('no_access', false);

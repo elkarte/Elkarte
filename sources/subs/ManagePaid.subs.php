@@ -552,6 +552,11 @@ function deleteSubscription($id)
 	);
 }
 
+/**
+ * Adds a new subscription 
+ *
+ * @param array $insert
+ */
 function insertSubscription($insert)
 {
 	global $smcFunc;
@@ -572,6 +577,12 @@ function insertSubscription($insert)
 	);
 }
 
+/**
+ * Used to count active subscriptions.
+ *
+ * @param int $sub_id
+ * @return int
+ */
 function countActiveSubscriptions($sub_id)
 {
 	global $smcFunc;
@@ -593,6 +604,12 @@ function countActiveSubscriptions($sub_id)
 	return $isActive;
 }
 
+/**
+ * Updates an changed subscription.
+ *
+ * @param array $update
+ * @param int $ignore_active, used to ignore already active subscriptions.
+ */
 function updateSubscription($update, $ignore_active)
 {
 	global $smcFunc;
@@ -621,6 +638,12 @@ function updateSubscription($update, $ignore_active)
 	);
 }
 
+/**
+ * Get the details from a given subscription.
+ *
+ * @param type $sub_id
+ * @return array
+ */
 function getSubscriptionDetails($sub_id)
 {
 	global $smcFunc;
@@ -678,6 +701,12 @@ function getSubscriptionDetails($sub_id)
 	return $subscription;
 }
 
+/**
+ * Gets some basic details from a given subsciption.
+ *
+ * @param int $id_sub
+ * @return array
+ */
 function getSubscription($id_sub)
 {
 	global $smcFunc;
@@ -708,7 +737,13 @@ function getSubscription($id_sub)
 	return $subscription;
 }
 
-function getSubscriptionID($id)
+/**
+ * Used to validate an existing subscription ID.
+ *
+ * @param int $id
+ * @return int
+ */
+function validateSubscriptionID($id)
 {
 	global $smcFunc;
 
@@ -780,6 +815,13 @@ function getMemberByName($name)
 	return $member;
 }
 
+/**
+ * Used to validate if a subscription is already in use.
+ *
+ * @param int $id_sub
+ * @param int $id_member
+ * @return boolean
+ */
 function alreadySubscribed($id_sub, $id_member)
 {
 	global $smcFunc;
@@ -803,6 +845,12 @@ function alreadySubscribed($id_sub, $id_member)
 	return false;
 }
 
+/**
+ * Get the current status from a given subscription.
+ *
+ * @param int $log_id
+ * @return array
+ */
 function getSubscriptionStatus($log_id)
 {
 	global $smcFunc;
@@ -826,6 +874,11 @@ function getSubscriptionStatus($log_id)
 	return $status;
 }
 
+/**
+ * Somebody paid again? we need to log that.
+ *
+ * @param int $item
+ */
 function updateSubscriptionItem($item)
 {
 	global $smcFunc;
@@ -843,6 +896,12 @@ function updateSubscriptionItem($item)
 	);
 }
 
+/**
+ * Wanna delete a subscription? Prepare the delete for the members as well.
+ *
+ * @param array $toDelete
+ * @return array $delete
+ */
 function prepareDeleteSubscriptions($toDelete)
 {
 	global $smcFunc;
@@ -862,6 +921,12 @@ function prepareDeleteSubscriptions($toDelete)
 	return $delete;
 }
 
+/**
+ * Get all the pending subscriptions.
+ *
+ * @param int $log_id
+ * @return array
+ */
 function getPendingSubscriptions($log_id)
 {
 	global $smcFunc;
@@ -883,6 +948,11 @@ function getPendingSubscriptions($log_id)
 	return $row;
 }
 
+/**
+ * Somebody paid the first time? Let's log ...
+ *
+ * @param type $details
+ */
 function logSubscription($details)
 {
 	global $smcFunc;
@@ -901,6 +971,12 @@ function logSubscription($details)
 	);
 }
 
+/**
+ * Updated details for a pending subscription? Logging..
+ *
+ * @param id $log_id
+ * @param string $details
+ */
 function updatePendingSubscription($log_id, $details)
 {
 	global $smcFunc;
