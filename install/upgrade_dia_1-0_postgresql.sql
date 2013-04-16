@@ -35,6 +35,7 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('avatar_default', '0'),
+	('visual_verification_num_chars', '6'),
 	('gravatar_rating', 'g');
 ---#
 
