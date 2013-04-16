@@ -416,6 +416,15 @@ function template_main()
 						echo '
 										<li><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
+			// Can they like this post
+			if ($message['can_like'])
+						echo '
+										<li><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="like_button">', $txt['like_post'], '</a></li>';
+			// Or remove the like they made
+			elseif ($message['can_unlike'])
+						echo '
+										<li><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="unlike_button">', $txt['unlike_post'], '</a></li>';
+
 			echo '
 									</ul>';
 		}
