@@ -427,7 +427,7 @@ function loadPaymentGateways()
 }
 
 /**
- * This just kind of caches all the subscription data.
+ * This just kind of catches all the subscription data.
  */
 function loadSubscriptions()
 {
@@ -605,7 +605,7 @@ function countActiveSubscriptions($sub_id)
 }
 
 /**
- * Updates an changed subscription.
+ * Updates a changed subscription.
  *
  * @param array $update
  * @param int $ignore_active, used to ignore already active subscriptions.
