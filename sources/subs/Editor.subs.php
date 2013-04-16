@@ -887,7 +887,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $smcFunc;
+		global $context, $smcFunc, $modSettings;
 
 		if (!$this->_show_captcha)
 			return;
@@ -898,7 +898,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			// Are we overriding the range?
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
-			for ($i = 0; $i < 6; $i++)
+			for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
@@ -939,13 +939,20 @@ class Control_Verification_Captcha implements Control_Verifications
 		$config_vars = array(
 			array('title', 'configure_verification_means'),
 			array('desc', 'configure_verification_means_desc'),
+			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
-				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : '')
+				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : ''),
 		);
 
+		if (isset($_GET['save']))
+		{
+			if (isset($_POST['visual_verification_num_chars']) && $_POST['visual_verification_num_chars'] < 6)
+				$_POST['visual_verification_num_chars'] = 5;
+		}
+
 		$_SESSION['visual_verification_code'] = '';
-		for ($i = 0; $i < 6; $i++)
+		for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
 
 		// Some javascript for CAPTCHA.
