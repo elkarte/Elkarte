@@ -71,6 +71,7 @@ function loadIllegalGuestPermissions()
 		'post_autosave_draft',
 		'postby_email',
 		'approve_emails',
+		'like_posts',
 	);
 
 	call_integration_hook('integrate_load_illegal_guest_permissions');
