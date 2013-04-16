@@ -207,18 +207,11 @@ function template_credits()
 		<div class="windowbg">
 			<div class="content">';
 
-		if (!empty($context['credits_software_graphics']['graphics']))
+		foreach ($context['credits_software_graphics'] as $section => $credits)
 			echo '
 				<dl>
-					<dt><strong>', $txt['credits_graphics'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['graphics']), '</dd>
-				</dl>';
-
-		if (!empty($context['credits_software_graphics']['software']))
-			echo '
-				<dl>
-					<dt><strong>', $txt['credits_software'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['software']), '</dd>
+					<dt><strong>', $txt['credits_' . $section], '</strong></dt>
+					<dd>', implode('</dd><dd>', $credits), '</dd>
 				</dl>';
 
 		echo '
