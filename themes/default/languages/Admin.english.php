@@ -681,6 +681,7 @@ $txt['badbehavior_title'] = 'Bad-Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
+$txt['likes'] = 'Likes';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signatures';
 $txt['custom_profile_shorttitle'] = 'Profile Fields';

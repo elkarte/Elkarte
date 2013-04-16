@@ -117,6 +117,12 @@ $txt['karmaLabel'] = 'Karma label';
 $txt['karmaApplaudLabel'] = 'Karma applaud label';
 $txt['karmaSmiteLabel'] = 'Karma smite label';
 
+$txt['likes_enabled'] = 'Enable Likes';
+$txt['likeMinPosts'] = 'Set the minimum posts a member needs in order to like posts';
+$txt['likeWaitTime'] = 'Set wait time period in minutes';
+$txt['likeWaitCount'] = 'Set the maximum number of likes/unlikes the member can do in the above time period';
+$txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
+
 $txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
 	<li>APC</li>
@@ -359,6 +365,8 @@ $txt['core_settings_item_ih'] = 'Integration Hooks Management';
 $txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by modifications. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
+$txt['core_settings_item_l'] = 'Likes';
+$txt['core_settings_item_l_desc'] = 'Likes is a feature that allows members to like a post to show thier approval and popularity of the message content.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';
 $txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_ml'] = 'Moderation, Administration and User Logs';
@@ -436,8 +444,3 @@ $txt['languages_download_illegal_paths'] = 'Package contains illegal paths - ple
 $txt['languages_download_complete'] = 'Installation Complete';
 $txt['languages_download_complete_desc'] = 'Language pack installed successfully. Please click <a href="%1$s">here</a> to return to the languages page';
 $txt['languages_delete_confirm'] = 'Are you sure you want to delete this language?';
-
-$txt['setting_frame_security'] = 'Frame Security Options';
-$txt['setting_frame_security_SAMEORIGIN'] = 'Allow Same Origin';
-$txt['setting_frame_security_DENY'] = 'Deny all frames';
-$txt['setting_frame_security_DISABLE'] = 'Disabled';
