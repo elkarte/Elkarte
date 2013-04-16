@@ -616,6 +616,9 @@ $txt['notification_disable_topic'] = 'Are you sure you wish to disable notificat
 $txt['report_to_mod'] = 'Report Post';
 $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
+$txt['like_post'] = 'Like Post';
+$txt['unlike_post'] = 'Unlike Post';
+
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
 $txt['unread_topics_visit_none'] = 'No unread topics found since your last visit.  <a href="' . $scripturl . '?action=unread;all">Click here to try all unread topics</a>.';
 $txt['unread_topics_all'] = 'All Unread Topics';
