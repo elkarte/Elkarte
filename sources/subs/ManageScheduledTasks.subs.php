@@ -18,7 +18,12 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-
+/**
+ * Loads a basic tasks list.
+ *
+ * @param array $tasks
+ * @return array
+ */
 function loadTasks($tasks)
 {
 	global $smcFunc;
@@ -39,6 +44,12 @@ function loadTasks($tasks)
 	return $task;
 }
 
+/**
+ * Logs a finished task.
+ *
+ * @param int $task_id
+ * @param int $total_time
+ */
 function logTask($task_id, $total_time)
 {
 	global $smcFunc;
@@ -51,6 +62,11 @@ function logTask($task_id, $total_time)
 	);
 }
 
+/**
+ * Sets the tasks status to enabled / disabled
+ *
+ * @param array $enablers
+ */
 function updateTaskStatus($enablers)
 {
 	global $smcFunc;
@@ -64,6 +80,15 @@ function updateTaskStatus($enablers)
 	);
 }
 
+/**
+ * Update the properties of a scheduled task.
+ *
+ * @param int $id_task
+ * @param int $disabled
+ * @param int $offset
+ * @param int $interval
+ * @param string $unit
+ */
 function updateTask($id_task, $disabled, $offset, $interval, $unit)
 {
 	global $smcFunc;
@@ -83,6 +108,12 @@ function updateTask($id_task, $disabled, $offset, $interval, $unit)
 	);
 }
 
+/**
+ * Loads the details from a given task.
+ *
+ * @param int $id_task
+ * @return array
+ */
 function loadTaskDetails($id_task)
 {
 	global $smcFunc, $txt;
