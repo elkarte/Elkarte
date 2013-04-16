@@ -39,6 +39,12 @@ class ManageFeatures_Controller
 	protected $_karmaSettings;
 
 	/**
+	 * Likes settings form
+	 * @var Settings_Form
+	 */
+	protected $_likesSettings;
+
+	/**
 	 * Layout settings form
 	 * @var Settings_Form
 	 */
@@ -73,6 +79,9 @@ class ManageFeatures_Controller
 			'karma' => array(
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display'),
+			'likes' => array(
+				'controller' => $this,
+				'function' => 'action_likesSettings_display'),
 			'sig' => array(
 				'controller' => $this,
 				'function' => 'action_signatureSettings_display'),
@@ -93,6 +102,10 @@ class ManageFeatures_Controller
 		// Same for Karma
 		if (!in_array('k', $context['admin_features']))
 			unset($subActions['karma']);
+
+		// And likes
+		if (!in_array('l', $context['admin_features']))
+			unset($subActions['likes']);
 
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
@@ -119,6 +132,8 @@ class ManageFeatures_Controller
 				'layout' => array(
 				),
 				'karma' => array(
+				),
+				'likes' => array(
 				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
@@ -377,6 +392,67 @@ class ManageFeatures_Controller
 		call_integration_hook('integrate_karma_settings', array(&$config_vars));
 
 		return $this->_karmaSettings->settings($config_vars);
+	}
+
+	/**
+	 * Display configuration settings page for likes settings.
+	 * Accessed  from ?action=admin;area=featuresettings;sa=likes;
+	 *
+	 */
+	public function action_likesSettings_display()
+	{
+		global $txt, $scripturl, $context;
+
+		// initialize the form
+		$this->_initLikesSettingsForm();
+
+		// retrieve the current config settings
+		$config_vars = $this->_likesSettings->settings();
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_likes_settings');
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=featuresettings;sa=likes');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=likes';
+		$context['settings_title'] = $txt['likes'];
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initializes the likes settings admin page.
+	 */
+	private function _initLikesSettingsForm()
+	{
+		global $txt;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_likesSettings = new Settings_Form();
+
+		$config_vars = array(
+				// Likes - On or off?
+				array('check', 'likes_enabled'),
+			'',
+				// Who can do it.... and who is restricted by count limits?
+				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
+				array('int', 'likeWaitCount', 6),
+				array('check', 'likeRestrictAdmins'),
+		);
+
+		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+
+		return $this->_likesSettings->settings($config_vars);
 	}
 
 	/**
