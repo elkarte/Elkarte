@@ -945,6 +945,12 @@ class Control_Verification_Captcha implements Control_Verifications
 				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : ''),
 		);
 
+		if (isset($_GET['save']))
+		{
+			if (isset($_POST['visual_verification_num_chars']) && $_POST['visual_verification_num_chars'] < 6)
+				$_POST['visual_verification_num_chars'] = 5;
+		}
+
 		$_SESSION['visual_verification_code'] = '';
 		for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
