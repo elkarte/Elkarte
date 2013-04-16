@@ -1764,8 +1764,8 @@ function scheduled_remove_old_followups()
 
 	$request = $smcFunc['db_query']('', '
 		SELECT fu.derived_from
-		FROM smf_follow_ups as fu
-			LEFT JOIN smf_messages as m ON (fu.derived_from = m.id_msg)
+		FROM {db_prefix}follow_ups as fu
+			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
 		WHERE m.id_msg IS NULL
 		LIMIT {int:limit}',
 		array(
