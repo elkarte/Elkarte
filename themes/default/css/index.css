@@ -2381,6 +2381,12 @@ ul.quickbuttons li .warn_button {
 ul.quickbuttons li .quotetonew_button {
 	background: url(../images/theme/quickbuttons.png) no-repeat 1px -360px;
 }
+ul.quickbuttons li .like_button {
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -384px;
+}
+ul.quickbuttons li .unlike_button {
+	background: url(../images/theme/quickbuttons.png) no-repeat 1px -408px;
+}
 ul.quickbuttons li.inline_mod_check {
 	padding: 1px 1px 1px 1px;
 }
