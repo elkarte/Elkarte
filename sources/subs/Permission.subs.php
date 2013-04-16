@@ -69,6 +69,7 @@ function loadIllegalGuestPermissions()
 		'approve_posts',
 		'post_draft',
 		'post_autosave_draft',
+		'like_posts',
 	);
 
 	call_integration_hook('integrate_load_illegal_guest_permissions');

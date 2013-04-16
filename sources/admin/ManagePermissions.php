@@ -1488,6 +1488,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 	$groupLevels['global']['standard'] = array_merge($groupLevels['global']['restrict'], array(
 		'view_mlist',
 		'karma_edit',
+		'like_posts',
 		'pm_read',
 		'pm_send',
 		'send_email_to_members',
@@ -1530,6 +1531,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 		'poll_remove_any',
 		'poll_add_any',
 		'approve_posts',
+		'like_posts',
 	));
 
 	// Maintenance - wannabe admins.  They can do almost everything.
@@ -1831,6 +1833,7 @@ function loadAllPermissions($loadType = 'classic')
 			'who_view' => array(false, 'general', 'view_basic_info'),
 			'search_posts' => array(false, 'general', 'view_basic_info'),
 			'karma_edit' => array(false, 'general', 'moderate_general'),
+			'like_posts' => array(false, 'general', 'moderate_general'),
 			'disable_censor' => array(false, 'general', 'disable_censor'),
 			'pm_read' => array(false, 'pm', 'use_pm_system'),
 			'pm_send' => array(false, 'pm', 'use_pm_system'),
@@ -1895,6 +1898,7 @@ function loadAllPermissions($loadType = 'classic')
 			'view_attachments' => array(false, 'attachment', 'participate'),
 			'post_unapproved_attachments' => array(false, 'attachment', 'make_unapproved_posts'),
 			'post_attachment' => array(false, 'attachment', 'attach'),
+			'like_posts' => array(false, 'topic', 'moderate')
 		),
 	);
 
@@ -1928,6 +1932,8 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'issue_warning';
 	if (!in_array('k', $context['admin_features']))
 		$hiddenPermissions[] = 'karma_edit';
+	if (!in_array('l', $context['admin_features']))
+		$hiddenPermissions[] = 'like_posts';
 	if (!in_array('dr', $context['admin_features']))
 	{
 		$hiddenPermissions[] = 'post_draft';
