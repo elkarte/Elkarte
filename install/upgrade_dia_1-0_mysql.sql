@@ -35,6 +35,7 @@ VALUES
 	('avatar_default', '0'),
 	('gravatar_rating', 'g'),
 	('xmlnews_limit', 5);
+	('visual_verification_num_chars', '6');
 	('enable_disregard', 0);
 ---#
 
