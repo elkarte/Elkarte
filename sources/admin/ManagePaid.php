@@ -423,7 +423,7 @@ class ManagePaid_Controller
 			checkSession();
 			validateToken('admin-pmsd');
 
-			deleteSubscripttion($context['sub_id']);
+			deleteSubscription($context['sub_id']);
 
 			call_integration_hook('integrate_delete_subscription', array($context['sub_id']));
 
