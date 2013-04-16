@@ -16,8 +16,8 @@
  * the request, such as being a narcissist
  *
  * @param int $id_liker - user_id of the liker/disliker
- * @param array $liked_message - message that is being worked on
- * @param type $dir - +1 for like -1 for unlike a previous liked one
+ * @param array $liked_message - message array that is being worked on
+ * @param type $direction - + for like - for unlike a previous liked one
  */
 function like_post($id_liker, $liked_message, $direction)
 {
@@ -127,11 +127,11 @@ function lastLikeOn($id_liker)
 }
 
 /**
- * Add a like action, from executor to target.
+ * Perform a like action, either + or -
  *
  * @param int $id_liker
- * @param int $id_target
- * @param int $direction - options: -1 or 1
+ * @param array $liked_message
+ * @param int $direction - options: - or +
  */
 function addLike($id_liker, $liked_message, $direction)
 {
@@ -193,7 +193,7 @@ function addLike($id_liker, $liked_message, $direction)
  * Increase the number of likes for this topic.
  *
  * @param int $id_topic, the topic
- * @param int $dir +/- liking or unliking
+ * @param int $direction +/- liking or unliking
  */
 function increaseTopicLikes($id_topic, $direction)
 {
