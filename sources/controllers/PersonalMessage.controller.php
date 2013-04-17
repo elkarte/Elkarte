@@ -1537,8 +1537,9 @@ function action_sendmessage2()
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
 
-		if ($context['require_verification'])
-			$post_errors->addError('need_qr_verification', 0);
+		if (is_array($context['require_verification']))
+			foreach ($context['require_verification'] as $error)
+				$post_errors->addError($error, 0);
 	}
 
 	// If they did, give a chance to make ammends.
