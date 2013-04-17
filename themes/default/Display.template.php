@@ -453,6 +453,26 @@ function template_main()
 									</ul>
 								</li>';
 
+		// Has anyone liked this post?
+		if (!empty($message['like_counter']))
+		{
+			// @todo modSettings for limit
+			if ($message['like_counter'] > 4)
+			{
+				// mix them up so we change up the names
+				shuffle($context['likes'][$message['id']]['member']);
+				$context['likes'][$message['id']]['member'] = array_slice($context['likes'][$message['id']]['member'], 0, 4);
+			}
+			if (($message['can_unlike']))
+			{
+				unset($context['likes'][$message['id']]['member'][$message['id_member']]);
+				array_unshift($context['likes'][$message['id']]['member'], $txt['you']);
+			}
+
+			echo '
+										<li class="quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
+		}
+
 		echo '
 							</ul>
 						</div>';
@@ -621,6 +641,12 @@ function template_main()
 	else
 		echo '
 		<br class="clear" />';
+
+	// tooltips for likes
+	echo '
+		<script><!-- // --><![CDATA[
+			$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+		// ]]></script>';
 
 	// draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
