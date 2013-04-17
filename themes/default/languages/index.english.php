@@ -618,6 +618,10 @@ $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
 $txt['like_post'] = 'Like Post';
 $txt['unlike_post'] = 'Unlike Post';
+$txt['likes'] = 'Likes';
+$txt['liked_by'] = 'Liked by:';
+$txt['liked_you'] = 'You';
+$txt['liked_more'] = 'more';
 
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
 $txt['unread_topics_visit_none'] = 'No unread topics found since your last visit.  <a href="' . $scripturl . '?action=unread;all">Click here to try all unread topics</a>.';
