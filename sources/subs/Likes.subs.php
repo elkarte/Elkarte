@@ -111,9 +111,12 @@ function prepareLikes($likes)
 			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
 		}
 
-		// Top billing just for you, the big lights, the grand stage
+		// Top billing just for you, the big lights, the grand stage, plus we need that key returned
 		if ($you_liked)
-			array_unshift($likes[$msg_id]['member'], $txt['liked_you']);
+		{
+			$likes[$msg_id]['member'][$user_info['id']] = $txt['liked_you'];
+			$likes[$msg_id]['member'] = array_reverse($likes[$msg_id]['member'], true);
+		}
 	}
 
 	return $likes;
@@ -180,11 +183,7 @@ function lastLikeOn($id_liker)
  */
 function addLike($id_liker, $liked_message, $direction)
 {
-	global $smcFunc, $topic;
-
-	// If we are liking the first message in a topic, we are de facto liking the topic
-	if ($topic === $liked_message['id_first_message'])
-		increaseTopicLikes($topic, $direction);
+	global $smcFunc;
 
 	// See if they already likeyed this message
 	$request = $smcFunc['db_query']('', '
@@ -210,6 +209,10 @@ function addLike($id_liker, $liked_message, $direction)
 			array($id_liker, $liked_message['id_msg']),
 			array('id_msg', 'id_member')
 		);
+
+		// If we are liking the first message in a topic, we are de facto liking the topic
+		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
+			increaseTopicLikes($topic, $direction);
 	}
 	// Or you are just being fickle?
 	elseif ($count !==0 && $direction === '-')
@@ -223,6 +226,10 @@ function addLike($id_liker, $liked_message, $direction)
 				'id_msg' => $liked_message['id_msg'],
 			)
 		);
+
+		// If we are unliking the first message in a topic, we are de facto unliking the topic
+		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
+			increaseTopicLikes($topic, $direction);
 	}
 
 	// Put it in the log so we can prevent flooding the system with likes
@@ -246,7 +253,7 @@ function increaseTopicLikes($id_topic, $direction)
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}topics
-		SET num_likes = num_likes ' . $direction === '+' ? '+ 1' : '- 1' . '
+		SET num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
 		WHERE id_topic = {int:current_topic}',
 		array(
 			'current_topic' => $id_topic,
