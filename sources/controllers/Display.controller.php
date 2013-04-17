@@ -742,7 +742,7 @@ class Display_Controller
 			if (!empty($modSettings['likes_enabled']))
 			{
 				require_once(SUBSDIR . '/Likes.subs.php');
-				$context['likes'] = loadLikes($messages);
+				$context['likes'] = loadLikes($messages, true);
 			}
 
 			$messages_request = $smcFunc['db_query']('', '
@@ -1109,8 +1109,9 @@ function prepareDisplayContext($reset = false)
 	$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
 
 	// Have you liked this post, can you
-	$message['likes'] = !empty($context['likes'][$message['id_msg']]) && in_array($user_info['id'], $context['likes'][$message['id_msg']]);
+	$message['likes'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
 	$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] !== $user_info['id'];
+	$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 	// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
 	if (!loadMemberContext($message['id_member'], true))
@@ -1172,7 +1173,7 @@ function prepareDisplayContext($reset = false)
 		'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member'] == $user_info['id'] && !empty($user_info['id'])),
 		'can_like' => $message['use_likes'] && !$message['likes'],
 		'can_unlike' => $message['use_likes'] && $message['likes'],
-		'like_counter' => !empty($context['likes'][$message['id_msg']]) ? $context['likes'][$message['id_msg']]['count'] : 0,
+		'like_counter' =>$message['like_count'],
 	);
 
 	// Is this user the message author?
