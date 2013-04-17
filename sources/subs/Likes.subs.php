@@ -93,24 +93,21 @@ function prepareLikes($likes)
 	foreach ($likes as $msg_id => $like)
 	{
 		// Did they like this message ?
-		$you_liked = isset($like['member'][$user_info['id']]) ? true : false;
+		$you_liked = isset($like['member'][$user_info['id']]);
 		if ($you_liked)
-		{
 			unset($likes[$msg_id]['member'][$user_info['id']]);
-			$like = array_filter($like);
-		}
 
 		// Any limits on how many to display
 		$limit = isset($modSettings['likeDisplayLimit']) ? $modSettings['likeDisplayLimit'] : 0;
 
-		// If there are a bunch of likes for this one, cull the herd
+		// If there are a lot of likes for this message, we cull the herd
 		if ($limit > 0 && $like['count'] > $limit)
 		{
-			// mix up the likers so we don't show the same ones everytime
+			// Mix up the likers so we don't show the same ones everytime
 			shuffle($likes[$msg_id]['member']);
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
-			// tag on how many others liked this
+			// Tag on how many others liked this
 			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
 		}
 
