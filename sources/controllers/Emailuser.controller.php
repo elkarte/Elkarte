@@ -418,6 +418,10 @@ function action_reporttm2()
 			'id' => 'report',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
+
+		if (is_array($context['require_verification']))
+			foreach ($context['require_verification'] as $error)
+				$report_errors->addError($error, 0);
 	}
 
 	// Any errors?
