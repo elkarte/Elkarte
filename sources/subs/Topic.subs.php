@@ -299,6 +299,32 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 	}
 
+	// Reuse the message array if available
+	if (empty($messages))
+	{
+		$messages = array();
+		$request = $smcFunc['db_query']('', '
+			SELECT id_msg
+			FROM {db_prefix}messages
+			WHERE id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$messages[] = $row[0];
+		$smcFunc['db_free_result']($request);
+	}
+
+	// Remove all likes now that the topic is gone
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+
 	// Delete anything related to the topic.
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}messages
@@ -1091,7 +1117,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
-			fu.derived_from' : '') . 
+			fu.derived_from' : '') .
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
@@ -1099,7 +1125,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			(!empty($selects) ? implode(',', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
-			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . 
+			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .
 			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
