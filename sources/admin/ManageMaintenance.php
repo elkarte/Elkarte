@@ -211,7 +211,7 @@ class ManageMaintenance_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Get all membergroups - for deleting members and the like.
-		$context['membergroups'] = getBasicMembergroupData('all');
+		$context['membergroups'] = getBasicMembergroupData(array('all'));
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
