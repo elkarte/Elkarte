@@ -112,5 +112,9 @@ function prepare_like()
 		$check = lastLikeOn($user_info['id']);
 	}
 
+	// Past the post threshold?
+	if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['likeDisplayLimit'])
+		$check = false;
+
 	return $check;
 }
