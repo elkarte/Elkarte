@@ -937,6 +937,17 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 
 	if (isset($split))
 	{
+		// If we have post groups disabled then we need to give a "ungrouped members" option.
+		if (empty($modSettings['permission_enable_postgroups']))
+		{
+			$groups['groups'][0] = array(
+				'id' => 0,
+				'name' => $txt['membergroups_members'],
+				'member_count' => 0,
+			);
+			$groups['membergroups'][0] = 0;
+		}
+	}
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['min_posts'] == -1)
