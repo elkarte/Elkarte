@@ -862,21 +862,35 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 }
 
 /**
- * Gets basich membergroup data
- * type needs to be 'standard' or 'extended' 
- * - 'standard' lists all self created groups
- * - 'extended' lists all groups including the system groups such as admin or global moderator.
+ * Gets basic membergroup data
+ * 
+ * the $param array is used for granular filtering the output. We need to exclude
+ * groups sometimes because they are special ones. 
+ * Example: getBasicMembergroupData(array('admin', 'mod', 'globalmod'));
+ * 
+ * - 'admin' inlcudes the admin: id_group = 1
+ * - 'mod' includes the local moderator: id_group = 3
+ * - 'globalmod' includes the global moderators: id_group = 2
+ * - 'member' includes the ungrouped users from id_group = 0
+ * - 'postgroups' includes the post based membergroups
+ * - 'protected' includes protected groups
+ * - 'exclude_custom' lists only the system based groups (id 0, 1, 2, 3)
+ * - 'ignore_membergroups' lists the post based membergroups
+ * - 'all' lists all groups
  *
- * @param string $type
+ * @param array $param
+ * @param string $sort_order
+ * @param bol $split, splits postgroups and membergroups
  * @return type
  */
-function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'member', 'postgroups', 'protected'))
+function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'member', 'postgroups', 'protected'), $sort_order = null, $split = null)
 {
 	global $smcFunc, $txt, $modSettings;
 
-	$where = '';
 	$groups = array();
-	
+	$where = '';
+	$sort_order = isset($sort_order) ? $sort_order : 'id_group';
+
 	// Do we need the post based membergroups?
 	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $param) ? '' : 'AND min_posts = {int:min_posts}';
 	// Include protected groups?
@@ -888,24 +902,29 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 	// Local Moderators?
 	$where .= in_array('moderator', $param) ? '' : ' AND id_group != {int:moderator_group}';
 	// Ignore the first post based group?
-	$where .= in_array('first_postgroup', $param) ? '' : ' AND id_group != {int:first_postgroup}';
-	// Do we only need the post based membergroups? We can safely overwrite the $where.
+	$where .= in_array('ignore_newbie', $param) ? '' : ' AND id_group != {int:newbie_group}';
+	// Exclude custom groups?
+	$where .= in_array('exclude_custom', $param) ? '' : ' AND id_group < {int:newbie_group}';
+	// Only the post based membergroups? We can safely overwrite the $where.
 	if (in_array('ignore_membergroups', $param))
 		$where = ' AND min_posts != {int:min_posts}';
+	// Simply all of them?
+	if (in_array('all', $param))
+			$where = '';
 	
 	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name
+		SELECT id_group, group_name, min_posts
 		FROM {db_prefix}membergroups
 		WHERE 1 = 1 
 			' . $where . '
-		ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
+		ORDER BY ' . $sort_order,
 		array(
 			'admin_group' => 1,
 			'moderator_group' => 3,
 			'global_mod_group' => 2,
 			'min_posts' => -1,
 			'is_protected' => 1,
-			'first_postgroup' => 4,
+			'newbie_group' => 4,
 		)
 	);
 
@@ -916,13 +935,32 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 			'name' => $txt['maintain_members_ungrouped']
 		);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	if (isset($split))
 	{
-		$groups[] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name']
-		);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			if ($row['min_posts'] == -1)
+				$groups['membergroups'][] = array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name'],
+					'can_be_additional' => true
+				);
+			else
+				$groups['postgroups'][] = array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name']
+				);
+		}
 	}
+	
+	else
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$groups[] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name']
+			);
+		}
 	$smcFunc['db_free_result']($request);
 
 	return $groups;
