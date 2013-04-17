@@ -222,6 +222,15 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
+	// Delete any likes...
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}message_likes
+		WHERE id_member IN ({array_int:users})',
+		array(
+			'users' => $users,
+		)
+	);
+
 	// Delete the logs...
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_actions
@@ -1440,7 +1449,7 @@ function admins($id_admin = 0)
 
 /**
  * Load some basic member infos
- * 
+ *
  * @param mixed $member_ids an array of member IDs or a single ID
  * @param array $options an array of possible little alternatives, can be:
  *                - 'add_guest' (set or not) to add a guest user to the returned array
