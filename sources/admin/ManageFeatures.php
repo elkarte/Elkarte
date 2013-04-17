@@ -448,6 +448,8 @@ class ManageFeatures_Controller
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
+			'',
+				array('int', 'likeDisplayLimit', 6)
 		);
 
 		call_integration_hook('integrate_likes_settings', array(&$config_vars));
