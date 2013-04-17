@@ -122,6 +122,7 @@ $txt['likeMinPosts'] = 'Set the minimum posts a member needs in order to like po
 $txt['likeWaitTime'] = 'Set wait time period in minutes';
 $txt['likeWaitCount'] = 'Set the maximum number of likes/unlikes the member can do in the above time period';
 $txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
+$txt['likeDisplayLimit'] = 'Set the maximum number of member names who liked a post, 0 for no limit, -1 to disable';
 
 $txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
