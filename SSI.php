@@ -45,9 +45,19 @@ require_once(dirname(__FILE__) . '/Settings.php');
 if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
 
-// Make absolutely sure the new directories are defined.
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($languagedir . '/themes/default/languages'))
+	$languagedir = $languagedir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -59,7 +69,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
-unset($boarddir, $cachedir, $sourcedir);
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
