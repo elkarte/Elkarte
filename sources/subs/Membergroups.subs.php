@@ -947,7 +947,6 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 			);
 			$groups['membergroups'][0] = 0;
 		}
-	}
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['min_posts'] == -1)
