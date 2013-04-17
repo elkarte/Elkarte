@@ -314,7 +314,7 @@ class ManageNews_Controller
 		$context['sub_template'] = 'email_members';
 		$context['groups'] = array();
 		
-		$membergroups = getExtraGroups();
+		$membergroups = getBasicMembergroupData(array('postgroups','member', 'globalmod'), null, true);
 		$context['groups'] = $membergroups['groups'];
 		
 		$groups = membersInGroups($membergroups['postgroups'], $membergroups['membergroups'], true, true);

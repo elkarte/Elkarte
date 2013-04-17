@@ -904,14 +904,14 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 	// Ignore the first post based group?
 	$where .= in_array('ignore_newbie', $param) ? '' : ' AND id_group != {int:newbie_group}';
 	// Exclude custom groups?
-	$where .= in_array('exclude_custom', $param) ? '' : ' AND id_group < {int:newbie_group}';
+	$where .= !in_array('exclude_custom', $param) ? '' : ' AND id_group < {int:newbie_group}';
 	// Only the post based membergroups? We can safely overwrite the $where.
 	if (in_array('ignore_membergroups', $param))
 		$where = ' AND min_posts != {int:min_posts}';
 	// Simply all of them?
 	if (in_array('all', $param))
 			$where = '';
-	
+
 	$request = $smcFunc['db_query']('', '
 		SELECT id_group, group_name, min_posts
 		FROM {db_prefix}membergroups
@@ -929,15 +929,14 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 	);
 
 	// Include the default membergroup? the ones with id_member = 0
-	if(in_array('member', $param))
+	if(in_array('member', $param) && !isset($split))
 		$groups[] = array(
 			'id' => 0,
-			'name' => $txt['maintain_members_ungrouped']
+			'name' => $txt['membergroups_members']
 		);
 
 	if (isset($split))
 	{
-		// If we have post groups disabled then we need to give a "ungrouped members" option.
 		if (empty($modSettings['permission_enable_postgroups']))
 		{
 			$groups['groups'][0] = array(
@@ -949,17 +948,16 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 		}
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
+			$groups['groups'][$row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+				'member_count' => 0,
+			);
+
 			if ($row['min_posts'] == -1)
-				$groups['membergroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name'],
-					'can_be_additional' => true
-				);
+				$groups['membergroups'][$row['id_group']] = $row['id_group'];
 			else
-				$groups['postgroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name']
-				);
+				$groups['postgroups'][$row['id_group']] = $row['id_group'];
 		}
 	}
 	
