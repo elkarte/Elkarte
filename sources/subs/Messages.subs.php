@@ -543,6 +543,15 @@ function removeMessage($message, $decreasePostCount = true)
 	// Only remove posts if they're not recycled.
 	if (!$recycle)
 	{
+		// Remove the likes!
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}message_likes
+			WHERE id_msg = {int:id_msg}',
+			array(
+				'id_msg' => $message,
+			)
+		);
+		
 		// Remove the message!
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}messages
@@ -589,7 +598,7 @@ function removeMessage($message, $decreasePostCount = true)
 				)
 			);
 		}
-		
+
 
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
