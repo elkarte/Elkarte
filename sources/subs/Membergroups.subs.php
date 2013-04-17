@@ -870,46 +870,51 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * @param string $type
  * @return type
  */
-function getBasicMembergroupData($type = 'standard')
+function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'member', 'postgroups', 'protected'))
 {
 	global $smcFunc, $txt, $modSettings;
 
+	$where = '';
 	$groups = array();
 	
-	switch ($type)
-	{
-		case 'standard':
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name
-				FROM {db_prefix}membergroups
-				WHERE (id_group > {int:moderator_group} OR id_group = {int:global_mod_group})' . (empty($modSettings['permission_enable_postgroups']) ? '
-					AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
-					AND group_type != {int:is_protected}') . '
-				ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
-				array(
-					'moderator_group' => 3,
-					'global_mod_group' => 2,
-					'min_posts' => -1,
-					'is_protected' => 1,
-				)
-			);
-			break;
+	// Do we need the post based membergroups?
+	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $param) ? '' : 'AND min_posts = {int:min_posts}';
+	// Include protected groups?
+	$where .= allowedTo('admin_forum') || !in_array('protected', $param) ? '' : ' AND group_type != {int:is_protected}';
+	// Include the global moderators?
+	$where .= in_array('globalmod', $param) ? '' : ' AND id_group != {int:global_mod_group}';
+	// Include the admins?
+	$where .= in_array('admin', $param) ? '' : ' AND id_group != {int:admin_group}';
+	// Local Moderators?
+	$where .= in_array('moderator', $param) ? '' : ' AND id_group != {int:moderator_group}';
+	// Ignore the first post based group?
+	$where .= in_array('first_postgroup', $param) ? '' : ' AND id_group != {int:first_postgroup}';
+	// Do we only need the post based membergroups? We can safely overwrite the $where.
+	if (in_array('ignore_membergroups', $param))
+		$where = ' AND min_posts != {int:min_posts}';
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name
+		FROM {db_prefix}membergroups
+		WHERE 1 = 1 
+			' . $where . '
+		ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
+		array(
+			'admin_group' => 1,
+			'moderator_group' => 3,
+			'global_mod_group' => 2,
+			'min_posts' => -1,
+			'is_protected' => 1,
+			'first_postgroup' => 4,
+		)
+	);
 
-		case 'all':
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name
-				FROM {db_prefix}membergroups',
-				array(
-				)
-			);
-			$groups[] = array(
-				'id' => 0,
-				'name' => $txt['maintain_members_ungrouped']
-			);
-			break;
-		default:
-			trigger_error('getBasicMembergroupData(): Invalid group type \'' . $type . '\'', E_USER_NOTICE);
-	}
+	// Include the default membergroup? the ones with id_member = 0
+	if(in_array('member', $param))
+		$groups[] = array(
+			'id' => 0,
+			'name' => $txt['maintain_members_ungrouped']
+		);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
