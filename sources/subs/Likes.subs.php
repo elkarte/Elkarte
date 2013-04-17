@@ -35,10 +35,12 @@ function like_post($id_liker, $liked_message, $direction)
 /**
  * Loads all of the likes for a group of messages
  * Returns an array of message_id to members who liked that post
+ * If prepare is true, will also prep the array for template use
  *
  * @param array $messages
+ * @param bool prepare
  */
-function loadLikes($messages)
+function loadLikes($messages, $prepare = true)
 {
 	global $smcFunc;
 
@@ -52,24 +54,70 @@ function loadLikes($messages)
 
 	// Load up them likes from the db
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, id_msg
-		FROM {db_prefix}message_likes
+		SELECT l.id_member, l.id_msg, m.real_name
+		FROM {db_prefix}message_likes AS l
+			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
 		WHERE id_msg IN ({array_int:id_messages})',
 		array(
 			'id_messages' => $messages,
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$likes[$row['id_msg']][] = $row['id_member'];
+		$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
 
-		// Keep a running per message total as well
-		if (isset($likes[$row['id_msg']]['count']))
-			$likes[$row['id_msg']]['count']++;
-		else
-			$likes[$row['id_msg']]['count'] = 1;
-	}
+	// total likes for this group
+	foreach ($likes as $msg_id => $like)
+		$likes[$msg_id]['count'] = count($like['member']);
+
 	$smcFunc['db_free_result']($request);
+
+	if ($prepare)
+		$likes = prepareLikes($likes);
+
+	return $likes;
+}
+
+/**
+ * Prepares the like array for use in the template
+ * Replaces the current member id with 'You' if they like a post and makes it first
+ * Truncates the like list at a given number and adds in +x others
+ *
+ * @param type $likes
+ * @return array
+ */
+function prepareLikes($likes)
+{
+	global $user_info, $modSettings, $txt;
+
+	// Prepare this like page context for the user
+	foreach ($likes as $msg_id => $like)
+	{
+		// Did they like this message ?
+		$you_liked = isset($like['member'][$user_info['id']]) ? true : false;
+		if ($you_liked)
+		{
+			unset($likes[$msg_id]['member'][$user_info['id']]);
+			$like = array_filter($like);
+		}
+
+		// Any limits on how many to display
+		$limit = isset($modSettings['likeDisplayLimit']) ? $modSettings['likeDisplayLimit'] : 0;
+
+		// If there are a bunch of likes for this one, cull the herd
+		if ($limit > 0 && $like['count'] > $limit)
+		{
+			// mix up the likers so we don't show the same ones everytime
+			shuffle($likes[$msg_id]['member']);
+			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
+
+			// tag on how many others liked this
+			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
+		}
+
+		// Top billing just for you, the big lights, the grand stage
+		if ($you_liked)
+			array_unshift($likes[$msg_id]['member'], $txt['liked_you']);
+	}
 
 	return $likes;
 }
