@@ -894,7 +894,7 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 	// Do we need the post based membergroups?
 	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $param) ? '' : 'AND min_posts = {int:min_posts}';
 	// Include protected groups?
-	$where .= allowedTo('admin_forum') || !in_array('protected', $param) ? '' : ' AND group_type != {int:is_protected}';
+	$where .= allowedTo('admin_forum') || in_array('protected', $param) ? '' : ' AND group_type != {int:is_protected}';
 	// Include the global moderators?
 	$where .= in_array('globalmod', $param) ? '' : ' AND id_group != {int:global_mod_group}';
 	// Include the admins?
