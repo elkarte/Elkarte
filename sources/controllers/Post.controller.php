@@ -1023,6 +1023,10 @@ function action_post2()
 			'id' => 'post',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions, true);
+
+		if (is_array($context['require_verification']))
+			foreach ($context['require_verification'] as $verification_error)
+				$post_errors->addError($verification_error);
 	}
 
 	require_once(SUBSDIR . '/Post.subs.php');
