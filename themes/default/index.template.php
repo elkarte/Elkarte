@@ -71,6 +71,18 @@ function template_init()
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
+
+	// This bit of template is used by default in the main menu to create the number next to the title of the menu to indicate for example the number of unread messages
+	$settings['menu_numeric_notice'] = ' [<strong>%1$s</strong>]';
+
+	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
+	$settings['page_index_template'] = array(
+		'base_link' => '<a class="navPages" href="{base_link}">%2$s</a> ',
+		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
+		'current_page' => '<span class="current_page"><strong>%1$s</strong></span>',
+		'next_page' => '<span class="next_page">{next_txt}</span>',
+		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
+	);
 }
 
 /**
