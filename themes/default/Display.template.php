@@ -455,23 +455,8 @@ function template_main()
 
 		// Has anyone liked this post?
 		if (!empty($message['like_counter']))
-		{
-			// @todo modSettings for limit
-			if ($message['like_counter'] > 4)
-			{
-				// mix them up so we change up the names
-				shuffle($context['likes'][$message['id']]['member']);
-				$context['likes'][$message['id']]['member'] = array_slice($context['likes'][$message['id']]['member'], 0, 4);
-			}
-			if (($message['can_unlike']))
-			{
-				unset($context['likes'][$message['id']]['member'][$message['id_member']]);
-				array_unshift($context['likes'][$message['id']]['member'], $txt['you']);
-			}
-
 			echo '
 										<li class="quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
-		}
 
 		echo '
 							</ul>
