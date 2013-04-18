@@ -314,10 +314,16 @@ class ManageNews_Controller
 		$context['sub_template'] = 'email_members';
 		$context['groups'] = array();
 		
-		$membergroups = getBasicMembergroupData(array(), array(), null, true);
-		$context['groups'] = $membergroups['groups'];
-		
-		$groups = membersInGroups($membergroups['postgroups'], $membergroups['membergroups'], true, true);
+		$allgroups = getBasicMembergroupData(array(), array('moderator'), null, true);
+		$context['groups'] = $allgroups['groups'];
+
+		foreach ($allgroups['postgroups'] as $postgroup)
+			$pg[] = $postgroup['id'];
+		foreach ($allgroups['membergroups'] as $membergroup)
+			$mg[] = $membergroup['id'];
+
+		$groups = membersInGroups($pg, $mg, true, true);
+
 		foreach ($groups as $id_group => $member_count)
 		{
 			if (isset($context['groups'][$id_group]['member_count']))
