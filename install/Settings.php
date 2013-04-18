@@ -159,7 +159,7 @@ $sourcedir = dirname(__FILE__) . '/sources';
  * Path to the external resources directory.
  * @var string
  */
-$extdir = dirname(__FILE__) . '/sources/lib';
+$extdir = dirname(__FILE__) . '/sources/ext';
 /**
  * Path to the languages directory.
  * @var string
