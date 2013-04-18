@@ -951,9 +951,15 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			$groups['groups'][0] = array(
 				'id' => 0,
 				'name' => $txt['membergroups_members'],
+				'can_be_additional' => false,
 				'member_count' => 0,
 			);
-			$groups['membergroups'][0] = 0;
+			$groups['membergroups'][0] = array(
+				'id' => 0,
+				'name' => $txt['membergroups_members'],
+				'can_be_additional' => false,
+				'member_count' => 0,
+			);
 		}
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
@@ -964,9 +970,16 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			);
 
 			if ($row['min_posts'] == -1)
-				$groups['membergroups'][$row['id_group']] = $row['id_group'];
+				$groups['membergroups'][] =  array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name'],
+					'can_be_additional' => true,
+				);
 			else
-				$groups['postgroups'][$row['id_group']] = $row['id_group'];
+				$groups['postgroups'][] =  array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name'],
+				);
 		}
 	}
 	
