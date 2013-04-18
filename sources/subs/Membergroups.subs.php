@@ -879,7 +879,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * - 'newbie' excludes the newbie group id_group 4
  * - 'custom' lists only the system based groups (id 0, 1, 2, 3)
  * - 'membergroups' excludes permission groups, lists the post based membergroups
- * 
+ * - 'hidden' excludes hidden groups
  *
  * @param array $includes
  * @param array $excludes
@@ -914,6 +914,8 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	$where .= in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
 	// Exclude custom groups?
 	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
+	// Exclude hidden?
+	$where .= !in_array('hidden', $excludes) ? '' : ' AND hidden != {int:hidden_group}';
 	// Only the post based membergroups? We can safely overwrite the $where.
 	if (in_array('membergroups', $excludes))
 		$where = ' AND min_posts != {int:min_posts}';
@@ -934,6 +936,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			'min_posts' => -1,
 			'is_protected' => 1,
 			'newbie_group' => 4,
+			'hidden_group' => 2,
 		)
 	);
 
