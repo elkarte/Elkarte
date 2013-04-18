@@ -51,8 +51,8 @@ if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/c
 	$cachedir = $boarddir . '/cache';
 if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
 	$extdir = $sourcedir . '/ext';
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($languagedir . '/themes/default/languages'))
-	$languagedir = $languagedir . '/themes/default/languages';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
