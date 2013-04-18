@@ -121,7 +121,7 @@ $db_error_send = 0;
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, smf, or xcache
+ * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, xcache or filesystem-based
  * (you can add more with a mod).
  * @var string
  */
@@ -156,12 +156,12 @@ $boarddir = dirname(__FILE__);
  */
 $sourcedir = dirname(__FILE__) . '/sources';
 /**
- * Path to the library directory.
+ * Path to the external resources directory.
  * @var string
  */
-$extdir = dirname(__FILE__) . '/sources/lib';
+$extdir = dirname(__FILE__) . '/sources/ext';
 /**
- * Path to the controllers directory.
+ * Path to the languages directory.
  * @var string
  */
 $languagedir = dirname(__FILE__) . '/themes/default/languages';
