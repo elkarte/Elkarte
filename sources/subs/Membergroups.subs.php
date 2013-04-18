@@ -864,52 +864,61 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 /**
  * Gets basic membergroup data
  * 
- * the $param array is used for granular filtering the output. We need to exclude
+ * the $includes and $excludes array is used for granular filtering the output. We need to exclude
  * groups sometimes because they are special ones. 
  * Example: getBasicMembergroupData(array('admin', 'mod', 'globalmod'));
- * 
+ * $includes parameters:
  * - 'admin' inlcudes the admin: id_group = 1
  * - 'mod' includes the local moderator: id_group = 3
  * - 'globalmod' includes the global moderators: id_group = 2
  * - 'member' includes the ungrouped users from id_group = 0
  * - 'postgroups' includes the post based membergroups
  * - 'protected' includes protected groups
- * - 'exclude_custom' lists only the system based groups (id 0, 1, 2, 3)
- * - 'ignore_membergroups' lists the post based membergroups
  * - 'all' lists all groups
+ * @excludes parameters:
+ * - 'newbie' excludes the newbie group id_group 4
+ * - 'custom' lists only the system based groups (id 0, 1, 2, 3)
+ * - 'membergroups' excludes permission groups, lists the post based membergroups
+ * 
  *
- * @param array $param
+ * @param array $includes
+ * @param array $excludes
  * @param string $sort_order
  * @param bol $split, splits postgroups and membergroups
  * @return type
  */
-function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'member', 'postgroups', 'protected'), $sort_order = null, $split = null)
+function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
 {
 	global $smcFunc, $txt, $modSettings;
 
+	//No $includes parameters given? Let's set some default values
+	if(empty($includes))
+		$includes = array('globalmod', 'member', 'postgroups');
+
 	$groups = array();
+
 	$where = '';
-	$sort_order = isset($sort_order) ? $sort_order : 'id_group';
+	$sort_order = isset($sort_order) ? $sort_order : 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
 
 	// Do we need the post based membergroups?
-	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $param) ? '' : 'AND min_posts = {int:min_posts}';
+	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $includes) ? '' : 'AND min_posts = {int:min_posts}';
 	// Include protected groups?
-	$where .= allowedTo('admin_forum') || in_array('protected', $param) ? '' : ' AND group_type != {int:is_protected}';
+	$where .= allowedTo('admin_forum') || in_array('protected', $includes) ? '' : ' AND group_type != {int:is_protected}';
 	// Include the global moderators?
-	$where .= in_array('globalmod', $param) ? '' : ' AND id_group != {int:global_mod_group}';
+	$where .= in_array('globalmod', $includes) ? '' : ' AND id_group != {int:global_mod_group}';
 	// Include the admins?
-	$where .= in_array('admin', $param) ? '' : ' AND id_group != {int:admin_group}';
+	$where .= in_array('admin', $includes) ? '' : ' AND id_group != {int:admin_group}';
 	// Local Moderators?
-	$where .= in_array('moderator', $param) ? '' : ' AND id_group != {int:moderator_group}';
+	$where .= in_array('mod', $includes) ? '' : ' AND id_group != {int:moderator_group}';
 	// Ignore the first post based group?
-	$where .= in_array('ignore_newbie', $param) ? '' : ' AND id_group != {int:newbie_group}';
+	$where .= in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
 	// Exclude custom groups?
-	$where .= !in_array('exclude_custom', $param) ? '' : ' AND id_group < {int:newbie_group}';
+	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
 	// Only the post based membergroups? We can safely overwrite the $where.
-	if (in_array('ignore_membergroups', $param))
+	if (in_array('membergroups', $excludes))
 		$where = ' AND min_posts != {int:min_posts}';
 	// Simply all of them?
-	if (in_array('all', $param))
+	if (in_array('all', $includes))
 			$where = '';
 
 	$request = $smcFunc['db_query']('', '
@@ -929,7 +938,7 @@ function getBasicMembergroupData($param = array('admin', 'mod', 'globalmod', 'me
 	);
 
 	// Include the default membergroup? the ones with id_member = 0
-	if(in_array('member', $param) && !isset($split))
+	if(in_array('member', $includes) && !isset($split))
 		$groups[] = array(
 			'id' => 0,
 			'name' => $txt['membergroups_members']
