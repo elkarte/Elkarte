@@ -463,7 +463,7 @@ class ManageMembergroups_Controller
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = getBasicMembergroupData(array('globalmod'), 'min_posts, id_group != {int:global_mod_group}, group_name');
+		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
 		$context += getBoardList(array('use_permissions' => true));
