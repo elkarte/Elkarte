@@ -164,7 +164,17 @@ class ManageRegistration_Controller
 		if (allowedTo('manage_membergroups'))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$context['member_groups'] = getMembergroups();
+			if (allowedTo('admin_forum'))
+				$includes = array('admin', 'globalmod', 'member', 'custom');
+			else
+				$includes = array('globalmod', 'member', 'custom');
+
+			$groups = array();
+			$membergroups = getBasicMembergroupdata($includes, array('hidden', 'protected'));
+			foreach ($membergroups as $membergroup)
+				$groups[$membergroup['id']] = $membergroup['name'];
+
+			$context['member_groups'] = $groups; 
 		}
 		else
 			$context['member_groups'] = array();
