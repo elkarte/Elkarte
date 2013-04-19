@@ -165,7 +165,7 @@ class ManageRegistration_Controller
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			if (allowedTo('admin_forum'))
-				$includes = array('admin', 'globalmod', 'member', 'custom');
+				$includes = array('admin', 'globalmod', 'member');
 			else
 				$includes = array('globalmod', 'member', 'custom');
 
