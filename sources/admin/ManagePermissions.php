@@ -36,9 +36,9 @@ class ManagePermissions_Controller
 	 *
 	 * @uses ManagePermissions language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		loadLanguage('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
@@ -135,7 +135,7 @@ class ManagePermissions_Controller
 	 * @uses ManagePermissions template file.
 	 * @uses ManageBoards template, permission_index sub-template.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings, $smcFunc;
 
@@ -353,9 +353,9 @@ class ManagePermissions_Controller
 	/**
 	 * Handle permissions by board... more or less. :P
 	 */
-	function action_board()
+	public function action_board()
 	{
-		global $context, $modSettings, $txt, $smcFunc, $cat_tree, $boardList, $boards;
+		global $context, $txt, $smcFunc, $cat_tree, $boardList, $boards;
 
 		$context['page_title'] = $txt['permissions_boards'];
 		$context['edit_all'] = isset($_GET['edit']);
@@ -430,7 +430,7 @@ class ManagePermissions_Controller
 	 * Handles permission modification actions from the upper part of the
 	 * permission manager index.
 	 */
-	function action_quick()
+	public function action_quick()
 	{
 		global $context, $smcFunc;
 
@@ -694,9 +694,9 @@ class ManagePermissions_Controller
 	/**
 	 * Initializes the necessary to modify a membergroup's permissions.
 	 */
-	function action_modify()
+	public function action_modify()
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $smcFunc;
 
 		if (!isset($_GET['group']))
 			fatal_lang_error('no_access', false);
@@ -841,9 +841,9 @@ class ManagePermissions_Controller
 	/**
 	 * This function actually saves modifications to a membergroup's board permissions.
 	 */
-	function action_modify2()
+	public function action_modify2()
 	{
-		global $modSettings, $smcFunc, $context;
+		global $smcFunc, $context;
 
 		checkSession();
 		validateToken('admin-mp');
@@ -962,7 +962,7 @@ class ManagePermissions_Controller
 	 * A screen to set some general settings for permissions.
 	 *
 	 */
-	function action_permSettings_display()
+	public function action_permSettings_display()
 	{
 		global $context, $modSettings, $txt, $scripturl, $smcFunc;
 
@@ -1061,7 +1061,7 @@ class ManagePermissions_Controller
 	/**
 	 * Initialize the settings form.
 	 */
-	function _initPermSettingsForm()
+	private function _initPermSettingsForm()
 	{
 		global $txt;
 
@@ -1087,7 +1087,7 @@ class ManagePermissions_Controller
 	 * Used by admin search.
 	 * @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
@@ -1108,7 +1108,7 @@ class ManagePermissions_Controller
 	/**
 	 * Add/Edit/Delete profiles.
 	 */
-	function action_profiles()
+	public function action_profiles()
 	{
 		global $context, $txt, $smcFunc;
 
@@ -1262,7 +1262,7 @@ class ManagePermissions_Controller
 	/**
 	 * Present a nice way of applying post moderation.
 	 */
-	function action_postmod()
+	public function action_postmod()
 	{
 		global $context, $txt, $smcFunc, $modSettings;
 
