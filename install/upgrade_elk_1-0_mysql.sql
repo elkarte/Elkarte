@@ -6,15 +6,15 @@
 
 ---# Adding login history...
 CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
-	id_login integer NOT NULL auto_increment,
-	id_member integer NOT NULL,
-	time integer NOT NULL,
+	id_login int(10) NOT NULL auto_increment,
+	id_member mediumint(8) NOT NULL,
+	time int(10) NOT NULL,
 	ip varchar(255) NOT NULL default '',
 	ip2 varchar(255) NOT NULL default '',
-	PRIMARY KEY id_login(id_login)
-	KEY id_member (id_member)
+	PRIMARY KEY id_login(id_login),
+	KEY id_member (id_member),
 	KEY time (time)
-);
+) ENGINE=MyISAM{$db_collation};
 ---#
 
 ---# Copying the current package backup setting...
@@ -32,22 +32,10 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
-	('avatar_default', '0');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('gravatar_rating', 'g');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
+	('avatar_default', '0'),
+	('gravatar_rating', 'g'),
 	('xmlnews_limit', 5);
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
 	('visual_verification_num_chars', '6');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
 	('enable_disregard', 0);
 ---#
 
@@ -168,33 +156,12 @@ CHANGE `session_id` `session_id` char(64) NOT NULL;
 ---#
 
 /******************************************************************************/
---- Adding new columns for MOVED topic updates
+--- Adding support for MOVED topics enhancements
 /******************************************************************************/
----# Adding new custom fields columns.
----{
-$smcFunc['db_alter_table']('{db_prefix}topics', array(
-	'add' => array(
-		'redirect_expires' => array(
-			'name' => 'redirect_expires',
-			'null' => false,
-			'default' => '0',
-			'type' => 'int',
-			'auto' => false,
-		),
-	)
-));
-$smcFunc['db_alter_table']('{db_prefix}topics', array(
-	'add' => array(
-		'id_redirect_topic' => array(
-			'name' => 'id_redirect_topic',
-			'null' => false,
-			'default' => '0',
-			'type' => 'int',
-			'auto' => false,
-		),
-	)
-));
----}
+---# Adding new columns to topics ..
+ALTER TABLE {$db_prefix}topics
+ADD COLUMN redirect_expires int(10) unsigned NOT NULL default '0',
+ADD COLUMN id_redirect_topic mediumint(8) unsigned NOT NULL default '0';
 ---#
 
 /******************************************************************************/
@@ -223,117 +190,90 @@ VALUES
 --- Adding support for deny boards access
 /******************************************************************************/
 ---# Adding new columns to boards...
----{
-$smcFunc['db_alter_table']('{db_prefix}boards', array(
-	'add' => array(
-		'deny_member_groups' => array(
-			'name' => 'deny_member_groups',
-			'null' => false,
-			'default' => '',
-			'type' => varchar,
-			'size' => 255,
-			'auto' => false,
-		),
-	)
-));
----}
+ALTER TABLE {$db_prefix}boards
+ADD COLUMN deny_member_groups varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
 --- Adding support for topic disregard
 /******************************************************************************/
----# Adding new columns to log_topics...
----{
-$smcFunc['db_alter_table']('{db_prefix}log_topics', array(
-	'add' => array(
-		'disregarded' => array(
-			'name' => 'disregarded',
-			'null' => false,
-			'default' => 0,
-			'type' => 'int',
-			'auto' => false,
-		),
-	)
-));
----}
+---# Adding new columns to boards...
+ALTER TABLE {$db_prefix}log_topics
+ADD COLUMN disregarded tinyint(3) NOT NULL DEFAULT '0';
 ---#
 
 /******************************************************************************/
 --- Adding support for custom profile fields on memberlist
 /******************************************************************************/
 ---# Adding new columns to boards...
----{
-$smcFunc['db_alter_table']('{db_prefix}custom_fields', array(
-	'add' => array(
-		'show_memberlist' => array(
-			'name' => 'show_memberlist',
-			'null' => false,
-			'default' => 0,
-			'type' => 'smallint',
-			'auto' => false,
-		),
-	)
-));
----}
+ALTER TABLE {$db_prefix}custom_fields
+ADD COLUMN show_memberlist tinyint(3) NOT NULL DEFAULT '0';
+---#
+
+/******************************************************************************/
+--- Fixing mail queue for long messages
+/******************************************************************************/
+---# Altering mil_queue table...
+ALTER TABLE {$db_prefix}mail_queue
+CHANGE body body mediumtext NOT NULL;
 ---#
 
 /******************************************************************************/
 --- Name changes
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
----{
-upgrade_query("
-	ALTER TABLE {$db_prefix}membergroups
-	CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT ''");
----}
+ALTER TABLE {$db_prefix}membergroups
+CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
----# Creating drafts table.
-CREATE TABLE {$db_prefix}user_drafts (
-	id_draft int unsigned NOT NULL auto_increment,
-	id_topic int unsigned NOT NULL default '0',
-	id_board smallint unsigned NOT NULL default '0',
-	id_reply int unsigned NOT NULL default '0',
-	type smallint NOT NULL default '0',
-	poster_time int unsigned NOT NULL default '0',
-	id_member int unsigned NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	smileys_enabled smallint NOT NULL default '1',
-	body text NOT NULL,
-	icon varchar(16) NOT NULL default 'xx',
-	locked smallint NOT NULL default '0',
-	is_sticky smallint NOT NULL default '0',
-	to_list varchar(255) NOT NULL default '',
-	outbox smallint NOT NULL default '0',
-	PRIMARY KEY (id_draft)
-);
+---# Creating draft table
+CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
+  id_draft int(10) unsigned NOT NULL auto_increment,
+  id_topic mediumint(8) unsigned NOT NULL default '0',
+  id_board smallint(5) unsigned NOT NULL default '0',
+  id_reply int(10) unsigned NOT NULL default '0',
+  type tinyint(4) NOT NULL default '0',
+  poster_time int(10) unsigned NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  subject varchar(255) NOT NULL default '',
+  smileys_enabled tinyint(4) NOT NULL default '1',
+  body mediumtext NOT NULL,
+  icon varchar(16) NOT NULL default 'xx',
+  locked tinyint(4) NOT NULL default '0',
+  is_sticky tinyint(4) NOT NULL default '0',
+  to_list varchar(255) NOT NULL default '',
+  outbox tinyint(4) NOT NULL default '0',
+  PRIMARY KEY id_draft(id_draft),
+  UNIQUE id_member (id_member, id_draft, type)
+) ENGINE=MyISAM{$db_collation};
 ---#
 
 ---# Adding draft permissions...
 ---{
 // We cannot do this twice
-if (@$modSettings['smfVersion'] < '2.1')
+// @todo this won't work when you upgrade from smf
+if (@$modSettings['elkVersion'] < '1.0')
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
-		SELECT id_group, id_board, add_deny, permission
+		SELECT id_group, id_profile, add_deny, permission
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_board], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_board], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	mysql_free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
 			INSERT IGNORE INTO {$db_prefix}board_permissions
-				(id_group, id_board, permission, add_deny)
+				(id_group, id_profile, permission, add_deny)
 			VALUES
 				" . implode(',', $inserts));
 
@@ -343,12 +283,12 @@ if (@$modSettings['smfVersion'] < '2.1')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'pm_send'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
 		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	mysql_free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -367,18 +307,9 @@ if (@$modSettings['smfVersion'] < '2.1')
 INSERT INTO `{$db_prefix}custom_fields`
 	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
 VALUES
-	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
-VALUES
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
-VALUES
-	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
-VALUES
+	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1),
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
+	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1),
 	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
 ---#
 
@@ -469,10 +400,10 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 
 ---# Creating follow-up table...
 CREATE TABLE {$db_prefix}follow_ups (
-  follow_up int NOT NULL default '0',
-  derived_from int NOT NULL default '0',
+  follow_up int(10) NOT NULL default '0',
+  derived_from int(10) NOT NULL default '0',
   PRIMARY KEY (follow_up, derived_from)
-);
+) ENGINE=MyISAM;
 ---#
 
 /******************************************************************************/
@@ -492,6 +423,8 @@ CREATE TABLE {$db_prefix}antispam_questions (
 
 ---# Move existing values...
 ---{
+global $language;
+
 $request = upgrade_query("
 	SELECT id_comment, recipient_name as answer, body as question
 	FROM {$db_prefix}log_comments
@@ -504,9 +437,9 @@ if (mysql_num_rows($request) != 0)
 	{
 		upgrade_query("
 			INSERT INTO {$db_prefix}antispam_questions
-				(answer, question)
+				(answer, question, language)
 			VALUES
-				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "')");
+				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
 		upgrade_query("
 			DELETE FROM {$db_prefix}log_comments
 			WHERE id_comment  = " . $row['id_comment'] . "
