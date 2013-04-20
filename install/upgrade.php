@@ -1410,7 +1410,7 @@ function action_databaseChanges()
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
 		array('upgrade_2-0_' . $db_type . '.sql', '2.1', '2.1 dev0'),
 		// array('upgrade_2-1_' . $db_type . '.sql', '3.0', '3.0 dev0'),
-		array('upgrade_dia_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
+		array('upgrade_elk_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
 	);
 
 	// How many files are there in total?
@@ -1421,9 +1421,9 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_elk_') === false && $modSettings['smfVersion'] < $file[1])
 				$upcontext['file_count']++;
-			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['elkVersion'] < $file[1]))
+			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_elk_') !== false && $modSettings['elkVersion'] < $file[1]))
 				$upcontext['file_count']++;
 		}
 	}
