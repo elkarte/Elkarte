@@ -423,6 +423,8 @@ CREATE TABLE {$db_prefix}antispam_questions (
 
 ---# Move existing values...
 ---{
+global $language;
+
 $request = upgrade_query("
 	SELECT id_comment, recipient_name as answer, body as question
 	FROM {$db_prefix}log_comments
@@ -435,9 +437,9 @@ if (mysql_num_rows($request) != 0)
 	{
 		upgrade_query("
 			INSERT INTO {$db_prefix}antispam_questions
-				(answer, question)
+				(answer, question, language)
 			VALUES
-				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "')");
+				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
 		upgrade_query("
 			DELETE FROM {$db_prefix}log_comments
 			WHERE id_comment  = " . $row['id_comment'] . "
