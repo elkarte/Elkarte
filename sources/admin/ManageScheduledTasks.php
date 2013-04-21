@@ -315,6 +315,7 @@ class ManageScheduledTasks_Controller
 			$disabled = !isset($_POST['enabled']) ? 1 : 0;
 
 			// Do the update!
+			$_GET['tid'] = (int) $_GET['tid'];
 			updateTask($_GET['tid'], $disabled, $offset, $interval, $unit);
 
 			// Check the next event.
@@ -325,6 +326,7 @@ class ManageScheduledTasks_Controller
 		}
 
 		// Load the task, understand? Que? Que?
+		$_GET['tid'] = (int) $_GET['tid'];
 		$context['task'] = loadTaskDetails($_GET['tid']);
 
 		createToken('admin-st');
