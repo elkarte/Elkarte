@@ -942,7 +942,7 @@ class ManagePermissions_Controller
 			validateToken('admin-mppm');
 
 			// Start by deleting all the permissions relevant.
-			deleteBoardPermission($context['profile_groups'], $context['current_profile'], $all_permissions);
+			deleteBoardPermissions($context['profile_groups'], $context['current_profile'], $all_permissions);
 
 			// Do it group by group.
 			$new_permissions = array();
