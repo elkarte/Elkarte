@@ -170,7 +170,7 @@ class ManageRegistration_Controller
 				$includes = array('globalmod', 'member', 'custom');
 
 			$groups = array();
-			$membergroups = getBasicMembergroupdata($includes, array('hidden', 'protected'));
+			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));
 			foreach ($membergroups as $membergroup)
 				$groups[$membergroup['id']] = $membergroup['name'];
 
