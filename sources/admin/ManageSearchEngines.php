@@ -113,7 +113,7 @@ class ManageSearchEngines_Controller
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		$groups = getBasicMemgergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
 		foreach ($groups as $row)
 			$config_vars['spider_group'][2][$row['id_group']] = $row['group_name'];
 
