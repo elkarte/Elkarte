@@ -498,7 +498,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show_prevnext = true)
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $context, $txt, $settings;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
@@ -516,23 +516,23 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	$context['current_page'] = $start / $num_per_page;
 
-	$base_link = '<a class="navPages" href="' . ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d') . '">%2$s</a> ';
+	$base_link = str_replace('{base_link}', ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
 	// Compact pages is off or on?
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid ? '<span class="current_page"><strong>' . $display_page++ . '</strong></span> ' : sprintf($base_link, $counter, $display_page++);
+			$pageindex .= $start == $counter && !$start_invalid ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
 		if ($start != $counter - $max_value && !$start_invalid)
-			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 	else
 	{
@@ -541,7 +541,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
 		if (!empty($start) && $show_prevnext)
-			$pageindex = sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+			$pageindex = sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 		else
 			$pageindex = '';
 
@@ -551,7 +551,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor = \'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -563,7 +563,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
 		if (!$start_invalid)
-			$pageindex .= '<span class="current_page"><strong>' . ($start / $num_per_page + 1) . '</strong></span>';
+			$pageindex .= sprintf($settings['page_index_template']['current_page'], ($start / $num_per_page + 1));
 		else
 			$pageindex .= sprintf($base_link, $start, $start / $num_per_page + 1);
 
@@ -578,7 +578,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)
@@ -586,7 +586,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
 		if ($start != $tmpMaxPages && $show_prevnext)
-			$pageindex .= sprintf($base_link, $start + $num_per_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 
 	return $pageindex;
@@ -3495,7 +3495,7 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
  */
 function setupMenuContext()
 {
-	global $context, $modSettings, $user_info, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $txt, $scripturl, $settings;
 
 	// Set up the menu privileges.
 	$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));
@@ -3773,7 +3773,8 @@ function setupMenuContext()
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
-		$context['menu_buttons']['pm']['title'] .= ' [<strong>' . $context['user']['unread_messages'] . '</strong>]';
+		if (!empty($settings['menu_numeric_notice']))
+			$context['menu_buttons']['pm']['title'] .= sprintf($settings['menu_numeric_notice'], $context['user']['unread_messages']);
 	}
 
 	// Update the Moderation menu items with action item totals
@@ -3786,24 +3787,24 @@ function setupMenuContext()
 		if (!empty($mod_count['total']))
 		{
 			$context['menu_buttons']['moderate']['alttitle'] = $context['menu_buttons']['moderate']['title'] . ' [' . $mod_count['total'] . ']';
-			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? ' [<strong>' . $mod_count['total'] . '</strong>]' : '';
+			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? sprintf($settings['menu_numeric_notice'], $mod_count['total']) : '';
 
 			if (!empty($mod_count['postmod']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= ' [<strong>' . $mod_count['postmod'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
 			}
 
 			if (!empty($mod_count['attachments']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= ' [<strong>' . $mod_count['attachments'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['attachments']);
 			}
 
 			if (!empty($mod_count['reports']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['reports']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] . ' [' . $mod_count['reports'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= ' [<strong>' . $mod_count['reports'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['reports']);
 			}
 		}
 	}
