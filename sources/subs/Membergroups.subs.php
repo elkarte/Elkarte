@@ -868,7 +868,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * groups sometimes because they are special ones. 
  * Example: getBasicMembergroupData(array('admin', 'mod', 'globalmod'));
  * $includes parameters:
- * - 'admin' inlcudes the admin: id_group = 1
+ * - 'admin' includes the admin: id_group = 1
  * - 'mod' includes the local moderator: id_group = 3
  * - 'globalmod' includes the global moderators: id_group = 2
  * - 'member' includes the ungrouped users from id_group = 0
@@ -884,7 +884,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * @param array $includes
  * @param array $excludes
  * @param string $sort_order
- * @param bol $split, splits postgroups and membergroups
+ * @param bool $split, splits postgroups and membergroups
  * @return type
  */
 function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
