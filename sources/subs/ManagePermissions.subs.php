@@ -704,3 +704,233 @@ function loadAllPermissions($loadType = 'classic')
 			}
 	}
 }
+
+function countPermissions($groups, $hidden_permissions = null)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, COUNT(*) AS num_permissions, add_deny
+		FROM {db_prefix}permissions'
+		. (isset($hidden_permissions) ? '' : 'WHERE permission NOT IN ({array_string:hidden_permissions})') . '
+		GROUP BY id_group, add_deny',
+		array(
+			'hidden_permissions' => !isset($hidden_permissions) ? $hidden_permissions : array(),
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
+			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] = $row['num_permissions'];
+	$smcFunc['db_free_result']($request);
+
+	return $groups;
+}
+
+function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_profile, id_group, COUNT(*) AS num_permissions, add_deny
+		FROM {db_prefix}board_permissions
+		WHERE 1 = 1'
+			. (isset($profile_id) ? ' AND id_profile = {int:current_profile}'  : '' )
+			. (isset($hidden_permissions) ? '' : ' AND permission NOT IN ({array_string:hidden_permissions})') . '
+		GROUP BY ' . (isset($profile_id) ? 'id_profile, ' : '') . 'id_group, add_deny',
+		array(
+			'hidden_permissions' => !isset($hidden_permissions) ? $hidden_permissions : array(),
+			'current_profile' => $profile_id,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
+			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] += $row['num_permissions'];
+	$smcFunc['db_free_result']($request);
+
+	return $groups;
+}
+
+function assignPermissionProfileToBoard($profile, $board)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}boards
+		SET id_profile = {int:current_profile}
+		WHERE id_board IN ({array_int:board_list})',
+		array(
+			'board_list' => $board,
+			'current_profile' => $profile,
+		)
+	);
+}
+
+function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
+{
+	global $smcFunc;
+
+	// Retrieve current permissions of group.
+	$request = $smcFunc['db_query']('', '
+		SELECT permission, add_deny
+		FROM {db_prefix}permissions
+		WHERE id_group = {int:copy_from}',
+		array(
+			'copy_from' => $copy_from,
+		)
+	);
+	$target_perm = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$target_perm[$row['permission']] = $row['add_deny'];
+	$smcFunc['db_free_result']($request);
+
+	$inserts = array();
+	foreach ($groups as $group_id)
+		foreach ($target_perm as $perm => $add_deny)
+		{
+			// No dodgy permissions please!
+			if (!empty($illgeal_permissions) && in_array($perm, $illgeal_permissions))
+				continue;
+			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
+				continue;
+
+			if ($group_id != 1 && $group_id != 3)
+				$inserts[] = array($perm, $group_id, $add_deny);
+		}
+
+	// Delete the previous permissions...
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}permissions
+		WHERE id_group IN ({array_int:group_list})
+			' . (empty($illgeal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+		array(
+			'group_list' => $groups,
+			'illegal_permissions' => !empty($illgeal_permissions) ? $illgeal_permissions : array(),
+		)
+	);
+
+	if (!empty($inserts))
+	{
+		// ..and insert the new ones.
+		$smcFunc['db_insert']('',
+			'{db_prefix}permissions',
+			array(
+				'permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int',
+			),
+			$inserts,
+			array('permission', 'id_group')
+		);
+	}
+}
+
+function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
+{
+	global $smcFunc;
+
+	// Now do the same for the board permissions.
+	$request = $smcFunc['db_query']('', '
+		SELECT permission, add_deny
+		FROM {db_prefix}board_permissions
+		WHERE id_group = {int:copy_from}
+			AND id_profile = {int:current_profile}',
+		array(
+			'copy_from' => $copy_from,
+			'current_profile' => $profile_id,
+		)
+	);
+	$target_perm = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$target_perm[$row['permission']] = $row['add_deny'];
+	$smcFunc['db_free_result']($request);
+
+	$inserts = array();
+	foreach ($_POST['group'] as $group_id)
+		foreach ($target_perm as $perm => $add_deny)
+		{
+			// Are these for guests?
+			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
+				continue;
+
+			$inserts[] = array($perm, $group_id, $profile_id, $add_deny);
+		}
+
+	// Delete the previous global board permissions...
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}board_permissions
+		WHERE id_group IN ({array_int:current_group_list})
+			AND id_profile = {int:current_profile}',
+		array(
+			'current_group_list' => $groups,
+			'current_profile' => $profile_id,
+		)
+	);
+
+	// And insert the copied permissions.
+	if (!empty($inserts))
+	{
+		// ..and insert the new ones.
+		$smcFunc['db_insert']('',
+			'{db_prefix}board_permissions',
+			array('permission' => 'string', 'id_group' => 'int', 'id_profile' => 'int', 'add_deny' => 'int'),
+			$inserts,
+			array('permission', 'id_group', 'id_profile')
+		);
+	}
+}
+
+function deletePermission($groups, $permission, $illegal_permissions)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}permissions
+		WHERE id_group IN ({array_int:current_group_list})
+			AND permission = {string:current_permission}
+			' . (empty($illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+		array(
+			'current_group_list' => $groups,
+			'current_permission' => $permission,
+			'illegal_permissions' => !empty($illegal_permissions) ? $illegal_permissions : array(),
+		)
+	);
+}
+
+function deleteBoardPermission($group, $profile_id, $permission)
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}board_permissions
+		WHERE id_group IN ({array_int:current_group_list})
+			AND id_profile = {int:current_profile}
+			AND permission = {string:current_permission}',
+		array(
+			'current_group_list' => $group,
+			'current_profile' => $profile_id,
+			'current_permission' => $permission,
+		)
+	);
+}
+
+function replacePermission($permChange)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('replace',
+		'{db_prefix}permissions',
+			array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int'),
+			$permChange,
+			array('permission', 'id_group')
+		);
+}
+
+function replaceBoardPermission($permChange)
+{
+	global $smcFunc;
+
+	$smcFunc['db_insert']('replace',
+		'{db_prefix}board_permissions',
+		array('permission' => 'string', 'id_group' => 'int', 'id_profile' => 'int', 'add_deny' => 'int'),
+		$permChange,
+		array('permission', 'id_group', 'id_profile')
+	);
+}
