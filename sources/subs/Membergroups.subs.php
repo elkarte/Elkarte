@@ -1026,7 +1026,7 @@ function getMembergroups()
 
 	while ($row = $smcFunc['db_fetch_assoc']($query))
 	{
-		$groups[$row['id_groups']] = array(
+		$groups[$row['id_group']] = array(
 			'id_group' => $row['id_group'],
 			'id_parent' => $row['id_parent'],
 			'group_name' => $row['group_name'],
