@@ -681,48 +681,23 @@ class ManagePermissions_Controller
 		// Insert the general permissions.
 		if ($_GET['group'] != 3 && empty($_GET['pid']))
 		{
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}permissions
-				WHERE id_group = {int:current_group}
-				' . (empty($context['illegal_permissions']) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
-				array(
-					'current_group' => $_GET['group'],
-					'illegal_permissions' => !empty($context['illegal_permissions']) ? $context['illegal_permissions'] : array(),
-				)
-			);
+			deleteIllegalPermissions($_GET['group'], $context['illegal_permissions']);
 
 			if (!empty($givePerms['membergroup']))
-			{
-				$smcFunc['db_insert']('replace',
-					'{db_prefix}permissions',
-					array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-					$givePerms['membergroup'],
-					array('id_group', 'permission')
-				);
-			}
+				replacePermission($givePerms['membergroup']);
+
 		}
 
 		// Insert the boardpermissions.
 		$profileid = max(1, $_GET['pid']);
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}board_permissions
-			WHERE id_group = {int:current_group}
-				AND id_profile = {int:current_profile}',
-			array(
-				'current_group' => $_GET['group'],
-				'current_profile' => $profileid,
-			)
-		);
+		deleteAllBoardPermissions($_GET['group'], $profileid);
+
 		if (!empty($givePerms['board']))
 		{
 			foreach ($givePerms['board'] as $k => $v)
 				$givePerms['board'][$k][] = $profileid;
-			$smcFunc['db_insert']('replace',
-				'{db_prefix}board_permissions',
-				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int', 'id_profile' => 'int'),
-				$givePerms['board'],
-				array('id_group', 'permission', 'id_profile')
-			);
+
+			replaceBoardPermission($givePerms['board']);
 		}
 
 		// Update any inherited permissions as required.
@@ -740,8 +715,9 @@ class ManagePermissions_Controller
 	 */
 	public function action_permSettings_display()
 	{
-		global $context, $modSettings, $txt, $scripturl, $smcFunc;
+		global $context, $modSettings, $txt, $scripturl;
 
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		// initialize the form
 		$this->_initPermSettingsForm();
 
@@ -765,65 +741,11 @@ class ManagePermissions_Controller
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
-			{
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}permissions
-					WHERE add_deny = {int:denied}',
-					array(
-						'denied' => 0,
-					)
-				);
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}board_permissions
-					WHERE add_deny = {int:denied}',
-					array(
-						'denied' => 0,
-					)
-				);
-			}
+				clearDenyPermissions();
 
 			// Make sure there are no postgroup based permissions left.
 			if (empty($modSettings['permission_enable_postgroups']))
-			{
-				// Get a list of postgroups.
-				$post_groups = array();
-				$request = $smcFunc['db_query']('', '
-					SELECT id_group
-					FROM {db_prefix}membergroups
-					WHERE min_posts != {int:min_posts}',
-					array(
-						'min_posts' => -1,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$post_groups[] = $row['id_group'];
-				$smcFunc['db_free_result']($request);
-
-				// Remove'em.
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}permissions
-					WHERE id_group IN ({array_int:post_group_list})',
-					array(
-						'post_group_list' => $post_groups,
-					)
-				);
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}board_permissions
-					WHERE id_group IN ({array_int:post_group_list})',
-					array(
-						'post_group_list' => $post_groups,
-					)
-				);
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}membergroups
-					SET id_parent = {int:not_inherited}
-					WHERE id_parent IN ({array_int:post_group_list})',
-					array(
-						'post_group_list' => $post_groups,
-						'not_inherited' => -2,
-					)
-				);
-			}
+				removePostgroupPermissions();
 
 			redirectexit('action=admin;area=permissions;sa=settings');
 		}
@@ -886,7 +808,9 @@ class ManagePermissions_Controller
 	 */
 	public function action_profiles()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt;
+	
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Setup the template, first for fun.
 		$context['page_title'] = $txt['permissions_profile_edit'];
@@ -897,44 +821,7 @@ class ManagePermissions_Controller
 		{
 			checkSession();
 			validateToken('admin-mpp');
-
-			$_POST['copy_from'] = (int) $_POST['copy_from'];
-			$_POST['profile_name'] = $smcFunc['htmlspecialchars']($_POST['profile_name']);
-
-			// Insert the profile itself.
-			$smcFunc['db_insert']('',
-				'{db_prefix}permission_profiles',
-				array(
-					'profile_name' => 'string',
-				),
-				array(
-					$_POST['profile_name'],
-				),
-				array('id_profile')
-			);
-			$profile_id = $smcFunc['db_insert_id']('{db_prefix}permission_profiles', 'id_profile');
-
-			// Load the permissions from the one it's being copied from.
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, permission, add_deny
-				FROM {db_prefix}board_permissions
-				WHERE id_profile = {int:copy_from}',
-				array(
-					'copy_from' => $_POST['copy_from'],
-				)
-			);
-			$inserts = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$inserts[] = array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
-			$smcFunc['db_free_result']($request);
-
-			if (!empty($inserts))
-				$smcFunc['db_insert']('insert',
-					'{db_prefix}board_permissions',
-					array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-					$inserts,
-					array('id_profile', 'id_group', 'permission')
-				);
+			copyPermissionProfile($_POST['profile_name'], (int) $_POST['copy_from']);
 		}
 		// Renaming?
 		elseif (isset($_POST['rename']))
@@ -947,21 +834,8 @@ class ManagePermissions_Controller
 				$context['show_rename_boxes'] = true;
 			else
 			{
-				foreach ($_POST['rename_profile'] as $id => $value)
-				{
-					$value = $smcFunc['htmlspecialchars']($value);
-
-					if (trim($value) != '' && $id > 4)
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}permission_profiles
-							SET profile_name = {string:profile_name}
-							WHERE id_profile = {int:current_profile}',
-							array(
-								'current_profile' => (int) $id,
-								'profile_name' => $value,
-							)
-						);
-				}
+				foreach ($_POST['rename_profile'] as $id => $name)
+					renamePermissionProfile($id, $name);
 			}
 		}
 		// Deleting?
@@ -975,50 +849,15 @@ class ManagePermissions_Controller
 				if ($profile > 4)
 					$profiles[] = (int) $profile;
 
-			// Verify it's not in use...
-			$request = $smcFunc['db_query']('', '
-				SELECT id_board
-				FROM {db_prefix}boards
-				WHERE id_profile IN ({array_int:profile_list})
-				LIMIT 1',
-				array(
-					'profile_list' => $profiles,
-				)
-			);
-			if ($smcFunc['db_num_rows']($request) != 0)
-				fatal_lang_error('no_access', false);
-			$smcFunc['db_free_result']($request);
-
-			// Oh well, delete.
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}permission_profiles
-				WHERE id_profile IN ({array_int:profile_list})',
-				array(
-					'profile_list' => $profiles,
-				)
-			);
+			deletePermissionProfiles($profiles);
 		}
 
 		// Clearly, we'll need this!
 		loadPermissionProfiles();
 
 		// Work out what ones are in use.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_profile, COUNT(id_board) AS board_count
-			FROM {db_prefix}boards
-			GROUP BY id_profile',
-			array(
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			if (isset($context['profiles'][$row['id_profile']]))
-			{
-				$context['profiles'][$row['id_profile']]['in_use'] = true;
-				$context['profiles'][$row['id_profile']]['boards'] = $row['board_count'];
-				$context['profiles'][$row['id_profile']]['boards_text'] = $row['board_count'] > 1 ? sprintf($txt['permissions_profile_used_by_many'], $row['board_count']) : $txt['permissions_profile_used_by_' . ($row['board_count'] ? 'one' : 'none')];
-			}
-		$smcFunc['db_free_result']($request);
-
+		$context['profiles'] = permProfilesInUse($profiles);
+	
 		// What can we do with these?
 		$context['can_edit_something'] = false;
 		foreach ($context['profiles'] as $id => $profile)
@@ -1040,7 +879,7 @@ class ManagePermissions_Controller
 	 */
 	public function action_postmod()
 	{
-		global $context, $txt, $smcFunc, $modSettings;
+		global $context, $txt, $smcFunc;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		// Just in case.
@@ -1088,36 +927,9 @@ class ManagePermissions_Controller
 		);
 
 		// Load the groups.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, online_color, id_parent
-			FROM {db_prefix}membergroups
-			WHERE id_group != {int:admin_group}
-				' . (empty($modSettings['permission_enable_postgroups']) ? ' AND min_posts = {int:min_posts}' : '') . '
-			ORDER BY id_parent ASC',
-			array(
-				'admin_group' => 1,
-				'min_posts' => -1,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if ($row['id_parent'] == -2)
-			{
-				$context['profile_groups'][$row['id_group']] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name'],
-					'color' => $row['online_color'],
-					'new_topic' => 'disallow',
-					'replies_own' => 'disallow',
-					'replies_any' => 'disallow',
-					'attachment' => 'disallow',
-					'children' => array(),
-				);
-			}
-			elseif (isset($context['profile_groups'][$row['id_parent']]))
-				$context['profile_groups'][$row['id_parent']]['children'][] = $row['group_name'];
-		}
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+		$context['profile_groups'] = fetchMembergroups();
 
 		// What are the permissions we are querying?
 		$all_permissions = array();
@@ -1130,17 +942,7 @@ class ManagePermissions_Controller
 			validateToken('admin-mppm');
 
 			// Start by deleting all the permissions relevant.
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}board_permissions
-				WHERE id_profile = {int:current_profile}
-					AND permission IN ({array_string:permissions})
-					AND id_group IN ({array_int:profile_group_list})',
-				array(
-					'profile_group_list' => array_keys($context['profile_groups']),
-					'current_profile' => $context['current_profile'],
-					'permissions' => $all_permissions,
-				)
-			);
+			deleteBoardPermission($context['profile_groups'], $context['current_profile'], $all_permissions);
 
 			// Do it group by group.
 			$new_permissions = array();
@@ -1164,28 +966,12 @@ class ManagePermissions_Controller
 
 			// Insert new permissions.
 			if (!empty($new_permissions))
-				$smcFunc['db_insert']('',
-					'{db_prefix}board_permissions',
-					array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-					$new_permissions,
-					array('id_profile', 'id_group', 'permission')
-				);
+				insertPermission($new_permissions);
 		}
 
 		// Now get all the permissions!
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, permission, add_deny
-			FROM {db_prefix}board_permissions
-			WHERE id_profile = {int:current_profile}
-				AND permission IN ({array_string:permissions})
-				AND id_group IN ({array_int:profile_group_list})',
-			array(
-				'profile_group_list' => array_keys($context['profile_groups']),
-				'current_profile' => $context['current_profile'],
-				'permissions' => $all_permissions,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		$perm = getPermission($context['profile_groups'], $context['current_profile'], $all_permissions);
+		foreach ($perm as $row)
 		{
 			foreach ($mappings as $key => $data)
 			{
@@ -1207,7 +993,6 @@ class ManagePermissions_Controller
 				}
 			}
 		}
-		$smcFunc['db_free_result']($request);
 
 		createToken('admin-mppm');
 	}

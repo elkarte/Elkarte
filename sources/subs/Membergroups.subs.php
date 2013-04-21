@@ -1038,3 +1038,43 @@ function getMembergroups()
 
 	return $groups;
 }
+
+function fetchMembergroups()
+{
+	global $smcFunc, $modSettings;
+
+	$profile_groups = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name, online_color, id_parent
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:admin_group}
+			' . (empty($modSettings['permission_enable_postgroups']) ? ' AND min_posts = {int:min_posts}' : '') . '
+		ORDER BY id_parent ASC',
+		array(
+			'admin_group' => 1,
+			'min_posts' => -1,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if ($row['id_parent'] == -2)
+		{
+			$profile_groups[$row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+				'color' => $row['online_color'],
+				'new_topic' => 'disallow',
+				'replies_own' => 'disallow',
+				'replies_any' => 'disallow',
+				'attachment' => 'disallow',
+				'children' => array(),
+			);
+		}
+		elseif (isset($profile_groups[$row['id_parent']]))
+			$profile_groups[$row['id_parent']]['children'][] = $row['group_name'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $profile_groups;
+}
