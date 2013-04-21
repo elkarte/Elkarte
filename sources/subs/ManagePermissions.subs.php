@@ -934,3 +934,60 @@ function replaceBoardPermission($permChange)
 		array('permission', 'id_group', 'id_profile')
 	);
 }
+
+function removeModeratorPermissions()
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}permissions
+		WHERE id_group = {int:moderator_group}',
+		array(
+			'moderator_group' => 3,
+		)
+	);
+}
+
+function fetchPermissions($id_group)
+{
+	global $smcFunc;
+
+	$permissions = array();
+
+	$result = $smcFunc['db_query']('', '
+		SELECT permission, add_deny
+		FROM {db_prefix}permissions
+		WHERE id_group = {int:current_group}',
+		array(
+			'current_group' => $id_group,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
+	$smcFunc['db_free_result']($result);
+
+	return $permissions;
+}
+
+function fetchBoardPermissions($id_group, $permission_type, $profile_id)
+{
+	global $smcFunc;
+
+	$permissions = array();
+
+	$result = $smcFunc['db_query']('', '
+		SELECT permission, add_deny
+		FROM {db_prefix}board_permissions
+		WHERE id_group = {int:current_group}
+			AND id_profile = {int:current_profile}',
+		array(
+			'current_group' => $id_group,
+			'current_profile' => $permission_type == 'membergroup' ? 1 : $profile_id,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
+	$smcFunc['db_free_result']($result);
+
+	return $permissions;
+}

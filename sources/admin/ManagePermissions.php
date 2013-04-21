@@ -501,7 +501,7 @@ class ManagePermissions_Controller
 	 */
 	public function action_modify()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt;
 
 		if (!isset($_GET['group']))
 			fatal_lang_error('no_access', false);
@@ -551,13 +551,7 @@ class ManagePermissions_Controller
 		if ($context['group']['id'] == 3 && empty($context['profile']['id']))
 		{
 			// For sanity just check they have no general permissions.
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}permissions
-				WHERE id_group = {int:moderator_group}',
-				array(
-					'moderator_group' => 3,
-				)
-			);
+			removeModeratorPermissions();
 
 			$context['profile']['id'] = 1;
 		}
@@ -580,35 +574,11 @@ class ManagePermissions_Controller
 
 		// General permissions?
 		if ($context['permission_type'] == 'membergroup')
-		{
-			$result = $smcFunc['db_query']('', '
-				SELECT permission, add_deny
-				FROM {db_prefix}permissions
-				WHERE id_group = {int:current_group}',
-				array(
-					'current_group' => $_GET['group'],
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($result))
-				$permissions['membergroup'][empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
-			$smcFunc['db_free_result']($result);
-		}
+			$permissions['membergroup'] = fetchPermissions($_GET['group']);
 
 		// Fetch current board permissions...
-		$result = $smcFunc['db_query']('', '
-			SELECT permission, add_deny
-			FROM {db_prefix}board_permissions
-			WHERE id_group = {int:current_group}
-				AND id_profile = {int:current_profile}',
-			array(
-				'current_group' => $context['group']['id'],
-				'current_profile' => $context['permission_type'] == 'membergroup' ? 1 : $context['profile']['id'],
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$permissions['board'][empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
-		$smcFunc['db_free_result']($result);
-
+		fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
+	
 		// Loop through each permission and set whether it's checked.
 		foreach ($context['permissions'] as $permissionType => $tmp)
 		{
