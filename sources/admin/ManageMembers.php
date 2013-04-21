@@ -194,7 +194,7 @@ class ManageMembers_Controller
 		{
 			// Retrieving the membergroups and postgroups.
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$groups = retrieveMembergroups();
+			$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 			$context['membergroups'] = $groups['membergroups'];
 			$context['postgroups'] = $groups['groups'];
@@ -618,10 +618,10 @@ class ManageMembers_Controller
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Get a list of all the membergroups and postgroups that can be selected.
-		$groups = retrieveMembergroups();
+		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 		$context['membergroups'] = $groups['membergroups'];
-		$context['postgroups'] = $groups['groups'];
+		$context['postgroups'] = $groups['postgroups'];
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'search_members';
 

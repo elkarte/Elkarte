@@ -111,21 +111,11 @@ class ManageSearchEngines_Controller
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// We need to load the groups for the spider group thingy.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name
-			FROM {db_prefix}membergroups
-			WHERE id_group != {int:admin_group}
-				AND id_group != {int:moderator_group}',
-			array(
-				'admin_group' => 1,
-				'moderator_group' => 3,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		foreach ($groups as $row)
 			$config_vars['spider_group'][2][$row['id_group']] = $row['group_name'];
-		$smcFunc['db_free_result']($request);
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))

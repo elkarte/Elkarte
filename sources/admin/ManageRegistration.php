@@ -44,9 +44,9 @@ class ManageRegistration_Controller
 	 * @uses Login language file
 	 * @uses Register template.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $context, $txt;
 
 		$subActions = array(
 			'register' => array(
@@ -118,7 +118,7 @@ class ManageRegistration_Controller
 	 *
 	 * @uses Register template, admin_register sub-template.
 	 */
-	function action_register()
+	public function action_register()
 	{
 		global $txt, $context, $scripturl, $smcFunc;
 
@@ -127,7 +127,7 @@ class ManageRegistration_Controller
 			checkSession();
 			validateToken('admin-regc');
 
-			foreach ($_POST as $key => $value)
+			foreach ($_POST as $key => $dummy)
 				if (!is_array($_POST[$key]))
 					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $_POST[$key]));
 
@@ -163,28 +163,18 @@ class ManageRegistration_Controller
 		// Load the assignable member groups.
 		if (allowedTo('manage_membergroups'))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT group_name, id_group
-				FROM {db_prefix}membergroups
-				WHERE id_group != {int:moderator_group}
-					AND min_posts = {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
-					AND id_group != {int:admin_group}
-					AND group_type != {int:is_protected}') . '
-					AND hidden != {int:hidden_group}
-				ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-				array(
-					'moderator_group' => 3,
-					'min_posts' => -1,
-					'admin_group' => 1,
-					'is_protected' => 1,
-					'hidden_group' => 2,
-					'newbie_group' => 4,
-				)
-			);
-			$context['member_groups'] = array(0 => $txt['admin_register_group_none']);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$context['member_groups'][$row['id_group']] = $row['group_name'];
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			if (allowedTo('admin_forum'))
+				$includes = array('admin', 'globalmod', 'member');
+			else
+				$includes = array('globalmod', 'member', 'custom');
+
+			$groups = array();
+			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));
+			foreach ($membergroups as $membergroup)
+				$groups[$membergroup['id']] = $membergroup['name'];
+
+			$context['member_groups'] = $groups; 
 		}
 		else
 			$context['member_groups'] = array();
@@ -203,10 +193,10 @@ class ManageRegistration_Controller
 	 *
 	 * @uses Admin template and the edit_agreement sub template.
 	 */
-	function action_agreement()
+	public function action_agreement()
 	{
 		// I hereby agree not to be a lazy bum.
-		global $txt, $context, $modSettings, $smcFunc, $settings;
+		global $txt, $context, $modSettings;
 
 		// By default we look at agreement.txt.
 		$context['current_agreement'] = '';
@@ -260,7 +250,7 @@ class ManageRegistration_Controller
 	 *
 	 * @uses Register template, reserved_words sub-template.
 	 */
-	function action_reservednames()
+	public function action_reservednames()
 	{
 		global $txt, $context, $modSettings;
 
@@ -301,7 +291,7 @@ class ManageRegistration_Controller
 	 * Accessed by ?action=admin;area=regcenter;sa=settings.
 	 * Requires the admin_forum permission.
 	 */
-	function action_registerSettings_display()
+	public function action_registerSettings_display()
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
@@ -363,7 +353,7 @@ class ManageRegistration_Controller
 	 *
 	 * @return array;
 	 */
-	function _init_registerSettingsForm()
+	private function _init_registerSettingsForm()
 	{
 		global $txt;
 
@@ -394,7 +384,7 @@ class ManageRegistration_Controller
 	 *
 	 * @return array;
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 

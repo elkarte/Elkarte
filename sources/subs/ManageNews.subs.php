@@ -48,62 +48,6 @@ function list_getNews()
 }
 
 /**
- * Get an array with all of our membergroups
- *
- * @todo: merge with getBasicMemgergroupData();
- * @return array
- */
-function getExtraGroups()
-{
-	global $smcFunc, $modSettings, $txt;
-
-	$groups = array(
-		'groups' => array(),
-		'membergroups' => array(),
-		'postgroups' => array(),
-	);
-	// If we have post groups disabled then we need to give a "ungrouped members" option.
-	if (empty($modSettings['permission_enable_postgroups']))
-	{
-		$groups['groups'][0] = array(
-			'id' => 0,
-			'name' => $txt['membergroups_members'],
-			'member_count' => 0,
-		);
-		$groups['membergroups'][0] = 0;
-	}
-
-	// Get all the extra groups as well as Administrator and Global Moderator.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name, min_posts
-		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-		WHERE min_posts = {int:min_posts}' : '') . '
-		GROUP BY id_group, min_posts, group_name
-		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-		array(
-			'min_posts' => -1,
-			'newbie_group' => 4,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$groups['groups'][$row['id_group']] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name'],
-			'member_count' => 0,
-		);
-
-		if ($row['min_posts'] == -1)
-			$groups['membergroups'][$row['id_group']] = $row['id_group'];
-		else
-			$groups['postgroups'][$row['id_group']] = $row['id_group'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $groups;
-}
-
-/**
  * Get a list of all full banned users.  Use their Username and email to find them.
  * Only get the ones that can't login to turn off notification.
  *
