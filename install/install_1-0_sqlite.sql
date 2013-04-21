@@ -2003,6 +2003,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pruningOptions', '30
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cache_enable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reg_verification', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('visual_verification_type', '3');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('visual_verification_num_chars', '6');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enable_buddylist', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('birthday_email', 'happy_birthday');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('dont_repeat_theme_core', '1');

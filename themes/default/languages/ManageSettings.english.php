@@ -217,6 +217,7 @@ $txt['configure_verification_means'] = 'Configure Verification Methods';
 $txt['setting_qa_verification_number'] = 'Number of verification questions user must answer';
 $txt['setting_qa_verification_number_desc'] = '(0 to disable; questions are set below)';
 $txt['configure_verification_means_desc'] = '<span class="smalltext">Below you can set which anti-spam features you wish to have enabled whenever a user needs to verify they are a human. Note that the user will have to pass <em>all</em> verification so if you enable both a verification image and a question/answer test they need to complete both to proceed.</span>';
+$txt['setting_visual_verification_num_chars'] = 'Number of characters in the verification image';
 $txt['setting_visual_verification_type'] = 'Visual verification image to display';
 $txt['setting_visual_verification_type_desc'] = 'The more complex the image the harder it is for bots to bypass';
 $txt['setting_image_verification_off'] = 'None';

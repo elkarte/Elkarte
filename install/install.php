@@ -916,7 +916,7 @@ function action_forumSettings()
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
-			'extdir' => addslashes(dirname(__FILE__)) . '/sources/subs',
+			'extdir' => addslashes(dirname(__FILE__)) . '/sources/ext',
 		);
 
 		// Must save!

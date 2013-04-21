@@ -40,9 +40,19 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Ready to load the site settings.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Double-check that directories which didn't exist in past releases are initialized.
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -54,7 +64,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
-unset($boarddir, $cachedir, $sourcedir);
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
 require_once(SOURCEDIR . '/QueryString.php');

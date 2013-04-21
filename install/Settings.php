@@ -159,7 +159,7 @@ $sourcedir = dirname(__FILE__) . '/sources';
  * Path to the external resources directory.
  * @var string
  */
-$extdir = dirname(__FILE__) . '/sources/lib';
+$extdir = dirname(__FILE__) . '/sources/ext';
 /**
  * Path to the languages directory.
  * @var string
@@ -182,13 +182,3 @@ if (file_exists(dirname(__FILE__) . '/install.php'))
 {
 	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install.php'); exit;
 }
-
-# Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
-	$sourcedir = $boarddir . '/sources';
-if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
-	$cachedir = $boarddir . '/cache';
-if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
-	$extdir = $sourcedir . '/ext';

@@ -666,7 +666,7 @@ function showCodeImage($code)
 	// Do we show no, low or high noise?
 	$noiseType = $imageType == 3 ? 'low' : ($imageType == 4 ? 'high' : ($imageType == 5 ? 'extreme' : 'none'));
 	// Can we have more than one font in use?
-	$varyFonts = $imageType > 3 ? true : false;
+	$varyFonts = $imageType > 1 ? true : false;
 	// Just a plain white background?
 	$simpleBGColor = $imageType < 3 ? true : false;
 	// Plain black foreground?
@@ -714,6 +714,9 @@ function showCodeImage($code)
 	if (!is_dir($settings['default_theme_dir'] . '/fonts'))
 		return false;
 
+	// Can we use true type fonts?
+	$can_do_ttf = function_exists('imagettftext');
+
 	// Get a list of the available fonts.
 	$font_dir = dir($settings['default_theme_dir'] . '/fonts');
 	$font_list = array();
@@ -726,7 +729,7 @@ function showCodeImage($code)
 			$ttfont_list[] = $entry;
 	}
 
-	if (empty($font_list))
+	if (empty($font_list) && ($can_do_ttf && empty($ttfont_list)))
 		return false;
 
 	// For non-hard things don't even change fonts.
@@ -748,23 +751,40 @@ function showCodeImage($code)
 	{
 		$characters[$i] = array(
 			'id' => $code{$i},
-			'font' => array_rand($font_list),
+			'font' => array_rand($can_do_ttf ? $ttfont_list : $font_list),
 		);
 
 		$loaded_fonts[$characters[$i]['font']] = null;
 	}
 
 	// Load all fonts and determine the maximum font height.
-	foreach ($loaded_fonts as $font_index => $dummy)
-		$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
+	if (!$can_do_ttf)
+		foreach ($loaded_fonts as $font_index => $dummy)
+			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
 
 	// Determine the dimensions of each character.
 	$total_width = $character_spacing * strlen($code) + 20;
 	$max_height = 0;
 	foreach ($characters as $char_index => $character)
 	{
-		$characters[$char_index]['width'] = imagefontwidth($loaded_fonts[$character['font']]);
-		$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
+		if ($can_do_ttf)
+		{
+			// GD2 handles font size differently.
+			if ($fontSizeRandom)
+				$font_size = $gd2 ? mt_rand(19, 21) : mt_rand(25, 32);
+			else
+				$font_size = $gd2 ? 24 : 30;
+
+			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
+
+			$characters[$char_index]['width'] = abs($img_box[2] - $img_box[0]);
+			$characters[$char_index]['height'] = abs($img_box[7] - $img_box[1]);
+		}
+		else
+		{
+			$characters[$char_index]['width'] = imagefontwidth($loaded_fonts[$character['font']]);
+			$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
+		}
 
 		$max_height = max($characters[$char_index]['height'] + 5, $max_height);
 		$total_width += $characters[$char_index]['width'];
@@ -806,9 +826,6 @@ function showCodeImage($code)
 		$cur_x = 0;
 		foreach ($characters as $char_index => $character)
 		{
-			// Can we use true type fonts?
-			$can_do_ttf = function_exists('imagettftext');
-
 			// How much rotation will we give?
 			if ($rotationType == 'none')
 				$angle = 0;
@@ -858,7 +875,7 @@ function showCodeImage($code)
 
 				// What color are we to do it in?
 				$is_reverse = $showReverseChars ? mt_rand(0, 1) : false;
-				$char_color = function_exists('imagecolorallocatealpha') && $fontTrans ? imagecolorallocatealpha($code_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2], 50) : imagecolorallocate($code_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]);
+				$char_color = $fontTrans ? imagecolorallocatealpha($code_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2], 50) : imagecolorallocate($code_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]);
 
 				$fontcord = @imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $char_color, $fontface, $character['id']);
 				if (empty($fontcord))
@@ -876,22 +893,15 @@ function showCodeImage($code)
 
 			if (!$can_do_ttf)
 			{
-				// Rotating the characters a little...
-				if (function_exists('imagerotate'))
-				{
-					$char_image = $gd2 ? imagecreatetruecolor($character['width'], $character['height']) : imagecreate($character['width'], $character['height']);
-					$char_bgcolor = imagecolorallocate($char_image, $background_color[0], $background_color[1], $background_color[2]);
-					imagefilledrectangle($char_image, 0, 0, $character['width'] - 1, $character['height'] - 1, $char_bgcolor);
-					imagechar($char_image, $loaded_fonts[$character['font']], 0, 0, $character['id'], imagecolorallocate($char_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
-					$rotated_char = imagerotate($char_image, mt_rand(-100, 100) / 10, $char_bgcolor);
-					imagecopy($code_image, $rotated_char, $cur_x, 0, 0, 0, $character['width'], $character['height']);
-					imagedestroy($rotated_char);
-					imagedestroy($char_image);
-				}
+				$char_image = $gd2 ? imagecreatetruecolor($character['width'], $character['height']) : imagecreate($character['width'], $character['height']);
+				$char_bgcolor = imagecolorallocate($char_image, $background_color[0], $background_color[1], $background_color[2]);
+				imagefilledrectangle($char_image, 0, 0, $character['width'] - 1, $character['height'] - 1, $char_bgcolor);
+				imagechar($char_image, $loaded_fonts[$character['font']], 0, 0, $character['id'], imagecolorallocate($char_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
+				$rotated_char = imagerotate($char_image, mt_rand(-100, 100) / 10, $char_bgcolor);
+				imagecopy($code_image, $rotated_char, $cur_x, 0, 0, 0, $character['width'], $character['height']);
+				imagedestroy($rotated_char);
+				imagedestroy($char_image);
 
-				// Sorry, no rotation available.
-				else
-					imagechar($code_image, $loaded_fonts[$character['font']], $cur_x, floor(($max_height - $character['height']) / 2), $character['id'], imagecolorallocate($code_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
 				$cur_x += $character['width'] + $character_spacing;
 			}
 		}
@@ -954,15 +964,15 @@ function showCodeImage($code)
 	}
 
 	// Show the image.
-	if (function_exists('imagegif'))
-	{
-		header('Content-type: image/gif');
-		imagegif($code_image);
-	}
-	else
+	if (function_exists('imagepng'))
 	{
 		header('Content-type: image/png');
 		imagepng($code_image);
+	}
+	else
+	{
+		header('Content-type: image/gif');
+		imagegif($code_image);
 	}
 
 	// Bail out.
