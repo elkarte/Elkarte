@@ -1553,3 +1553,32 @@ function countInactiveMembers()
 
 	return $inactive_members;
 }
+/**
+ * Get the member's id and group
+ *
+ * @param string $name
+ * @return array
+ */
+function getMemberByName($name)
+{
+	global $smcFunc;
+
+	$member = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, id_group
+		FROM {db_prefix}members
+		WHERE real_name = {string:name}
+		LIMIT 1',
+		array(
+			'name' => $name,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) == 0)
+		fatal_lang_error('error_member_not_found');
+
+	list ($member['id_member'], $member['id_group']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $member;
+}
