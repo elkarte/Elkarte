@@ -201,18 +201,9 @@ class ManagePermissions_Controller
 		$normalGroups = array();
 
 		// Query the database defined membergroups.
-		$query = $smcFunc['db_query']('', '
-			SELECT id_group, id_parent, group_name, min_posts, online_color, icons
-			FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-			WHERE min_posts = {int:min_posts}' : '') . '
-			ORDER BY id_parent = {int:not_inherited} DESC, min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'min_posts' => -1,
-				'not_inherited' => -2,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($query))
+		$groupData = getMembergroups();
+		
+		foreach ($groupData as $row)
 		{
 			// If it's inherited, just add it as a child.
 			if ($row['id_parent'] != -2)
@@ -248,7 +239,6 @@ class ManagePermissions_Controller
 			else
 				$postGroups[$row['id_group']] = $row['id_group'];
 		}
-		$smcFunc['db_free_result']($query);
 
 		// Get the number of members in this post group.
 		$groups = membersInGroups($postGroups, $normalGroups, true);

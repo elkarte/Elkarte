@@ -998,3 +998,43 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 
 	return $groups;
 }
+
+/**
+ * Gets a list of membergroups
+ *
+ * @todo: Merge with getBasicMembergroupData();
+ * @return groups
+ */
+function getMembergroups()
+{
+	global $smcFunc, $modSettings;
+
+	$groups = array();
+
+	// Query the database defined membergroups.
+	$query = $smcFunc['db_query']('', '
+		SELECT id_group, id_parent, group_name, min_posts, online_color, icons
+		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
+		WHERE min_posts = {int:min_posts}' : '') . '
+		ORDER BY id_parent = {int:not_inherited} DESC, min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		array(
+			'min_posts' => -1,
+			'not_inherited' => -2,
+			'newbie_group' => 4,
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($query))
+	{
+		$groups[$row['id_groups']] = array(
+			'id_group' => $row['id_group'],
+			'id_parent' => $row['id_parent'],
+			'group_name' => $row['group_name'],
+			'min_posts' => $row['min_posts'],
+			'online_color' => $row['min_posts'],
+			'icons' => $row['icons'],
+		);
+	}
+
+	return $groups;
+}
