@@ -1,3 +1,14 @@
+/**
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * This file contains javascript associated with the drafts auto function as it
+ * relates to an sceditor invocation
+ */
+
 (function($, window, document) {
 	'use strict';
 
@@ -83,7 +94,7 @@
 		// Still saving the last one or some other?
 		if (this.opts._bInDraftMode)
 			this.draftCancel;
-		
+
 		// Nothing to save
 		var sPostdata = base.val();
 		if (isEmptyText(sPostdata))
