@@ -606,6 +606,7 @@ $txt['defaultMaxMessages'] = 'Number of posts per page in a topic page';
 $txt['disable_print_topic'] = 'Disable print topic feature';
 $txt['hotTopicPosts'] = 'Number of posts for a hot topic';
 $txt['hotTopicVeryPosts'] = 'Number of posts for a very hot topic';
+$txt['useLikesNotViews'] = 'Use number of likes in place of posts to define hot topics';
 $txt['enableAllMessages'] = 'Max topic size to show &quot;All&quot; posts';
 $txt['enableAllMessages_zero'] = '0 to never show &quot;All&quot;';
 $txt['disableCustomPerPage'] = 'Disable user defined topic/message count per page';

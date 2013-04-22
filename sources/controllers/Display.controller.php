@@ -353,8 +353,8 @@ function Display()
 	// Information about the current topic...
 	$context['is_locked'] = $topicinfo['locked'];
 	$context['is_sticky'] = $topicinfo['is_sticky'];
-	$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
-	$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
+	$context['is_hot'] = !empty($modSettings['useLikesNotViews']) ? $topicinfo['num_likes'] >= $modSettings['hotTopicPosts'] : $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
+	$context['is_very_hot'] = !empty($modSettings['useLikesNotViews']) ? $topicinfo['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 	$context['is_approved'] = $topicinfo['approved'];
 
 	// @todo Tricks? We don't want to show the poll icon in the topic class here, so pretend it's not one.
