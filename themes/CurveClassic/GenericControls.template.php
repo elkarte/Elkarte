@@ -36,8 +36,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
-					plugins: "bbcode",
-					enablePasteFiltering: true,
+					plugins: "bbcode, draft",
+					enablePasteFiltering: true,', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? '
+					draftOptions: {
+						sLastNote: \'draft_lastautosave\',
+						sSceditorID: \'' . $context['post_box_name'] . '\',
+						sType: \'post\',
+						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
+						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
+						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
+					},' : ''), '
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
@@ -173,25 +181,14 @@ function template_control_richedit_buttons($editor_id)
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 
-		// Start an instance of the auto saver if its enabled
+		// Set a a div to show the draft save status
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
 		<br />
 		<span class="righttext padding" style="display: block">
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
-		</span>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new elk_DraftAutoSave({
-				sSelf: \'oDraftAutoSave\',
-				sLastNote: \'draft_lastautosave\',
-				sLastID: \'id_draft\',
-				sSceditorID: \'', $context['post_box_name'], '\',
-				sType: \'post\',
-				iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
-				iFreq: ', $context['drafts_autosave_frequency'], '
-			});
-		// ]]></script>';
+		</span>';
 	}
 
 	if (!empty($context['drafts_pm_save']))
@@ -207,19 +204,7 @@ function template_control_richedit_buttons($editor_id)
 		<span class="righttext padding" style="display: block">
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
-		</span>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oDraftAutoSave = new elk_DraftAutoSave({
-				sSelf: \'oDraftAutoSave\',
-				sLastNote: \'draft_lastautosave\',
-				sLastID: \'id_pm_draft\',
-				sSceditorID: \'', $context['post_box_name'], '\',
-				sType: \'post\',
-				bPM: true,
-				iBoard: 0,
-				iFreq: ', $context['drafts_autosave_frequency'], '
-			});
-		// ]]></script>';
+		</span>';
 	}
 }
 

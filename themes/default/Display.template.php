@@ -613,7 +613,7 @@ function template_main()
 		echo '
 		<br class="clear" />';
 
-	// draft autosave available and the user has it enabled?
+	// Draft autosave available, the user has it enabled, and not using sceditor?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
 			<script><!-- // --><![CDATA[
@@ -621,8 +621,6 @@ function template_main()
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',
-					sSceditorID: ' . (!empty($context['post_box_name']) ? "'" . $context['post_box_name'] . "'" : "null") . ',
-					sType: \'', (!empty($options['use_editor_quick_reply']) ? 'qpost' : 'quick'), '\',
 					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});
