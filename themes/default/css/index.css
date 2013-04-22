@@ -4269,6 +4269,7 @@ tr.windowbg2 .stats_day {
 }
 .table_grid tr.catbg th.stats {
 	text-align: center;
+	white-space: nowrap;
 }
 .table_grid tr.catbg th.centertext, .table_grid tr.windowbg2 td.centertext, .table_grid tr.windowbg td.centertext, .table_grid tr.highlight2 td.centertext {
 	text-align: center;
