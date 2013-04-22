@@ -862,124 +862,134 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 }
 
 /**
- * Gets basich membergroup data
- * type needs to be 'standard' or 'all' 
- * - 'standard' lists all self created groups
- * - 'extended' lists all groups including the system groups such as admin or global moderator.
- * - 'permission' lists all permission based groups, ignores the local moderator
+ * Gets basic membergroup data
+ * 
+ * the $includes and $excludes array is used for granular filtering the output. We need to exclude
+ * groups sometimes because they are special ones. 
+ * Example: getBasicMembergroupData(array('admin', 'mod', 'globalmod'));
+ * $includes parameters:
+ * - 'admin' includes the admin: id_group = 1
+ * - 'mod' includes the local moderator: id_group = 3
+ * - 'globalmod' includes the global moderators: id_group = 2
+ * - 'member' includes the ungrouped users from id_group = 0
+ * - 'postgroups' includes the post based membergroups
+ * - 'protected' includes protected groups
+ * - 'all' lists all groups
+ * @excludes parameters:
+ * - 'newbie' excludes the newbie group id_group 4
+ * - 'custom' lists only the system based groups (id 0, 1, 2, 3)
+ * - 'membergroups' excludes permission groups, lists the post based membergroups
+ * - 'hidden' excludes hidden groups
  *
- * @param string $type
+ * @param array $includes
+ * @param array $excludes
+ * @param string $sort_order
+ * @param bool $split, splits postgroups and membergroups
  * @return type
  */
-function getBasicMembergroupData($type = 'standard')
+function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
 {
 	global $smcFunc, $txt, $modSettings;
 
+	//No $includes parameters given? Let's set some default values
+	if(empty($includes))
+		$includes = array('globalmod', 'member', 'postgroups');
+
 	$groups = array();
-	
-	switch ($type)
-	{
-		case 'standard':
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name
-				FROM {db_prefix}membergroups
-				WHERE (id_group > {int:moderator_group} OR id_group = {int:global_mod_group})' . (empty($modSettings['permission_enable_postgroups']) ? '
-					AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
-					AND group_type != {int:is_protected}') . '
-				ORDER BY min_posts, id_group != {int:global_mod_group}, group_name',
-				array(
-					'moderator_group' => 3,
-					'global_mod_group' => 2,
-					'min_posts' => -1,
-					'is_protected' => 1,
-				)
-			);
-			break;
 
-		case 'all':
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name
-				FROM {db_prefix}membergroups',
-				array(
-				)
-			);
-			$groups[] = array(
-				'id' => 0,
-				'name' => $txt['maintain_members_ungrouped']
-			);
-			break;
-		case 'permission':
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name
-				FROM {db_prefix}membergroups
-				WHERE id_group != {int:moderator_group}
-					AND min_posts = {int:min_posts}',
-				array(
-					'moderator_group' => 3,
-					'min_posts' => -1,
-				)
-			);
-		default:
-			trigger_error('getBasicMembergroupData(): Invalid group type \'' . $type . '\'', E_USER_NOTICE);
-	}
+	$where = '';
+	$sort_order = isset($sort_order) ? $sort_order : 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$groups[] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name']
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $groups;
-}
-
-/**
- * Retrieves postgroups and membergroups from the membergroups table
- * except the moderator and the newbie group
- *
- * @todo: merge with getBasicMembergroupData();
- * @return array
- */
-function retrieveMembergroups()
-{
-	global $smcFunc, $txt;
-
-	$groups = array(
-		'membergroups' => array(),
-		'postgroups' => array(),
-	);
-
-	// Retrieving the membergroups and postgroups.
-	$groups['membergroups'] = array(
-		array(
-			'id' => 0,
-			'name' => $txt['membergroups_members'],
-			'can_be_additional' => false
-		)
-	);
+	// Do we need the post based membergroups?
+	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $includes) ? '' : 'AND min_posts = {int:min_posts}';
+	// Include protected groups?
+	$where .= allowedTo('admin_forum') || in_array('protected', $includes) ? '' : ' AND group_type != {int:is_protected}';
+	// Include the global moderators?
+	$where .= in_array('globalmod', $includes) ? '' : ' AND id_group != {int:global_mod_group}';
+	// Include the admins?
+	$where .= in_array('admin', $includes) ? '' : ' AND id_group != {int:admin_group}';
+	// Local Moderators?
+	$where .= in_array('mod', $includes) ? '' : ' AND id_group != {int:moderator_group}';
+	// Ignore the first post based group?
+	$where .= in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
+	// Exclude custom groups?
+	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
+	// Exclude hidden?
+	$where .= !in_array('hidden', $excludes) ? '' : ' AND hidden != {int:hidden_group}';
+	// Only the post based membergroups? We can safely overwrite the $where.
+	if (in_array('membergroups', $excludes))
+		$where = ' AND min_posts != {int:min_posts}';
+	// Simply all of them?
+	if (in_array('all', $includes))
+			$where = '';
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_group, group_name, min_posts
 		FROM {db_prefix}membergroups
-		WHERE id_group != {int:moderator_group}
-		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		WHERE 1 = 1 
+			' . $where . '
+		ORDER BY ' . $sort_order,
 		array(
+			'admin_group' => 1,
 			'moderator_group' => 3,
+			'global_mod_group' => 2,
+			'min_posts' => -1,
+			'is_protected' => 1,
 			'newbie_group' => 4,
+			'hidden_group' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+
+	// Include the default membergroup? the ones with id_member = 0
+	if(in_array('member', $includes) && !isset($split))
+		$groups[] = array(
+			'id' => 0,
+			'name' => $txt['membergroups_members']
+		);
+
+	if (isset($split))
 	{
-		if ($row['min_posts'] == -1)
-			$groups['membergroups'][] = array(
+		if (empty($modSettings['permission_enable_postgroups']))
+		{
+			$groups['groups'][0] = array(
+				'id' => 0,
+				'name' => $txt['membergroups_members'],
+				'can_be_additional' => false,
+				'member_count' => 0,
+			);
+			$groups['membergroups'][0] = array(
+				'id' => 0,
+				'name' => $txt['membergroups_members'],
+				'can_be_additional' => false,
+				'member_count' => 0,
+			);
+		}
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$groups['groups'][$row['id_group']] = array(
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
-				'can_be_additional' => true
+				'member_count' => 0,
 			);
-		else
-			$groups['postgroups'][] = array(
+
+			if ($row['min_posts'] == -1)
+				$groups['membergroups'][] =  array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name'],
+					'can_be_additional' => true,
+				);
+			else
+				$groups['postgroups'][] =  array(
+					'id' => $row['id_group'],
+					'name' => $row['group_name'],
+				);
+		}
+	}
+	
+	else
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$groups[] = array(
 				'id' => $row['id_group'],
 				'name' => $row['group_name']
 			);

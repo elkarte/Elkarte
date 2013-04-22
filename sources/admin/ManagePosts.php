@@ -39,9 +39,9 @@ class ManagePosts_Controller
 	 * Accessed from ?action=admin;area=postsettings.
 	 * Requires (and checks for) the admin_forum permission.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Make sure you can be here.
 		isAllowedTo('admin_forum');
@@ -107,9 +107,9 @@ class ManagePosts_Controller
 	 *
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
-	function action_censor()
+	public function action_censor()
 	{
-		global $txt, $modSettings, $context, $smcFunc;
+		global $txt, $modSettings, $context;
 
 		if (!empty($_POST['save_censor']))
 		{
@@ -201,9 +201,9 @@ class ManagePosts_Controller
 	 *
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
-	function action_postSettings_display()
+	public function action_postSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc, $db_prefix, $db_type;
+		global $context, $txt, $modSettings, $scripturl, $db_type;
 
 		// initialize the form
 		$this->_initPostSettingsForm();
@@ -224,9 +224,8 @@ class ManagePosts_Controller
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
 			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && $db_type == 'mysql')
 			{
-				db_extend('packages');
-
-				$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+				require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
 					if ($column['name'] == 'body')
 						$body_type = $column['type'];
@@ -259,7 +258,7 @@ class ManagePosts_Controller
 	 *
 	 * @return array
 	 */
-	function _initPostSettingsForm()
+	private function _initPostSettingsForm()
 	{
 		global $txt;
 
@@ -296,7 +295,7 @@ class ManagePosts_Controller
 	 *
 	 * @return array
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 

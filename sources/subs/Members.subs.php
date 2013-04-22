@@ -1553,7 +1553,6 @@ function countInactiveMembers()
 
 	return $inactive_members;
 }
-
 /**
  * Get the member's id and group
  *
