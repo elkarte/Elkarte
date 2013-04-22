@@ -362,7 +362,7 @@ $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml
 	and similar data.  It is also recommended that you limit the size of recent posts/news because, when rss data
 	is displayed in some clients, like Trillian, it is expected to be truncated.';
 $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the state of a &quot;hot&quot; or
-	&quot;very hot&quot; topic.';
+	&quot;very hot&quot; topic.  Select the likes option to base this state on the number of likes instead of the number of posts';
 $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
 	Your site is at http://www.sitename.org/,<br />
 	And your forum is at http://forum.sitename.org/,<br />
