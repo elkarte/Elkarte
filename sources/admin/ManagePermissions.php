@@ -619,13 +619,14 @@ class ManagePermissions_Controller
 	 */
 	public function action_modify2()
 	{
-		global $smcFunc, $context;
+		global $context;
 
 		checkSession();
 		validateToken('admin-mp');
 
 		// we'll need to init illegal permissions, update child permissions, etc.
 		require_once(SUBSDIR . '/Permission.subs.php');
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		loadIllegalPermissions();
 
@@ -672,7 +673,7 @@ class ManagePermissions_Controller
 							if (!empty($context['illegal_permissions']) && in_array($permission, $context['illegal_permissions']))
 								continue;
 
-							$givePerms[$perm_type][] = array($_GET['group'], $permission, $value == 'deny' ? 0 : 1);
+							$givePerms[$perm_type][] = array($permission, $_GET['group'], $value == 'deny' ? 0 : 1);
 						}
 				}
 			}
@@ -681,11 +682,10 @@ class ManagePermissions_Controller
 		// Insert the general permissions.
 		if ($_GET['group'] != 3 && empty($_GET['pid']))
 		{
-			deleteIllegalPermissions($_GET['group'], $context['illegal_permissions']);
+			deleteInvalidPermissions($_GET['group'], $context['illegal_permissions']);
 
 			if (!empty($givePerms['membergroup']))
 				replacePermission($givePerms['membergroup']);
-
 		}
 
 		// Insert the boardpermissions.

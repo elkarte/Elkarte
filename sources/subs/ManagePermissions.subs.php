@@ -738,7 +738,7 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
 			. (!isset($hidden_permissions) ? '' : ' AND permission NOT IN ({array_string:hidden_permissions})') . '
 		GROUP BY ' . (isset($profile_id) ? 'id_profile, ' : '') . 'id_group, add_deny',
 		array(
-			'hidden_permissions' => !isset($hidden_permissions) ? $hidden_permissions : array(),
+			'hidden_permissions' => !empty($hidden_permissions) ? $hidden_permissions : array(),
 			'current_profile' => $profile_id,
 		)
 	);
@@ -992,7 +992,7 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 	return $permissions;
 }
 
-function deleteIllegalPermissions($id_group, $illegal_permissions)
+function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
 	global $smcFunc;
 
