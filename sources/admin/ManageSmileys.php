@@ -1676,7 +1676,6 @@ class ManageSmileys_Controller
 			if (isset($smileys[strtolower($duplicate)]))
 				unset($smileys[strtolower($duplicate)]);
 
-
 		$smiley_order = getMaxSmileyOrder();
 
 		$new_smileys = array();
