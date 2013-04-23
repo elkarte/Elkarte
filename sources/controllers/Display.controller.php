@@ -144,21 +144,11 @@ function Display()
 	else
 		$context['total_visible_posts'] = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
+	require_once(SUBSDIR . '/Messages.subs.php');
 	// When was the last time this topic was replied to?  Should we warn them about it?
-	$request = $smcFunc['db_query']('', '
-		SELECT poster_time
-		FROM {db_prefix}messages
-		WHERE id_msg = {int:id_last_msg}
-		LIMIT 1',
-		array(
-			'id_last_msg' => $topicinfo['id_last_msg'],
-		)
-	);
+	$mgsOptions = getMessageInfo($topicinfo['id_last_msg'], true);
 
-	list ($lastPostTime) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	$context['oldTopicError'] = !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
+	$context['oldTopicError'] = !empty($modSettings['oldTopicDays']) && $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 
 	// The start isn't a number; it's information about what to do, where to go.
 	if (!is_numeric($_REQUEST['start']))
@@ -1271,19 +1261,10 @@ function action_quickmod2()
 		redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 	if (isset($_REQUEST['split_selection']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT subject
-			FROM {db_prefix}messages
-			WHERE id_msg = {int:message}
-			LIMIT 1',
-			array(
-				'message' => min($messages),
-			)
-		);
-		list($subname) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$mgsOptions = getMessageInfo(min($messages), true);
+
 		$_SESSION['split_selection'][$topic] = $messages;
-		redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($subname) . ';' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	// Allowed to delete any message?

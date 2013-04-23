@@ -1214,19 +1214,11 @@ function action_post2()
 	{
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, poster_name, poster_email, poster_time, approved
-			FROM {db_prefix}messages
-			WHERE id_msg = {int:id_msg}
-			LIMIT 1',
-			array(
-				'id_msg' => $_REQUEST['msg'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$msgInfo = getMessageInfo($_REQUEST['msg'], true);
+
+		if (empty($msgInfo))
 			fatal_lang_error('cant_find_messages', false);
-		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
 
 		if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
 			fatal_lang_error('topic_locked', false);
@@ -1258,9 +1250,9 @@ function action_post2()
 		if (isset($_POST['sticky']) && (!allowedTo('make_sticky') || $_POST['sticky'] == $topic_info['is_sticky']))
 			unset($_POST['sticky']);
 
-		if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
+		if ($msgInfo['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 		{
-			if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+			if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				fatal_lang_error('modify_post_time_passed', false);
 			elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
 				isAllowedTo('modify_replies');
@@ -1279,7 +1271,7 @@ function action_post2()
 			isAllowedTo('modify_any');
 
 			// Log it, assuming you're not modifying your own post.
-			if ($row['id_member'] != $user_info['id'])
+			if ($msgInfo['id_member'] != $user_info['id'])
 				$moderationAction = true;
 		}
 
@@ -1290,17 +1282,17 @@ function action_post2()
 			return action_post();
 		}
 
-		$posterIsGuest = empty($row['id_member']);
+		$posterIsGuest = empty($msgInfo['id_member']);
 
 		// Can they approve it?
 		$can_approve = allowedTo('approve_posts');
-		$becomesApproved = $modSettings['postmod_active'] ? ($can_approve && !$row['approved'] ? (!empty($_REQUEST['approve']) ? 1 : 0) : $row['approved']) : 1;
-		$approve_has_changed = $row['approved'] != $becomesApproved;
+		$becomesApproved = $modSettings['postmod_active'] ? ($can_approve && !$msgInfo['approved'] ? (!empty($_REQUEST['approve']) ? 1 : 0) : $msgInfo['approved']) : 1;
+		$approve_has_changed = $msgInfo['approved'] != $becomesApproved;
 
 		if (!allowedTo('moderate_forum') || !$posterIsGuest)
 		{
-			$_POST['guestname'] = $row['poster_name'];
-			$_POST['email'] = $row['poster_email'];
+			$_POST['guestname'] = $msgInfo['poster_name'];
+			$_POST['email'] = $msgInfo['poster_email'];
 		}
 	}
 
@@ -1308,7 +1300,7 @@ function action_post2()
 	if (allowedTo('approve_posts'))
 	{
 		$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
-		$approve_has_changed = isset($row['approved']) ? $row['approved'] != $becomesApproved : false;
+		$approve_has_changed = isset($msgInfo['approved']) ? $msgInfo['approved'] != $becomesApproved : false;
 	}
 
 	// If the poster is a guest evaluate the legality of name and email.
@@ -1325,7 +1317,7 @@ function action_post2()
 		if (empty($modSettings['guest_post_no_email']))
 		{
 			// Only check if they changed it!
-			if (!isset($row) || $row['poster_email'] != $_POST['email'])
+			if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
 			{
 				if (!allowedTo('moderate_forum') && (!isset($_POST['email']) || $_POST['email'] == ''))
 					$post_errors->addError('no_email');
@@ -1407,7 +1399,7 @@ function action_post2()
 	{
 		// If user is a guest, make sure the chosen name isn't taken.
 		require_once(SUBSDIR . '/Members.subs.php');
-		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($row['poster_name']) || $_POST['guestname'] != $row['poster_name']))
+		if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] != $msgInfo['poster_name']))
 			$post_errors->addError('bad_name');
 	}
 	// If the user isn't a guest, get his or her name and email.
@@ -1648,7 +1640,7 @@ function action_post2()
 	if (!empty($_REQUEST['msg']))
 	{
 		// Have admins allowed people to hide their screwups?
-		if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $user_info['id'] != $row['id_member'])
+		if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $user_info['id'] != $msgInfo['id_member'])
 		{
 			$msgOptions['modify_time'] = time();
 			$msgOptions['modify_name'] = $user_info['name'];
