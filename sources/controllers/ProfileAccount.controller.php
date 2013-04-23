@@ -313,30 +313,18 @@ function action_issuewarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// Are they warning because of a message?
 	if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT subject
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE id_msg = {int:message}
-				AND {query_see_board}
-			LIMIT 1',
-			array(
-				'message' => (int) $_REQUEST['msg'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$message = getExistingMessage((int) $_REQUEST['msg']);
+		if (!empty($message))
 		{
 			$context['warning_for_message'] = (int) $_REQUEST['msg'];
-			list ($context['warned_message_subject']) = $smcFunc['db_fetch_row']($request);
+			$context['warned_message_subject'] = $message['subject'];
 		}
-		$smcFunc['db_free_result']($request);
-
 	}
 
 	// Didn't find the message?
