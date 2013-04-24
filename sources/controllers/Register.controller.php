@@ -337,16 +337,13 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
 			$_POST['secret_answer'] = md5($_POST['secret_answer']);
 
-		// Needed for isReservedName() and registerMember().
-		require_once(SUBSDIR . '/Members.subs.php');
+		// It takes care of include Members.subs.php
+		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Validation... even if we're not a mall.
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
-		{
-			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
+			if (validateUsername(0, $_POST['real_name'], true, true, 60) === null)
 				$possible_strings[] = 'real_name';
-		}
 
 		// Handle a string as a birthdate...
 		if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')

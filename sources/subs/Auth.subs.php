@@ -438,14 +438,14 @@ function resetPassword($memID, $username = null)
  * @param boolean $check_reserved_name
  * @return string Returns null if fine
  */
-function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true)
+function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true, $max_lenght = 25)
 {
 	global $txt;
 
 	$errors = error_context::context($error_context, 0);
 
 	// Don't use too long a name.
-	if (Util::strlen($username) > 25)
+	if (Util::strlen($username) > $max_lenght)
 		$errors->addError('error_long_name');
 
 	// No name?!  How can you register with no name?
