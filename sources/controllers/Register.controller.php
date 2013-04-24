@@ -542,6 +542,11 @@ class Register_Controller extends Action_Controller
 		}
 		else
 		{
+			if (!empty($modSettings['tag_users']))
+			{
+				require_once(SUBSDIR . '/TagUsers.subs.php');
+				rebuildMembersCache(substr($regOptions['username'], 0, 2));
+			}
 			call_integration_hook('integrate_activate', array($regOptions['username']));
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, sha1(sha1(strtolower($regOptions['username']) . $regOptions['password']) . $regOptions['register_vars']['password_salt']));
@@ -683,6 +688,12 @@ class Register_Controller extends Action_Controller
 			$context['member_id'] = $row['id_member'];
 
 			return;
+		}
+
+		if (!empty($modSettings['tag_users']))
+		{
+			require_once(SUBSDIR . '/TagUsers.subs.php');
+			rebuildMembersCache(substr($row['member_name'], 0, 2));
 		}
 
 		// Let the integration know that they've been activated!

@@ -563,6 +563,11 @@ class ProfileAccount_Controller extends Action_Controller
 				redirectexit();
 			}
 
+			if (!empty($modSettings['tag_users']))
+			{
+				require_once(SUBSDIR . '/TagUsers.subs.php');
+				rebuildMembersCache(substr($user_profile[$memID]['member_name'], 0, 2));
+			}
 			// Let the integrations know of the activation.
 			call_integration_hook('integrate_activate', array($user_profile[$memID]['member_name']));
 
