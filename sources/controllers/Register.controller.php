@@ -337,6 +337,9 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
 			$_POST['secret_answer'] = md5($_POST['secret_answer']);
 
+		// Needed for isReservedName() and registerMember().
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		// It takes care of include Members.subs.php
 		require_once(SUBSDIR . '/Auth.subs.php');
 
