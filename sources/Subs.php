@@ -1581,6 +1581,19 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'block_level' => true,
 			),
 			array(
+				'tag' => 'tagged',
+				'type' => 'unparsed_equals',
+				'before' => '<a href="$1">@',
+				'after' => '</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					global $scripturl;
+
+					$data = $scripturl . \'?action=profile;u=\' . $data;
+				'),
+				'quoted' => 'optional',
+				'disabled_after' => ' ($1)',
+			),
+			array(
 				'tag' => 'td',
 				'before' => '<td>',
 				'after' => '</td>',
