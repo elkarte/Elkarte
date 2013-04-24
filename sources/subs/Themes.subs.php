@@ -245,3 +245,33 @@ function getThemesPathbyID($theme_list = array())
 
 	return $theme_paths;
 }
+
+/**
+ * Load the installed themes
+ * (minimum data)
+ */
+function loadThemes($knownThemes)
+{
+	global $smcFunc;
+
+	// Load up all the themes.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_theme, value AS name
+		FROM {db_prefix}themes
+		WHERE variable = {string:name}
+			AND id_member = {int:no_member}
+		ORDER BY id_theme',
+		array(
+			'no_member' => 0,
+			'name' => 'name',
+		)
+	);
+	$themes = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$themes[] = array(
+			'id' => $row['id_theme'],
+			'name' => $row['name'],
+			'known' => in_array($row['id_theme'], $knownThemes),
+		);
+	$smcFunc['db_free_result']($request);
+}
