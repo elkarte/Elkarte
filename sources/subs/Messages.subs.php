@@ -83,6 +83,39 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 }
 
 /**
+ * Get some basic info of a certain message
+ *
+ * @param int $id_msg
+ */
+function getMessageInfo($id_msg, $override_permissions = false)
+{
+	global $smcFunc, $modSettings;
+
+	if (empty($id_msg))
+		return false;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			m.id_member, m.id_topic, m.id_board,
+			m.body, m.subject,
+			m.poster_name, m.poster_email, m.poster_time,
+			m.approved
+		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
+		WHERE id_msg = {int:message}
+		LIMIt 1',
+		array(
+			'message' => $id_msg,
+		)
+	);
+
+	$row = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return empty($row) ? false : $row;
+}
+
+/**
  * Checks permissions to modify a message.
  * This function will give a fatal error if the current user
  * doesn't have permissions to modify the message.

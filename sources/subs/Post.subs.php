@@ -1098,15 +1098,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// using a custom search index, then lets get the old message so we can update our index as needed
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT body
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_msg' => $msgOptions['id'],
-				)
-			);
-			list ($msgOptions['old_body']) = $smcFunc['db_fetch_row']($request);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$message = getExistingMessage($msgOptions['id'], true);
+			$msgOptions['old_body'] = $message['body'];
 			$smcFunc['db_free_result']($request);
 		}
 	}

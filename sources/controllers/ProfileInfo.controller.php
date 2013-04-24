@@ -315,16 +315,8 @@ function action_showPosts($memID)
 		checkSession('get');
 
 		// We need msg info for logging.
-		$request = $smcFunc['db_query']('', '
-			SELECT subject, id_member, id_topic, id_board
-			FROM {db_prefix}messages
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_msg' => (int) $_GET['delete'],
-			)
-		);
-		$info = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$info = getExistingMessage((int) $_GET['delete'], true);
 
 		// Trying to remove a message that doesn't exist.
 		if (empty($info))
@@ -335,8 +327,8 @@ function action_showPosts($memID)
 		removeMessage((int) $_GET['delete']);
 
 		// Add it to the mod log.
-		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info[1] != $user_info['id']))
-			logAction('delete', array('topic' => $info[2], 'subject' => $info[0], 'member' => $info[1], 'board' => $info[3]));
+		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info['id_member'] != $user_info['id']))
+			logAction('delete', array('topic' => $info['id_topic'], 'subject' => $info['subject'], 'member' => $info['id_member'], 'board' => $info['id_board']));
 
 		// Back to... where we are now ;).
 		redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
