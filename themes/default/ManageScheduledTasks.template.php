@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Template for listing all scheduled tasks.
+/**
+ * Template for listing all scheduled tasks.
+ */
 function template_view_scheduled_tasks()
 {
 	global $context, $txt;
@@ -29,7 +31,9 @@ function template_view_scheduled_tasks()
 	template_show_list('scheduled_tasks');
 }
 
-// A template for, you guessed it, editing a task!
+/**
+ * A template for, you guessed it, editing a task!
+ */
 function template_edit_scheduled_tasks()
 {
 	global $context, $txt, $scripturl;

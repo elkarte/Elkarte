@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the message index page.
+ */
 function template_main()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;

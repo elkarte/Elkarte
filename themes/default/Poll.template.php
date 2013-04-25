@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Interface to allow edit of a poll.
+ */
 function template_poll_edit()
 {
 	global $context, $txt;

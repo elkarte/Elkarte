@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Interface for the bit up the print page.
+ */
 function template_print_above()
 {
 	global $context, $txt, $topic, $scripturl;
@@ -123,6 +126,9 @@ function template_print_above()
 		<div id="posts">';
 }
 
+/**
+ * Interface for print page central view.
+ */
 function template_main()
 {
 	global $context, $txt, $scripturl, $topic;
@@ -170,6 +176,9 @@ function template_main()
 	}
 }
 
+/**
+ * Interface for the bit down the print page.
+ */
 function template_print_below()
 {
 	global $topic, $txt, $scripturl;
