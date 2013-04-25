@@ -101,7 +101,7 @@ function action_requestmembers()
 /**
  * Called by index.php?action=findmember.
  * This function result is used as a popup for searching members.
- * @uses sub template find_members of the Help template.
+ * @uses sub template find_members of the Members template.
  */
 function action_findmember()
 {
