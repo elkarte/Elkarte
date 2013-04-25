@@ -249,6 +249,8 @@ function getThemesPathbyID($theme_list = array())
 /**
  * Load the installed themes
  * (minimum data)
+ *
+ * @param array $knownThemes available themes
  */
 function loadThemes($knownThemes)
 {
