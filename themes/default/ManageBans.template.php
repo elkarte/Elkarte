@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template to edit bans
+ */
 function template_ban_edit()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -226,6 +229,9 @@ function template_ban_edit()
 		}// ]]></script>';
 }
 
+/**
+ * Template to edit ban triggers
+ */
 function template_ban_edit_trigger()
 {
 	global $context, $settings, $txt, $modSettings;
