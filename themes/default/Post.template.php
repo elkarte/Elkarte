@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The main template for the post page.
+/**
+ * The main template for the post page.
+ */
 function template_main()
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings, $counter;
@@ -151,7 +153,7 @@ function template_main()
 	if (!empty($context['show_boards_dropdown']))
 		echo '
 						<dt class="clear_left">
-							', $txt['post_in_board'], ': 
+							', $txt['post_in_board'], ':
 						</dt>
 						<dd>', template_select_boards('post_in_board'), '
 						</dd>';
@@ -634,7 +636,9 @@ function template_main()
 	}
 }
 
-// The template for the spellchecker.
+/**
+ * The template for the spellchecker.
+ */
 function template_spellcheck()
 {
 	global $context, $settings, $txt;
@@ -709,6 +713,9 @@ function template_spellcheck()
 </html>';
 }
 
+/**
+ * Interface to allow quote.
+ */
 function template_quotefast()
 {
 	global $context, $settings, $txt;

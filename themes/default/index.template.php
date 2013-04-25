@@ -193,6 +193,9 @@ function template_html_above()
 		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board']) : '', '">';
 }
 
+/**
+ * Section above the main contents of the page, after opening the body tag
+ */
 function template_body_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -375,6 +378,9 @@ function template_body_above()
 			<div id="main_content_section">';
 }
 
+/**
+ * Section down the page, before closing body
+ */
 function template_body_below()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -411,6 +417,9 @@ function template_body_below()
 	</div>';
 }
 
+/**
+ * Section down the page, at closing html tag
+ */
 function template_html_below()
 {
 	// load in any javascipt that could be defered to the end of the page

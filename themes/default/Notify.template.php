@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Interface to allow notification enable/disable.
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -32,6 +35,9 @@ function template_main()
 		</div>';
 }
 
+/**
+ * Interface for board notifications toggle.
+ */
 function template_notify_board()
 {
 	global $context, $settings, $txt, $scripturl;

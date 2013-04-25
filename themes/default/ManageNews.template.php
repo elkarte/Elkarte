@@ -14,6 +14,10 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the email to members page in admin panel.
+ * It allows to select members and membergroups.
+ */
 function template_email_members()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -190,6 +194,9 @@ function template_email_members()
 	// ]]></script>';
 }
 
+/**
+ * Template for the section to compose an email to members
+ */
 function template_email_members_compose()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -300,6 +307,9 @@ function template_email_members_compose()
 	</div>';
 }
 
+/**
+ * Template for sending an email to members
+ */
 function template_email_members_send()
 {
 	global $context, $settings, $txt, $scripturl;

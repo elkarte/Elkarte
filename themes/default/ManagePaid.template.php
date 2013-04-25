@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The template for adding or editing a subscription.
+/**
+ * The template for adding or editing a subscription.
+ */
 function template_modify_subscription()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -199,6 +201,9 @@ function template_modify_subscription()
 
 }
 
+/**
+ * Template to delete a paid subscription
+ */
 function template_delete_subscription()
 {
 	global $context, $scripturl, $txt;
@@ -223,7 +228,9 @@ function template_delete_subscription()
 
 }
 
-// Add or edit an existing subscriber.
+/**
+ * Add or edit an existing subscriber.
+ */
 function template_modify_user_subscription()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -391,7 +398,9 @@ function template_modify_user_subscription()
 		</div>';
 }
 
-// Template for a user to edit/pick their subscriptions.
+/**
+ * Template for a user to edit/pick their subscriptions.
+ */
 function template_user_subscription()
 {
 	global $context, $txt, $scripturl, $modSettings;
@@ -529,7 +538,9 @@ function template_user_subscription()
 	</div>';
 }
 
-// The "choose payment" dialog.
+/**
+ * The "choose payment" dialog.
+ */
 function template_choose_payment()
 {
 	global $context, $txt;
@@ -595,7 +606,9 @@ function template_choose_payment()
 	<br class="clear" />';
 }
 
-// The "thank you" bit...
+/**
+ * The "thank you" bit, when paid subscription is completed.
+ */
 function template_paid_done()
 {
 	global $context, $txt, $scripturl;

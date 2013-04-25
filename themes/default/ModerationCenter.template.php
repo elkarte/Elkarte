@@ -14,6 +14,10 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the main page of moderation center.
+ * It shows blocks with information.
+ */
 function template_moderation_center()
 {
 	global $context;
@@ -45,6 +49,9 @@ function template_moderation_center()
 					</div>';
 }
 
+/**
+ * Template to show latest news.
+ */
 function template_latest_news()
 {
 	global $settings, $txt, $scripturl;
@@ -86,7 +93,9 @@ function template_latest_news()
 
 }
 
-// Show all the group requests the user can see.
+/**
+ * Show all the group requests the user can see.
+ */
 function template_group_requests_block()
 {
 	global $context, $txt, $scripturl;
@@ -120,7 +129,9 @@ function template_group_requests_block()
 								</div>';
 }
 
-// A block to show the current top reported posts.
+/**
+ * A block to show the current top reported posts.
+ */
 function template_reported_posts_block()
 {
 	global $context, $txt, $scripturl;
@@ -312,7 +323,9 @@ function template_reported_posts()
 					</form>';
 }
 
-// Show a list of all the unapproved posts
+/**
+ * Show a list of all the unapproved posts
+ */
 function template_unapproved_posts()
 {
 	global $options, $context, $txt, $scripturl;
@@ -488,7 +501,11 @@ function template_viewmodreport()
 					</div>';
 }
 
-// Callback function for showing a watched users post in the table.
+/**
+ * Callback function for showing a watched users post in the table.
+ *
+ * @param int $post
+ */
 function template_user_watch_post_callback($post)
 {
 	global $scripturl, $context, $txt, $delete_button;
@@ -521,7 +538,9 @@ function template_user_watch_post_callback($post)
 	return $output_html;
 }
 
-// Moderation settings
+/**
+ * Moderation settings.
+ */
 function template_moderation_settings()
 {
 	global $context, $txt, $scripturl;
@@ -591,7 +610,9 @@ function template_moderation_settings()
 	</div>';
 }
 
-// Show a notice sent to a user.
+/**
+ * Show a notice sent to a user.
+ */
 function template_show_notice()
 {
 	global $txt, $settings, $context;
@@ -628,7 +649,9 @@ function template_show_notice()
 
 }
 
-// Add or edit a warning template.
+/**
+ * Add or edit a warning template.
+ */
 function template_warn_template()
 {
 	global $context, $txt, $scripturl;

@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// This is just the basic "login" form.
+/**
+ * This is just the basic "login" form.
+ */
 function template_login()
 {
 	global $context, $settings, $scripturl, $modSettings, $txt;
@@ -87,7 +89,9 @@ function template_login()
 		// ]]></script>';
 }
 
-// Tell a guest to get lost or login!
+/**
+ * Tell a guest to get lost or login!
+ */
 function template_kick_guest()
 {
 	global $context, $settings, $scripturl, $modSettings, $txt;
@@ -159,7 +163,9 @@ function template_kick_guest()
 		// ]]></script>';
 }
 
-// This is for maintenance mode.
+/**
+ * This is for maintenance mode.
+ */
 function template_maintenance()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -200,7 +206,9 @@ function template_maintenance()
 </form>';
 }
 
-// This is for the security stuff - makes administrators login every so often.
+/**
+ * This is for the security stuff - makes administrators login every so often.
+ */
 function template_admin_login()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -244,7 +252,9 @@ function template_admin_login()
 // ]]></script>';
 }
 
-// Activate your account manually?
+/**
+ * Activate your account manually?
+ */
 function template_retry_activate()
 {
 	global $context, $txt, $scripturl;
@@ -273,7 +283,9 @@ function template_retry_activate()
 		</form>';
 }
 
-// Activate your account manually?
+/**
+ * Activate your account manually?
+ */
 function template_resend()
 {
 	global $context, $txt, $scripturl;

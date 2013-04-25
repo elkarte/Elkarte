@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// This is the main sidebar for the personal messages section.
+/**
+ * This is the main sidebar for the personal messages section.
+ */
 function template_pm_above()
 {
 	global $context, $txt;
@@ -43,13 +45,18 @@ function template_pm_above()
 						</div>';
 }
 
-// Just the end of the index bar, nothing special.
+/**
+ * The end of the index bar, for personal messages page.
+ */
 function template_pm_below()
 {
 	echo '
 					</div>';
 }
 
+/**
+ * Messages folder.
+ */
 function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
@@ -560,7 +567,9 @@ function template_build_pmposter_div($message)
 	return $poster_div;
 }
 
-// Just list all the personal message subjects - to make templates easier.
+/**
+ * Just list all the personal message subjects - to make templates easier.
+ */
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -679,6 +688,9 @@ function template_subject_list()
 						</div>';
 }
 
+/**
+ * Page to search in PMs.
+ */
 function template_search()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -858,6 +870,9 @@ function template_search()
 	</form>';
 }
 
+/**
+ * Template for the results of search in PMs.
+ */
 function template_search_results()
 {
 	global $context, $scripturl, $txt;
@@ -1263,7 +1278,9 @@ function template_send()
 		// ]]></script>';
 }
 
-// This template asks the user whether they wish to empty out their folder/messages.
+/**
+ * This template asks the user whether they wish to empty out their folder/messages.
+ */
 function template_ask_delete()
 {
 	global $context, $scripturl, $txt;
@@ -1280,7 +1297,9 @@ function template_ask_delete()
 		</div>';
 }
 
-// This template asks the user what messages they want to prune.
+/**
+ * This template asks the user what messages they want to prune.
+ */
 function template_prune()
 {
 	global $context, $scripturl, $txt;
@@ -1300,7 +1319,9 @@ function template_prune()
 	</form>';
 }
 
-// Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
+/**
+ * Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
+ */
 function template_labels()
 {
 	global $context, $scripturl, $txt;
@@ -1396,7 +1417,9 @@ function template_labels()
 	</form>';
 }
 
-// Template for reporting a personal message.
+/**
+ * Template for reporting a personal message.
+ */
 function template_report_message()
 {
 	global $context, $txt, $scripturl;
@@ -1450,7 +1473,9 @@ function template_report_message()
 	</form>';
 }
 
-// Little template just to say "Yep, it's been submitted"
+/**
+ * Little template just to say "Yep, it's been submitted".
+ */
 function template_report_message_complete()
 {
 	global $context, $txt, $scripturl;
@@ -1542,7 +1567,9 @@ function template_rules()
 
 }
 
-// Template for adding/editing a rule.
+/**
+ * Template for adding/editing a rule.
+ */
 function template_add_rule()
 {
 	global $context, $txt, $scripturl;
@@ -1755,7 +1782,9 @@ function template_add_rule()
 		// ]]></script>';
 }
 
-// Template for showing all the PM drafts of the user.
+/**
+ * Template for showing all the PM drafts of the user.
+ */
 function template_showPMDrafts()
 {
 	global $context, $settings, $scripturl, $txt;

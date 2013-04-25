@@ -14,11 +14,18 @@
  * @version 1.0 Alpha
  */
 
-// Template template wraps around the simple settings page to add javascript functionality.
+/**
+ * Template template wraps around the simple settings page to add javascript functionality.
+ * (section below)
+ */
 function template_avatar_settings_above()
 {
 }
 
+/**
+ * Template template wraps around the simple settings page to add javascript functionality.
+ * (section above)
+ */
 function template_avatar_settings_below()
 {
 	echo '
@@ -37,6 +44,9 @@ function template_avatar_settings_below()
 ';
 }
 
+/**
+ * Forum maintenance page.
+ */
 function template_maintenance()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -195,6 +205,9 @@ function template_maintenance()
 			<br class="clear" />';
 }
 
+/**
+ * Repair attachments page
+ */
 function template_attachment_repair()
 {
 	global $context, $txt, $scripturl;
@@ -265,6 +278,9 @@ function template_attachment_repair()
 	}
 }
 
+/**
+ * Section on the page for attachments directories paths.
+ */
 function template_attach_paths()
 {
 	global $modSettings;
