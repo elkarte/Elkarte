@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Template for the database maintenance tasks.
+/**
+ * Template for the database maintenance tasks.
+ */
 function template_maintain_database()
 {
 	global $context, $settings, $txt, $scripturl, $db_type;
@@ -109,7 +111,9 @@ function template_maintain_database()
 	</div>';
 }
 
-// Template for the routine maintenance tasks.
+/**
+ * Template for the routine maintenance tasks.
+ */
 function template_maintain_routine()
 {
 	global $context, $txt, $scripturl;
@@ -198,7 +202,9 @@ function template_maintain_routine()
 	</div>';
 }
 
-// Template for the member maintenance tasks.
+/**
+ * Template for the member maintenance tasks.
+ */
 function template_maintain_members()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -365,7 +371,9 @@ function template_maintain_members()
 	// ]]></script>';
 }
 
-// Template for the topic maintenance tasks.
+/**
+ * Template for the topic maintenance tasks.
+ */
 function template_maintain_topics()
 {
 	global $scripturl, $txt, $context, $settings, $modSettings;
@@ -508,7 +516,9 @@ function template_maintain_topics()
 	</div>';
 }
 
-// Simple template for showing results of our optimization...
+/**
+ * Simple template for showing results of our optimization...
+ */
 function template_optimize()
 {
 	global $context, $txt, $scripturl;
@@ -541,6 +551,9 @@ function template_optimize()
 	</div>';
 }
 
+/**
+ * Template for maintenance conversion of messages body to several conditions
+ */
 function template_convert_msgbody()
 {
 	global $context, $txt, $scripturl;

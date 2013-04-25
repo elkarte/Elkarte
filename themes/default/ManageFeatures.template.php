@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Template for showing custom profile fields.
+/**
+ * Template for showing custom profile fields.
+ */
 function template_show_custom_profile()
 {
 	// Standard fields.
@@ -32,7 +34,9 @@ function template_show_custom_profile()
 	template_show_list('custom_profile_fields');
 }
 
-// Edit a profile field?
+/**
+ * Template to edit a profile field
+ */
 function template_edit_profile_field()
 {
 	global $context, $txt, $settings, $scripturl;
