@@ -14,6 +14,10 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the section that allows to modify weights for search settings
+ * in admin panel.
+ */
 function template_modify_weights()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -92,6 +96,10 @@ function template_modify_weights()
 	</div>';
 }
 
+/**
+ * Template for the section to select a search method
+ * in search area of admin panel.
+ */
 function template_select_search_method()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -223,6 +231,9 @@ function template_select_search_method()
 	</div>';
 }
 
+/**
+ * Template to create a search index.
+ */
 function template_create_index()
 {
 	global $context, $scripturl, $txt;
@@ -256,6 +267,9 @@ function template_create_index()
 	</div>';
 }
 
+/**
+ * Template to show progress during creation of a search index.
+ */
 function template_create_index_progress()
 {
 	global $context, $scripturl, $txt;
@@ -311,7 +325,9 @@ function template_create_index_done()
 	</div>';
 }
 
-// Add or edit a search engine spider.
+/**
+ * Add or edit a search engine spider.
+ */
 function template_spider_edit()
 {
 	global $context, $scripturl, $txt;
@@ -359,7 +375,9 @@ function template_spider_edit()
 	</div>';
 }
 
-// Show... spider... logs...
+/**
+ * Spider logs page.
+ */
 function template_show_spider_logs()
 {
 	global $context, $txt, $scripturl;
@@ -390,7 +408,9 @@ function template_show_spider_logs()
 	</div>';
 }
 
-// Show... spider... stats...
+/**
+ * Spider stats section.
+ */
 function template_show_spider_stats()
 {
 	global $context, $txt, $scripturl;
@@ -422,7 +442,9 @@ function template_show_spider_stats()
 	</div>';
 }
 
-// the settings page for sphinx search
+/**
+ * The settings page for sphinx search
+ */
 function template_manage_sphinx()
 {
 	global $context, $modSettings, $txt, $scripturl;

@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the permissions page in admin panel.
+ */
 function template_permission_index()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;

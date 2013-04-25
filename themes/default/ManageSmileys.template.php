@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Editing the smiley sets.
+/**
+ * Editing the smiley sets.
+ */
 function template_editsets()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -71,7 +73,9 @@ function template_editsets()
 	// ]]></script>';
 }
 
-// Modifying a smiley set.
+/**
+ * Modifying a smiley set.
+ */
 function template_modifyset()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -160,7 +164,9 @@ function template_modifyset()
 	</div>';
 }
 
-// Editing an individual smiley
+/**
+ * Editing an individual smiley.
+ */
 function template_modifysmiley()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -255,7 +261,9 @@ function template_modifysmiley()
 	// ]]></script>';
 }
 
-// Adding a new smiley.
+/**
+ * Adding a new smiley.
+ */
 function template_addsmiley()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -394,7 +402,9 @@ function template_addsmiley()
 	</div>';
 }
 
-// Ordering smileys.
+/**
+ * Ordering smileys.
+ */
 function template_setorder()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -446,7 +456,9 @@ function template_setorder()
 	</div>';
 }
 
-// Editing an individual message icon
+/**
+ * Editing an individual message icon.
+ */
 function template_editicon()
 {
 	global $context, $scripturl, $txt;
