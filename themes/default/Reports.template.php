@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Choose which type of report to run?
+/**
+ * Interface to allow to choose which type of report to run.
+ */
 function template_report_type()
 {
 	global $context, $scripturl, $txt;
@@ -54,7 +56,9 @@ function template_report_type()
 	</div>';
 }
 
-// This is the standard template for showing reports in.
+/**
+ * This is the standard template for showing reports in.
+ */
 function template_main()
 {
 	global $context, $txt;
@@ -148,7 +152,9 @@ function template_main()
 	</div>';
 }
 
-// Header of the print page!
+/**
+ * Header of the print page.
+ */
 function template_print_above()
 {
 	global $context, $settings;
@@ -163,6 +169,9 @@ function template_print_above()
 	<body>';
 }
 
+/**
+ * Print a report.
+ */
 function template_print()
 {
 	global $context;
@@ -229,14 +238,16 @@ function template_print()
 			$row_number++;
 			$alternate = !$alternate;
 		}
-		
+
 		echo '
 			</table>
 		</div><br />';
 	}
 }
 
-// Footer of the print page.
+/**
+ * Footer of the print page.
+ */
 function template_print_below()
 {
 	echo '
