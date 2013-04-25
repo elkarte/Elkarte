@@ -696,7 +696,8 @@ function action_notification($memID)
 }
 
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
+ * Retrieve topic notifications count.
  *
  * @param int $memID id_member
  * @return string
@@ -726,7 +727,7 @@ function list_getTopicNotificationCount($memID)
 }
 
 /**
- * @todo Needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page
@@ -792,7 +793,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 }
 
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page

@@ -435,7 +435,7 @@ class ManageAttachments_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them attachments here!
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');		
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
@@ -662,7 +662,7 @@ class ManageAttachments_Controller
 		$context['num_avatars'] = comma_format(getAvatarCount(), 0);
 
 		// Total size of attachments
-		$context['attachment_total_size'] = OverallAttachmentsSize();
+		$context['attachment_total_size'] = overallAttachmentsSize();
 
 		// Total size and files from the current attachments dir.
 		$current_dir = currentAttachDirProperties();
