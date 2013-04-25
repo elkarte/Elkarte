@@ -22,6 +22,7 @@ if (!defined('ELKARTE'))
 
 /**
  * Prepare the actual attachment directories to be displayed in the list.
+ * Callback function for createList().
  */
 function list_getAttachDirs()
 {
@@ -138,6 +139,7 @@ function attachDirStatus($dir, $expected_files)
 
 /**
  * Prepare the base directories to be displayed in a list.
+ * Callback function for createList().
  */
 function list_getBaseDirs()
 {
@@ -187,6 +189,7 @@ function list_getBaseDirs()
 /**
  * Return the number of files of the specified type recorded in the database.
  * (the specified type being attachments or avatars).
+ * Callback function for createList()
  *
  * @param string $browse_type can be one of 'avatars' or not. (in which case they're attachments)
  */
@@ -228,6 +231,7 @@ function list_getNumFiles($browse_type)
 /**
  * Returns the list of attachments files (avatars or not), recorded
  * in the database, per the parameters received.
+ * Callback function for createList()
  *
  * @param int $start
  * @param int $items_per_page
@@ -288,13 +292,14 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 }
 
 /**
- * List the overall attachments size
- * @return string 
+ * Return the overall attachments size
+ *
+ * @return string
  */
-function OverallAttachmentsSize()
+function overallAttachmentsSize()
 {
 	global $smcFunc;
-	
+
 	// Check the size of all the directories.
 	$request = $smcFunc['db_query']('', '
 		SELECT SUM(size)
@@ -309,17 +314,18 @@ function OverallAttachmentsSize()
 
 	// Divide it into kilobytes.
 	$attachmentDirSize /= 1024;
-	return comma_format($attachmentDirSize, 2);		
+	return comma_format($attachmentDirSize, 2);
 }
 
 /**
  * Get files and size from the current attachments dir
- * @return int 
+ *
+ * @return int
  */
 function currentAttachDirProperties()
 {
 	global $smcFunc, $modSettings;
-	
+
 	$current_dir = array();
 
 	$request = $smcFunc['db_query']('', '
@@ -345,7 +351,7 @@ function currentAttachDirProperties()
 function moveAvatars()
 {
 	global $smcFunc, $modSettings;
-	
+
 	$request = $smcFunc['db_query']('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
@@ -380,8 +386,9 @@ function moveAvatars()
 
 /**
  * Extend the message body with a removal message.
- * @param string $messages
- * @param string $notice 
+ *
+ * @param string $messages messages to update
+ * @param string $notice notice to add
  */
 function setRemovalNotice($messages, $notice)
 {

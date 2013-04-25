@@ -109,8 +109,8 @@ function action_findmember()
 
 	checkSession('get');
 
-	// Why is this in the Help template, you ask?  Well, erm... it helps you.  Does that work?
-	loadTemplate('Help');
+	// Load members template
+	loadTemplate('Members');
 	$context['template_layers'] = array();
 	$context['sub_template'] = 'find_members';
 
