@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The only template in the file.
+/**
+ * Who's online page.
+ */
 function template_main()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -131,6 +133,9 @@ function template_main()
 	</div>';
 }
 
+/**
+ * Display the credits page.
+ */
 function template_credits()
 {
 	global $context, $txt;
