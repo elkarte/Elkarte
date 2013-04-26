@@ -60,6 +60,7 @@ class Site_Dispatcher
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
 			'file' => CONTROLLERDIR . '/BoardIndex.controller.php',
+			'controller' => 'BoardIndex_Controller',
 			'function' => 'action_boardindex'
 		);
 
@@ -96,6 +97,8 @@ class Site_Dispatcher
 				if (empty($this->_function_name))
 				{
 					$this->_file_name = $default_action['file'];
+					if (isset($default_action['controller']))
+						$this->_controller_name = $default_action['controller'];
 					$this->_function_name = $default_action['function'];
 				}
 			}
@@ -109,7 +112,8 @@ class Site_Dispatcher
 			else
 			{
 				$this->_file_name = CONTROLLERDIR . '/Display.controller.php';
-				$this->_function_name = 'Display';
+				$this->_controller_name = 'Display_Controller';
+				$this->_function_name = 'action_index';
 			}
 		}
 
@@ -124,16 +128,16 @@ class Site_Dispatcher
 		$actionArray = array(
 			'activate' => array('Register.controller.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
-			// 'announce' => array('Announce.controller.php', 'action_announce'),
+			'announce' => array('Announce.controller.php', 'Announce_Controller', 'action_index'),
 			'attachapprove' => array('ModerateAttachments.controller.php', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'action_buddy'),
-			'calendar' => array('Calendar.controller.php', 'action_calendar'),
-			'collapse' => array('BoardIndex.controller.php', 'action_collapse'),
+			'calendar' => array('Calendar.controller.php', 'Calendar_Controller', 'action_calendar'),
+			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
 			'contact' => array('Register.controller.php', 'action_contact'),
 			'coppa' => array('Register.controller.php', 'action_coppa'),
 			// 'credits' => array('Who.controller.php', 'action_credits'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'action_deletemsg'),
-			'dlattach' => array('Attachment.controller.php', 'action_dlattach'),
+			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_dlattach'),
 			'disregardtopic' => array('Notify.controller.php', 'action_disregardtopic'),
 			'editpoll' => array('Poll.controller.php', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'action_editpoll2'),
@@ -167,7 +171,7 @@ class Site_Dispatcher
 			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'quotefast' => array('Post.controller.php', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'action_quickmod'),
-			'quickmod2' => array('Display.controller.php', 'action_quickmod2'),
+			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
 			'recent' => array('Recent.controller.php', 'action_recent'),
 			'register' => array('Register.controller.php', 'action_register'),
 			'register2' => array('Register.controller.php', 'action_register2'),

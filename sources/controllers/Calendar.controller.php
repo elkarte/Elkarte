@@ -42,11 +42,11 @@ class Calendar_Controller
 		// Doing something other than calendar viewing?
 		$subActions = array(
 			'ical' => 'action_ical',
-			'post' => 'CalendarPost',
+			'post' => 'action_event_post',
 		);
 
 		if (isset($_GET['sa']) && isset($subActions[$_GET['sa']]))
-			return $subActions[$_GET['sa']]();
+			return $this->{$subActions[$_GET['sa']]}();
 
 		// This is gonna be needed...
 		loadTemplate('Calendar');
@@ -169,7 +169,7 @@ class Calendar_Controller
 	 * It uses the event_post sub template in the Calendar template.
 	 * It is accessed with ?action=calendar;sa=post.
 	 */
-	function CalendarPost()
+	function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
 		global $modSettings, $topic, $smcFunc;
