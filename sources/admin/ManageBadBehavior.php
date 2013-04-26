@@ -75,9 +75,9 @@ class ManageBadBehavior_Controller
 			validateToken('admin-bbl');
 			
 			$redirect = deleteBadBehavior($type, $filter);
-			if ($redirect == 'delete')
+			if ($redirect === 'delete')
 			{
-				$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
+				$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 				// Go back to where we were.
 				redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
 			}
