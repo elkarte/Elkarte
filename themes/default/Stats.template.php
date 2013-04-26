@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Stats page.
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;

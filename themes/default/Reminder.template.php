@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Show the main page with the reminder form.
+ */
 function template_main()
 {
 	global $context, $txt, $scripturl;
@@ -40,6 +43,9 @@ function template_main()
 	</form>';
 }
 
+/**
+ * Page to allow to pick a reminder.
+ */
 function template_reminder_pick()
 {
 	global $context, $txt, $scripturl;
@@ -72,6 +78,9 @@ function template_reminder_pick()
 	</form>';
 }
 
+/**
+ * Inform the user that reminder has been sent.
+ */
 function template_sent()
 {
 	global $context;
@@ -86,6 +95,9 @@ function template_sent()
 		</div>';
 }
 
+/**
+ * Allow to set a password.
+ */
 function template_set_password()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
@@ -135,6 +147,9 @@ function template_set_password()
 // ]]></script>';
 }
 
+/**
+ * Show a page to allow a new password to be entered.
+ */
 function template_ask()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;

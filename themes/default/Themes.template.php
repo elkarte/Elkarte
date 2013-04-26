@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The main sub template - for theme administration.
+/**
+ * The main sub template - for theme administration.
+ */
 function template_main()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -194,6 +196,9 @@ function template_main()
 		// ]]></script>';
 }
 
+/**
+ * Interface to list the existing themes.
+ */
 function template_list_themes()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -273,6 +278,9 @@ function template_list_themes()
 	</div>';
 }
 
+/**
+ * Page to allow reset of themes.
+ */
 function template_reset_list()
 {
 	global $context, $scripturl, $txt;
@@ -320,6 +328,9 @@ function template_reset_list()
 	</div>';
 }
 
+/**
+ * Template to allow to set options.
+ */
 function template_set_options()
 {
 	global $context, $scripturl, $txt;
@@ -424,6 +435,9 @@ function template_set_options()
 	</div>';
 }
 
+/**
+ * Allows to set settings for a theme.
+ */
 function template_set_settings()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -646,7 +660,9 @@ function template_set_settings()
 	}
 }
 
-// This template allows for the selection of different themes ;).
+/**
+ * This template allows for the selection of different themes.
+ */
 function template_pick()
 {
 	global $context, $scripturl, $txt;
@@ -741,7 +757,9 @@ function template_pick()
 	</div>';
 }
 
-// Okay, that theme was installed successfully!
+/**
+ * Messages to show when a theme was installed successfully.
+ */
 function template_installed()
 {
 	global $context, $scripturl, $txt;
@@ -765,6 +783,9 @@ function template_installed()
 	</div>';
 }
 
+/**
+ * Interface to edit a list.
+ */
 function template_edit_list()
 {
 	global $context, $scripturl, $txt;
@@ -804,6 +825,9 @@ function template_edit_list()
 	</div>';
 }
 
+/**
+ * Interface to copy a template.
+ */
 function template_copy_template()
 {
 	global $context, $scripturl, $txt;
@@ -847,6 +871,9 @@ function template_copy_template()
 	</div>';
 }
 
+/**
+ * Interface to browse the files of a theme in admin panel.
+ */
 function template_edit_browse()
 {
 	global $context, $txt;
@@ -893,7 +920,9 @@ function template_edit_browse()
 	</div>';
 }
 
-// Wanna edit the stylesheet?
+/**
+ * Allows to edit a stylesheet.
+ */
 function template_edit_style()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -1051,7 +1080,9 @@ function template_edit_style()
 	</div>';
 }
 
-// This edits the template...
+/**
+ * Allow to edit the template.
+ */
 function template_edit_template()
 {
 	global $context, $scripturl, $txt;
@@ -1108,6 +1139,9 @@ function template_edit_template()
 	</div>';
 }
 
+/**
+ * Interface to edit a file.
+ */
 function template_edit_file()
 {
 	global $context, $scripturl, $txt;

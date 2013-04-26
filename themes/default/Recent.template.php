@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Recent posts page.
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -83,6 +86,9 @@ function template_main()
 		</div>';
 }
 
+/**
+ * Unread posts page.
+ */
 function template_unread()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
@@ -244,6 +250,9 @@ function template_unread()
 				</div>';
 }
 
+/**
+ * Interface to show unread replies to your posts.
+ */
 function template_replies()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;

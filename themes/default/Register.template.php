@@ -72,7 +72,9 @@ function template_registration_agreement()
 
 }
 
-// Before registering - get their information.
+/**
+ * Before registering - get their information.
+ */
 function template_registration_form()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -395,7 +397,9 @@ function template_registration_form()
 		// ]]></script>';
 }
 
-// After registration... all done ;).
+/**
+ * After registration... all done ;).
+ */
 function template_after()
 {
 	global $context;
@@ -412,7 +416,9 @@ function template_after()
 		</div>';
 }
 
-// Template for giving instructions about COPPA activation.
+/**
+ * Template for giving instructions about COPPA activation.
+ */
 function template_coppa()
 {
 	global $context, $txt, $scripturl;
@@ -461,7 +467,9 @@ function template_coppa()
 			</div>';
 }
 
-// An easily printable form for giving permission to access the forum for a minor.
+/**
+ * An easily printable form for giving permission to access the forum for a minor.
+ */
 function template_coppa_form()
 {
 	global $context, $txt;
@@ -495,7 +503,9 @@ function template_coppa_form()
 		<br />';
 }
 
-// Show a window containing the spoken verification code.
+/**
+ * Show a window containing the spoken verification code.
+ */
 function template_verification_sound()
 {
 	global $context, $settings, $txt;
@@ -538,6 +548,9 @@ function template_verification_sound()
 </html>';
 }
 
+/**
+ * Show a page for admins to register new members.
+ */
 function template_admin_register()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -629,7 +642,9 @@ function template_admin_register()
 	<br class="clear" />';
 }
 
-// Form for editing the agreement shown for people registering to the forum.
+/**
+ * Form for editing the agreement shown for people registering to the forum.
+ */
 function template_edit_agreement()
 {
 	global $context, $scripturl, $txt;
@@ -697,6 +712,9 @@ function template_edit_agreement()
 		</form>';
 }
 
+/**
+ * Interface to edit reserved words in admin panel.
+ */
 function template_edit_reserved_words()
 {
 	global $context, $scripturl, $txt;
@@ -747,6 +765,9 @@ function template_edit_reserved_words()
 		</form>';
 }
 
+/**
+ * Interface for contact form.
+ */
 function template_contact_form()
 {
 	global $context, $scripturl, $txt;
@@ -799,6 +820,9 @@ function template_contact_form()
 		</form>';
 }
 
+/**
+ * Show a success page when contact form is submitted.
+ */
 function template_contact_form_done()
 {
 	global $txt;
