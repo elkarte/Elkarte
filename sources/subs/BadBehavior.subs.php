@@ -25,7 +25,7 @@ function deleteBadBehavior($type ,$filter)
 	global $smcFunc;
 
 	// Delete all or just some?
-	if ($type == 'delall' && empty($filter))
+	if ($type === 'delall' && empty($filter))
 	{
 		$smcFunc['db_query']('truncate_table', '
 			TRUNCATE {db_prefix}log_badbehavior',
@@ -34,7 +34,7 @@ function deleteBadBehavior($type ,$filter)
 		);
 	}
 	// Deleting all with a filter?
-	elseif ($type == 'delall'  && !empty($filter))
+	elseif ($type === 'delall'  && !empty($filter))
 	{
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_badbehavior
