@@ -18,6 +18,298 @@ if (!defined('ELKARTE'))
 loadLanguage('Drafts');
 require_once(SUBSDIR . '/Drafts.subs.php');
 
+
+class Draft_Controller
+{
+	/**
+	 * Loads in a group of drafts for the user of a given type
+	 * (0/posts, 1/pm's)
+	 * loads a specific draft for forum use if selected.
+	 * Used in the posting screens to allow draft selection
+	 * Will load a draft if selected is supplied via post
+	 *
+	 * @param int $member_id
+	 * @param int $topic
+	 * @param int $draft_type
+	 * @return boolean
+	 */
+	function action_showDrafts($member_id, $topic = false, $draft_type = 0)
+	{
+		global $scripturl, $context, $txt, $modSettings;
+
+		$context['drafts'] = array();
+
+		// Permissions
+		if (($draft_type === 0 && empty($context['drafts_save'])) || ($draft_type === 1 && empty($context['drafts_pm_save'])) || empty($member_id))
+			return false;
+
+		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
+		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+			loadDraft((int) $_REQUEST['id_draft'], $draft_type, true, true);
+
+		// load all the drafts for this user that meet the criteria
+		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+		$order = 'poster_time DESC';
+		$user_drafts = load_user_drafts($member_id, $draft_type, $topic, $drafts_keep_days, $order);
+
+		// add them to the context draft array for template display
+		foreach ($user_drafts as $draft)
+		{
+			// Post drafts
+			if ($draft_type === 0)
+				$context['drafts'][] = array(
+					'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'poster_time' => relativeTime($draft['poster_time']),
+					'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+				);
+			// PM drafts
+			elseif ($draft_type === 1)
+				$context['drafts'][] = array(
+					'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
+				'poster_time' => relativeTime($draft['poster_time']),
+					'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+				);
+		}
+	}
+
+	/**
+	 * Show all drafts of a given type by the current user
+	 * Uses the showdraft template
+	 * Allows for the deleting and loading/editing of drafts
+	 *
+	 * @param int $memID
+	 * @param int $draft_type = 0
+	 */
+	function action_showProfileDrafts($memID, $draft_type = 0)
+	{
+		global $txt, $scripturl, $modSettings, $context, $smcFunc;
+
+		// Some initial context.
+		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+		$context['current_member'] = $memID;
+
+		// If just deleting a draft, do it and then redirect back.
+		if (!empty($_REQUEST['delete']))
+		{
+			checkSession('get');
+
+			$id_delete = (int) $_REQUEST['delete'];
+			deleteDrafts($id_delete, $memID);
+			redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
+		}
+
+		// Default to 10.
+		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
+			$_REQUEST['viewscount'] = 10;
+
+		// Get things started
+		$user_drafts = array();
+		$msgCount = draftsCount($memID, $draft_type);
+		$maxIndex = (int) $modSettings['defaultMaxMessages'];
+
+		// Make sure the starting place makes sense and construct our friend the page index.
+		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showdrafts', $context['start'], $msgCount, $maxIndex);
+		$context['current_page'] = $context['start'] / $maxIndex;
+
+		// Reverse the query if we're past 50% of the pages for better performance.
+		$start = $context['start'];
+		$reverse = $start > $msgCount / 2;
+		if ($reverse)
+		{
+			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
+			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
+		}
+
+		// Find this user's drafts
+		$limit = $start . ', ' . $maxIndex;
+		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+		$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
+
+		// Start counting at the number of the first message displayed.
+		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
+		$context['posts'] = array();
+		foreach ($user_drafts as $row)
+		{
+			// Censor....
+			if (empty($row['body']))
+				$row['body'] = '';
+
+			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			if (empty($row['subject']))
+				$row['subject'] = $txt['drafts_none'];
+
+			censorText($row['body']);
+			censorText($row['subject']);
+
+			// BBC-ilize the message.
+			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], 'draft' . $row['id_draft']);
+
+			// And the array...
+			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
+				'body' => $row['body'],
+				'counter' => $counter,
+				'alternate' => $counter % 2,
+				'board' => array(
+					'name' => $row['bname'],
+					'id' => $row['id_board'],
+				),
+				'topic' => array(
+					'id' => $row['id_topic'],
+					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+				),
+				'subject' => $row['subject'],
+				'time' => relativeTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'icon' => $row['icon'],
+				'id_draft' => $row['id_draft'],
+				'locked' => $row['locked'],
+				'sticky' => $row['is_sticky'],
+				'age' => floor((time() - $row['poster_time']) / 86400),
+				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+			);
+		}
+
+		// If the drafts were retrieved in reverse order, get them right again.
+		if ($reverse)
+			$context['drafts'] = array_reverse($context['drafts'], true);
+
+		// Menu tab
+		$context[$context['profile_menu_name']]['tab_data'] = array(
+			'title' => $txt['drafts_show'] . ' - ' . $context['member']['name'],
+			'icon' => 'inbox_hd.png'
+		);
+
+		$context['sub_template'] = 'showDrafts';
+	}
+
+	/**
+	 * Show all PM drafts of the current user
+	 * Uses the showpmdraft template
+	 * Allows for the deleting and loading/editing of PM drafts
+	 *
+	 * @param int $memID = -1
+	 */
+	function action_showPMDrafts($memID = -1)
+	{
+		global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
+
+		// set up what we will need
+		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+
+		// If just deleting a draft, do it and then redirect back.
+		if (!empty($_REQUEST['delete']))
+		{
+			checkSession('get');
+
+			$id_delete = (int) $_REQUEST['delete'];
+			deleteDrafts($id_delete, $memID);
+			redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
+		}
+
+		// perhaps a draft was selected for editing? if so pass this off
+		if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']) && $memID == $user_info['id'])
+		{
+			checkSession('get');
+			$id_draft = (int) $_REQUEST['id_draft'];
+			redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
+		}
+
+		// init
+		$draft_type = 1;
+		$user_drafts = array();
+		$maxIndex = (int) $modSettings['defaultMaxMessages'];
+
+		// Default to 10.
+		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
+			$_REQUEST['viewscount'] = 10;
+
+		// Get the count of applicable drafts
+		$msgCount = draftsCount($memID, $draft_type);
+
+		// Make sure the starting place makes sense and construct our friend the page index.
+		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
+		$context['current_page'] = $context['start'] / $maxIndex;
+
+		// Reverse the query if we're past 50% of the total for better performance.
+		$start = $context['start'];
+		$reverse = $start > $msgCount / 2;
+		if ($reverse)
+		{
+			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
+			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
+		}
+
+		// go get em'
+		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+		$limit = $start . ', ' . $maxIndex;
+		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+		$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
+
+		// Start counting at the number of the first message displayed.
+		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
+		$context['posts'] = array();
+		foreach ($user_drafts as $row)
+		{
+			// Censor....
+			if (empty($row['body']))
+				$row['body'] = '';
+
+			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			if (empty($row['subject']))
+				$row['subject'] = $txt['no_subject'];
+
+			censorText($row['body']);
+			censorText($row['subject']);
+
+			// BBC-ilize the message.
+			$row['body'] = parse_bbc($row['body'], true, 'draft' . $row['id_draft']);
+
+			// Have they provided who this will go to?
+			$recipients = array(
+				'to' => array(),
+				'bcc' => array(),
+			);
+			$recipient_ids = (!empty($row['to_list'])) ? unserialize($row['to_list']) : array();
+
+			// Get nice names to show the user, the id's are not that great to see!
+			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
+			{
+				$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);
+				$recipient_ids['bcc'] = array_map('intval', $recipient_ids['bcc']);
+				$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
+				$recipients = draftsRecipients($allRecipients, $recipient_ids);
+			}
+
+			// Add the items to the array for template use
+			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
+				'body' => $row['body'],
+				'counter' => $counter,
+				'alternate' => $counter % 2,
+				'subject' => $row['subject'],
+				'time' => relativeTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'id_draft' => $row['id_draft'],
+				'recipients' => $recipients,
+				'age' => floor((time() - $row['poster_time']) / 86400),
+				'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+			);
+		}
+
+		// if the drafts were retrieved in reverse order, then put them in the right order again.
+		if ($reverse)
+			$context['drafts'] = array_reverse($context['drafts'], true);
+
+		// off to the template we go
+		$context['page_title'] = $txt['drafts'];
+		$context['sub_template'] = 'showPMDrafts';
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=pm;sa=showpmdrafts',
+			'name' => $txt['drafts'],
+		);
+	}
+}
+
 /**
  * Saves a post draft in the user_drafts table
  * The core draft feature must be enabled, as well as the post draft option
@@ -282,292 +574,4 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 	}
 
 	return $draft_info;
-}
-
-/**
- * Loads in a group of drafts for the user of a given type
- * (0/posts, 1/pm's)
- * loads a specific draft for forum use if selected.
- * Used in the posting screens to allow draft selection
- * Will load a draft if selected is supplied via post
- *
- * @param int $member_id
- * @param int $topic
- * @param int $draft_type
- * @return boolean
- */
-function action_showDrafts($member_id, $topic = false, $draft_type = 0)
-{
-	global $scripturl, $context, $txt, $modSettings;
-
-	$context['drafts'] = array();
-
-	// Permissions
-	if (($draft_type === 0 && empty($context['drafts_save'])) || ($draft_type === 1 && empty($context['drafts_pm_save'])) || empty($member_id))
-		return false;
-
-	// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-		loadDraft((int) $_REQUEST['id_draft'], $draft_type, true, true);
-
-	// load all the drafts for this user that meet the criteria
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, $draft_type, $topic, $drafts_keep_days, $order);
-
-	// add them to the context draft array for template display
-	foreach ($user_drafts as $draft)
-	{
-		// Post drafts
-		if ($draft_type === 0)
-			$context['drafts'][] = array(
-				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
-				'poster_time' => relativeTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
-		// PM drafts
-		elseif ($draft_type === 1)
-			$context['drafts'][] = array(
-				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
-				'poster_time' => relativeTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
-	}
-}
-
-/**
- * Show all drafts of a given type by the current user
- * Uses the showdraft template
- * Allows for the deleting and loading/editing of drafts
- *
- * @param int $memID
- * @param int $draft_type = 0
- */
-function action_showProfileDrafts($memID, $draft_type = 0)
-{
-	global $txt, $scripturl, $modSettings, $context, $smcFunc;
-
-	// Some initial context.
-	$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-	$context['current_member'] = $memID;
-
-	// If just deleting a draft, do it and then redirect back.
-	if (!empty($_REQUEST['delete']))
-	{
-		checkSession('get');
-
-		$id_delete = (int) $_REQUEST['delete'];
-		deleteDrafts($id_delete, $memID);
-		redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
-	}
-
-	// Default to 10.
-	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-		$_REQUEST['viewscount'] = 10;
-
-	// Get things started
-	$user_drafts = array();
-	$msgCount = draftsCount($memID, $draft_type);
-	$maxIndex = (int) $modSettings['defaultMaxMessages'];
-
-	// Make sure the starting place makes sense and construct our friend the page index.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showdrafts', $context['start'], $msgCount, $maxIndex);
-	$context['current_page'] = $context['start'] / $maxIndex;
-
-	// Reverse the query if we're past 50% of the pages for better performance.
-	$start = $context['start'];
-	$reverse = $start > $msgCount / 2;
-	if ($reverse)
-	{
-		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
-		$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
-	}
-
-	// Find this user's drafts
-	$limit = $start . ', ' . $maxIndex;
-	$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-	$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
-
-	// Start counting at the number of the first message displayed.
-	$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-	$context['posts'] = array();
-	foreach ($user_drafts as $row)
-	{
-		// Censor....
-		if (empty($row['body']))
-			$row['body'] = '';
-
-		$row['subject'] = $smcFunc['htmltrim']($row['subject']);
-		if (empty($row['subject']))
-			$row['subject'] = $txt['drafts_none'];
-
-		censorText($row['body']);
-		censorText($row['subject']);
-
-		// BBC-ilize the message.
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], 'draft' . $row['id_draft']);
-
-		// And the array...
-		$context['drafts'][$counter += $reverse ? -1 : 1] = array(
-			'body' => $row['body'],
-			'counter' => $counter,
-			'alternate' => $counter % 2,
-			'board' => array(
-				'name' => $row['bname'],
-				'id' => $row['id_board'],
-			),
-			'topic' => array(
-				'id' => $row['id_topic'],
-				'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
-			),
-			'subject' => $row['subject'],
-			'time' => relativeTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'icon' => $row['icon'],
-			'id_draft' => $row['id_draft'],
-			'locked' => $row['locked'],
-			'sticky' => $row['is_sticky'],
-			'age' => floor((time() - $row['poster_time']) / 86400),
-			'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
-		);
-	}
-
-	// If the drafts were retrieved in reverse order, get them right again.
-	if ($reverse)
-		$context['drafts'] = array_reverse($context['drafts'], true);
-
-	// Menu tab
-	$context[$context['profile_menu_name']]['tab_data'] = array(
-		'title' => $txt['drafts_show'] . ' - ' . $context['member']['name'],
-		'icon' => 'inbox_hd.png'
-	);
-
-	$context['sub_template'] = 'showDrafts';
-}
-
-/**
- * Show all PM drafts of the current user
- * Uses the showpmdraft template
- * Allows for the deleting and loading/editing of PM drafts
- *
- * @param int $memID = -1
- */
-function action_showPMDrafts($memID = -1)
-{
-	global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
-
-	// set up what we will need
-	$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-
-	// If just deleting a draft, do it and then redirect back.
-	if (!empty($_REQUEST['delete']))
-	{
-		checkSession('get');
-
-		$id_delete = (int) $_REQUEST['delete'];
-		deleteDrafts($id_delete, $memID);
-		redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
-	}
-
-	// perhaps a draft was selected for editing? if so pass this off
-	if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']) && $memID == $user_info['id'])
-	{
-		checkSession('get');
-		$id_draft = (int) $_REQUEST['id_draft'];
-		redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
-	}
-
-	// init
-	$draft_type = 1;
-	$user_drafts = array();
-	$maxIndex = (int) $modSettings['defaultMaxMessages'];
-
-	// Default to 10.
-	if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-		$_REQUEST['viewscount'] = 10;
-
-	// Get the count of applicable drafts
-	$msgCount = draftsCount($memID, $draft_type);
-
-	// Make sure the starting place makes sense and construct our friend the page index.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
-	$context['current_page'] = $context['start'] / $maxIndex;
-
-	// Reverse the query if we're past 50% of the total for better performance.
-	$start = $context['start'];
-	$reverse = $start > $msgCount / 2;
-	if ($reverse)
-	{
-		$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
-		$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
-	}
-
-	// go get em'
-	$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
-	$limit = $start . ', ' . $maxIndex;
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-	$user_drafts = load_user_drafts($memID, $draft_type, false, $drafts_keep_days, $order, $limit);
-
-	// Start counting at the number of the first message displayed.
-	$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-	$context['posts'] = array();
-	foreach ($user_drafts as $row)
-	{
-		// Censor....
-		if (empty($row['body']))
-			$row['body'] = '';
-
-		$row['subject'] = $smcFunc['htmltrim']($row['subject']);
-		if (empty($row['subject']))
-			$row['subject'] = $txt['no_subject'];
-
-		censorText($row['body']);
-		censorText($row['subject']);
-
-		// BBC-ilize the message.
-		$row['body'] = parse_bbc($row['body'], true, 'draft' . $row['id_draft']);
-
-		// Have they provided who this will go to?
-		$recipients = array(
-			'to' => array(),
-			'bcc' => array(),
-		);
-		$recipient_ids = (!empty($row['to_list'])) ? unserialize($row['to_list']) : array();
-
-		// Get nice names to show the user, the id's are not that great to see!
-		if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
-		{
-			$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);
-			$recipient_ids['bcc'] = array_map('intval', $recipient_ids['bcc']);
-			$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
-			$recipients = draftsRecipients($allRecipients, $recipient_ids);
-		}
-
-		// Add the items to the array for template use
-		$context['drafts'][$counter += $reverse ? -1 : 1] = array(
-			'body' => $row['body'],
-			'counter' => $counter,
-			'alternate' => $counter % 2,
-			'subject' => $row['subject'],
-			'time' => relativeTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'id_draft' => $row['id_draft'],
-			'recipients' => $recipients,
-			'age' => floor((time() - $row['poster_time']) / 86400),
-			'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
-		);
-	}
-
-	// if the drafts were retrieved in reverse order, then put them in the right order again.
-	if ($reverse)
-		$context['drafts'] = array_reverse($context['drafts'], true);
-
-	// off to the template we go
-	$context['page_title'] = $txt['drafts'];
-	$context['sub_template'] = 'showPMDrafts';
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=pm;sa=showpmdrafts',
-		'name' => $txt['drafts'],
-	);
 }

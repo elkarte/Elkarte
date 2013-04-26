@@ -1154,9 +1154,10 @@ function action_sendmessage()
 	// Generate a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_pm_save']))
 	{
-		require_once(CONTROLLERDIR . '/Drafts.controller.php');
+		require_once(CONTROLLERDIR . '/Draft.controller.php');
 		$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-		action_showDrafts($user_info['id'], $pm_seed, 1);
+		$controller = new Draft_Controller();
+		$controller->action_showDrafts($user_info['id'], $pm_seed, 1);
 	}
 
 	// Needed for the WYSIWYG editor.
@@ -1209,8 +1210,9 @@ function action_messagedrafts()
 	list ($memID) = $memberResult;
 
 	// drafts is where the functions reside
-	require_once(CONTROLLERDIR . '/Drafts.controller.php');
-	action_showPMDrafts($memID);
+	require_once(CONTROLLERDIR . '/Draft.controller.php');
+	$controller = new Draft_Controller();
+		$controller->action_showPMDrafts($memID);
 }
 
 /**

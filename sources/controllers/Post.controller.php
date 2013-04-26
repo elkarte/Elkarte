@@ -874,8 +874,9 @@ function action_post()
 	// Build a list of drafts that they can load in to the editor
 	if (!empty($context['drafts_save']))
 	{
-		require_once(CONTROLLERDIR . '/Drafts.controller.php');
-		action_showDrafts($user_info['id'], $topic);
+		require_once(CONTROLLERDIR . '/Draft.controller.php');
+		$controller = new Draft_Controller();
+		$controller->action_showDrafts($user_info['id'], $topic);
 	}
 
 	// Needed for the editor and message icons.
