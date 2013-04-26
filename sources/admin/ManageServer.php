@@ -113,9 +113,9 @@ class ManageServer_Controller
 	 *
 	 * @uses edit_settings adminIndex.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
@@ -186,7 +186,7 @@ class ManageServer_Controller
 	/**
 	 * Initialize _databaseSettings form.
 	 */
-	function _initDatabaseSettingsForm()
+	private function _initDatabaseSettingsForm()
 	{
 		global $txt;
 
@@ -222,9 +222,9 @@ class ManageServer_Controller
 	/**
 	 * Initialize _generalSettings form.
 	 */
-	function _initGeneralSettingsForm()
+	private function _initGeneralSettingsForm()
 	{
-		global $scripturl, $context, $txt;
+		global $txt;
 
 		$this->_generalSettingsForm = new Settings_Form();
 
@@ -250,7 +250,7 @@ class ManageServer_Controller
 	/**
 	 * Initialize _cookieSettings form.
 	 */
-	function _initCookieSettingsForm()
+	private function _initCookieSettingsForm()
 	{
 		global $txt;
 
@@ -280,7 +280,7 @@ class ManageServer_Controller
 	/**
 	 * Initialize _cacheSettings form.
 	 */
-	function _initCacheSettingsForm()
+	private function _initCacheSettingsForm()
 	{
 		global $txt;
 
@@ -333,7 +333,7 @@ class ManageServer_Controller
 	/**
 	 * Initialize balancingSettings form.
 	 */
-	function _initBalancingSettingsForm()
+	private function _initBalancingSettingsForm()
 	{
 		global $txt, $modSettings, $context;
 
@@ -408,7 +408,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for generalSettings form.
 	 */
-	function action_generalSettings_display()
+	public function action_generalSettings_display()
 	{
 		global $scripturl, $context, $txt;
 
@@ -450,9 +450,9 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _databaseSettings form.
 	 */
-	function action_databaseSettings_display()
+	public function action_databaseSettings_display()
 	{
-		global $scripturl, $context, $settings, $txt;
+		global $scripturl, $context, $txt;
 
 		// initialize the form
 		$this->_initDatabaseSettingsForm();
@@ -484,7 +484,7 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
 	 */
-	function action_cookieSettings_display()
+	public function action_cookieSettings_display()
 	{
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
@@ -506,6 +506,7 @@ class ManageServer_Controller
 			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
 				fatal_lang_error('invalid_cookie_domain', false);
 
+			//Settings_Form::save_db($config_vars);
 			$this->_cookieSettingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
@@ -536,9 +537,9 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
 	 */
-	function action_cacheSettings_display()
+	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt, $helptxt, $cache_enable;
+		global $context, $scripturl, $txt, $cache_enable;
 
 		// initialize the form
 		$this->_initCacheSettingsForm();
@@ -589,9 +590,9 @@ class ManageServer_Controller
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _balancingSettings form.
 	 */
-	function action_balancingSettings_display()
+	public function action_balancingSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initBalancingSettingsForm();
@@ -634,9 +635,9 @@ class ManageServer_Controller
 	 * Handles the submission of new/changed load balancing settings.
 	 * Uses the _balancingSettings form.
 	 */
-	function action_balancingSettings_save()
+	public function action_balancingSettings_save()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings;
+		global $context;
 
 		// initialize the form
 		$this->_initBalancingSettingsForm();
@@ -672,13 +673,13 @@ class ManageServer_Controller
 	 * - loads the settings into an array for display in a template
 	 * - drops cookie values just in case
 	 */
-	function action_phpinfo()
+	public function action_phpinfo()
 	{
 		global $context, $txt;
 
 		$info_lines = array();
 		$category = $txt['phpinfo_settings'];
-
+		$pinfo = array();
 		// get the data
 		ob_start();
 		phpinfo();
