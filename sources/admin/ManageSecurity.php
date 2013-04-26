@@ -51,9 +51,9 @@ class ManageSecurity_Controller
 	/**
 	 * This function passes control through to the relevant security tab.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings, $settings;
+		global $context, $txt;
 
 		$context['page_title'] = $txt['admin_security_moderation'];
 
@@ -120,9 +120,9 @@ class ManageSecurity_Controller
 	 * Uses a settings form for security options.
 	 *
 	 */
-	function action_securitySettings_display()
+	public function action_securitySettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initSecuritySettingsForm();
@@ -152,7 +152,7 @@ class ManageSecurity_Controller
 	/**
 	 * Initializes security settings admin screen data.
 	 */
-	function _initSecuritySettingsForm()
+	private function _initSecuritySettingsForm()
 	{
 		global $txt;
 
@@ -198,9 +198,9 @@ class ManageSecurity_Controller
 	 * Uses the moderation settings form.
 	 *
 	 */
-	function action_moderationSettings_display()
+	public function action_moderationSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// initialize the form
 		$this->_initModerationSettingsForm();
@@ -260,7 +260,7 @@ class ManageSecurity_Controller
 	 *
 	 * @return array
 	 */
-	function _initModerationSettingsForm()
+	private function _initModerationSettingsForm()
 	{
 		global $txt;
 
@@ -289,9 +289,9 @@ class ManageSecurity_Controller
 	 * Handles admin security spam settings.
 	 * Displays a page with settings and eventually allows the admin to change them.
 	 */
-	function action_spamSettings_display()
+	public function action_spamSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc, $language;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Let's try keep the spam to a minimum ah Thantos?
 		// initialize the form
@@ -344,9 +344,9 @@ class ManageSecurity_Controller
 	/**
 	 * Initializes spam settings with the current configuration saved.
 	 */
-	function _initSpamSettingsForm()
+	private function _initSpamSettingsForm()
 	{
-		global $txt, $context;
+		global $txt;
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -378,7 +378,7 @@ class ManageSecurity_Controller
 			'questions',
 		);
 		call_integration_hook('integrate_control_verification', array(&$known_verifications));
-		$verification_instances = null;
+		
 		foreach ($known_verifications as $verification)
 		{
 			$class_name = 'Control_Verification_' . ucfirst($verification);
@@ -400,7 +400,7 @@ class ManageSecurity_Controller
 	 * Change the way bad behavior ... well behaves
 	 *
 	 */
-	function action_bbSettings_display()
+	public function action_bbSettings_display()
 	{
 		global $txt, $scripturl, $context, $modSettings, $boardurl;
 
@@ -491,7 +491,7 @@ class ManageSecurity_Controller
 	 * Retrieves and returns the configuration settings for Bad Behavior.
 	 * Initializes bbSettings form.
 	 */
-	function _initBBSettingsForm()
+	private function _initBBSettingsForm()
 	{
 		global $txt, $context;
 
@@ -539,9 +539,9 @@ class ManageSecurity_Controller
 	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
-	function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
-		global $context, $txt;
+		global $context;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
