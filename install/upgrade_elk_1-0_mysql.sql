@@ -34,8 +34,8 @@ INSERT IGNORE INTO {$db_prefix}settings
 VALUES
 	('avatar_default', '0'),
 	('gravatar_rating', 'g'),
-	('xmlnews_limit', 5);
-	('visual_verification_num_chars', '6');
+	('xmlnews_limit', 5),
+	('visual_verification_num_chars', '6'),
 	('enable_disregard', 0);
 ---#
 
@@ -399,7 +399,7 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 /******************************************************************************/
 
 ---# Creating follow-up table...
-CREATE TABLE {$db_prefix}follow_ups (
+CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
   follow_up int(10) NOT NULL default '0',
   derived_from int(10) NOT NULL default '0',
   PRIMARY KEY (follow_up, derived_from)
@@ -411,10 +411,10 @@ CREATE TABLE {$db_prefix}follow_ups (
 /******************************************************************************/
 
 ---# Creating antispam questions table...
-CREATE TABLE {$db_prefix}antispam_questions (
+CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
   id_question tinyint(4) unsigned NOT NULL auto_increment,
-  question text NOT NULL default '',
-  answer text NOT NULL default '',
+  question text NOT NULL,
+  answer text NOT NULL,
   language varchar(50) NOT NULL default '',
   PRIMARY KEY (id_question),
   KEY language (language(30))

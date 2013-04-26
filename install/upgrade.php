@@ -99,6 +99,35 @@ else
 // Load this now just because we can.
 require_once($upgrade_path . '/Settings.php');
 
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
+if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
+
+// Time to forget about variables and go with constants!
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('SOURCEDIR', $sourcedir);
+
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
+
 // Are we logged in?
 if (isset($upgradeData))
 {
@@ -921,14 +950,14 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php')
-		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
+		&& @file_exists(dirname(__FILE__) . '/upgrade_elk_1-0_' . $db_type . '.sql');
 
-	// Need legacy scripts?
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.1)
+	// Need scripts to migrate from SMF?
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.0)
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.0)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 1.1)
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	if (!$check)
@@ -3633,7 +3662,6 @@ function template_welcome_message()
 				', $upcontext['warning'], '
 			</div>
 		</div>';
-
 	// Paths are incorrect?
 	echo '
 		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #804840; color: black; background: #fe5a44; ', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? 'display: none;' : ''), '" id="js_script_missing_error">
