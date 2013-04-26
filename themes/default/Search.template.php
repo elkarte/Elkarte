@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Main search page. Allows the user to search the forum according to criteria.
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
@@ -269,6 +272,9 @@ function template_main()
 				</form>';
 }
 
+/**
+ * Displays the search results page.
+ */
 function template_results()
 {
 	global $context, $settings, $options, $txt, $scripturl, $message;
