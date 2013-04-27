@@ -856,7 +856,7 @@ class ManagePermissions_Controller
 		loadPermissionProfiles();
 
 		// Work out what ones are in use.
-		$context['profiles'] = permProfilesInUse($profiles);
+		$context['profiles'] = permProfilesInUse($context['profiles']);
 	
 		// What can we do with these?
 		$context['can_edit_something'] = false;
