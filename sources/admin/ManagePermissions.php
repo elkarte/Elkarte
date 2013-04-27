@@ -577,8 +577,8 @@ class ManagePermissions_Controller
 			$permissions['membergroup'] = fetchPermissions($_GET['group']);
 
 		// Fetch current board permissions...
-		fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
-	
+		$permissions['board'] = fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
+
 		// Loop through each permission and set whether it's checked.
 		foreach ($context['permissions'] as $permissionType => $tmp)
 		{
