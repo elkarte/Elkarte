@@ -158,7 +158,7 @@ class Site_Dispatcher
 			'mergetopics' => array('MergeTopics.controller.php', 'action_mergetopics'),
 			'memberlist' => array('Memberlist.controller.php', 'pre_memberlist'),
 			'moderate' => array('ModerationCenter.controller.php', 'action_modcenter'),
-			// 'karma' => array('Karma.controller.php', 'action_karma'),
+			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
 			'movetopic' => array('MoveTopic.controller.php', 'action_movetopic'),
 			'movetopic2' => array('MoveTopic.controller.php', 'action_movetopic2'),
 			'notify' => array('Notify.controller.php', 'action_notify'),
