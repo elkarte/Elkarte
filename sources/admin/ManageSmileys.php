@@ -329,7 +329,7 @@ class ManageSmileys_Controller
 
 				// The user might have checked to also import smileys.
 				if (!empty($_POST['smiley_sets_import']))
-					ImportSmileys($_POST['smiley_sets_path']);
+					importSmileys($_POST['smiley_sets_path']);
 			}
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
@@ -356,7 +356,7 @@ class ManageSmileys_Controller
 
 			// Sanity check - then import.
 			if (isset($context['smiley_sets'][$_GET['set']]))
-				ImportSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
+				importSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
 
 			// Force the process to continue.
 			$context['sub_action'] = 'modifyset';
@@ -705,7 +705,7 @@ class ManageSmileys_Controller
 			{
 				$_POST['smiley_location'] = (int) $_POST['smiley_location'];
 				$smiley_order = nextSmileyLocation($_POST['smiley_location']);
-				
+
 				if (empty($smiley_order))
 					$smiley_order = '0';
 			}
@@ -788,7 +788,7 @@ class ManageSmileys_Controller
 
 				if ($_POST['smiley_action'] == 'delete')
 					deleteSmileys($_POST['checked_smileys']);
-		
+
 				// Changing the status of the smiley?
 				else
 				{
@@ -800,7 +800,7 @@ class ManageSmileys_Controller
 					);
 					if (isset($displayTypes[$_POST['smiley_action']]))
 						updateSmileyDisplayType($_POST['checked_smileys'], $displayTypes[$_POST['smiley_action']]);
-					
+
 				}
 			}
 			// Create/modify a smiley.
@@ -1140,7 +1140,7 @@ class ManageSmileys_Controller
 		require_once(SUBSDIR . '/ManageMessageIcons.subs.php');
 		// Get a list of icons.
 		$context['icons'] = getMessageIcons();
-		
+
 
 		// Submitting a form?
 		if (isset($_POST['icons_save']))
@@ -1220,7 +1220,7 @@ class ManageSmileys_Controller
 
 				if (!empty($iconInsert_new))
 					addMessageIcon($iconInsert_new);
-	
+
 			}
 
 			// Sort by order, so it is quicker :)
@@ -1380,7 +1380,7 @@ class ManageSmileys_Controller
 			{
 				$_GET['after'] = (int) $_GET['after'];
 
-				$smiley = getSmileyPosition($_GET['location'], $_GET['after']);	
+				$smiley = getSmileyPosition($_GET['location'], $_GET['after']);
 				if (empty($smiley))
 					fatal_lang_error('smiley_not_found');
 			}
@@ -1647,55 +1647,6 @@ class ManageSmileys_Controller
 	}
 
 	/**
-	 * A function to import new smileys from an existing directory into the database.
-	 *
-	 * @param string $smileyPath
-	 */
-	public function ImportSmileys($smileyPath)
-	{
-		global $modSettings;
-
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
-
-		if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
-			fatal_lang_error('smiley_set_unable_to_import');
-
-		$smileys = array();
-		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
-		while ($entry = $dir->read())
-		{
-			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
-				$smileys[strtolower($entry)] = $entry;
-		}
-		$dir->close();
-
-		// Exclude the smileys that are already in the database.
-		$duplicates = smileyExists($smileys);
-		
-		foreach ($duplicates as $duplicate)
-			if (isset($smileys[strtolower($duplicate)]))
-				unset($smileys[strtolower($duplicate)]);
-
-		$smiley_order = getMaxSmileyOrder();
-
-		$new_smileys = array();
-		foreach ($smileys as $smiley)
-			if (strlen($smiley) <= 48)
-				$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
-
-		if (!empty($new_smileys))
-		{
-			addSmiley($new_smileys);
-
-			// Make sure the smiley codes are still in the right order.
-			sortSmileyTable();
-
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
-		}
-	}
-
-	/**
 	 * Sets our internal smiley context.
 	 */
 	private function _initSmileyContext()
@@ -1711,5 +1662,54 @@ class ManageSmileys_Controller
 			$smiley_context[$set] = $set_names[$i];
 
 		$this->_smiley_context = $smiley_context;
+	}
+}
+
+/**
+ * A function to import new smileys from an existing directory into the database.
+ *
+ * @param string $smileyPath
+ */
+function importSmileys($smileyPath)
+{
+	global $modSettings;
+
+	require_once(SUBSDIR . '/ManageSmileys.subs.php');
+
+	if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
+		fatal_lang_error('smiley_set_unable_to_import');
+
+	$smileys = array();
+	$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
+	while ($entry = $dir->read())
+	{
+		if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+			$smileys[strtolower($entry)] = $entry;
+	}
+	$dir->close();
+
+	// Exclude the smileys that are already in the database.
+	$duplicates = smileyExists($smileys);
+
+	foreach ($duplicates as $duplicate)
+		if (isset($smileys[strtolower($duplicate)]))
+			unset($smileys[strtolower($duplicate)]);
+
+	$smiley_order = getMaxSmileyOrder();
+
+	$new_smileys = array();
+	foreach ($smileys as $smiley)
+		if (strlen($smiley) <= 48)
+			$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
+
+	if (!empty($new_smileys))
+	{
+		addSmiley($new_smileys);
+
+		// Make sure the smiley codes are still in the right order.
+		sortSmileyTable();
+
+		cache_put_data('parsing_smileys', null, 480);
+		cache_put_data('posting_smileys', null, 480);
 	}
 }
