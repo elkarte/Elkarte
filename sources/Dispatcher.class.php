@@ -166,7 +166,7 @@ class Site_Dispatcher
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
 			'openidreturn' => array('OpenID.subs.php', 'action_openidreturn'),
-			'pm' => array('PersonalMessage.controller.php', 'action_pm'),
+			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'action_post'),
 			'post2' => array('Post.controller.php', 'action_post2'),
 			'printpage' => array('Topic.controller.php', 'action_printpage'), // done
