@@ -107,6 +107,7 @@ class Site_Dispatcher
 			elseif (empty($topic))
 			{
 				$this->_file_name = CONTROLLERDIR . '/MessageIndex.controller.php';
+				$this->_controller_name = 'MessageIndex_Controller';
 				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display
@@ -171,7 +172,7 @@ class Site_Dispatcher
 			'printpage' => array('Topic.controller.php', 'action_printpage'), // done
 			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'quotefast' => array('Post.controller.php', 'action_quotefast'),
-			'quickmod' => array('MessageIndex.controller.php', 'action_quickmod'),
+			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
 			'recent' => array('Recent.controller.php', 'action_recent'),
 			'register' => array('Register.controller.php', 'action_register'),
