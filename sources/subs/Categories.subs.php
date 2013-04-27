@@ -352,3 +352,27 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			);
 	}
 }
+
+/**
+ * Return the name of the given category
+ *
+ * @param int $id_cat
+ */
+function categoryName($id_cat)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT name
+		FROM {db_prefix}categories
+		WHERE id_cat = {int:id_cat}
+		LIMIT 1',
+		array(
+			'id_cat' => $id_cat,
+		)
+	);
+	list ($name) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $name;
+}
