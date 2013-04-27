@@ -1460,7 +1460,7 @@ function maxMemberID()
 
 /**
  * Load some basic member infos
- * 
+ *
  * @param mixed $member_ids an array of member IDs or a single ID
  * @param array $options an array of possible little alternatives, can be:
  *                - 'add_guest' (set or not) to add a guest user to the returned array

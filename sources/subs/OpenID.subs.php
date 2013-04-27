@@ -358,7 +358,8 @@ function action_openidreturn()
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
 			require_once(CONTROLLERDIR . '/Register.controller.php');
-			return action_register2(true);
+			$controller = new Register_Controller();
+			return $controller->action_register2(true);
 		}
 		else
 			redirectexit('action=register');
