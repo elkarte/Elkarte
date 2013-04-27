@@ -120,7 +120,7 @@ class ManageRegistration_Controller
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $scripturl, $smcFunc;
+		global $txt, $context, $scripturl;
 
 		if (!empty($_POST['regSubmit']))
 		{
