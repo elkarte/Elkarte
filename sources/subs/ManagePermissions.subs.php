@@ -1171,12 +1171,10 @@ function deletePermissionProfiles($profiles)
 	);
 }
 
-function permProfilesInUse($profile)
+function permProfilesInUse($profiles)
 {
 	global $smcFunc, $txt;
 	
-	$profiles = array();
-
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, COUNT(id_board) AS board_count
 		FROM {db_prefix}boards
@@ -1185,7 +1183,7 @@ function permProfilesInUse($profile)
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		if (isset($profile[$row['id_profile']]))
+		if (isset($profiles[$row['id_profile']]))
 		{
 			$profiles[$row['id_profile']]['in_use'] = true;
 			$profiles[$row['id_profile']]['boards'] = $row['board_count'];
