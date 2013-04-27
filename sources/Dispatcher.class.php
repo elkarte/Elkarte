@@ -148,7 +148,7 @@ class Site_Dispatcher
 			'groups' => array('Groups.controller.php', 'Groups_Controller', 'action_groups'),
 			'help' => array('Help.controller.php', 'Help_Controller', 'action_help'),
 			'quickhelp' => array('Help.controller.php', 'Help_Controller', 'action_quickhelp'),
-			'jsmodify' => array('Post.controller.php', 'action_jsmodify'),
+			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lock' => array('Topic.controller.php', 'action_lock'), // done
@@ -167,11 +167,11 @@ class Site_Dispatcher
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
 			'openidreturn' => array('OpenID.subs.php', 'action_openidreturn'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
-			'post' => array('Post.controller.php', 'action_post'),
-			'post2' => array('Post.controller.php', 'action_post2'),
+			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
+			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			'printpage' => array('Topic.controller.php', 'action_printpage'), // done
 			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
-			'quotefast' => array('Post.controller.php', 'action_quotefast'),
+			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
 			'recent' => array('Recent.controller.php', 'action_recent'),
@@ -187,7 +187,7 @@ class Site_Dispatcher
 			'search2' => array('Search.controller.php', 'action_plushsearch2'),
 			'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'action_suggest'),
-			'spellcheck' => array('Post.controller.php', 'action_spellcheck'),
+			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'action_stats'),
 			'sticky' => array('Topic.controller.php', 'action_sticky'), // done

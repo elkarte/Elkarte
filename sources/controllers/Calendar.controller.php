@@ -202,7 +202,8 @@ class Calendar_Controller
 			{
 				$_REQUEST['calendar'] = 1;
 				require_once(CONTROLLERDIR . '/Post.controller.php');
-				return action_post();
+				$controller = new Post_Controller();
+				return $controller->action_post();
 			}
 			// New...
 			elseif ($_REQUEST['eventid'] == -1)
@@ -262,7 +263,8 @@ class Calendar_Controller
 		{
 			$_REQUEST['calendar'] = 1;
 			require_once(CONTROLLERDIR . '/Post.controller.php');
-			return action_post();
+			$controller = new Post_Controller();
+			return $controller->action_post();
 		}
 
 		// New?
