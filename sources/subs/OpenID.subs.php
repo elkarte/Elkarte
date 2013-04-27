@@ -390,7 +390,7 @@ function action_openidreturn()
 			'openid_uri' => $openid_uri,
 		);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
 
 		if (!checkActivation())
 			return;

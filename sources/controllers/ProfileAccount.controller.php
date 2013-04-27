@@ -499,8 +499,9 @@ function action_deleteaccount2($memID)
 	{
 		deleteMembers($memID);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
-		action_logout(true);
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
+		$controller = new Auth_Controller();
+		$controller->action_logout(true);
 
 		redirectexit();
 	}

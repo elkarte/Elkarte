@@ -70,7 +70,8 @@ class Site_Dispatcher
 			// You can only login
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/LogInOut.controller.php';
+				$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
+				$this->_controller_name = 'Auth_Controller';
 				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
@@ -151,9 +152,9 @@ class Site_Dispatcher
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lock' => array('Topic.controller.php', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'action_lockvoting'),
-			'login' => array('LogInOut.controller.php', 'action_login'),
-			'login2' => array('LogInOut.controller.php', 'action_login2'),
-			'logout' => array('LogInOut.controller.php', 'action_logout'),
+			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
+			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
+			'logout' => array('Auth.controller.php', 'Auth_Controller', 'action_logout'),
 			'markasread' => array('Markasread.controller.php', 'markasread'),
 			'mergetopics' => array('MergeTopics.controller.php', 'action_mergetopics'),
 			'memberlist' => array('Memberlist.controller.php', 'pre_memberlist'),
