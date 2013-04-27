@@ -1505,7 +1505,7 @@ class ManageSmileys_Controller
 		}
 
 		$extracted = read_tgz_file($destination, BOARDDIR . '/packages/temp');
-		if (!$extracted)
+		if (!$extracted) //Norv needs to change the URL in the next line ;)
 			fatal_lang_error('packageget_unable', false, array('http://custom.simplemachines.org/mods/index.php?action=search;type=12;basic_search=' . $name));
 		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($extracted as $file)
