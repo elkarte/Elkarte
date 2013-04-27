@@ -1359,28 +1359,6 @@ function populateDuplicateMembers(&$members)
 }
 
 /**
- * Generate a random validation code.
- * @todo Err. Whatcha doin' here.
- *
- * @return type
- */
-function generateValidationCode()
-{
-	global $smcFunc, $modSettings;
-
-	$request = $smcFunc['db_query']('get_random_number', '
-		SELECT RAND()',
-		array(
-		)
-	);
-
-	list ($dbRand) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
-}
-
-/**
  * Find out if there is another admin than the given user.
  *
  * @param int $memberID ID of the member, to compare with.

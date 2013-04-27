@@ -242,12 +242,12 @@ class Site_Dispatcher
 		// add-ons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
-			// action=drafts => Drafts.controller.php
+			// action=drafts => Drafts.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
 			// ... if it ain't there yet, no problem.
-			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php';
 
 				// procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
@@ -260,11 +260,11 @@ class Site_Dispatcher
 					$this->_function_name = 'action_' . $_GET['action'];
 			}
 			// or... an add-on can do just this!
-			// action=gallery => Gallery-Controller.php
+			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '-Controller.php'))
+			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '-Controller.php';
+				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
