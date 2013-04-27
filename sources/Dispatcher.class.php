@@ -201,7 +201,7 @@ class Site_Dispatcher
 			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			// 'who' => array('Who.controller.php', 'action_who'), // done
-			'.xml' => array('News.controller.php', 'action_showfeed'),
+			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),
 			'xmlhttp' => array('Xml.controller.php', 'action_xmlhttp'),
 		);
 
