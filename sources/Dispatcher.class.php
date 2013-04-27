@@ -131,7 +131,7 @@ class Site_Dispatcher
 			'activate' => array('Register.controller.php', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
 			'announce' => array('Announce.controller.php', 'Announce_Controller', 'action_index'),
-			'attachapprove' => array('ModerateAttachments.controller.php', 'action_attachapprove'),
+			'attachapprove' => array('ModerateAttachments.controller.php', 'ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'Members_Controller', 'action_buddy'),
 			'calendar' => array('Calendar.controller.php', 'Calendar_Controller', 'action_calendar'),
 			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
