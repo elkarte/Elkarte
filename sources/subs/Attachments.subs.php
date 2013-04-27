@@ -1843,3 +1843,150 @@ function maxThumbnails()
 
 	return $thumbnails;
 }
+
+/**
+ * Check multiple attachments IDs against the database.
+ *
+ * @param array $attachments
+ * @param string $approve_query
+ */
+function validateAttachments($attachments, $approve_query)
+{
+	global $smcFunc;
+
+	// double check the attachments array, pick only what is returned from the database
+	$request = $smcFunc['db_query']('', '
+		SELECT a.id_attach
+		FROM {db_prefix}attachments AS a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+		WHERE a.id_attach IN ({array_int:attachments})
+			AND a.approved = {int:not_approved}
+			AND a.attachment_type = {int:attachment_type}
+			AND {query_see_board}
+			' . $approve_query,
+		array(
+			'attachments' => $attachments,
+			'not_approved' => 0,
+			'attachment_type' => 0,
+		)
+	);
+	$attachments = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$attachments[] = $row['id_attach'];
+	$smcFunc['db_free_result']($request);
+
+	return $attachments;
+}
+
+/**
+ * Callback function for action_unapproved_attachments
+ * retrieve all the attachments waiting for approval the approver can approve
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $approve_query additional restrictions based on the boards the approver can see
+ * @return array, an array of unapproved attachments
+ */
+function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
+{
+	global $smcFunc, $scripturl;
+
+	// Get all unapproved attachments.
+	$request = $smcFunc['db_query']('', '
+		SELECT a.id_attach, a.filename, a.size, m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
+			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
+			t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
+		FROM {db_prefix}attachments AS a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
+		WHERE a.approved = {int:not_approved}
+			AND a.attachment_type = {int:attachment_type}
+			AND {query_see_board}
+			{raw:approve_query}
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:items_per_page}',
+		array(
+			'not_approved' => 0,
+			'attachment_type' => 0,
+			'start' => $start,
+			'sort' => $sort,
+			'items_per_page' => $items_per_page,
+			'approve_query' => $approve_query,
+		)
+	);
+
+	$unapproved_items = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$unapproved_items[] = array(
+			'id' => $row['id_attach'],
+			'filename' => $row['filename'],
+			'size' => round($row['size'] / 1024, 2),
+			'time' => timeformat($row['poster_time']),
+			'poster' => array(
+				'id' => $row['id_member'],
+				'name' => $row['poster_name'],
+				'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name'],
+				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+			),
+			'message' => array(
+				'id' => $row['id_msg'],
+				'subject' => $row['subject'],
+				'body' => parse_bbc($row['body']),
+				'time' => timeformat($row['poster_time']),
+				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
+			),
+			'topic' => array(
+				'id' => $row['id_topic'],
+			),
+			'board' => array(
+				'id' => $row['id_board'],
+				'name' => $row['board_name'],
+			),
+			'category' => array(
+				'id' => $row['id_cat'],
+				'name' => $row['cat_name'],
+			),
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $unapproved_items;
+}
+
+/**
+ * Callback function for action_unapproved_attachments
+ * count all the attachments waiting for approval that this approver can approve
+ *
+ * @param string $approve_query additional restrictions based on the boards the approver can see
+ * @return int the number of unapproved attachments
+ */
+function list_getNumUnapprovedAttachments($approve_query)
+{
+	global $smcFunc;
+
+	// How many unapproved attachments in total?
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments AS a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE a.approved = {int:not_approved}
+			AND a.attachment_type = {int:attachment_type}
+			AND {query_see_board}
+			' . $approve_query,
+		array(
+			'not_approved' => 0,
+			'attachment_type' => 0,
+		)
+	);
+	list ($total_unapproved_attachments) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $total_unapproved_attachments;
+}
