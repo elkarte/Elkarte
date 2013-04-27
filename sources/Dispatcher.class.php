@@ -156,7 +156,7 @@ class Site_Dispatcher
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
 			'logout' => array('Auth.controller.php', 'Auth_Controller', 'action_logout'),
 			'markasread' => array('Markasread.controller.php', 'markasread'),
-			'mergetopics' => array('MergeTopics.controller.php', 'action_mergetopics'),
+			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
 			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
 			'moderate' => array('ModerationCenter.controller.php', 'action_modcenter'),
 			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
