@@ -173,31 +173,9 @@ class ManageErrors_Controller
 			'is_selected' => empty($filter),
 		);
 
-		$sum = 0;
 		// What type of errors do we have and how many do we have?
-		$request = $smcFunc['db_query']('', '
-			SELECT error_type, COUNT(*) AS num_errors
-			FROM {db_prefix}log_errors
-			GROUP BY error_type
-			ORDER BY error_type = {string:critical_type} DESC, error_type ASC',
-			array(
-				'critical_type' => 'critical',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// Total errors so far?
-			$sum += $row['num_errors'];
-
-			$context['error_types'][$sum] = array(
-				'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
-				'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-				'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-				'is_selected' => isset($filter) && $filter['value']['sql'] == $smcFunc['db_escape_wildcard_string']($row['error_type']),
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['error_types'] = fetchErrorsByType($filter, $sort);
+	
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 

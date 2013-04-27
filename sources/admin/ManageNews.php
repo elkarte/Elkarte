@@ -485,8 +485,7 @@ class ManageNews_Controller
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
-		global $txt, $context, $smcFunc;
-		global $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $modSettings, $user_info;
 
 		if (isset($_POST['preview']))
 		{
@@ -505,13 +504,13 @@ class ManageNews_Controller
 		checkSession();
 
 		// Where are we actually to?
-		$context['start'] = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
+		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 		$context['email_force'] = !empty($_POST['email_force']) ? 1 : 0;
 		$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
 		$context['total_emails'] = !empty($_POST['total_emails']) ? (int) $_POST['total_emails'] : 0;
 		$context['max_id_member'] = !empty($_POST['max_id_member']) ? (int) $_POST['max_id_member'] : 0;
-		$context['send_html'] = !empty($_POST['send_html']) ? '1' : '0';
-		$context['parse_html'] = !empty($_POST['parse_html']) ? '1' : '0';
+		$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
+		$context['parse_html'] = !empty($_POST['parse_html']) ? 1 : 0;
 
 		// Create our main context.
 		$context['recipients'] = array(
