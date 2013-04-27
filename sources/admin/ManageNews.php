@@ -485,8 +485,7 @@ class ManageNews_Controller
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
-		global $txt, $context, $smcFunc;
-		global $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $modSettings, $user_info;
 
 		if (isset($_POST['preview']))
 		{
