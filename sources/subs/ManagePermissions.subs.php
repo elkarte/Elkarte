@@ -705,6 +705,13 @@ function loadAllPermissions($loadType = 'classic')
 	}
 }
 
+/**
+ * Counts membergroup permissions.
+ *
+ * @param array $groups
+ * @param array $hidden_permissions
+ * @return array
+ */
 function countPermissions($groups, $hidden_permissions = null)
 {
 	global $smcFunc;
@@ -726,6 +733,14 @@ function countPermissions($groups, $hidden_permissions = null)
 	return $groups;
 }
 
+/**
+ * Counts board permissions.
+ *
+ * @param array $groups
+ * @param array $hidden_permissions
+ * @param int $profile_id
+ * @return array
+ */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
 	global $smcFunc;
@@ -750,6 +765,12 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
 	return $groups;
 }
 
+/**
+ * Used to assign a permission profile to a board.
+ *
+ * @param int $profile
+ * @param int $board
+ */
 function assignPermissionProfileToBoard($profile, $board)
 {
 	global $smcFunc;
@@ -765,6 +786,14 @@ function assignPermissionProfileToBoard($profile, $board)
 	);
 }
 
+/**
+ * Copy a set of permissions from one group to another..
+ *
+ * @param int $copy_from
+ * @param array $groups
+ * @param array $illgeal_permissions
+ * @param array $non_guest_permissions
+ */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
 {
 	global $smcFunc;
@@ -822,6 +851,14 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
 	}
 }
 
+/**
+ * Copy a set of board permissions from one group to another..
+ *
+ * @param int $copy_from
+ * @param array $groups
+ * @param int $profile_id
+ * @param array $non_guest_permissions
+ */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
 {
 	global $smcFunc;
@@ -877,6 +914,13 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 	}
 }
 
+/**
+ * Deletes membergroup permissions.
+ *
+ * @param array $groups
+ * @param string $permission
+ * @param array $illegal_permissions
+ */
 function deletePermission($groups, $permission, $illegal_permissions)
 {
 	global $smcFunc;
@@ -894,6 +938,13 @@ function deletePermission($groups, $permission, $illegal_permissions)
 	);
 }
 
+/**
+ * Delete board permissions.
+ *
+ * @param array $group
+ * @param int $profile_id
+ * @param string $permission
+ */
 function deleteBoardPermission($group, $profile_id, $permission)
 {
 	global $smcFunc;
@@ -911,6 +962,11 @@ function deleteBoardPermission($group, $profile_id, $permission)
 	);
 }
 
+/**
+ * Replaces existing membergroup permissions with the given ones.
+ *
+ * @param array $permChange
+ */
 function replacePermission($permChange)
 {
 	global $smcFunc;
@@ -923,6 +979,11 @@ function replacePermission($permChange)
 		);
 }
 
+/**
+ * * Replaces existing board permissions with the given ones.
+ *
+ * @param array $permChange
+ */
 function replaceBoardPermission($permChange)
 {
 	global $smcFunc;
@@ -935,6 +996,9 @@ function replaceBoardPermission($permChange)
 	);
 }
 
+/**
+ * Removes the moderator's permissions.
+ */
 function removeModeratorPermissions()
 {
 	global $smcFunc;
@@ -948,6 +1012,11 @@ function removeModeratorPermissions()
 	);
 }
 
+/**
+ * Fetches membergroup permissions from the given group.
+ * @param int $id_group
+ * @return array
+ */
 function fetchPermissions($id_group)
 {
 	global $smcFunc;
@@ -972,6 +1041,14 @@ function fetchPermissions($id_group)
 	return $permissions;
 }
 
+/**
+ * Fetches board permissions from the given group.
+ *
+ * @param int $id_group
+ * @param string $permission_type
+ * @param int $profile_id
+ * @return type
+ */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {
 	global $smcFunc;
@@ -998,6 +1075,12 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 	return $permissions;
 }
 
+/**
+ * Deletes invalid permissions for the given group.
+ *
+ * @param int $id_group
+ * @param array $illegal_permissions
+ */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
 	global $smcFunc;
@@ -1013,6 +1096,12 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
 	);
 }
 
+/**
+ * Deletes a membergroup's board permissions from a specified permission profile. 
+ *
+ * @param int $id_group
+ * @param profile $id_profile
+ */
 function deleteAllBoardPermissions($id_group, $id_profile)
 {
 	global $smcFunc;
@@ -1028,6 +1117,9 @@ function deleteAllBoardPermissions($id_group, $id_profile)
 	);
 }
 
+/**
+ * Deny permissions disabled? We need to clean the permission tables.
+ */
 function clearDenyPermissions()
 {
 	global $smcFunc;
@@ -1048,6 +1140,10 @@ function clearDenyPermissions()
 	);
 }
 
+/**
+ * Permissions for post based groups disabled? We need to clean the permission 
+ * tables, too.
+ */
 function removePostgroupPermissions()
 {
 	global $smcFunc;
@@ -1091,6 +1187,12 @@ function removePostgroupPermissions()
 	);
 }
 
+/**
+ * Copies a permission profile.
+ *
+ * @param string $profile_name
+ * @param int $copy_from
+ */
 function copyPermissionProfile($profile_name, $copy_from)
 {
 	global $smcFunc;
@@ -1132,6 +1234,12 @@ function copyPermissionProfile($profile_name, $copy_from)
 		);
 }
 
+/**
+ * Rename a permission profile.
+ *
+ * @param int $id_profile
+ * @param string $name
+ */
 function renamePermissionProfile($id_profile, $name)
 {
 	global $smcFunc;
@@ -1149,6 +1257,11 @@ function renamePermissionProfile($id_profile, $name)
 	);
 }
 
+/**
+ * Delete a permission profile
+ *
+ * @param array $profiles
+ */
 function deletePermissionProfiles($profiles)
 {
 	global $smcFunc;
@@ -1177,6 +1290,12 @@ function deletePermissionProfiles($profiles)
 	);
 }
 
+/**
+ * checks, if a permission profile is in use.
+ *
+ * @param array $profiles
+ * @return array
+ */
 function permProfilesInUse($profiles)
 {
 	global $smcFunc, $txt;
@@ -1200,6 +1319,13 @@ function permProfilesInUse($profiles)
 	return $profiles;
 }
 
+/**
+ * Delete a board permission.
+ *
+ * @param array $groups
+ * @param array $profile
+ * @param string $permissions
+ */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {
 	global $smcFunc;
@@ -1218,6 +1344,11 @@ function deleteBoardPermissions($groups, $profile, $permissions)
 	);
 }
 
+/**
+ * Adds a new board permission to the board_permissions table.
+ *
+ * @param array $new_permissions
+ */
 function insertBoardPermission($new_permissions)
 {
 	global $smcFunc;
@@ -1230,6 +1361,14 @@ function insertBoardPermission($new_permissions)
 	);
 }
 
+/**
+ * Lists the board permissions.
+ *
+ * @param array $group
+ * @param int $profile
+ * @param array $permissions
+ * @return array
+ */
 function getPermission($group, $profile, $permissions)
 {
 	global $smcFunc;
