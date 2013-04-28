@@ -744,7 +744,7 @@ class ManagePermissions_Controller
 
 			// Make sure there are no postgroup based permissions left.
 			if (empty($modSettings['permission_enable_postgroups']))
-				removePostgroupPermissions();
+				clearPostgroupPermissions();
 
 			redirectexit('action=admin;area=permissions;sa=settings');
 		}
