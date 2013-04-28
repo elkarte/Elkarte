@@ -1000,12 +1000,12 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 }
 
 /**
- * Gets a list of membergroups
+ * Gets a list of membergroups, parent groups first.
  *
  * @todo: Merge with getBasicMembergroupData();
  * @return groups
  */
-function getMembergroups()
+function getExtendedMembergroupData()
 {
 	global $smcFunc, $modSettings;
 
@@ -1039,7 +1039,12 @@ function getMembergroups()
 	return $groups;
 }
 
-function fetchMembergroups()
+/**
+ * List all membergroups and prepares them to assign permissions to..
+ *
+ * @return array
+ */
+function prepareMembergroupPermissions()
 {
 	global $smcFunc, $modSettings;
 

@@ -202,7 +202,7 @@ class ManagePermissions_Controller
 		$normalGroups = array();
 
 		// Query the database defined membergroups.
-		$groupData = getMembergroups();
+		$groupData = getExtendedMembergroupData();
 		
 		foreach ($groupData as $row)
 		{
@@ -928,7 +928,7 @@ class ManagePermissions_Controller
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		$context['profile_groups'] = fetchMembergroups();
+		$context['profile_groups'] = prepareMembergroupPermissions();
 
 		// What are the permissions we are querying?
 		$all_permissions = array();
