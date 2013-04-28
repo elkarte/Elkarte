@@ -1582,3 +1582,28 @@ function getMemberByName($name)
 
 	return $member;
 }
+
+/**
+ * Count members of a given group
+ *
+ * @param int $id_group
+ * @return int
+ */
+function countMembersInGroup($id_group = 0)
+{
+	global $smcFunc;
+
+	// Determine the number of ungrouped members.
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}members
+		WHERE id_group = {int:group}',
+		array(
+			'group' => $id_group,
+		)
+	);
+	list ($num_members) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $num_members;
+}
