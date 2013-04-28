@@ -929,7 +929,7 @@ function replaceBoardPermission($permChange)
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}board_permissions',
-		array('permission' => 'string', 'id_group' => 'int', 'id_profile' => 'int', 'add_deny' => 'int'),
+		array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int', 'id_profile' => 'int'),
 		$permChange,
 		array('permission', 'id_group', 'id_profile')
 	);
@@ -952,7 +952,10 @@ function fetchPermissions($id_group)
 {
 	global $smcFunc;
 
-	$permissions = array();
+	$permissions = array(
+		'allowed' => array(),
+		'denied' => array(),
+	);
 
 	$result = $smcFunc['db_query']('', '
 		SELECT permission, add_deny
@@ -973,7 +976,10 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {
 	global $smcFunc;
 
-	$permissions = array();
+	$permissions = array(
+		'allowed' => array(),
+		'denied' => array(),
+	);
 
 	$result = $smcFunc['db_query']('', '
 		SELECT permission, add_deny
@@ -1212,7 +1218,7 @@ function deleteBoardPermissions($groups, $profile, $permissions)
 	);
 }
 
-function insertPermission($new_permissions)
+function insertBoardPermission($new_permissions)
 {
 	global $smcFunc;
 

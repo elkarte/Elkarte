@@ -476,7 +476,7 @@ class ManagePermissions_Controller
 					if ($permissionType == 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($context['illegal_permissions']) || !in_array($permission, $context['illegal_permissions'])))
 						$permChange[] = array($permission, $groupID, $add_deny);
 					elseif ($permissionType != 'membergroup')
-						$permChange[] = array($permission, $groupID, $bid, $add_deny);
+						$permChange[] = array($permission, $groupID, $add_deny, $bid);
 				}
 
 				if (!empty($permChange))
@@ -696,7 +696,6 @@ class ManagePermissions_Controller
 		{
 			foreach ($givePerms['board'] as $k => $v)
 				$givePerms['board'][$k][] = $profileid;
-
 			replaceBoardPermission($givePerms['board']);
 		}
 
@@ -879,7 +878,7 @@ class ManagePermissions_Controller
 	 */
 	public function action_postmod()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		// Just in case.
@@ -966,7 +965,7 @@ class ManagePermissions_Controller
 
 			// Insert new permissions.
 			if (!empty($new_permissions))
-				insertPermission($new_permissions);
+				insertBoardPermission($new_permissions);
 		}
 
 		// Now get all the permissions!
@@ -997,4 +996,3 @@ class ManagePermissions_Controller
 		createToken('admin-mppm');
 	}
 }
-
