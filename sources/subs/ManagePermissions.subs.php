@@ -1144,7 +1144,7 @@ function clearDenyPermissions()
  * Permissions for post based groups disabled? We need to clean the permission 
  * tables, too.
  */
-function removePostgroupPermissions()
+function clearPostgroupPermissions()
 {
 	global $smcFunc;
 
