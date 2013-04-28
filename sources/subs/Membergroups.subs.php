@@ -998,3 +998,88 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 
 	return $groups;
 }
+
+/**
+ * Gets a list of membergroups, parent groups first.
+ *
+ * @todo: Merge with getBasicMembergroupData();
+ * @return groups
+ */
+function getExtendedMembergroupData()
+{
+	global $smcFunc, $modSettings;
+
+	$groups = array();
+
+	// Query the database defined membergroups.
+	$query = $smcFunc['db_query']('', '
+		SELECT id_group, id_parent, group_name, min_posts, online_color, icons
+		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
+		WHERE min_posts = {int:min_posts}' : '') . '
+		ORDER BY id_parent = {int:not_inherited} DESC, min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		array(
+			'min_posts' => -1,
+			'not_inherited' => -2,
+			'newbie_group' => 4,
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($query))
+	{
+		$groups[$row['id_group']] = array(
+			'id_group' => $row['id_group'],
+			'id_parent' => $row['id_parent'],
+			'group_name' => $row['group_name'],
+			'min_posts' => $row['min_posts'],
+			'online_color' => $row['online_color'],
+			'icons' => $row['icons'],
+		);
+	}
+
+	return $groups;
+}
+
+/**
+ * List all membergroups and prepares them to assign permissions to..
+ *
+ * @return array
+ */
+function prepareMembergroupPermissions()
+{
+	global $smcFunc, $modSettings;
+
+	$profile_groups = array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_group, group_name, online_color, id_parent
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:admin_group}
+			' . (empty($modSettings['permission_enable_postgroups']) ? ' AND min_posts = {int:min_posts}' : '') . '
+		ORDER BY id_parent ASC',
+		array(
+			'admin_group' => 1,
+			'min_posts' => -1,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if ($row['id_parent'] == -2)
+		{
+			$profile_groups[$row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+				'color' => $row['online_color'],
+				'new_topic' => 'disallow',
+				'replies_own' => 'disallow',
+				'replies_any' => 'disallow',
+				'attachment' => 'disallow',
+				'children' => array(),
+			);
+		}
+		elseif (isset($profile_groups[$row['id_parent']]))
+			$profile_groups[$row['id_parent']]['children'][] = $row['group_name'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $profile_groups;
+}
