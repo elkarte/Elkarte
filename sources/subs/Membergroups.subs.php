@@ -1031,7 +1031,7 @@ function getMembergroups()
 			'id_parent' => $row['id_parent'],
 			'group_name' => $row['group_name'],
 			'min_posts' => $row['min_posts'],
-			'online_color' => $row['min_posts'],
+			'online_color' => $row['online_color'],
 			'icons' => $row['icons'],
 		);
 	}
