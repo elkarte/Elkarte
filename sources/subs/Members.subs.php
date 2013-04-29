@@ -1563,6 +1563,45 @@ function getMemberByName($name)
 	return $member;
 }
 
+function getMember($search, $buddies = array())
+{
+	global $smcFunc;
+
+	// Find the member.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name
+		FROM {db_prefix}members
+		WHERE real_name LIKE {string:search}' . (!empty($search) ? '
+			AND id_member IN ({array_int:buddy_list})' : '') . '
+			AND is_activated IN (1, 11)
+		LIMIT ' . ($smcFunc['strlen']($search) <= 2 ? '100' : '800'),
+		array(
+			'buddy_list' => $buddies,
+			'search' => $search,
+		)
+	);
+	$xml_data = array(
+		'items' => array(
+			'identifier' => 'item',
+			'children' => array(),
+		),
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
+
+		$xml_data['items']['children'][] = array(
+			'attributes' => array(
+				'id' => $row['id_member'],
+			),
+			'value' => $row['real_name'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $xml_data;
+}
+
 /**
  * Count members of a given group
  *
