@@ -188,7 +188,7 @@ class Site_Dispatcher
 			'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
-			'splittopics' => array('SplitTopics.controller.php', 'action_splittopics'),
+			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'action_stats'),
 			'sticky' => array('Topic.controller.php', 'action_sticky'), // done
 			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),

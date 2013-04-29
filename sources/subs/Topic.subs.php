@@ -1091,7 +1091,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.num_replies, t.num_views, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
-			fu.derived_from' : '') . 
+			fu.derived_from' : '') .
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
@@ -1099,7 +1099,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			(!empty($selects) ? implode(',', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
-			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . 
+			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .
 			($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
@@ -1362,4 +1362,89 @@ function unapprovedPosts($id_topic, $id_member)
 	$smcFunc['db_free_result']($request);
 
 	return $myUnapprovedPosts;
+}
+
+/**
+ * Update topic info after a successful split of a topic.
+ *
+ * @param array $options
+ * @param int $id_board
+ */
+function updateSplitTopics($options, $id_board)
+{
+	global $smcFunc;
+
+	// Any associated reported posts better follow...
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_reported
+		SET id_topic = {int:id_topic}
+		WHERE id_msg IN ({array_int:split_msgs})',
+		array(
+			'split_msgs' => $options['splitMessages'],
+			'id_topic' => $options['split2_ID_TOPIC'],
+		)
+	);
+
+	// Mess with the old topic's first, last, and number of messages.
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET
+			num_replies = {int:num_replies},
+			id_first_msg = {int:id_first_msg},
+			id_last_msg = {int:id_last_msg},
+			id_member_started = {int:id_member_started},
+			id_member_updated = {int:id_member_updated},
+			unapproved_posts = {int:unapproved_posts}
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'num_replies' => $options['split1_replies'],
+			'id_first_msg' => $options['split1_first_msg'],
+			'id_last_msg' => $options['split1_last_msg'],
+			'id_member_started' => $options['split1_firstMem'],
+			'id_member_updated' => $options['split1_lastMem'],
+			'unapproved_posts' => $options['split1_unapprovedposts'],
+			'id_topic' => $options['split1_ID_TOPIC'],
+		)
+	);
+
+	// Now, put the first/last message back to what they should be.
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET
+			id_first_msg = {int:id_first_msg},
+			id_last_msg = {int:id_last_msg}
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'id_first_msg' => $options['split2_first_msg'],
+			'id_last_msg' => $options['split2_last_msg'],
+			'id_topic' => $options['split2_ID_TOPIC'],
+		)
+	);
+
+	// If the new topic isn't approved ensure the first message flags
+	// this just in case.
+	if (!$split2_approved)
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}messages
+			SET approved = {int:approved}
+			WHERE id_msg = {int:id_msg}
+				AND id_topic = {int:id_topic}',
+			array(
+				'approved' => 0,
+				'id_msg' => $options['split2_first_msg'],
+				'id_topic' => $options['split2_ID_TOPIC'],
+			)
+		);
+
+	// The board has more topics now (Or more unapproved ones!).
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}boards
+		SET ' . ($options['split2_approved'] ? '
+			num_topics = num_topics + 1' : '
+			unapproved_topics = unapproved_topics + 1') . '
+		WHERE id_board = {int:id_board}',
+		array(
+			'id_board' => $id_board,
+		)
+	);
 }
