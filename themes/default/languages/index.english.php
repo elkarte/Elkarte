@@ -393,7 +393,7 @@ $txt['template_parse_error_details'] = 'There was a problem loading the <tt><str
 $txt['today'] = 'Today at ';
 $txt['yesterday'] = 'Yesterday at ';
 
-//Relavite times
+//Relative times
 $txt['rt_now'] = 'just now';
 $txt['rt_minute'] = 'A minute ago';
 $txt['rt_minutes'] = '%s minutes ago';

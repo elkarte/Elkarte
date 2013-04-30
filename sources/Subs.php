@@ -736,9 +736,9 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 		return $past_time;
 	}
 
-    $past_time = time()- $timestamp;
+    $past_time = time() - $timestamp;
 
-	// Within the first 60 seconds it is just niw. 
+	// Within the first 60 seconds it is just now. 
     if ($past_time < 60)
         return $txt['rt_now'];
 
