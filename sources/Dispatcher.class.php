@@ -151,7 +151,7 @@ class Site_Dispatcher
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
-			'lock' => array('Topic.controller.php', 'action_lock'), // done
+			'lock' => array('Topic.controller.php', 'Topic_Controller', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
@@ -169,7 +169,7 @@ class Site_Dispatcher
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-			'printpage' => array('Topic.controller.php', 'action_printpage'), // done
+			'printpage' => array('Topic.controller.php', 'Topic_Controller', 'action_printpage'), // done
 			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
@@ -190,7 +190,7 @@ class Site_Dispatcher
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
-			'sticky' => array('Topic.controller.php', 'action_sticky'), // done
+			'sticky' => array('Topic.controller.php', 'Topic_Controller', 'action_sticky'), // done
 			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),

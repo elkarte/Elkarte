@@ -1448,3 +1448,60 @@ function updateSplitTopics($options, $id_board)
 		)
 	);
 }
+
+function topicStarter()
+{
+	global $smcFunc;
+
+	// Find out who started the topic - in case User Topic Locking is enabled.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member_started, locked
+		FROM {db_prefix}topics
+		WHERE id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topic,
+		)
+	);
+	$starter = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $starter;
+}
+
+/**
+ * Set attributes for a topic, i.e. locked, sticky.
+ * Parameter $attributes is an array with:
+ *  - 'locked' => lock_value,
+ *  - 'sticky' => sticky_value
+ *
+ * @param int $topic
+ * @param array $attributes
+ */
+function setTopicAttribute($topic, $attributes)
+{
+	global $smcFunc;
+
+	if (isset($attributes['locked']))
+		// Lock the topic in the database with the new value.
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics
+			SET locked = {int:locked}
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic,
+				'locked' => $attributes['locked'],
+			)
+		);
+	if (isset($attributes['sticky']))
+		// Toggle the sticky value... pretty simple ;).
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics
+			SET is_sticky = {int:is_sticky}
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic,
+				'is_sticky' => empty($attributes['sticky']) ? 1 : 0,
+			)
+		);
+}
