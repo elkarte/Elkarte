@@ -254,7 +254,7 @@ function action_unapproved()
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'subject' => $row['subject'],
 			'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
@@ -554,7 +554,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'id' => $row['id_attach'],
 			'filename' => $row['filename'],
 			'size' => round($row['size'] / 1024, 2),
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
@@ -565,7 +565,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 				'id' => $row['id_msg'],
 				'subject' => $row['subject'],
 				'body' => parse_bbc($row['body']),
-				'time' => timeformat($row['poster_time']),
+				'time' => standardTime($row['poster_time']),
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 			),
 			'topic' => array(

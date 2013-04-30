@@ -573,7 +573,7 @@ function action_xmlmembers($xml_format)
 		else
 			$data[] = array(
 				'name' => cdata_parse($row['real_name']),
-				'time' => htmlspecialchars(strip_tags(timeformat($row['date_registered']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['date_registered']))),
 				'id' => $row['id_member'],
 				'link' => $scripturl . '?action=profile;u=' . $row['id_member']
 			);
@@ -706,7 +706,7 @@ function action_xmlnews($xml_format)
 		else
 		{
 			$data[] = array(
-				'time' => htmlspecialchars(strip_tags(timeformat($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
 				'id' => $row['id_topic'],
 				'subject' => cdata_parse($row['subject']),
 				'body' => cdata_parse($row['body']),
@@ -870,7 +870,7 @@ function action_xmlrecent($xml_format)
 		else
 		{
 			$data[] = array(
-				'time' => htmlspecialchars(strip_tags(timeformat($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
 				'id' => $row['id_msg'],
 				'subject' => cdata_parse($row['subject']),
 				'body' => cdata_parse($row['body']),

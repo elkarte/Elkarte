@@ -320,7 +320,7 @@ function action_printpage()
 			'edit' => allowedTo('poll_edit_any') || ($context['user']['started'] && allowedTo('poll_edit_own')),
 			'allowed_warning' => $pollinfo['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($pollOptions), $pollinfo['max_votes'])) : '',
 			'is_expired' => !empty($pollinfo['expire_time']) && $pollinfo['expire_time'] < time(),
-			'expire_time' => !empty($pollinfo['expire_time']) ? timeformat($pollinfo['expire_time']) : 0,
+			'expire_time' => !empty($pollinfo['expire_time']) ? standardTime($pollinfo['expire_time']) : 0,
 			'has_voted' => !empty($pollinfo['has_voted']),
 			'starter' => array(
 				'id' => $pollinfo['id_member'],
@@ -376,7 +376,7 @@ function action_printpage()
 	$context['board_name'] = $board_info['name'];
 	$context['category_name'] = $board_info['cat']['name'];
 	$context['poster_name'] = $row['poster_name'];
-	$context['post_time'] = timeformat($row['poster_time'], false);
+	$context['post_time'] = standardTime($row['poster_time'], false);
 	$context['parent_boards'] = array();
 	foreach ($board_info['parent_boards'] as $parent)
 		$context['parent_boards'][] = $parent['name'];
@@ -405,7 +405,7 @@ function action_printpage()
 		$context['posts'][] = array(
 			'subject' => $row['subject'],
 			'member' => $row['poster_name'],
-			'time' => timeformat($row['poster_time'], false),
+			'time' => standardTime($row['poster_time'], false),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => parse_bbc($row['body'], 'print'),
 			'id_msg' => $row['id_msg'],

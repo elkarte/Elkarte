@@ -310,7 +310,7 @@ class ManageSearchEngines_Controller
 						'function' => create_function('$rowData', '
 							global $context, $txt;
 
-							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? timeformat($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
+							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? standardTime($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
 						'),
 					),
 				),
@@ -535,7 +535,7 @@ class ManageSearchEngines_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'log_time\']);
+							return standardTime($rowData[\'log_time\']);
 						'),
 					),
 					'sort' => array(

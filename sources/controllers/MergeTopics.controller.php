@@ -272,13 +272,13 @@ function action_mergeExecute($topics = array())
 			'num_views' => $row['num_views'],
 			'subject' => $row['subject'],
 			'started' => array(
-				'time' => timeformat($row['time_started']),
+				'time' => standardTime($row['time_started']),
 				'timestamp' => forum_time(true, $row['time_started']),
 				'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
 				'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
 			),
 			'updated' => array(
-				'time' => timeformat($row['time_updated']),
+				'time' => standardTime($row['time_updated']),
 				'timestamp' => forum_time(true, $row['time_updated']),
 				'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
 				'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'

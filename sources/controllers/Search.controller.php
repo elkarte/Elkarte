@@ -2372,7 +2372,7 @@ function MessageSearch2()
 				'member' => &$memberContext[$row['id_member_from']],
 				'subject' => $subject_highlighted,
 				'body' => $body_highlighted,
-				'time' => timeformat($row['msgtime']),
+				'time' => standardTime($row['msgtime']),
 				'recipients' => &$recipients[$row['id_pm']],
 				'labels' => &$context['message_labels'][$row['id_pm']],
 				'fully_labeled' => count($context['message_labels'][$row['id_pm']]) == count($context['labels']),
@@ -2552,7 +2552,7 @@ function prepareSearchContext($reset = false)
 		'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
 		'first_post' => array(
 			'id' => $message['first_msg'],
-			'time' => timeformat($message['first_poster_time']),
+			'time' => standardTime($message['first_poster_time']),
 			'timestamp' => forum_time(true, $message['first_poster_time']),
 			'subject' => $message['first_subject'],
 			'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
@@ -2568,7 +2568,7 @@ function prepareSearchContext($reset = false)
 		),
 		'last_post' => array(
 			'id' => $message['last_msg'],
-			'time' => timeformat($message['last_poster_time']),
+			'time' => standardTime($message['last_poster_time']),
 			'timestamp' => forum_time(true, $message['last_poster_time']),
 			'subject' => $message['last_subject'],
 			'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
@@ -2645,11 +2645,11 @@ function prepareSearchContext($reset = false)
 		'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 		'subject' => $message['subject'],
 		'subject_highlighted' => $subject_highlighted,
-		'time' => timeformat($message['poster_time']),
+		'time' => standardTime($message['poster_time']),
 		'timestamp' => forum_time(true, $message['poster_time']),
 		'counter' => $counter,
 		'modified' => array(
-			'time' => timeformat($message['modified_time']),
+			'time' => standardTime($message['modified_time']),
 			'timestamp' => forum_time(true, $message['modified_time']),
 			'name' => $message['modified_name']
 		),

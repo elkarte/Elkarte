@@ -636,7 +636,7 @@ function comma_format($number, $override_decimal_count = false)
  * @param bool $show_today = true
  * @param string $offset_type = false
  */
-function timeformat($log_time, $show_today = true, $offset_type = false)
+function standardTime($log_time, $show_today = true, $offset_type = false)
 {
 	global $context, $user_info, $txt, $modSettings, $smcFunc;
 	static $non_twelve_hour;
@@ -675,11 +675,11 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 		// Same day of the year, same year.... Today!
 		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
-			return $txt['today'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['today'] . standardTime($log_time, $today_fmt, $offset_type);
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
 		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
-			return $txt['yesterday'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['yesterday'] . standardTime($log_time, $today_fmt, $offset_type);
 	}
 
 	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];
@@ -716,7 +716,7 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 /**
  * Calculates the relative time between now and a given timestamp.
- * If relative time is disabled we can just bypass to timeformat();
+ * If relative time is disabled we can just bypass to standardTime();
  * This function is based on ideas from user "Eye" at 
  * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
  *
@@ -729,10 +729,10 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 {
 	global $modSettings, $txt;
 
-	// We don't want relative times? Bypass to timeformat();
+	// We don't want relative times? Bypass to standardTime();
 	if ($modSettings['todayMod'] < 3)
 	{
-		$past_time = timeformat($timestamp, $show_today, $offset_type);
+		$past_time = standardTime($timestamp, $show_today, $offset_type);
 		return $past_time;
 	}
 
@@ -1544,7 +1544,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '$1',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					if (is_numeric($data))
-						$data = timeformat($data);
+						$data = standardTime($data);
 					else
 						$tag[\'content\'] = \'[time]$1[/time]\';'),
 			),
@@ -2740,7 +2740,7 @@ function setupThemeContext($forceload = false)
 	$loaded = true;
 
 	$context['in_maintenance'] = !empty($maintenance);
-	$context['current_time'] = timeformat(time(), false);
+	$context['current_time'] = standardTime(time(), false);
 	$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 
@@ -3060,7 +3060,7 @@ function template_header()
 
 			if (!empty($_SESSION['ban']['expire_time']))
 				echo '
-					<div>', sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)), '</div>';
+					<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
 			else
 				echo '
 					<div>', $txt['your_ban_expires_never'], '</div>';

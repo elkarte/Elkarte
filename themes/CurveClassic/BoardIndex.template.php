@@ -425,7 +425,7 @@ function template_info_center()
 			</p>
 			<p class="last">
 				', $txt['most_online_today'], ': <strong>', comma_format($modSettings['mostOnlineToday']), '</strong>.
-				', $txt['most_online_ever'], ': ', comma_format($modSettings['mostOnline']), ' (', timeformat($modSettings['mostDate']), ')
+				', $txt['most_online_ever'], ': ', comma_format($modSettings['mostOnline']), ' (', standardTime($modSettings['mostDate']), ')
 			</p>';
 
 	// If they are logged in, but statistical information is off... show a personal message bar.

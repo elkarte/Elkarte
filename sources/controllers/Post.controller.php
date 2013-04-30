@@ -1956,7 +1956,7 @@ function getTopic()
 			'alternate' => $counter % 2,
 			'poster' => $row['poster_name'],
 			'message' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'id' => $row['id_msg'],
 			'is_new' => !empty($context['new_replies']),
@@ -2286,7 +2286,7 @@ function action_jsmodify()
 			$context['message'] = array(
 				'id' => $row['id_msg'],
 				'modified' => array(
-					'time' => isset($msgOptions['modify_time']) ? timeformat($msgOptions['modify_time']) : '',
+					'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 					'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 					'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 				),
@@ -2307,7 +2307,7 @@ function action_jsmodify()
 			$context['message'] = array(
 				'id' => $row['id_msg'],
 				'modified' => array(
-					'time' => isset($msgOptions['modify_time']) ? timeformat($msgOptions['modify_time']) : '',
+					'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 					'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 					'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 				),

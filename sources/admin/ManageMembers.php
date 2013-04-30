@@ -864,7 +864,7 @@ class ManageMembers_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '\']);
+							return standardTime($rowData[\'' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '\']);
 						'),
 					),
 					'sort' => array(
