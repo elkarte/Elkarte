@@ -821,8 +821,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 interface Control_Verifications
 {
-	function showVerification($isNew, $force_refresh);
-	function createTest($refresh);
+	function showVerification($isNew, $force_refresh = true);
+	function createTest($refresh = true);
 	function prepareContext();
 	function doTest();
 	function settings();

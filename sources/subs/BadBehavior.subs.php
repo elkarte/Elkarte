@@ -147,7 +147,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 				'ip' => $row['ip'],
 				'session' => $row['session']
 			),
-			'date' => timeformat($row['date']),
+			'date' => standardTime($row['date']),
 			'timestamp' => $row['date'],
 			'request_uri' => array(
 				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri']),

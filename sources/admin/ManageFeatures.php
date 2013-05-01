@@ -296,7 +296,7 @@ class ManageFeatures_Controller
 				array('int', 'defaultMaxMembers'),
 			'',
 				// Stuff that just is everywhere - today, search, online, etc.
-				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'])),
+				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
 				array('check', 'topbottomEnable'),
 				array('check', 'onlineEnable'),
 				array('check', 'enableVBStyleLogin'),

@@ -322,14 +322,14 @@ function action_showDrafts($member_id, $topic = false, $draft_type = 0)
 		if ($draft_type === 0)
 			$context['drafts'][] = array(
 				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
-				'poster_time' => timeformat($draft['poster_time']),
+				'poster_time' => relativeTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		// PM drafts
 		elseif ($draft_type === 1)
 			$context['drafts'][] = array(
 				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_subject(stripslashes($draft['subject']), 24)),
-				'poster_time' => timeformat($draft['poster_time']),
+				'poster_time' => relativeTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 	}
@@ -422,7 +422,7 @@ function action_showProfileDrafts($memID, $draft_type = 0)
 				'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			),
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'icon' => $row['icon'],
 			'id_draft' => $row['id_draft'],
@@ -550,7 +550,7 @@ function action_showPMDrafts($memID = -1)
 			'counter' => $counter,
 			'alternate' => $counter % 2,
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'id_draft' => $row['id_draft'],
 			'recipients' => $recipients,

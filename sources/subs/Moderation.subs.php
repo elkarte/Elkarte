@@ -325,7 +325,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 		$templates[] = array(
 			'id_comment' => $row['id_comment'],
 			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'title' => $row['template_title'],
 			'body' => $smcFunc['htmlspecialchars']($row['body']),
 		);
@@ -394,7 +394,7 @@ function list_getWarnings($start, $items_per_page, $sort)
 		$warnings[] = array(
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
 			'recipient_link' => $row['id_recipient'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_recipient'] . '">' . $row['recipient_name'] . '</a>') : $row['recipient_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],

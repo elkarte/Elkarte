@@ -121,7 +121,7 @@ function DumpDatabase2()
 		'-- ==========================================================' . $crlf .
 		'--' . $crlf .
 		'-- Database dump of tables in `' . $db_name . '`' . $crlf .
-		'-- ' . timeformat(time(), false) . $crlf .
+		'-- ' . standardTime(time(), false) . $crlf .
 		'--' . $crlf .
 		'-- ==========================================================' . $crlf .
 		$crlf;

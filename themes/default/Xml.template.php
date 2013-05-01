@@ -429,6 +429,6 @@ function template_xml_draft()
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <drafts>
-	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', timeformat($context['draft_saved_on']), ']]></draft>
+	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', relativeTime($context['draft_saved_on']), ']]></draft>
 </drafts>';
 }

@@ -416,9 +416,9 @@ function Display()
 				'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'can_export' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
 				'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'start_date' => timeformat($start_date, $date_string, 'none'),
+				'start_date' => standardTime($start_date, $date_string, 'none'),
 				'start_timestamp' => $start_date,
-				'end_date' => timeformat($end_date, $date_string, 'none'),
+				'end_date' => standardTime($end_date, $date_string, 'none'),
 				'end_timestamp' => $end_date,
 				'is_last' => false
 			);
@@ -540,7 +540,7 @@ function Display()
 			'edit' => allowedTo('poll_edit_any') || ($context['user']['started'] && allowedTo('poll_edit_own')),
 			'allowed_warning' => $pollinfo['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($pollOptions), $pollinfo['max_votes'])) : '',
 			'is_expired' => !empty($pollinfo['expire_time']) && $pollinfo['expire_time'] < time(),
-			'expire_time' => !empty($pollinfo['expire_time']) ? timeformat($pollinfo['expire_time']) : 0,
+			'expire_time' => !empty($pollinfo['expire_time']) ? standardTime($pollinfo['expire_time']) : 0,
 			'has_voted' => !empty($pollinfo['has_voted']),
 			'starter' => array(
 				'id' => $pollinfo['id_member'],
@@ -1022,11 +1022,11 @@ function prepareDisplayContext($reset = false)
 		'icon' => $message['icon'],
 		'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 		'subject' => $message['subject'],
-		'time' => timeformat($message['poster_time']),
+		'time' => relativeTime($message['poster_time']),
 		'timestamp' => forum_time(true, $message['poster_time']),
 		'counter' => $counter,
 		'modified' => array(
-			'time' => timeformat($message['modified_time']),
+			'time' => relativeTime($message['modified_time']),
 			'timestamp' => forum_time(true, $message['modified_time']),
 			'name' => $message['modified_name']
 		),

@@ -412,7 +412,7 @@ function action_groupmembers()
 	$context['members'] = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$last_online = empty($row['last_login']) ? $txt['never'] : timeformat($row['last_login']);
+		$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
 
 		// Italicize the online note if they aren't activated.
 		if ($row['is_activated'] % 10 != 1)
@@ -424,7 +424,7 @@ function action_groupmembers()
 			'email' => $row['email_address'],
 			'show_email' => showEmailAddress(!empty($row['hide_email']), $row['id_member']),
 			'ip' => '<a href="' . $scripturl . '?action=trackip;searchip=' . $row['member_ip'] . '">' . $row['member_ip'] . '</a>',
-			'registered' => timeformat($row['date_registered']),
+			'registered' => standardTime($row['date_registered']),
 			'last_online' => $last_online,
 			'posts' => comma_format($row['posts']),
 			'is_activated' => $row['is_activated'] % 10 == 1,
@@ -814,7 +814,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 			'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
 			'reason' => censorText($row['reason']),
-			'time_submitted' => timeformat($row['time_applied']),
+			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
 	$smcFunc['db_free_result']($request);

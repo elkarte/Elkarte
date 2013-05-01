@@ -193,7 +193,7 @@ class ManageBans_Controller
 						'function' => create_function('$rowData', '
 							global $context;
 
-							return timeformat($rowData[\'ban_time\'], empty($context[\'ban_time_format\']) ? true : $context[\'ban_time_format\']);
+							return standardTime($rowData[\'ban_time\'], empty($context[\'ban_time_format\']) ? true : $context[\'ban_time_format\']);
 						'),
 					),
 					'sort' => array(
@@ -586,7 +586,7 @@ class ManageBans_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'log_time\']);
+							return standardTime($rowData[\'log_time\']);
 						'),
 					),
 					'sort' => array(

@@ -1620,7 +1620,7 @@ function scheduled_paid_subscriptions()
 			'PROFILE_LINK' => $scripturl . '?action=profile;area=subscriptions;u=' . $row['id_member'],
 			'REALNAME' => $row['member_name'],
 			'SUBSCRIPTION' => $row['name'],
-			'END_DATE' => strip_tags(timeformat($row['end_time'])),
+			'END_DATE' => strip_tags(standardTime($row['end_time'])),
 		);
 
 		$emaildata = loadEmailTemplate('paid_subscription_reminder', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);

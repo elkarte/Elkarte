@@ -550,7 +550,7 @@ class ManageAttachments_Controller
 							global $txt, $context, $scripturl;
 
 							// The date the message containing the attachment was posted or the owner of the avatar was active.
-							$date = empty($rowData[\'poster_time\']) ? $txt[\'never\'] : timeformat($rowData[\'poster_time\']);
+							$date = empty($rowData[\'poster_time\']) ? $txt[\'never\'] : standardTime($rowData[\'poster_time\']);
 
 							// Add a link to the topic in case of an attachment.
 							if ($context[\'browse_type\'] !== \'avatars\')

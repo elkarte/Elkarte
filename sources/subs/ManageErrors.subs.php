@@ -114,7 +114,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 				'ip' => $row['ip'],
 				'session' => $row['session']
 			),
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'timestamp' => $row['log_time'],
 			'url' => array(
 				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url']),
