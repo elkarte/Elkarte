@@ -63,8 +63,8 @@ function getLastPosts($latestPostOptions)
 		censorText($row['body']);
 
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if ($smcFunc['strlen']($row['body']) > $modSettings['body_length'])
+			$row['body'] = $smcFunc['substr']($row['body'], 0, $modSettings['body_length']) . '...';
 
 		// Build the array.
 		$posts[] = array(
@@ -82,7 +82,7 @@ function getLastPosts($latestPostOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_string($row['subject'], 24),
+			'short_subject' => shorten_string($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => timeformat($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),

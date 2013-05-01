@@ -54,6 +54,18 @@ VALUES
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
+	('ssi_body_length', '128');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('subject_length', '24');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('body_length', '128');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
 	('enable_disregard', 0);
 ---#
 

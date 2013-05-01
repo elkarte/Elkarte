@@ -321,14 +321,14 @@ function action_showDrafts($member_id, $topic = false, $draft_type = 0)
 		// Post drafts
 		if ($draft_type === 0)
 			$context['drafts'][] = array(
-				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_string(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_string(stripslashes($draft['subject']), $modSettings['subject_length'])),
 				'poster_time' => timeformat($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		// PM drafts
 		elseif ($draft_type === 1)
 			$context['drafts'][] = array(
-				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_string(stripslashes($draft['subject']), 24)),
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_string(stripslashes($draft['subject']), $modSettings['subject_length'])),
 				'poster_time' => timeformat($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
