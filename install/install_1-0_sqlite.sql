@@ -1987,6 +1987,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('search_weight_subjec
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('search_weight_first_message', '10');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('search_max_results', '1200');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('search_floodcontrol_time', '5');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('ssi_subject_length', '25');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('permission_enable_deny', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('permission_enable_postgroups', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('mail_next_send', '0');
