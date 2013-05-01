@@ -440,7 +440,7 @@ function action_unapproved_attachments()
 				),
 				'data' => array(
 					'function' => create_function('$data', '
-						return \'<a href="\' . $data[\'message\'][\'href\'] . \'">\' . shorten_subject($data[\'message\'][\'subject\'], 20) . \'</a>\';'
+						return \'<a href="\' . $data[\'message\'][\'href\'] . \'">\' . shorten_string($data[\'message\'][\'subject\'], 20) . \'</a>\';'
 					),
 					'class' => 'smalltext',
 					'style' => 'width:15em;',

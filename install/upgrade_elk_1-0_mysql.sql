@@ -36,6 +36,10 @@ VALUES
 	('gravatar_rating', 'g'),
 	('xmlnews_limit', 5),
 	('visual_verification_num_chars', '6'),
+	('ssi_subject_length', '25'),
+	('ssi_body_length', '128'),
+	('subject_length', '24'),
+	('body_length', '128'),
 	('enable_disregard', 0);
 ---#
 

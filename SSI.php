@@ -449,8 +449,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_subject($row['subject'], 25),
-			'preview' => $smcFunc['strlen']($preview) > 128 ? $smcFunc['substr']($preview, 0, 128) . '...' : $preview,
+			'short_subject' => shorten_string($row['subject'], $modSettings['ssi_subject_length']),
+			'preview' => $smcFunc['strlen']($preview) > $modSettings['ssi_body_length'] ? $smcFunc['substr']($preview, 0, $modSettings['ssi_body_length']) . '...' : $preview,
 			'body' => $row['body'],
 			'time' => timeformat($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -559,8 +559,8 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if ($smcFunc['strlen']($row['body']) > $modSettings['ssi_body_length'])
+			$row['body'] = $smcFunc['substr']($row['body'], 0, $modSettings['ssi_body_length']) . '...';
 
 		// Censor the subject.
 		censorText($row['subject']);
@@ -587,7 +587,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => shorten_subject($row['subject'], 25),
+			'short_subject' => shorten_string($row['subject'], $modSettings['ssi_subject_length']),
 			'preview' => $row['body'],
 			'time' => timeformat($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
