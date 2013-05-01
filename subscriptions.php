@@ -166,7 +166,7 @@ if ($gatewayClass->isRefund())
 			'REFUNDNAME' => $member_info['member_name'],
 			'REFUNDUSER' => $member_info['real_name'],
 			'PROFILELINK' => $scripturl . '?action=profile;u=' . $member_id,
-			'DATE' => timeformat(time(), false),
+			'DATE' => standardTime(time(), false),
 		);
 
 		emailAdmins('paid_subscription_refund', $replacements, $notify_users);
@@ -255,7 +255,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 			'SUBEMAIL' => $member_info['email_address'],
 			'PRICE' => sprintf($modSettings['paid_currency_symbol'], $total_cost),
 			'PROFILELINK' => $scripturl . '?action=profile;u=' . $member_id,
-			'DATE' => timeformat(time(), false),
+			'DATE' => standardTime(time(), false),
 		);
 
 		emailAdmins('paid_subscription_new', $replacements, $notify_users);

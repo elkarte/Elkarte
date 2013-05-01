@@ -274,7 +274,7 @@ class ManageScheduledTasks_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'tasks';
 		$context['sub_template'] = 'edit_scheduled_tasks';
 		$context['page_title'] = $txt['scheduled_task_edit'];
-		$context['server_time'] = timeformat(time(), false, 'server');
+		$context['server_time'] = standardTime(time(), false, 'server');
 
 		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
 		// Cleaning...
@@ -387,7 +387,7 @@ class ManageScheduledTasks_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'time_run\'], true);
+							return standardTime($rowData[\'time_run\'], true);
 						'),
 					),
 					'sort' => array(

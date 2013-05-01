@@ -400,7 +400,7 @@ function template_info_center()
 	echo $context['show_who'] ? '</a>' : '', '
 
 				&nbsp;-&nbsp;', $txt['most_online_today'], ': <strong>', comma_format($modSettings['mostOnlineToday']), '</strong>&nbsp;-&nbsp;
-				', $txt['most_online_ever'], ': ', comma_format($modSettings['mostOnline']), ' (', timeformat($modSettings['mostDate']), ')<br />';
+				', $txt['most_online_ever'], ': ', comma_format($modSettings['mostOnline']), ' (', relativeTime($modSettings['mostDate']), ')<br />';
 
 	// Assuming there ARE users online... each user in users_online has an id, username, name, group, href, and link.
 	if (!empty($context['users_online']))

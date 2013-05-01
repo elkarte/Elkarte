@@ -84,7 +84,7 @@ function getLastPosts($latestPostOptions)
 			'subject' => $row['subject'],
 			'short_subject' => shorten_subject($row['subject'], 24),
 			'preview' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'raw_timestamp' => $row['poster_time'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'],
@@ -109,7 +109,7 @@ function cache_getLastPosts($latestPostOptions)
 		'post_retri_eval' => '
 			foreach ($cache_block[\'data\'] as $k => $post)
 			{
-				$cache_block[\'data\'][$k][\'time\'] = timeformat($post[\'raw_timestamp\']);
+				$cache_block[\'data\'][$k][\'time\'] = relativeTime($post[\'raw_timestamp\']);
 				$cache_block[\'data\'][$k][\'timestamp\'] = forum_time(true, $post[\'raw_timestamp\']);
 			}',
 	);

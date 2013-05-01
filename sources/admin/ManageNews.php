@@ -645,7 +645,7 @@ class ManageNews_Controller
 		$_POST['message'] = str_replace($variables,
 			array(
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
-				timeformat(forum_time(), false),
+				standardTime(forum_time(), false),
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
@@ -654,7 +654,7 @@ class ManageNews_Controller
 		$_POST['subject'] = str_replace($variables,
 			array(
 				$scripturl,
-				timeformat(forum_time(), false),
+				standardTime(forum_time(), false),
 				$modSettings['latestRealName'],
 				$modSettings['latestMember'],
 				$modSettings['latestRealName']

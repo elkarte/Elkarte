@@ -339,7 +339,7 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
 			'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
 			'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
 			'url' => $row['url'],
-			'time' => timeformat($row['log_time']),
+			'time' => relativeTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
 	$smcFunc['db_free_result']($request);
@@ -413,7 +413,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 			'topic' => $row['id_topic'],
 			'id' => $row['id_msg'],
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time'])
 		);
 	$smcFunc['db_free_result']($request);
@@ -841,7 +841,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 	$logins = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$logins[] = array(
-			'time' => timeformat($row['time']),
+			'time' => relativeTime($row['time']),
 			'ip' => $row['ip'],
 			'ip2' => $row['ip2'],
 		);
@@ -1036,7 +1036,7 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 			'action_text' => $action_text,
 			'before' => !empty($extra['previous']) ? ($parse_bbc ? parse_bbc($extra['previous']) : $extra['previous']) : '',
 			'after' => !empty($extra['new']) ? ($parse_bbc ? parse_bbc($extra['new']) : $extra['new']) : '',
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
