@@ -177,7 +177,7 @@ function prepareMessageContext($message)
 	// When was it last modified?
 	if (!empty($message['message']['modified_time']))
 	{
-		$context['last_modified'] = standardTime($message['message']['modified_time']);
+		$context['last_modified'] = relativeTime($message['message']['modified_time']);
 		$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $message['message']['modified_name']);
 	}
 

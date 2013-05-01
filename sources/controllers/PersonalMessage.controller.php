@@ -840,7 +840,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
 			),
 			'recipients' => &$recipients[$subject['id_pm']],
 			'subject' => $subject['subject'],
-			'time' => standardTime($subject['msgtime']),
+			'time' => relativeTime($subject['msgtime']),
 			'timestamp' => forum_time(true, $subject['msgtime']),
 			'number_recipients' => count($recipients[$subject['id_pm']]['to']),
 			'labels' => &$context['message_labels'][$subject['id_pm']],
@@ -908,7 +908,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
 		'id' => $message['id_pm'],
 		'member' => &$memberContext[$message['id_member_from']],
 		'subject' => $message['subject'],
-		'time' => standardTime($message['msgtime']),
+		'time' => relativeTime($message['msgtime']),
 		'timestamp' => forum_time(true, $message['msgtime']),
 		'counter' => $counter,
 		'body' => $message['body'],
@@ -1062,7 +1062,7 @@ function action_sendmessage()
 				'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 			),
 			'subject' => $row_quoted['subject'],
-			'time' => standardTime($row_quoted['msgtime']),
+			'time' => relativeTime($row_quoted['msgtime']),
 			'timestamp' => forum_time(true, $row_quoted['msgtime']),
 			'body' => $row_quoted['body']
 		);
@@ -1309,7 +1309,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 				'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 			),
 			'subject' => $row_quoted['subject'],
-			'time' => standardTime($row_quoted['msgtime']),
+			'time' => relativeTime($row_quoted['msgtime']),
 			'timestamp' => forum_time(true, $row_quoted['msgtime']),
 			'body' => parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']),
 		);

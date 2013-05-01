@@ -144,7 +144,7 @@ function action_stats()
 	$context['num_topics'] = comma_format($modSettings['totalTopics']);
 	$context['most_members_online'] = array(
 		'number' => comma_format($modSettings['mostOnline']),
-		'date' => standardTime($modSettings['mostDate'])
+		'date' => relativeTime($modSettings['mostDate'])
 	);
 	$context['latest_member'] = &$context['common_stats']['latest_member'];
 

@@ -376,7 +376,7 @@ function action_printpage()
 	$context['board_name'] = $board_info['name'];
 	$context['category_name'] = $board_info['cat']['name'];
 	$context['poster_name'] = $row['poster_name'];
-	$context['post_time'] = standardTime($row['poster_time'], false);
+	$context['post_time'] = relativeTime($row['poster_time'], false);
 	$context['parent_boards'] = array();
 	foreach ($board_info['parent_boards'] as $parent)
 		$context['parent_boards'][] = $parent['name'];
@@ -405,7 +405,7 @@ function action_printpage()
 		$context['posts'][] = array(
 			'subject' => $row['subject'],
 			'member' => $row['poster_name'],
-			'time' => standardTime($row['poster_time'], false),
+			'time' => relativeTime($row['poster_time'], false),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => parse_bbc($row['body'], 'print'),
 			'id_msg' => $row['id_msg'],

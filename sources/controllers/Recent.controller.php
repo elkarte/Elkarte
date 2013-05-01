@@ -67,7 +67,7 @@ function getLastPost()
 		'subject' => $row['subject'],
 		'short_subject' => shorten_subject($row['subject'], 24),
 		'preview' => $row['body'],
-		'time' => standardTime($row['poster_time']),
+		'time' => relativeTime($row['poster_time']),
 		'timestamp' => forum_time(true, $row['poster_time']),
 		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'
@@ -341,7 +341,7 @@ function action_recent()
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
 			'start' => $row['num_replies'],
 			'subject' => $row['subject'],
-			'time' => standardTime($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'first_poster' => array(
 				'id' => $row['id_first_member'],
@@ -1244,7 +1244,7 @@ function action_unread()
 					'href' => $scripturl . '?action=profile;u=' . $row['id_first_member'],
 					'link' => !empty($row['id_first_member']) ? '<a class="preview" href="' . $scripturl . '?action=profile;u=' . $row['id_first_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_poster_name'] . '">' . $row['first_poster_name'] . '</a>' : $row['first_poster_name']
 				),
-				'time' => standardTime($row['first_poster_time']),
+				'time' => relativeTime($row['first_poster_time']),
 				'timestamp' => forum_time(true, $row['first_poster_time']),
 				'subject' => $row['first_subject'],
 				'preview' => $row['first_body'],
@@ -1261,7 +1261,7 @@ function action_unread()
 					'href' => $scripturl . '?action=profile;u=' . $row['id_last_member'],
 					'link' => !empty($row['id_last_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_last_member'] . '">' . $row['last_poster_name'] . '</a>' : $row['last_poster_name']
 				),
-				'time' => standardTime($row['last_poster_time']),
+				'time' => relativeTime($row['last_poster_time']),
 				'timestamp' => forum_time(true, $row['last_poster_time']),
 				'subject' => $row['last_subject'],
 				'preview' => $row['last_body'],
