@@ -254,7 +254,7 @@ function getBoardIndex($boardIndexOptions)
 
 		// Prepare the subject, and make sure it's not too long.
 		censorText($row_board['subject']);
-		$row_board['short_subject'] = shorten_subject($row_board['subject'], 24);
+		$row_board['short_subject'] = shorten_string($row_board['subject'], 24);
 		$this_last_post = array(
 			'id' => $row_board['id_msg'],
 			'time' => $row_board['poster_time'] > 0 ? timeformat($row_board['poster_time']) : $txt['not_applicable'],

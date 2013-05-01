@@ -744,7 +744,7 @@ function un_htmlspecialchars($string)
  * @param string $subject
  * @param int $len
  */
-function shorten_subject($subject, $len)
+function shorten_string($subject, $len)
 {
 	global $smcFunc;
 

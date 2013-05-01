@@ -449,7 +449,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_subject($row['subject'], 25),
+			'short_subject' => shorten_string($row['subject'], 25),
 			'preview' => $smcFunc['strlen']($preview) > 128 ? $smcFunc['substr']($preview, 0, 128) . '...' : $preview,
 			'body' => $row['body'],
 			'time' => timeformat($row['poster_time']),
@@ -587,7 +587,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => shorten_subject($row['subject'], 25),
+			'short_subject' => shorten_string($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => timeformat($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),

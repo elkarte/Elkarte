@@ -82,7 +82,7 @@ function getLastPosts($latestPostOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_subject($row['subject'], 24),
+			'short_subject' => shorten_string($row['subject'], 24),
 			'preview' => $row['body'],
 			'time' => timeformat($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
