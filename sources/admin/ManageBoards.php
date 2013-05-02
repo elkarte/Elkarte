@@ -421,7 +421,6 @@ class ManageBoards_Controller
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/ManageBoards.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -592,7 +591,6 @@ class ManageBoards_Controller
 		validateToken('admin-be-' . $_REQUEST['boardid']);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/ManageBoards.subs.php');
 
 		// Mode: modify aka. don't delete.
 		if (isset($_POST['edit']) || isset($_POST['add']))
@@ -659,7 +657,7 @@ class ManageBoards_Controller
 			if (!empty($_POST['boardid']))
 			{
 				$properties = getBoardProperties($_POST['boardid']);
-				
+
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
 				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
 					unset($boardOptions['redirect']);
