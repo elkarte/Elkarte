@@ -185,6 +185,8 @@ class PackageServers_Controller
 	{
 		global $txt, $context, $scripturl, $forum_version, $context, $smcFunc;
 
+		require_once(SUBSDIR . '/PackageServers.subs.php');
+
 		if (isset($_GET['server']))
 		{
 			if ($_GET['server'] == '')
