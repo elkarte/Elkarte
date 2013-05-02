@@ -435,7 +435,7 @@ class ManageAttachments_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them attachments here!
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
@@ -650,7 +650,7 @@ class ManageAttachments_Controller
 
 		// We're working with them attachments here!
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// we need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
@@ -707,7 +707,7 @@ class ManageAttachments_Controller
 		}
 
 		// Finally move the attachments..
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		moveAvatars();
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
@@ -729,7 +729,7 @@ class ManageAttachments_Controller
 
 		// someone has to do the dirty work
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Deleting an attachment?
 		if ($_REQUEST['type'] != 'avatars')
@@ -762,7 +762,7 @@ class ManageAttachments_Controller
 
 		// we'll need this
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
@@ -789,7 +789,7 @@ class ManageAttachments_Controller
 		{
 			// we'll need this
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			require_once(SUBSDIR . '/ManageAttachments.subs.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			$attachments = array();
 			// There must be a quicker way to pass this safety test??
@@ -1373,7 +1373,7 @@ class ManageAttachments_Controller
 	{
 		global $modSettings, $scripturl, $context, $txt, $smcFunc;
 
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
