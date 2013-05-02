@@ -17,8 +17,6 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-
-
 /**
  * Gets all of the files in a directory and its chidren directories
  *
