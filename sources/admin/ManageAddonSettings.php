@@ -32,9 +32,9 @@ class ManageAddonSettings_Controller
 	/**
 	 * This my friend, is for all the mod authors out there.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings, $settings;
+		global $context, $txt;
 
 		$context['page_title'] = $txt['admin_modifications'];
 
@@ -84,10 +84,8 @@ class ManageAddonSettings_Controller
 	/**
 	 * If you have a general mod setting to add stick it here.
 	 */
-	function action_addonSettings_display()
+	public function action_addonSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
-
 		// initialize the form
 		$this->_initAddonSettingsForm();
 
@@ -113,7 +111,7 @@ class ManageAddonSettings_Controller
 	/**
 	 * Initialize the customSettings form with any custom admin settings for or from add-ons.
 	 */
-	function _initAddonSettingsForm()
+	public function _initAddonSettingsForm()
 	{
 		global $context, $txt, $scripturl;
 
@@ -146,7 +144,7 @@ class ManageAddonSettings_Controller
 	 * This method is used by admin search.
 	 * @deprecated
 	 */
-	function settings()
+	public function settings()
 	{
 		$config_vars = array();
 
@@ -161,7 +159,7 @@ class ManageAddonSettings_Controller
 	 * Accessed through ?action=admin;area=modsettings;sa=hooks;
 	 * Allows for removal or disabing of selected hooks
 	 */
-	function action_hooks()
+	public function action_hooks()
 	{
 		global $scripturl, $context, $txt, $modSettings, $settings;
 
@@ -346,9 +344,9 @@ class ManageAddonSettings_Controller
 	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
-	function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
-		global $context, $txt;
+		global $context;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
