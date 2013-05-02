@@ -57,7 +57,7 @@ function get_files_recursive($dir_path)
  * @param type $sort
  * @return array
  */
-function get_integration_hooks_data($start, $per_page, $sort)
+function list_integration_hooks_data($start, $per_page, $sort)
 {
 	global $settings, $txt, $context, $scripturl, $modSettings;
 
@@ -224,7 +224,7 @@ function get_integration_hooks_data($start, $per_page, $sort)
  * @global type $context
  * @return int
  */
-function get_integration_hooks_count()
+function list_integration_hooks_count()
 {
 	global $context;
 

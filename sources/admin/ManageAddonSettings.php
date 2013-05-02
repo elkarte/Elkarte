@@ -213,10 +213,10 @@ class ManageAddonSettings_Controller
 			'base_href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
-				'function' => 'get_integration_hooks_data',
+				'function' => 'list_integration_hooks_data',
 			),
 			'get_count' => array(
-				'function' => 'get_integration_hooks_count',
+				'function' => 'list_integration_hooks_count',
 			),
 			'no_items_label' => $txt['hooks_no_hooks'],
 			'columns' => array(
