@@ -151,7 +151,7 @@ class ManageSmileys_Controller
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...
@@ -258,7 +258,7 @@ class ManageSmileys_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		// Set the right tab to be selected.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
 		$context['sub_template'] = $context['sub_action'];
@@ -539,7 +539,7 @@ class ManageSmileys_Controller
 	{
 		global $modSettings, $context, $txt;
 
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		// Get a list of all known smiley sets.
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
@@ -769,7 +769,7 @@ class ManageSmileys_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl, $modSettings;
 
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// Force the correct tab to be displayed.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
@@ -1360,7 +1360,7 @@ class ManageSmileys_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'setorder';
 
 		// Move smileys to another position.
@@ -1446,7 +1446,7 @@ class ManageSmileys_Controller
 		loadLanguage('Errors');
 		loadLanguage('Packages');
 
-		require_once(SUBSDIR . '/ManageSmileys.subs.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Installing unless proven otherwise
@@ -1674,7 +1674,7 @@ function importSmileys($smileyPath)
 {
 	global $modSettings;
 
-	require_once(SUBSDIR . '/ManageSmileys.subs.php');
+	require_once(SUBSDIR . '/Smileys.subs.php');
 
 	if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
 		fatal_lang_error('smiley_set_unable_to_import');
