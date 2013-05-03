@@ -83,7 +83,7 @@ class ManageMembers_Controller
 		$context['awaiting_activation'] = 0;
 		$context['awaiting_approval'] = 0;
 		$context['activation_numbers'] = countInactiveMembers();
-		
+
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
 			if (in_array($activation_type, array(0, 2)))
@@ -520,7 +520,7 @@ class ManageMembers_Controller
 						'function' => create_function('$rowData', '
 							global $txt;
 
-							require_once(SUBSDIR . \'/ManageMembers.subs.php\');
+							require_once(SUBSDIR . \'/Members.subs.php\');
 							// Calculate number of days since last online.
 							if (empty($rowData[\'last_login\']))
 								$difference = $txt[\'never\'];
@@ -982,7 +982,7 @@ class ManageMembers_Controller
 		checkSession();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
-		require_once(SUBSDIR . '/ManageMembers.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
