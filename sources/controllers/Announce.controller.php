@@ -72,37 +72,7 @@ class Announce_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		$context['groups'] = array();
-		if (in_array(0, $groups))
-		{
-			$context['groups'][0] = array(
-				'id' => 0,
-				'name' => $txt['announce_regular_members'],
-				'member_count' => 'n/a',
-			);
-		}
-
-		// Get all membergroups that have access to the board the announcement was made on.
-		$request = $smcFunc['db_query']('', '
-			SELECT mg.id_group, COUNT(mem.id_member) AS num_members
-			FROM {db_prefix}membergroups AS mg
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0 OR mg.id_group = mem.id_post_group)
-			WHERE mg.id_group IN ({array_int:group_list})
-			GROUP BY mg.id_group',
-			array(
-				'group_list' => $groups,
-				'newbie_id_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['groups'][$row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => '',
-				'member_count' => $row['num_members'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$context['groups'] = getGroups($groups);
 
 		// Now get the membergroup names.
 		$groups_info = membergroupsById($groups, 0);
