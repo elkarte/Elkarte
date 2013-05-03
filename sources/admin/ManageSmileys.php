@@ -1137,10 +1137,9 @@ class ManageSmileys_Controller
 	{
 		global $context, $settings, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManageMessageIcons.subs.php');
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 		// Get a list of icons.
 		$context['icons'] = getMessageIcons();
-
 
 		// Submitting a form?
 		if (isset($_POST['icons_save']))
