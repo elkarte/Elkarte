@@ -159,7 +159,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  * @param int $filter
  * @return array
  */
-function fetchErrorsByType($sort = null, $filter = null)
+function fetchErrorsByType($filter = null, $sort = null)
 {
 	global $smcFunc, $txt, $scripturl;
 
