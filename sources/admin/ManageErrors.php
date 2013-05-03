@@ -166,16 +166,19 @@ class ManageErrors_Controller
 
 		$context['error_types'] = array();
 
+		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
+		// What type of errors do we have and how many do we have?
+		$context['error_types'] = fetchErrorsByType($filter, $sort);
+		$sum = 0;
+		foreach ($context['error_types'] as $key => $value)
+			$sum += $key;
+
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
 			'is_selected' => empty($filter),
 		);
-
-		// What type of errors do we have and how many do we have?
-		$context['error_types'] = fetchErrorsByType($filter, $sort);
-	
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 
