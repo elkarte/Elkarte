@@ -33,7 +33,7 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $smcFunc, $smcFunc, $cur_profile;
+		global $language, $scripturl, $smcFunc, $cur_profile;
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
