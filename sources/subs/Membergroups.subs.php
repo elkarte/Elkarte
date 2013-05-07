@@ -875,7 +875,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * - 'postgroups' includes the post based membergroups
  * - 'protected' includes protected groups
  * - 'all' lists all groups
- * @excludes parameters:
+ * $excludes parameters:
  * - 'newbie' excludes the newbie group id_group 4
  * - 'custom' lists only the system based groups (id 0, 1, 2, 3)
  * - 'membergroups' excludes permission groups, lists the post based membergroups

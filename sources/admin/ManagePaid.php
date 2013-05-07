@@ -113,7 +113,7 @@ class ManagePaid_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SBUSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/ManagePaid.subs.php');
 
 		// initialize the form
 		$this->_init_paidSettingsForm();
@@ -270,6 +270,7 @@ class ManagePaid_Controller
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
+		require_once(SUBSDIR . '/ManagePaid.subs.php');
 		loadSubscriptions();
 
 		$listOptions = array(

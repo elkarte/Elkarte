@@ -425,7 +425,7 @@ class ManageBoards_Controller
 
 		// For editing the profile we'll need this.
 		loadLanguage('ManagePermissions');
-		require_once(ADMINDIR . '/ManagePermissions.php');
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
 		// id_board must be a number....

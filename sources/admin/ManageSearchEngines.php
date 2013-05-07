@@ -115,7 +115,7 @@ class ManageSearchEngines_Controller
 
 		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
 		foreach ($groups as $row)
-			$config_vars['spider_group'][2][$row['id_group']] = $row['group_name'];
+			$config_vars['spider_group'][2][$row['id']] = $row['name'];
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))

@@ -276,4 +276,6 @@ function loadThemes($knownThemes)
 			'known' => in_array($row['id_theme'], $knownThemes),
 		);
 	$smcFunc['db_free_result']($request);
+
+	return $themes;
 }
