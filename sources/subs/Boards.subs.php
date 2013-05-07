@@ -146,27 +146,10 @@ function markBoardsRead($boards, $unread = false)
  */
 function getMsgMemberID($messageID)
 {
-	global $smcFunc;
-
-	// Find the topic and make sure the member still exists.
-	$result = $smcFunc['db_query']('', '
-		SELECT IFNULL(mem.id_member, 0)
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_msg = {int:selected_message}
-		LIMIT 1',
-		array(
-			'selected_message' => (int) $messageID,
-		)
-	);
-	if ($smcFunc['db_num_rows']($result) > 0)
-		list ($memberID) = $smcFunc['db_fetch_row']($result);
-	// The message doesn't even exist.
-	else
-		$memberID = 0;
-	$smcFunc['db_free_result']($result);
-
-	return (int) $memberID;
+	require_once(SUBSDIR . '/Messages.subs.php');
+	$message_info = getMessageInfo((int) $messageID);
+	
+	return empty($message_info['id_member']) ? 0 : (int) $message_info['id_member'];
 }
 
 /**
