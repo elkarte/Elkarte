@@ -1355,6 +1355,106 @@ function approved_attach_sort($a, $b)
 }
 
 /**
+<<<<<<< HEAD
+ * In-topic quick moderation.
+ * Accessed by ?action=quickmod2
+ */
+function action_quickmod2()
+{
+	global $topic, $board, $user_info, $smcFunc, $modSettings, $context;
+
+	// Check the session = get or post.
+	checkSession('request');
+
+	require_once(SUBSDIR . '/Messages.subs.php');
+
+	if (empty($_REQUEST['msgs']))
+		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+
+	$messages = array();
+	foreach ($_REQUEST['msgs'] as $dummy)
+		$messages[] = (int) $dummy;
+
+	// We are restoring messages. We handle this in another place.
+	if (isset($_REQUEST['restore_selected']))
+		redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
+	if (isset($_REQUEST['split_selection']))
+	{
+		$mgsOptions = getMessageInfo(min($messages), true);
+
+		$_SESSION['split_selection'][$topic] = $messages;
+		redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+	}
+
+	require_once(SUBSDIR . '/Topic.subs.php');
+	$topic_info = getTopicInfo($topic);
+
+	// Allowed to delete any message?
+	if (allowedTo('delete_any'))
+		$allowed_all = true;
+	// Allowed to delete replies to their messages?
+	elseif (allowedTo('delete_replies'))
+	{
+		$allowed_all = $topic_info['id_member_started'] == $user_info['id'];
+	}
+	else
+		$allowed_all = false;
+
+	// Make sure they're allowed to delete their own messages, if not any.
+	if (!$allowed_all)
+		isAllowedTo('delete_own');
+
+	// Allowed to remove which messages?
+	$request = $smcFunc['db_query']('', '
+		SELECT id_msg, subject, id_member, poster_time
+		FROM {db_prefix}messages
+		WHERE id_msg IN ({array_int:message_list})
+			AND id_topic = {int:current_topic}' . (!$allowed_all ? '
+			AND id_member = {int:current_member}' : '') . '
+		LIMIT ' . count($messages),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'message_list' => $messages,
+		)
+	);
+	$messages = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+			continue;
+
+		$messages[$row['id_msg']] = array($row['subject'], $row['id_member']);
+	}
+	$smcFunc['db_free_result']($request);
+
+	// Get the first message in the topic - because you can't delete that!
+	$first_message = $topic_info['id_first_msg'];
+	$last_message = $topic_info['id_last_msg'];
+
+	// Delete all the messages we know they can delete. ($messages)
+	foreach ($messages as $message => $info)
+	{
+		// Just skip the first message - if it's not the last.
+		if ($message == $first_message && $message != $last_message)
+			continue;
+		// If the first message is going then don't bother going back to the topic as we're effectively deleting it.
+		elseif ($message == $first_message)
+			$topicGone = true;
+
+		removeMessage($message);
+
+		// Log this moderation action ;).
+		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info[1] != $user_info['id']))
+			logAction('delete', array('topic' => $topic, 'subject' => $info[0], 'member' => $info[1], 'board' => $board));
+	}
+
+	redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . $_REQUEST['start']);
+}
+
+/**
+=======
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
  * Callback filter for the retrieval of attachments.
  * This function returns false when:
  *  - the attachment is unapproved, and

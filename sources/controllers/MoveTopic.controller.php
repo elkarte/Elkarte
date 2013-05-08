@@ -272,6 +272,54 @@ class MoveTopic_Controller
 			);
 			createPost($msgOptions, $topicOptions, $posterOptions);
 		}
+<<<<<<< HEAD
+	}
+
+	// Create a link to this in the old board.
+	// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
+	if (isset($_POST['postRedirect']))
+	{
+		// Should be in the boardwide language.
+		if ($user_info['language'] != $language)
+			loadLanguage('index', $language);
+
+		$reason = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
+		preparsecode($reason);
+
+		// Add a URL onto the message.
+		$reason = strtr($reason, array(
+			$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $toboard . '.0]' . $board_info['name'] . '[/url]',
+			$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $topic . '.0[/iurl]'
+		));
+
+		// auto remove this MOVED redirection topic in the future?
+		$redirect_expires = !empty($_POST['redirect_expires']) ? ((int) ($_POST['redirect_expires'] * 60) + time()) : 0;
+
+		// redirect to the MOVED topic from topic list?
+		$redirect_topic = isset($_POST['redirect_topic']) ? $topic : 0;
+
+		$msgOptions = array(
+			'subject' => $txt['moved'] . ': ' . $board_info['subject'],
+			'body' => $reason,
+			'icon' => 'moved',
+			'smileys_enabled' => 1,
+		);
+		$topicOptions = array(
+			'board' => $board,
+			'lock_mode' => 1,
+			'mark_as_read' => true,
+			'redirect_expires' => $redirect_expires,
+			'redirect_topic' => $redirect_topic,
+			'is_approved' => $topic_info['approved'],
+		);
+		$posterOptions = array(
+			'id' => $user_info['id'],
+			'update_post_count' => empty($board_info['count_posts']),
+		);
+		createPost($msgOptions, $topicOptions, $posterOptions);
+	}
+=======
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
 
 		$request = $smcFunc['db_query']('', '
 			SELECT count_posts

@@ -1112,6 +1112,13 @@ class Post_Controller
 			if ($topic_info['locked'] != 0 && !allowedTo('moderate_board'))
 				fatal_lang_error('topic_locked', false);
 
+<<<<<<< HEAD
+	// If this isn't a new topic load the topic info that we need.
+	if (!empty($topic))
+	{
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topic_info = getTopicInfo($topic);
+=======
 			// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
 			if (isset($_REQUEST['poll']) && $topic_info['id_poll'] > 0)
 				unset($_REQUEST['poll']);
@@ -1132,6 +1139,7 @@ class Post_Controller
 				else
 					isAllowedTo('post_reply_own');
 			}
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
 
 			if (isset($_POST['lock']))
 			{
@@ -1775,6 +1783,12 @@ class Post_Controller
 		// Mark all the parents read.  (since you just posted and they will be unread.)
 		if (!$user_info['is_guest'] && !empty($board_info['parent_boards']))
 		{
+<<<<<<< HEAD
+			$event_poster = getEventPoster($_REQUEST['eventid']);
+
+			// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
+			isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
+=======
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}log_boards
 				SET id_msg = {int:id_msg}
@@ -1786,6 +1800,7 @@ class Post_Controller
 					'id_msg' => $modSettings['maxMsgID'],
 				)
 			);
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
 		}
 
 		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)

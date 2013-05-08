@@ -773,7 +773,35 @@ class MergeTopics_Controller
 		list($id_board) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
 
+<<<<<<< HEAD
+	// Determine the board the final topic resides in
+	require_once(SUBSDIR . '/Topic.subs.php');
+	$topic_info = getTopicInfo($id_topic);
+	$id_board = $topic_info['id_board'];
+
+	require_once(SUBSDIR . '/Post.subs.php');
+
+	// Update all the statistics.
+	updateStats('topic');
+	updateStats('subject', $id_topic, $target_subject);
+	updateLastMessages($boards);
+
+	logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
+
+	// Notify people that these topics have been merged?
+	sendNotifications($id_topic, 'merge');
+
+	// If there's a search index that needs updating, update it...
+	require_once(SUBSDIR . '/Search.subs.php');
+	$searchAPI = findSearchAPI();
+	if (is_callable(array($searchAPI, 'topicMerge')))
+		$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($_POST['enforce_subject']) ? null : array($context['response_prefix'], $target_subject));
+	// Send them to the all done page.
+	redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);
+}
+=======
 		require_once(SUBSDIR . '/Post.subs.php');
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
 
 		// Update all the statistics.
 		updateStats('topic');

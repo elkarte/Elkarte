@@ -169,8 +169,21 @@ class SplitTopics_Controller
 		// Before the actual split because of the fatal_lang_errors
 		$boards = splitDestinationBoard();
 
+<<<<<<< HEAD
+/**
+ * If we are also moving the topic somewhere else, let's try do to it
+ * Includes checks for permissions move_own/any, etc.
+ *
+ * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
+ * @param int $totopic id of the destination topic
+ */
+function splitAttemptMove($boards, $totopic)
+{
+	global $board, $user_info, $context, $smcFunc;
+=======
 		$splitAt = (int) $_POST['at'];
 		$messagesToBeSplit = array();
+>>>>>>> f6c70120449bacfbb751ada1ed9fd14bdd6fbb00
 
 		// Fetch the message IDs of the topic that are at or after the message.
 		if ($_POST['step2'] == 'afterthis')
