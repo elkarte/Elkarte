@@ -13,47 +13,48 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains one humble function, which applauds or smites a user.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
-/**
- * Modify a user's karma.
- * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
- * Requires the karma_edit permission, and that the user isn't a guest.
- * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
- * It is accessed via ?action=karma, sa=smite or sa=applaud.
- */
-function action_applaud()
+class Karma_Controller
 {
-	global $user_info;
+	/**
+ 	* Modify a user's karma.
+ 	* It redirects back to the referrer afterward, whether by javascript or the passed parameters.
+ 	* Requires the karma_edit permission, and that the user isn't a guest.
+ 	* It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
+ 	* It is accessed via ?action=karma, sa=smite or sa=applaud.
+ 	*/
+	function action_applaud()
+	{
+		global $user_info;
 
-	$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
 
-	// Start off with no change in karma.
-	$action = prepare_karma($id_target);
+		// Start off with no change in karma.
+		$action = prepare_karma($id_target);
 
-	give_karma($user_info['id'], $id_target, $action, 1);
+		give_karma($user_info['id'], $id_target, $action, 1);
 
-	redirect_karma();
-}
+		redirect_karma();
+	}
 
-function action_smite()
-{
-	global $user_info;
+	function action_smite()
+	{
+		global $user_info;
 
-	// The user ID _must_ be a number, no matter what.
-	$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		// The user ID _must_ be a number, no matter what.
+		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
 
-	// Start off with no change in karma.
-	$action = prepare_karma($id_target);
+		// Start off with no change in karma.
+		$action = prepare_karma($id_target);
 
-	give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
+		give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
 
-	redirect_karma();
+		redirect_karma();
+	}
 }
 
 function give_karma($id_executor, $id_target, $action, $dir)

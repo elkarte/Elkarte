@@ -8,3 +8,4 @@ Packages/temp
 .buildpath
 .project
 .settings/
+/nbproject/private/

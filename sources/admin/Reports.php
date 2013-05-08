@@ -145,7 +145,7 @@ class Reports_Controller
 		global $context, $txt, $smcFunc, $modSettings;
 
 		// Load the permission profiles.
-		require_once(ADMINDIR . '/ManagePermissions.php');
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadLanguage('ManagePermissions');
 		loadPermissionProfiles();
 

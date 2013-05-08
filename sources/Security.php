@@ -401,8 +401,9 @@ function is_not_banned($forceCheck = false)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
-		Logout(true, false);
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
+		$controller = new Auth_Controller();
+		$controller->action_logout(true, false);
 
 		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}

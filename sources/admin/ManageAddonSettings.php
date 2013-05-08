@@ -47,7 +47,11 @@ class ManageAddonSettings_Controller
 		// Make it easier for mods to add new areas.
 		call_integration_hook('integrate_modify_modifications', array(&$subActions));
 
-		$subAction = $_REQUEST['sa'];
+		// Pick the correct sub-action.
+		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
+			$subAction = $_REQUEST['sa'];
+		else
+			$subAction = 'general';
 
 		// Set up action/subaction stuff.
 		$action = new Action();

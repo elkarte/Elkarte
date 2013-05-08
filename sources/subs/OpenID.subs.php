@@ -358,7 +358,8 @@ function action_openidreturn()
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
 			require_once(CONTROLLERDIR . '/Register.controller.php');
-			return action_register2(true);
+			$controller = new Register_Controller();
+			return $controller->action_register2(true);
 		}
 		else
 			redirectexit('action=register');
@@ -390,7 +391,7 @@ function action_openidreturn()
 			'openid_uri' => $openid_uri,
 		);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
 
 		if (!checkActivation())
 			return;
