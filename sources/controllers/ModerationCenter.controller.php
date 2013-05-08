@@ -622,7 +622,7 @@ class ModerationCenter_Controller
 		$smcFunc['db_free_result']($request);
 
 		// What have the other moderators done to this message?
-		require_once(ADMINDIR . '/Modlog.php');
+		require_once(SUBSDIR . '/Modlog.subs.php');
 		require_once(SUBSDIR . '/List.subs.php');
 		loadLanguage('Modlog');
 
