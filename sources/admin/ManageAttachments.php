@@ -114,23 +114,6 @@ class ManageAttachments_Controller
 		// initialize the form
 		$this->_initAttachSettingsForm();
 
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
-		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-
-		// First time here?
-		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1)
-			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
-
-		// If not set, show a default path for the base directory
-		if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
-			if (is_dir($modSettings['attachmentUploadDir'][1]))
-				$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];
-			else
-				$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
-
 		$config_vars = $this->_attachSettingsForm->settings();
 
 		$context['settings_post_javascript'] = '
@@ -220,7 +203,7 @@ class ManageAttachments_Controller
 	 */
 	private function _initAttachSettingsForm()
 	{
-		global $modSettings, $txt;
+		global $modSettings, $txt, $scripturl;
 
 		// instantiate the form
 		$this->_attachSettingsForm = new Settings_Form();

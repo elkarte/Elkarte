@@ -628,7 +628,7 @@ class ManageServer_Controller
 
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
-		$this->_balancingSettingsForm->prepare_db();
+		$this->_balancingSettingsForm->prepare_db($config_vars);
 	}
 
 	/**
