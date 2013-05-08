@@ -1449,7 +1449,7 @@ function updateSplitTopics($options, $id_board)
 	);
 }
 
-function topicStarter()
+function topicStarter($topic)
 {
 	global $smcFunc;
 

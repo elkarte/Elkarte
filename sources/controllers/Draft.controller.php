@@ -77,12 +77,13 @@ class Draft_Controller
 	 * Uses the showdraft template
 	 * Allows for the deleting and loading/editing of drafts
 	 *
-	 * @param int $memID
 	 * @param int $draft_type = 0
 	 */
-	function action_showProfileDrafts($memID, $draft_type = 0)
+	function action_showProfileDrafts($draft_type = 0)
 	{
 		global $txt, $scripturl, $modSettings, $context, $smcFunc;
+
+		$memID = currentMemberID();
 
 		// Some initial context.
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
@@ -188,11 +189,15 @@ class Draft_Controller
 	 * Uses the showpmdraft template
 	 * Allows for the deleting and loading/editing of PM drafts
 	 *
-	 * @param int $memID = -1
 	 */
-	function action_showPMDrafts($memID = -1)
+	function action_showPMDrafts()
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
+
+		$memID = currentMemberID(false);
+		// @todo: is necessary? Added because the default was -1
+		if (empty($memID))
+			$memID = -1;
 
 		// set up what we will need
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;

@@ -1571,7 +1571,7 @@ function getMember($search, $buddies = array())
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (!empty($search) ? '
+		WHERE real_name LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
 		LIMIT ' . ($smcFunc['strlen']($search) <= 2 ? '100' : '800'),

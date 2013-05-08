@@ -45,9 +45,10 @@ class Topic_Controller
 
 		// Get subs/Post.subs.php for sendNotifications.
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Find out who started the topic
-		list ($starter, $locked) = topicStarter();
+		list ($starter, $locked) = topicStarter($topic);
 
 		// Can you lock topics here, mister?
 		$user_lock = !allowedTo('lock_any');
@@ -111,6 +112,7 @@ class Topic_Controller
 
 		// We need subs/Post.subs.php for the sendNotifications() function.
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
 		$request = $smcFunc['db_query']('', '
