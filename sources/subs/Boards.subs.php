@@ -931,6 +931,8 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
+	global $smcFunc;
+
 	// Find out if they have notification set for this board already.
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member
@@ -1019,8 +1021,6 @@ function accessibleBoards()
 function boardInfo($board_id, $topic_id = null)
 {
 	global $smcFunc;
-
-	$returns = array();
 
 	if (!empty($topic_id))
 	{
