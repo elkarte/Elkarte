@@ -196,7 +196,7 @@ function action_splitExecute()
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context;
+	global $board, $user_info, $context, $smcFunc;
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)
