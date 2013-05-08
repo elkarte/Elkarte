@@ -1227,7 +1227,7 @@ function action_showPermissions($memID)
 	loadTemplate('ManageMembers');
 
 	// Load all the permission profiles.
-	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(SUBSDIR . '/ManagePermissions.subs.php');
 	loadPermissionProfiles();
 
 	$context['member']['id'] = $memID;
