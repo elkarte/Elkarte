@@ -1505,3 +1505,26 @@ function setTopicAttribute($topic, $attributes)
 			)
 		);
 }
+
+/**
+ * Toggle sticky status for the passed topics.
+ *
+ * @param array $topics
+ */
+function toggleTopicSticky($topics)
+{
+	global $smcFunc;
+
+	$topics = is_array($topics) ? $topics : array($topics);
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET is_sticky = CASE WHEN is_sticky = 1 THEN 0 ELSE 1 END
+		WHERE id_topic IN ({array_int:sticky_topic_ids})',
+		array(
+			'sticky_topic_ids' => $topics,
+		)
+	);
+
+	return $smcFunc['db_affected_rows']();
+}

@@ -639,6 +639,8 @@ class MessageIndex_Controller
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(SUBSDIR . '/Post.subs.php');
+		// Process process process data.
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Remember the last board they moved things to.
 		if (isset($_REQUEST['move_to']))
@@ -809,15 +811,7 @@ class MessageIndex_Controller
 		// Do all the stickies...
 		if (!empty($stickyCache))
 		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}topics
-				SET is_sticky = CASE WHEN is_sticky = {int:is_sticky} THEN 0 ELSE 1 END
-				WHERE id_topic IN ({array_int:sticky_topic_ids})',
-				array(
-					'sticky_topic_ids' => $stickyCache,
-					'is_sticky' => 1,
-				)
-			);
+			toggleTopicSticky($stickyCache);
 
 			// Get the board IDs and Sticky status
 			$request = $smcFunc['db_query']('', '
