@@ -20,12 +20,13 @@ if (!defined('ELKARTE'))
 
 /**
  * View a summary.
- * @param int $memID id_member
  */
-function action_summary($memID)
+function action_summary()
 {
 	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
 	global $scripturl, $smcFunc, $settings;
+
+	$memID = currentMemberID();
 
 	// Attempt to load the member's profile data.
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
@@ -264,12 +265,13 @@ function action_summary($memID)
  * Show all posts by the current user
  * @todo This function needs to be split up properly.
  *
- * @param int $memID id_member
  */
-function action_showPosts($memID)
+function action_showPosts()
 {
 	global $txt, $user_info, $scripturl, $modSettings;
 	global $context, $user_profile, $smcFunc, $board;
+
+	$memID = currentMemberID();
 
 	// Some initial context.
 	$context['start'] = (int) $_REQUEST['start'];
@@ -587,9 +589,8 @@ function action_showPosts($memID)
 /**
  * Show all the attachments of a user.
  *
- * @param int $memID id_member
  */
-function action_showAttachments($memID)
+function action_showAttachments()
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
 	global $context, $user_profile, $smcFunc;
@@ -600,6 +601,8 @@ function action_showAttachments($memID)
 	// Make sure we can't actually see anything...
 	if (empty($boardsAllowed))
 		$boardsAllowed = array(-1);
+
+	$memID = currentMemberID();
 
 	require_once(SUBSDIR . '/List.subs.php');
 
@@ -803,11 +806,12 @@ function list_getNumAttachments($boardsAllowed, $memID)
 /**
  * Show all the disregarded topics.
  *
- * @param int $memID id_member
  */
-function action_showDisregarded($memID)
+function action_showDisregarded()
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $smcFunc;
+
+	$memID = currentMemberID();
 
 	// Only the owner can see the list (if the function is enabled of course)
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
@@ -1014,11 +1018,12 @@ function list_getNumDisregarded($memID)
 /**
  * Gets the user stats for display
  *
- * @param int $memID id_member
  */
-function action_statPanel($memID)
+function action_statPanel()
 {
 	global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings, $smcFunc;
+
+	$memID = currentMemberID();
 
 	$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$memID]['real_name'];
 
@@ -1212,9 +1217,8 @@ function action_statPanel($memID)
 /**
  * Show permissions for a user.
  *
- * @param int $memID id_member
  */
-function action_showPermissions($memID)
+function action_showPermissions()
 {
 	global $scripturl, $txt, $board, $modSettings;
 	global $user_profile, $context, $user_info, $smcFunc;
@@ -1227,8 +1231,10 @@ function action_showPermissions($memID)
 	loadTemplate('ManageMembers');
 
 	// Load all the permission profiles.
-	require_once(ADMINDIR . '/ManagePermissions.php');
+	require_once(SUBSDIR . '/ManagePermissions.subs.php');
 	loadPermissionProfiles();
+
+	$memID = currentMemberID();
 
 	$context['member']['id'] = $memID;
 	$context['member']['name'] = $user_profile[$memID]['real_name'];
@@ -1394,9 +1400,8 @@ function action_showPermissions($memID)
 /**
  * View a members warnings?
  *
- * @param int $memID id_member
  */
-function action_viewWarning($memID)
+function action_viewWarning()
 {
 	global $modSettings, $context, $txt, $scripturl;
 
@@ -1412,7 +1417,8 @@ function action_viewWarning($memID)
 	// Let's use a generic list to get all the current warnings
 	// and use the issue warnings grab-a-granny thing.
 	require_once(SUBSDIR . '/List.subs.php');
-	require_once(SUBSDIR . '/Profile.subs.php');
+
+	$memID = currentMemberID();
 
 	$listOptions = array(
 		'id' => 'view_warnings',

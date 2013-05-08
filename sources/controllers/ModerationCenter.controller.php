@@ -622,7 +622,7 @@ class ModerationCenter_Controller
 		$smcFunc['db_free_result']($request);
 
 		// What have the other moderators done to this message?
-		require_once(ADMINDIR . '/Modlog.php');
+		require_once(SUBSDIR . '/Modlog.subs.php');
 		require_once(SUBSDIR . '/List.subs.php');
 		loadLanguage('Modlog');
 
@@ -1740,21 +1740,24 @@ function action_modcenter($dont_call = false)
 			'areas' => array(
 				'index' => array(
 					'label' => $txt['moderation_center'],
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_moderationHome',
 				),
 				'settings' => array(
 					'label' => $txt['mc_settings'],
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_moderationSettings',
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_modEndSession',
 					'enabled' => empty($modSettings['securityDisable_moderate']),
 				),
 				'notice' => array(
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_showNotice',
 					'select' => 'index'
@@ -1791,6 +1794,7 @@ function action_modcenter($dont_call = false)
 					'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
 					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=postmod',
 					'subsections' => array(
@@ -1802,13 +1806,14 @@ function action_modcenter($dont_call = false)
 					'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 					'enabled' => $context['can_moderate_approvals'],
 					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
 					'function' => 'action_postmoderation',
 					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 				),
 				'reports' => array(
 					'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
 					'enabled' => $context['can_moderate_boards'],
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_reportedPosts',
 					'subsections' => array(
 						'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
@@ -1824,7 +1829,7 @@ function action_modcenter($dont_call = false)
 				'userwatch' => array(
 					'label' => $txt['mc_watched_users_title'],
 					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_viewWatchedUsers',
 					'subsections' => array(
 						'member' => array($txt['mc_watched_users_member']),

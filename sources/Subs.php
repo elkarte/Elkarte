@@ -3834,6 +3834,10 @@ function setupMenuContext()
 	if (isset($context['menu_buttons'][$current_action]))
 		$context['menu_buttons'][$current_action]['active_button'] = true;
 
+	// No need for accurate text if we are in xml mode
+	if (isset($_REQUEST['xml']))
+		return;
+
 	// Update the PM menu item if they have unread messages
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
