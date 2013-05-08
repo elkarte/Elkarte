@@ -104,8 +104,7 @@ class ManageBans_Controller
 	 */
 	function action_list()
 	{
-		global $txt, $context, $ban_request, $ban_counts, $scripturl;
-		global $user_info, $smcFunc;
+		global $txt, $context, $scripturl, $user_info;
 
 		// User pressed the 'remove selection button'.
 		if (!empty($_POST['removeBans']) && !empty($_POST['remove']) && is_array($_POST['remove']))
@@ -297,7 +296,7 @@ class ManageBans_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $modSettings, $context, $ban_request, $scripturl, $smcFunc;
+		global $txt, $modSettings, $context, $scripturl;
 
 		$ban_errors = error_context::context('ban', 1);
 
@@ -499,7 +498,7 @@ class ManageBans_Controller
 	 */
 	function action_log()
 	{
-		global $scripturl, $context, $smcFunc, $txt;
+		global $scripturl, $context, $txt;
 		global $context;
 
 		// Delete one or more entries.
@@ -705,7 +704,6 @@ class ManageBans_Controller
 
 		if (isset($_POST['ban_items']))
 		{
-			$items_ids = array();
 			$ban_group_id = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 			array_map('intval', $_POST['ban_items']);
 
@@ -847,8 +845,7 @@ class ManageBans_Controller
 	 */
 	function action_browse()
 	{
-		global $modSettings, $context, $scripturl, $smcFunc, $txt;
-		global $settings;
+		global $modSettings, $context, $scripturl, $txt;
 
 		if (!empty($_POST['remove_triggers']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{

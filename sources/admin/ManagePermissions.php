@@ -365,7 +365,7 @@ class ManagePermissions_Controller
 	 */
 	public function action_quick()
 	{
-		global $context, $smcFunc;
+		global $context;
 
 		checkSession();
 		validateToken('admin-mpq', 'quick');

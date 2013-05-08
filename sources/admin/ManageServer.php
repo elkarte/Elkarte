@@ -415,9 +415,6 @@ class ManageServer_Controller
 		// initialize the form
 		$this->_initGeneralSettingsForm();
 
-		// lets accept this for now :P
-		$config_vars = $this->_generalSettingsForm->settings();
-
 		call_integration_hook('integrate_general_settings');
 
 		// Setup the template stuff.
@@ -457,8 +454,6 @@ class ManageServer_Controller
 		// initialize the form
 		$this->_initDatabaseSettingsForm();
 
-		$config_vars = $this->_databaseSettingsForm->settings();
-
 		call_integration_hook('integrate_database_settings');
 
 		// Setup the template stuff.
@@ -490,8 +485,6 @@ class ManageServer_Controller
 
 		// initialize the form
 		$this->_initCookieSettingsForm();
-
-		$config_vars = $this->_cookieSettingsForm->settings();
 
 		call_integration_hook('integrate_cookie_settings');
 
@@ -539,12 +532,10 @@ class ManageServer_Controller
 	 */
 	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt, $cache_enable;
+		global $context, $scripturl, $txt;
 
 		// initialize the form
 		$this->_initCacheSettingsForm();
-
-		$config_vars = $this->_cacheSettingsForm->settings();
 
 		// some javascript to enable / disable certain settings if the option is not selected
 		$context['settings_post_javascript'] = '

@@ -38,7 +38,7 @@ class ManageSearchEngines_Controller
  	*/
 	function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 
@@ -81,7 +81,7 @@ class ManageSearchEngines_Controller
 	 */
 	function action_engineSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initEngineSettingsForm();

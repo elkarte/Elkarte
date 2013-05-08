@@ -46,7 +46,7 @@ class Reports_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $modSettings, $context, $scripturl;
+		global $txt, $context, $scripturl;
 
 		// Only admins, only EVER admins!
 		isAllowedTo('admin_forum');
