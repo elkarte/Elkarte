@@ -171,7 +171,7 @@ class PersonalMessage_Controller
 
 		// Known action, go to it, otherwise the inbox for you
 		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-			action_messagefolder();
+			$this->action_messagefolder();
 		else
 		{
 			if (!isset($_REQUEST['xml']))
@@ -214,7 +214,7 @@ class PersonalMessage_Controller
 
 		// Set up some basic theme stuff.
 		$context['from_or_to'] = $context['folder'] != 'sent' ? 'from' : 'to';
-		$context['get_pmessage'] = 'prepareMessageContext';
+		$context['get_pmessage'] = 'preparePMContext';
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
@@ -2424,7 +2424,7 @@ function messageIndexBar($area)
  * @param $type
  * @param $reset
  */
-function prepareMessageContext($type = 'subject', $reset = false)
+function preparePMContext($type = 'subject', $reset = false)
 {
 	global $txt, $scripturl, $modSettings, $settings, $context, $messages_request, $memberContext, $recipients, $smcFunc;
 	global $user_info, $subjects_request;
