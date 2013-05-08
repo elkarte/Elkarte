@@ -24,18 +24,9 @@ function associatedPoll($topicID, $pollID = null)
 
 	if ($pollID === null)
 	{
-		// Retrieve the poll ID.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_poll
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topicID,
-			)
-		);
-		list ($pollID) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topic_info = getTopicInfo($topicID);
+		$pollID = $topic_info['id_poll'];
 
 		return $pollID;
 	}

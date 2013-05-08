@@ -759,17 +759,9 @@ function action_mergeExecute($topics = array())
 	}
 
 	// Determine the board the final topic resides in
-	$request = $smcFunc['db_query']('', '
-		SELECT id_board
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:id_topic}
-		LIMIT 1',
-		array(
-			'id_topic' => $id_topic,
-		)
-	);
-	list($id_board) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	require_once(SUBSDIR . '/Topic.subs.php');
+	$topic_info = getTopicInfo($id_topic);
+	$id_board = $topic_info['id_board'];
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
