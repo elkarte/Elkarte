@@ -19,6 +19,47 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
+ * Find the ID of the "current" member
+ *
+ * @param $fatal if the function ends in a fatal error in case of problems (default true)
+ * @param $reload_id if true the already set value is ignored (default false)
+ *
+ * @return mixed and integer if no error, false in case of problems if $fatal is false
+ */
+function currentMemberID($fatal = true, $reload_id = false)
+{
+	global $user_info;
+	static $memID;
+
+	// If we already 
+	if (isset($memID) && !$reload_id)
+		return $memID;
+
+	// Did we get the user by name...
+	if (isset($_REQUEST['user']))
+		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
+	// ... or by id_member?
+	elseif (!empty($_REQUEST['u']))
+		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
+	// If it was just ?action=profile, edit your own profile.
+	else
+		$memberResult = loadMemberData($user_info['id'], false, 'profile');
+
+	// Check if loadMemberData() has returned a valid result.
+	if (!is_array($memberResult))
+	{
+		if ($fatal)
+			fatal_lang_error('not_a_user', false);
+		else
+			return false;
+	}
+
+	// If all went well, we have a valid member ID!
+	list ($memID) = $memberResult;
+	return $memID;
+}
+
+/**
  * Setup the context for a page load!
  *
  * @param array $fields

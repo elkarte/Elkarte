@@ -312,7 +312,7 @@ function destroyMenu($menu_id = 'last')
  *
  * @param array $selectedMenu
  */
-function callMenu($selectedMenu, $params = array())
+function callMenu($selectedMenu)
 {
 	// We use only $selectedMenu['function'] and
 	//  $selectedMenu['controller'] if the latter is set.
@@ -322,17 +322,11 @@ function callMenu($selectedMenu, $params = array())
 		// 'controller' => 'ManageAttachments_Controller'
 		// 'function' => 'action_avatars'
 		$controller = new $selectedMenu['controller']();
-		if (!empty($params))
-			call_user_func_array(array($controller, $selectedMenu['function']), is_array($params) ? $params : array($params));
-		else
-			$controller->{$selectedMenu['function']}();
+		$controller->{$selectedMenu['function']}();
 	}
 	else
 	{
 		// a single function name... call it over!
-		if (!empty($params))
-			call_user_func_array($selectedMenu['function'], is_array($params) ? $params : array($params));
-		else
-			$selectedMenu['function']();
+		$selectedMenu['function']();
 	}
 }

@@ -36,23 +36,9 @@ function action_modifyprofile()
 	loadTemplate('Profile');
 
 	require_once(SUBSDIR . '/Menu.subs.php');
+	require_once(SUBSDIR . '/Profile.subs.php');
 
-	// Did we get the user by name...
-	if (isset($_REQUEST['user']))
-		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
-	// ... or by id_member?
-	elseif (!empty($_REQUEST['u']))
-		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
-	// If it was just ?action=profile, edit your own profile.
-	else
-		$memberResult = loadMemberData($user_info['id'], false, 'profile');
-
-	// Check if loadMemberData() has returned a valid result.
-	if (!is_array($memberResult))
-		fatal_lang_error('not_a_user', false);
-
-	// If all went well, we have a valid member ID!
-	list ($memID) = $memberResult;
+	$memID = currentMemberID();
 	$context['id_member'] = $memID;
 	$cur_profile = $user_profile[$memID];
 
@@ -510,8 +496,6 @@ function action_modifyprofile()
 	$post_errors = array();
 	$profile_vars = array();
 
-	require_once(SUBSDIR . '/Profile.subs.php');
-
 	// Right - are we saving - if so let's save the old data first.
 	if ($context['completed_save'])
 	{
@@ -557,7 +541,7 @@ function action_modifyprofile()
 		if ($current_area == 'activateaccount')
 		{
 			if (empty($post_errors))
-				action_activateaccount($memID);
+				action_activateaccount();
 		}
 		elseif ($current_area == 'deleteaccount')
 		{
@@ -661,7 +645,7 @@ function action_modifyprofile()
 	if (isset($profile_include_data['file']))
 		require_once(SOURCEDIR . '/' . $profile_include_data['file']);
 
-	callMenu($profile_include_data, $memID);
+	callMenu($profile_include_data);
 
 	// Set the page title if it's not already set...
 	if (!isset($context['page_title']))

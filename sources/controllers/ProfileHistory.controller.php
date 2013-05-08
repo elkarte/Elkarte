@@ -22,11 +22,12 @@ if (!defined('ELKARTE'))
  * Profile history main function.
  * Re-directs to sub-actions (@todo it should only set the context)
  *
- * @param int $memID id_member
  */
-function action_history($memID)
+function action_history()
 {
 	global $context, $txt, $scripturl, $modSettings, $user_profile;
+
+	$memID = currentMemberID();
 
 	$subActions = array(
 		'activity' => array('action_trackactivity', $txt['trackActivity']),

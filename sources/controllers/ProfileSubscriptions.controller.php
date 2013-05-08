@@ -23,15 +23,16 @@ if (!defined('ELKARTE'))
 /**
  * Function for doing all the paid subscription stuff - kinda.
  *
- * @param int $memID
  */
-function action_subscriptions($memID)
+function action_subscriptions()
 {
 	global $context, $txt, $modSettings, $smcFunc, $scripturl;
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');
 	loadLanguage('ManagePaid');
+
+	$memID = currentMemberID();
 
 	// Load all of the subscriptions.
 	require_once(SUBSDIR . '/ManagePaid.subs.php');
@@ -283,13 +284,14 @@ function action_subscriptions($memID)
  * Activate an account.
  * This function is called from the profile account actions area.
  *
- * @param int $memID the member ID
  */
-function action_activateaccount($memID)
+function action_activateaccount()
 {
 	global $context, $user_profile, $modSettings, $user_info;
 
 	isAllowedTo('moderate_forum');
+
+	$memID = currentMemberID();
 
 	if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
 	{

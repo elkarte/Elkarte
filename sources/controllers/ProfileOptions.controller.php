@@ -25,11 +25,12 @@ if (!defined('ELKARTE'))
 /**
  * Show all the users buddies, as well as a add/delete interface.
  *
- * @param int $memID id_member
  */
-function action_editBuddyIgnoreLists($memID)
+function action_editBuddyIgnoreLists()
 {
 	global $context, $txt, $scripturl, $modSettings, $user_profile;
+
+	$memID = currentMemberID();
 
 	// Do a quick check to ensure people aren't getting here illegally!
 	if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
@@ -282,14 +283,12 @@ function action_editIgnoreList($memID)
 /**
  * Allows the user to see or change their account info.
  *
- * @param int $memID id_member
  */
-function action_account($memID)
+function action_account()
 {
 	global $context, $txt;
 
-	// be sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -312,14 +311,12 @@ function action_account($memID)
 /**
  * Allow the user to change the forum options in their profile.
  *
- * @param int $memID id_member
  */
-function action_forumProfile($memID)
+function action_forumProfile()
 {
 	global $context, $user_profile, $user_info, $txt, $modSettings;
 
-	// make sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -343,13 +340,12 @@ function action_forumProfile($memID)
 /**
  * Allow the edit of *someone elses* personal message settings.
  *
- * @param int $memID id_member
  */
-function action_pmprefs($memID)
+function action_pmprefs()
 {
 	global $context, $txt, $scripturl;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
@@ -367,13 +363,12 @@ function action_pmprefs($memID)
 /**
  * Allow the user to pick a theme.
  *
- * @param int $memID id_member
  */
-function action_themepick($memID)
+function action_themepick()
 {
 	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -480,11 +475,12 @@ function action_authentication($memID, $saving = false)
 /**
  * Display the notifications and settings for changes.
  *
- * @param int $memID id_member
  */
-function action_notification($memID)
+function action_notification()
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $settings;
+
+	$memID = currentMemberID();
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -891,11 +887,12 @@ function loadThemeOptions($memID)
  * Allows the user to see the list of their ignored boards.
  * (and un-ignore them)
  *
- * @param int $memID id_member
  */
-function action_ignoreboards($memID)
+function action_ignoreboards()
 {
 	global $context, $modSettings, $cur_profile;
+
+	$memID = currentMemberID();
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
@@ -915,11 +912,12 @@ function action_ignoreboards($memID)
 /**
  * Function to allow the user to choose group membership etc...
  *
- * @param int $memID id_member
  */
-function action_groupMembership($memID)
+function action_groupMembership()
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc;
+
+	$memID = currentMemberID();
 
 	$curMember = $user_profile[$memID];
 	$context['primary_group'] = $curMember['id_group'];

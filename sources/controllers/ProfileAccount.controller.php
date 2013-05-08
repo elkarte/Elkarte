@@ -23,12 +23,13 @@ if (!defined('ELKARTE'))
 /**
  * Issue/manage an user's warning status.
  *
- * @param int $memID
  */
-function action_issuewarning($memID)
+function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
 	global $context, $cur_profile, $memberContext, $smcFunc;
+
+	$memID = currentMemberID();
 
 	// make sure the sub-template is set...
 	$context['sub_template'] = 'issueWarning';
@@ -376,9 +377,8 @@ function action_issuewarning($memID)
 /**
  * Present a screen to make sure the user wants to be deleted.
  *
- * @param int $memID the member ID
  */
-function action_deleteaccount($memID)
+function action_deleteaccount()
 {
 	global $txt, $context, $user_info, $modSettings, $cur_profile, $smcFunc;
 
@@ -401,9 +401,8 @@ function action_deleteaccount($memID)
 /**
  * Actually delete an account.
  *
- * @param int $memID the member ID
  */
-function action_deleteaccount2($memID)
+function action_deleteaccount2()
 {
 	global $user_info, $context, $cur_profile, $modSettings, $smcFunc;
 
@@ -418,6 +417,8 @@ function action_deleteaccount2($memID)
 		isAllowedTo('profile_remove_own');
 
 	checkSession();
+
+	$memID = currentMemberID();
 
 	$old_profile = &$cur_profile;
 
