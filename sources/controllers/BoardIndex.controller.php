@@ -144,6 +144,6 @@ class BoardIndex_Controller
 		}
 
 		// And go back to the board index.
-		action_boardindex();
+		$this->action_boardindex();
 	}
 }
