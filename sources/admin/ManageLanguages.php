@@ -90,7 +90,7 @@ class ManageLanguages_Controller
 		{
 			// Need fetch_web_data.
 			require_once(SUBSDIR . '/Package.subs.php');
-			require_once(SUBSDIR . '/ManageLanguages.subs.php');
+			require_once(SUBSDIR . '/Language.subs.php');
 
 			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
 
@@ -159,7 +159,7 @@ class ManageLanguages_Controller
 	{
 		global $txt, $context, $scripturl, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 
 		// Setting a new default?
 		if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -625,7 +625,7 @@ class ManageLanguages_Controller
 	{
 		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
 
 		// Select the languages tab.

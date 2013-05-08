@@ -94,7 +94,7 @@ reloadSettings();
 // Clean the request!
 cleanRequest();
 
-// Our good ole' contextual array, which will hold everything 
+// Our good ole' contextual array, which will hold everything
 $context = array();
 
 // Seed the random generator.

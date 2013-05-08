@@ -172,7 +172,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(CONTROLLERDIR . '/PostModeration.controller.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 

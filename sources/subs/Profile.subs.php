@@ -397,7 +397,7 @@ function loadProfileFields($force_reload = false)
 				// Do they need to revalidate? If so schedule the function!
 				if ($isValid === true && !empty($modSettings[\'send_validation_onChange\']) && !allowedTo(\'moderate_forum\'))
 				{
-					require_once(SUBSDIR . \'/Members.subs.php\');
+					require_once(SUBSDIR . \'/Auth.subs.php\');
 					$profile_vars[\'validation_code\'] = generateValidationCode();
 					$profile_vars[\'is_activated\'] = 2;
 					$context[\'profile_execute_on_save\'][] = \'profileSendActivation\';
