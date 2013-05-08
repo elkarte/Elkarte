@@ -738,3 +738,61 @@ function isFirstLogin($id_member)
 
 	return !empty($member) && $member['last_login'] == 0;
 }
+
+function findUser($where, $whereparams)
+{
+	global $smcFunc;
+
+	// Find the user!
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
+		FROM {db_prefix}members
+		WHERE ' . $where . '
+		LIMIT 1',
+		array_merge($where_params, array(
+		))
+	);
+
+	// Maybe email?
+	if ($smcFunc['db_num_rows']($request) == 0 && empty($_REQUEST['uid']))
+	{
+		$smcFunc['db_free_result']($request);
+
+		$request = $smcFunc['db_query']('', '
+			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
+			FROM {db_prefix}members
+			WHERE email_address = {string:email_address}
+			LIMIT 1',
+			array_merge($where_params, array(
+			))
+		);
+		if ($smcFunc['db_num_rows']($request) == 0)
+			fatal_lang_error('no_user_with_email', false);
+	}
+
+	$member = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $member;
+}
+
+/**
+ * Generate a random validation code.
+ *
+ * @return type
+ */
+function generateValidationCode()
+{
+	global $smcFunc, $modSettings;
+
+	$request = $smcFunc['db_query']('get_random_number', '
+		SELECT RAND()',
+		array(
+		)
+	);
+
+	list ($dbRand) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
+}

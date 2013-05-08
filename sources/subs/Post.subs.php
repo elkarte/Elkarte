@@ -1999,3 +1999,55 @@ function notifyMembersBoard(&$topicData)
 		)
 	);
 }
+
+/**
+ * Get the latest post made on the system
+ * - respects approved, recycled, and board permissions
+ *
+ * @return array
+ */
+function lastPost()
+{
+	global $user_info, $scripturl, $modSettings, $smcFunc;
+
+	// Find it by the board - better to order by board than sort the entire messages table.
+	$request = $smcFunc['db_query']('substring', '
+		SELECT ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
+			ml.smileys_enabled
+		FROM {db_prefix}boards AS b
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = b.id_last_msg)
+		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND ml.approved = {int:is_approved}
+		ORDER BY b.id_msg_updated DESC
+		LIMIT 1',
+		array(
+			'recycle_board' => $modSettings['recycle_board'],
+			'is_approved' => 1,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return array();
+	$row = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	// Censor the subject and post...
+	censorText($row['subject']);
+	censorText($row['body']);
+
+	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
+	if ($smcFunc['strlen']($row['body']) > 128)
+		$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+
+	// Send the data.
+	return array(
+		'topic' => $row['id_topic'],
+		'subject' => $row['subject'],
+		'short_subject' => shorten_subject($row['subject'], 24),
+		'preview' => $row['body'],
+		'time' => timeformat($row['poster_time']),
+		'timestamp' => forum_time(true, $row['poster_time']),
+		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'
+	);
+}

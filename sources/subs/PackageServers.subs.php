@@ -18,7 +18,7 @@ if (!defined('ELKARTE'))
  * @param int $server
  * @return array
  */
-function fetchPackageServers($server)
+function fetchPackageServers($server = null)
 {
 	global $smcFunc;
 	
@@ -28,7 +28,7 @@ function fetchPackageServers($server)
 	$request = $smcFunc['db_query']('', '
 		SELECT id_server, name, url
 		FROM {db_prefix}package_servers' .
-		!empty($server) ? 'WHERE id_server = {int:current_server}' : '',
+		(!empty($server) ? 'WHERE id_server = {int:current_server}' : ''),
 		array(
 			'current_server' => $server,
 		)

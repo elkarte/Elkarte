@@ -38,7 +38,7 @@ class ManageErrors_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
 
-		require_once(SUBSDIR . '/ManageErrors.subs.php');
+		require_once(SUBSDIR . '/Error.subs.php');
 
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
@@ -91,7 +91,7 @@ class ManageErrors_Controller
 			// // Go back to where we were.
 			if ($type == 'delete')
 				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
-		
+
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 		}
@@ -119,7 +119,7 @@ class ManageErrors_Controller
 			$context['errors'] = $logdata['errors'];
 			$members = $logdata['members'];
 		}
-		
+
 		// Load the member data.
 		if (!empty($members))
 		{
