@@ -45,7 +45,7 @@ function action_issuewarning($memID)
 
 	// Get the base (errors related) stuff done.
 	loadLanguage('Errors');
-	$context['custom_error_title'] = $txt['profile_warning_errors_occured'];
+	$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 	// Make sure things which are disabled stay disabled.
 	$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;
