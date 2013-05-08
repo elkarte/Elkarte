@@ -310,9 +310,13 @@ class Site_Dispatcher
 			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
-			elseif (method_exists($this->controller, 'action_index'))
+			elseif (method_exists($controller, 'action_index'))
 				$controller->action_index();
 			// fall back
+			elseif (function_exists($this->_function_name))
+			{
+				call_user_func($this->_function_name);
+			}
 			else
 			{
 				// things went pretty bad, huh?

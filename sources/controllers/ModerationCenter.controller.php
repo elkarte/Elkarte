@@ -1740,21 +1740,24 @@ function action_modcenter($dont_call = false)
 			'areas' => array(
 				'index' => array(
 					'label' => $txt['moderation_center'],
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_moderationHome',
 				),
 				'settings' => array(
 					'label' => $txt['mc_settings'],
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_moderationSettings',
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_modEndSession',
 					'enabled' => empty($modSettings['securityDisable_moderate']),
 				),
 				'notice' => array(
+					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_showNotice',
 					'select' => 'index'
