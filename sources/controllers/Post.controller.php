@@ -1037,7 +1037,7 @@ class Post_Controller
 
 		// Drafts enabled and needed?
 		if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
-			require_once(CONTROLLERDIR . '/Drafts.controller.php');
+			require_once(CONTROLLERDIR . '/Draft.controller.php');
 
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))

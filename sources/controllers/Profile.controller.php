@@ -121,7 +121,7 @@ function action_modifyprofile()
 				),
 				'showdrafts' => array(
 					'label' => $txt['drafts_show'],
-					'file' => 'Drafts.controller.php',
+					'file' => 'Draft.controller.php',
 					'controller' => 'Draft_Controller',
 					'function' => 'action_showProfileDrafts',
 					'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],

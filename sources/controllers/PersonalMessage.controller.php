@@ -943,7 +943,7 @@ class PersonalMessage_Controller
 
 		// PM Drafts enabled and needed?
 		if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-			require_once(CONTROLLERDIR . '/Drafts.controller.php');
+			require_once(CONTROLLERDIR . '/Draft.controller.php');
 
 		loadLanguage('PersonalMessage', '', false);
 
