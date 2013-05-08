@@ -22,7 +22,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Poll_Controller
+class Post_Controller
 {
 	/**
 	 * Handles showing the post screen, loading the post to be modified, and loading any post quoted.
