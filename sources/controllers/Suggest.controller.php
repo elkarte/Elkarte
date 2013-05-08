@@ -56,7 +56,7 @@ class Suggest_Controller
 		{
 			$function = 'action_suggest_' . $searchTypes[$_REQUEST['suggest_type']];
 			$context['sub_template'] = 'generic_xml';
-			$context['xml_data'] = $function();
+			$context['xml_data'] = $this->$function();
 		}
 	}
 
