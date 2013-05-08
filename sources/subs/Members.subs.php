@@ -1466,15 +1466,11 @@ function maxMemberID()
  *                - 'add_guest' (set or not) to add a guest user to the returned array
  *                - 'limit' int if set overrides the default query limit
  *                - 'sort' (string) a column to sort the results
- *                - 'moderation' (set or not) includes member_ip, id_group, additional_groups, last_login
- *                - 'authentication' (set or not) includes secret_answer, secret_question, openid_uri,
- *                                                         is_activated, validation_code, passwd_flood
- *                - 'preferences' (set or not) includes lngfile, mod_prefs, notify_types, signature
  * @return array
  */
 function getBasicMemberData($member_ids, $options = array())
 {
-	global $smcFunc, $txt;
+	global $txt;
 
 	$members = array();
 
@@ -1499,12 +1495,55 @@ function getBasicMemberData($member_ids, $options = array())
 		);
 	}
 
+	// This is complicated because it isn't safe. They are looking for a top/bottom of a list
+	// @todo do this with PHP instead of the database
+	// Get all of the ids that are in this group
+	if (isset($options['sort']))
+	{
+		$cache = cache_get_data('members=' . implode($member_ids, ',') . (isset($options['sort']) ? ';sort=' . $options['sort'] : '') . (isset($options['limit']) ? ';limit=' . $options['limit'] : ''));
+		if ($cache === null)
+		{
+			$members += getBasicMemberDataQuery($member_ids, $options);
+			return $members;
+		}
+	}
+
+	// We can do this the fast way
+	$query_ids = array();
+	foreach ($member_ids as $id)
+	{
+		// Can't do a multi get because we don't support that yet. At some point, we will and this needs to be refactored
+		$result = cache_get_data('member-' . $id);
+		if ($result === null)
+			$query_ids[] = $id;
+		else
+			$members[$id] = $result;
+	}
+
+	if (!empty($query_ids))
+		$members += getBasicMemberDataQuery($query_ids, $options);
+
+	return $single ? array_shift($members) : $members;
+}
+
+/**
+ * A function to be used by getBasicMemberData() to get the member data from the database
+ * @global type $smcFunc
+ * @param type $member_ids
+ * @param array $options
+ * @return type
+ */
+function getBasicMemberDataQuery($member_ids, array $options)
+{
+	global $smcFunc;
+
+	$members = array();
 	// Get some additional member info...
 	$request = $smcFunc['db_query']('', '
-		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (isset($options['moderation']) ? ',
-		member_ip, id_group, additional_groups, last_login' : '') . (isset($options['authentication']) ? ',
-		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (isset($options['preferences']) ? ',
-		lngfile, mod_prefs, notify_types, signature' : '') . '
+		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme,
+		member_ip, id_group, additional_groups, last_login,
+		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood,
+		lngfile, mod_prefs, notify_types, signature
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
 		' . (isset($options['sort']) ? '
@@ -1519,10 +1558,14 @@ function getBasicMemberData($member_ids, $options = array())
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!empty($single))
-				$members = $row;
-		else
-			$members[$row['id_member']] = $row;
+		$members[$row['id_member']] = $row;
+		cache_put_data('member-' . $row['id_member'], $row);
+	}
+
+	// When sorting we cache that special case
+	if (isset($options['sort']))
+	{
+		cache_get_data('members=' . implode($member_ids, ',') . (isset($options['sort']) ? ';sort=' . $options['sort'] : '') . (isset($options['limit']) ? ';limit=' . $options['limit'] : ''), array_keys($members));
 	}
 	$smcFunc['db_free_result']($request);
 
