@@ -248,8 +248,8 @@ class ModerationCenter_Controller
 					'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				),
 				'comments' => array(),
-				'time_started' => timeformat($row['time_started']),
-				'last_updated' => timeformat($row['time_updated']),
+				'time_started' => standardTime($row['time_started']),
+				'last_updated' => standardTime($row['time_updated']),
 				'subject' => $row['subject'],
 				'body' => parse_bbc($row['body']),
 				'num_reports' => $row['num_reports'],
@@ -277,7 +277,7 @@ class ModerationCenter_Controller
 				$context['reports'][$row['id_report']]['comments'][] = array(
 					'id' => $row['id_comment'],
 					'message' => $row['comment'],
-					'time' => timeformat($row['time_sent']),
+					'time' => standardTime($row['time_sent']),
 					'member' => array(
 						'id' => $row['id_member'],
 						'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
@@ -1251,7 +1251,7 @@ function ModBlockWatchedUsers()
 			'name' => $user['real_name'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
 			'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
-			'last_login' => !empty($user['last_login']) ? timeformat($user['last_login']) : '',
+			'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
 		);
 	}
 
@@ -1373,9 +1373,9 @@ function ModBlockNotes()
 		$context['notes'][] = array(
 			'author' => array(
 				'id' => $note['id_member'],
-				'link' => $note['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $note['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(timeformat($note['log_time'])) . '">' . $note['member_name'] . '</a>') : $note['member_name'],
+				'link' => $note['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $note['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($note['log_time'])) . '">' . $note['member_name'] . '</a>') : $note['member_name'],
 			),
-			'time' => timeformat($note['log_time']),
+			'time' => standardTime($note['log_time']),
 			'text' => parse_bbc($note['body']),
 			'delete_href' => $scripturl . '?action=moderate;area=index;notes;delete=' . $note['id_note'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 		);
@@ -1489,7 +1489,7 @@ function ModBlockGroupRequests()
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 			),
-			'time_submitted' => timeformat($row['time_applied']),
+			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1549,7 +1549,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 		$watched_users[$row['id_member']] = array(
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
-			'last_login' => $row['last_login'] ? timeformat($row['last_login']) : $txt['never'],
+			'last_login' => $row['last_login'] ? standardTime($row['last_login']) : $txt['never'],
 			'last_post' => $txt['not_applicable'],
 			'last_post_id' => 0,
 			'warning' => $row['warning'],
@@ -1591,7 +1591,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 			{
-				$watched_users[$row['id_member']]['last_post'] = timeformat($row['poster_time']);
+				$watched_users[$row['id_member']]['last_post'] = standardTime($row['poster_time']);
 				$watched_users[$row['id_member']]['last_post_id'] = $latest_posts[$row['id_member']];
 			}
 
@@ -1612,7 +1612,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			$watched_users[$row['id_member']]['last_post'] = timeformat($row['last_post']);
+			$watched_users[$row['id_member']]['last_post'] = standardTime($row['last_post']);
 			$watched_users[$row['id_member']]['last_post_id'] = $row['last_post_id'];
 		}
 		$smcFunc['db_free_result']($request);
@@ -1688,7 +1688,7 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
 			'author_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'subject' => $row['subject'],
 			'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
-			'poster_time' => timeformat($row['poster_time']),
+			'poster_time' => standardTime($row['poster_time']),
 			'approved' => $row['approved'],
 			'can_delete' => $delete_boards == array(0) || in_array($row['id_board'], $delete_boards),
 		);

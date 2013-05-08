@@ -2045,7 +2045,7 @@ function lastPost()
 		'subject' => $row['subject'],
 		'short_subject' => shorten_subject($row['subject'], 24),
 		'preview' => $row['body'],
-		'time' => timeformat($row['poster_time']),
+		'time' => standardTime($row['poster_time']),
 		'timestamp' => forum_time(true, $row['poster_time']),
 		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'
