@@ -53,7 +53,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
 
 	// Get it from the cache and send it back.
-	if (($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
 		return $temp;
 
 	// Initialize the array that'll be returned later on.
