@@ -34,7 +34,7 @@ function action_subscriptions($memID)
 	loadLanguage('ManagePaid');
 
 	// Load all of the subscriptions.
-	require_once(ADMINDIR . '/ManagePaid.php');
+	require_once(SUBSDIR . '/ManagePaid.subs.php');
 	loadSubscriptions();
 	$context['member']['id'] = $memID;
 
