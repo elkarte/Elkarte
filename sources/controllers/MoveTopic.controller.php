@@ -263,6 +263,7 @@ function action_movetopic2()
 			'mark_as_read' => true,
 			'redirect_expires' => $redirect_expires,
 			'redirect_topic' => $redirect_topic,
+			'is_approved' => $topic_info['approved'],
 		);
 		$posterOptions = array(
 			'id' => $user_info['id'],
