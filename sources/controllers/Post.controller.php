@@ -242,7 +242,8 @@ class Post_Controller
 				{
 					// @todo this shouldn't call directly CalendarPost()
 					require_once(CONTROLLERDIR . '/Calendar.controller.php');
-					return CalendarPost();
+					$controller = new Calendar_Controller();
+					return $controller->action_event_post();
 				}
 
 				// Get the current event information.
