@@ -89,7 +89,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-	global $smcFunc, $modSettings;
+	global $smcFunc;
 
 	if (empty($id_msg))
 		return false;
@@ -652,22 +652,9 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function associatedTopic($msg_id)
 {
-	global $smcFunc;
+	$message_info = getMessageInfo((int) $msg_id, true);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_topic
-		FROM {db_prefix}messages
-		WHERE id_msg = {int:msg}',
-		array(
-			'msg' => $msg_id,
-	));
-	if ($smcFunc['db_num_rows']($request) != 1)
-		$topic = false;
-	else
-		list ($topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $topic;
+	return empty($message_info) ? false : $message_info['id_topic'];
 }
 
 /**
@@ -680,7 +667,13 @@ function associatedTopic($msg_id)
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$message_info = getMessageInfo($id_msg);
+	if (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id'])
+			return true;
+
+	return false;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg, id_member, approved
