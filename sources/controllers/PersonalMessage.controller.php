@@ -181,7 +181,7 @@ class PersonalMessage_Controller
 			if (is_array($subActions[$_REQUEST['sa']]))
 			{
 				require_once(CONTROLLERDIR . '/' . $subActions[$_REQUEST['sa']][0]);
-				$this->{$subActions[$_REQUEST['sa']][1]}();
+				$subActions[$_REQUEST['sa']][1]();
 			}
 			else
 				$this->{$subActions[$_REQUEST['sa']]}();
