@@ -1084,11 +1084,11 @@ class Post_Controller
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
 		{
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$topic_info = getTopicInfo($topic);
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$topic_info = getTopicInfo($topic);
 
 			// Though the topic should be there, it might have vanished.
-			if (!is_array($topic_info))
+			if (empty($topic_info))
 				fatal_lang_error('topic_doesnt_exist');
 
 			// Did this topic suddenly move? Just checking...
@@ -1712,10 +1712,10 @@ class Post_Controller
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))
 			{
-			$event_poster = getEventPoster($_REQUEST['eventid']);
+				$event_poster = getEventPoster($_REQUEST['eventid']);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
-			isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
+				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
 			}
 
 			// Delete it?
