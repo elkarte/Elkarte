@@ -1084,20 +1084,11 @@ class Post_Controller
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT locked, is_sticky, id_poll, approved, id_first_msg, id_last_msg, id_member_started, id_board
-				FROM {db_prefix}topics
-				WHERE id_topic = {int:current_topic}
-				LIMIT 1',
-				array(
-					'current_topic' => $topic,
-				)
-			);
-			$topic_info = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$topic_info = getTopicInfo($topic);
 
 			// Though the topic should be there, it might have vanished.
-			if (!is_array($topic_info))
+			if (empty($topic_info))
 				fatal_lang_error('topic_doesnt_exist');
 
 			// Did this topic suddenly move? Just checking...
@@ -1721,20 +1712,10 @@ class Post_Controller
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))
 			{
-				// Get the event's poster.
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member
-					FROM {db_prefix}calendar
-					WHERE id_event = {int:id_event}',
-					array(
-						'id_event' => $_REQUEST['eventid'],
-					)
-				);
-				$row2 = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
+				$event_poster = getEventPoster($_REQUEST['eventid']);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
-				isAllowedTo('calendar_edit_' . ($row2['id_member'] == $user_info['id'] ? 'own' : 'any'));
+				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
 			}
 
 			// Delete it?
