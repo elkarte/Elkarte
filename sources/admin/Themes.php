@@ -1438,6 +1438,8 @@ class Themes_Controller
 			else
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 		}
+		else
+			fatal_lang_error('theme_install_general', false);
 
 		// Something go wrong?
 		if ($theme_dir != '' && basename($theme_dir) != 'themes')
