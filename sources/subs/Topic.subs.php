@@ -1079,9 +1079,9 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			'board' => (int) $board,
 		);
 
-	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
-	$follow_ups_table = !empty($full) && ($full === 'follow_up' || $full === 'all');
-	$logs_table = !empty($full) && $full === 'all';
+	$messages_table = $full === 'message' || $full === 'all';
+	$follow_ups_table = $full === 'follow_up' || $full === 'all';
+	$logs_table = $full === 'all';
 
 	// Create the query, taking full and integration in to account
 	$request = $smcFunc['db_query']('', '
