@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function AdminMain()
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $smcFunc;
+	global $txt, $context, $scripturl, $modSettings, $settings;
 
 	// Load the language and templates....
 	loadLanguage('Admin');
@@ -591,7 +591,7 @@ class Admin_Controller
 	*/
 	function action_home()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -708,7 +708,7 @@ class Admin_Controller
 	*/
 	function action_credits()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));

@@ -309,7 +309,7 @@ class ManageAttachments_Controller
 	 */
 	public function settings()
 	{
-		global $modSettings, $txt;
+		global $modSettings, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -1998,6 +1998,7 @@ class ManageAttachments_Controller
 					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
 					{
 						$dir_files++;
+						// @todo $source is unitialized at this point. If this isn't a bug, we should comment where it is set as to not add confusion later
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
 						// If we've reached a limit. Do something.

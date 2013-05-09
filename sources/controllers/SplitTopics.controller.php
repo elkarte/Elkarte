@@ -808,7 +808,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context;
+	global $board, $user_info, $context, $smcFunc;
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)

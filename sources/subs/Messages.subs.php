@@ -89,7 +89,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-	global $smcFunc, $modSettings;
+	global $smcFunc;
 
 	if (empty($id_msg))
 		return false;
@@ -622,7 +622,7 @@ function removeMessage($message, $decreasePostCount = true)
 				)
 			);
 		}
-		
+
 
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
@@ -652,27 +652,14 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function associatedTopic($msg_id)
 {
-	global $smcFunc;
+	$message_info = getMessageInfo((int) $msg_id, true);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_topic
-		FROM {db_prefix}messages
-		WHERE id_msg = {int:msg}',
-		array(
-			'msg' => $msg_id,
-	));
-	if ($smcFunc['db_num_rows']($request) != 1)
-		$topic = false;
-	else
-		list ($topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $topic;
+	return empty($message_info) ? false : $message_info['id_topic'];
 }
 
 /**
- * Small function that simply query the database to verify
- * if the current user can access a specific message
+ * Small function that simply verifies if the current
+ * user can access a specific message
  *
  * @param int $id_msg a message id
  * @param bool $check_approval if true messages are checked for approval (default true)
@@ -680,32 +667,21 @@ function associatedTopic($msg_id)
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg, id_member, approved
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => $id_msg,
-		)
-	);
-	$exists = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$message_info = getMessageInfo($id_msg);
 
-	// It doesn't exists or is not accessible
-	if (empty($exists))
+	// Do we even have a message to speak of?
+	if (empty($message_info))
 		return false;
-	// We have to check for approval...
-	elseif ($check_approval)
+
+	// Check for approval status?
+	if ($check_approval)
 	{
-		// Message approved or user is owner
-		if (!empty($exists['approved']) || $exists['id_member'] == $user_info['id'])
-			return true;
+		// The user can access this message if it's approved or they're owner
+		return (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id']);
 	}
 
-	// Any other case should be false.
+	// Otherwise, nope.
 	return false;
 }
