@@ -243,6 +243,8 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[quote\]\s*\[/quote\]~', '', $parts[$i]);
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
+
+		call_integration_hook('integrate_preparse_code', array(&$message, &$parts, &$i));
 	}
 
 	// Put it back together!
@@ -262,8 +264,6 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	global $smcFunc;
-
 	$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 	// We're going to unparse only the stuff outside [code]...
@@ -278,12 +278,12 @@ function un_preparsecode($message)
 			// Attempt to un-parse the time to something less awful.
 			$parts[$i] = preg_replace('~\[time\](\d{0,10})\[/time\]~ie', '\'[time]\' . standardTime(\'$1\', false) . \'[/time]\'', $parts[$i]);
 		}
-	}
 
+		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
+	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-
 }
 
 /**
@@ -360,6 +360,7 @@ function fixTags(&$message)
 		),
 	);
 
+	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
