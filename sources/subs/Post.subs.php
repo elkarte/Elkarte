@@ -1099,7 +1099,6 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$message = getExistingMessage($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
-			$smcFunc['db_free_result']($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -1189,19 +1188,11 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	if (isset($msgOptions['subject']))
 	{
-		// Only update the subject if this was the first message in the topic.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE id_first_msg = {int:id_first_msg}
-			LIMIT 1',
-			array(
-				'id_first_msg' => $msgOptions['id'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) == 1)
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topic_info = getTopicInfo($topicOptions['id']);
+
+		if ($topic_info['id_first_msg'] == $msgOptions['id'])
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
-		$smcFunc['db_free_result']($request);
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -1478,7 +1469,7 @@ function approveTopics($topics, $approve = true)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $txt, $scripturl, $language, $user_info;
+	global $scripturl, $language, $user_info;
 	global $modSettings, $smcFunc;
 
 	// Clean up the data...
