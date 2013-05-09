@@ -1085,7 +1085,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 
 	$topic_info = array();
 
-	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+	if (!empty($modSettings['cache_enable']) && ((empty($full) && $modSettings['cache_enable'] >= 2) || $modSettings['cache_enable'] >= 3))
 	{
 		$cache_key = 'topic-info-' . $topic_parameters['topic'] . $full;
 		$cache_key .= md5(implode(',', $topic_parameters + $selects + $tables));
@@ -1123,7 +1123,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			$topic_info = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
 
-		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+		if (!empty($modSettings['cache_enable']) && ((empty($full) && $modSettings['cache_enable'] >= 2) || $modSettings['cache_enable'] >= 3))
 			cache_put_data($cache_key, $topic_info, 120);
 	}
 
