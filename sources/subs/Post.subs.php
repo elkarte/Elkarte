@@ -758,9 +758,17 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$topic_info = getTopicInfo($topicOptions['id']);
-		$topicOptions['is_approved'] = $topic_info['is_approved'];
+		$request = $smcFunc['db_query']('', '
+			SELECT approved
+			FROM {db_prefix}topics
+			WHERE id_topic = {int:id_topic}
+			LIMIT 1',
+			array(
+				'id_topic' => $topicOptions['id'],
+			)
+		);
+		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
 	}
 
 	// If nothing was filled in as name/e-mail address, try the member table.
