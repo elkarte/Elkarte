@@ -147,8 +147,8 @@ function markBoardsRead($boards, $unread = false)
 function getMsgMemberID($messageID)
 {
 	require_once(SUBSDIR . '/Messages.subs.php');
-	$message_info = getMessageInfo((int) $messageID);
-	
+	$message_info = getMessageInfo((int) $messageID, true);
+
 	return empty($message_info['id_member']) ? 0 : (int) $message_info['id_member'];
 }
 
