@@ -622,7 +622,7 @@ function removeMessage($message, $decreasePostCount = true)
 				)
 			);
 		}
-		
+
 
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
@@ -658,8 +658,8 @@ function associatedTopic($msg_id)
 }
 
 /**
- * Small function that simply query the database to verify
- * if the current user can access a specific message
+ * Small function that simply verifies if the current
+ * user can access a specific message
  *
  * @param int $id_msg a message id
  * @param bool $check_approval if true messages are checked for approval (default true)
@@ -670,35 +670,18 @@ function canAccessMessage($id_msg, $check_approval = true)
 	global $user_info;
 
 	$message_info = getMessageInfo($id_msg);
-	if (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id'])
-			return true;
 
-	return false;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg, id_member, approved
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => $id_msg,
-		)
-	);
-	$exists = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
-
-	// It doesn't exists or is not accessible
-	if (empty($exists))
+	// Do we even have a message to speak of?
+	if (empty($message_info))
 		return false;
-	// We have to check for approval...
-	elseif ($check_approval)
+
+	// Check for approval status?
+	if ($check_approval)
 	{
-		// Message approved or user is owner
-		if (!empty($exists['approved']) || $exists['id_member'] == $user_info['id'])
-			return true;
+		// The user can access this message if it's approved or they're owner
+		return (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id']);
 	}
 
-	// Any other case should be false.
+	// Otherwise, nope.
 	return false;
 }
