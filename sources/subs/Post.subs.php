@@ -243,6 +243,8 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[quote\]\s*\[/quote\]~', '', $parts[$i]);
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
+
+		call_integration_hook('integrate_preparse_code', array(&$message, &$parts, &$i));
 	}
 
 	// Put it back together!
@@ -262,8 +264,6 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	global $smcFunc;
-
 	$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 	// We're going to unparse only the stuff outside [code]...
@@ -278,12 +278,12 @@ function un_preparsecode($message)
 			// Attempt to un-parse the time to something less awful.
 			$parts[$i] = preg_replace('~\[time\](\d{0,10})\[/time\]~ie', '\'[time]\' . standardTime(\'$1\', false) . \'[/time]\'', $parts[$i]);
 		}
-	}
 
+		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
+	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-
 }
 
 /**
@@ -360,6 +360,7 @@ function fixTags(&$message)
 		),
 	);
 
+	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
@@ -369,67 +370,7 @@ function fixTags(&$message)
 
 	// Limit the size of images posted?
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
-	{
-		// We'll need this for image processing
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
-		// Find all the img tags - with or without width and height.
-		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
-
-		$replaces = array();
-		foreach ($matches[0] as $match => $dummy)
-		{
-			// If the width was after the height, handle it.
-			$matches[1][$match] = !empty($matches[3][$match]) ? $matches[3][$match] : $matches[1][$match];
-
-			// Now figure out if they had a desired height or width...
-			$desired_width = !empty($matches[1][$match]) ? (int) substr(trim($matches[1][$match]), 6) : 0;
-			$desired_height = !empty($matches[2][$match]) ? (int) substr(trim($matches[2][$match]), 7) : 0;
-
-			// One was omitted, or both.  We'll have to find its real size...
-			if (empty($desired_width) || empty($desired_height))
-			{
-				list ($width, $height) = url_image_size(un_htmlspecialchars($matches[4][$match]));
-
-				// They don't have any desired width or height!
-				if (empty($desired_width) && empty($desired_height))
-				{
-					$desired_width = $width;
-					$desired_height = $height;
-				}
-				// Scale it to the width...
-				elseif (empty($desired_width) && !empty($height))
-					$desired_width = (int) (($desired_height * $width) / $height);
-				// Scale if to the height.
-				elseif (!empty($width))
-					$desired_height = (int) (($desired_width * $height) / $width);
-			}
-
-			// If the width and height are fine, just continue along...
-			if ($desired_width <= $modSettings['max_image_width'] && $desired_height <= $modSettings['max_image_height'])
-				continue;
-
-			// Too bad, it's too wide.  Make it as wide as the maximum.
-			if ($desired_width > $modSettings['max_image_width'] && !empty($modSettings['max_image_width']))
-			{
-				$desired_height = (int) (($modSettings['max_image_width'] * $desired_height) / $desired_width);
-				$desired_width = $modSettings['max_image_width'];
-			}
-
-			// Now check the height, as well.  Might have to scale twice, even...
-			if ($desired_height > $modSettings['max_image_height'] && !empty($modSettings['max_image_height']))
-			{
-				$desired_width = (int) (($modSettings['max_image_height'] * $desired_width) / $desired_height);
-				$desired_height = $modSettings['max_image_height'];
-			}
-
-			$replaces[$matches[0][$match]] = '[img' . (!empty($desired_width) ? ' width=' . $desired_width : '') . (!empty($desired_height) ? ' height=' . $desired_height : '') . ']' . $matches[4][$match] . '[/img]';
-		}
-
-		// If any img tags were actually changed...
-		if (!empty($replaces))
-			$message = strtr($message, $replaces);
-	}
+		resizeBBCImages($message);
 }
 
 /**
@@ -510,6 +451,71 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
 			unset($replaces[$k]);
 	}
 
+	if (!empty($replaces))
+		$message = strtr($message, $replaces);
+}
+
+function resizeBBCImages(&$message)
+{
+	global $modSettings;
+
+	// We'll need this for image processing
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	// Find all the img tags - with or without width and height.
+	preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
+
+	$replaces = array();
+	foreach ($matches[0] as $match => $dummy)
+	{
+		// If the width was after the height, handle it.
+		$matches[1][$match] = !empty($matches[3][$match]) ? $matches[3][$match] : $matches[1][$match];
+
+		// Now figure out if they had a desired height or width...
+		$desired_width = !empty($matches[1][$match]) ? (int) substr(trim($matches[1][$match]), 6) : 0;
+		$desired_height = !empty($matches[2][$match]) ? (int) substr(trim($matches[2][$match]), 7) : 0;
+
+		// One was omitted, or both.  We'll have to find its real size...
+		if (empty($desired_width) || empty($desired_height))
+		{
+			list ($width, $height) = url_image_size(un_htmlspecialchars($matches[4][$match]));
+
+			// They don't have any desired width or height!
+			if (empty($desired_width) && empty($desired_height))
+			{
+				$desired_width = $width;
+				$desired_height = $height;
+			}
+			// Scale it to the width...
+			elseif (empty($desired_width) && !empty($height))
+				$desired_width = (int) (($desired_height * $width) / $height);
+			// Scale if to the height.
+			elseif (!empty($width))
+				$desired_height = (int) (($desired_width * $height) / $width);
+		}
+
+		// If the width and height are fine, just continue along...
+		if ($desired_width <= $modSettings['max_image_width'] && $desired_height <= $modSettings['max_image_height'])
+			continue;
+
+		// Too bad, it's too wide.  Make it as wide as the maximum.
+		if ($desired_width > $modSettings['max_image_width'] && !empty($modSettings['max_image_width']))
+		{
+			$desired_height = (int) (($modSettings['max_image_width'] * $desired_height) / $desired_width);
+			$desired_width = $modSettings['max_image_width'];
+		}
+
+		// Now check the height, as well.  Might have to scale twice, even...
+		if ($desired_height > $modSettings['max_image_height'] && !empty($modSettings['max_image_height']))
+		{
+			$desired_width = (int) (($modSettings['max_image_height'] * $desired_width) / $desired_height);
+			$desired_height = $modSettings['max_image_height'];
+		}
+
+		$replaces[$matches[0][$match]] = '[img' . (!empty($desired_width) ? ' width=' . $desired_width : '') . (!empty($desired_height) ? ' height=' . $desired_height : '') . ']' . $matches[4][$match] . '[/img]';
+	}
+
+	// If any img tags were actually changed...
 	if (!empty($replaces))
 		$message = strtr($message, $replaces);
 }
