@@ -75,7 +75,7 @@ function action_loadlocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $context, $txt, $settings, $smcFunc;
+	global $modSettings, $txt, $settings, $smcFunc;
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -697,8 +697,7 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $txt, $modSettings, $options, $smcFunc, $language;
-	global $context, $settings, $user_info, $scripturl;
+	global $txt, $context;
 	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
 	static $all_instances;
 
@@ -887,7 +886,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $smcFunc, $modSettings;
+		global $smcFunc, $modSettings;
 
 		if (!$this->_show_captcha)
 			return;
@@ -930,7 +929,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $scripturl, $modSettings;
 
 		// Generate a sample registration image.
 		$verification_image = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
@@ -1039,8 +1038,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $modSettings;
-
 		if (empty($this->_number_questions))
 			return;
 
@@ -1292,7 +1289,7 @@ class Control_Verification_Questions implements Control_Verifications
 	{
 		global $smcFunc;
 
-		$request = $smcFunc['db_query']('', '
+		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}antispam_questions
 			SET
 				question = {string:question},
@@ -1348,7 +1345,7 @@ function theme_postbox($msg)
  */
 function bbc_to_html($text, $compat_mode = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	if (!$compat_mode)
 		return $text;
@@ -1688,7 +1685,6 @@ function html_to_bbc($text)
 		// End tag?
 		if ($matches[4] != '/' && strpos($text, '</' . $matches[1] . '>', $start_pos) !== false)
 		{
-			$end_length = strlen('</' . $matches[1] . '>');
 			$end_pos = strpos($text, '</' . $matches[1] . '>', $start_pos);
 
 			// Remove the align from that tag so it's never checked again.
@@ -2005,7 +2001,6 @@ function html_to_bbc($text)
 		$end_pos = $start_pos + strlen($matches[0]);
 
 		$params = '';
-		$had_params = array();
 		$src = '';
 
 		$attrs = fetchTagAttributes($matches[1]);
@@ -2254,11 +2249,6 @@ function legalise_bbc($text)
 		return $text;
 
 	// We are going to cycle through the BBC and keep track of tags as they arise - in order. If get to a block level tag we're going to make sure it's not in a non-block level tag!
-	// This will keep the order of tags that are open.
-	$current_tags = array();
-
-	// This will quickly let us see if the tag is active.
-	$active_tags = array();
 
 	// A list of tags that's disabled by the admin.
 	$disabled = empty($modSettings['disabledBBC']) ? array() : array_flip(explode(',', strtolower($modSettings['disabledBBC'])));
@@ -2347,7 +2337,6 @@ function legalise_bbc($text)
 
 	// In case things changed above set these back to normal.
 	$in_code_nobbc = false;
-	$new_text_offset = 0;
 
 	// These keep track of where we are!
 	if (count($parts = preg_split(sprintf('~(\\[)(/?)(%1$s)((?:[\\s=][^\\]\\[]*)?\\])~', implode('|', array_keys($valid_tags))), $text, -1, PREG_SPLIT_DELIM_CAPTURE)) > 1)

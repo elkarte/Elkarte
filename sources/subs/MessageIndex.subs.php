@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
-	global $smcFunc, $user_info;
+	global $smcFunc;
 
 	if ((isset($boardListOptions['excluded_boards']) || isset($boardListOptions['allowed_to'])) && isset($boardListOptions['included_boards']))
 		trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);

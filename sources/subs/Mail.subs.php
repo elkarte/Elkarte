@@ -40,7 +40,6 @@ if (!defined('ELKARTE'))
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false)
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global $smcFunc;
 
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
@@ -218,7 +217,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false)
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $smcFunc;
 
 	static $cur_insert = array();
 	static $cur_insert_len = 0;
@@ -322,8 +321,6 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  */
 function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $line_break = "\r\n", $custom_charset = null)
 {
-	global $context;
-
 	$charset = $custom_charset !== null ? $custom_charset : 'UTF-8';
 
 	// This is the fun part....
@@ -568,7 +565,7 @@ function server_parse($message, $socket, $response)
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
 {
-	global $txt, $mbname, $scripturl, $settings, $user_info;
+	global $txt, $mbname, $scripturl, $settings;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)

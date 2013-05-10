@@ -103,7 +103,7 @@ class Settings_Form
 			'sourcedir',
 			'cachedir',
 		);
-		foreach ($this->_config_vars as $identifier => $config_var)
+		foreach ($this->_config_vars as $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
 				$context['config_vars'][] = $config_var;
@@ -329,9 +329,6 @@ class Settings_Form
  	*/
 	function save()
 	{
-		global $sc, $cookiename, $modSettings, $user_settings;
-		global $context;
-
 		validateToken('admin-ssc');
 
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
@@ -429,8 +426,6 @@ class Settings_Form
  	*/
 	static function save_db(&$config_vars)
 	{
-		global $context;
-
 		validateToken('admin-dbsc');
 
 		$inlinePermissions = array();
@@ -643,7 +638,6 @@ class Settings_Form
 		if (filemtime(BOARDDIR . '/Settings.php') === $last_settings_change)
 		{
 			// save the old before we do anything
-			$file = BOARDDIR . '/Settings.php';
 			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 			$settings_backup_fail = !$settings_backup_fail ? (!file_exists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
 
