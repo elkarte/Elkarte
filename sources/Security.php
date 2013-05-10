@@ -116,7 +116,7 @@ function validateSession($type = 'admin')
  *
  * @param string $message = ''
  */
-function is_not_guest($message = '')
+function is_not_guest($message = '', $is_fatal = true)
 {
 	global $user_info, $txt, $context, $scripturl;
 
@@ -131,7 +131,7 @@ function is_not_guest($message = '')
 	writeLog(true);
 
 	// Just die.
-	if (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['xml']) || !$is_fatal)
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
@@ -703,7 +703,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// A session error occurred, show the error.
 	elseif ($is_fatal)
 	{
-		if (isset($_GET['xml']))
+		if (isset($_GET['xml']) || isset($_REQUEST['api']))
 		{
 			ob_end_clean();
 			header('HTTP/1.1 403 Forbidden - Session timeout');

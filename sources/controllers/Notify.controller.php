@@ -33,9 +33,9 @@ class Notify_Controller
 	 *
 	 * @uses Notify template, main sub-template
 	 */
-	function action_notify()
+	public function action_notify()
 	{
-		global $scripturl, $txt, $topic, $user_info, $context, $smcFunc;
+		global $topic, $scripturl, $txt, $topic, $user_info, $context;
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();
@@ -64,23 +64,56 @@ class Notify_Controller
 
 			return;
 		}
-		elseif ($_GET['sa'] == 'on')
-		{
-			checkSession('get');
-
-			// Attempt to turn notifications on.
-			setTopicNotification($user_info['id'], $topic, true);
-		}
 		else
 		{
 			checkSession('get');
 
-			// Just turn notifications off.
-			setTopicNotification($user_info['id'], $topic, false);
+			// Attempt to turn notifications on.
+			setTopicNotification($user_info['id'], $topic, $_GET['sa'] == 'on');
 		}
 
 		// Send them back to the topic.
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+	}
+
+	/**
+	 * Turn off/on notifications for a particular topic
+	 * Intended for use in XML or JSON calls
+	 */
+	function action_notify_api()
+	{
+		global $topic, $txt, $scripturl, $context, $user_info;
+
+		is_not_guest('', false);
+		if (!allowedTo('mark_any_notify') || empty($topic) || empty($_GET['sa']))
+			obExit(false);
+
+		checkSession('get');
+
+		// Our topic functions are here
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Attempt to turn notifications on.
+		setTopicNotification($user_info['id'], $topic, $_GET['sa'] == 'on');
+
+		$text = $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'];
+		$url = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : '');
+
+		if (isset($_REQUEST['json']))
+		{
+			die(json_encode(array('text' => $text, 'url' => $url)));
+		}
+		loadTemplate('Xml');
+
+		$context['template_layers'] = array();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		$context['xml_data'] = array(
+			array(
+				'text' => $text,
+				'url' => $url,
+			),
+		);
 	}
 
 	/**

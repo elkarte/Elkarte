@@ -290,6 +290,9 @@ class Site_Dispatcher
 				$this->_function_name = $default_action['function'];
 			}
 		}
+
+		if (isset($_REQUEST['api']))
+			$this->_function_name .= '_api';
 	}
 
 	/**
