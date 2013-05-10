@@ -77,40 +77,34 @@ function loadIllegalGuestPermissions()
 /**
  * This function updates the permissions of any groups based on the given groups.
  *
- * @param mixed $parents (array or int) group or groups whose children are to be updated
+ * @param mixed $parents_param (array or int) group or groups whose children are to be updated
  * @param mixed $profile = null an int or null for the customized profile, if any
  */
-function updateChildPermissions($parents, $profile = null)
+function updateChildPermissions($parents_param, $profile = null)
 {
-	global $smcFunc;
+	global $smcFunc, $context;
 
 	// All the parent groups to sort out.
-	if (!is_array($parents))
-		$parents = array($parents);
+	if (!is_array($parents_param))
+		$parents_param = array($parents_param);
 
 	// Find all the children of this group.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_parent, id_group
-		FROM {db_prefix}membergroups
-		WHERE id_parent != {int:not_inherited}
-			' . (empty($parents) ? '' : 'AND id_parent IN ({array_int:parent_list})'),
-		array(
-			'parent_list' => $parents,
-			'not_inherited' => -2,
-		)
-	);
+	if (empty($context['membergroups']))
+		loadMemberGroups();
+
 	$children = array();
 	$parents = array();
 	$child_groups = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$children[$row['id_parent']][] = $row['id_group'];
-		$child_groups[] = $row['id_group'];
-		$parents[] = $row['id_parent'];
-	}
-	$smcFunc['db_free_result']($request);
 
-	$parents = array_unique($parents);
+	foreach ($context['membergroups'] as $group)
+	{
+		if ($group['id_parent'] != -2 && (empty($parents) || (!empty($parents) && in_array($group['id_parent'], $parents_param))))
+		{
+			$children[$group['id_parent']][] = $group['id_group'];
+			$child_groups[] = $group['id_group'];
+			$parents[$group['id_parent']] = $group['id_parent'];
+		}
+	}
 
 	// Not a sausage, or a child?
 	if (empty($children))
