@@ -1388,7 +1388,7 @@ function loadBadBehavior()
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
-	global $smcFunc, $cookiename;
+	global $cookiename;
 
 	// As this is only brute protection, we allow 5 attempts every 10 seconds.
 
@@ -1429,5 +1429,27 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
+}
 
+/**
+ * Check if a user can see a board based on the board groups
+ * A PHP equivalent to {query_see_board}
+ * 
+ * @param array $board_groups
+ * @param array $board_deny_groups (optional)
+ * @return boolean
+ */
+function canSeeBoard(array $board_groups, array $board_deny_groups = array())
+{
+	global $user_info, $modSettings;
+
+	if ($user_info['is_admin'])
+		return true;
+
+	// If the user is a member of any of these groups, send them packin'
+	if (!empty($modSettings['deny_boards_access']) && !empty($board_deny_groups) && array_intersect($board_deny_groups, $user_info['groups']) != array())
+		return false;
+
+	// If anything matches, they are okay
+	return array_intersect($board_groups, $user_info['groups']) != array();
 }
