@@ -1063,6 +1063,42 @@ function boardInfo($board_id, $topic_id = null)
 }
 
 /**
+ * Get all of a board's info (not the often updated stuff like num_topics)
+ * 
+ * @param int $id_board
+ * @return array
+ */
+function getBoardInfo($id_board)
+{
+	global $smcFunc, $modSettings;
+
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+		$board_info = cache_get_data('board-info-' . $id_board);
+
+	if (empty($board_info))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_board, name, id_cat, child_level, id_parent, board_order, member_groups,
+				id_profile, description, count_posts, id_theme, override_theme, redirect, deny_member_groups
+			FROM {db_prefix}boards
+			WHERE id_board = {int:board}',
+			array(
+				'board' => $id_board,
+			)
+		);
+		$board_info = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+
+		$board_info['member_groups'] = explode(',', $board_info['member_groups']);
+		$board_info['deny_member_groups'] = explode(',', $board_info['deny_member_groups']);
+
+		cache_put_data('board-info-' . $id_board, $board_info, 360);
+	}
+
+	return $board_info;
+}
+
+/**
  * Loads properties from non-standard groups
  *
  * @param int $curBoard

@@ -86,33 +86,47 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  * Get some basic info of a certain message
  *
  * @param int $id_msg
+ * @return array
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-	global $smcFunc;
+	global $smcFunc, $modSettings;
 
 	if (empty($id_msg))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			m.id_member, m.id_topic, m.id_board,
-			m.body, m.subject,
-			m.poster_name, m.poster_email, m.poster_time,
-			m.approved
-		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
-		WHERE id_msg = {int:message}
-		LIMIt 1',
-		array(
-			'message' => $id_msg,
-		)
-	);
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
+		$message_info = cache_get_data('message-info-' . $id_msg);
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	if (empty($message_info))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				id_member, id_topic, id_board,
+				body, subject,
+				poster_name, poster_email, poster_time,
+				approved
+			FROM {db_prefix}messages
+			WHERE id_msg = {int:message}',
+			array(
+				'message' => $id_msg,
+			)
+		);
 
-	return empty($row) ? false : $row;
+		$message_info = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+	}
+
+	if (!$override_permissions)
+	{
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$board_info = getBoardInfo($message_info['id_board']);
+		$can_see_board = canSeeBoard($board_info['member_groups'], $board_info['deny_member_groups']);
+	}
+	else
+		$can_see_board = true;
+
+	return !$can_see_board || empty($message_info) ? false : $message_info;
 }
 
 /**
@@ -199,7 +213,7 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $modSettings, $user_info, $smcFunc;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -213,8 +227,7 @@ function removeMessage($message, $decreasePostCount = true)
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
+		WHERE m.id_msg = {int:id_msg}',
 		array(
 			'id_msg' => $message,
 		)
