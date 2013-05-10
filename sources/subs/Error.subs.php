@@ -52,19 +52,23 @@ function deleteErrors($type, $filter = null, $error_list = null)
 /**
  * Counts error log entries 
  *
+ * @param string $filter_col (optional) The column to filter on
+ * @param string|int $value (optional) The value of the filter
  * @return int
  */
-function numErrors()
+function numErrors($filter_col = null, $value = null)
 {
 	global $smcFunc;
+
+	$filter = !empty($filter_col) && isset($value);
 
 	// Just how many errors are there?
 	$result = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_errors' . (isset($filter) ? '
-		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
+		FROM {db_prefix}log_errors' . ($filter ? '
+		WHERE ' . $filter_col . ' LIKE {string:filter}' : ''),
 		array(
-			'filter' => isset($filter) ? $filter['value']['sql'] : '',
+			'filter' => $filter ? $value : '',
 		)
 	);
 	list ($num_errors) = $smcFunc['db_fetch_row']($result);
