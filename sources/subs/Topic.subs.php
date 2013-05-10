@@ -1079,39 +1079,53 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			'board' => (int) $board,
 		);
 
-	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
-	$follow_ups_table = !empty($full) && ($full === 'follow_up' || $full === 'all');
-	$logs_table = !empty($full) && $full === 'all';
+	$messages_table = $full === 'message' || $full === 'all';
+	$follow_ups_table = $full === 'follow_up' || $full === 'all';
+	$logs_table = $full === 'all';
 
-	// Create the query, taking full and integration in to account
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
-			t.id_member_started, t.id_member_updated, t.id_poll,
-			t.num_replies, t.num_views, t.locked, t.redirect_expires,
-			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
-			fu.derived_from' : '') .
-			($logs_table ? ',
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
-			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
-			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
-			(!empty($selects) ? implode(',', $selects) : '') . '
-		FROM {db_prefix}topics AS t' . ($messages_table ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
-			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .
-			($logs_table && !$user_info['is_guest'] ? '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
-			(!empty($tables) ? implode("\n\t\t\t", $tables) : '') . '
-		WHERE t.id_topic = {int:topic}
-		LIMIT 1',
-			$topic_parameters
-	);
 	$topic_info = array();
-	if ($request !== false)
-		$topic_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+
+	if (!empty($modSettings['cache_enable']) && ((empty($full) && $modSettings['cache_enable'] >= 2) || $modSettings['cache_enable'] >= 3))
+	{
+		$cache_key = 'topic-info-' . $topic_parameters['topic'] . $full;
+		$cache_key .= md5(implode(',', $topic_parameters + $selects + $tables));
+		$topic_info = cache_get_data($cache_key);
+	}
+
+	if (empty($topic_info))
+	{
+		// Create the query, taking full and integration in to account
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
+				t.id_member_started, t.id_member_updated, t.id_poll,
+				t.num_replies, t.num_views, t.locked, t.redirect_expires,
+				t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
+				ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
+				fu.derived_from' : '') .
+				($logs_table ? ',
+				' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
+				' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
+				' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
+				(!empty($selects) ? implode(',', $selects) : '') . '
+			FROM {db_prefix}topics AS t' . ($messages_table ? '
+				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
+				LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .
+				($logs_table && !$user_info['is_guest'] ? '
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
+				(!empty($tables) ? implode("\n\t\t\t", $tables) : '') . '
+			WHERE t.id_topic = {int:topic}
+			LIMIT 1',
+				$topic_parameters
+		);
+		if ($request !== false)
+			$topic_info = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+
+		if (!empty($modSettings['cache_enable']) && ((empty($full) && $modSettings['cache_enable'] >= 2) || $modSettings['cache_enable'] >= 3))
+			cache_put_data($cache_key, $topic_info, 120);
+	}
 
 	return $topic_info;
 }

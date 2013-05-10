@@ -199,7 +199,7 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $modSettings, $user_info, $smcFunc;
 
 	if (empty($message) || !is_numeric($message))
 		return false;

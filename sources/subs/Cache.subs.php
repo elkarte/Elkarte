@@ -87,7 +87,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	global $boardurl, $modSettings, $memcached;
+	global $modSettings, $memcached;
 	global $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
@@ -210,7 +210,7 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	global $boardurl, $modSettings, $memcached;
+	global $modSettings, $memcached, $expired;
 	global $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
@@ -241,7 +241,7 @@ function cache_get_data($key, $ttl = 120)
 				if (!$memcached)
 					return null;
 
-				$value = (function_exists('memcache_get')) ? memcache_get($cache['connection'], $key) : memcached_get($cache['connection'], $key);
+				$value = (function_exists('memcache_get')) ? memcache_get($memcached, $key) : memcached_get($memcached, $key);
 			}
 			break;
 		case 'eaccelerator':
@@ -308,7 +308,7 @@ function cache_get_data($key, $ttl = 120)
  */
 function get_memcached_server($level = 3)
 {
-	global $modSettings, $memcached, $db_persist, $cache_memcached;
+	global $memcached, $db_persist, $cache_memcached;
 
 	$servers = explode(',', $cache_memcached);
 	$server = explode(':', trim($servers[array_rand($servers)]));

@@ -42,7 +42,6 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
 			'id' => $member,
 		)
 	);
-	$ban_triggers = array();
 	$ban_errors = error_context::context('ban', 1);
 
 	foreach ($suggestions as $key => $value)
@@ -928,8 +927,6 @@ function updateBanMembers()
 
 function getMemberData($id)
 {
-	global $smcFunc;
-
 	$suggestions = array();
 	require_once(SUBSDIR . '/Members.subs.php');
 	$result = getBasicMemberData($id, array('moderation' => true));

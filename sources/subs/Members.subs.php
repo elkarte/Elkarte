@@ -434,8 +434,8 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $return_errors = false)
 {
-	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings, $smcFunc;
+	global $scripturl, $txt, $modSettings;
+	global $user_info, $smcFunc;
 
 	loadLanguage('Login');
 

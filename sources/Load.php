@@ -895,15 +895,10 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
 			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
-			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
-			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
-			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '') . '
-			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
+			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '');
 	$select_tables = '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)';
 
 	// We add or replace according to the set
 	switch ($set)
@@ -1032,6 +1027,25 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// Well, it's loaded now anyhow.
 	$dataLoaded[$user] = true;
 	$profile = $user_profile[$user];
+
+	// Setup the group info
+	if (!empty($context['membergroups'][$profile['id_group']]))
+	{
+		$member_group = $context['membergroups'][$profile['id_group']];
+		$profile['member_group'] = $member_group['group_name'];
+		$profile['member_group_color'] = $member_group['online_color'];
+	}
+
+	// Now post groups
+	if (!empty($context['membergroups'][$profile['id_post_group']]))
+	{
+		$post_group = $context['membergroups'][$profile['id_post_group']];
+		$profile['post_group'] = $post_group['group_name'];
+		$profile['post_group_color'] = $post_group['online_color'];
+	}
+
+	// The badge icons
+	$profile['icons'] = empty($profile['id_group']) || empty($member_group['icons']) ? $post_group['icons'] : $member_group_icons;
 
 	// Censor everything.
 	censorText($profile['signature']);
@@ -2671,4 +2685,40 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
+}
+
+/**
+ * Load all of the membergroups
+ * 
+ * @global array $smcFunc
+ * @global array $context
+ * @global array $modSettings
+ */
+function loadMemberGroups($force = false)
+{
+	global $smcFunc, $context, $modSettings;
+
+	$context['membergroups'] = array();
+
+	if ($force || (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($context['membergroups'] = cache_get_data('all-membergroups')) !== null))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT *
+			FROM {db_prefix}membergroups
+			ORDER BY group_name',
+			array()
+		);
+
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$id = (int) $row['id_group'];
+			$context['membergroups'][$id] = $row;
+			$context['membergroups'][$id]['assignable'] = $context['membergroups'][$id]['min_posts'] == -1;
+			$context['membergroups'][$id]['is_post_group'] = $context['membergroups'][$id]['min_posts'] != -1;
+		}
+
+		$smcFunc['db_free_result']($request);
+
+		cache_put_data('all-membegroups', $context['membergroups'], 180);
+	}
 }

@@ -615,7 +615,6 @@ function loadAllPermissions($loadType = 'classic')
 			$position = $loadType == 'classic' && !in_array($own_group, $leftPermissionGroups) ? 1 : 0;
 
 			// If the groups have not yet been created be sure to create them.
-			$bothGroups = array('own' => $own_group);
 			$bothGroups = array();
 
 			// For guests, just reset the array.

@@ -288,7 +288,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  */
 function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0)
 {
-	global $gd2, $modSettings;
+	global $gd2;
 
 	if (checkImagick())
 	{

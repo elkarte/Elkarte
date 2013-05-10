@@ -193,6 +193,8 @@ function deleteMembergroups($groups)
 
 	updateSettings($settings_update);
 
+	loadMembergroups(true);
+
 	// It was a success.
 	return true;
 }
@@ -426,7 +428,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $smcFunc, $modSettings;
+	global $smcFunc;
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -549,7 +551,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl, $txt, $smcFunc;
+	global $scripturl, $smcFunc;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, real_name
@@ -627,8 +629,6 @@ function cache_getMembergroupList()
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
 {
 	global $scripturl, $smcFunc;
-
-	$groups = array();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color, mg.hidden,
@@ -813,47 +813,41 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *
  * @param array/int $group_id the ID of the groups
  * @param integer $limit the number of results returned (default 1, if null/false/0 returns all)
- * @param array/string $detailed returns more fields default false,
- *  - false returns: id_group, group_name, group_type,
+ * @param array/string $detailed returns more fields default false, 
+ *  - false returns: id_group, group_name, group_type, 
  *  - true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent
  * @param bool $assignable determine if the group is assignable or not and return that information
  * @param bool $protected include protected groups
+ * @return array
+ * 
+ * @todo remove $limit, $detailed, $assignable arguments
  */
 function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
-	global $smcFunc;
+	global $context;
 
 	if (!isset($group_id))
 		return false;
 
+	if (empty($context['membergroups']))
+		loadMemberGroups();
+
 	$group_ids = is_array($group_id) ? $group_id : array($group_id);
 
 	$groups = array();
-	$group_ids = array_map('intval', $group_ids);
+	$count = 0;
+	foreach ($group_ids as $group)
+	{
+		$id = (int) $group;
+		if (isset($context['memmbergroups'][$id]) && (!$protected || ($protected && $context['memmbergroups'][$id]['group_type'] != 1)))
+		{
+			$groups[$id] = $context['memmbergroups'][$id];
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
-			description, min_posts, online_color, max_messages, icons, hidden, id_parent') . (!$assignable ? '' : ',
-			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable,
-			CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group') . '
-		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_ids})' . ($protected ? '' : '
-			AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
-		LIMIT {int:limit}'),
-		array(
-			'min_posts' => -1,
-			'group_ids' => $group_ids,
-			'limit' => $limit,
-			'is_protected' => 1,
-		)
-	);
-
-	if ($smcFunc['db_num_rows']($request) == 0)
-		return $groups;
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$groups[$row['id_group']] = $row;
-	$smcFunc['db_free_result']($request);
+			$count++;
+			if ($count == $limit)
+				break;
+		}
+	}
 
 	if (is_array($group_id))
 		return $groups;
@@ -1007,7 +1001,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
-	global $smcFunc;
+	global $smcFunc, $txt;
 
 	$groups = array();
 	if (in_array(0, $groups))
@@ -1088,6 +1082,8 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
 		),
 		array('id_group')
 	);
+
+	loadMemberGroups(true);
 }
 
 /**
@@ -1191,6 +1187,8 @@ function updateCopiedGroup($id_group, $copy_from)
 				'icons' => $group_info['icons'],
 			)
 	);
+
+	loadMemberGroups(true);
 }
 
 /**
@@ -1212,6 +1210,8 @@ function updateInheritedGroup($id_group, $copy_id)
 			'current_group' => $id_group,
 		)
 	);
+
+	loadMemberGroups(true);
 }
 
 /**
@@ -1242,6 +1242,8 @@ function updateMembergroupProperties($properties)
 			'group_desc' => $properties['group_desc'],
 		)
 	);
+
+	loadMemberGroups(true);
 }
 
 /**

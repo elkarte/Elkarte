@@ -82,6 +82,14 @@ function loadPMLabels()
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
 }
 
+/**
+ * Get the number of PMs for the current user
+ * 
+ * @param bool $descending
+ * @param int $pmID
+ * @param string $labelQuery
+ * @return type
+ */
 function getPMCount($descending = false, $pmID = null, $labelQuery)
 {
 	global $user_info, $context, $smcFunc;
@@ -122,7 +130,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 	list ($count) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	return $count;
+	return (int) $count;
 }
 
 /**
@@ -415,8 +423,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	require_once(SUBSDIR . '/Mail.subs.php');
 	require_once(SUBSDIR . '/Post.subs.php');
 
-	$onBehalf = $from !== null;
-
 	// Initialize log array.
 	$log = array(
 		'failed' => array(),
@@ -526,7 +532,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$delete = false;
 		foreach ($criteria as $criterium)
 		{
-			$match = false;
 			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], $user_info['groups'])) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
 				$delete = true;
 			// If we're adding and one criteria don't match then we stop!

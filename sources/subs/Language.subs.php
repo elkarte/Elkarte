@@ -48,7 +48,7 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $smcFunc, $language, $context, $txt;
+	global $settings, $smcFunc, $language, $txt;
 
 	$languages = array();
 	// Keep our old entries.

@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $smcFunc, $context, $scripturl, $user_info, $modSettings, $txt;
+	global $smcFunc, $scripturl, $user_info, $modSettings, $txt;
 
 	// The list can be sorted in several ways.
 	$allowed_sort_options = array(
