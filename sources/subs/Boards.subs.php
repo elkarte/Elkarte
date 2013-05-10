@@ -1133,7 +1133,7 @@ function getOtherGroups($curBoard)
 			'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
 			'is_post_group' => $row['min_posts'] != -1,
 		);
-		}
+	}
 	$smcFunc['db_free_result']($request);
 
 	return $groups;
