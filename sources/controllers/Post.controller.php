@@ -502,6 +502,8 @@ class Post_Controller
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '') . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
 
+			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
@@ -529,23 +531,14 @@ class Post_Controller
 		{
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-			require_once(SUBSDIR . '/Messages.subs.php');
-			// Get the existing message.
-			$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
-			// The message they were trying to edit was most likely deleted.
-			if ($message === false)
-				fatal_lang_error('no_message', false);
-
-			$errors = checkMessagePermissions($message['message']);
-			if (!empty($errors))
+			$message = getFormMsgSubject(true, $topic);
+			if (!empty($message['errors']))
 				foreach ($errors as $error)
 					$post_errors->addError($error);
 
-			prepareMessageContext($message);
-
 			// Get the stuff ready for the form.
-			$form_subject = $message['message']['subject'];
-			$form_message = un_preparsecode($message['message']['body']);
+			list($form_subject, $form_message) = $message['message'];
+
 			censorText($form_message);
 			censorText($form_subject);
 
@@ -573,78 +566,7 @@ class Post_Controller
 
 			$context['submit_label'] = $txt['post'];
 
-			// Posting a quoted reply?
-			if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
-			{
-				// Make sure they _can_ quote this post, and if so get it.
-				$request = $smcFunc['db_query']('', '
-					SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
-					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-					WHERE m.id_msg = {int:id_msg}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND m.approved = {int:is_approved}') . '
-					LIMIT 1',
-					array(
-						'id_msg' => !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'],
-						'is_approved' => 1,
-					)
-				);
-				if ($smcFunc['db_num_rows']($request) == 0)
-					fatal_lang_error('quoted_post_deleted', false);
-				list ($form_subject, $mname, $mdate, $form_message) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
-				// Add 'Re: ' to the front of the quoted subject.
-				if (trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
-					$form_subject = $context['response_prefix'] . $form_subject;
-
-				// Censor the message and subject.
-				censorText($form_message);
-				censorText($form_subject);
-
-				// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
-				if (strpos($form_message, '[html]') !== false)
-				{
-					$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $form_message, -1, PREG_SPLIT_DELIM_CAPTURE);
-					for ($i = 0, $n = count($parts); $i < $n; $i++)
-					{
-						// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-						if ($i % 4 == 0)
-							$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', \'$1\') . \'[/html]\'', $parts[$i]);
-					}
-					$form_message = implode('', $parts);
-				}
-
-				$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $form_message);
-
-				// Remove any nested quotes, if necessary.
-				if (!empty($modSettings['removeNestedQuotes']))
-					$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
-
-				// Add a quote string on the front and end.
-				$form_message = '[quote author=' . $mname . ' link=topic=' . $topic . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
-			}
-			// Posting a reply without a quote?
-			elseif (!empty($topic) && empty($_REQUEST['quote']))
-			{
-				// Get the first message's subject.
-				$form_subject = $first_subject;
-
-				// Add 'Re: ' to the front of the subject.
-				if (trim($context['response_prefix']) != '' && $form_subject != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
-					$form_subject = $context['response_prefix'] . $form_subject;
-
-				// Censor the subject.
-				censorText($form_subject);
-
-				$form_message = '';
-			}
-			else
-			{
-				$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
-				$form_message = '';
-			}
+			list($form_subject, $form_message) = getFormMsgSubject(false, $topic);
 		}
 
 		// Are we moving a discussion to its own topic?
