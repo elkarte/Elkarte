@@ -1721,3 +1721,9 @@ function notifyButton(btn)
 	toggleButtonAJAX(btn, 'notification_topic_notice');
 	return false;
 }
+
+function disregardButton(btn)
+{
+	toggleButtonAJAX(btn);
+	return false;
+}

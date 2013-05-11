@@ -96,8 +96,6 @@ class Notify_Controller
 		// Attempt to turn notifications on/off.
 		setTopicNotification($user_info['id'], $topic, $_GET['sa'] == 'on');
 
-		$text = $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'];
-		$url = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : '');
 		$return = array(
 			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
 			'url' => $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
@@ -191,7 +189,9 @@ class Notify_Controller
 	 */
 	function action_disregardtopic()
 	{
-		global $smcFunc, $user_info, $topic, $modSettings;
+		global $user_info, $topic, $modSettings;
+
+		is_not_guest();
 
 		// our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -201,13 +201,50 @@ class Notify_Controller
 		{
 			checkSession('get');
 
-			if ($_GET['sa'] === 'on')
-				setTopicRegard($user_info['id'], $topic, true);
-			elseif ($_GET['sa'] === 'off')
-				setTopicRegard($user_info['id'], $topic, false);
+			setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
 		}
 
 		// Back to the topic.
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+	}
+
+	/**
+	 * Turn off/on unread replies subscription for a topic
+	 * Intended for use in XML or JSON calls
+	 */
+	function action_disregardtopic_api()
+	{
+		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
+
+		is_not_guest('', false);
+
+		// our topic functions are here
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Let's do something only if the function is enabled
+		if (empty($modSettings['enable_disregard']))
+			obExit(false);
+
+		checkSession('get');
+
+		setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
+
+		$return = array(
+			'text' => $_GET['sa'] == 'on' ? $txt['undisregard'] : $txt['disregard'],
+			'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $_REQUEST['start'] . ';sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+		);
+
+		if (isset($_REQUEST['json']))
+		{
+			die(json_encode($return));
+		}
+		loadTemplate('Xml');
+
+		$context['template_layers'] = array();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		$context['xml_data'] = array(
+			$return,
+		);
 	}
 }
