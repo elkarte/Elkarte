@@ -1722,6 +1722,15 @@ function notifyButton(btn)
 	return false;
 }
 
+function notifyboardButton(btn)
+{
+	if (typeof(notification_board_notice) != 'undefined' && !confirm(notification_board_notice))
+		return false;
+
+	toggleButtonAJAX(btn, 'notification_board_notice');
+	return false;
+}
+
 function disregardButton(btn)
 {
 	toggleButtonAJAX(btn);

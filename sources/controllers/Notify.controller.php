@@ -158,25 +158,58 @@ class Notify_Controller
 
 			return;
 		}
-		// Turn the board level notification on....
-		elseif ($_GET['sa'] == 'on')
-		{
-			checkSession('get');
-
-			// Turn notification on.  (note this just blows smoke if it's already on.)
-			setBoardNotification($user_info['id'], $board, true);
-		}
-		// ...or off?
+		// Turn the board level notification on/off?
 		else
 		{
 			checkSession('get');
 
-			// Turn notification off for this board.
-			setBoardNotification($user_info['id'], $board, false);
+			// Turn notification on/off for this board.
+			setBoardNotification($user_info['id'], $board, $_GET['sa'] == 'on');
 		}
 
 		// Back to the board!
 		redirectexit('board=' . $board . '.' . $_REQUEST['start']);
+	}
+
+	/**
+	 * Turn off/on notification for a particular board.
+	 * Intended for use in XML or JSON calls
+	 */
+	function action_notifyboard_api()
+	{
+		global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
+
+		// Permissions are an important part of anything ;).
+		is_not_guest('', false);
+		if (!allowedTo('mark_notify') || empty($board) || empty($_GET['sa']))
+			obExit(false);
+
+		// our board functions are here
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		checkSession('get');
+
+		// Turn notification on/off for this board.
+		setBoardNotification($user_info['id'], $board, $_GET['sa'] == 'on');
+
+		$return = array(
+			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notifyboard;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
+		);
+
+		if (isset($_REQUEST['json']))
+		{
+			die(json_encode($return));
+		}
+		loadTemplate('Xml');
+
+		$context['template_layers'] = array();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		$context['xml_data'] = array(
+			$return,
+		);
 	}
 
 	/**
