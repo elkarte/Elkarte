@@ -93,15 +93,20 @@ class Notify_Controller
 		// Our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Attempt to turn notifications on.
+		// Attempt to turn notifications on/off.
 		setTopicNotification($user_info['id'], $topic, $_GET['sa'] == 'on');
 
 		$text = $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'];
 		$url = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : '');
+		$return = array(
+			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
+		);
 
 		if (isset($_REQUEST['json']))
 		{
-			die(json_encode(array('text' => $text, 'url' => $url)));
+			die(json_encode($return));
 		}
 		loadTemplate('Xml');
 
@@ -109,10 +114,7 @@ class Notify_Controller
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
-			array(
-				'text' => $text,
-				'url' => $url,
-			),
+			$return,
 		);
 	}
 

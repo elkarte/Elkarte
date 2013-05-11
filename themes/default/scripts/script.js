@@ -1685,3 +1685,39 @@ function doAutoSubmit()
 
 	setTimeout("doAutoSubmit();", 1000);
 }
+
+function toggleButtonAJAX(btn, text_confirm)
+{
+	ajax_indicator(true);
+
+	var oXMLDoc = getXMLDocument(btn.href + ';api');
+
+	if (oXMLDoc.responseXML)
+	{
+		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+		var url = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
+		var confirm_elem = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('confirm');
+		if (confirm_elem.length == 1)
+			var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+
+		$('.' + btn.className).each(function() {
+			// @todo: the span should be moved somewhere in themes.js?
+			$(this).html('<span>' + text + '</span>');
+			$(this).attr('href', url);
+			if (typeof(confirm_text) != 'undefined')
+				eval(text_confirm + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+		});
+	}
+
+	ajax_indicator(false);
+
+}
+
+function notifyButton(btn)
+{
+	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
+		return false;
+
+	toggleButtonAJAX(btn, 'notification_topic_notice');
+	return false;
+}

@@ -339,8 +339,9 @@ function template_generic_xml_buttons()
 	foreach ($context['xml_data'] as $button)
 		echo '
 		<button>
-			<text>', cleanXml($button['text']), '</text>
-			<url>', cleanXml($button['url']), '</text>
+			<text><![CDATA[', cleanXml($button['text']), ']]></text>
+			<url><![CDATA[', cleanXml($button['url']), ']]></url>', !empty($button['confirm']) ? '
+			<confirm><![CDATA[' . cleanXml($button['confirm']) . ']]></confirm>' : '', '
 		</button>';
 	echo '
 	</buttons>
