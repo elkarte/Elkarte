@@ -2979,13 +2979,19 @@ function template_header()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
 		// Are we debugging the template/html content?
-		if (!isset($_REQUEST['xml']) && isset($_GET['debug']) && !isBrowser('ie'))
+		if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
 			header('Content-Type: application/xhtml+xml');
-		elseif (!isset($_REQUEST['xml']))
+		elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
 			header('Content-Type: text/html; charset=UTF-8');
 	}
 
-	header('Content-Type: text/' . (isset($_REQUEST['xml']) ? 'xml' : 'html') . '; charset=UTF-8');
+	// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+	if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+		header('Content-Type: application/json; charset=UTF-8');
+	elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+		header('Content-Type: text/xml; charset=UTF-8');
+	else
+		header('Content-Type: text/html; charset=UTF-8');
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
