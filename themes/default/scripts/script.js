@@ -1692,7 +1692,7 @@ function toggleButtonAJAX(btn, text_confirm)
 
 	var oXMLDoc = getXMLDocument(btn.href + ';api');
 
-	if (oXMLDoc.responseXML)
+	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
 	{
 		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 		var url = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
@@ -1734,5 +1734,43 @@ function notifyboardButton(btn)
 function disregardButton(btn)
 {
 	toggleButtonAJAX(btn);
+	return false;
+}
+
+function markboardreadButton(btn)
+{
+	toggleButtonAJAX(btn);
+
+	// Remove all the "new" icons next to the topics subjects
+	$('.new_posts').each(function() {
+		$(this).parent().remove();
+	});
+
+	$('.boardicon').each(function() {
+		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
+		$(this).attr("src", src);
+	});
+
+	return false;
+}
+
+function markallreadButton(btn)
+{
+	toggleButtonAJAX(btn);
+
+	// Remove all the "new" icons next to the topics subjects
+	$('.new_posts').each(function() {
+		$(this).parent().remove();
+	});
+
+	$('.boardicon').each(function() {
+		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
+		$(this).attr("src", src);
+	});
+
+	$('.board_new_posts').each(function() {
+		$(this).removeClass('board_new_posts');
+	});
+
 	return false;
 }

@@ -80,7 +80,7 @@ class Notify_Controller
 	 * Turn off/on notifications for a particular topic
 	 * Intended for use in XML or JSON calls
 	 */
-	function action_notify_api()
+	public function action_notify_api()
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
 
@@ -126,7 +126,7 @@ class Notify_Controller
 	 *
 	 * @uses Notify template, notify_board sub-template.
 	 */
-	function action_notifyboard()
+	public function action_notifyboard()
 	{
 		global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
 
@@ -175,7 +175,7 @@ class Notify_Controller
 	 * Turn off/on notification for a particular board.
 	 * Intended for use in XML or JSON calls
 	 */
-	function action_notifyboard_api()
+	public function action_notifyboard_api()
 	{
 		global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
 
@@ -220,7 +220,7 @@ class Notify_Controller
 	 * Upon successful completion of action will direct user back to topic.
 	 * Accessed via ?action=disregardtopic.
 	 */
-	function action_disregardtopic()
+	public function action_disregardtopic()
 	{
 		global $user_info, $topic, $modSettings;
 
@@ -245,7 +245,7 @@ class Notify_Controller
 	 * Turn off/on unread replies subscription for a topic
 	 * Intended for use in XML or JSON calls
 	 */
-	function action_disregardtopic_api()
+	public function action_disregardtopic_api()
 	{
 		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
 
