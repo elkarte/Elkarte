@@ -161,7 +161,7 @@ function sessionRead($session_id)
  */
 function sessionWrite($session_id, $data)
 {
-	global $smcFunc, $db;
+	global $db;
 
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
@@ -171,7 +171,7 @@ function sessionWrite($session_id, $data)
 		$db = database();
 
 	// First try to update an existing row...
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		UPDATE {db_prefix}sessions
 		SET data = {string:data}, last_update = {int:last_update}
 		WHERE session_id = {string:session_id}',
@@ -183,8 +183,8 @@ function sessionWrite($session_id, $data)
 	);
 
 	// If that didn't work, try inserting a new one.
-	if ($smcFunc['db_affected_rows']() == 0)
-		$result = $smcFunc['db_insert']('ignore',
+	if ($db->affected_rows() == 0)
+		$result = $db->insert('ignore',
 			'{db_prefix}sessions',
 			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 			array($session_id, $data, time()),
