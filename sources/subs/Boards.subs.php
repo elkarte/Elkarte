@@ -1190,6 +1190,12 @@ function getBoardProperties($idboard)
 	return $properties;
 }
 
+/**
+ * Fetch the number of posts in an array of boards based on board IDs or category IDs
+ * @param array $boards an array of board IDs
+ * @param array $categories an array of category IDs
+ * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
+ */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
 {
 	global $smcFunc;
@@ -1226,6 +1232,26 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 	return $return;
 }
 
+/**
+ * Returns information of a set of boards based on board IDs or category IDs
+ *
+ * @param mixed $conditions is an associative array that holds the board or the cat IDs
+ *              'categories' => an array of category IDs (it accepts a single ID too)
+ *              'boards' => an array of board IDs (it accepts a single ID too)
+ *              if conditions is set to 'all' (not an array) all the boards are queried
+ * @param array $params is an optional array that allows to control the results returned:
+ *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
+ *              'count' => (bool) the number of boards found is returned
+ *              'selects' => (string) determines what informations are retrieved and returned
+ *                           Allowed values: 'name', 'posts', 'detailed', 'permissions'; 
+ *                           default: 'name';
+ *                           see the function for detailes on the fields associated to each value
+ *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
+ *              'exclude_recycle' => (bool) recycle board is not included (default false)
+ *              'exclude_redirects' => (bool) redirects are not included (default false)
+ *
+ * @todo unify the two queries?
+ */
 function fetchBoardsInfo($conditions, $params = array())
 {
 	global $smcFunc, $modSettings;
@@ -1287,7 +1313,7 @@ function fetchBoardsInfo($conditions, $params = array())
 			FROM {db_prefix}boards AS b
 			WHERE ' . (!empty($params['wanna_see_board']) ? '{query_wanna_see_board}' : '{query_see_board}') . (!empty($clauses) ? '
 				AND b.' . implode(' OR b.', $clauses) : '') . (!empty($params['exclude_recycle']) ? '
-				AND b.id_board != {int:recycle_board}' : '') . (!empty($params['exclude_redirect']) ? '
+				AND b.id_board != {int:recycle_board}' : '') . (!empty($params['exclude_redirects']) ? '
 				AND b.redirect = {string:empty_string}' : ''),
 			array_merge($clauseParameters, array(
 				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
@@ -1309,4 +1335,36 @@ function fetchBoardsInfo($conditions, $params = array())
 	$smcFunc['db_free_result']($request);
 
 	return $return;
+}
+
+/**
+ * Retrieve the all the child boards of an array of boards
+ * and add the ids to the same array
+ * @param mixed $boards an array of board IDs (it accepts a single board too
+ *              The param is passed by ref and the result it returned through the param itself
+ */
+function addBoardsParents(&$boards)
+{
+	global $smcFunc;
+
+	if (!is_array($boards))
+		$boards = array($boards);
+
+	$request = $smcFunc['db_query']('', '
+		SELECT b.id_board, b.id_parent
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}
+			AND b.child_level > {int:no_parents}
+			AND b.id_board NOT IN ({array_int:board_list})
+		ORDER BY child_level ASC
+		',
+		array(
+			'no_parents' => 0,
+			'board_list' => ,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		if (in_array($row['id_parent'], $boards))
+			$boards[] = $row['id_board'];
+	$smcFunc['db_free_result']($request);
 }

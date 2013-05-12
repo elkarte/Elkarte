@@ -230,27 +230,10 @@ class MarkRead_Controller
 		{
 			// They want to mark the entire tree starting with the boards specified
 			// The easist thing is to just get all the boards they can see, but since we've specified the top of tree we ignore some of them
-
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.id_parent
-				FROM {db_prefix}boards AS b
-				WHERE {query_see_board}
-					AND b.child_level > {int:no_parents}
-					AND b.id_board NOT IN ({array_int:board_list})
-				ORDER BY child_level ASC
-				',
-				array(
-					'no_parents' => 0,
-					'board_list' => $boards,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				if (in_array($row['id_parent'], $boards))
-					$boards[] = $row['id_board'];
-			$smcFunc['db_free_result']($request);
+			addBoardsParents($boards);
 		}
 
-		$boards = canSeeBoards($boards, $categories);
+		$boards = boardsPosts($boards, $categories);
 
 		if (empty($boards))
 			return '';

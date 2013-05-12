@@ -485,7 +485,7 @@ function action_plushsearch2()
 	else
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('exclude_recycle' => true, 'exclude_redirect' => true, 'wanna_see_board' => empty($search_params['advanced']))));
+		$search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('exclude_recycle' => true, 'exclude_redirects' => true, 'wanna_see_board' => empty($search_params['advanced']))));
 
 		// This error should pro'bly only happen for hackers.
 		if (empty($search_params['brd']))
