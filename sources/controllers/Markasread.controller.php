@@ -57,7 +57,7 @@ class MarkRead_Controller
 			// the rest, for now...
 			$sa = 'action_markasread';
 
-		return call_user_func(array($this, $sa));
+		return $this->{$sa}();
 	}
 
 	public function action_index_api()
