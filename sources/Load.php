@@ -148,28 +148,7 @@ function reloadSettings()
 		date_default_timezone_set($modSettings['default_timezone']);
 
 	// Check the load averages?
-	if (!empty($modSettings['loadavg_enable']))
-	{
-		if (($modSettings['load_average'] = cache_get_data('loadavg', 90)) == null)
-		{
-			$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
-			if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			else
-				unset($modSettings['load_average']);
-
-			if (!empty($modSettings['load_average']))
-				cache_put_data('loadavg', $modSettings['load_average'], 90);
-		}
-
-		if (!empty($modSettings['load_average']))
-			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
-
-		if (!empty($modSettings['loadavg_forum']) && !empty($modSettings['load_average']) && $modSettings['load_average'] >= $modSettings['loadavg_forum'])
-			display_loadavg_error();
-	}
+	checkLoadAverage();
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
@@ -2671,4 +2650,55 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
+}
+
+/**
+ * Get the server's load average
+ * 
+ * @param bool $force = false Force getting it from the cache
+ * @return float
+ */
+function getLoadAverage($force = false)
+{
+	if (!$force && ($load_average = cache_get_data('loadavg', 90)) == null)
+	{
+		$load_average = @file_get_contents('/proc/loadavg');
+		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
+			$load_average = (float) $matches[1];
+		elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+			$load_average = (float) $matches[1];
+		else
+			$load_average = null;
+
+		if (!empty($load_average))
+			cache_put_data('loadavg', $load_average, 90);
+	}
+
+	return $load_average;
+}
+
+/**
+ * Check that a server's load average isn't out of range, display an error if it is
+ * 
+ * @return bool false if it is out of range, true if it isn't
+ */
+function checkLoadAverage()
+{
+	global $modSettings;
+
+	if (!empty($modSettings['loadavg_enable']))
+	{
+		$modSettings['load_average'] = getLoadAverage();
+
+		if (!empty($modSettings['load_average']))
+			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
+
+		if (!empty($modSettings['loadavg_forum']) && !empty($modSettings['load_average']) && $modSettings['load_average'] >= $modSettings['loadavg_forum'])
+		{
+			display_loadavg_error();
+			return false;
+		}
+	}
+
+	return true;
 }
