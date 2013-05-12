@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
+	global $modSettings, $smcFunc, $txt, $context;
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
@@ -2151,6 +2151,10 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 function getBoardParents($id_parent)
 {
 	global $scripturl, $smcFunc;
+
+	// First level has no parents
+	if (empty($id_parent))
+		array();
 
 	// First check if we have this cached already.
 	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
