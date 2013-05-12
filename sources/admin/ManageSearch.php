@@ -516,6 +516,7 @@ class ManageSearch_Controller
 				);
 		}
 		else
+			// Here may be wolves.
 			$context['table_info'] = array(
 				'data_length' => $txt['not_applicable'],
 				'index_length' => $txt['not_applicable'],

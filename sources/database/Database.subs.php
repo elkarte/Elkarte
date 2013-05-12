@@ -31,8 +31,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 }
 
 /**
- * Extend the database functionality. It calls the respective file's init
- * to add the implementations in that file to $smcFunc array.
+ * Extend the database functionality. It calls the respective class initialization method.
  *
  * @param string $type = 'extra'
  */
@@ -41,8 +40,9 @@ function db_extend ($type = 'extra')
 	global $db_type;
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
-	$initFunc = 'db_' . $type . '_init';
-	$initFunc();
+	$db_extend_class = 'Db' . strtoupper($type[0]) . substr($type, 1) . '_' . $db_type;
+	$db_extend = new $db_extend_class();
+	$db_extend->initialize();
 }
 
 /**
