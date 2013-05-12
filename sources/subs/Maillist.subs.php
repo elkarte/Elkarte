@@ -158,7 +158,7 @@ function maillist_delete_entry($id)
 
 /**
  * Loads the filers or parsers for the post by email system
- *  - If supplied an ID will load that specific filter/parser
+ *  - If an ID is supplied, it will load that specific filter/parser
  *	- Style defines if it will load parsers or filters
  *
  * @param int type $start
@@ -214,7 +214,8 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 
 /**
  * Get the count of the filters or parsers of the system
- *	- If supplied an ID will valid it exits and return 1
+ * If ID is 0, it will retrieve the count.
+ * If ID is a valid positive integer, it will return 1 and exit.
  *
  * @param int $id
  * @param string $style
@@ -246,7 +247,7 @@ function list_count_filter_parser($id, $style)
 
 /**
  * Loads a specific filter/parser from the database for display
- *	- If supplied an ID will load just that filter/parser
+ * It will load only that filter/parser
  *
  * @param type $id
  * @param type $style
@@ -283,7 +284,7 @@ function maillist_load_filter_parser($id, $style)
 /**
  * Removes a specific filter or parser from the system
  *
- * @param type $id
+ * @param type $id ID of the filter/parser
  */
 function maillist_delete_filter_parser($id)
 {

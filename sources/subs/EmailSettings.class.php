@@ -7,8 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * Takes an email body and attempts to re-flow/format it for posting.  It will
- * as best it can to undo the 78/80 character email wrap
+ * Handles saving of config vars in another table than settings
  */
 
 if (!defined('ELKARTE'))
