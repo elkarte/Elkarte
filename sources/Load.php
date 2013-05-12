@@ -2117,16 +2117,6 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			}
 			$txt['emails'] = array();
 		}
-		if (!empty($birthdayEmails))
-		{
-			foreach ($birthdayEmails as $key => $value)
-			{
-				$txtBirthdayEmails[$key . '_subject'] = $value['subject'];
-				$txtBirthdayEmails[$key . '_body'] = $value['body'];
-				$txtBirthdayEmails[$key . '_author'] = $value['author'];
-			}
-			$birthdayEmails = array();
-		}
 	}
 
 	// Keep track of what we're up to soldier.
