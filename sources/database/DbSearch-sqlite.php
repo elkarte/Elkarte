@@ -21,12 +21,7 @@ class DbSearch_SQLite
 	 */
 	function initialize()
 	{
-		global $smcFunc;
-
-		$smcFunc += array(
-				'db_search_support' => 'search_support',
-				'db_create_word_search' => 'create_word_search',
-			);
+		// initialize or let it go :P
 	}
 
 	/**

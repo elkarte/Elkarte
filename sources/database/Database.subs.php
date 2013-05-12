@@ -37,12 +37,31 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  */
 function db_extend ($type = 'extra')
 {
-	global $db_type;
+	global $db_type, $db_search, $db_packages, $db_extra;
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
-	$db_extend_class = 'Db' . strtoupper($type[0]) . substr($type, 1) . '_' . $db_type;
-	$db_extend = new $db_extend_class();
-	$db_extend->initialize();
+
+	// $type = 'search' is now handled by classes
+	if ($type == 'search')
+	{
+		$db_extend_class = 'Db' . strtoupper($type[0]) . substr($type, 1) . '_' . $db_type;
+		$db_extend = new $db_extend_class();
+		$db_extend->initialize();
+
+		// Bah. Quick 'n dirty :P
+		if ($db_type == 'mysql')
+			$db_search = new DbSearch_MySQL();
+		elseif ($db_type == 'postgresql')
+			$db_search = new DbSearch_PostgreSQL();
+		elseif ($db_type == 'sqlite')
+			$db_search = new DbSearch_SQLite();
+	}
+	else
+	{
+		// packages, extra
+		$initFunc = 'db_' . $type . '_init';
+		$initFunc();
+	}
 }
 
 /**

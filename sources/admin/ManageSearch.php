@@ -302,12 +302,12 @@ class ManageSearch_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
+		global $txt, $context, $modSettings, $smcFunc, $db_search, $db_type, $db_prefix;
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_method_title'];
 		$context['sub_template'] = 'select_search_method';
-		$context['supports_fulltext'] = $smcFunc['db_search_support']('fulltext');
+		$context['supports_fulltext'] = $db_search->search_support('fulltext');
 
 		// Load any apis.
 		$context['search_apis'] = loadSearchAPIs();
@@ -554,7 +554,7 @@ class ManageSearch_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+		global $modSettings, $context, $smcFunc, $db_search, $db_prefix, $txt;
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -630,7 +630,7 @@ class ManageSearch_Controller
 					);
 				}
 
-				$smcFunc['db_create_word_search']($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
+				$db_search->create_word_search($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
 
 				// Temporarily switch back to not using a search index.
 				if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
