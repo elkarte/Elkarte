@@ -318,23 +318,19 @@ class MergeTopics_Controller
 		if (empty($merge_boards))
 			fatal_lang_error('cannot_merge_any', 'user');
 
+		require_once(SUBSDIR . '/Boards.subs.php');
 		// Make sure they can see all boards....
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE b.id_board IN ({array_int:boards})
-				AND {query_see_board}' . (!in_array(0, $merge_boards) ? '
-				AND b.id_board IN ({array_int:merge_boards})' : '') . '
-			LIMIT ' . count($boards),
-			array(
-				'boards' => $boards,
-				'merge_boards' => $merge_boards,
-			)
-		);
-		// If the number of boards that's in the output isn't exactly the same as we've put in there, you're in trouble.
-		if ($smcFunc['db_num_rows']($request) != count($boards))
+		$query_boards = array('boards' => $boards);
+
+		if (!in_array(0, $merge_boards))
+			$query_boards['boards'] = array_merge($query_boards['boards'], $merge_boards);
+
+		// Saved in a variable to (potentially) save a query later
+		$boards_info = fetchBoardsInfo($query_boards);
+
+		// This happens when a member is moderator of a board he cannot see
+		if (count($boards_info) != count($boards))
 			fatal_lang_error('no_board');
-		$smcFunc['db_free_result']($request);
 
 		if (empty($_REQUEST['sa']) || $_REQUEST['sa'] == 'options')
 		{
@@ -365,23 +361,12 @@ class MergeTopics_Controller
 			}
 			if (count($boards) > 1)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT id_board, name
-					FROM {db_prefix}boards
-					WHERE id_board IN ({array_int:boards})
-					ORDER BY name
-					LIMIT ' . count($boards),
-					array(
-						'boards' => $boards,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				foreach ($boards_info as $row)
 					$context['boards'][] = array(
 						'id' => $row['id_board'],
 						'name' => $row['name'],
 						'selected' => $row['id_board'] == $topic_data[$firstTopic]['board']
 					);
-				$smcFunc['db_free_result']($request);
 			}
 
 			$context['topics'] = $topic_data;

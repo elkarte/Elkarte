@@ -274,25 +274,25 @@ class Reports_Controller
 
 		// Get as much memory as possible as this can be big.
 		setMemoryLimit('256M');
+		require_once(SUBSDIR . '/Boards.subs.php');
 
 		if (isset($_REQUEST['boards']))
 		{
 			if (!is_array($_REQUEST['boards']))
-				$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $k => $dummy)
-				$_REQUEST['boards'][$k] = (int) $dummy;
-
-			$board_clause = 'id_board IN ({array_int:boards})';
+				$query_boards['boards'] = array_map('intval', explode(',', $_REQUEST['boards']));
+			else
+				$query_boards['boards'] = array_map('intval', $_REQUEST['boards']);
 		}
 		else
-			$board_clause = '1=1';
+			$query_boards = '1=1';
 
+		$query_groups = array();
 		if (isset($_REQUEST['groups']))
 		{
 			if (!is_array($_REQUEST['groups']))
-				$_REQUEST['groups'] = explode(',', $_REQUEST['groups']);
-			foreach ($_REQUEST['groups'] as $k => $dummy)
-				$_REQUEST['groups'][$k] = (int) $dummy;
+				$query_groups = array_map('intval', explode(',', $_REQUEST['groups']));
+			else
+				$query_groups = array_map('intval', $_REQUEST['groups']);
 
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
@@ -300,25 +300,10 @@ class Reports_Controller
 			$group_clause = '1=1';
 
 		// Fetch all the board names.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_board, name, id_profile
-			FROM {db_prefix}boards
-			WHERE ' . $board_clause . '
-			ORDER BY id_board',
-			array(
-				'boards' => isset($_REQUEST['boards']) ? $_REQUEST['boards'] : array(),
-			)
-		);
+		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board'));
 		$profiles = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$boards[$row['id_board']] = array(
-				'name' => $row['name'],
-				'profile' => $row['id_profile'],
-			);
+		foreach ($boards as $row)
 			$profiles[] = $row['id_profile'];
-		}
-		$smcFunc['db_free_result']($request);
 
 		// Get all the possible membergroups, except admin!
 		$request = $smcFunc['db_query']('', '
@@ -332,10 +317,10 @@ class Reports_Controller
 				'admin_group' => 1,
 				'min_posts' => -1,
 				'newbie_group' => 4,
-				'groups' => isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array(),
+				'groups' => $query_groups,
 			)
 		);
-		if (!isset($_REQUEST['groups']) || in_array(-1, $_REQUEST['groups']) || in_array(0, $_REQUEST['groups']))
+		if (empty($query_groups) || in_array(-1, $query_groups) || in_array(0, $query_groups))
 			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']);
 		else
 			$member_groups = array('col' => '');
@@ -359,13 +344,13 @@ class Reports_Controller
 			array(
 				'profile_list' => $profiles,
 				'not_deny' => 1,
-				'groups' => isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array(),
+				'groups' => $query_groups,
 			)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
 			foreach ($boards as $id => $board)
-				if ($board['profile'] == $row['id_profile'])
+				if ($board['id_profile'] == $row['id_profile'])
 					$board_permissions[$id][$row['id_group']][$row['permission']] = $row['add_deny'];
 
 			// Make sure we get every permission.

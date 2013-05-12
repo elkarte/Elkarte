@@ -200,16 +200,10 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($boards))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_board, name
-			FROM {db_prefix}boards
-			WHERE id_board IN ({array_int:board_list})
-			LIMIT ' . count(array_keys($boards)),
-			array(
-				'board_list' => array_keys($boards),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$boards_info = fetchBoardsInfo(array('boards' => array_keys($boards)));
+
+		foreach ($boards_info as $row)
 		{
 			foreach ($boards[$row['id_board']] as $action)
 			{
@@ -222,7 +216,6 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$entries[$action]['extra']['board'] = '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
 	}
 
 	if (!empty($topics))

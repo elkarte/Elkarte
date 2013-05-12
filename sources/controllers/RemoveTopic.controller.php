@@ -300,6 +300,8 @@ class RemoveTopic_Controller
 
 		if (!empty($topics_to_restore))
 		{
+			require_once(SUBSDIR . 'Boards.subs.php');
+
 			// Lets get the data for these topics.
 			$request = $smcFunc['db_query']('', '
 				SELECT t.id_topic, t.id_previous_board, t.id_board, t.id_first_msg, m.subject
@@ -310,6 +312,7 @@ class RemoveTopic_Controller
 					'topics' => $topics_to_restore,
 				)
 			);
+
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 			{
 				// We can only restore if the previous board is set.
@@ -334,18 +337,9 @@ class RemoveTopic_Controller
 				);
 
 				// Lets see if the board that we are returning to has post count enabled.
-				$request2 = $smcFunc['db_query']('', '
-					SELECT count_posts
-					FROM {db_prefix}boards
-					WHERE id_board = {int:board}',
-					array(
-						'board' => $row['id_previous_board'],
-					)
-				);
-				list ($count_posts) = $smcFunc['db_fetch_row']($request2);
-				$smcFunc['db_free_result']($request2);
+				$board_data = boardInfo($row['id_previous_board']);
 
-				if (empty($count_posts))
+				if (empty($board_data['count_posts']))
 				{
 					// Lets get the members that need their post count restored.
 					$request2 = $smcFunc['db_query']('', '

@@ -77,7 +77,7 @@ class MarkRead_Controller
 	* action=markasread;sa=all
 	* Marks boards as read (or unread).
 	*/
-	function action_markboards()
+	public function action_markboards()
 	{
 		global $modSettings;
 
@@ -103,7 +103,7 @@ class MarkRead_Controller
 	* action=markasread;sa=unreadreplies
 	* Marks the selected topics as read.
 	*/
-	function action_markreplies()
+	public function action_markreplies()
 	{
 		global $user_info, $modSettings, $smcFunc;
 
@@ -129,7 +129,7 @@ class MarkRead_Controller
 	* action=markasread;sa=topic
 	* Mark a single topic as unread.
 	*/
-	function action_marktopic()
+	public function action_marktopic()
 	{
 		global $board, $topic, $user_info, $smcFunc;
 
@@ -138,14 +138,15 @@ class MarkRead_Controller
 		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
 		$topicinfo = getTopicInfo($topic, 'all');
+		$topic_msg_id = (int) $_GET['t'];
 
-		if (!empty($_GET['t']))
+		if (!empty($topic_msg_id))
 		{
 			// If they read the whole topic, go back to the beginning.
-			if ($_GET['t'] >= $topicinfo['id_last_msg'])
+			if ($topic_msg_id >= $topicinfo['id_last_msg'])
 				$earlyMsg = 0;
 			// If they want to mark the whole thing read, same.
-			elseif ($_GET['t'] <= $topicinfo['id_first_msg'])
+			elseif ($topic_msg_id <= $topicinfo['id_first_msg'])
 				$earlyMsg = 0;
 			// Otherwise, get the latest message before the named one.
 			else
@@ -158,7 +159,7 @@ class MarkRead_Controller
 						AND id_msg < {int:topic_msg_id}',
 					array(
 						'current_topic' => $topic,
-						'topic_msg_id' => (int) $_GET['t'],
+						'topic_msg_id' => $topic_msg_id,
 						'id_first_msg' => $topicinfo['id_first_msg'],
 					)
 				);
@@ -199,12 +200,9 @@ class MarkRead_Controller
 	* Accessed by action=markasread
 	* Subactions: sa=topic, sa=all, sa=unreadreplies
 	*/
-	function action_markasread()
+	public function action_markasread()
 	{
 		global $board, $user_info, $board_info, $modSettings, $smcFunc;
-
-		// no guests
-		is_not_guest();
 
 		checkSession('get');
 
@@ -252,170 +250,7 @@ class MarkRead_Controller
 			$smcFunc['db_free_result']($request);
 		}
 
-		$clauses = array();
-		$clauseParameters = array();
-		if (!empty($categories))
-		{
-			$clauses[] = 'id_cat IN ({array_int:category_list})';
-			$clauseParameters['category_list'] = $categories;
-		}
-		if (!empty($boards))
-		{
-			$clauses[] = 'id_board IN ({array_int:board_list})';
-			$clauseParameters['board_list'] = $boards;
-		}
-
-		if (empty($clauses))
-			return '';
-
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}
-				AND b.' . implode(' OR b.', $clauses),
-			array_merge($clauseParameters, array(
-			))
-		);
-		$boards = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$boards[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
-
-		if (empty($boards))
-			return '';
-
-		markBoardsRead($boards, isset($_REQUEST['unread']));
-
-		foreach ($boards as $b)
-		{
-			if (isset($_SESSION['topicseen_cache'][$b]))
-				$_SESSION['topicseen_cache'][$b] = array();
-		}
-
-		if (!isset($_REQUEST['unread']))
-		{
-			// Find all the boards this user can see.
-			$result = $smcFunc['db_query']('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE b.id_parent IN ({array_int:parent_list})
-					AND {query_see_board}',
-				array(
-					'parent_list' => $boards,
-				)
-			);
-			if ($smcFunc['db_num_rows']($result) > 0)
-			{
-				$logBoardInserts = '';
-				while ($row = $smcFunc['db_fetch_assoc']($result))
-					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $row['id_board']);
-					$smcFunc['db_insert']('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					$logBoardInserts,
-					array('id_member', 'id_board')
-				);
-			}
-			$smcFunc['db_free_result']($result);
-			if (empty($board))
-				return '';
-			else
-				return 'board=' . $board . '.0';
-		}
-		else
-		{
-			if (empty($board_info['parent']))
-				return '';
-			else
-				return 'board=' . $board_info['parent'] . '.0';
-		}
-	}
-
-	/**
-	* Mark as read: boards, topics, unread replies.
-	* Intended for use in XML or JSON calls
-	*/
-	function action_markasread_api()
-	{
-		global $board, $user_info, $board_info, $modSettings, $smcFunc;
-
-		// no guests
-		is_not_guest('', false);
-
-		checkSession('get');
-
-		require_once(SUBSDIR . '/Boards.subs.php');
-
-		$categories = array();
-		$boards = array();
-
-		if (isset($_REQUEST['c']))
-		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $c)
-				$categories[] = (int) $c;
-		}
-		if (isset($_REQUEST['boards']))
-		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $b)
-				$boards[] = (int) $b;
-		}
-		if (!empty($board))
-			$boards[] = (int) $board;
-
-		if (isset($_REQUEST['children']) && !empty($boards))
-		{
-			// They want to mark the entire tree starting with the boards specified
-			// The easist thing is to just get all the boards they can see, but since we've specified the top of tree we ignore some of them
-
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.id_parent
-				FROM {db_prefix}boards AS b
-				WHERE {query_see_board}
-					AND b.child_level > {int:no_parents}
-					AND b.id_board NOT IN ({array_int:board_list})
-				ORDER BY child_level ASC
-				',
-				array(
-					'no_parents' => 0,
-					'board_list' => $boards,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				if (in_array($row['id_parent'], $boards))
-					$boards[] = $row['id_board'];
-			$smcFunc['db_free_result']($request);
-		}
-
-		$clauses = array();
-		$clauseParameters = array();
-		if (!empty($categories))
-		{
-			$clauses[] = 'id_cat IN ({array_int:category_list})';
-			$clauseParameters['category_list'] = $categories;
-		}
-		if (!empty($boards))
-		{
-			$clauses[] = 'id_board IN ({array_int:board_list})';
-			$clauseParameters['board_list'] = $boards;
-		}
-
-		if (empty($clauses))
-			return '';
-
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}
-				AND b.' . implode(' OR b.', $clauses),
-			array_merge($clauseParameters, array(
-			))
-		);
-		$boards = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$boards[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$boards = canSeeBoards($boards, $categories);
 
 		if (empty($boards))
 			return '';

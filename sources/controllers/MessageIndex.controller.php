@@ -629,9 +629,6 @@ class MessageIndex_Controller
 		// Check the session = get or post.
 		checkSession('request');
 
-		// Some help we may need
-		require_once(SUBSDIR . '/Topic.subs.php');
-
 		// Lets go straight to the restore area.
 		if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
 			redirectexit('action=restoretopic;topics=' . implode(',', $_REQUEST['topics']) . ';' . $context['session_var'] . '=' . $context['session_id']);
@@ -883,17 +880,11 @@ class MessageIndex_Controller
 			// Does the post counts need to be updated?
 			if (!empty($moveTos))
 			{
+				require_once(SUBSDIR . '/Boards.subs.php');
 				$topicRecounts = array();
-				$request = $smcFunc['db_query']('', '
-					SELECT id_board, count_posts
-					FROM {db_prefix}boards
-					WHERE id_board IN ({array_int:move_boards})',
-					array(
-						'move_boards' => array_keys($moveTos),
-					)
-				);
+				$boards_info = fetchBoardsInfo(array('boards' => array_keys($moveTos)), array('selects' => 'posts'));
 
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				foreach ($boards_info as $row)
 				{
 					$cp = empty($row['count_posts']);
 
@@ -908,8 +899,6 @@ class MessageIndex_Controller
 						}
 					}
 				}
-
-				$smcFunc['db_free_result']($request);
 
 				if (!empty($topicRecounts))
 				{

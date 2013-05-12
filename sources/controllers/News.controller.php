@@ -59,43 +59,19 @@ class News_Controller
 		);
 		if (!empty($_REQUEST['c']) && empty($board))
 		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $i => $c)
-				$_REQUEST['c'][$i] = (int) $c;
+			$categories = array_map('intval', explode(',', $_REQUEST['c']));
 
-			if (count($_REQUEST['c']) == 1)
+			if (count($categories) == 1)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT name
-					FROM {db_prefix}categories
-					WHERE id_cat = {int:current_category}',
-					array(
-						'current_category' => (int) $_REQUEST['c'][0],
-					)
-				);
-				list ($feed_title) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				require_once(SUBSDIR . '/Categories.subs.php');
+				$feed_title = categoryName($categories[0]);
 
 				$feed_title = ' - ' . strip_tags($feed_title);
 			}
 
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.num_posts
-				FROM {db_prefix}boards AS b
-				WHERE b.id_cat IN ({array_int:current_category_list})
-					AND {query_see_board}',
-				array(
-					'current_category_list' => $_REQUEST['c'],
-				)
-			);
-			$total_cat_posts = 0;
-			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$boards[] = $row['id_board'];
-				$total_cat_posts += $row['num_posts'];
-			}
-			$smcFunc['db_free_result']($request);
+			$boards_posts = boardsPosts(array(), $categories);
+			$total_cat_posts = array_sum($boards_posts);
+			$boards = array_keys($boards_posts);
 
 			if (!empty($boards))
 				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
@@ -106,38 +82,27 @@ class News_Controller
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $i => $b)
-				$_REQUEST['boards'][$i] = (int) $b;
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$query_boards = array_map('intval', explode(',', $_REQUEST['boards']));
 
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.num_posts, b.name
-				FROM {db_prefix}boards AS b
-				WHERE b.id_board IN ({array_int:board_list})
-					AND {query_see_board}
-				LIMIT ' . count($_REQUEST['boards']),
-				array(
-					'board_list' => $_REQUEST['boards'],
-				)
-			);
+			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
 
 			// Either the board specified doesn't exist or you have no access.
-			$num_boards = $smcFunc['db_num_rows']($request);
+			$num_boards = count($boards_data);
 			if ($num_boards == 0)
 				fatal_lang_error('no_board');
 
 			$total_posts = 0;
-			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			$boards = array_keys($boards_data);
+			foreach ($boards_data as $row)
 			{
 				if ($num_boards == 1)
 					$feed_title = ' - ' . strip_tags($row['name']);
 
-				$boards[] = $row['id_board'];
 				$total_posts += $row['num_posts'];
 			}
-			$smcFunc['db_free_result']($request);
 
+			// @todo: when $boards is empty? If it is empty there is the fatal_lang_error. No?
 			if (!empty($boards))
 				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
@@ -147,24 +112,15 @@ class News_Controller
 		}
 		elseif (!empty($board))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT num_posts
-				FROM {db_prefix}boards
-				WHERE id_board = {int:current_board}
-				LIMIT 1',
-				array(
-					'current_board' => $board,
-				)
-			);
-			list ($total_posts) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$boards_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 
 			$feed_title = ' - ' . strip_tags($board_info['name']);
 
 			$query_this_board = 'b.id_board = ' . $board;
 
 			// Try to look through just a few messages, if at all possible.
-			if ($total_posts > 80 && $total_posts > $modSettings['totalMessages'] / 10)
+			if ($boards_data['num_posts'] > 80 && $boards_data['num_posts'] > $modSettings['totalMessages'] / 10)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $_GET['limit'] * 5);
 		}
 		else
