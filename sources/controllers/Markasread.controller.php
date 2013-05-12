@@ -62,6 +62,8 @@ class MarkRead_Controller
 
 	public function action_index_api()
 	{
+		global $context, $txt;
+
 		// Guests can't mark things.
 		is_not_guest('', false);
 
@@ -69,8 +71,29 @@ class MarkRead_Controller
 
 		$this->_dispatch();
 
-		// No need to do anything, just die
-		obExit(false);
+		// For the time being this is a special case
+		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
+		{
+			$return = array(
+				'text' => $txt['unread_topics_visit_none'],
+			);
+
+			if (isset($_REQUEST['json']))
+			{
+				die(json_encode($return));
+			}
+			loadTemplate('Xml');
+
+			$context['template_layers'] = array();
+			$context['sub_template'] = 'generic_xml_buttons';
+
+			$context['xml_data'] = array(
+				$return,
+			);
+		}
+		else
+			// No need to do anything, just die
+			obExit(false);
 	}
 
 	/**

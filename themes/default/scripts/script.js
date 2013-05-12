@@ -1713,6 +1713,26 @@ function toggleButtonAJAX(btn, text_confirm)
 
 }
 
+function toggleHeaderAJAX(btn, container_id)
+{
+	ajax_indicator(true);
+
+	var oXMLDoc = getXMLDocument(btn.href + ';api');
+	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
+
+	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
+	{
+		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+		$('#' + container_id + ' .pagesection').remove();
+		$('#' + container_id + ' .topic_table').remove();
+		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+	}
+
+	ajax_indicator(false);
+
+}
+
 function notifyButton(btn)
 {
 	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
@@ -1772,5 +1792,11 @@ function markallreadButton(btn)
 		$(this).removeClass('board_new_posts');
 	});
 
+	return false;
+}
+
+function markunreadButton(btn)
+{
+	toggleHeaderAJAX(btn, 'recentposts');
 	return false;
 }

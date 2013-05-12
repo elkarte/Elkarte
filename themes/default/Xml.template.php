@@ -337,12 +337,15 @@ function template_generic_xml_buttons()
 <elk>
 	<buttons>';
 	foreach ($context['xml_data'] as $button)
+	{
 		echo '
-		<button>
-			<text><![CDATA[', cleanXml($button['text']), ']]></text>
-			<url><![CDATA[', cleanXml($button['url']), ']]></url>', !empty($button['confirm']) ? '
-			<confirm><![CDATA[' . cleanXml($button['confirm']) . ']]></confirm>' : '', '
+		<button>';
+		foreach ($button as $key => $val)
+			echo '
+			<', $key, '><![CDATA[', cleanXml($val), ']]></', $key, '>';
+		echo '
 		</button>';
+	}
 	echo '
 	</buttons>
 </elk>';
