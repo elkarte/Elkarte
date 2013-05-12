@@ -38,12 +38,6 @@ $databases = array(
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
 	),
-	'sqlite' => array(
-		'name' => 'SQLite',
-		'version' => '1',
-		'version_check' => 'return 1;',
-		'always_has_db' => true,
-	),
 );
 
 // General options for the script.

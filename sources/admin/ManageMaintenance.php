@@ -446,10 +446,6 @@ class ManageMaintenance_Controller
 			// Optimize the table!  We use backticks here because it might be a custom table.
 			$data_freed = optimizeTable($table['table_name']);
 
-			// Optimizing one sqlite table optimizes them all.
-			if ($db_type == 'sqlite')
-				break;
-
 			if ($data_freed > 0)
 				$context['optimized_tables'][] = array(
 					'name' => $table['table_name'],
@@ -893,7 +889,7 @@ class ManageMaintenance_Controller
 			{
 				// Lets get the topics.
 				$topics = getTopicsToMove($id_board_from);
-	
+
 				// Just return if we don't have any topics left to move.
 				if (empty($topics))
 				{
@@ -991,7 +987,7 @@ class ManageMaintenance_Controller
 				apache_reset_timeout();
 			return;
 		}
-		// No countable posts? set posts counter to 0 
+		// No countable posts? set posts counter to 0
 		 updateZeroPostMembers();
 
 		// all done

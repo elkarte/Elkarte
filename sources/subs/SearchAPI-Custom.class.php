@@ -63,7 +63,7 @@ class Custom_Search
 	 * What databases support the custom index?
 	 * @var array
 	 */
-	protected $supported_databases = array('mysql', 'postgresql', 'sqlite');
+	protected $supported_databases = array('mysql', 'postgresql');
 
 	/**
 	 * constructor function
