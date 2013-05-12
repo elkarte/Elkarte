@@ -52,7 +52,7 @@ class Database_SQLite
 				'db_quote' => 'elk_db_quote',
 				'db_fetch_assoc' => 'sqlite_fetch_array',
 				'db_fetch_row' => 'elk_db_fetch_row',
-				'db_free_result' => 'smf_db_free_result',
+				'db_free_result' => 'elk_db_free_result',
 				'db_insert' => 'elk_db_insert',
 				'db_insert_id' => 'elk_db_insert_id',
 				'db_num_rows' => 'sqlite_num_rows',
@@ -60,10 +60,10 @@ class Database_SQLite
 				'db_num_fields' => 'sqlite_num_fields',
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_server_info' => 'smf_db_libversion',
+				'db_server_info' => 'elk_db_libversion',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
-				'db_error' => 'smf_db_last_error',
+				'db_error' => 'elk_db_last_error',
 				'db_select_db' => '',
 				'db_title' => 'SQLite',
 				'db_sybase' => true,
@@ -93,16 +93,16 @@ class Database_SQLite
 		@sqlite_query('PRAGMA short_column_names = 1', $connection);
 
 		// Make some user defined functions!
-		sqlite_create_function($connection, 'unix_timestamp', 'smf_udf_unix_timestamp', 0);
-		sqlite_create_function($connection, 'inet_aton', 'smf_udf_inet_aton', 1);
-		sqlite_create_function($connection, 'inet_ntoa', 'smf_udf_inet_ntoa', 1);
-		sqlite_create_function($connection, 'find_in_set', 'smf_udf_find_in_set', 2);
-		sqlite_create_function($connection, 'year', 'smf_udf_year', 1);
-		sqlite_create_function($connection, 'month', 'smf_udf_month', 1);
-		sqlite_create_function($connection, 'dayofmonth', 'smf_udf_dayofmonth', 1);
-		sqlite_create_function($connection, 'concat', 'smf_udf_concat');
-		sqlite_create_function($connection, 'locate', 'smf_udf_locate', 2);
-		sqlite_create_function($connection, 'regexp', 'smf_udf_regexp', 2);
+		sqlite_create_function($connection, 'unix_timestamp', 'elk_udf_runix_timestamp', 0);
+		sqlite_create_function($connection, 'inet_aton', 'elk_udf_rinet_aton', 1);
+		sqlite_create_function($connection, 'inet_ntoa', 'elk_udf_rinet_ntoa', 1);
+		sqlite_create_function($connection, 'find_in_set', 'elk_udf_rfind_in_set', 2);
+		sqlite_create_function($connection, 'year', 'elk_udf_ryear', 1);
+		sqlite_create_function($connection, 'month', 'elk_udf_rmonth', 1);
+		sqlite_create_function($connection, 'dayofmonth', 'elk_udf_rdayofmonth', 1);
+		sqlite_create_function($connection, 'concat', 'elk_udf_rconcat');
+		sqlite_create_function($connection, 'locate', 'elk_udf_locate', 2);
+		sqlite_create_function($connection, 'regexp', 'elk_udf_regexp', 2);
 
 		return $connection;
 	}
@@ -439,7 +439,7 @@ class Database_SQLite
 	/**
 	 * Last error on SQLite
 	 */
-	function smf_db_last_error()
+	function elk_db_last_error()
 	{
 		global $db_connection, $sqlite_error;
 
@@ -635,7 +635,7 @@ class Database_SQLite
 	 *
 	 * @param resource $handle = false
 	 */
-	function smf_db_free_result($handle = false)
+	function elk_db_free_result($handle = false)
 	{
 		return true;
 	}
@@ -715,7 +715,7 @@ class Database_SQLite
 	/**
 	 * Emulate UNIX_TIMESTAMP.
 	 */
-	function smf_udf_unix_timestamp()
+	function elk_udf_runix_timestamp()
 	{
 		return strftime('%s', 'now');
 	}
@@ -725,7 +725,7 @@ class Database_SQLite
 	 *
 	 * @param $ip
 	 */
-	function smf_udf_inet_aton($ip)
+	function elk_udf_rinet_aton($ip)
 	{
 		$chunks = explode('.', $ip);
 		return @$chunks[0] * pow(256, 3) + @$chunks[1] * pow(256, 2) + @$chunks[2] * 256 + @$chunks[3];
@@ -736,7 +736,7 @@ class Database_SQLite
 	 *
 	 * @param $n
 	 */
-	function smf_udf_inet_ntoa($n)
+	function elk_udf_rinet_ntoa($n)
 	{
 		$t = array(0, 0, 0, 0);
 		$msk = 16777216.0;
@@ -762,7 +762,7 @@ class Database_SQLite
 	 * @param $find
 	 * @param $groups
 	 */
-	function smf_udf_find_in_set($find, $groups)
+	function elk_udf_rfind_in_set($find, $groups)
 	{
 		foreach (explode(',', $groups) as $key => $group)
 		{
@@ -778,7 +778,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function smf_udf_year($date)
+	function elk_udf_ryear($date)
 	{
 		return substr($date, 0, 4);
 	}
@@ -788,7 +788,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function smf_udf_month($date)
+	function elk_udf_rmonth($date)
 	{
 		return substr($date, 5, 2);
 	}
@@ -798,7 +798,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function smf_udf_dayofmonth($date)
+	function elk_udf_rdayofmonth($date)
 	{
 		return substr($date, 8, 2);
 	}
@@ -808,7 +808,7 @@ class Database_SQLite
 	 *
 	 * @param $void
 	 */
-	function smf_db_libversion($void = null)
+	function elk_db_libversion($void = null)
 	{
 		return sqlite_libversion();
 	}
@@ -817,7 +817,7 @@ class Database_SQLite
 	 * This function uses variable argument lists so that it can handle more then two parameters.
 	 * Emulates the CONCAT function.
 	 */
-	function smf_udf_concat()
+	function elk_udf_rconcat()
 	{
 		// Since we didn't specify any arguments we must get them from PHP.
 		$args = func_get_args();
@@ -832,7 +832,7 @@ class Database_SQLite
 	 * @param string $find
 	 * @param string $string
 	 */
-	function smf_udf_locate($find, $string)
+	function elk_udf_locate($find, $string)
 	{
 		return strpos($string, $find);
 	}
@@ -843,7 +843,7 @@ class Database_SQLite
 	 * @param string $exp
 	 * @param string $search
 	 */
-	function smf_udf_regexp($exp, $search)
+	function elk_udf_regexp($exp, $search)
 	{
 		if (preg_match($exp, $match))
 			return 1;

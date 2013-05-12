@@ -166,11 +166,11 @@ function elk_db_error_backtrace($error_message, $log_message = '', $error_type =
 /**
  * Emulate UNIX_TIMESTAMP.
  */
-function smf_udf_unix_timestamp()
+function elk_udf_runix_timestamp()
 {
 	global $db;
 
-	return $db->smf_udf_unix_timestamp();
+	return $db->elk_udf_runix_timestamp();
 }
 
 /**
@@ -178,11 +178,11 @@ function smf_udf_unix_timestamp()
  *
  * @param $ip
  */
-function smf_udf_inet_aton($ip)
+function elk_udf_rinet_aton($ip)
 {
 	global $db;
 
-	return $db->smf_udf_inet_aton($ip);
+	return $db->elk_udf_rinet_aton($ip);
 }
 
 /**
@@ -190,11 +190,11 @@ function smf_udf_inet_aton($ip)
  *
  * @param $n
  */
-function smf_udf_inet_ntoa($n)
+function elk_udf_rinet_ntoa($n)
 {
 	global $db;
 
-	return $db->smf_udf_inet_ntoa($n);
+	return $db->elk_udf_rinet_ntoa($n);
 }
 
 /**
@@ -203,11 +203,11 @@ function smf_udf_inet_ntoa($n)
  * @param $find
  * @param $groups
  */
-function smf_udf_find_in_set($find, $groups)
+function elk_udf_rfind_in_set($find, $groups)
 {
 	global $db;
 
-	return $db->smf_udf_find_in_set($find, $groups);
+	return $db->elk_udf_rfind_in_set($find, $groups);
 }
 
 /**
@@ -215,11 +215,11 @@ function smf_udf_find_in_set($find, $groups)
  *
  * @param $date
  */
-function smf_udf_year($date)
+function elk_udf_ryear($date)
 {
 	global $db;
 
-	return $db->smf_udf_year($date);
+	return $db->elk_udf_ryear($date);
 }
 
 /**
@@ -227,11 +227,11 @@ function smf_udf_year($date)
  *
  * @param $date
  */
-function smf_udf_month($date)
+function elk_udf_rmonth($date)
 {
 	global $db;
 
-	return $db->smf_udf_month($date);
+	return $db->elk_udf_rmonth($date);
 }
 
 /**
@@ -239,11 +239,11 @@ function smf_udf_month($date)
  *
  * @param $date
  */
-function smf_udf_dayofmonth($date)
+function elk_udf_rdayofmonth($date)
 {
 	global $db;
 
-	return $db->smf_udf_dayofmonth($date);
+	return $db->elk_udf_rdayofmonth($date);
 }
 
 /**
@@ -251,22 +251,22 @@ function smf_udf_dayofmonth($date)
  *
  * @param $void
  */
-function smf_db_libversion($void = null)
+function elk_db_libversion($void = null)
 {
 	global $db;
 
-	return $db->smf_db_libversion($void);
+	return $db->elk_db_libversion($void);
 }
 
 /**
  * This function uses variable argument lists so that it can handle more then two parameters.
  * Emulates the CONCAT function.
  */
-function smf_udf_concat()
+function elk_udf_rconcat()
 {
 	global $db;
 
-	return $db->smf_udf_concat();
+	return $db->elk_udf_rconcat();
 }
 
 /**
@@ -275,11 +275,11 @@ function smf_udf_concat()
  * @param string $find
  * @param string $string
  */
-function smf_udf_locate($find, $string)
+function elk_udf_locate($find, $string)
 {
 	global $db;
 
-	return $db->smf_udf_locate($find, $string);
+	return $db->elk_udf_locate($find, $string);
 }
 
 /**
@@ -288,11 +288,11 @@ function smf_udf_locate($find, $string)
  * @param string $exp
  * @param string $search
  */
-function smf_udf_regexp($exp, $search)
+function elk_udf_regexp($exp, $search)
 {
 	global $db;
 
-	return $db->smf_udf_regexp($exp, $search);
+	return $db->elk_udf_regexp($exp, $search);
 }
 
 /**
