@@ -528,6 +528,17 @@ class Database_PostgreSQL
 	}
 
 	/**
+	 * Free the resultset.
+	 *
+	 * @param resource $result
+	 */
+	function free_result($result)
+	{
+		// Just delegate to the native function
+		pg_free_result($result);
+	}
+
+	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
@@ -551,7 +562,7 @@ class Database_PostgreSQL
 	}
 
 	/**
-	 * Database error!
+	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
@@ -602,10 +613,11 @@ class Database_PostgreSQL
 	}
 
 	/**
-	 * A PostgreSQL specific function for tracking the current row...
+	 * Tracking the current row.
+	 * Fetch a row from the resultset given as parameter.
 	 *
-	 * @param $request
-	 * @param $counter
+	 * @param resource $request
+	 * @param bool $counter
 	 */
 	function fetch_row($request, $counter = false)
 	{

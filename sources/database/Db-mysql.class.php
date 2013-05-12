@@ -429,6 +429,28 @@ class Database_MySQL extends Database
 	}
 
 	/**
+	 * Fetch a row from the resultset given as parameter.
+	 *
+	 * @param resource $result
+	 */
+	function fetch_row($result)
+	{
+		// Just delegate to MySQL's function
+		return mysql_fetch_row($result);
+	}
+
+	/**
+	 * Free the resultset.
+	 *
+	 * @param resource $result
+	 */
+	function free_result($result)
+	{
+		// Just delegate to MySQL's function
+		mysql_free_result($result);
+	}
+
+	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
