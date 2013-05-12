@@ -137,10 +137,10 @@ class Database_PostgreSQL
 			return $user_info['query_wanna_see_board'];
 
 		if (!isset($matches[2]))
-			elk_db_error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
+			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
 		if (!isset($values[$matches[2]]))
-			elk_db_error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2]), '', E_USER_ERROR, __FILE__, __LINE__);
+			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2]), '', E_USER_ERROR, __FILE__, __LINE__);
 
 		$replacement = $values[$matches[2]];
 
@@ -148,7 +148,7 @@ class Database_PostgreSQL
 		{
 			case 'int':
 				if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
-					elk_db_error_backtrace('Wrong value type sent to the database. Integer expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+					$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 				return (string) (int) $replacement;
 			break;
 
@@ -161,12 +161,12 @@ class Database_PostgreSQL
 				if (is_array($replacement))
 				{
 					if (empty($replacement))
-						elk_db_error_backtrace('Database error, given array of integer values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+						$this->error_backtrace('Database error, given array of integer values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 					foreach ($replacement as $key => $value)
 					{
 						if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-							elk_db_error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+							$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 						$replacement[$key] = (string) (int) $value;
 					}
@@ -174,7 +174,7 @@ class Database_PostgreSQL
 					return implode(', ', $replacement);
 				}
 				else
-					elk_db_error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 			break;
 
@@ -182,7 +182,7 @@ class Database_PostgreSQL
 				if (is_array($replacement))
 				{
 					if (empty($replacement))
-						elk_db_error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 					foreach ($replacement as $key => $value)
 						$replacement[$key] = sprintf('\'%1$s\'', pg_escape_string($value));
@@ -190,19 +190,19 @@ class Database_PostgreSQL
 					return implode(', ', $replacement);
 				}
 				else
-					elk_db_error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+					$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 			break;
 
 			case 'date':
 				if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
 					return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
 				else
-					elk_db_error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+					$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 			break;
 
 			case 'float':
 				if (!is_numeric($replacement))
-					elk_db_error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+					$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 				return (string) (float) $replacement;
 			break;
 
@@ -215,7 +215,7 @@ class Database_PostgreSQL
 			break;
 
 			default:
-				elk_db_error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
+				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
 			break;
 		}
 	}
@@ -378,7 +378,7 @@ class Database_PostgreSQL
 		$db_replace_result = 0;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
-			elk_db_error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
+			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
 
 		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
 		{
@@ -396,7 +396,7 @@ class Database_PostgreSQL
 		if (isset($db_show_debug) && $db_show_debug === true)
 		{
 			// Get the file and line number this function was called.
-			list ($file, $line) = elk_db_error_backtrace('', '', 'return', __FILE__, __LINE__);
+			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 			// Initialize $db_cache if not already initialized.
 			if (!isset($db_cache))
@@ -467,13 +467,13 @@ class Database_PostgreSQL
 				$fail = true;
 
 			if (!empty($fail) && function_exists('log_error'))
-				elk_db_error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
+				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 		}
 
 		$db_last_result = @pg_query($connection, $db_string);
 
 		if ($db_last_result === false && empty($db_values['db_error_skip']))
-			$db_last_result = elk_db_error($db_string, $connection);
+			$db_last_result = $this->error($db_string, $connection);
 
 		// Debugging.
 		if (isset($db_show_debug) && $db_show_debug === true)
@@ -557,7 +557,7 @@ class Database_PostgreSQL
 	 * @param string $db_string
 	 * @param resource $connection = null
 	 */
-	function elk_db_error($db_string, $connection = null)
+	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
@@ -565,7 +565,7 @@ class Database_PostgreSQL
 		global $smcFunc;
 
 		// We'll try recovering the file and line number the original db query was called from.
-		list ($file, $line) = elk_db_error_backtrace('', '', 'return', __FILE__, __LINE__);
+		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 		// Decide which connection to use
 		$connection = $connection === null ? $db_connection : $connection;
@@ -804,7 +804,7 @@ class Database_PostgreSQL
 	 * @param $file
 	 * @param $line
 	 */
-	function elk_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
 		if (empty($log_message))
 			$log_message = $error_message;

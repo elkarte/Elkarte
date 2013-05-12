@@ -126,7 +126,7 @@ function elk_db_error($db_string, $connection = null)
 {
 	global $db;
 
-	return $db->elk_db_error($db_string, $connection);
+	return $db->error($db_string, $connection);
 }
 
 /**
@@ -211,7 +211,7 @@ function elk_db_error_backtrace($error_message, $log_message = '', $error_type =
 {
 	global $db;
 
-	$db->elk_db_error_backtrace($error_message, $log_message, $error_type, $file, $line);
+	$db->error_backtrace($error_message, $log_message, $error_type, $file, $line);
 }
 
 /**
