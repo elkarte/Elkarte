@@ -17,7 +17,7 @@ if (!defined('ELKARTE'))
 class DbSearch_MySQL
 {
 	/**
-	 *  Add the file functions to the $smcFunc array.
+	 *  Initialize. (if necessary)
 	 */
 	function initialize()
 	{
@@ -25,16 +25,27 @@ class DbSearch_MySQL
 
 		if (!isset($smcFunc['db_search_query']) || $smcFunc['db_search_query'] != 'elk_db_query')
 			$smcFunc += array(
-				'db_search_query' => 'elk_db_query',
-				'db_search_support' => 'smf_db_search_support',
-				'db_create_word_search' => 'smf_db_create_word_search',
+				'db_search_query' => 'search_query',
+				'db_search_support' => 'search_support',
+				'db_create_word_search' => 'create_word_search',
 				'db_support_ignore' => true,
 			);
 	}
 
-	function db_search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	/**
+	 * Execute the appropriate query for the search.
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param array $db_values
+	 * @param resource $connection
+	 */
+	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		return elk_db_query($identifier, $db_string, $db_values, $connection);
+		global $db;
+
+		// Simply delegate to the database adapter method.
+		return $db->query($identifier, $db_string, $db_values, $connection);
 	}
 
 	/**
@@ -42,7 +53,7 @@ class DbSearch_MySQL
 	 *
 	 * @param string $search_type
 	 */
-	function smf_db_search_support($search_type)
+	function search_support($search_type)
 	{
 		$supported_types = array('fulltext');
 
@@ -54,7 +65,7 @@ class DbSearch_MySQL
 	 *
 	 * @param $size
 	 */
-	function smf_db_create_word_search($size)
+	function create_word_search($size)
 	{
 		global $smcFunc;
 
@@ -83,7 +94,7 @@ class DbSearch_MySQL
 	 *
 	 * @return bool
 	 */
-	function db_support_ignore()
+	function support_ignore()
 	{
 		return true;
 	}
