@@ -99,7 +99,7 @@ function elk_db_insert_id($table, $field = null, $connection = null)
 {
 	global $db;
 
-	return $db->elk_db_insert_id($table, $field, $connection);
+	return $db->insert_id($table, $field, $connection);
 }
 
 /**
@@ -144,7 +144,7 @@ function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 {
 	global $db;
 
-	return $db->elk_db_insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
+	return $db->insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
 }
 
 /**

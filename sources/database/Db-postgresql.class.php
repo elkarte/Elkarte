@@ -505,7 +505,7 @@ class Database_PostgreSQL
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	function elk_db_insert_id($table, $field = null, $connection = null)
+	function insert_id($table, $field = null, $connection = null)
 	{
 		global $db_connection, $smcFunc, $db_prefix;
 

@@ -426,7 +426,7 @@ class Database_SQLite
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	function elk_db_insert_id($table, $field = null, $connection = null)
+	function insert_id($table, $field = null, $connection = null)
 	{
 		global $db_connection, $db_prefix;
 
@@ -568,7 +568,7 @@ class Database_SQLite
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_in_transact, $db_connection, $smcFunc, $db_prefix;
 

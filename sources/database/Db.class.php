@@ -80,7 +80,7 @@ abstract class Database
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	abstract function elk_db_insert_id($table, $field = null, $connection = null);
+	abstract function insert_id($table, $field = null, $connection = null);
 
 	/**
 	 * Do a transaction.
@@ -110,7 +110,7 @@ abstract class Database
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	abstract function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
+	abstract function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
 
 	/**
 	 * This function tries to work out additional error information from a back trace.
