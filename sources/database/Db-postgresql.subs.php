@@ -23,7 +23,7 @@ if (!defined('ELKARTE'))
 /**
  * Maps the implementations in this file (smf_db_function_name)
  * to the $smcFunc['db_function_name'] variable.
- * @see Db-mysql.subs.php#smf_db_initiate
+ * @see Db-mysql.subs.php#elk_db_initiate
  *
  * @param type $db_server
  * @param type $db_name
@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  * @param type $db_options
  * @return null
  */
-function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
+function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 {
 	global $smcFunc, $mysql_set_mode;
 

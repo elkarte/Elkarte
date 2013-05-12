@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  * @param string $db_prefix
  * @param array $db_options
  */
-function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 {
 	global $smcFunc, $mysql_set_mode, $db_in_transact, $sqlite_error;
 
