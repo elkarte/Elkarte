@@ -244,7 +244,7 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
 
-		call_integration_hook('integrate_preparse_code', array(&$message, &$parts, &$i));
+		call_integration_hook('integrate_preparse_code', array(&$parts[$i]));
 	}
 
 	// Put it back together!
