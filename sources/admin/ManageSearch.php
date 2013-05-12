@@ -370,7 +370,7 @@ class ManageSearch_Controller
 			$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
 			if (!empty($tables))
 			{
-				$smcFunc['db_search_query']('drop_words_table', '
+				$db_search->search_query('drop_words_table', '
 					DROP TABLE {db_prefix}log_search_words',
 					array(
 					)
@@ -623,7 +623,7 @@ class ManageSearch_Controller
 				$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
 				if (!empty($tables))
 				{
-					$smcFunc['db_search_query']('drop_words_table', '
+					$db_search->search_query('drop_words_table', '
 						DROP TABLE {db_prefix}log_search_words',
 						array(
 						)

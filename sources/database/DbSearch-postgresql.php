@@ -23,12 +23,9 @@ class DbSearch_PostgreSQL
 	{
 		global $smcFunc;
 
-		if (!isset($smcFunc['db_search_query']) || $smcFunc['db_search_query'] != 'smf_db_search_query')
-			$smcFunc += array(
-				'db_search_query' => 'search_query',
+		$smcFunc += array(
 				'db_search_support' => 'search_support',
 				'db_create_word_search' => 'create_word_search',
-				'db_support_ignore' => false,
 			);
 	}
 

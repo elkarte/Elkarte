@@ -117,7 +117,7 @@ class Fulltext_Search
 		global $smcFunc;
 
 		// Try to determine the minimum number of letters for a fulltext search.
-		$request = $smcFunc['db_search_query']('max_fulltext_length', '
+		$request = $db_search->search_query('max_fulltext_length', '
 			SHOW VARIABLES
 			LIKE {string:fulltext_minimum_word_length}',
 			array(
@@ -277,7 +277,7 @@ class Fulltext_Search
 				$query_where[] = 'MATCH (body) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
 		}
 
-		$ignoreRequest = $smcFunc['db_search_query']('insert_into_log_messages_fulltext', ($db->support_ignore() ? ( '
+		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ( '
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
