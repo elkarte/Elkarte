@@ -130,7 +130,7 @@ function elk_db_error($db_string, $connection = null)
 }
 
 /**
- * A PostgreSQL specific function for tracking the current row...
+ * Function for tracking the current row...
  *
  * @param $request
  * @param $counter
@@ -139,7 +139,7 @@ function elk_db_fetch_row($request, $counter = false)
 {
 	global $db;
 
-	return $db->elk_db_fetch_row($request, $counter);
+	return $db->fetch_row($request, $counter);
 }
 
 /**
@@ -152,7 +152,7 @@ function elk_db_fetch_assoc($request, $counter = false)
 {
 	global $db;
 
-	return $db->elk_db_fetch_assoc($request, $counter);
+	return $db->fetch_assoc($request, $counter);
 }
 
 /**
@@ -165,7 +165,7 @@ function elk_db_data_seek($request, $counter)
 {
 	global $db;
 
-	return $db->elk_db_data_seek($request, $counter);
+	return $db->data_seek($request, $counter);
 }
 
 /**
@@ -177,7 +177,7 @@ function elk_db_unescape_string($string)
 {
 	global $db;
 
-	return $db->elk_db_unescape_string($string);
+	return $db->unescape_string($string);
 }
 
 /**

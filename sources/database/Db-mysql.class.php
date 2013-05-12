@@ -657,7 +657,7 @@ class Database_MySQL extends Database
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $smcFunc, $db_connection, $db_prefix;
 

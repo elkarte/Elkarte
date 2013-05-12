@@ -607,7 +607,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function elk_db_fetch_row($request, $counter = false)
+	function fetch_row($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -628,7 +628,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function elk_db_fetch_assoc($request, $counter = false)
+	function fetch_assoc($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -649,7 +649,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function elk_db_data_seek($request, $counter)
+	function data_seek($request, $counter)
 	{
 		global $db_row_count;
 
@@ -663,7 +663,7 @@ class Database_PostgreSQL
 	 *
 	 * @param $string
 	 */
-	function elk_db_unescape_string($string)
+	function unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}
@@ -679,7 +679,7 @@ class Database_PostgreSQL
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_replace_result, $db_in_transact, $smcFunc, $db_connection, $db_prefix;
 

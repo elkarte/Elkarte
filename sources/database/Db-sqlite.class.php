@@ -635,7 +635,7 @@ class Database_SQLite
 	 *
 	 * @param resource $handle = false
 	 */
-	function elk_db_free_result($handle = false)
+	function free_result($handle = false)
 	{
 		return true;
 	}
@@ -646,7 +646,7 @@ class Database_SQLite
 	 *
 	 * @param $handle
 	 */
-	function elk_db_fetch_row($handle)
+	function fetch_row($handle)
 	{
 		return sqlite_fetch_array($handle, SQLITE_NUM);
 	}
@@ -656,7 +656,7 @@ class Database_SQLite
 	 *
 	 * @param $string
 	 */
-	function elk_db_unescape_string($string)
+	function unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}
