@@ -956,7 +956,7 @@ class Display_Controller
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
-		$topic_info = getTopic($topic);
+		$topic_info = getTopicInfo($topic);
 
 		// Allowed to delete any message?
 		if (allowedTo('delete_any'))
