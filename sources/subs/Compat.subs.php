@@ -150,3 +150,25 @@ if (!function_exists('crc32_compat'))
 		return $crc;
 	}
 }
+
+/**
+ * Compatibility function: it initializes $smcFunc array with utility methods.
+ */
+function util_init()
+{
+	global $smcFunc;
+
+	$smcFunc += array(
+		'entity_fix' => create_function('$string', 'return Util::entity_fix($string);'),
+		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', 'return Util::htmlspecialchars($string);'),
+		'htmltrim' => create_function('$string', 'return Util::htmltrim($string);'),
+		'strlen' => create_function('$string', 'return Util::strlen($string);'),
+		'strpos' => create_function('$haystack, $needle, $offset = 0', 'return Util::strpos($haystack, $needle);'),
+		'substr' => create_function('$string, $start, $length = null', 'return Util::substr($string, $start);'),
+		'strtolower' => create_function('$string', 'return Util::strtolower($string);'),
+		'strtoupper' => create_function('$string', 'return Util::strtoupper($string);'),
+		'truncate' => create_function('$string, $length', 'return Util::truncate($string, $length);'),
+		'ucfirst' => create_function('$string', 'return Util::ucfirst($string);'),
+		'ucwords' => create_function('$string', 'return Util::ucwords($string);'),
+	);
+}
