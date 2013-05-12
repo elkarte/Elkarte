@@ -847,7 +847,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
 
 		// Oh dear god!!
 		if ($db_connection === null)

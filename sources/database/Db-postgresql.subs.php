@@ -81,22 +81,10 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix
 		}
 	}
 
+	require_once(SOURCEDIR . '/database/Db-postgresql.class.php');
+	$db = new Database_PostgreSQL();
+
 	return $connection;
-}
-
-/**
- * Extend the database functionality. It calls the respective file's init
- * to add the implementations in that file to $smcFunc array.
- *
- * @param string $type = 'extra'
- */
-function db_extend ($type = 'extra')
-{
-	global $db_type;
-
-	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
-	$initFunc = 'db_' . $type . '_init';
-	$initFunc();
 }
 
 /**

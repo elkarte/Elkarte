@@ -94,22 +94,10 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	sqlite_create_function($connection, 'locate', 'smf_udf_locate', 2);
 	sqlite_create_function($connection, 'regexp', 'smf_udf_regexp', 2);
 
+	require_once(SOURCEDIR . '/database/Db-sqlite.class.php');
+	$db = new Database_SQLite();
+
 	return $connection;
-}
-
-/**
- * Extend the database functionality. It calls the respective file's init
- * to add the implementations in that file to $smcFunc array.
- *
- * @param string $type indicated which additional file to load. ('extra', 'packages')
- */
-function db_extend($type = 'extra')
-{
-	global $db_type;
-
-	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
-	$initFunc = 'db_' . $type . '_init';
-	$initFunc();
 }
 
 /**
