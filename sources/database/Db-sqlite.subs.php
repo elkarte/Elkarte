@@ -255,7 +255,7 @@ function elk_db_libversion($void = null)
 {
 	global $db;
 
-	return $db->elk_db_libversion($void);
+	return $db->libversion($void);
 }
 
 /**

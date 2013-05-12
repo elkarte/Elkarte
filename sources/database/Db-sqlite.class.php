@@ -439,7 +439,7 @@ class Database_SQLite
 	/**
 	 * Last error on SQLite
 	 */
-	function elk_db_last_error()
+	function last_error()
 	{
 		global $db_connection, $sqlite_error;
 
@@ -808,7 +808,7 @@ class Database_SQLite
 	 *
 	 * @param $void
 	 */
-	function elk_db_libversion($void = null)
+	function libversion($void = null)
 	{
 		return sqlite_libversion();
 	}

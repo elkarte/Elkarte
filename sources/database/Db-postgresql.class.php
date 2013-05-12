@@ -780,7 +780,7 @@ class Database_PostgreSQL
 	 * @param unknown_type $db_name
 	 * @param unknown_type $db_connection
 	 */
-	function elk_db_select_db($db_name, $db_connection)
+	function select_db($db_name, $db_connection)
 	{
 		return true;
 	}
@@ -788,7 +788,7 @@ class Database_PostgreSQL
 	/**
 	 * Get the current version.
 	 */
-	function elk_db_version()
+	function db_version()
 	{
 		$version = pg_version();
 
