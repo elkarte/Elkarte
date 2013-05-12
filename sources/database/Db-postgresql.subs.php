@@ -85,7 +85,7 @@ function elk_db_affected_rows($connection = null)
 {
 	global $db;
 
-	return $db->elk_db_affected_rows($connection);
+	return $db->affected_rows($connection);
 }
 
 /**
@@ -112,7 +112,7 @@ function elk_db_transaction($type = 'commit', $connection = null)
 {
 	global $db;
 
-	return $db->elk_db_transaction($type, $connection);
+	return $db->do_transaction($type, $connection);
 }
 
 /**
@@ -224,5 +224,5 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 {
 	global $db;
 
-	return $db->elk_db_escape_wildcard_string($string, $translate_human_wildcards);
+	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }

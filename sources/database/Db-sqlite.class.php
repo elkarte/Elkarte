@@ -93,14 +93,14 @@ class Database_SQLite
 		@sqlite_query('PRAGMA short_column_names = 1', $connection);
 
 		// Make some user defined functions!
-		sqlite_create_function($connection, 'unix_timestamp', 'elk_udf_runix_timestamp', 0);
-		sqlite_create_function($connection, 'inet_aton', 'elk_udf_rinet_aton', 1);
-		sqlite_create_function($connection, 'inet_ntoa', 'elk_udf_rinet_ntoa', 1);
-		sqlite_create_function($connection, 'find_in_set', 'elk_udf_rfind_in_set', 2);
-		sqlite_create_function($connection, 'year', 'elk_udf_ryear', 1);
-		sqlite_create_function($connection, 'month', 'elk_udf_rmonth', 1);
-		sqlite_create_function($connection, 'dayofmonth', 'elk_udf_rdayofmonth', 1);
-		sqlite_create_function($connection, 'concat', 'elk_udf_rconcat');
+		sqlite_create_function($connection, 'unix_timestamp', 'elk_udf_unix_timestamp', 0);
+		sqlite_create_function($connection, 'inet_aton', 'elk_udf_inet_aton', 1);
+		sqlite_create_function($connection, 'inet_ntoa', 'elk_udf_inet_ntoa', 1);
+		sqlite_create_function($connection, 'find_in_set', 'elk_udf_find_in_set', 2);
+		sqlite_create_function($connection, 'year', 'elk_udf_year', 1);
+		sqlite_create_function($connection, 'month', 'elk_udf_month', 1);
+		sqlite_create_function($connection, 'dayofmonth', 'elk_udf_dayofmonth', 1);
+		sqlite_create_function($connection, 'concat', 'elk_udf_concat');
 		sqlite_create_function($connection, 'locate', 'elk_udf_locate', 2);
 		sqlite_create_function($connection, 'regexp', 'elk_udf_regexp', 2);
 
@@ -412,7 +412,7 @@ class Database_SQLite
 	 *
 	 * @param resource $connection
 	 */
-	function elk_db_affected_rows($connection = null)
+	function affected_rows($connection = null)
 	{
 		global $db_connection;
 
@@ -453,7 +453,7 @@ class Database_SQLite
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function elk_db_transaction($type = 'commit', $connection = null)
+	function do_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection, $db_in_transact;
 
@@ -715,7 +715,7 @@ class Database_SQLite
 	/**
 	 * Emulate UNIX_TIMESTAMP.
 	 */
-	function elk_udf_runix_timestamp()
+	function udf_unix_timestamp()
 	{
 		return strftime('%s', 'now');
 	}
@@ -725,7 +725,7 @@ class Database_SQLite
 	 *
 	 * @param $ip
 	 */
-	function elk_udf_rinet_aton($ip)
+	function udf_inet_aton($ip)
 	{
 		$chunks = explode('.', $ip);
 		return @$chunks[0] * pow(256, 3) + @$chunks[1] * pow(256, 2) + @$chunks[2] * 256 + @$chunks[3];
@@ -736,7 +736,7 @@ class Database_SQLite
 	 *
 	 * @param $n
 	 */
-	function elk_udf_rinet_ntoa($n)
+	function udf_inet_ntoa($n)
 	{
 		$t = array(0, 0, 0, 0);
 		$msk = 16777216.0;
@@ -762,7 +762,7 @@ class Database_SQLite
 	 * @param $find
 	 * @param $groups
 	 */
-	function elk_udf_rfind_in_set($find, $groups)
+	function udf_find_in_set($find, $groups)
 	{
 		foreach (explode(',', $groups) as $key => $group)
 		{
@@ -778,7 +778,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function elk_udf_ryear($date)
+	function udf_year($date)
 	{
 		return substr($date, 0, 4);
 	}
@@ -788,7 +788,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function elk_udf_rmonth($date)
+	function udf_month($date)
 	{
 		return substr($date, 5, 2);
 	}
@@ -798,7 +798,7 @@ class Database_SQLite
 	 *
 	 * @param $date
 	 */
-	function elk_udf_rdayofmonth($date)
+	function udf_dayofmonth($date)
 	{
 		return substr($date, 8, 2);
 	}
@@ -817,7 +817,7 @@ class Database_SQLite
 	 * This function uses variable argument lists so that it can handle more then two parameters.
 	 * Emulates the CONCAT function.
 	 */
-	function elk_udf_rconcat()
+	function udf_concat()
 	{
 		// Since we didn't specify any arguments we must get them from PHP.
 		$args = func_get_args();
@@ -832,7 +832,7 @@ class Database_SQLite
 	 * @param string $find
 	 * @param string $string
 	 */
-	function elk_udf_locate($find, $string)
+	function udf_locate($find, $string)
 	{
 		return strpos($string, $find);
 	}
@@ -843,7 +843,7 @@ class Database_SQLite
 	 * @param string $exp
 	 * @param string $search
 	 */
-	function elk_udf_regexp($exp, $search)
+	function udf_regexp($exp, $search)
 	{
 		if (preg_match($exp, $match))
 			return 1;
@@ -854,7 +854,7 @@ class Database_SQLite
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 * The optional second parameter turns human readable wildcards into SQL wildcards.
 	 */
-	function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+	function escape_wildcard_string($string, $translate_human_wildcards=false)
 	{
 		$replacements = array(
 			'%' => '\%',

@@ -404,7 +404,7 @@ class Database_MySQL extends Database
 	 * affected_rows
 	 * @param resource $connection
 	 */
-	function elk_db_affected_rows($connection = null)
+	function affected_rows($connection = null)
 	{
 		global $db_connection;
 
@@ -434,7 +434,7 @@ class Database_MySQL extends Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function elk_db_transaction($type = 'commit', $connection = null)
+	function do_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection;
 
@@ -768,7 +768,7 @@ class Database_MySQL extends Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+	function escape_wildcard_string($string, $translate_human_wildcards=false)
 	{
 		$replacements = array(
 			'%' => '\%',
