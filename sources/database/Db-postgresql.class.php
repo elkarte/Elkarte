@@ -33,7 +33,7 @@ class Database_PostgreSQL
 	/**
 	 * Maps the implementations in the legacy subs file (smf_db_function_name)
 	 * to the $smcFunc['db_function_name'] variable.
-	 * @see Db-mysql.subs.php#elk_db_initiate
+	 * @see Db.class.php#db_initiate
 	 *
 	 * @param type $db_server
 	 * @param type $db_name
@@ -43,7 +43,7 @@ class Database_PostgreSQL
 	 * @param type $db_options
 	 * @return null
 	 */
-	function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
+	function db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode, $db;
 

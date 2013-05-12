@@ -28,7 +28,7 @@ abstract class Database
 	 * @param array $db_options
 	 * @return null
 	 */
-	abstract function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
+	abstract function db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
 
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.

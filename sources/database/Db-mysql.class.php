@@ -40,7 +40,7 @@ class Database_MySQL extends Database
 	 * @param array $db_options
 	 * @return null
 	 */
-	function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	function db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode, $db;
 
