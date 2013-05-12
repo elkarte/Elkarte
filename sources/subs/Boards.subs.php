@@ -1360,7 +1360,7 @@ function addChildBoards(&$boards)
 		',
 		array(
 			'no_parents' => 0,
-			'board_list' => ,
+			'board_list' => $boards,
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
