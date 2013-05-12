@@ -161,10 +161,14 @@ function sessionRead($session_id)
  */
 function sessionWrite($session_id, $data)
 {
-	global $smcFunc;
+	global $smcFunc, $db;
 
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
+
+	// Better safe than sorry
+	if (!isset($db))
+		$db = database();
 
 	// First try to update an existing row...
 	$result = $smcFunc['db_query']('', '

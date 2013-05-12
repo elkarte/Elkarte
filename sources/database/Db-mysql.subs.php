@@ -45,7 +45,7 @@ function smf_db_replacement__callback($matches)
 {
 	global $db;
 
-	return $db->smf_db_replacement_callback($matches);
+	return $db->smf_db_replacement__callback($matches);
 }
 
 /**
@@ -144,7 +144,7 @@ function smf_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 {
 	global $db;
 
-	return $db->smf_db_insert($method, $table, $columns, $data, $key, $disable_trans, $connection);
+	return $db->smf_db_insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
 }
 
 /**

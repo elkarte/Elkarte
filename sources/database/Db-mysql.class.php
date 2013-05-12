@@ -20,9 +20,12 @@ if (!defined('ELKARTE'))
 
 class Database_MySQL
 {
+	private static $_db = null;
+
 	function __construct()
 	{
 		// initialize the instance.
+		self::$_db = $this;
 	}
 
 	/**
@@ -779,5 +782,13 @@ class Database_MySQL
 			);
 
 		return strtr($string, $replacements);
+	}
+
+	/**
+	 * Returns a reference to the existing instance
+	 */
+	static function db()
+	{
+		return self::$_db;
 	}
 }

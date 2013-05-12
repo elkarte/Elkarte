@@ -20,9 +20,14 @@ if (!defined('ELKARTE'))
 
 class Database_SQLite
 {
+	private static $_db = null;
+
 	function __construct()
 	{
 		// make this thing
+
+		// initialize the instance.
+		self::$_db = $this;
 	}
 
 	/**
@@ -862,5 +867,13 @@ class Database_SQLite
 			);
 
 		return strtr($string, $replacements);
+	}
+
+	/**
+	 * Returns a reference to the existing instance
+	 */
+	static function db()
+	{
+		return self::$_db;
 	}
 }

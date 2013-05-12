@@ -43,3 +43,21 @@ function db_extend ($type = 'extra')
 	$initFunc = 'db_' . $type . '_init';
 	$initFunc();
 }
+
+/**
+ * Retrieve existing instance of the active database class
+ */
+function database()
+{
+	global $db_type;
+
+	// quick 'n dirty retrieval
+	if (strtolower($db_type) === 'mysql')
+		$db = Database_MySQL::db();
+	elseif (strtolower($db_type) === 'postgresql')
+		$db = Database_PostgreSQL::db();
+	elseif (strtolower($db_type) === 'sqlite')
+		$db = Database_SQLite::db();
+
+	return $db;
+}
