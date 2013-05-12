@@ -317,7 +317,7 @@ class Recent_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
-			addBoardsParents($boards);
+			addChildBoards($boards);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');

@@ -1343,7 +1343,7 @@ function fetchBoardsInfo($conditions, $params = array())
  * @param mixed $boards an array of board IDs (it accepts a single board too
  *              The param is passed by ref and the result it returned through the param itself
  */
-function addBoardsParents(&$boards)
+function addChildBoards(&$boards)
 {
 	global $smcFunc;
 

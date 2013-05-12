@@ -230,7 +230,7 @@ class MarkRead_Controller
 		{
 			// They want to mark the entire tree starting with the boards specified
 			// The easist thing is to just get all the boards they can see, but since we've specified the top of tree we ignore some of them
-			addBoardsParents($boards);
+			addChildBoards($boards);
 		}
 
 		$boards = boardsPosts($boards, $categories);
