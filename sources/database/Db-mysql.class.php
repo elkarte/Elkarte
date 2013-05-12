@@ -18,7 +18,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Database_MySQL
+class Database_MySQL extends Database
 {
 	private static $_db = null;
 
