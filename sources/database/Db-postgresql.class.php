@@ -102,7 +102,7 @@ class Database_PostgreSQL
 	 * @param type $db_name
 	 * @return type
 	 */
-	function db_fix_prefix (&$db_prefix, $db_name)
+	function fix_prefix (&$db_prefix, $db_name)
 	{
 		return;
 	}
@@ -117,7 +117,7 @@ class Database_PostgreSQL
 	 *
 	 * @param $matches
 	 */
-	function elk_db_replacement__callback($matches)
+	function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 

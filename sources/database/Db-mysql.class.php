@@ -104,7 +104,7 @@ class Database_MySQL extends Database
 	 * @param string &db_prefix
 	 * @param string $db_name
 	 */
-	function db_fix_prefix(&$db_prefix, $db_name)
+	function fix_prefix(&$db_prefix, $db_name)
 	{
 		$db_prefix = is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
 	}
@@ -117,7 +117,7 @@ class Database_MySQL extends Database
 	 *
 	 * @param $matches
 	 */
-	function elk_db_replacement__callback($matches)
+	function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 

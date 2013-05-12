@@ -30,7 +30,7 @@ function db_fix_prefix(&$db_prefix, $db_name)
 {
 	global $db;
 
-	$db->db_fix_prefix(&$db_prefix, $db_name);
+	$db->fix_prefix(&$db_prefix, $db_name);
 }
 
 /**
@@ -45,7 +45,7 @@ function elk_db_replacement__callback($matches)
 {
 	global $db;
 
-	return $db->elk_db_replacement__callback($matches);
+	return $db->replacement__callback($matches);
 }
 
 /**

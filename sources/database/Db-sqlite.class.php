@@ -114,7 +114,7 @@ class Database_SQLite
 	 * @param type $db_prefix
 	 * @param type $db_name
 	 */
-	function db_fix_prefix(&$db_prefix, $db_name)
+	function fix_prefix(&$db_prefix, $db_name)
 	{
 		return false;
 	}
@@ -129,7 +129,7 @@ class Database_SQLite
 	 *
 	 * @param $matches
 	 */
-	function elk_db_replacement__callback($matches)
+	function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 

@@ -36,7 +36,7 @@ abstract class Database
 	 * @param string &db_prefix
 	 * @param string $db_name
 	 */
-	abstract function db_fix_prefix(&$db_prefix, $db_name);
+	abstract function fix_prefix(&$db_prefix, $db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -46,7 +46,7 @@ abstract class Database
 	 *
 	 * @param $matches
 	 */
-	abstract function elk_db_replacement__callback($matches);
+	abstract function replacement__callback($matches);
 
 	/**
 	 * Just like the db_query, escape and quote a string, but not executing the query.
