@@ -48,10 +48,10 @@ class Database_SQLite
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'sqlite_fetch_array')
 			$smcFunc += array(
-				'db_query' => 'smf_db_query',
-				'db_quote' => 'smf_db_quote',
+				'db_query' => 'elk_db_query',
+				'db_quote' => 'elk_db_quote',
 				'db_fetch_assoc' => 'sqlite_fetch_array',
-				'db_fetch_row' => 'smf_db_fetch_row',
+				'db_fetch_row' => 'elk_db_fetch_row',
 				'db_free_result' => 'smf_db_free_result',
 				'db_insert' => 'elk_db_insert',
 				'db_insert_id' => 'elk_db_insert_id',
@@ -59,7 +59,7 @@ class Database_SQLite
 				'db_data_seek' => 'sqlite_seek',
 				'db_num_fields' => 'sqlite_num_fields',
 				'db_escape_string' => 'sqlite_escape_string',
-				'db_unescape_string' => 'smf_db_unescape_string',
+				'db_unescape_string' => 'elk_db_unescape_string',
 				'db_server_info' => 'smf_db_libversion',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
@@ -129,7 +129,7 @@ class Database_SQLite
 	 *
 	 * @param $matches
 	 */
-	function smf_db_replacement__callback($matches)
+	function elk_db_replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -240,7 +240,7 @@ class Database_SQLite
 	 * @param string $db_values
 	 * @param resource $connection
 	 */
-	function smf_db_quote($db_string, $db_values, $connection = null)
+	function elk_db_quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback, $db_connection;
 
@@ -251,7 +251,7 @@ class Database_SQLite
 			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -268,7 +268,7 @@ class Database_SQLite
 	 * @param string $db_values
 	 * @param resource $connection
 	 */
-	function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+	function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
@@ -365,7 +365,7 @@ class Database_SQLite
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
@@ -610,7 +610,7 @@ class Database_SQLite
 			// Here's where the variables are injected to the query.
 			$insertRows = array();
 			foreach ($data as $dataRow)
-				$insertRows[] = smf_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+				$insertRows[] = elk_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
@@ -646,7 +646,7 @@ class Database_SQLite
 	 *
 	 * @param $handle
 	 */
-	function smf_db_fetch_row($handle)
+	function elk_db_fetch_row($handle)
 	{
 		return sqlite_fetch_array($handle, SQLITE_NUM);
 	}
@@ -656,7 +656,7 @@ class Database_SQLite
 	 *
 	 * @param $string
 	 */
-	function smf_db_unescape_string($string)
+	function elk_db_unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}

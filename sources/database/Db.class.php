@@ -46,7 +46,7 @@ abstract class Database
 	 *
 	 * @param $matches
 	 */
-	abstract function smf_db_replacement__callback($matches);
+	abstract function elk_db_replacement__callback($matches);
 
 	/**
 	 * Just like the db_query, escape and quote a string, but not executing the query.
@@ -55,7 +55,7 @@ abstract class Database
 	 * @param array $db_values
 	 * @param resource $connection = null
 	 */
-	abstract function smf_db_quote($db_string, $db_values, $connection = null);
+	abstract function elk_db_quote($db_string, $db_values, $connection = null);
 
 	/**
 	 * Do a query.  Takes care of errors too.
@@ -65,7 +65,7 @@ abstract class Database
 	 * @param array $db_values = array()
 	 * @param resource $connection = null
 	 */
-	abstract function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null);
+	abstract function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
 	 * affected_rows

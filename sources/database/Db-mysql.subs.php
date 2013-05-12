@@ -41,11 +41,11 @@ function db_fix_prefix(&$db_prefix, $db_name)
  *
  * @param $matches
  */
-function smf_db_replacement__callback($matches)
+function elk_db_replacement__callback($matches)
 {
 	global $db;
 
-	return $db->smf_db_replacement__callback($matches);
+	return $db->elk_db_replacement__callback($matches);
 }
 
 /**
@@ -55,11 +55,11 @@ function smf_db_replacement__callback($matches)
  * @param array $db_values
  * @param resource $connection = null
  */
-function smf_db_quote($db_string, $db_values, $connection = null)
+function elk_db_quote($db_string, $db_values, $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_quote($db_string, $db_values, $connection);
+	return $db->elk_db_quote($db_string, $db_values, $connection);
 }
 
 /**
@@ -70,11 +70,11 @@ function smf_db_quote($db_string, $db_values, $connection = null)
  * @param array $db_values = array()
  * @param resource $connection = null
  */
-function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_query($identifier, $db_string, $db_values, $connection);
+	return $db->elk_db_query($identifier, $db_string, $db_values, $connection);
 }
 
 /**

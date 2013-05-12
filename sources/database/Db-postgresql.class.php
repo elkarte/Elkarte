@@ -50,23 +50,23 @@ class Database_PostgreSQL
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'postg_fetch_assoc')
 			$smcFunc += array(
-				'db_query' => 'smf_db_query',
-				'db_quote' => 'smf_db_quote',
+				'db_query' => 'elk_db_query',
+				'db_quote' => 'elk_db_quote',
 				'db_insert' => 'elk_db_insert',
 				'db_insert_id' => 'elk_db_insert_id',
-				'db_fetch_assoc' => 'smf_db_fetch_assoc',
-				'db_fetch_row' => 'smf_db_fetch_row',
+				'db_fetch_assoc' => 'elk_db_fetch_assoc',
+				'db_fetch_row' => 'elk_db_fetch_row',
 				'db_free_result' => 'pg_free_result',
 				'db_num_rows' => 'pg_num_rows',
-				'db_data_seek' => 'smf_db_data_seek',
+				'db_data_seek' => 'elk_db_data_seek',
 				'db_num_fields' => 'pg_num_fields',
 				'db_escape_string' => 'pg_escape_string',
-				'db_unescape_string' => 'smf_db_unescape_string',
-				'db_server_info' => 'smf_db_version',
+				'db_unescape_string' => 'elk_db_unescape_string',
+				'db_server_info' => 'elk_db_version',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'pg_last_error',
-				'db_select_db' => 'smf_db_select_db',
+				'db_select_db' => 'elk_db_select_db',
 				'db_title' => 'PostgreSQL',
 				'db_sybase' => true,
 				'db_case_sensitive' => true,
@@ -117,7 +117,7 @@ class Database_PostgreSQL
 	 *
 	 * @param $matches
 	 */
-	function smf_db_replacement__callback($matches)
+	function elk_db_replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -229,7 +229,7 @@ class Database_PostgreSQL
 	 * @param type $connection
 	 * @return type
 	 */
-	function smf_db_quote($db_string, $db_values, $connection = null)
+	function elk_db_quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback, $db_connection;
 
@@ -240,7 +240,7 @@ class Database_PostgreSQL
 			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -260,7 +260,7 @@ class Database_PostgreSQL
 	 * @param type $connection
 	 * @return boolean
 	 */
-	function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+	function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $db_last_result, $db_replace_result, $modSettings;
@@ -386,7 +386,7 @@ class Database_PostgreSQL
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
@@ -607,7 +607,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function smf_db_fetch_row($request, $counter = false)
+	function elk_db_fetch_row($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -628,7 +628,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function smf_db_fetch_assoc($request, $counter = false)
+	function elk_db_fetch_assoc($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -649,7 +649,7 @@ class Database_PostgreSQL
 	 * @param $request
 	 * @param $counter
 	 */
-	function smf_db_data_seek($request, $counter)
+	function elk_db_data_seek($request, $counter)
 	{
 		global $db_row_count;
 
@@ -663,7 +663,7 @@ class Database_PostgreSQL
 	 *
 	 * @param $string
 	 */
-	function smf_db_unescape_string($string)
+	function elk_db_unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}
@@ -754,7 +754,7 @@ class Database_PostgreSQL
 			// Here's where the variables are injected to the query.
 			$insertRows = array();
 			foreach ($data as $dataRow)
-				$insertRows[] = smf_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+				$insertRows[] = elk_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
@@ -780,7 +780,7 @@ class Database_PostgreSQL
 	 * @param unknown_type $db_name
 	 * @param unknown_type $db_connection
 	 */
-	function smf_db_select_db($db_name, $db_connection)
+	function elk_db_select_db($db_name, $db_connection)
 	{
 		return true;
 	}
@@ -788,7 +788,7 @@ class Database_PostgreSQL
 	/**
 	 * Get the current version.
 	 */
-	function smf_db_version()
+	function elk_db_version()
 	{
 		$version = pg_version();
 

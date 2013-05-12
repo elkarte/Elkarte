@@ -27,9 +27,9 @@ function db_search_init()
 {
 	global $smcFunc;
 
-	if (!isset($smcFunc['db_search_query']) || $smcFunc['db_search_query'] != 'smf_db_query')
+	if (!isset($smcFunc['db_search_query']) || $smcFunc['db_search_query'] != 'elk_db_query')
 		$smcFunc += array(
-			'db_search_query' => 'smf_db_query',
+			'db_search_query' => 'elk_db_query',
 			'db_search_support' => 'smf_db_search_support',
 			'db_create_word_search' => 'smf_db_create_word_search',
 			'db_support_ignore' => true,

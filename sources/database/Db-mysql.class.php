@@ -47,8 +47,8 @@ class Database_MySQL extends Database
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'mysql_fetch_assoc')
 			$smcFunc += array(
-				'db_query' => 'smf_db_query',
-				'db_quote' => 'smf_db_quote',
+				'db_query' => 'elk_db_query',
+				'db_quote' => 'elk_db_quote',
 				'db_fetch_assoc' => 'mysql_fetch_assoc',
 				'db_fetch_row' => 'mysql_fetch_row',
 				'db_free_result' => 'mysql_free_result',
@@ -117,7 +117,7 @@ class Database_MySQL extends Database
 	 *
 	 * @param $matches
 	 */
-	function smf_db_replacement__callback($matches)
+	function elk_db_replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -228,7 +228,7 @@ class Database_MySQL extends Database
 	 * @param array $db_values
 	 * @param resource $connection = null
 	 */
-	function smf_db_quote($db_string, $db_values, $connection = null)
+	function elk_db_quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback, $db_connection;
 
@@ -239,7 +239,7 @@ class Database_MySQL extends Database
 			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -256,7 +256,7 @@ class Database_MySQL extends Database
 	 * @param array $db_values = array()
 	 * @param resource $connection = null
 	 */
-	function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+	function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
@@ -301,7 +301,7 @@ class Database_MySQL extends Database
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'smf_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
@@ -692,7 +692,7 @@ class Database_MySQL extends Database
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
-			$insertRows[] = smf_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+			$insertRows[] = elk_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');

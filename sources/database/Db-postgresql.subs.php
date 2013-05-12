@@ -41,11 +41,11 @@ function db_fix_prefix(&$db_prefix, $db_name)
  *
  * @param $matches
  */
-function smf_db_replacement__callback($matches)
+function elk_db_replacement__callback($matches)
 {
 	global $db;
 
-	return $db->smf_db_replacement__callback($matches);
+	return $db->elk_db_replacement__callback($matches);
 }
 
 /**
@@ -55,11 +55,11 @@ function smf_db_replacement__callback($matches)
  * @param array $db_values
  * @param resource $connection = null
  */
-function smf_db_quote($db_string, $db_values, $connection = null)
+function elk_db_quote($db_string, $db_values, $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_quote($db_string, $db_values, $connection);
+	return $db->elk_db_quote($db_string, $db_values, $connection);
 }
 
 /**
@@ -70,11 +70,11 @@ function smf_db_quote($db_string, $db_values, $connection = null)
  * @param array $db_values = array()
  * @param resource $connection = null
  */
-function smf_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_query($identifier, $db_string, $db_values, $connection);
+	return $db->elk_db_query($identifier, $db_string, $db_values, $connection);
 }
 
 /**
@@ -135,11 +135,11 @@ function elk_db_error($db_string, $connection = null)
  * @param $request
  * @param $counter
  */
-function smf_db_fetch_row($request, $counter = false)
+function elk_db_fetch_row($request, $counter = false)
 {
 	global $db;
 
-	return $db->smf_db_fetch_row($request, $counter);
+	return $db->elk_db_fetch_row($request, $counter);
 }
 
 /**
@@ -148,11 +148,11 @@ function smf_db_fetch_row($request, $counter = false)
  * @param $request
  * @param $counter
  */
-function smf_db_fetch_assoc($request, $counter = false)
+function elk_db_fetch_assoc($request, $counter = false)
 {
 	global $db;
 
-	return $db->smf_db_fetch_assoc($request, $counter);
+	return $db->elk_db_fetch_assoc($request, $counter);
 }
 
 /**
@@ -161,11 +161,11 @@ function smf_db_fetch_assoc($request, $counter = false)
  * @param $request
  * @param $counter
  */
-function smf_db_data_seek($request, $counter)
+function elk_db_data_seek($request, $counter)
 {
 	global $db;
 
-	return $db->smf_db_data_seek($request, $counter);
+	return $db->elk_db_data_seek($request, $counter);
 }
 
 /**
@@ -173,11 +173,11 @@ function smf_db_data_seek($request, $counter)
  *
  * @param $string
  */
-function smf_db_unescape_string($string)
+function elk_db_unescape_string($string)
 {
 	global $db;
 
-	return $db->smf_db_unescape_string($string);
+	return $db->elk_db_unescape_string($string);
 }
 
 /**
