@@ -646,15 +646,49 @@ function removeMessage($message, $decreasePostCount = true)
 }
 
 /**
- * Retrieve the topic associated with a message.
+ * This function deals with the topic associated to a message.
+ * It allows to retrieve or update the topic to which the message belongs.
  *
+ * If $topicID is not passed, the current topic ID of the message is returned.
+ * If $topicID is passed, the message is updated to point to the new topic.
+ *
+ * @param int $msg_id message ID
+ * @param int $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return mixed, int topic ID if any, or false
  */
-function associatedTopic($msg_id)
+function associatedTopic($msg_id, $topicID = null)
 {
-	$message_info = getMessageInfo((int) $msg_id, true);
+	global $smcFunc;
 
-	return empty($message_info) ? false : $message_info['id_topic'];
+	if ($topicID === null)
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_topic
+			FROM {db_prefix}messages
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+		));
+		if ($smcFunc['db_num_rows']($request) != 1)
+			$topic = false;
+		else
+			list ($topic) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		return $topic;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}messages
+			SET id_topic = {int:topic}
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+				'topic' => $topicID,
+			)
+		);
+	}
 }
 
 /**
