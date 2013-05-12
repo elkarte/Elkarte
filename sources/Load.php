@@ -29,14 +29,6 @@ function reloadSettings()
 {
 	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
 
-	// Most database systems have not set UTF-8 as their default input charset.
-	if (!empty($db_character_set))
-		$smcFunc['db_query']('set_character_set', '
-			SET NAMES ' . $db_character_set,
-			array(
-			)
-		);
-
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
 	{

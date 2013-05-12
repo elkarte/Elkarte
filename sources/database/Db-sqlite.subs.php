@@ -82,6 +82,8 @@ function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	// This is frankly stupid - stop SQLite returning alias names!
 	@sqlite_query('PRAGMA short_column_names = 1', $connection);
 
+	smf_db_set_charset();
+
 	// Make some user defined functions!
 	sqlite_create_function($connection, 'unix_timestamp', 'smf_udf_unix_timestamp', 0);
 	sqlite_create_function($connection, 'inet_aton', 'smf_udf_inet_aton', 1);
@@ -872,4 +874,20 @@ function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false
 		);
 
 	return strtr($string, $replacements);
+}
+
+/**
+ * Set the connection's character set
+ */
+function smf_db_set_charset()
+{
+	global $smcFunc, $db_character_set;
+
+	// Most database systems have not set UTF-8 as their default input charset.
+	if (!empty($db_character_set))
+		$smcFunc['db_query']('set_character_set', '
+			SET NAMES ' . $db_character_set,
+			array(
+			)
+		);
 }

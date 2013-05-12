@@ -81,6 +81,8 @@ function smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix
 		}
 	}
 
+	smf_db_set_charset();
+
 	return $connection;
 }
 
@@ -871,4 +873,20 @@ function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false
 		);
 
 	return strtr($string, $replacements);
+}
+
+/**
+ * Set the connection's character set
+ */
+function smf_db_set_charset()
+{
+	global $smcFunc, $db_character_set;
+
+	// Most database systems have not set UTF-8 as their default input charset.
+	if (!empty($db_character_set))
+		$smcFunc['db_query']('set_character_set', '
+			SET NAMES ' . $db_character_set,
+			array(
+			)
+		);
 }
