@@ -122,11 +122,11 @@ function smf_db_transaction($type = 'commit', $connection = null)
  * @param string $db_string
  * @param resource $connection = null
  */
-function smf_db_error($db_string, $connection = null)
+function elk_db_error($db_string, $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_error($db_string, $connection);
+	return $db->elk_db_error($db_string, $connection);
 }
 
 /**
@@ -156,11 +156,11 @@ function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
  * @param $file
  * @param $line
  */
-function smf_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+function elk_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 {
 	global $db;
 
-	return $db->smf_db_error_backtrace($error_message, $log_message, $error_type, $file, $line);
+	return $db->elk_db_error_backtrace($error_message, $log_message, $error_type, $file, $line);
 }
 
 /**

@@ -97,7 +97,7 @@ abstract class Database
 	 * @param string $db_string
 	 * @param resource $connection = null
 	 */
-	abstract function smf_db_error($db_string, $connection = null);
+	abstract function elk_db_error($db_string, $connection = null);
 
 	/**
 	 * insert
@@ -121,7 +121,7 @@ abstract class Database
 	 * @param $file
 	 * @param $line
 	 */
-	abstract function smf_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
+	abstract function elk_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
