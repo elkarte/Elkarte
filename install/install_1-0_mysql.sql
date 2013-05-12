@@ -1672,7 +1672,7 @@ VALUES
 	(11, 0, 120, 1, 'd', 1, 'remove_temp_attachments'),
 	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
 	(13, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
-	(14, 0, 0, 6, 'h', 0, 'remove_old_followups');
+	(14, 0, 0, 6, 'h', 0, 'remove_old_followups'),
 	(14, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
 
 # --------------------------------------------------------
@@ -2164,7 +2164,7 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
 	message mediumtext NOT NULL default '',
-	PRIMARY KEY (id_email),
+	PRIMARY KEY (id_email)
 ) ENGINE=MyISAM;
 
 #
@@ -2177,5 +2177,5 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
 	filter_to varchar(255) NOT NULL default '',
 	filter_from varchar(255) NOT NULL default '',
 	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter),
+	PRIMARY KEY (id_filter)
 ) ENGINE=MyISAM;
