@@ -27,7 +27,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	elseif (strtolower($db_type) === 'sqlite')
 		$db = new Database_SQLite();
 
-	return $db->db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
+	return $db->initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
 }
 
 /**

@@ -59,7 +59,7 @@ function elk_db_quote($db_string, $db_values, $connection = null)
 {
 	global $db;
 
-	return $db->elk_db_quote($db_string, $db_values, $connection);
+	return $db->quote($db_string, $db_values, $connection);
 }
 
 /**
@@ -74,7 +74,7 @@ function elk_db_query($identifier, $db_string, $db_values = array(), $connection
 {
 	global $db;
 
-	return $db->elk_db_query($identifier, $db_string, $db_values, $connection);
+	return $db->query($identifier, $db_string, $db_values, $connection);
 }
 
 /**

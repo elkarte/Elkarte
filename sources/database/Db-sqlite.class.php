@@ -41,7 +41,7 @@ class Database_SQLite
 	 * @param string $db_prefix
 	 * @param array $db_options
 	 */
-	function db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode, $db_in_transact, $sqlite_error;
 
@@ -240,7 +240,7 @@ class Database_SQLite
 	 * @param string $db_values
 	 * @param resource $connection
 	 */
-	function elk_db_quote($db_string, $db_values, $connection = null)
+	function quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback, $db_connection;
 
@@ -268,7 +268,7 @@ class Database_SQLite
 	 * @param string $db_values
 	 * @param resource $connection
 	 */
-	function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
@@ -610,7 +610,7 @@ class Database_SQLite
 			// Here's where the variables are injected to the query.
 			$insertRows = array();
 			foreach ($data as $dataRow)
-				$insertRows[] = elk_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+				$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
 			foreach ($insertRows as $entry)
 				// Do the insert.

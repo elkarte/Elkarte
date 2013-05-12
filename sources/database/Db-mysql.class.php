@@ -40,7 +40,7 @@ class Database_MySQL extends Database
 	 * @param array $db_options
 	 * @return null
 	 */
-	function db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode, $db;
 
@@ -228,7 +228,7 @@ class Database_MySQL extends Database
 	 * @param array $db_values
 	 * @param resource $connection = null
 	 */
-	function elk_db_quote($db_string, $db_values, $connection = null)
+	function quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback, $db_connection;
 
@@ -256,7 +256,7 @@ class Database_MySQL extends Database
 	 * @param array $db_values = array()
 	 * @param resource $connection = null
 	 */
-	function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
+	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
@@ -692,7 +692,7 @@ class Database_MySQL extends Database
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
-			$insertRows[] = elk_db_quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+			$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');

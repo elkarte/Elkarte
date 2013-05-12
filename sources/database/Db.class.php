@@ -28,7 +28,7 @@ abstract class Database
 	 * @param array $db_options
 	 * @return null
 	 */
-	abstract function db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
+	abstract function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
 
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
@@ -55,7 +55,7 @@ abstract class Database
 	 * @param array $db_values
 	 * @param resource $connection = null
 	 */
-	abstract function elk_db_quote($db_string, $db_values, $connection = null);
+	abstract function quote($db_string, $db_values, $connection = null);
 
 	/**
 	 * Do a query.  Takes care of errors too.
@@ -65,7 +65,7 @@ abstract class Database
 	 * @param array $db_values = array()
 	 * @param resource $connection = null
 	 */
-	abstract function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null);
+	abstract function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
 	 * affected_rows
