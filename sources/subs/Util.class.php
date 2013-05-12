@@ -9,6 +9,9 @@
  *
  */
 
+if (!defined('ELKARTE'))
+	die('No access...');
+
 /**
  * Legacy utility functions, such as to handle multi byte strings
  * Note: some of these might be deprecated or removed in the future.
