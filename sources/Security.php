@@ -1431,3 +1431,27 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
 
 }
+
+/**
+* This sets the X-Frame-Options header.
+*
+* @param string $option the frame option, defaults to deny.
+* @return void.
+*/
+function frameOptionsHeader($override = null)
+{
+	global $modSettings;
+
+	$option = 'SAMEORIGIN';
+	if (is_null($override) && !empty($modSettings['frame_security']))
+		$option = $modSettings['frame_security'];
+	elseif (in_array($override, array('SAMEORIGIN', 'DENY', 'SAMEORIGIN')))
+		$option = $override;
+
+	// Don't bother setting the header if we have disabled it.
+	if ($option == 'DISABLE')
+		return;
+
+	// Finally set it.
+	header('X-Frame-Options: ' . $option);
+}
