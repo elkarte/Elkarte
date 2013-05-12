@@ -53,8 +53,8 @@ class Database_SQLite
 				'db_fetch_assoc' => 'sqlite_fetch_array',
 				'db_fetch_row' => 'smf_db_fetch_row',
 				'db_free_result' => 'smf_db_free_result',
-				'db_insert' => 'smf_db_insert',
-				'db_insert_id' => 'smf_db_insert_id',
+				'db_insert' => 'elk_db_insert',
+				'db_insert_id' => 'elk_db_insert_id',
 				'db_num_rows' => 'sqlite_num_rows',
 				'db_data_seek' => 'sqlite_seek',
 				'db_num_fields' => 'sqlite_num_fields',
@@ -426,7 +426,7 @@ class Database_SQLite
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert_id($table, $field = null, $connection = null)
+	function elk_db_insert_id($table, $field = null, $connection = null)
 	{
 		global $db_connection, $db_prefix;
 
@@ -568,7 +568,7 @@ class Database_SQLite
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_in_transact, $db_connection, $smcFunc, $db_prefix;
 

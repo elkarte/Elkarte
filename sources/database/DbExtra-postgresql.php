@@ -31,7 +31,7 @@ function db_extra_init()
 		$smcFunc += array(
 			'db_backup_table' => 'smf_db_backup_table',
 			'db_optimize_table' => 'smf_db_optimize_table',
-			'db_insert_sql' => 'smf_db_insert_sql',
+			'db_insert_sql' => 'elk_db_insert_sql',
 			'db_table_sql' => 'smf_db_table_sql',
 			'db_list_tables' => 'smf_db_list_tables',
 			'db_get_version' => 'smf_db_get_version',
@@ -151,7 +151,7 @@ function smf_db_list_tables($db = false, $filter = false)
  * @param bool new_table
  * @return string the query to insert the data back in, or an empty string if the table was empty.
  */
-function smf_db_insert_sql($tableName, $new_table = false)
+function elk_db_insert_sql($tableName, $new_table = false)
 {
 	global $smcFunc, $db_prefix;
 	static $start = 0, $num_rows, $fields, $limit;

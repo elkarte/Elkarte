@@ -52,8 +52,8 @@ class Database_MySQL extends Database
 				'db_fetch_assoc' => 'mysql_fetch_assoc',
 				'db_fetch_row' => 'mysql_fetch_row',
 				'db_free_result' => 'mysql_free_result',
-				'db_insert' => 'smf_db_insert',
-				'db_insert_id' => 'smf_db_insert_id',
+				'db_insert' => 'elk_db_insert',
+				'db_insert_id' => 'elk_db_insert_id',
 				'db_num_rows' => 'mysql_num_rows',
 				'db_data_seek' => 'mysql_data_seek',
 				'db_num_fields' => 'mysql_num_fields',
@@ -418,7 +418,7 @@ class Database_MySQL extends Database
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert_id($table, $field = null, $connection = null)
+	function elk_db_insert_id($table, $field = null, $connection = null)
 	{
 		global $db_connection, $db_prefix;
 
@@ -657,7 +657,7 @@ class Database_MySQL extends Database
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $smcFunc, $db_connection, $db_prefix;
 

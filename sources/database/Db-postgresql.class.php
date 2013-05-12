@@ -52,8 +52,8 @@ class Database_PostgreSQL
 			$smcFunc += array(
 				'db_query' => 'smf_db_query',
 				'db_quote' => 'smf_db_quote',
-				'db_insert' => 'smf_db_insert',
-				'db_insert_id' => 'smf_db_insert_id',
+				'db_insert' => 'elk_db_insert',
+				'db_insert_id' => 'elk_db_insert_id',
 				'db_fetch_assoc' => 'smf_db_fetch_assoc',
 				'db_fetch_row' => 'smf_db_fetch_row',
 				'db_free_result' => 'pg_free_result',
@@ -505,7 +505,7 @@ class Database_PostgreSQL
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert_id($table, $field = null, $connection = null)
+	function elk_db_insert_id($table, $field = null, $connection = null)
 	{
 		global $db_connection, $smcFunc, $db_prefix;
 
@@ -679,7 +679,7 @@ class Database_PostgreSQL
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	function smf_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_replace_result, $db_in_transact, $smcFunc, $db_connection, $db_prefix;
 

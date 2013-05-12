@@ -95,11 +95,11 @@ function smf_db_affected_rows($connection = null)
  * @param string $field = null
  * @param resource $connection = null
  */
-function smf_db_insert_id($table, $field = null, $connection = null)
+function elk_db_insert_id($table, $field = null, $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_insert_id($table, $field, $connection);
+	return $db->elk_db_insert_id($table, $field, $connection);
 }
 
 /**
@@ -191,11 +191,11 @@ function smf_db_unescape_string($string)
  * @param bool $disable_trans = false
  * @param resource $connection = null
  */
-function smf_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
+	return $db->elk_db_insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
 }
 
 /**
