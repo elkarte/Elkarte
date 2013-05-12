@@ -71,7 +71,7 @@ abstract class Database
 	 * affected_rows
 	 * @param resource $connection
 	 */
-	abstract function smf_db_affected_rows($connection = null);
+	abstract function elk_db_affected_rows($connection = null);
 
 	/**
 	 * insert_id
@@ -88,7 +88,7 @@ abstract class Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	abstract function smf_db_transaction($type = 'commit', $connection = null);
+	abstract function elk_db_transaction($type = 'commit', $connection = null);
 
 	/**
 	 * Database error!
@@ -129,5 +129,5 @@ abstract class Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	abstract function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false);
+	abstract function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false);
 }

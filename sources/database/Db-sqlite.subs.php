@@ -81,11 +81,11 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
  * affected_rows
  * @param resource $connection
  */
-function smf_db_affected_rows($connection = null)
+function elk_db_affected_rows($connection = null)
 {
 	global $db;
 
-	return $db->smf_db_affected_rows($connection);
+	return $db->elk_db_affected_rows($connection);
 }
 
 /**
@@ -108,11 +108,11 @@ function elk_db_insert_id($table, $field = null, $connection = null)
  * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
  * @param resource $connection = null
  */
-function smf_db_transaction($type = 'commit', $connection = null)
+function elk_db_transaction($type = 'commit', $connection = null)
 {
 	global $db;
 
-	return $db->smf_db_transaction($type, $connection);
+	return $db->elk_db_transaction($type, $connection);
 }
 
 /**
@@ -301,9 +301,9 @@ function smf_udf_regexp($exp, $search)
  * @param $string
  * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
  */
-function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
 {
 	global $db;
 
-	return $db->smf_db_escape_wildcard_string($string, $translate_human_wildcards);
+	return $db->elk_db_escape_wildcard_string($string, $translate_human_wildcards);
 }

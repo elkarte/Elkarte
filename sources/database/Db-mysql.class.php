@@ -60,14 +60,14 @@ class Database_MySQL extends Database
 				'db_escape_string' => 'addslashes',
 				'db_unescape_string' => 'stripslashes',
 				'db_server_info' => 'mysql_get_server_info',
-				'db_affected_rows' => 'smf_db_affected_rows',
-				'db_transaction' => 'smf_db_transaction',
+				'db_affected_rows' => 'elk_db_affected_rows',
+				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'mysql_error',
 				'db_select_db' => 'mysql_select_db',
 				'db_title' => 'MySQL',
 				'db_sybase' => false,
 				'db_case_sensitive' => false,
-				'db_escape_wildcard_string' => 'smf_db_escape_wildcard_string',
+				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 			);
 
 		if (!empty($db_options['persist']))
@@ -404,7 +404,7 @@ class Database_MySQL extends Database
 	 * affected_rows
 	 * @param resource $connection
 	 */
-	function smf_db_affected_rows($connection = null)
+	function elk_db_affected_rows($connection = null)
 	{
 		global $db_connection;
 
@@ -434,7 +434,7 @@ class Database_MySQL extends Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function smf_db_transaction($type = 'commit', $connection = null)
+	function elk_db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection;
 
@@ -768,7 +768,7 @@ class Database_MySQL extends Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+	function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
 	{
 		$replacements = array(
 			'%' => '\%',

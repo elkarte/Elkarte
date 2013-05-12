@@ -63,14 +63,14 @@ class Database_PostgreSQL
 				'db_escape_string' => 'pg_escape_string',
 				'db_unescape_string' => 'smf_db_unescape_string',
 				'db_server_info' => 'smf_db_version',
-				'db_affected_rows' => 'smf_db_affected_rows',
-				'db_transaction' => 'smf_db_transaction',
+				'db_affected_rows' => 'elk_db_affected_rows',
+				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'pg_last_error',
 				'db_select_db' => 'smf_db_select_db',
 				'db_title' => 'PostgreSQL',
 				'db_sybase' => true,
 				'db_case_sensitive' => true,
-				'db_escape_wildcard_string' => 'smf_db_escape_wildcard_string',
+				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 			);
 
 		if (!empty($db_options['persist']))
@@ -486,7 +486,7 @@ class Database_PostgreSQL
 	 * affected_rows
 	 * @param string $result
 	 */
-	function smf_db_affected_rows($result = null)
+	function elk_db_affected_rows($result = null)
 	{
 		global $db_last_result, $db_replace_result;
 
@@ -533,7 +533,7 @@ class Database_PostgreSQL
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function smf_db_transaction($type = 'commit', $connection = null)
+	function elk_db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection;
 
@@ -852,7 +852,7 @@ class Database_PostgreSQL
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+	function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
 	{
 		$replacements = array(
 			'%' => '\%',

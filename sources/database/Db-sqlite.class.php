@@ -61,14 +61,14 @@ class Database_SQLite
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'smf_db_unescape_string',
 				'db_server_info' => 'smf_db_libversion',
-				'db_affected_rows' => 'smf_db_affected_rows',
-				'db_transaction' => 'smf_db_transaction',
+				'db_affected_rows' => 'elk_db_affected_rows',
+				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'smf_db_last_error',
 				'db_select_db' => '',
 				'db_title' => 'SQLite',
 				'db_sybase' => true,
 				'db_case_sensitive' => true,
-				'db_escape_wildcard_string' => 'smf_db_escape_wildcard_string',
+				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 			);
 
 		if (substr($db_name, -3) != '.db')
@@ -412,7 +412,7 @@ class Database_SQLite
 	 *
 	 * @param resource $connection
 	 */
-	function smf_db_affected_rows($connection = null)
+	function elk_db_affected_rows($connection = null)
 	{
 		global $db_connection;
 
@@ -453,7 +453,7 @@ class Database_SQLite
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function smf_db_transaction($type = 'commit', $connection = null)
+	function elk_db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection, $db_in_transact;
 
@@ -854,7 +854,7 @@ class Database_SQLite
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 * The optional second parameter turns human readable wildcards into SQL wildcards.
 	 */
-	function smf_db_escape_wildcard_string($string, $translate_human_wildcards=false)
+	function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
 	{
 		$replacements = array(
 			'%' => '\%',
