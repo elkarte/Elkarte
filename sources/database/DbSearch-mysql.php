@@ -88,14 +88,4 @@ class DbSearch_MySQL
 			)
 		);
 	}
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return bool
-	 */
-	function support_ignore()
-	{
-		return true;
-	}
 }

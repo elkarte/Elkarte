@@ -123,14 +123,4 @@ class DbSearch_PostgreSQL
 			)
 		);
 	}
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return bool
-	 */
-	function support_ignore()
-	{
-		return false;
-	}
 }

@@ -130,4 +130,11 @@ abstract class Database
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
 	abstract function escape_wildcard_string($string, $translate_human_wildcards=false);
+
+	/**
+	 * Returns whether the database system supports ignore.
+	 *
+	 * @return bool
+	 */
+	abstract function support_ignore();
 }

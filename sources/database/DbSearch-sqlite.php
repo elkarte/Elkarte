@@ -106,14 +106,4 @@ class DbSearch_SQLite
 			)
 		);
 	}
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return bool
-	 */
-	function support_ignore()
-	{
-		return false;
-	}
 }

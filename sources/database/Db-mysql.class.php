@@ -807,6 +807,16 @@ class Database_MySQL extends Database
 	}
 
 	/**
+	 * Returns whether the database system supports ignore.
+	 *
+	 * @return bool
+	 */
+	function support_ignore()
+	{
+		return true;
+	}
+
+	/**
 	 * Returns a reference to the existing instance
 	 */
 	static function db()

@@ -197,7 +197,7 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, $smcFunc;
+	global $excludedWords, $participants, $smcFunc, $db;
 
 	// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 	// Coming from quick search box and going to some custome place?
@@ -1066,7 +1066,7 @@ function action_plushsearch2()
 					$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
 					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_subject',
-						($smcFunc['db_support_ignore'] ? '
+						($db->support_ignore() ? '
 						INSERT IGNORE INTO {db_prefix}log_search_results
 							(id_search, id_topic, relevance, id_msg, num_matches)' : '') . '
 						SELECT
@@ -1093,7 +1093,7 @@ function action_plushsearch2()
 					);
 
 					// If the database doesn't support IGNORE to make this fast we need to do some tracking.
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 						{
@@ -1306,7 +1306,7 @@ function action_plushsearch2()
 						if (empty($subject_query['where']))
 							continue;
 
-						$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_topics', ($smcFunc['db_support_ignore'] ? ( '
+						$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_topics', ($db->support_ignore() ? ( '
 							INSERT IGNORE INTO {db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics
 								(' . ($createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
 							SELECT ' . ($createTemporary ? '' : $_SESSION['search_cache']['id_search'] . ', ') . 't.id_topic
@@ -1321,7 +1321,7 @@ function action_plushsearch2()
 							$subject_query['params']
 						);
 						// Don't do INSERT IGNORE? Manually fix this up!
-						if (!$smcFunc['db_support_ignore'])
+						if (!$db->support_ignore())
 						{
 							while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 							{
@@ -1423,7 +1423,7 @@ function action_plushsearch2()
 
 							$ignoreRequest = $searchAPI->indexedWordQuery($words, $search_data);
 
-							if (!$smcFunc['db_support_ignore'])
+							if (!$db->support_ignore())
 							{
 								while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 								{
@@ -1535,7 +1535,7 @@ function action_plushsearch2()
 					}
 					$main_query['select']['relevance'] = substr($relevance, 0, -3) . ') / ' . $new_weight_total . ' AS relevance';
 
-					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_no_index', ($smcFunc['db_support_ignore'] ? ( '
+					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_no_index', ($db->support_ignore() ? ( '
 						INSERT IGNORE INTO ' . '{db_prefix}log_search_results
 							(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 						SELECT
@@ -1554,7 +1554,7 @@ function action_plushsearch2()
 					);
 
 					// We love to handle non-good databases that don't support our ignore!
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						$inserts = array();
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
@@ -1603,7 +1603,7 @@ function action_plushsearch2()
 					$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
 					$usedIDs = array_flip(empty($inserts) ? array() : array_keys($inserts));
-					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_sub_only', ($smcFunc['db_support_ignore'] ? ( '
+					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_sub_only', ($db->support_ignore() ? ( '
 						INSERT IGNORE INTO {db_prefix}log_search_results
 							(id_search, id_topic, relevance, id_msg, num_matches)') : '') . '
 						SELECT
@@ -1625,7 +1625,7 @@ function action_plushsearch2()
 						)
 					);
 					// Once again need to do the inserts if the database don't support ignore!
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						$inserts = array();
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
