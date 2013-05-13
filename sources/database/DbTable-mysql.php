@@ -20,11 +20,11 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Add the file functions to the $smcFunc array.
+ * Initialize... while we still have something to do :P
  */
 function db_packages_init()
 {
-	global $smcFunc, $db_package_log, $db_prefix;
+	global $db_package_log;
 
 	$db_package_log = array();
 }
