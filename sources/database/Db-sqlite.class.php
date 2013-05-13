@@ -460,7 +460,7 @@ class Database_SQLite extends Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function do_transaction($type = 'commit', $connection = null)
+	function db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection, $db_in_transact;
 
@@ -1217,6 +1217,35 @@ class Database_SQLite extends Database
 	function db_get_version()
 	{
 		return sqlite_libversion();
+	}
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 */
+	function db_escape_string($string)
+	{
+		return sqlite_escape_string($string);
+	}
+
+	/**
+	 * Fetch next result as association.
+	 * The sqlite implementation simply delegates to sqlite_fetch_array().
+	 * It requires $request parameter to be int.
+	 * It ignores $counter parameter.
+	 *
+	 * @param int $request
+	 * @param mixed counter = false
+	 */
+	function fetch_assoc($request, $counter = false)
+	{
+		return sqlite_fetch_array($request);
+	}
+
+	function free_result($result)
+	{
+		//
 	}
 
 	/**

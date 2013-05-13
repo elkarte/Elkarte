@@ -74,7 +74,7 @@ abstract class Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	abstract function do_transaction($type = 'commit', $connection = null);
+	abstract function db_transaction($type = 'commit', $connection = null);
 
 	/**
 	 * Database error!

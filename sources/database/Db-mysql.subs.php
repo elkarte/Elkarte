@@ -112,7 +112,7 @@ function elk_db_transaction($type = 'commit', $connection = null)
 {
 	$db = database();
 
-	return $db->do_transaction($type, $connection);
+	return $db->db_transaction($type, $connection);
 }
 
 /**

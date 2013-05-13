@@ -551,7 +551,7 @@ class Database_PostgreSQL extends Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function do_transaction($type = 'commit', $connection = null)
+	function db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection;
 
@@ -1205,6 +1205,21 @@ class Database_PostgreSQL extends Database
 		$smcFunc['db_free_result']($request);
 
 		return $ver;
+	}
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 */
+	function db_escape_string($string)
+	{
+		return pg_escape_string($string);
+	}
+
+	function free_result($result)
+	{
+		return pg_free_result($result);
 	}
 
 	/**

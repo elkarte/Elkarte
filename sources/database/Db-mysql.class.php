@@ -465,7 +465,7 @@ class Database_MySQL extends Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	function do_transaction($type = 'commit', $connection = null)
+	function db_transaction($type = 'commit', $connection = null)
 	{
 		global $db_connection;
 
@@ -1245,6 +1245,29 @@ class Database_MySQL extends Database
 		$smcFunc['db_free_result']($request);
 
 		return $ver;
+	}
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 */
+	function db_escape_string($string)
+	{
+		return addslashes($string);
+	}
+
+	/**
+	 * Fetch next result as association.
+	 * The mysql implementation simply delegates to mysql_fetch_assoc().
+	 * It ignores $counter parameter.
+	 *
+	 * @param resource $request
+	 * @param mixed counter = false
+	 */
+	function fetch_assoc($request, $counter = false)
+	{
+		return mysql_fetch_assoc($request);
 	}
 
 	/**
