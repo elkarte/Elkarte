@@ -89,7 +89,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $db_prefix, $db_character_set;
+		global $db_package_log, $db_prefix, $db_character_set;
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -147,7 +147,7 @@ class DbTable_MySQL extends DbTable
 		$table_query .= ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
 		// Create the table!
-		$smcFunc['db_query']('', $table_query,
+		$db->query('', $table_query,
 			array(
 				'security_override' => true,
 			)
@@ -163,7 +163,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// working hard with the db!
+		$db = database();
 
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -176,14 +179,11 @@ class DbTable_MySQL extends DbTable
 		if (in_array(strtolower($table_name), $this->_reservedTables))
 			return false;
 
-		// working hard with the db!
-		$db = database();
-
 		// Does it exist?
 		if (in_array($full_table_name, $db->db_list_tables()))
 		{
 			$query = 'DROP TABLE ' . $table_name;
-			$smcFunc['db_query']('',
+			$db->query('',
 				$query,
 				array(
 					'security_override' => true,
@@ -208,7 +208,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $txt, $db_prefix;
+		global $db_package_log, $txt, $db_prefix;
+
+		// working hard with the db!
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -241,7 +244,8 @@ class DbTable_MySQL extends DbTable
 		$query = '
 			ALTER TABLE ' . $table_name . '
 			ADD ' . elk_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
-		$smcFunc['db_query']('', $query,
+
+		$db->query('', $query,
 			array(
 				'security_override' => true,
 			)
@@ -260,7 +264,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// need this thing
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -269,7 +276,7 @@ class DbTable_MySQL extends DbTable
 		foreach ($columns as $column)
 			if ($column['name'] == $column_name)
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP COLUMN ' . $column_name,
 					array(
@@ -295,7 +302,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// need this thing
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -334,10 +344,10 @@ class DbTable_MySQL extends DbTable
 		if ($size !== null)
 			$type = $type . '(' . $size . ')';
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			ALTER TABLE ' . $table_name . '
 			CHANGE COLUMN `' . $old_column . '` `' . $column_info['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (empty($column_info['null']) ? 'NOT NULL' : '') . ' ' .
-				(!isset($column_info['default']) ? '' : 'default \'' . $smcFunc['db_escape_string']($column_info['default']) . '\'') . ' ' .
+				(!isset($column_info['default']) ? '' : 'default \'' . $db->db_escape_string($column_info['default']) . '\'') . ' ' .
 				(empty($column_info['auto']) ? '' : 'auto_increment') . ' ',
 			array(
 				'security_override' => true,
@@ -356,7 +366,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $db_prefix;
+		global $db_package_log, $db_prefix;
+
+		// need this thing
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -382,6 +395,7 @@ class DbTable_MySQL extends DbTable
 
 		// Let's get all our indexes.
 		$indexes = $this->db_list_indexes($table_name, true);
+
 		// Do we already have it?
 		foreach ($indexes as $index)
 		{
@@ -398,7 +412,7 @@ class DbTable_MySQL extends DbTable
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD PRIMARY KEY (' . $columns . ')',
 				array(
@@ -408,7 +422,7 @@ class DbTable_MySQL extends DbTable
 		}
 		else
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')',
 				array(
@@ -428,7 +442,10 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// need this
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -441,7 +458,7 @@ class DbTable_MySQL extends DbTable
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key?
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP PRIMARY KEY',
 					array(
@@ -454,7 +471,7 @@ class DbTable_MySQL extends DbTable
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP INDEX ' . $index_name,
 					array(
@@ -512,11 +529,14 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// make sure db is available
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW FIELDS
 			FROM {raw:table_name}',
 			array(
@@ -524,7 +544,7 @@ class DbTable_MySQL extends DbTable
 			)
 		);
 		$columns = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			if (!$detail)
 			{
@@ -565,7 +585,7 @@ class DbTable_MySQL extends DbTable
 				}
 			}
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		return $columns;
 	}
@@ -580,11 +600,14 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// make sure db is available
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW KEYS
 			FROM {raw:table_name}',
 			array(
@@ -592,7 +615,7 @@ class DbTable_MySQL extends DbTable
 			)
 		);
 		$indexes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			if (!$detail)
 				$indexes[] = $row['Key_name'];
@@ -625,7 +648,7 @@ class DbTable_MySQL extends DbTable
 					$indexes[$row['Key_name']]['columns'][] = $row['Column_name'];
 			}
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		return $indexes;
 	}
@@ -638,7 +661,8 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_query_column($column)
 	{
-		global $smcFunc;
+		// make sure db is available
+		$db = database();
 
 		// Auto increment is easy here!
 		if (!empty($column['auto']))
@@ -646,7 +670,7 @@ class DbTable_MySQL extends DbTable
 			$default = 'auto_increment';
 		}
 		elseif (isset($column['default']) && $column['default'] !== null)
-			$default = 'default \'' . $smcFunc['db_escape_string']($column['default']) . '\'';
+			$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
 		else
 			$default = '';
 

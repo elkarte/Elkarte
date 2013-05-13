@@ -1243,11 +1243,6 @@ class Database_SQLite extends Database
 		return sqlite_fetch_array($request);
 	}
 
-	function free_result($result)
-	{
-		//
-	}
-
 	/**
 	 * Returns a reference to the existing instance
 	 */
