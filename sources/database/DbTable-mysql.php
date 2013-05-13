@@ -26,23 +26,7 @@ function db_packages_init()
 {
 	global $smcFunc, $reservedTables, $db_package_log, $db_prefix;
 
-	if (!isset($smcFunc['db_create_table']) || $smcFunc['db_create_table'] != 'elk_db_create_table')
-	{
-		$smcFunc += array(
-			'db_add_column' => 'elk_db_add_column',
-			'db_add_index' => 'elk_db_add_index',
-			'db_calculate_type' => 'elk_db_calculate_type',
-			'db_change_column' => 'elk_db_change_column',
-			'db_create_table' => 'elk_db_create_table',
-			'db_drop_table' => 'elk_db_drop_table',
-			'db_table_structure' => 'elk_db_table_structure',
-			'db_list_columns' => 'elk_db_list_columns',
-			'db_list_indexes' => 'elk_db_list_indexes',
-			'db_remove_column' => 'elk_db_remove_column',
-			'db_remove_index' => 'elk_db_remove_index',
-		);
-		$db_package_log = array();
-	}
+	$db_package_log = array();
 
 	// We setup an array of tables we can't do auto-remove on - in case a mod writer cocks it up!
 	$reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
@@ -677,88 +661,4 @@ class DbTable_MySQL extends DbTable
 		}
 		return self::$_tbl;
 	}
-}
-
-function elk_db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_create_table($table_name, $columns, $indexes, $parameters, $if_exists, $error);
-}
-
-function elk_db_drop_table($table_name, $parameters = array(), $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_drop_table($table_name, $parameters, $error);
-}
-
-function elk_db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_add_column($table_name, $column_info, $parameters, $if_exists, $error);
-}
-
-function elk_db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_remove_column($table_name, $column_name, $parameters, $error);
-}
-
-function elk_db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_change_column($table_name, $old_column, $column_info, $parameters, $error);
-}
-
-function elk_db_add_index($table_name, $index_info, $parameters, $if_exists = 'update', $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_add_index($table_name, $index_info, $parameters, $if_exists, $error);
-}
-
-function elk_db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
-{
-	$tbl = db_table();
-
-	return $tbl->db_remove_index($table_name, $index_name, $parameters, $error);
-}
-
-function elk_db_calculate_type($type_name, $type_size = null, $reverse = false)
-{
-	$tbl = db_table();
-
-	return $tbl->db_calculate_type($type_name, $type_size, $reverse);
-}
-
-function elk_db_table_structure($table_name, $parameters = array())
-{
-	$tbl = db_table();
-
-	return $tbl->db_table_structure($table_name, $parameters);
-}
-
-function elk_db_list_columns($table_name, $detail = false, $parameters = array())
-{
-	$tbl = db_table();
-
-	return $tbl->db_list_columns($table_name, $detail, $parameters);
-}
-
-function elk_db_list_indexes($table_name, $detail = false, $parameters = array())
-{
-	$tbl = db_table();
-
-	return $tbl->db_list_indexes($table_name, $detail, $parameters);
-}
-
-function elk_db_create_query_column($column)
-{
-	$tbl = db_table();
-
-	return $tbl->db_create_query_column($column);
 }
