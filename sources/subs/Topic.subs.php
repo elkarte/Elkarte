@@ -1233,11 +1233,14 @@ function messagesAfter($topic, $message)
 
 /**
  * Retrieve a few data on a particular message.
+ * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * and doesn't use {query_see_board}
  *
- * @param int $topic
- * @param int $message
+ * @param int $topic topic ID
+ * @param int $message message ID
+ * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message)
+function messageInfo($topic, $message, $topic_approved = false)
 {
 	global $smcFunc, $modSettings;
 
@@ -1245,20 +1248,20 @@ function messageInfo($topic, $message)
 
 	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved
+		SELECT m.id_member, m.subject,' . ($topic_approved ? ' t.approved,' : 'm.approved,') . '
+			t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+		WHERE m.id_msg = {int:message_id}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 			AND m.approved = 1') . '
 			AND m.id_topic = {int:current_topic}
 		LIMIT 1',
 		array(
 			'current_topic' => $topic,
-			'split_at' => $message,
+			'message_id' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('cant_find_messages');
+
 	$messageInfo = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 

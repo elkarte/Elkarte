@@ -298,25 +298,13 @@ class Emailuser_Controller
 			fatal_lang_error('no_access', false);
 
 		// For compatibility, accept mid, but we should be using msg. (not the flavor kind!)
-		$_REQUEST['msg'] = empty($_REQUEST['msg']) ? (int) $_REQUEST['mid'] : (int) $_REQUEST['msg'];
+		$message_id = empty($_REQUEST['msg']) ? (int) $_REQUEST['mid'] : (int) $_REQUEST['msg'];
 
 		// Check the message's ID - don't want anyone reporting a post they can't even see!
-		$result = $smcFunc['db_query']('', '
-			SELECT m.id_msg, m.id_member, t.id_member_started
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-			WHERE m.id_msg = {int:id_msg}
-				AND m.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-				'id_msg' => $_REQUEST['msg'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($result) == 0)
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$message_info = messageInfo($topic, $current_msg);
+		if (empty($message_info ))
 			fatal_lang_error('no_board', false);
-		list ($_REQUEST['msg'], $member, $starter) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
 
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
@@ -358,7 +346,7 @@ class Emailuser_Controller
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
 		$context['start'] = $_REQUEST['start'];
-		$context['message_id'] = $_REQUEST['msg'];
+		$context['message_id'] = $message_id;
 
 		$context['page_title'] = $txt['report_to_mod'];
 		$context['sub_template'] = 'report';
