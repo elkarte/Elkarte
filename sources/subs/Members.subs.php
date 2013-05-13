@@ -654,19 +654,13 @@ function registerMember(&$regOptions, $return_errors = false)
 
 		// Check if this group is assignable.
 		$unassignableGroups = array(-1, 3);
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group
-			FROM {db_prefix}membergroups
-			WHERE min_posts != {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
-				OR group_type = {int:is_protected}'),
-			array(
-				'min_posts' => -1,
-				'is_protected' => 1,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$unassignableGroups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+
+		if (empty($context['membergroups']))
+			loadMemberGroups();
+
+		foreach ($context['membergroups'] as $group)
+			if ($group['min_posts'] != -1 && $group['group_type'] == 1)
+				$unassignableGroups[] = $group['id_group'];
 
 		if (in_array($regOptions['register_vars']['id_group'], $unassignableGroups))
 			$regOptions['register_vars']['id_group'] = 0;

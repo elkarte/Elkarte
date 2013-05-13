@@ -47,200 +47,243 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
-
 	switch ($type)
 	{
-	case 'member':
-		$changes = array(
-			'memberlist_updated' => time(),
-		);
+		case 'member':
+			updateMemberStats($parameter1, $parameter2);
+			break;
 
-		// #1 latest member ID, #2 the real name for a new registration.
-		if (is_numeric($parameter1))
-		{
-			$changes['latestMember'] = $parameter1;
-			$changes['latestRealName'] = $parameter2;
+		case 'message':
+			updateMessageStats($parameter1, $parameter2);
+			break;
 
-			updateSettings(array('totalMembers' => true), true);
-		}
+		case 'subject':
+			updateSubjectStats($parameter1, $parameter2);
+			break;
 
-		// We need to calculate the totals.
-		else
-		{
-			// Update the latest activated member (highest id_member) and count.
-			$result = $smcFunc['db_query']('', '
-				SELECT COUNT(*), MAX(id_member)
-				FROM {db_prefix}members
-				WHERE is_activated = {int:is_activated}',
-				array(
-					'is_activated' => 1,
-				)
-			);
-			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+		case 'topic':
+			updateTopicStats($parameter1, $parameter2);
+			break;
 
-			require_once(SUBSDIR . '/Members.subs.php');
-			// Get the latest activated member's display name.
-			$result = getBasicMemberData((int) $changes['latestMember']);
-			$changes['latestRealName'] = $result['real_name'];
-
-			// Are we using registration approval?
-			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
-			{
-				// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-				$result = $smcFunc['db_query']('', '
-					SELECT COUNT(*)
-					FROM {db_prefix}members
-					WHERE is_activated IN ({array_int:activation_status})',
-					array(
-						'activation_status' => array(3, 4),
-					)
-				);
-				list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
-			}
-		}
-
-		updateSettings($changes);
-		break;
-
-	case 'message':
-		if ($parameter1 === true && $parameter2 !== null)
-			updateSettings(array('totalMessages' => true, 'maxMsgID' => $parameter2), true);
-		else
-		{
-			// SUM and MAX on a smaller table is better for InnoDB tables.
-			$result = $smcFunc['db_query']('', '
-				SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
-				FROM {db_prefix}boards
-				WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-					AND id_board != {int:recycle_board}' : ''),
-				array(
-					'recycle_board' => isset($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
-					'blank_redirect' => '',
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
-
-			updateSettings(array(
-				'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
-				'maxMsgID' => $row['max_msg_id'] === null ? 0 : $row['max_msg_id']
-			));
-		}
-		break;
-
-	case 'subject':
-		// Remove the previous subject (if any).
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_search_subjects
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'id_topic' => (int) $parameter1,
-			)
-		);
-
-		// Insert the new subject.
-		if ($parameter2 !== null)
-		{
-			$parameter1 = (int) $parameter1;
-			$parameter2 = text2words($parameter2);
-
-			$inserts = array();
-			foreach ($parameter2 as $word)
-				$inserts[] = array($word, $parameter1);
-
-			if (!empty($inserts))
-				$smcFunc['db_insert']('ignore',
-					'{db_prefix}log_search_subjects',
-					array('word' => 'string', 'id_topic' => 'int'),
-					$inserts,
-					array('word', 'id_topic')
-				);
-		}
-		break;
-
-	case 'topic':
-		if ($parameter1 === true)
-			updateSettings(array('totalTopics' => true), true);
-		else
-		{
-			// Get the number of topics - a SUM is better for InnoDB tables.
-			// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-			$result = $smcFunc['db_query']('', '
-				SELECT SUM(num_topics + unapproved_topics) AS total_topics
-				FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				WHERE id_board != {int:recycle_board}' : ''),
-				array(
-					'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
-
-			updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
-		}
-		break;
-
-	case 'postgroups':
-		// Parameter two is the updated columns: we should check to see if we base groups off any of these.
-		if ($parameter2 !== null && !in_array('posts', $parameter2))
-			return;
-
-		$postgroups = cache_get_data('updateStats:postgroups', 360);
-		if ($postgroups === null || $parameter1 === null)
-		{
-			// Fetch the postgroups!
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, min_posts
-				FROM {db_prefix}membergroups
-				WHERE min_posts != {int:min_posts}',
-				array(
-					'min_posts' => -1,
-				)
-			);
-			$postgroups = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$postgroups[$row['id_group']] = $row['min_posts'];
-			$smcFunc['db_free_result']($request);
-
-			// Sort them this way because if it's done with MySQL it causes a filesort :(.
-			arsort($postgroups);
-
-			cache_put_data('updateStats:postgroups', $postgroups, 360);
-		}
-
-		// Oh great, they've screwed their post groups.
-		if (empty($postgroups))
-			return;
-
-		// Set all membergroups from most posts to least posts.
-		$conditions = '';
-		$lastMin = 0;
-		foreach ($postgroups as $id => $min_posts)
-		{
-			$conditions .= '
-					WHEN posts >= ' . $min_posts . (!empty($lastMin) ? ' AND posts <= ' . $lastMin : '') . ' THEN ' . $id;
-			$lastMin = $min_posts;
-		}
-
-		// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET id_post_group = CASE ' . $conditions . '
-					ELSE 0
-				END' . ($parameter1 != null ? '
-			WHERE ' . (is_array($parameter1) ? 'id_member IN ({array_int:members})' : 'id_member = {int:members}') : ''),
-			array(
-				'members' => $parameter1,
-			)
-		);
+		case 'postgroups':
+			updatePostGroupStats($parameter1, $parameter2);
 		break;
 
 		default:
 			trigger_error('updateStats(): Invalid statistic type \'' . $type . '\'', E_USER_NOTICE);
 	}
+}
+
+/**
+ * 
+ * @param int $member = null If not an integer reload from the database
+ * @param string $real_name = null
+ */
+function updateMemberStats($id_member = null, $real_name = null)
+{
+	global $smcFunc, $modSettings;
+
+	$changes = array(
+		'memberlist_updated' => time(),
+	);
+
+	// #1 latest member ID, #2 the real name for a new registration.
+	if (is_int($id_member))
+	{
+		$changes['latestMember'] = $id_member;
+		$changes['latestRealName'] = $real_name;
+
+		updateSettings(array('totalMembers' => true), true);
+	}
+
+	// We need to calculate the totals.
+	else
+	{
+		// Update the latest activated member (highest id_member) and count.
+		$result = $smcFunc['db_query']('', '
+			SELECT COUNT(*), MAX(id_member)
+			FROM {db_prefix}members
+			WHERE is_activated = {int:is_activated}',
+			array(
+				'is_activated' => 1,
+			)
+		);
+		list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
+		$smcFunc['db_free_result']($result);
+
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData((int) $changes['latestMember']);
+		$changes['latestRealName'] = $result['real_name'];
+
+		// Are we using registration approval?
+		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
+		{
+			// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
+			$result = $smcFunc['db_query']('', '
+				SELECT COUNT(*)
+				FROM {db_prefix}members
+				WHERE is_activated IN ({array_int:activation_status})',
+				array(
+					'activation_status' => array(3, 4),
+				)
+			);
+			list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+		}
+	}
+
+	updateSettings($changes);
+}
+
+/**
+ * 
+ * @param bool $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
+ * @param int $max_msg_id = null, Only used if $increment === true
+ */
+function updateMessageStats($increment = null, $max_msg_id = null)
+{
+	global $smcFunc, $modSettings;
+
+	if ($increment === true && $max_msg_id !== null)
+		updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
+	else
+	{
+		// SUM and MAX on a smaller table is better for InnoDB tables.
+		$result = $smcFunc['db_query']('', '
+			SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
+			FROM {db_prefix}boards
+			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+				AND id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => isset($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+				'blank_redirect' => '',
+			)
+		);
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
+
+		updateSettings(array(
+			'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
+			'maxMsgID' => $row['max_msg_id'] === null ? 0 : $row['max_msg_id']
+		));
+	}
+}
+
+function updateSubjectStats($id_topic, $subject = null)
+{
+	global $smcFunc;
+
+	// Remove the previous subject (if any).
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_search_subjects
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'id_topic' => (int) $id_topic,
+		)
+	);
+
+	// Insert the new subject.
+	if ($subject !== null)
+	{
+		$id_topic = (int) $id_topic;
+		$subject_words = text2words($subject);
+
+		$inserts = array();
+		foreach ($subject_words as $word)
+			$inserts[] = array($word, $id_topic);
+
+		if (!empty($inserts))
+			$smcFunc['db_insert']('ignore',
+				'{db_prefix}log_search_subjects',
+				array('word' => 'string', 'id_topic' => 'int'),
+				$inserts,
+				array('word', 'id_topic')
+			);
+	}
+}
+
+/**
+ * 
+ * @param bool $increment = null, If true, increment + 1 the total topics, otherwise recount all topics
+ */
+function updateTopicStats($increment = null)
+{
+	global $smcFunc, $modSettings;
+
+	if ($increment === true)
+		updateSettings(array('totalTopics' => true), true);
+	else
+	{
+		// Get the number of topics - a SUM is better for InnoDB tables.
+		// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
+		$result = $smcFunc['db_query']('', '
+			SELECT SUM(num_topics + unapproved_topics) AS total_topics
+			FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			WHERE id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+			)
+		);
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
+
+		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
+	}
+}
+
+/**
+ * 
+ * @todo wtf is the point in $parameter2 now or did I break something with the loadMemberGroups() commit?
+ * 
+ * @param array $members = null The members to update, null if all
+ * @param array $parameter2 = null
+ */
+function updatePostGroupStats($members = null, $parameter2)
+{
+	global $smcFunc, $context;
+
+	// Parameter two is the updated columns: we should check to see if we base groups off any of these.
+	if ($parameter2 !== null && !in_array('posts', $parameter2))
+		return;
+
+	if (empty($context['membergroups']))
+		loadMemberGroups();
+
+	$postgroups = array();
+	foreach ($context['membergroups'] as $group)
+		if ($group['min_posts'] != -1)
+			$postgroups[$group['id_group']] = $group['min_posts'];
+
+	arsort($postgroups);
+
+	// Oh great, they've screwed their post groups.
+	if (empty($postgroups))
+		return;
+
+	// Set all membergroups from most posts to least posts.
+	$conditions = '';
+	$lastMin = 0;
+	foreach ($postgroups as $id => $min_posts)
+	{
+		$conditions .= '
+				WHEN posts >= ' . $min_posts . (!empty($lastMin) ? ' AND posts <= ' . $lastMin : '') . ' THEN ' . $id;
+		$lastMin = $min_posts;
+	}
+
+	$members = is_array($members) ? $members : array($members);
+
+	// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}members
+		SET id_post_group = CASE ' . $conditions . '
+				ELSE 0
+			END' . ($members !== null ? '
+		WHERE id_member IN ({array_int:members})' : ''),
+		array(
+			'members' => $members,
+		)
+	);
 }
 
 /**
@@ -3265,102 +3308,35 @@ function template_css()
 
 /**
  * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
- * @todo this currently returns the hash if new, and the full filename otherwise.
- * Something messy like that.
- * @todo and of course everything relies on this behavior and work around it. :P.
- * Converters included.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- * @param $file_hash
+ * @param string $file_hash
+ * @param int $attachment_id
+ * @param string $filename = ''
+ * @param int $id_folder = null
+ * @return string The full path to the attachment
  */
-function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
+function getAttachmentFilename($file_hash, $attachment_id, $filename, $id_folder = null)
 {
-	global $modSettings, $smcFunc;
-
-	// Just make up a nice hash...
-	if ($new)
-		return sha1(md5($filename . time()) . mt_rand());
-
-	// Grab the file hash if it wasn't added.
-	// @todo: Locate all places that don't call a hash and fix that.
-	if ($file_hash === '')
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT file_hash
-			FROM {db_prefix}attachments
-			WHERE id_attach = {int:id_attach}',
-			array(
-				'id_attach' => $attachment_id,
-		));
-
-		if ($smcFunc['db_num_rows']($request) === 0)
-			return false;
-
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-	}
+	global $modSettings;
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
-		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
+	{
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		return getLegacyAttachmentFilename($filename, $attachment_id, $id_folder);
+	}
 
 	// Are we using multiple directories?
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['attachmentUploadDir'];
+		$path = isset($modSettings['attachmentUploadDir'][$id_folder]) ? $modSettings['attachmentUploadDir'][$id_folder] : $modSettings['attachmentUploadDir'];
 	}
 	else
 		$path = $modSettings['attachmentUploadDir'];
 
 	return $path . '/' . $attachment_id . '_' . $file_hash;
-}
-
-/**
- * Older attachments may still use this function.
- *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- */
-function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
-{
-	global $modSettings, $db_character_set;
-
-	$clean_name = $filename;
-
-	// Sorry, no spaces, dots, or anything else but letters allowed.
-	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
-
-	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
-	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
-
-	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
-		return $clean_name;
-	elseif ($new)
-		return $enc_name;
-
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = $modSettings['attachmentUploadDir'][$dir];
-	}
-	else
-		$path = $modSettings['attachmentUploadDir'];
-
-	if (file_exists($path . '/' . $enc_name))
-		$filename = $path . '/' . $enc_name;
-	else
-		$filename = $path . '/' . $clean_name;
-
-	return $filename;
 }
 
 /**

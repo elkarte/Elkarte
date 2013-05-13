@@ -27,15 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
-
-	// Most database systems have not set UTF-8 as their default input charset.
-	if (!empty($db_character_set))
-		$smcFunc['db_query']('set_character_set', '
-			SET NAMES ' . $db_character_set,
-			array(
-			)
-		);
+	global $modSettings, $smcFunc, $txt, $context;
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
@@ -66,6 +58,8 @@ function reloadSettings()
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('modSettings', $modSettings, 90);
 	}
+
+	$modSettings['recycle_board'] = empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']) ? 0 : $modSettings['recycle_board'];
 
 	// Set a list of common functions.
 	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
@@ -148,28 +142,7 @@ function reloadSettings()
 		date_default_timezone_set($modSettings['default_timezone']);
 
 	// Check the load averages?
-	if (!empty($modSettings['loadavg_enable']))
-	{
-		if (($modSettings['load_average'] = cache_get_data('loadavg', 90)) == null)
-		{
-			$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
-			if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			else
-				unset($modSettings['load_average']);
-
-			if (!empty($modSettings['load_average']))
-				cache_put_data('loadavg', $modSettings['load_average'], 90);
-		}
-
-		if (!empty($modSettings['load_average']))
-			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
-
-		if (!empty($modSettings['loadavg_forum']) && !empty($modSettings['load_average']) && $modSettings['load_average'] >= $modSettings['loadavg_forum'])
-			display_loadavg_error();
-	}
+	checkLoadAverage();
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
@@ -1480,19 +1453,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
 
 	// This determines the server... not used in many places, except for login fixing.
-	$context['server'] = array(
-		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
-	);
-
-	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+	detectServer();
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
@@ -1516,6 +1477,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'quotefast',
 		'spellcheck',
 	);
+
+	call_integration_hook('integrate_simple_actions', &$simpleActions);
 
 	// Output is fully XML, so no need for the index template.
 	if (isset($_REQUEST['xml']))
@@ -2156,16 +2119,6 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			}
 			$txt['emails'] = array();
 		}
-		if (!empty($birthdayEmails))
-		{
-			foreach ($birthdayEmails as $key => $value)
-			{
-				$txtBirthdayEmails[$key . '_subject'] = $value['subject'];
-				$txtBirthdayEmails[$key . '_body'] = $value['body'];
-				$txtBirthdayEmails[$key . '_author'] = $value['author'];
-			}
-			$birthdayEmails = array();
-		}
 	}
 
 	// Keep track of what we're up to soldier.
@@ -2190,6 +2143,10 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 function getBoardParents($id_parent)
 {
 	global $scripturl, $smcFunc;
+
+	// First level has no parents
+	if (empty($id_parent))
+		array();
 
 	// First check if we have this cached already.
 	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
@@ -2324,7 +2281,7 @@ function getLanguages($use_cache = true)
  */
 function censorText(&$text, $force = false)
 {
-	global $modSettings, $options, $settings, $txt;
+	global $modSettings, $options, $settings;
 	static $censor_vulgar = null, $censor_proper;
 
 	if ((!empty($options['show_no_censored']) && $settings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
@@ -2671,4 +2628,77 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
+}
+
+/**
+ * Get the server's load average
+ * 
+ * @param bool $force = false Force getting it from the cache
+ * @return float
+ */
+function getLoadAverage($force = false)
+{
+	if (!$force && ($load_average = cache_get_data('loadavg', 90)) == null)
+	{
+		$load_average = @file_get_contents('/proc/loadavg');
+		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
+			$load_average = (float) $matches[1];
+		elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+			$load_average = (float) $matches[1];
+		else
+			$load_average = null;
+
+		if (!empty($load_average))
+			cache_put_data('loadavg', $load_average, 90);
+	}
+
+	return $load_average;
+}
+
+/**
+ * Check that a server's load average isn't out of range, display an error if it is
+ * 
+ * @return bool false if it is out of range, true if it isn't
+ */
+function checkLoadAverage()
+{
+	global $modSettings;
+
+	if (!empty($modSettings['loadavg_enable']))
+	{
+		$modSettings['load_average'] = getLoadAverage();
+
+		if (!empty($modSettings['load_average']))
+			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
+
+		if (!empty($modSettings['loadavg_forum']) && !empty($modSettings['load_average']) && $modSettings['load_average'] >= $modSettings['loadavg_forum'])
+		{
+			display_loadavg_error();
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Get information about the server
+ */
+function detectServer()
+{
+	global $context;
+
+	$context['server'] = array(
+		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
+		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
+		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
+		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
+		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
+		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
+		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
+		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+	);
+
+	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
+	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
 }

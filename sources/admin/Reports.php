@@ -163,16 +163,13 @@ class Reports_Controller
 		$smcFunc['db_free_result']($request);
 
 		// Get all the possible membergroups!
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, online_color
-			FROM {db_prefix}membergroups',
-			array(
-			)
-		);
+		if (empty($context['membergroups']))
+			loadMemberGroups();
+
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$smcFunc['db_free_result']($request);
+
+		foreach ($context['membergroups'] as $group)
+			$groups[$row['id_group']] = empty($group['online_color']) ? $group['group_name'] : '<span style="color: ' . $group['online_color'] . '">' . $group['group_name'] . '</span>';
 
 		// All the fields we'll show.
 		$boardSettings = array(
@@ -722,16 +719,13 @@ class Reports_Controller
 			fatal_lang_error('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, online_color
-			FROM {db_prefix}membergroups',
-			array(
-			)
-		);
-		$groups = array(0 => $txt['full_member']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$smcFunc['db_free_result']($request);
+		if (empty($context['membergroups']))
+			loadMemberGroups();
+
+		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
+
+		foreach ($context['membergroups'] as $group)
+			$groups[$row['id_group']] = empty($group['online_color']) ? $group['group_name'] : '<span style="color: ' . $group['online_color'] . '">' . $group['group_name'] . '</span>';
 
 		// All the fields we'll show.
 		$staffSettings = array(
