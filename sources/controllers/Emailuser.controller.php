@@ -302,7 +302,7 @@ class Emailuser_Controller
 
 		// Check the message's ID - don't want anyone reporting a post they can't even see!
 		require_once(SUBSDIR . '/Topic.subs.php');
-		$message_info = messageInfo($topic, $current_msg);
+		$message_info = messageInfo($topic, $message_id);
 		if (empty($message_info ))
 			fatal_lang_error('no_board', false);
 
