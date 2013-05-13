@@ -59,7 +59,7 @@ function reloadSettings()
 			cache_put_data('modSettings', $modSettings, 90);
 	}
 
-	$modSettings['recycle_board'] = empty($modSettings['recycle_board']) ? 0 : $modSettings['recycle_board'];
+	$modSettings['recycle_board'] = empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']) ? 0 : $modSettings['recycle_board'];
 
 	// Set a list of common functions.
 	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
