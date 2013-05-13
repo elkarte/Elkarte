@@ -5,9 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
@@ -32,7 +30,7 @@ function db_extra_init()
 			'db_backup_table' => 'smf_db_backup_table',
 			'db_optimize_table' => 'smf_db_optimize_table',
 			'db_insert_sql' => 'elk_db_insert_sql',
-			'db_table_sql' => 'smf_db_table_sql',
+			'db_table_sql' => 'elk_db_table_sql',
 			'db_list_tables' => 'smf_db_list_tables',
 			'db_get_backup' => 'smf_db_get_backup',
 			'db_get_version' => 'smf_db_get_version',
@@ -202,135 +200,22 @@ function smf_db_list_tables($db = false, $filter = false)
  */
 function elk_db_insert_sql($tableName, $new_table = false)
 {
-	global $smcFunc, $db_prefix;
-	static $start = 0, $num_rows, $fields, $limit;
+	global $db;
 
-	if ($new_table)
-	{
-		$limit = strstr($tableName, 'log_') !== false ? 500 : 250;
-		$start = 0;
-	}
-
-	$data = '';
-	$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
-
-	// This will be handy...
-	$crlf = "\r\n";
-
-	$result = $smcFunc['db_query']('', '
-		SELECT *
-		FROM ' . $tableName . '
-		LIMIT ' . $start . ', ' . $limit,
-		array(
-			'security_override' => true,
-		)
-	);
-
-	// The number of rows, just for record keeping and breaking INSERTs up.
-	$num_rows = $smcFunc['db_num_rows']($result);
-
-	if ($num_rows == 0)
-		return '';
-
-	if ($new_table)
-	{
-		$fields = array_keys($smcFunc['db_fetch_assoc']($result));
-
-		// SQLite fetches an array so we need to filter out the numberic index for the columns.
-		foreach ($fields as $key => $name)
-			if (is_numeric($name))
-				unset($fields[$key]);
-
-		$smcFunc['db_data_seek']($result, 0);
-	}
-
-	// Start it off with the basic INSERT INTO.
-	$data = 'BEGIN TRANSACTION;' . $crlf;
-	$insert_msg = $crlf . 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
-
-	// Loop through each row.
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-	{
-		// Get the fields in this row...
-		$field_list = array();
-
-		foreach ($row as $key => $item)
-		{
-			// Try to figure out the type of each field. (NULL, number, or 'string'.)
-			if (!isset($item))
-				$field_list[] = 'NULL';
-			elseif (is_numeric($item) && (int) $item == $item)
-				$field_list[] = $item;
-			else
-				$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
-		}
-
-		// 'Insert' the data.
-		$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
-	}
-	$smcFunc['db_free_result']($result);
-
-	$data .= $crlf;
-
-	$start += $limit;
-
-	return $data;
+	return $db->insert_sql($tableName, $new_table);
 }
 
 /**
  * Dumps the schema (CREATE) for a table.
- * @todo why is this needed for?
+ *
  * @param string $tableName - the table
  * @return string - the CREATE statement as string
  */
-function smf_db_table_sql($tableName)
+function elk_db_table_sql($tableName)
 {
-	global $smcFunc, $db_prefix;
+	global $db;
 
-	$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
-
-	// This will be needed...
-	$crlf = "\r\n";
-
-	// Start the create table...
-	$schema_create = '';
-	$index_create = '';
-
-	// Let's get the create statement directly from SQLite.
-	$result = $smcFunc['db_query']('', '
-		SELECT sql
-		FROM sqlite_master
-		WHERE type = {string:type}
-			AND name = {string:table_name}',
-		array(
-			'type' => 'table',
-			'table_name' => $tableName,
-		)
-	);
-	list ($schema_create) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
-
-	// Now the indexes.
-	$result = $smcFunc['db_query']('', '
-		SELECT sql
-		FROM sqlite_master
-		WHERE type = {string:type}
-			AND tbl_name = {string:table_name}',
-		array(
-			'type' => 'index',
-			'table_name' => $tableName,
-		)
-	);
-	$indexes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-		if (trim($row['sql']) != '')
-			$indexes[] = $row['sql'];
-	$smcFunc['db_free_result']($result);
-
-	$index_create .= implode(';' . $crlf, $indexes);
-	$schema_create = empty($indexes) ? rtrim($schema_create) : $schema_create . ';' . $crlf . $crlf;
-
-	return $schema_create . $index_create;
+	return $db->db_table_sql($tableName);
 }
 
 /**

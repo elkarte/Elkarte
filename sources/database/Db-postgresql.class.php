@@ -891,6 +891,189 @@ class Database_PostgreSQL
 	}
 
 	/**
+	 * Gets all the necessary INSERTs for the table named table_name.
+	 * It goes in 250 row segments.
+	 *
+	 * @param string $tableName - the table to create the inserts for.
+	 * @param bool new_table
+	 * @return string the query to insert the data back in, or an empty string if the table was empty.
+	 */
+	function insert_sql($tableName, $new_table = false)
+	{
+		global $smcFunc, $db_prefix;
+		static $start = 0, $num_rows, $fields, $limit;
+
+		if ($new_table)
+		{
+			$limit = strstr($tableName, 'log_') !== false ? 500 : 250;
+			$start = 0;
+		}
+
+		$data = '';
+		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+
+		// This will be handy...
+		$crlf = "\r\n";
+
+		$result = $smcFunc['db_query']('', '
+			SELECT *
+			FROM ' . $tableName . '
+			LIMIT ' . $start . ', ' . $limit,
+			array(
+				'security_override' => true,
+			)
+		);
+
+		// The number of rows, just for record keeping and breaking INSERTs up.
+		$num_rows = $smcFunc['db_num_rows']($result);
+
+		if ($num_rows == 0)
+			return '';
+
+		if ($new_table)
+		{
+			$fields = array_keys($smcFunc['db_fetch_assoc']($result));
+			$smcFunc['db_data_seek']($result, 0);
+		}
+
+		// Start it off with the basic INSERT INTO.
+		$data = '';
+		$insert_msg = $crlf . 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
+
+		// Loop through each row.
+		while ($row = $smcFunc['db_fetch_assoc']($result))
+		{
+			// Get the fields in this row...
+			$field_list = array();
+
+			foreach ($row as $key => $item)
+			{
+				// Try to figure out the type of each field. (NULL, number, or 'string'.)
+				if (!isset($item))
+					$field_list[] = 'NULL';
+				elseif (is_numeric($item) && (int) $item == $item)
+					$field_list[] = $item;
+				else
+					$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+			}
+
+			// 'Insert' the data.
+			$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
+		}
+		$smcFunc['db_free_result']($result);
+
+		$data .= $crlf;
+
+		$start += $limit;
+
+		return $data;
+	}
+
+	/**
+	 * Dumps the schema (CREATE) for a table.
+	 *
+	 * @param string $tableName - the table
+	 * @return string - the CREATE statement as string
+	 */
+	function db_table_sql($tableName)
+	{
+		global $smcFunc, $db_prefix;
+
+		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+
+		// This will be needed...
+		$crlf = "\r\n";
+
+		// Start the create table...
+		$schema_create = 'CREATE TABLE ' . $tableName . ' (' . $crlf;
+		$index_create = '';
+		$seq_create = '';
+
+		// Find all the fields.
+		$result = $smcFunc['db_query']('', '
+			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
+			FROM information_schema.columns
+			WHERE table_name = {string:table}
+			ORDER BY ordinal_position',
+			array(
+				'table' => $tableName,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($result))
+		{
+			if ($row['data_type'] == 'character varying')
+				$row['data_type'] = 'varchar';
+			elseif ($row['data_type'] == 'character')
+				$row['data_type'] = 'char';
+			if ($row['character_maximum_length'])
+				$row['data_type'] .= '(' . $row['character_maximum_length'] . ')';
+
+			// Make the CREATE for this column.
+			$schema_create .= ' "' . $row['column_name'] . '" ' . $row['data_type'] . ($row['is_nullable'] != 'YES' ? ' NOT NULL' : '');
+
+			// Add a default...?
+			if (trim($row['column_default']) != '')
+			{
+				$schema_create .= ' default ' . $row['column_default'] . '';
+
+				// Auto increment?
+				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)
+				{
+					// Get to find the next variable first!
+					$count_req = $smcFunc['db_query']('', '
+						SELECT MAX("{raw:column}")
+						FROM {raw:table}',
+						array(
+							'column' => $row['column_name'],
+							'table' => $tableName,
+						)
+					);
+					list ($max_ind) = $smcFunc['db_fetch_row']($count_req);
+					$smcFunc['db_free_result']($count_req);
+					// Get the right bloody start!
+					$seq_create .= 'CREATE SEQUENCE ' . $matches[1] . ' START WITH ' . ($max_ind + 1) . ';' . $crlf . $crlf;
+				}
+			}
+
+			$schema_create .= ',' . $crlf;
+		}
+		$smcFunc['db_free_result']($result);
+
+		// Take off the last comma.
+		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
+
+		$result = $smcFunc['db_query']('', '
+			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
+			FROM pg_class AS c
+				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
+				INNER JOIN pg_class AS c2 ON (c2.oid = i.indexrelid)
+			WHERE c.relname = {string:table}',
+			array(
+				'table' => $tableName,
+			)
+		);
+		$indexes = array();
+		while ($row = $smcFunc['db_fetch_assoc']($result))
+		{
+			if ($row['is_primary'])
+			{
+				if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
+					continue;
+
+				$index_create .= $crlf . 'ALTER TABLE ' . $tableName . ' ADD PRIMARY KEY ("' . $matches[1] . '");';
+			}
+			else
+				$index_create .= $crlf . $row['inddef'] . ';';
+		}
+		$smcFunc['db_free_result']($result);
+
+		// Finish it off!
+		$schema_create .= $crlf . ');';
+
+		return $seq_create . $schema_create . $index_create;
+	}
+
+	/**
 	 * Returns a reference to the existing instance
 	 */
 	static function db()

@@ -31,7 +31,8 @@ if (!defined('ELKARTE'))
  */
 function DumpDatabase2()
 {
-	global $db_name, $scripturl, $context, $modSettings, $crlf, $smcFunc, $db_prefix, $db_show_debug;
+	global $db_name, $scripturl, $context, $modSettings, $crlf;
+	global $smcFunc, $db, $db_prefix, $db_show_debug;
 
 	// Administrators only!
 	if (!allowedTo('admin_forum'))
@@ -165,7 +166,7 @@ function DumpDatabase2()
 		$close_table = false;
 
 		// Are there any rows in this table?
-		while ($get_rows = $smcFunc['db_insert_sql']($tableName, $first_round))
+		while ($get_rows = $db->insert_sql($tableName, $first_round))
 		{
 			if (empty($get_rows))
 				break;
