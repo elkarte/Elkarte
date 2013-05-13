@@ -32,7 +32,7 @@ function db_extra_init()
 			'db_insert_sql' => 'elk_db_insert_sql',
 			'db_table_sql' => 'elk_db_table_sql',
 			'db_list_tables' => 'elk_db_list_tables',
-			'db_get_version' => 'smf_db_get_version',
+			'db_get_version' => 'elk_db_get_version',
 		);
 }
 
@@ -108,19 +108,12 @@ function elk_db_table_sql($tableName)
 
 /**
  *  Get the version number.
+ *
  *  @return string - the version
  */
-function smf_db_get_version()
+function elk_db_get_version()
 {
-	global $smcFunc;
+	global $db;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT VERSION()',
-		array(
-		)
-	);
-	list ($ver) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $ver;
+	return $db->db_get_version();
 }

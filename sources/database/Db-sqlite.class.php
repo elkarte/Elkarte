@@ -69,6 +69,13 @@ class Database_SQLite
 				'db_sybase' => true,
 				'db_case_sensitive' => true,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
+				'db_backup_table' => 'elk_db_backup_table',
+				'db_optimize_table' => 'elk_db_optimize_table',
+				'db_insert_sql' => 'elk_db_insert_sql',
+				'db_table_sql' => 'elk_db_table_sql',
+				'db_list_tables' => 'elk_db_list_tables',
+				'db_get_backup' => 'elk_db_get_backup',
+				'db_get_version' => 'elk_db_get_version',
 			);
 
 		if (substr($db_name, -3) != '.db')
@@ -1175,32 +1182,41 @@ class Database_SQLite
 		return $request;
 	}
 
-/**
- * Simply return the database - and die!
- * Used by DumpDatabase.php.
- */
-function db_get_backup()
-{
-	global $db_name;
+	/**
+	 * Simply return the database - and die!
+	 * Used by DumpDatabase.php.
+	 */
+	function db_get_backup()
+	{
+		global $db_name;
 
-	$db_file = substr($db_name, -3) === '.db' ? $db_name : $db_name . '.db';
+		$db_file = substr($db_name, -3) === '.db' ? $db_name : $db_name . '.db';
 
-	// Add more info if zipped...
-	$ext = '';
-	if (isset($_REQUEST['compress']) && function_exists('gzencode'))
-		$ext = '.gz';
+		// Add more info if zipped...
+		$ext = '';
+		if (isset($_REQUEST['compress']) && function_exists('gzencode'))
+			$ext = '.gz';
 
-	// Do the remaining headers.
-	header('Content-Disposition: attachment; filename="' . $db_file . $ext . '"');
-	header('Cache-Control: private');
-	header('Connection: close');
+		// Do the remaining headers.
+		header('Content-Disposition: attachment; filename="' . $db_file . $ext . '"');
+		header('Cache-Control: private');
+		header('Connection: close');
 
-	// Literally dump the contents.  Try reading the file first.
-	if (@readfile($db_file) == null)
-		echo file_get_contents($db_file);
+		// Literally dump the contents.  Try reading the file first.
+		if (@readfile($db_file) == null)
+			echo file_get_contents($db_file);
 
-	obExit(false);
-}
+		obExit(false);
+	}
+
+	/**
+	 *  Get the version number.
+	 *  @return string - the version
+	 */
+	function db_get_version()
+	{
+		return sqlite_libversion();
+	}
 
 	/**
 	 * Returns a reference to the existing instance

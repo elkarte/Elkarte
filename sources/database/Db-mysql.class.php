@@ -68,6 +68,12 @@ class Database_MySQL extends Database
 				'db_sybase' => false,
 				'db_case_sensitive' => false,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
+				'db_backup_table' => 'elk_db_backup_table',
+				'db_optimize_table' => 'elk_db_optimize_table',
+				'db_insert_sql' => 'elk_db_insert_sql',
+				'db_table_sql' => 'elk_db_table_sql',
+				'db_list_tables' => 'elk_db_list_tables',
+				'db_get_version' => 'elk_db_get_version',
 			);
 
 		if (!empty($db_options['persist']))
@@ -1039,6 +1045,7 @@ class Database_MySQL extends Database
 
 	/**
 	 * This function optimizes a table.
+	 *
 	 * @param string $table - the table to be optimized
 	 * @return how much it was gained
 	 */
@@ -1215,6 +1222,26 @@ class Database_MySQL extends Database
 		}
 
 		return $request;
+	}
+
+	/**
+	 *  Get the version number.
+	 *
+	 *  @return string - the version
+	 */
+	function db_get_version()
+	{
+		global $smcFunc;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT VERSION()',
+			array(
+			)
+		);
+		list ($ver) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		return $ver;
 	}
 
 	/**

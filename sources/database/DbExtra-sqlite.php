@@ -29,7 +29,7 @@ function db_extra_init()
 			'db_table_sql' => 'elk_db_table_sql',
 			'db_list_tables' => 'elk_db_list_tables',
 			'db_get_backup' => 'elk_db_get_backup',
-			'db_get_version' => 'smf_db_get_version',
+			'db_get_version' => 'elk_db_get_version',
 		);
 }
 
@@ -107,9 +107,11 @@ function elk_db_table_sql($tableName)
  *  Get the version number.
  *  @return string - the version
  */
-function smf_db_get_version()
+function elk_db_get_version()
 {
-	return sqlite_libversion();
+	global $db;
+
+	return $db->db_get_version();
 }
 
 /**
