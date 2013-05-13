@@ -3311,25 +3311,6 @@ function getAttachmentFilename($file_hash, $attachment_id, $filename, $id_folder
 {
 	global $modSettings, $smcFunc;
 
-	// Grab the file hash if it wasn't added.
-	// @todo: Locate all places that don't call a hash and fix that.
-	if ($file_hash === '')
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT file_hash
-			FROM {db_prefix}attachments
-			WHERE id_attach = {int:id_attach}',
-			array(
-				'id_attach' => (int) $attachment_id,
-		));
-
-		if ($smcFunc['db_num_rows']($request) === 0)
-			return false;
-
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-	}
-
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
 	{
