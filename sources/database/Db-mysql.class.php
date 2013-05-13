@@ -1014,24 +1014,24 @@ class Database_MySQL extends Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param mixed $db string holding the table name, or false, default false
+	 * @param mixed $db_name_str string holding the database name, or false, default false
 	 * @param mixed $filter string to filter by, or false, default false
 	 * @return array, an array of table names. (strings)
 	 */
-	function db_list_tables($db = false, $filter = false)
+	function db_list_tables($db_name_str = false, $filter = false)
 	{
 		global $db_name, $smcFunc;
 
-		$db = $db == false ? $db_name : $db;
-		$db = trim($db);
+		$db_name_str = $db_name_str == false ? $db_name : $db_name_str;
+		$db_name_str = trim($db_name_str);
 		$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
 
 		$request = $smcFunc['db_query']('', '
 			SHOW TABLES
-			FROM `{raw:db}`
+			FROM `{raw:db_name_str}`
 			{raw:filter}',
 			array(
-				'db' => $db[0] == '`' ? strtr($db, array('`' => '')) : $db,
+				'db_name_str' => $db_name_str[0] == '`' ? strtr($db_name_str, array('`' => '')) : $db_name_str,
 				'filter' => $filter,
 			)
 		);

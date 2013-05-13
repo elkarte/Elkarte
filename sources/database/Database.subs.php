@@ -44,10 +44,6 @@ function db_extend ($type = 'extra')
 	// $type = 'search' is now handled by classes
 	if ($type == 'search')
 	{
-		$db_extend_class = 'Db' . strtoupper($type[0]) . substr($type, 1) . '_' . $db_type;
-		$db_extend = new $db_extend_class();
-		$db_extend->initialize();
-
 		// Bah. Quick 'n dirty :P
 		if ($db_type == 'mysql')
 			$db_search = new DbSearch_MySQL();
@@ -55,10 +51,16 @@ function db_extend ($type = 'extra')
 			$db_search = new DbSearch_PostgreSQL();
 		elseif ($db_type == 'sqlite')
 			$db_search = new DbSearch_SQLite();
+
+		$db_search->initialize();
+	}
+	elseif ($type == 'extra')
+	{
+		// Nothing... :P
 	}
 	else
 	{
-		// packages, extra
+		// packages
 		$initFunc = 'db_' . $type . '_init';
 		$initFunc();
 	}
