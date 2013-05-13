@@ -27,20 +27,20 @@ function db_packages_init()
 {
 	global $smcFunc, $reservedTables, $db_package_log, $db_prefix;
 
-	if (!isset($smcFunc['db_create_table']) || $smcFunc['db_create_table'] != 'smf_db_create_table')
+	if (!isset($smcFunc['db_create_table']) || $smcFunc['db_create_table'] != 'elk_db_create_table')
 	{
 		$smcFunc += array(
-			'db_add_column' => 'smf_db_add_column',
-			'db_add_index' => 'smf_db_add_index',
-			'db_calculate_type' => 'smf_db_calculate_type',
-			'db_change_column' => 'smf_db_change_column',
-			'db_create_table' => 'smf_db_create_table',
-			'db_drop_table' => 'smf_db_drop_table',
-			'db_table_structure' => 'smf_db_table_structure',
-			'db_list_columns' => 'smf_db_list_columns',
-			'db_list_indexes' => 'smf_db_list_indexes',
-			'db_remove_column' => 'smf_db_remove_column',
-			'db_remove_index' => 'smf_db_remove_index',
+			'db_add_column' => 'elk_db_add_column',
+			'db_add_index' => 'elk_db_add_index',
+			'db_calculate_type' => 'elk_db_calculate_type',
+			'db_change_column' => 'elk_db_change_column',
+			'db_create_table' => 'elk_db_create_table',
+			'db_drop_table' => 'elk_db_drop_table',
+			'db_table_structure' => 'elk_db_table_structure',
+			'db_list_columns' => 'elk_db_list_columns',
+			'db_list_indexes' => 'elk_db_list_indexes',
+			'db_remove_column' => 'elk_db_remove_column',
+			'db_remove_index' => 'elk_db_remove_index',
 		);
 		$db_package_log = array();
 	}
@@ -94,7 +94,7 @@ function db_packages_init()
  * @param string $if_exists default 'ignore'
  * @param string $error default 'fatal'
  */
-function smf_db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+function elk_db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 {
 	global $reservedTables, $smcFunc, $db_package_log, $db_prefix;
 
@@ -202,7 +202,7 @@ function smf_db_create_table($table_name, $columns, $indexes = array(), $paramet
  * @param array $parameters default array()
  * @param string $error default 'fatal'
  */
-function smf_db_drop_table($table_name, $parameters = array(), $error = 'fatal')
+function elk_db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 {
 	global $reservedTables, $smcFunc, $db_prefix;
 
@@ -261,7 +261,7 @@ function smf_db_drop_table($table_name, $parameters = array(), $error = 'fatal')
  * @param string $if_exists default 'update'
  * @param string $error default 'fatal'
  */
-function smf_db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+function elk_db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 {
 	global $smcFunc, $db_package_log, $txt, $db_prefix;
 
@@ -315,7 +315,7 @@ function smf_db_add_column($table_name, $column_info, $parameters = array(), $if
  * @param array $parameters default array()
  * @param string $error default 'fatal'
  */
-function smf_db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
+function elk_db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 {
 	global $smcFunc, $db_prefix;
 
@@ -359,7 +359,7 @@ function smf_db_remove_column($table_name, $column_name, $parameters = array(), 
  * @param array $parameters default array()
  * @param string $error default 'fatal'
  */
-function smf_db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
+function elk_db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 {
 	global $smcFunc, $db_prefix;
 
@@ -516,7 +516,7 @@ function smf_db_change_column($table_name, $old_column, $column_info, $parameter
  * @param string $if_exists default 'update'
  * @param string $error default 'fatal'
  */
-function smf_db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+function elk_db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 {
 	global $smcFunc, $db_package_log, $db_prefix;
 
@@ -587,7 +587,7 @@ function smf_db_add_index($table_name, $index_info, $parameters = array(), $if_e
  * @param array$parameters default array()
  * @param string $error default 'fatal'
  */
-function smf_db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
+function elk_db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 {
 	global $smcFunc, $db_prefix;
 
@@ -639,7 +639,7 @@ function smf_db_remove_index($table_name, $index_name, $parameters = array(), $e
  * @param $type_size
  * @param $reverse
  */
-function smf_db_calculate_type($type_name, $type_size = null, $reverse = false)
+function elk_db_calculate_type($type_name, $type_size = null, $reverse = false)
 {
 	// Let's be sure it's lowercase MySQL likes both, others no.
 	$type_name = strtolower($type_name);
@@ -685,7 +685,7 @@ function smf_db_calculate_type($type_name, $type_size = null, $reverse = false)
  * @param string $table_name
  * @param array $parameters default array()
  */
-function smf_db_table_structure($table_name, $parameters = array())
+function elk_db_table_structure($table_name, $parameters = array())
 {
 	global $smcFunc, $db_prefix;
 
@@ -706,7 +706,7 @@ function smf_db_table_structure($table_name, $parameters = array())
  * @param array $parameters default array()
  * @return mixed
  */
-function smf_db_list_columns($table_name, $detail = false, $parameters = array())
+function elk_db_list_columns($table_name, $detail = false, $parameters = array())
 {
 	global $smcFunc, $db_prefix;
 
@@ -768,7 +768,7 @@ function smf_db_list_columns($table_name, $detail = false, $parameters = array()
  * @param array $parameters
  * @return mixed
  */
-function smf_db_list_indexes($table_name, $detail = false, $parameters = array())
+function elk_db_list_indexes($table_name, $detail = false, $parameters = array())
 {
 	global $smcFunc, $db_prefix;
 

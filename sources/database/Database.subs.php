@@ -13,7 +13,7 @@
  */
 
 /**
- *  Initialize database classes and connection.
+ * Initialize database classes and connection.
  *
  * @param string $db_server
  * @param string $db_name
@@ -94,4 +94,19 @@ function database()
 		$db = Database_SQLite::db();
 
 	return $db;
+}
+
+function db_table()
+{
+	$tbl = null;
+
+	// quick 'n dirty retrieval
+	if ($db_type == 'mysql')
+		$tbl = DbTable_MySQL::db_table();
+	elseif ($db_type == 'postgresql')
+		$tbl = DbTable_PostgreSQL::db_table();
+	elseif ($db_type == 'sqlite')
+		$tbl = DbTable_SQLite::db_table();
+
+	return $tbl;
 }
