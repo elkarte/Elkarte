@@ -17,20 +17,6 @@ if (!defined('ELKARTE'))
 abstract class Database
 {
 	/**
-	 *  Maps the implementations in the legacy subs file (smf_db_function_name)
-	 *  to the $smcFunc['db_function_name'] variable.
-	 *
-	 * @param string $db_server
-	 * @param string $db_name
-	 * @param string $db_user
-	 * @param string $db_passwd
-	 * @param string $db_prefix
-	 * @param array $db_options
-	 * @return null
-	 */
-	abstract function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
-
-	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
 	 *
 	 * @param string &db_prefix

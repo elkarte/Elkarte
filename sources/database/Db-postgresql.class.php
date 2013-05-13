@@ -22,12 +22,9 @@ class Database_PostgreSQL extends Database
 {
 	private static $_db = null;
 
-	function __construct()
+	private function __construct()
 	{
-		// make this thing
-
-		// initialize the instance.
-		self::$_db = $this;
+		// Objects should be created through initiate().
 	}
 
 	/**
@@ -43,7 +40,7 @@ class Database_PostgreSQL extends Database
 	 * @param type $db_options
 	 * @return null
 	 */
-	function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
+	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode;
 
@@ -96,6 +93,9 @@ class Database_PostgreSQL extends Database
 				display_db_error();
 			}
 		}
+
+		// initialize the instance.
+		self::$_db = new self();
 
 		return $connection;
 	}

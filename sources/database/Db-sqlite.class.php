@@ -22,12 +22,9 @@ class Database_SQLite extends Database
 {
 	private static $_db = null;
 
-	function __construct()
+	private function __construct()
 	{
-		// make this thing
-
-		// initialize the instance.
-		self::$_db = $this;
+		// Objects should be created through initiate().
 	}
 
 	/**
@@ -41,7 +38,7 @@ class Database_SQLite extends Database
 	 * @param string $db_prefix
 	 * @param array $db_options
 	 */
-	function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $smcFunc, $mysql_set_mode, $db_in_transact, $sqlite_error;
 
@@ -110,6 +107,9 @@ class Database_SQLite extends Database
 		sqlite_create_function($connection, 'concat', 'elk_udf_concat');
 		sqlite_create_function($connection, 'locate', 'elk_udf_locate', 2);
 		sqlite_create_function($connection, 'regexp', 'elk_udf_regexp', 2);
+
+		// initialize the instance.
+		self::$_db = new self();
 
 		return $connection;
 	}

@@ -33,13 +33,12 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 
 	// quick 'n dirty initialization of the right database class.
 	if ($db_type == 'mysql')
-		$db = new Database_MySQL();
+		return Database_MySQL::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	elseif ($db_type == 'postgresql')
-		$db = new Database_PostgreSQL();
+		return Database_PostgreSQL::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	elseif ($db_type == 'sqlite')
-		$db = new Database_SQLite();
+		return Database_SQLite::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 
-	return $db->initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
 }
 
 /**
