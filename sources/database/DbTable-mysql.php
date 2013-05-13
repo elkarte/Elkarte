@@ -41,9 +41,6 @@ function db_packages_init()
 		'themes', 'topics');
 	foreach ($reservedTables as $k => $table_name)
 		$reservedTables[$k] = strtolower($db_prefix . $table_name);
-
-	// We in turn may need the extra stuff.
-	db_extend('extra');
 }
 
 class DbTable_MySQL extends DbTable
@@ -99,8 +96,11 @@ class DbTable_MySQL extends DbTable
 		// Log that we'll want to remove this on uninstall.
 		$db_package_log[] = array('remove_table', $table_name);
 
+		// Grab ourselves one o'these.
+		$db = database();
+
 		// Slightly easier on MySQL than the others...
-		$tables = $smcFunc['db_list_tables']();
+		$tables = $db->db_list_tables();
 		if (in_array($full_table_name, $tables))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
@@ -167,8 +167,11 @@ class DbTable_MySQL extends DbTable
 		if (in_array(strtolower($table_name), $reservedTables))
 			return false;
 
+		// working hard with the db!
+		$db = database();
+
 		// Does it exist?
-		if (in_array($full_table_name, $smcFunc['db_list_tables']()))
+		if (in_array($full_table_name, $db->db_list_tables()))
 		{
 			$query = 'DROP TABLE ' . $table_name;
 			$smcFunc['db_query']('',
