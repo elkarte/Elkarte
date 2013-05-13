@@ -489,7 +489,8 @@ class Database_PostgreSQL
 	}
 
 	/**
-	 * affected_rows
+	 * Affected rows from previous operation.
+	 *
 	 * @param string $result
 	 */
 	function affected_rows($result = null)
@@ -505,7 +506,7 @@ class Database_PostgreSQL
 	}
 
 	/**
-	 * insert_id
+	 * Last inserted id.
 	 *
 	 * @param string $table
 	 * @param string $field = null

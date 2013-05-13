@@ -407,7 +407,8 @@ class Database_MySQL extends Database
 	}
 
 	/**
-	 * affected_rows
+	 * Affected rows from previous operation.
+	 *
 	 * @param resource $connection
 	 */
 	function affected_rows($connection = null)
@@ -418,7 +419,7 @@ class Database_MySQL extends Database
 	}
 
 	/**
-	 * insert_id
+	 * Last inserted id.
 	 *
 	 * @param string $table
 	 * @param string $field = null

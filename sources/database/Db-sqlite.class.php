@@ -415,7 +415,7 @@ class Database_SQLite
 	}
 
 	/**
-	 * affected_rows
+	 * Affected rows from previous operation.
 	 *
 	 * @param resource $connection
 	 */
@@ -427,7 +427,7 @@ class Database_SQLite
 	}
 
 	/**
-	 * insert_id
+	 * Last inserted id.
 	 *
 	 * @param string $table
 	 * @param string $field = null
@@ -444,7 +444,7 @@ class Database_SQLite
 	}
 
 	/**
-	 * Last error on SQLite
+	 * Last error on SQLite.
 	 */
 	function last_error()
 	{
