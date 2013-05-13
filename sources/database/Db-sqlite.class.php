@@ -1183,7 +1183,8 @@ class Database_SQLite extends Database
 	}
 
 	/**
-	 * Simply return the database - and die!
+	 * Simply return the database - and die.
+	 * Only needed for SQLite.
 	 * Used by DumpDatabase.php.
 	 */
 	function db_get_backup()

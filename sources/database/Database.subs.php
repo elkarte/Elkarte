@@ -66,16 +66,13 @@ function db_extend ($type = 'extra')
 
 		$db_search->initialize();
 	}
-	elseif ($type == 'extra')
+	elseif ($type == 'packages')
 	{
-		// Nothing... :P
-	}
-	else
-	{
-		// packages... make sure the compatibility initialization
-		// (of $smcFunc) is called at least once.
+		// packages... lets make sure the initialization of $smcFunc
+		// (for backwards compatibility) is called at least once.
 		db_table();
 	}
+	// Otherwise, for 'extra' we have loaded the file, so bye.
 }
 
 /**
