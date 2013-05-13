@@ -924,7 +924,7 @@ class ManageAttachments_Controller
 						// If we are repairing remove the file from disk now.
 						if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
 						{
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 							@unlink($filename);
 						}
 					}
@@ -1034,7 +1034,7 @@ class ManageAttachments_Controller
 					if ($row['attachment_type'] == 1)
 						$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
 					else
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 
 					// File doesn't exist?
 					if (!file_exists($filename))
@@ -1153,7 +1153,7 @@ class ManageAttachments_Controller
 						if ($row['attachment_type'] == 1)
 							$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
 						else
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 						@unlink($filename);
 					}
 				}
@@ -1221,7 +1221,7 @@ class ManageAttachments_Controller
 					// If we are repairing remove the file from disk now.
 					if ($fix_errors && in_array('attachment_no_msg', $to_fix))
 					{
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 						@unlink($filename);
 					}
 				}
@@ -2030,7 +2030,7 @@ class ManageAttachments_Controller
 						}
 					}
 
-					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
 
 					if (@rename($source, $dest))

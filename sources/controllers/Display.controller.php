@@ -1254,7 +1254,8 @@ function loadAttachmentContext($id_msg)
 							$thumb_mime = 'image/' . $thumb_ext;
 
 						$thumb_filename = $attachment['filename'] . '_thumb';
-						$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
+						require_once(SUBSDIR . '/Attachments.subs.php');
+						$thumb_hash = getAttachmentFileHash($thumb_filename);
 
 						// Add this beauty to the database.
 						$smcFunc['db_insert']('',
@@ -1277,7 +1278,7 @@ function loadAttachmentContext($id_msg)
 								)
 							);
 
-							$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
+							$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, $thumb_hash);
 							rename($filename . '_thumb', $thumb_realname);
 
 							// Do we need to remove an old thumbnail?

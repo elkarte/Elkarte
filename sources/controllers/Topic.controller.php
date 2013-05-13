@@ -446,7 +446,7 @@ class Topic_Controller
 						}
 					}
 
-					$row['filename'] = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$row['filename'] = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 
 					// save for the template
 					$context['printattach'][$row['id_msg']][] = $row;

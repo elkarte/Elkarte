@@ -730,7 +730,7 @@ function createAttachment(&$attachmentOptions)
 
 	// Get the hash if no hash has been given yet.
 	if (empty($attachmentOptions['file_hash']))
-		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], false, null, true);
+		$attachmentOptions['file_hash'] = getAttachmentFileHash($attachmentOptions['name']);
 
 	// Assuming no-one set the extension let's take a look at it.
 	if (empty($attachmentOptions['fileext']))
@@ -761,7 +761,7 @@ function createAttachment(&$attachmentOptions)
 		return false;
 
 	// Now that we have the attach id, let's rename this sucker and finish up.
-	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
+	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], $attachmentOptions['file_hash']);
 	rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
 
 	// If it's not approved then add to the approval queue.
@@ -799,7 +799,7 @@ function createAttachment(&$attachmentOptions)
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
 			$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
-			$thumb_file_hash = getAttachmentFilename($thumb_filename, false, null, true);
+			$thumb_file_hash = getAttachmentFileHash($thumb_filename);
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
@@ -854,7 +854,7 @@ function createAttachment(&$attachmentOptions)
 					)
 				);
 
-				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $modSettings['currentAttachmentUploadDir'], false, $thumb_file_hash));
+				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $modSettings['currentAttachmentUploadDir'], $thumb_file_hash));
 			}
 		}
 	}
@@ -1125,7 +1125,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		}
 		else
 		{
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 			@unlink($filename);
 
 			// If this was a thumb, the parent attachment should know about it.
@@ -1135,7 +1135,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			// If this attachments has a thumb, remove it as well.
 			if (!empty($row['id_thumb']) && $autoThumbRemoval)
 			{
-				$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
+				$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], $row['thumb_file_hash']);
 				@unlink($thumb_filename);
 				$attach[] = $row['id_thumb'];
 			}
@@ -1232,7 +1232,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = getAttachmentPathID();
-	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFileHash($destName) : '';
 	$smcFunc['db_insert']('',
 		'{db_prefix}attachments',
 		array(
@@ -2336,7 +2336,7 @@ function moveAvatars()
 	$updatedAvatars = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
 
 		if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
 			$updatedAvatars[] = $row['id_attach'];
@@ -2374,4 +2374,9 @@ function setRemovalNotice($messages, $notice)
 			'notice' => '<br /><br />' . $notice,
 		)
 	);
+}
+
+function getAttachmentFileHash($seed = '')
+{
+	return sha1(md5($seed . time()) . mt_rand());
 }
