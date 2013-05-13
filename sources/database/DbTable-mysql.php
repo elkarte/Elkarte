@@ -24,28 +24,32 @@ if (!defined('ELKARTE'))
  */
 function db_packages_init()
 {
-	global $smcFunc, $reservedTables, $db_package_log, $db_prefix;
+	global $smcFunc, $db_package_log, $db_prefix;
 
 	$db_package_log = array();
-
-	// We setup an array of tables we can't do auto-remove on - in case a mod writer cocks it up!
-	$reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
-		'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
-		'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
-		'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
-		'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
-		'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
-		'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
-		'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
-		'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-		'themes', 'topics');
-	foreach ($reservedTables as $k => $table_name)
-		$reservedTables[$k] = strtolower($db_prefix . $table_name);
 }
 
 class DbTable_MySQL extends DbTable
 {
 	private static $_tbl = null;
+	private $_reservedTables = null;
+
+	private function __construct()
+	{
+		// We setup an array of tables we can't do auto-remove on - in case a mod writer cocks it up!
+		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
+			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
+			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
+			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
+			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
+			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
+			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
+			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
+			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
+			'themes', 'topics');
+		foreach ($this->_reservedTables as $k => $table_name)
+			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+	}
 
 	/**
 	 * This function can be used to create a table without worrying about schema
@@ -80,7 +84,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $reservedTables, $smcFunc, $db_package_log, $db_prefix, $db_character_set;
+		global $smcFunc, $db_package_log, $db_prefix, $db_character_set;
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -90,7 +94,7 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// First - no way do we touch our tables.
-		if (in_array(strtolower($table_name), $reservedTables))
+		if (in_array(strtolower($table_name), $this->_reservedTables))
 			return false;
 
 		// Log that we'll want to remove this on uninstall.
@@ -154,7 +158,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
-		global $reservedTables, $smcFunc, $db_prefix;
+		global $smcFunc, $db_prefix;
 
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -164,7 +168,7 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
-		if (in_array(strtolower($table_name), $reservedTables))
+		if (in_array(strtolower($table_name), $this->_reservedTables))
 			return false;
 
 		// working hard with the db!
