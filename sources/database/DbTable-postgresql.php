@@ -32,11 +32,16 @@ function db_packages_init()
 class DbTable_PostgreSQL
 {
 	private static $_tbl = null;
+
+	/**
+	 * Array of table names we don't allow to be removed by addons.
+	 * @var array
+	 */
 	private $_reservedTables = null;
 
 	private function __construct()
 	{
-		// We setup an array of tables we can't do auto-remove on - in case a mod writer cocks it up!
+		// We won't do any remove on these
 		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
 			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
 			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
