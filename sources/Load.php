@@ -59,6 +59,8 @@ function reloadSettings()
 			cache_put_data('modSettings', $modSettings, 90);
 	}
 
+	$modSettings['recycle_board'] = empty($modSettings['recycle_board']) ? 0 : $modSettings['recycle_board'];
+
 	// Set a list of common functions.
 	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
 	$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
@@ -2279,7 +2281,7 @@ function getLanguages($use_cache = true)
  */
 function censorText(&$text, $force = false)
 {
-	global $modSettings, $options, $settings, $txt;
+	global $modSettings, $options, $settings;
 	static $censor_vulgar = null, $censor_proper;
 
 	if ((!empty($options['show_no_censored']) && $settings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
