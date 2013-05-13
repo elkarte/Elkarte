@@ -160,4 +160,17 @@ abstract class DbTable
 	 */
 	abstract function elk_db_create_query_column($column);
 
+	/**
+	 * Alter table.
+	 *
+	 * @param string $table_name
+	 * @param array $columns
+	 */
+	function elk_db_alter_table($table_name, $columns)
+	{
+		// Not implemented by default.
+		// Only SQLite needed it.
+		return;
+	}
+
 }

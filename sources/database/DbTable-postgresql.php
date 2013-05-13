@@ -11,7 +11,8 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains database functionality specifically designed for packages (mods) to utilize.
+ * This class implements functionality related to table structure.
+ * Intended in particular for add-ons to change it to suit their needs.
  *
  */
 
