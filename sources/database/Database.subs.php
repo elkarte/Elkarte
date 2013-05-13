@@ -72,9 +72,9 @@ function db_extend ($type = 'extra')
 	}
 	else
 	{
-		// packages
-		$initFunc = 'db_' . $type . '_init';
-		$initFunc();
+		// packages... make sure the compatibility initialization
+		// (of $smcFunc) is called at least once.
+		db_table();
 	}
 }
 

@@ -670,6 +670,11 @@ class DbTable_MySQL extends DbTable
 
 	static function db_table()
 	{
+		if (is_null(self::$_tbl))
+		{
+			self::$_tbl = new DbTable_MySQL();
+			db_packages_init();
+		}
 		return self::$_tbl;
 	}
 }

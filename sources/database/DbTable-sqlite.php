@@ -65,6 +65,8 @@ function db_packages_init()
 
 class DbTable_SQLite
 {
+	private static $_tbl = null;
+
 	/**
 	 * This function can be used to create a table without worrying about schema
 	 *  compatabilities across supported database systems.
@@ -822,6 +824,16 @@ class DbTable_SQLite
 
 		// We got here so we're good.  The temp table should be deleted, if not it will be gone later on >:D.
 		return true;
+	}
+
+	public static function db_table()
+	{
+		if (is_null(self::$_tbl))
+		{
+			self::$_tbl = new DbTable_MySQL();
+			db_packages_init();
+		}
+		return self::$_tbl;
 	}
 }
 
