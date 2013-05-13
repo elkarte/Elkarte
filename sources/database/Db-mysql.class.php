@@ -42,7 +42,7 @@ class Database_MySQL extends Database
 	 */
 	function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global $smcFunc, $mysql_set_mode, $db;
+		global $smcFunc, $mysql_set_mode;
 
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'mysql_fetch_assoc')

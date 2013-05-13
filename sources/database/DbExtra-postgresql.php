@@ -45,7 +45,7 @@ function db_extra_init()
  */
 function elk_db_backup_table($table, $backup_table)
 {
-	global $db;
+	$db = database();
 
 	return $db->db_list_table($table, $backup_table);
 }
@@ -58,7 +58,7 @@ function elk_db_backup_table($table, $backup_table)
  */
 function elk_db_optimize_table($table)
 {
-	global $db;
+	$db = database();
 
 	return $db->db_optimize_table($table);
 }
@@ -73,7 +73,7 @@ function elk_db_optimize_table($table)
  */
 function elk_db_list_tables($db_name_str = false, $filter = false)
 {
-	global $db;
+	$db = database();
 
 	return $db->db_list_tables($db_name_str, $filter);
 }
@@ -88,7 +88,7 @@ function elk_db_list_tables($db_name_str = false, $filter = false)
  */
 function elk_db_insert_sql($tableName, $new_table = false)
 {
-	global $db;
+	$db = database();
 
 	return $db->insert_sql($tableName, $new_table);
 }
@@ -101,7 +101,7 @@ function elk_db_insert_sql($tableName, $new_table = false)
  */
 function elk_db_table_sql($tableName)
 {
-	global $db;
+	$db = database();
 
 	return $db->db_table_sql($tableName);
 }
@@ -113,7 +113,7 @@ function elk_db_table_sql($tableName)
  */
 function elk_db_get_version()
 {
-	global $db;
+	$db = database();
 
 	return $db->db_get_version();
 }

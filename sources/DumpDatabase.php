@@ -32,11 +32,14 @@ if (!defined('ELKARTE'))
 function DumpDatabase2()
 {
 	global $db_name, $scripturl, $context, $modSettings, $crlf;
-	global $smcFunc, $db, $db_prefix, $db_show_debug;
+	global $smcFunc, $db_prefix, $db_show_debug;
 
 	// Administrators only!
 	if (!allowedTo('admin_forum'))
 		fatal_lang_error('no_dump_database', 'critical');
+
+	// We'll need a db to dump :P
+	$db = database();
 
 	// We don't need debug when dumping the database
 	$modSettings['disableQueryCheck'] = true;

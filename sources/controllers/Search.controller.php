@@ -197,7 +197,10 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, $smcFunc, $db, $db_search;
+	global $excludedWords, $participants, $smcFunc, $db_search;
+
+	// We shouldn't be working with the db, but we do :P
+	$db = database();
 
 	// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 	// Coming from quick search box and going to some custome place?

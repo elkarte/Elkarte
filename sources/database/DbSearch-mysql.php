@@ -34,7 +34,7 @@ class DbSearch_MySQL
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db;
+		$db = database();
 
 		// Simply delegate to the database adapter method.
 		return $db->query($identifier, $db_string, $db_values, $connection);

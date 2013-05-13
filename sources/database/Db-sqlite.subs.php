@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function db_fix_prefix(&$db_prefix, $db_name)
 {
-	global $db;
+	$db = database();
 
 	$db->fix_prefix(&$db_prefix, $db_name);
 }
@@ -43,7 +43,7 @@ function db_fix_prefix(&$db_prefix, $db_name)
  */
 function elk_db_replacement__callback($matches)
 {
-	global $db;
+	$db = database();
 
 	return $db->replacement__callback($matches);
 }
@@ -57,7 +57,7 @@ function elk_db_replacement__callback($matches)
  */
 function elk_db_quote($db_string, $db_values, $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->quote($db_string, $db_values, $connection);
 }
@@ -72,7 +72,7 @@ function elk_db_quote($db_string, $db_values, $connection = null)
  */
 function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->query($identifier, $db_string, $db_values, $connection);
 }
@@ -83,7 +83,7 @@ function elk_db_query($identifier, $db_string, $db_values = array(), $connection
  */
 function elk_db_affected_rows($connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->affected_rows($connection);
 }
@@ -97,7 +97,7 @@ function elk_db_affected_rows($connection = null)
  */
 function elk_db_insert_id($table, $field = null, $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->insert_id($table, $field, $connection);
 }
@@ -110,7 +110,7 @@ function elk_db_insert_id($table, $field = null, $connection = null)
  */
 function elk_db_transaction($type = 'commit', $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->do_transaction($type, $connection);
 }
@@ -124,7 +124,7 @@ function elk_db_transaction($type = 'commit', $connection = null)
  */
 function elk_db_error($db_string, $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->error($db_string, $connection);
 }
@@ -142,7 +142,7 @@ function elk_db_error($db_string, $connection = null)
  */
 function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->insert($method, $table, $columns, $data, $keys, $disable_trans, $connection);
 }
@@ -158,7 +158,7 @@ function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
  */
 function elk_db_error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->error_backtrace($error_message, $log_message, $error_type, $file, $line);
 }
@@ -168,7 +168,7 @@ function elk_db_error_backtrace($error_message, $log_message = '', $error_type =
  */
 function elk_udf_unix_timestamp()
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_unix_timestamp();
 }
@@ -180,7 +180,7 @@ function elk_udf_unix_timestamp()
  */
 function elk_udf_inet_aton($ip)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_inet_aton($ip);
 }
@@ -192,7 +192,7 @@ function elk_udf_inet_aton($ip)
  */
 function elk_udf_inet_ntoa($n)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_inet_ntoa($n);
 }
@@ -205,7 +205,7 @@ function elk_udf_inet_ntoa($n)
  */
 function elk_udf_find_in_set($find, $groups)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_find_in_set($find, $groups);
 }
@@ -217,7 +217,7 @@ function elk_udf_find_in_set($find, $groups)
  */
 function elk_udf_year($date)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_year($date);
 }
@@ -229,7 +229,7 @@ function elk_udf_year($date)
  */
 function elk_udf_month($date)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_month($date);
 }
@@ -241,7 +241,7 @@ function elk_udf_month($date)
  */
 function elk_udf_dayofmonth($date)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_dayofmonth($date);
 }
@@ -253,7 +253,7 @@ function elk_udf_dayofmonth($date)
  */
 function elk_db_libversion($void = null)
 {
-	global $db;
+	$db = database();
 
 	return $db->libversion($void);
 }
@@ -264,7 +264,7 @@ function elk_db_libversion($void = null)
  */
 function elk_udf_concat()
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_concat();
 }
@@ -277,7 +277,7 @@ function elk_udf_concat()
  */
 function elk_udf_locate($find, $string)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_locate($find, $string);
 }
@@ -290,7 +290,7 @@ function elk_udf_locate($find, $string)
  */
 function elk_udf_regexp($exp, $search)
 {
-	global $db;
+	$db = database();
 
 	return $db->udf_regexp($exp, $search);
 }
@@ -303,7 +303,7 @@ function elk_udf_regexp($exp, $search)
  */
 function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
 {
-	global $db;
+	$db = database();
 
 	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }

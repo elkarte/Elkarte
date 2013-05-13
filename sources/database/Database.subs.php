@@ -1,6 +1,18 @@
 <?php
 
 /**
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * This file has all the main functions in it that set up the database connection
+ * and initializes the appropriate adapters.
+ *
+ */
+
+/**
  *  Initialize database classes and connection.
  *
  * @param string $db_server
@@ -13,7 +25,7 @@
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
-	global $smcFunc, $mysql_set_mode, $db;
+	global $smcFunc, $mysql_set_mode;
 
 	require_once(SOURCEDIR . '/database/Db.class.php');
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');

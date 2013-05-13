@@ -18,7 +18,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Database_PostgreSQL
+class Database_PostgreSQL extends Database
 {
 	private static $_db = null;
 
@@ -45,7 +45,7 @@ class Database_PostgreSQL
 	 */
 	function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global $smcFunc, $mysql_set_mode, $db;
+		global $smcFunc, $mysql_set_mode;
 
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'postg_fetch_assoc')

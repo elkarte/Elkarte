@@ -18,7 +18,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Database_SQLite
+class Database_SQLite extends Database
 {
 	private static $_db = null;
 

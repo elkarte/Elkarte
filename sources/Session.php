@@ -130,10 +130,11 @@ function sessionClose()
  */
 function sessionRead($session_id)
 {
-	global $db;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
+
+	// Get our database, quick
+	$db = database();
 
 	// Look for it in the database.
 	$result = $db->query('', '
@@ -160,14 +161,11 @@ function sessionRead($session_id)
  */
 function sessionWrite($session_id, $data)
 {
-	global $db;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
 	// Better safe than sorry
-	if (!isset($db))
-		$db = database();
+	$db = database();
 
 	// First try to update an existing row...
 	$result = $db->query('', '
@@ -201,14 +199,11 @@ function sessionWrite($session_id, $data)
  */
 function sessionDestroy($session_id)
 {
-	global $db;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
 	// Better safe than sorry
-	if (!isset($db))
-		$db = database();
+	$db = database();
 
 	// Just delete the row...
 	return $db->query('', '
@@ -229,15 +224,14 @@ function sessionDestroy($session_id)
  */
 function sessionGC($max_lifetime)
 {
-	global $modSettings, $db;
+	global $modSettings;
 
 	// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 	if (!empty($modSettings['databaseSession_lifetime']) && ($max_lifetime <= 1440 || $modSettings['databaseSession_lifetime'] > $max_lifetime))
 		$max_lifetime = max($modSettings['databaseSession_lifetime'], 60);
 
-	// Try harder... just this time.
-	if (!isset($db))
-		$db = database();
+	// Try hard... just this time.
+	$db = database();
 
 	// Clean up after yerself ;).
 	return $db->query('', '
