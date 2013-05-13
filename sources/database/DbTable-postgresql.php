@@ -114,7 +114,7 @@ class DbTable_PostgreSQL
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($if_exists == 'overwrite')
-				$smcFunc['db_drop_table']($table_name);
+				$this->db_drop_table($table_name);
 			else
 				return $if_exists == 'ignore';
 		}
@@ -142,7 +142,7 @@ class DbTable_PostgreSQL
 
 			// Sort out the size...
 			$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-			list ($type, $size) = $smcFunc['db_calculate_type']($column['type'], $column['size']);
+			list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
 			if ($size !== null)
 				$type = $type . '(' . $size . ')';
 
@@ -270,20 +270,20 @@ class DbTable_PostgreSQL
 		$db_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
-		$columns = $smcFunc['db_list_columns']($table_name, false);
+		$columns = $this->db_list_columns($table_name, false);
 		foreach ($columns as $column)
 			if ($column == $column_info['name'])
 			{
 				// If we're going to overwrite then use change column.
 				if ($if_exists == 'update')
-					return $smcFunc['db_change_column']($table_name, $column_info['name'], $column_info);
+					return $this->db_change_column($table_name, $column_info['name'], $column_info);
 				else
 					return false;
 			}
 
 		// Get the specifics...
 		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-		list ($type, $size) = $smcFunc['db_calculate_type']($column_info['type'], $column_info['size']);
+		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
 		if ($size !== null)
 			$type = $type . '(' . $size . ')';
 
@@ -301,7 +301,7 @@ class DbTable_PostgreSQL
 		unset($column_info['type'], $column_info['size']);
 
 		if (count($column_info) != 1)
-			return $smcFunc['db_change_column']($table_name, $column_info['name'], $column_info);
+			return $this->db_change_column($table_name, $column_info['name'], $column_info);
 		else
 			return true;
 	}
@@ -321,7 +321,7 @@ class DbTable_PostgreSQL
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Does it exist?
-		$columns = $smcFunc['db_list_columns']($table_name, true);
+		$columns = $this->db_list_columns($table_name, true);
 		foreach ($columns as $column)
 			if ($column['name'] == $column_name)
 			{
@@ -365,7 +365,7 @@ class DbTable_PostgreSQL
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Check it does exist!
-		$columns = $smcFunc['db_list_columns']($table_name, true);
+		$columns = $this->db_list_columns($table_name, true);
 		$old_info = null;
 		foreach ($columns as $column)
 			if ($column['name'] == $old_column)
@@ -429,7 +429,7 @@ class DbTable_PostgreSQL
 		if (isset($column_info['type']) && ($column_info['type'] != $old_info['type'] || (isset($column_info['size']) && $column_info['size'] != $old_info['size'])))
 		{
 			$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-			list ($type, $size) = $smcFunc['db_calculate_type']($column_info['type'], $column_info['size']);
+			list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
 			if ($size !== null)
 				$type = $type . '(' . $size . ')';
 
@@ -542,7 +542,7 @@ class DbTable_PostgreSQL
 		$db_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
-		$indexes = $smcFunc['db_list_indexes']($table_name, true);
+		$indexes = $this->db_list_indexes($table_name, true);
 		// Do we already have it?
 		foreach ($indexes as $index)
 		{
@@ -552,7 +552,7 @@ class DbTable_PostgreSQL
 				if ($if_exists != 'update' || $index['type'] == 'primary')
 					return false;
 				else
-					$smcFunc['db_remove_index']($table_name, $index_info['name']);
+					$this->db_remove_index($table_name, $index_info['name']);
 			}
 		}
 
@@ -593,7 +593,7 @@ class DbTable_PostgreSQL
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Better exist!
-		$indexes = $smcFunc['db_list_indexes']($table_name, true);
+		$indexes = $this->db_list_indexes($table_name, true);
 		if ($index_name != 'primary')
 			$index_name = $table_name . '_' . $index_name;
 
@@ -692,8 +692,8 @@ class DbTable_PostgreSQL
 
 		return array(
 			'name' => $table_name,
-			'columns' => $smcFunc['db_list_columns']($table_name, true),
-			'indexes' => $smcFunc['db_list_indexes']($table_name, true),
+			'columns' => $this->db_list_columns($table_name, true),
+			'indexes' => $this->db_list_indexes($table_name, true),
 		);
 	}
 
@@ -742,7 +742,7 @@ class DbTable_PostgreSQL
 					$default = null;
 
 				// Make the type generic.
-				list ($type, $size) = $smcFunc['db_calculate_type']($row['data_type'], $row['character_maximum_length'], true);
+				list ($type, $size) = $this->db_calculate_type($row['data_type'], $row['character_maximum_length'], true);
 
 				$columns[$row['column_name']] = array(
 					'name' => $row['column_name'],
