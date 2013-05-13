@@ -761,7 +761,7 @@ function createAttachment(&$attachmentOptions)
 		return false;
 
 	// Now that we have the attach id, let's rename this sucker and finish up.
-	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], $attachmentOptions['file_hash']);
+	$attachmentOptions['destination'] = getAttachmentFilename($attachmentOptions['file_hash'], $attachmentOptions['id'], basename($attachmentOptions['name']), $attachmentOptions['id_folder']);
 	rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
 
 	// If it's not approved then add to the approval queue.
@@ -854,7 +854,7 @@ function createAttachment(&$attachmentOptions)
 					)
 				);
 
-				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $modSettings['currentAttachmentUploadDir'], $thumb_file_hash));
+				rename($thumb_path, getAttachmentFilename($thumb_file_hash, $attachmentOptions['thumb'], $thumb_filename, $modSettings['currentAttachmentUploadDir']));
 			}
 		}
 	}
@@ -1125,7 +1125,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		}
 		else
 		{
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
+			$filename = getAttachmentFilename($row['file_hash'], $row['id_attach'], $row['filename'], $row['id_folder']);
 			@unlink($filename);
 
 			// If this was a thumb, the parent attachment should know about it.
@@ -1135,7 +1135,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			// If this attachments has a thumb, remove it as well.
 			if (!empty($row['id_thumb']) && $autoThumbRemoval)
 			{
-				$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], $row['thumb_file_hash']);
+				$thumb_filename = getAttachmentFilename($row['thumb_file_hash'], $row['id_thumb'], $row['thumb_filename'], $row['thumb_folder']);
 				@unlink($thumb_filename);
 				$attach[] = $row['id_thumb'];
 			}
@@ -2336,7 +2336,7 @@ function moveAvatars()
 	$updatedAvatars = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], $row['file_hash']);
+		$filename = getAttachmentFilename($row['file_hash'], $row['id_attach'], $row['filename'], $row['id_folder']);
 
 		if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
 			$updatedAvatars[] = $row['id_attach'];
@@ -2379,4 +2379,47 @@ function setRemovalNotice($messages, $notice)
 function getAttachmentFileHash($seed = '')
 {
 	return sha1(md5($seed . time()) . mt_rand());
+}
+
+/**
+ * Older attachments may still use this function.
+ *
+ * @param $filename
+ * @param $attachment_id
+ * @param $dir
+ * @param $new
+ */
+function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
+{
+	global $modSettings, $db_character_set;
+
+	$clean_name = $filename;
+
+	// Sorry, no spaces, dots, or anything else but letters allowed.
+	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
+
+	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
+	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
+
+	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
+		return $clean_name;
+	elseif ($new)
+		return $enc_name;
+
+	// Are we using multiple directories?
+	if (!empty($modSettings['currentAttachmentUploadDir']))
+	{
+		if (!is_array($modSettings['attachmentUploadDir']))
+			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$path = $modSettings['attachmentUploadDir'][$dir];
+	}
+	else
+		$path = $modSettings['attachmentUploadDir'];
+
+	if (file_exists($path . '/' . $enc_name))
+		$filename = $path . '/' . $enc_name;
+	else
+		$filename = $path . '/' . $clean_name;
+
+	return $filename;
 }

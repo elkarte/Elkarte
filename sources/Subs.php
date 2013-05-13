@@ -3300,17 +3300,14 @@ function template_css()
 
 /**
  * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
- * @todo this currently returns the hash if new, and the full filename otherwise.
- * Something messy like that.
- * @todo and of course everything relies on this behavior and work around it. :P.
- * Converters included.
  *
- * @param string $filename
- * @param int $attachment_id
- * @param string $dir
  * @param string $file_hash
+ * @param int $attachment_id
+ * @param string $filename = ''
+ * @param int $id_folder = null
+ * @return string The full path to the attachment
  */
-function getAttachmentFilename($filename, $attachment_id, $dir = null, $file_hash = '')
+function getAttachmentFilename($file_hash, $attachment_id, $filename, $id_folder = null)
 {
 	global $modSettings, $smcFunc;
 
@@ -3323,7 +3320,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $file_has
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
 			array(
-				'id_attach' => $attachment_id,
+				'id_attach' => (int) $attachment_id,
 		));
 
 		if ($smcFunc['db_num_rows']($request) === 0)
@@ -3335,62 +3332,22 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $file_has
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
-		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
+	{
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		return getLegacyAttachmentFilename($filename, $attachment_id, $id_folder);
+	}
 
 	// Are we using multiple directories?
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['attachmentUploadDir'];
+		$path = isset($modSettings['attachmentUploadDir'][$id_folder]) ? $modSettings['attachmentUploadDir'][$id_folder] : $modSettings['attachmentUploadDir'];
 	}
 	else
 		$path = $modSettings['attachmentUploadDir'];
 
 	return $path . '/' . $attachment_id . '_' . $file_hash;
-}
-
-/**
- * Older attachments may still use this function.
- *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- */
-function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
-{
-	global $modSettings, $db_character_set;
-
-	$clean_name = $filename;
-
-	// Sorry, no spaces, dots, or anything else but letters allowed.
-	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
-
-	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
-	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
-
-	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
-		return $clean_name;
-	elseif ($new)
-		return $enc_name;
-
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = $modSettings['attachmentUploadDir'][$dir];
-	}
-	else
-		$path = $modSettings['attachmentUploadDir'];
-
-	if (file_exists($path . '/' . $enc_name))
-		$filename = $path . '/' . $enc_name;
-	else
-		$filename = $path . '/' . $clean_name;
-
-	return $filename;
 }
 
 /**
