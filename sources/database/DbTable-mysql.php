@@ -668,7 +668,7 @@ class DbTable_MySQL extends DbTable
 		return '`' .$column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
 	}
 
-	static function db_table()
+	public static function db_table()
 	{
 		if (is_null(self::$_tbl))
 		{

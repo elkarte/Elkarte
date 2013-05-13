@@ -827,7 +827,7 @@ class DbTable_PostgreSQL
 		return $indexes;
 	}
 
-	static function db_table()
+	public static function db_table()
 	{
 		if (is_null(self::$_tbl))
 		{
