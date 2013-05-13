@@ -3309,7 +3309,7 @@ function template_css()
  */
 function getAttachmentFilename($file_hash, $attachment_id, $filename, $id_folder = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
