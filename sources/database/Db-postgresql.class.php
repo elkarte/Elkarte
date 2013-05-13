@@ -1074,6 +1074,113 @@ class Database_PostgreSQL
 	}
 
 	/**
+	 * This function lists all tables in the database.
+	 * The listing could be filtered according to $filter.
+	 *
+	 * @param mixed $db string holding the table name, or false, default false
+	 * @param mixed $filter string to filter by, or false, default false
+	 * @return array an array of table names. (strings)
+	 */
+	function db_list_tables($db = false, $filter = false)
+	{
+		global $smcFunc;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT tablename
+			FROM pg_tables
+			WHERE schemaname = {string:schema_public}' . ($filter == false ? '' : '
+				AND tablename LIKE {string:filter}') . '
+			ORDER BY tablename',
+			array(
+				'schema_public' => 'public',
+				'filter' => $filter,
+			)
+		);
+
+		$tables = array();
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$tables[] = $row[0];
+		$smcFunc['db_free_result']($request);
+
+		return $tables;
+	}
+
+	/**
+	 * This function optimizes a table.
+	 *
+	 * @param string $table - the table to be optimized
+	 * @return how much it was gained
+	 */
+	function db_optimize_table($table)
+	{
+		global $smcFunc, $db_prefix;
+
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
+
+		$request = $smcFunc['db_query']('', '
+				VACUUM ANALYZE {raw:table}',
+				array(
+					'table' => $table,
+				)
+			);
+		if (!$request)
+			return -1;
+
+		$row = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+
+		if (isset($row['Data_free']))
+			return $row['Data_free'] / 1024;
+		else
+			return 0;
+	}
+
+	/**
+	 * Backup $table to $backup_table.
+	 *
+	 * @param string $table
+	 * @param string $backup_table
+	 * @return resource -the request handle to the table creation query
+	 */
+	function db_backup_table($table, $backup_table)
+	{
+		global $smcFunc, $db_prefix;
+
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
+
+		// Do we need to drop it first?
+		$tables = elk_db_list_tables(false, $backup_table);
+		if (!empty($tables))
+			$smcFunc['db_query']('', '
+				DROP TABLE {raw:backup_table}',
+				array(
+					'backup_table' => $backup_table,
+				)
+			);
+
+		// @todo Should we create backups of sequences as well?
+		$smcFunc['db_query']('', '
+			CREATE TABLE {raw:backup_table}
+			(
+				LIKE {raw:table}
+				INCLUDING DEFAULTS
+			)',
+			array(
+				'backup_table' => $backup_table,
+				'table' => $table,
+			)
+		);
+		$smcFunc['db_query']('', '
+			INSERT INTO {raw:backup_table}
+			SELECT * FROM {raw:table}',
+			array(
+				'backup_table' => $backup_table,
+				'table' => $table,
+			)
+		);
+	}
+
+	/**
 	 * Returns a reference to the existing instance
 	 */
 	static function db()

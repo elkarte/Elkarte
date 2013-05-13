@@ -1021,6 +1021,188 @@ class Database_SQLite
 	}
 
 	/**
+	 * This function lists all tables in the database.
+	 * The listing could be filtered according to $filter.
+	 *
+	 * @param mixed $db string holding the table name, or false, default false
+	 * @param mixed $filter string to filter by, or false, default false
+	 * @return array an array of table names. (strings)
+	 */
+	function elk_db_list_tables($db = false, $filter = false)
+	{
+		global $smcFunc;
+
+		$filter = $filter == false ? '' : ' AND name LIKE \'' . str_replace("\_", "_", $filter) . '\'';
+
+		$request = $smcFunc['db_query']('', '
+			SELECT name
+			FROM sqlite_master
+			WHERE type = {string:type}
+			{raw:filter}
+			ORDER BY name',
+			array(
+				'type' => 'table',
+				'filter' => $filter,
+			)
+		);
+		$tables = array();
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$tables[] = $row[0];
+		$smcFunc['db_free_result']($request);
+
+		return $tables;
+	}
+
+	/**
+	 * This function optimizes a table.
+	 *
+	 * @param string $table - the table to be optimized
+	 * @return how much it was gained
+	 */
+	function db_optimize_table($table)
+	{
+		global $smcFunc, $db_prefix;
+
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
+
+		$request = $smcFunc['db_query']('', '
+			VACUUM {raw:table}',
+			array(
+				'table' => $table,
+			)
+		);
+		if (!$request)
+			return -1;
+
+		$row = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+
+		// The function returns nothing.
+		return 0;
+	}
+
+	/**
+	 * Backup $table to $backup_table.
+	 *
+	 * @param string $table
+	 * @param string $backup_table
+	 * @return resource -the request handle to the table creation query
+	 */
+	function db_backup_table($table, $backup_table)
+	{
+		global $smcFunc, $db_prefix;
+
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
+
+		$result = $smcFunc['db_query']('', '
+			SELECT sql
+			FROM sqlite_master
+			WHERE type = {string:txttable}
+				AND name = {string:table}',
+			array(
+				'table' => $table,
+				'txttable' => 'table'
+			)
+		);
+		list ($create) = $smcFunc['db_fetch_row']($result);
+		$smcFunc['db_free_result']($result);
+
+		$create = preg_split('/[\n\r]/', $create);
+		$auto_inc = '';
+
+		// Remove the first line and check to see if the second one contain useless info.
+		unset($create[0]);
+		if (trim($create[1]) == '(')
+			unset($create[1]);
+		if (trim($create[count($create)]) == ')')
+			unset($create[count($create)]);
+
+		foreach ($create as $k => $l)
+		{
+			// Get the name of the auto_increment column.
+			if (strpos($l, 'primary') || strpos($l, 'PRIMARY'))
+				$auto_inc = trim($l);
+
+			// Skip everything but keys...
+			if ((strpos($l, 'KEY') !== false && strpos($l, 'PRIMARY KEY') === false) || strpos($l, $table) !== false || strpos(trim($l), 'PRIMARY KEY') === 0)
+				unset($create[$k]);
+		}
+
+		if (!empty($create))
+			$create = '(
+				' . implode('
+				', $create) . ')';
+		else
+			$create = '';
+
+		// Is there an extra junk at the end?
+		if (substr($create, -2, 1) == ',')
+			$create = substr($create, 0, -2) . ')';
+		if (substr($create, -2) == '))')
+			$create = substr($create, 0, -1);
+
+		$smcFunc['db_query']('', '
+			DROP TABLE {raw:backup_table}',
+			array(
+				'backup_table' => $backup_table,
+				'db_error_skip' => true,
+			)
+		);
+
+		$request = $smcFunc['db_quote']('
+			CREATE TABLE {raw:backup_table} {raw:create}',
+			array(
+				'backup_table' => $backup_table,
+				'create' => $create,
+		));
+
+		$smcFunc['db_query']('', '
+			CREATE TABLE {raw:backup_table} {raw:create}',
+			array(
+				'backup_table' => $backup_table,
+				'create' => $create,
+		));
+
+		$request = $smcFunc['db_query']('', '
+			INSERT INTO {raw:backup_table}
+			SELECT *
+			FROM {raw:table}',
+			array(
+				'backup_table' => $backup_table,
+				'table' => $table,
+		));
+
+		return $request;
+	}
+
+/**
+ * Simply return the database - and die!
+ * Used by DumpDatabase.php.
+ */
+function db_get_backup()
+{
+	global $db_name;
+
+	$db_file = substr($db_name, -3) === '.db' ? $db_name : $db_name . '.db';
+
+	// Add more info if zipped...
+	$ext = '';
+	if (isset($_REQUEST['compress']) && function_exists('gzencode'))
+		$ext = '.gz';
+
+	// Do the remaining headers.
+	header('Content-Disposition: attachment; filename="' . $db_file . $ext . '"');
+	header('Cache-Control: private');
+	header('Connection: close');
+
+	// Literally dump the contents.  Try reading the file first.
+	if (@readfile($db_file) == null)
+		echo file_get_contents($db_file);
+
+	obExit(false);
+}
+
+	/**
 	 * Returns a reference to the existing instance
 	 */
 	static function db()
