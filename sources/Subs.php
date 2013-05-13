@@ -3313,19 +3313,14 @@ function template_css()
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- * @param $file_hash
+ * @param string $filename
+ * @param int $attachment_id
+ * @param string $dir
+ * @param string $file_hash
  */
-function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
+function getAttachmentFilename($filename, $attachment_id, $dir = null, $file_hash = '')
 {
 	global $modSettings, $smcFunc;
-
-	// Just make up a nice hash...
-	if ($new)
-		return sha1(md5($filename . time()) . mt_rand());
 
 	// Grab the file hash if it wasn't added.
 	// @todo: Locate all places that don't call a hash and fix that.
