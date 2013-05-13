@@ -97,7 +97,7 @@ class DbTable_MySQL extends DbTable
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
 		global $reservedTables, $smcFunc, $db_package_log, $db_prefix, $db_character_set;
 
@@ -168,7 +168,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_drop_table($table_name, $parameters = array(), $error = 'fatal')
+	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
 		global $reservedTables, $smcFunc, $db_prefix;
 
@@ -210,7 +210,7 @@ class DbTable_MySQL extends DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
 		global $smcFunc, $db_package_log, $txt, $db_prefix;
 
@@ -262,7 +262,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
+	function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 	{
 		global $smcFunc, $db_prefix;
 
@@ -297,7 +297,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
+	function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
 		global $smcFunc, $db_prefix;
 
@@ -358,7 +358,7 @@ class DbTable_MySQL extends DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
 		global $smcFunc, $db_package_log, $db_prefix;
 
@@ -430,7 +430,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array$parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function elk_db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
+	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 	{
 		global $smcFunc, $db_prefix;
 
@@ -481,7 +481,7 @@ class DbTable_MySQL extends DbTable
 	 * @param $type_size
 	 * @param $reverse
 	 */
-	function elk_db_calculate_type($type_name, $type_size = null, $reverse = false)
+	function db_calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// MySQL is actually the generic baseline.
 		return array($type_name, $type_size);
@@ -493,7 +493,7 @@ class DbTable_MySQL extends DbTable
 	 * @param string $table_name
 	 * @param array $parameters default array()
 	 */
-	function elk_db_table_structure($table_name, $parameters = array())
+	function db_table_structure($table_name, $parameters = array())
 	{
 		global $smcFunc, $db_prefix;
 
@@ -514,7 +514,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $parameters default array()
 	 * @return mixed
 	 */
-	function elk_db_list_columns($table_name, $detail = false, $parameters = array())
+	function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
 		global $smcFunc, $db_prefix;
 
@@ -582,7 +582,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $parameters
 	 * @return mixed
 	 */
-	function elk_db_list_indexes($table_name, $detail = false, $parameters = array())
+	function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
 		global $smcFunc, $db_prefix;
 
@@ -640,7 +640,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $column
 	 * @return type
 	 */
-	function elk_db_create_query_column($column)
+	function db_create_query_column($column)
 	{
 		global $smcFunc;
 
