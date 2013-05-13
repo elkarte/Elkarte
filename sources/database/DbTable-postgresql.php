@@ -89,7 +89,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $db_prefix;
+		global $db_package_log, $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -120,14 +123,14 @@ class DbTable_PostgreSQL
 		}
 
 		// If we've got this far - good news - no table exists. We can build our own!
-		$smcFunc['db_transaction']('begin');
+		$db->db_transaction('begin');
 		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		foreach ($columns as $column)
 		{
 			// If we have an auto increment do it!
 			if (!empty($column['auto']))
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					CREATE SEQUENCE ' . $table_name . '_seq',
 					array(
 						'security_override' => true,
@@ -136,7 +139,7 @@ class DbTable_PostgreSQL
 				$default = 'default nextval(\'' . $table_name . '_seq\')';
 			}
 			elseif (isset($column['default']) && $column['default'] !== null)
-				$default = 'default \'' . $smcFunc['db_escape_string']($column['default']) . '\'';
+				$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
 			else
 				$default = '';
 
@@ -174,21 +177,21 @@ class DbTable_PostgreSQL
 		$table_query .= ')';
 
 		// Create the table!
-		$smcFunc['db_query']('', $table_query,
+		$db->query('', $table_query,
 			array(
 				'security_override' => true,
 			)
 		);
 		// And the indexes...
 		foreach ($index_queries as $query)
-			$smcFunc['db_query']('', $query,
+			$db->query('', $query,
 			array(
 				'security_override' => true,
 			)
 		);
 
 		// Go, go power rangers!
-		$smcFunc['db_transaction']('commit');
+		$db->db_transaction('commit');
 	}
 
 	/**
@@ -200,7 +203,7 @@ class DbTable_PostgreSQL
 	 */
 	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -220,7 +223,7 @@ class DbTable_PostgreSQL
 		if (in_array($full_table_name, $db->db_list_tables()))
 		{
 			// We can then drop the table.
-			$smcFunc['db_transaction']('begin');
+			$db->db_transaction('begin');
 
 			// the table
 			$table_query = 'DROP TABLE ' . $table_name;
@@ -229,20 +232,20 @@ class DbTable_PostgreSQL
 			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
 
 			// drop them
-			$smcFunc['db_query']('',
+			$db->query('',
 				$table_query,
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_query']('',
+			$db->query('',
 				$sequence_query,
 				array(
 					'security_override' => true,
 				)
 			);
 
-			$smcFunc['db_transaction']('commit');
+			$db->db_transaction('commit');
 
 			return true;
 		}
@@ -262,7 +265,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $txt, $db_prefix;
+		global $db_package_log, $txt, $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -291,7 +297,8 @@ class DbTable_PostgreSQL
 		$query = '
 			ALTER TABLE ' . $table_name . '
 			ADD COLUMN ' . $column_info['name'] . ' ' . $type;
-		$smcFunc['db_query']('', $query,
+
+		$db->query('', $query,
 			array(
 				'security_override' => true,
 			)
@@ -316,7 +323,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -327,14 +337,14 @@ class DbTable_PostgreSQL
 			{
 				// If there is an auto we need remove it!
 				if ($column['auto'])
-					$smcFunc['db_query']('',
+					$db->query('',
 						'DROP SEQUENCE ' . $table_name . '_seq',
 						array(
 							'security_override' => true,
 						)
 					);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP COLUMN ' . $column_name,
 					array(
@@ -360,7 +370,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// Working hard with the db!
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -378,7 +391,7 @@ class DbTable_PostgreSQL
 		// Now we check each bit individually and ALTER as required.
 		if (isset($column_info['name']) && $column_info['name'] != $old_column)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				RENAME COLUMN ' . $old_column . ' TO ' . $column_info['name'],
 				array(
@@ -389,8 +402,8 @@ class DbTable_PostgreSQL
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
 		{
-			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $smcFunc['db_escape_string']($column_info['default']) . '\'' : 'DROP DEFAULT';
-			$smcFunc['db_query']('', '
+			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $db->db_escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action,
 				array(
@@ -402,12 +415,12 @@ class DbTable_PostgreSQL
 		if (isset($column_info['null']) && $column_info['null'] != $old_info['null'])
 		{
 			$action = $column_info['null'] ? 'DROP' : 'SET';
-			$smcFunc['db_transaction']('begin');
+			$db->db_transaction('begin');
 			if (!$column_info['null'])
 			{
 				// We have to set it to something if we are making it NOT NULL. And we must comply with the current column format.
 				$setTo = isset($column_info['default']) ? $column_info['default'] : (strpos($old_info['type'], 'int') !== false ? 0 : '');
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE ' . $table_name . '
 					SET ' . $column_info['name'] . ' = \'' . $setTo . '\'
 					WHERE ' . $column_info['name'] . ' IS NULL',
@@ -416,14 +429,14 @@ class DbTable_PostgreSQL
 					)
 				);
 			}
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action . ' NOT NULL',
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_transaction']('commit');
+			$db->db_transaction('commit');
 		}
 		// What about a change in type?
 		if (isset($column_info['type']) && ($column_info['type'] != $old_info['type'] || (isset($column_info['size']) && $column_info['size'] != $old_info['size'])))
@@ -434,36 +447,36 @@ class DbTable_PostgreSQL
 				$type = $type . '(' . $size . ')';
 
 			// The alter is a pain.
-			$smcFunc['db_transaction']('begin');
-			$smcFunc['db_query']('', '
+			$db->db_transaction('begin');
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD COLUMN ' . $column_info['name'] . '_tempxx ' . $type,
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE ' . $table_name . '
 				SET ' . $column_info['name'] . '_tempxx = CAST(' . $column_info['name'] . ' AS ' . $type . ')',
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				DROP COLUMN ' . $column_info['name'],
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name'],
 				array(
 					'security_override' => true,
 				)
 			);
-			$smcFunc['db_transaction']('commit');
+			$db->db_transaction('commit');
 		}
 		// Finally - auto increment?!
 		if (isset($column_info['auto']) && $column_info['auto'] != $old_info['auto'])
@@ -472,14 +485,14 @@ class DbTable_PostgreSQL
 			if ($old_info['auto'])
 			{
 				// Alter the table first - then drop the sequence.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT \'0\'',
 					array(
 						'security_override' => true,
 					)
 				);
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DROP SEQUENCE ' . $table_name . '_seq',
 					array(
 						'security_override' => true,
@@ -489,13 +502,13 @@ class DbTable_PostgreSQL
 			// Otherwise add it!
 			else
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					CREATE SEQUENCE ' . $table_name . '_seq',
 					array(
 						'security_override' => true,
 					)
 				);
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT nextval(\'' . $table_name . '_seq\')',
 					array(
@@ -517,7 +530,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $smcFunc, $db_package_log, $db_prefix;
+		global $db_package_log, $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -559,7 +575,7 @@ class DbTable_PostgreSQL
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD PRIMARY KEY (' . $columns . ')',
 				array(
@@ -569,7 +585,7 @@ class DbTable_PostgreSQL
 		}
 		else
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				CREATE ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $index_info['name'] . ' ON ' . $table_name . ' (' . $columns . ')',
 				array(
 					'security_override' => true,
@@ -588,7 +604,10 @@ class DbTable_PostgreSQL
 	 */
 	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -603,7 +622,7 @@ class DbTable_PostgreSQL
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key is odd...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP CONSTRAINT ' . $index['name'],
 					array(
@@ -616,7 +635,7 @@ class DbTable_PostgreSQL
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DROP INDEX ' . $index_name,
 					array(
 						'security_override' => true,
@@ -686,7 +705,7 @@ class DbTable_PostgreSQL
 	 */
 	function db_table_structure($table_name, $parameters = array())
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -707,11 +726,14 @@ class DbTable_PostgreSQL
 	 */
 	function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = \'' . $table_name . '\'
@@ -721,7 +743,7 @@ class DbTable_PostgreSQL
 			)
 		);
 		$columns = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			if (!$detail)
 			{
@@ -754,7 +776,7 @@ class DbTable_PostgreSQL
 				);
 			}
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		return $columns;
 	}
@@ -769,11 +791,14 @@ class DbTable_PostgreSQL
 	 */
 	function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
+		// Working with the db
+		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary,
 				CASE WHEN i.indisunique THEN 1 ELSE 0 END AS is_unique,
 				c2.relname AS name,
@@ -787,7 +812,7 @@ class DbTable_PostgreSQL
 			)
 		);
 		$indexes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			// Try get the columns that make it up.
 			if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
@@ -818,7 +843,7 @@ class DbTable_PostgreSQL
 				);
 			}
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		return $indexes;
 	}
