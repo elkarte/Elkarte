@@ -425,7 +425,7 @@ function logPackageInstall($param)
 }
 
 /**
- * Get the last smiley_order from the first smileys row. 
+ * Get the last smiley_order from the first smileys row.
  *
  * @return type
  */
@@ -458,10 +458,10 @@ function sortSmileyTable()
 {
 	global $smcFunc;
 
-	db_extend('packages');
+	$table = db_table();
 
 	// Add a sorting column.
-	$smcFunc['db_add_column']('{db_prefix}smileys', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
+	$table->db_add_column('{db_prefix}smileys', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
 
 	// Set the contents of this column.
 	$smcFunc['db_query']('set_smiley_order', '
@@ -481,7 +481,7 @@ function sortSmileyTable()
 	);
 
 	// Remove the sorting column.
-	$smcFunc['db_remove_column']('{db_prefix}smileys', 'temp_order');
+	$table->db_remove_column('{db_prefix}smileys', 'temp_order');
 }
 
 /**

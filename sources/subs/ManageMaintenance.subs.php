@@ -80,14 +80,14 @@ function flushLogTables()
 /**
  * Gets the table columns from the messages table, just a wrapper function
  *
- * @return array 
+ * @return array
  */
 function getMessageTableColumns()
 {
 	global $smcFunc;
 
-	db_extend('packages');
-	$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+	$table = db_table();
+	$colData = $table->db_list_columns('{db_prefix}messages', true);
 
 	return $colData;
 }
@@ -95,14 +95,14 @@ function getMessageTableColumns()
 /**
  * Resizes the body column from the messages table
  *
- * @param string $type 
+ * @param string $type
  */
 function resizeMessageTableBody($type)
 {
 	global $smcFunc;
 
-	db_extend('packages');
-	$smcFunc['db_change_column']('{db_prefix}messages', 'body', array('type' => $type));
+	$table = db_table();
+	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
 }
 
 /**
@@ -110,7 +110,7 @@ function resizeMessageTableBody($type)
  *
  * @param type $start
  * @param type $increment
- * @return type 
+ * @return type
  */
 function detectExceedingMessages($start, $increment)
 {
@@ -166,7 +166,7 @@ function getExceedingMessages($msg)
  * Lists all the tables from our ElkArte installation.
  * Additional tables from modifications are also included.
  *
- * @return array 
+ * @return array
  */
 function getElkTables()
 {
@@ -175,7 +175,7 @@ function getElkTables()
 	$tables = array();
 
 	db_extend();
-	
+
 	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
@@ -190,20 +190,20 @@ function getElkTables()
 /**
  * Wrapper function for db_optimize_table
  *
- * @param string $tablename 
+ * @param string $tablename
  */
 function optimizeTable($tablename)
 {
 	global $smcFunc;
-	
+
 	db_extend();
 	$smcFunc['db_optimize_table']($tablename);
 }
 
 /**
  * gets the last topics id.
- * 
- * @return int 
+ *
+ * @return int
  */
 function getMaxTopicID()
 {
@@ -311,7 +311,7 @@ function resetBoardsCounter($column)
 	global $smcFunc;
 
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
-	
+
 	if (!in_array($column, $allowed_columns))
 			return false;
 
@@ -331,7 +331,7 @@ function resetBoardsCounter($column)
  *
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start
- * @param int $increment 
+ * @param int $increment
  */
 function updateBoardsCounter($type, $start, $increment)
 {
@@ -472,7 +472,7 @@ function updatePersonalMessagesCounter()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		updateMemberData($row['id_member'], array('instant_messages' => $row['real_num']));
-			
+
 	$smcFunc['db_free_result']($request);
 
 	$request = $smcFunc['db_query']('', '
@@ -602,7 +602,7 @@ function updateBoardsLastMessage()
  * Counts topics from a given board.
  *
  * @param int $id_board
- * @return int 
+ * @return int
  */
 function countTopicsFromBoard($id_board)
 {
@@ -626,14 +626,14 @@ function countTopicsFromBoard($id_board)
  * Gets a list of topics which should be moved to a different board.
  *
  * @param type $id_board
- * @return type 
+ * @return type
  */
 function getTopicsToMove($id_board)
 {
 	global $smcFunc;
 
 	$topics = array();
-	
+
 	// Lets get the topics.
 	$request = $smcFunc['db_query']('', '
 		SELECT id_topic

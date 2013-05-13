@@ -2617,13 +2617,13 @@ function protected_alter($change, $substep, $is_test = false)
 {
 	global $db_prefix, $smcFunc;
 
-	db_extend('packages');
+	$table = db_table();
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $smcFunc['db_list_columns']('{db_prefix}' . $change['table'], true);
+		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?

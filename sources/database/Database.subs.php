@@ -32,11 +32,11 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
 
 	// quick 'n dirty initialization of the right database class.
-	if (strtolower($db_type) === 'mysql')
+	if ($db_type == 'mysql')
 		$db = new Database_MySQL();
-	elseif (strtolower($db_type) === 'postgresql')
+	elseif ($db_type == 'postgresql')
 		$db = new Database_PostgreSQL();
-	elseif (strtolower($db_type) === 'sqlite')
+	elseif ($db_type == 'sqlite')
 		$db = new Database_SQLite();
 
 	return $db->initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
@@ -86,11 +86,11 @@ function database()
 	global $db_type;
 
 	// quick 'n dirty retrieval
-	if (strtolower($db_type) === 'mysql')
+	if ($db_type == 'mysql')
 		$db = Database_MySQL::db();
-	elseif (strtolower($db_type) === 'postgresql')
+	elseif ($db_type == 'postgresql')
 		$db = Database_PostgreSQL::db();
-	elseif (strtolower($db_type) === 'sqlite')
+	elseif ($db_type == 'sqlite')
 		$db = Database_SQLite::db();
 
 	return $db;

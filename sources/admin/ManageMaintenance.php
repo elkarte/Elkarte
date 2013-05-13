@@ -129,9 +129,9 @@ class ManageMaintenance_Controller
 
 		if ($db_type == 'mysql')
 		{
-			db_extend('packages');
+			$table = db_table();
 
-			$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+			$colData = $table->db_list_columns('{db_prefix}messages', true);
 			foreach ($colData as $column)
 				if ($column['name'] == 'body')
 					$body_type = $column['type'];
