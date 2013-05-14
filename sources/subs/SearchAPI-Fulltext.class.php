@@ -114,7 +114,10 @@ class Fulltext_Search
 	 */
 	protected function _getMinWordLength()
 	{
-		global $smcFunc, $db_search;
+		global $smcFunc;
+
+		// need some search specific database tricks
+		$db_search = db_search();
 
 		// Try to determine the minimum number of letters for a fulltext search.
 		$request = $db_search->search_query('max_fulltext_length', '
@@ -210,7 +213,9 @@ class Fulltext_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, $smcFunc, $db_search;
+		global $modSettings, $smcFunc;
+
+		$db_search = db_search();
 
 		$query_select = array(
 			'id_msg' => 'm.id_msg',

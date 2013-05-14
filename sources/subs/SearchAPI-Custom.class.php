@@ -190,7 +190,10 @@ class Custom_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, $smcFunc, $db_search;
+		global $modSettings, $smcFunc;
+
+		// we can't do anything without this
+		$db_search = db_search();
 
 		$query_select = array(
 			'id_msg' => 'm.id_msg',

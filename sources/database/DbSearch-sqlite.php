@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_SQLite
 {
-	private $_search = null;
+	private static $_search = null;
 
 	/**
 	 * This function will tell you whether this database type supports this search type.
@@ -100,7 +100,7 @@ class DbSearch_SQLite
 	{
 		if (is_null(self::$_search))
 		{
-			self::$_search = new DbSearch_SQLite();
+			self::$_search = new self();
 		}
 		return self::$_search;
 	}

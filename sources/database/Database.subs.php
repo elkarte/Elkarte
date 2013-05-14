@@ -47,7 +47,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  */
 function db_extend ($type = 'extra')
 {
-	global $db_type, $db_search;
+	global $db_type;
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
 
@@ -72,6 +72,8 @@ function db_extend ($type = 'extra')
 
 /**
  * Retrieve existing instance of the active database class.
+ *
+ * @return Database
  */
 function database()
 {
@@ -91,6 +93,8 @@ function database()
 /**
  * This function retrieves an existing instance of DbTable
  * and returns it.
+ *
+ * @return DbTable
  */
 function db_table()
 {
@@ -107,4 +111,30 @@ function db_table()
 		$tbl = DbTable_SQLite::db_table();
 
 	return $tbl;
+}
+
+/**
+ * This function returns an instance of DbSearch,
+ * specifically designed for database utilities related to search.
+ *
+ * @return DbSearch_MySQL or DbSearch_PostgreSQL
+ *
+ */
+function db_search()
+{
+	global $db_type;
+
+	require_once(SOURCEDIR . '/database/DbSearch-' . $db_type . '.php');
+
+	$db_search = null;
+
+	// quick 'n dirty retrieval
+	if ($db_type == 'mysql')
+		$db_search = DbSearch_MySQL::db_search();
+	elseif ($db_type == 'postgresql')
+		$db_search = DbSearch_PostgreSQL::db_search();
+	elseif ($db_type == 'sqlite')
+		$db_search = DbSearch_SQLite::db_search();
+
+	return $db_search;
 }

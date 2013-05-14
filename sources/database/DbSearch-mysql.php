@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_MySQL
 {
-	private $_search = null;
+	private static $_search = null;
 
 	/**
 	 * Execute the appropriate query for the search.
@@ -82,7 +82,7 @@ class DbSearch_MySQL
 	{
 		if (is_null(self::$_search))
 		{
-			self::$_search = new DbSearch_MySQL();
+			self::$_search = new self();
 		}
 		return self::$_search;
 	}

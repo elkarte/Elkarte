@@ -302,7 +302,10 @@ class ManageSearch_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $smcFunc, $db_search, $db_type, $db_prefix;
+		global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
+
+		// need to work with some db search stuffs
+		$db_search = db_search();
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_method_title'];
@@ -554,7 +557,10 @@ class ManageSearch_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $smcFunc, $db_search, $db_prefix, $txt;
+		global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+
+		// Get hang of db_search
+		$db_search = db_search();
 
 		// Scotty, we need more time...
 		@set_time_limit(600);

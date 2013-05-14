@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_PostgreSQL
 {
-	private $_search = null;
+	private static $_search = null;
 
 	/**
 	 * This function will tell you whether this database type supports this search type.
@@ -117,7 +117,7 @@ class DbSearch_PostgreSQL
 	{
 		if (is_null(self::$_search))
 		{
-			self::$_search = new DbSearch_PostgreSQL();
+			self::$_search = new self();
 		}
 		return self::$_search;
 	}
