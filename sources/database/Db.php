@@ -65,8 +65,9 @@ interface Database
 	 * Fetch a row from the resultset given as parameter.
 	 *
 	 * @param resource $result
+	 * @param $counter = false
 	 */
-	function fetch_row($result);
+	function fetch_row($result, $counter = false);
 
 	/**
 	 * affected_rows

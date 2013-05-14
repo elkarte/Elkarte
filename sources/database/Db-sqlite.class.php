@@ -649,13 +649,15 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * fetch_row
-	 * Make sure we return no string indexes!
+	 * Fetch a row of next data.
+	 * SQLite method doesn't use the second parameter.
 	 *
-	 * @param $handle
+	 * @param $request
+	 * @param bool $counter = false
 	 */
-	function fetch_row($handle)
+	function fetch_row($handle, $counter = false)
 	{
+		// Make sure we return no string indexes
 		return sqlite_fetch_array($handle, SQLITE_NUM);
 	}
 
@@ -992,7 +994,7 @@ class Database_SQLite implements Database
 				'table_name' => $tableName,
 			)
 		);
-		list ($schema_create) = $smcFunc['db_fetch_row']($result);
+		list ($schema_create) = $this->fetch_row($result);
 		$smcFunc['db_free_result']($result);
 
 		// Now the indexes.
@@ -1044,7 +1046,7 @@ class Database_SQLite implements Database
 			)
 		);
 		$tables = array();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
 		$smcFunc['db_free_result']($request);
 
@@ -1102,7 +1104,7 @@ class Database_SQLite implements Database
 				'txttable' => 'table'
 			)
 		);
-		list ($create) = $smcFunc['db_fetch_row']($result);
+		list ($create) = $this->fetch_row($result);
 		$smcFunc['db_free_result']($result);
 
 		$create = preg_split('/[\n\r]/', $create);

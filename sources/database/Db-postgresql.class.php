@@ -529,7 +529,7 @@ class Database_PostgreSQL implements Database
 		);
 		if (!$request)
 			return false;
-		list ($lastID) = $smcFunc['db_fetch_row']($request);
+		list ($lastID) = $this->fetch_row($request);
 		$smcFunc['db_free_result']($request);
 
 		return $lastID;
@@ -625,7 +625,7 @@ class Database_PostgreSQL implements Database
 	 * Fetch a row from the resultset given as parameter.
 	 *
 	 * @param resource $request
-	 * @param bool $counter
+	 * @param bool $counter = false
 	 */
 	function fetch_row($request, $counter = false)
 	{
@@ -1034,7 +1034,7 @@ class Database_PostgreSQL implements Database
 							'table' => $tableName,
 						)
 					);
-					list ($max_ind) = $smcFunc['db_fetch_row']($count_req);
+					list ($max_ind) = $this->fetch_row($count_req);
 					$smcFunc['db_free_result']($count_req);
 					// Get the right bloody start!
 					$seq_create .= 'CREATE SEQUENCE ' . $matches[1] . ' START WITH ' . ($max_ind + 1) . ';' . $crlf . $crlf;
@@ -1104,7 +1104,7 @@ class Database_PostgreSQL implements Database
 		);
 
 		$tables = array();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
 		$smcFunc['db_free_result']($request);
 

@@ -50,7 +50,7 @@ class Database_MySQL implements Database
 				'db_query' => 'elk_db_query', //
 				'db_quote' => 'elk_db_quote', //
 				'db_fetch_assoc' => 'mysql_fetch_assoc', //
-				'db_fetch_row' => 'mysql_fetch_row',
+				'db_fetch_row' => 'mysql_fetch_row', //
 				'db_free_result' => 'mysql_free_result',
 				'db_insert' => 'elk_db_insert',
 				'db_insert_id' => 'elk_db_insert_id',
@@ -440,10 +440,12 @@ class Database_MySQL implements Database
 
 	/**
 	 * Fetch a row from the resultset given as parameter.
+	 * MySQL implementation doesn't use $counter parameter.
 	 *
 	 * @param resource $result
+	 * @param $counter = false
 	 */
-	function fetch_row($result)
+	function fetch_row($result, $counter = false)
 	{
 		// Just delegate to MySQL's function
 		return mysql_fetch_row($result);
@@ -1040,7 +1042,7 @@ class Database_MySQL implements Database
 			)
 		);
 		$tables = array();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
 		$smcFunc['db_free_result']($request);
 
@@ -1146,7 +1148,7 @@ class Database_MySQL implements Database
 				'table' => $table,
 			)
 		);
-		list (, $create) = $smcFunc['db_fetch_row']($result);
+		list (, $create) = $this->fetch_row($result);
 		$smcFunc['db_free_result']($result);
 
 		$create = preg_split('/[\n\r]/', $create);
@@ -1242,7 +1244,7 @@ class Database_MySQL implements Database
 			array(
 			)
 		);
-		list ($ver) = $smcFunc['db_fetch_row']($request);
+		list ($ver) = $this->fetch_row($request);
 		$smcFunc['db_free_result']($request);
 
 		return $ver;
@@ -1303,7 +1305,7 @@ class Database_MySQL implements Database
 			array(
 			)
 		);
-		list ($ver) = $smcFunc['db_fetch_row']($request);
+		list ($ver) = $this->fetch_row($request);
 		$smcFunc['db_free_result']($request);
 
 		return $ver;
