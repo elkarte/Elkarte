@@ -70,6 +70,13 @@ interface Database
 	function fetch_row($result, $counter = false);
 
 	/**
+	 * Free the resultset.
+	 *
+	 * @param resource $result
+	 */
+	function free_result($result);
+
+	/**
 	 * affected_rows
 	 * @param resource $connection
 	 */

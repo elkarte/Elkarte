@@ -955,7 +955,7 @@ class Database_SQLite implements Database
 			// 'Insert' the data.
 			$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		$data .= $crlf;
 
@@ -995,7 +995,7 @@ class Database_SQLite implements Database
 			)
 		);
 		list ($schema_create) = $this->fetch_row($result);
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Now the indexes.
 		$result = $smcFunc['db_query']('', '
@@ -1012,7 +1012,7 @@ class Database_SQLite implements Database
 		while ($row = $this->fetch_assoc($result))
 			if (trim($row['sql']) != '')
 				$indexes[] = $row['sql'];
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		$index_create .= implode(';' . $crlf, $indexes);
 		$schema_create = empty($indexes) ? rtrim($schema_create) : $schema_create . ';' . $crlf . $crlf;
@@ -1048,7 +1048,7 @@ class Database_SQLite implements Database
 		$tables = array();
 		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $tables;
 	}
@@ -1075,7 +1075,7 @@ class Database_SQLite implements Database
 			return -1;
 
 		$row = $this->fetch_assoc($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		// The function returns nothing.
 		return 0;
@@ -1105,7 +1105,7 @@ class Database_SQLite implements Database
 			)
 		);
 		list ($create) = $this->fetch_row($result);
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		$create = preg_split('/[\n\r]/', $create);
 		$auto_inc = '';

@@ -530,7 +530,7 @@ class Database_PostgreSQL implements Database
 		if (!$request)
 			return false;
 		list ($lastID) = $this->fetch_row($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $lastID;
 	}
@@ -966,7 +966,7 @@ class Database_PostgreSQL implements Database
 			// 'Insert' the data.
 			$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		$data .= $crlf;
 
@@ -1035,7 +1035,7 @@ class Database_PostgreSQL implements Database
 						)
 					);
 					list ($max_ind) = $this->fetch_row($count_req);
-					$smcFunc['db_free_result']($count_req);
+					$this->free_result($count_req);
 					// Get the right bloody start!
 					$seq_create .= 'CREATE SEQUENCE ' . $matches[1] . ' START WITH ' . ($max_ind + 1) . ';' . $crlf . $crlf;
 				}
@@ -1043,7 +1043,7 @@ class Database_PostgreSQL implements Database
 
 			$schema_create .= ',' . $crlf;
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
@@ -1071,7 +1071,7 @@ class Database_PostgreSQL implements Database
 			else
 				$index_create .= $crlf . $row['inddef'] . ';';
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Finish it off!
 		$schema_create .= $crlf . ');';
@@ -1106,7 +1106,7 @@ class Database_PostgreSQL implements Database
 		$tables = array();
 		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $tables;
 	}
@@ -1133,7 +1133,7 @@ class Database_PostgreSQL implements Database
 			return -1;
 
 		$row = $this->fetch_assoc($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		if (isset($row['Data_free']))
 			return $row['Data_free'] / 1024;

@@ -897,7 +897,7 @@ class Database_MySQL implements Database
 			$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
 		}
 
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 		$data = substr(trim($data), 0, -1) . ';' . $crlf . $crlf;
 
 		$start += $limit;
@@ -959,7 +959,7 @@ class Database_MySQL implements Database
 			// And now any extra information. (such as auto_increment.)
 			$schema_create .= ($row['Extra'] != '' ? ' ' . $row['Extra'] : '') . ',' . $crlf;
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
@@ -988,7 +988,7 @@ class Database_MySQL implements Database
 			else
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`';
 		}
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Build the CREATEs for the keys.
 		foreach ($indexes as $keyname => $columns)
@@ -1008,7 +1008,7 @@ class Database_MySQL implements Database
 			)
 		);
 		$row = $this->fetch_assoc($result);
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		// Probably MyISAM.... and it might have a comment.
 		$schema_create .= $crlf . ') ENGINE=' . (isset($row['Type']) ? $row['Type'] : $row['Engine']) . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
@@ -1044,7 +1044,7 @@ class Database_MySQL implements Database
 		$tables = array();
 		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $tables;
 	}
@@ -1069,7 +1069,7 @@ class Database_MySQL implements Database
 				)
 			);
 		$row = $this->fetch_assoc($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
 		$request = $smcFunc['db_query']('', '
@@ -1089,7 +1089,7 @@ class Database_MySQL implements Database
 				)
 			);
 		$row = $this->fetch_assoc($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
 
@@ -1149,7 +1149,7 @@ class Database_MySQL implements Database
 			)
 		);
 		list (, $create) = $this->fetch_row($result);
-		$smcFunc['db_free_result']($result);
+		$this->free_result($result);
 
 		$create = preg_split('/[\n\r]/', $create);
 
@@ -1245,7 +1245,7 @@ class Database_MySQL implements Database
 			)
 		);
 		list ($ver) = $this->fetch_row($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $ver;
 	}
@@ -1306,7 +1306,7 @@ class Database_MySQL implements Database
 			)
 		);
 		list ($ver) = $this->fetch_row($request);
-		$smcFunc['db_free_result']($request);
+		$this->free_result($request);
 
 		return $ver;
 	}
