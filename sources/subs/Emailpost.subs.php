@@ -915,27 +915,12 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	loadLanguage('Maillist');
 
 	// Check on some things needed by parse_bbc as autotask does not load em
-	// @todo still needed?
 	if (!isset($context['browser']))
-	{
-		include_once(SOURCEDIR . '/Load.php');
 		detectBrowser();
-	}
 
 	// Server?
 	if (!isset($context['server']))
-	{
-		$context['server'] = array(
-			'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-			'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-			'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-			'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-			'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-			'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-			'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-			'iso_case_folding' => ord(strtolower(chr(138))) === 154,
-		);
-	}
+		detectServer();
 
 	// Clean it up.
 	censorText($message);
