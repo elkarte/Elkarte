@@ -69,6 +69,9 @@ function template_init()
 	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
 	$settings['require_theme_strings'] = false;
 
+	// This is used for the color variants
+	$settings['theme_variants'] = array('white', 'red', 'green', 'blue');
+
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
 
@@ -94,7 +97,7 @@ function template_html_above()
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
-<html ', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+<html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>
 	<title>', $context['page_title_html_safe'], '</title>';
 
@@ -122,14 +125,12 @@ function template_html_above()
 
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
-	{
 		echo '
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
-		if (!empty($context['theme_variant']))
-			echo '
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl', $context['theme_variant'], '.css?alp21" />';
-	}
+	if (!empty($context['theme_variant']))
+		echo '
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />';
 
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

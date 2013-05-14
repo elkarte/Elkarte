@@ -146,3 +146,9 @@ $txt['themeadmin_edit_on_line'] = 'Beginning on line';
 $txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes that the user is able to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of themes';
+
+// Strings for the variants
+$txt['variant_red'] = 'Minimalist White';
+$txt['variant_red'] = 'Red Sector';
+$txt['variant_green'] = 'Green Style';
+$txt['variant_blue'] = 'Blue Sky';
