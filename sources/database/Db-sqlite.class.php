@@ -58,7 +58,7 @@ class Database_SQLite implements Database
 				'db_num_fields' => 'sqlite_num_fields',
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_server_info' => 'elk_db_libversion',
+				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'elk_db_last_error',
@@ -594,7 +594,7 @@ class Database_SQLite implements Database
 		$priv_trans = false;
 		if (count($data) > 1 && !$db_in_transact && !$disable_trans)
 		{
-			$smcFunc['db_transaction']('begin', $connection);
+			$this->db_transaction('begin', $connection);
 			$priv_trans = true;
 		}
 
@@ -635,7 +635,7 @@ class Database_SQLite implements Database
 		}
 
 		if ($priv_trans)
-			$smcFunc['db_transaction']('commit', $connection);
+			$this->db_transaction('commit', $connection);
 	}
 
 	/**
@@ -809,16 +809,6 @@ class Database_SQLite implements Database
 	function udf_dayofmonth($date)
 	{
 		return substr($date, 8, 2);
-	}
-
-	/**
-	 * We need this since sqlite_libversion() doesn't take any parameters.
-	 *
-	 * @param $void
-	 */
-	function libversion($void = null)
-	{
-		return sqlite_libversion();
 	}
 
 	/**
@@ -1212,8 +1202,10 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 *  Get the version number.
-	 *  @return string - the version
+	 * Get the server version number.
+	 * For sqlite, that means the library version.
+	 *
+	 * @return string - the version
 	 */
 	function db_server_version()
 	{
@@ -1242,6 +1234,35 @@ class Database_SQLite implements Database
 	function fetch_assoc($request, $counter = false)
 	{
 		return sqlite_fetch_array($request);
+	}
+
+	/**
+	 * Return server info.
+	 *
+	 * @return string - the version
+	 */
+	function db_server_info()
+	{
+		// give info on library version
+		return sqlite_libversion();
+	}
+
+	/**
+	 * Get the client version number.
+	 *
+	 * @return string - the version
+	 */
+	function db_client_version()
+	{
+		return sqlite_libversion();
+	}
+
+	/**
+	 * Get the name (title) of the database system.
+	 */
+	function db_title()
+	{
+		return 'SQLite';
 	}
 
 	/**

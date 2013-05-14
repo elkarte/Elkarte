@@ -224,11 +224,11 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 /**
  * Get the current version.
  */
-function elk_db_version()
+function elk_db_server_info()
 {
 	$db = database();
 
-	return $db->db_version();
+	return $db->db_server_info();
 }
 
 /**

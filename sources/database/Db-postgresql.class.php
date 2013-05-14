@@ -60,7 +60,7 @@ class Database_PostgreSQL implements Database
 				'db_num_fields' => 'pg_num_fields',
 				'db_escape_string' => 'pg_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_server_info' => 'elk_db_version',
+				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
 				'db_error' => 'pg_last_error',
@@ -607,7 +607,7 @@ class Database_PostgreSQL implements Database
 		else
 			$context['error_message'] = $txt['try_again'];
 
-		// A database error is often the sign of a database in need of updgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
+		// A database error is often the sign of a database in need of upgrade.  Check forum versions, and if not identical suggest an upgrade... (not for Demo/CVS versions!)
 		if (allowedTo('admin_forum') && !empty($forum_version) && $forum_version != 'ELKARTE ' . @$modSettings['elkVersion'] && strpos($forum_version, 'Demo') === false && strpos($forum_version, 'CVS') === false)
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $forum_version, $modSettings['elkVersion']);
 
@@ -717,7 +717,7 @@ class Database_PostgreSQL implements Database
 		$priv_trans = false;
 		if ((count($data) > 1 || $method == 'replace') && !$db_in_transact && !$disable_trans)
 		{
-			$smcFunc['db_transaction']('begin', $connection);
+			$this->db_transaction('begin', $connection);
 			$priv_trans = true;
 		}
 
@@ -791,7 +791,7 @@ class Database_PostgreSQL implements Database
 		}
 
 		if ($priv_trans)
-			$smcFunc['db_transaction']('commit', $connection);
+			$this->db_transaction('commit', $connection);
 	}
 
 	/**
@@ -803,16 +803,6 @@ class Database_PostgreSQL implements Database
 	function select_db($db_name, $db_connection)
 	{
 		return true;
-	}
-
-	/**
-	 * Get the current client version.
-	 */
-	function db_version()
-	{
-		$version = pg_version();
-
-		return $version['client'];
 	}
 
 	/**
@@ -1197,23 +1187,15 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 *  Get the version number.
+	 * Get the server version number.
 	 *
-	 *  @return string - the version
+	 * @return string - the version
 	 */
 	function db_server_version()
 	{
-		global $smcFunc;
+		$version = pg_version();
 
-		$request = $smcFunc['db_query']('', '
-			SHOW server_version',
-			array(
-			)
-		);
-		list ($ver) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		return $ver;
+		return $version['server'];
 	}
 
 	/**
@@ -1226,9 +1208,39 @@ class Database_PostgreSQL implements Database
 		return pg_escape_string($string);
 	}
 
+	/**
+	 * Free resources used for the passed result set.
+	 *
+	 * @param resource $result
+	 */
 	function free_result($result)
 	{
 		return pg_free_result($result);
+	}
+
+	/**
+	 * Return server info.
+	 *
+	 * @return string
+	 */
+	function db_server_info()
+	{
+		// give info on client! we use it in install and upgrade and such things.
+		$version = pg_version();
+
+		return $version['client'];
+	}
+
+	/**
+	 * Return client version.
+	 *
+	 * @return string - the version
+	 */
+	function db_client_version()
+	{
+		$version = pg_version();
+
+		return $version['client'];
 	}
 
 	/**

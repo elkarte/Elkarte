@@ -169,3 +169,15 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 
 	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }
+
+/**
+ *  Get the version number.
+ *
+ *  @return string - the version
+ */
+function elk_db_server_version()
+{
+	$db = database();
+
+	return $db->db_server_version();
+}

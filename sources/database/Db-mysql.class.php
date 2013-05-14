@@ -61,10 +61,10 @@ class Database_MySQL implements Database
 				'db_unescape_string' => 'stripslashes',
 				'db_server_info' => 'mysql_get_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
-				'db_transaction' => 'elk_db_transaction',
+				'db_transaction' => 'elk_db_transaction', //
 				'db_error' => 'mysql_error',
 				'db_select_db' => 'mysql_select_db',
-				'db_title' => 'MySQL',
+				'db_title' => 'MySQL', // done
 				'db_sybase' => false,
 				'db_case_sensitive' => false,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
@@ -74,7 +74,6 @@ class Database_MySQL implements Database
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_server_version' => 'elk_db_server_version',
-				'db_client_version' => 'elk_db_client_version',
 			);
 
 		if (!empty($db_options['persist']))
@@ -1230,9 +1229,9 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 *  Get the version number.
+	 * Get the version number.
 	 *
-	 *  @return string - the version
+	 * @return string - the version
 	 */
 	function db_server_version()
 	{
@@ -1278,6 +1277,36 @@ class Database_MySQL implements Database
 	function fetch_assoc($request, $counter = false)
 	{
 		return mysql_fetch_assoc($request);
+	}
+
+	/**
+	 * Return server info.
+	 *
+	 * @return string
+	 */
+	function db_server_info()
+	{
+		return mysql_server_info();
+	}
+
+	/**
+	 *  Get the version number.
+	 *
+	 *  @return string - the version
+	 */
+	function db_client_version()
+	{
+		global $smcFunc;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT VERSION()',
+			array(
+			)
+		);
+		list ($ver) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		return $ver;
 	}
 
 	/**

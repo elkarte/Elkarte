@@ -241,15 +241,13 @@ function elk_udf_dayofmonth($date)
 }
 
 /**
- * We need this since sqlite_libversion() doesn't take any parameters.
- *
- * @param $void
+ * Server information.
  */
-function elk_db_libversion($void = null)
+function elk_db_server_info()
 {
 	$db = database();
 
-	return $db->libversion($void);
+	return $db->db_server_info();
 }
 
 /**
@@ -300,4 +298,16 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 	$db = database();
 
 	return $db->escape_wildcard_string($string, $translate_human_wildcards);
+}
+
+/**
+ *  Get the version number.
+ *
+ *  @return string - the version
+ */
+function elk_db_server_version()
+{
+	$db = database();
+
+	return $db->db_server_version();
 }
