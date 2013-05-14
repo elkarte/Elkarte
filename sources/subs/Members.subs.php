@@ -412,7 +412,7 @@ function deleteMembers($users, $check_not_admin = false)
 	// Integration rocks!
 	call_integration_hook('integrate_delete_members', array($users));
 
-	updateStats('member');
+	updateMemberStats();
 
 	require_once(SOURCEDIR . '/Logging.php');
 	logActions($log_changes);
@@ -724,9 +724,9 @@ function registerMember(&$regOptions, $return_errors = false)
 
 	// Update the number of members and latest member's info - and pass the name, but remove the 's.
 	if ($regOptions['register_vars']['is_activated'] == 1)
-		updateStats('member', $memberID, $regOptions['register_vars']['real_name']);
+		updateMemberStats($memberID, $regOptions['register_vars']['real_name']);
 	else
-		updateStats('member');
+		updateMemberStats();
 
 	// Theme variables too?
 	if (!empty($theme_vars))

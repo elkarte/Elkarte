@@ -350,7 +350,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Update the totals...
 	updateStats('message');
-	updateStats('topic');
+	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
@@ -671,7 +671,7 @@ function moveTopics($topics, $toBoard)
 	updateLastMessages(array_unique($updates));
 
 	// Update 'em pesky stats.
-	updateStats('topic');
+	updateTopicStats();
 	updateStats('message');
 	updateSettings(array(
 		'calendar_updated' => time(),

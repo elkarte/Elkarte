@@ -539,7 +539,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$recycle = true;
 
 			// Make sure we update the search subject index.
-			updateStats('subject', $topicID, $row['subject']);
+			updateSubjectStats($topicID, $row['subject']);
 		}
 
 		// If it wasn't approved don't keep it in the queue.
@@ -629,7 +629,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 
 	// Update the pesky statistics.
-	updateStats('message');
+	updateMessageStats();
 	updateStats('topic');
 	updateSettings(array(
 		'calendar_updated' => time(),

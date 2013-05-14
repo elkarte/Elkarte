@@ -183,7 +183,7 @@ function deleteMembergroups($groups)
 		);
 
 	// Recalculate the post groups, as they likely changed.
-	updateStats('postgroups');
+	updatePostgroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
 	$settings_update = array('settings_updated' => time());
@@ -265,7 +265,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			)
 		);
 
-		updateStats('postgroups', $members);
+		updatePostgroupStats($members);
 
 		// Log what just happened.
 		foreach ($members as $member)
@@ -387,7 +387,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		);
 
 	// Their post groups may have changed now...
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
@@ -529,7 +529,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
@@ -1623,7 +1623,7 @@ function prepareMembergroupPermissions()
  * @param array $members = null The members to update, null if all
  * @param array $parameter2 = null
  */
-function updatePostGroupStats($members = null, $parameter2)
+function updatePostgroupStats($members = null, $parameter2)
 {
 	global $smcFunc, $context;
 

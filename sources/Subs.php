@@ -71,7 +71,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 		case 'postgroups':
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			updatePostGroupStats($parameter1, $parameter2);
+			updatePostgroupStats($parameter1, $parameter2);
 			break;
 
 		default:
