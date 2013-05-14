@@ -741,6 +741,7 @@ function scheduled_daily_digest()
 		loadLanguage('Post', $lang);
 		loadLanguage('index', $lang);
 		loadLanguage('Maillist', $lang);
+		loadLanguage('EmailTemplates', $lang);
 
 		$langtxt[$lang] = array(
 			'subject' => $txt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],
@@ -1083,7 +1084,6 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		return false;
 
 	// Send each email, yea!
-	require_once(SOURCEDIR . '/Subs.php');
 	require_once(SUBSDIR . '/Mail.subs.php');
 	$sent = array();
 	$failed_emails = array();
@@ -1121,9 +1121,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
-// @todo remove before beta
-$mail_function = (!empty($modSettings['email_debug']) ? 'mail_todisk' : 'mail');
-			$result = $mail_function(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
+			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
 
 			// if it sent, keep a record so we can save it in our allowed to reply log
 			if (!empty($unq_head) && $result)
@@ -1912,6 +1910,7 @@ function scheduled_maillist_fetch_IMAP()
 
 	return true;
 }
+
 /**
  * Check for followups from removed topics and remove them from the table
  */
