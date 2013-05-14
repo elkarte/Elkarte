@@ -47,7 +47,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  */
 function db_extend ($type = 'extra')
 {
-	global $db_type, $db_search, $db_packages, $db_extra;
+	global $db_type, $db_search;
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
 
@@ -94,6 +94,8 @@ function database()
  */
 function db_table()
 {
+	global $db_type;
+
 	$tbl = null;
 
 	// quick 'n dirty retrieval
