@@ -18,7 +18,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Database_PostgreSQL extends Database
+class Database_PostgreSQL implements Database
 {
 	private static $_db = null;
 
