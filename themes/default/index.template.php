@@ -230,7 +230,7 @@ function template_body_above()
 	{
 		echo '
 			<form id="search_form" class="floatright" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
-				<input type="text" name="search" value="" class="input_text" />&nbsp;';
+				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />&nbsp;';
 
 		// Using the quick search dropdown?
 		if (!empty($modSettings['search_dropdown']))
@@ -305,8 +305,8 @@ function template_body_above()
 		echo '
 						<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 						<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-							<input type="text" name="user" size="10" class="input_text" />
-							<input type="password" name="passwrd" size="10" class="input_password" />
+							<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
+							<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
 							<select name="cookielength">
 								<option value="60">', $txt['one_hour'], '</option>
 								<option value="1440">', $txt['one_day'], '</option>
