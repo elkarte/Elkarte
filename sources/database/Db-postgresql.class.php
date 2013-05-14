@@ -938,7 +938,7 @@ class Database_PostgreSQL implements Database
 
 		if ($new_table)
 		{
-			$fields = array_keys($smcFunc['db_fetch_assoc']($result));
+			$fields = array_keys($this->fetch_assoc($result));
 			$smcFunc['db_data_seek']($result, 0);
 		}
 
@@ -947,7 +947,7 @@ class Database_PostgreSQL implements Database
 		$insert_msg = $crlf . 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
 
 		// Loop through each row.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			// Get the fields in this row...
 			$field_list = array();
@@ -1005,7 +1005,7 @@ class Database_PostgreSQL implements Database
 				'table' => $tableName,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			if ($row['data_type'] == 'character varying')
 				$row['data_type'] = 'varchar';
@@ -1059,7 +1059,7 @@ class Database_PostgreSQL implements Database
 			)
 		);
 		$indexes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			if ($row['is_primary'])
 			{
@@ -1132,7 +1132,7 @@ class Database_PostgreSQL implements Database
 		if (!$request)
 			return -1;
 
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $this->fetch_assoc($request);
 		$smcFunc['db_free_result']($request);
 
 		if (isset($row['Data_free']))

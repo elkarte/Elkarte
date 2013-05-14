@@ -919,7 +919,7 @@ class Database_SQLite implements Database
 
 		if ($new_table)
 		{
-			$fields = array_keys($smcFunc['db_fetch_assoc']($result));
+			$fields = array_keys($this->fetch_assoc($result));
 
 			// SQLite fetches an array so we need to filter out the numberic index for the columns.
 			foreach ($fields as $key => $name)
@@ -934,7 +934,7 @@ class Database_SQLite implements Database
 		$insert_msg = $crlf . 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
 
 		// Loop through each row.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			// Get the fields in this row...
 			$field_list = array();
@@ -1007,7 +1007,7 @@ class Database_SQLite implements Database
 			)
 		);
 		$indexes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 			if (trim($row['sql']) != '')
 				$indexes[] = $row['sql'];
 		$smcFunc['db_free_result']($result);
@@ -1072,7 +1072,7 @@ class Database_SQLite implements Database
 		if (!$request)
 			return -1;
 
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $this->fetch_assoc($request);
 		$smcFunc['db_free_result']($request);
 
 		// The function returns nothing.

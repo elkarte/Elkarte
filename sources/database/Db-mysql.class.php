@@ -47,9 +47,9 @@ class Database_MySQL implements Database
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'mysql_fetch_assoc')
 			$smcFunc += array(
-				'db_query' => 'elk_db_query',
-				'db_quote' => 'elk_db_quote',
-				'db_fetch_assoc' => 'mysql_fetch_assoc',
+				'db_query' => 'elk_db_query', //
+				'db_quote' => 'elk_db_quote', //
+				'db_fetch_assoc' => 'mysql_fetch_assoc', //
 				'db_fetch_row' => 'mysql_fetch_row',
 				'db_free_result' => 'mysql_free_result',
 				'db_insert' => 'elk_db_insert',
@@ -868,7 +868,7 @@ class Database_MySQL implements Database
 
 		if ($new_table)
 		{
-			$fields = array_keys($smcFunc['db_fetch_assoc']($result));
+			$fields = array_keys($this->fetch_assoc($result));
 			$smcFunc['db_data_seek']($result, 0);
 		}
 
@@ -876,7 +876,7 @@ class Database_MySQL implements Database
 		$data = 'INSERT INTO `' . $tableName . '`' . $crlf . "\t" . '(`' . implode('`, `', $fields) . '`)' . $crlf . 'VALUES ';
 
 		// Loop through each row.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			// Get the fields in this row...
 			$field_list = array();
@@ -932,7 +932,7 @@ class Database_MySQL implements Database
 				'table' => $tableName,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			// Make the CREATE for this column.
 			$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] != 'YES' ? ' NOT NULL' : '');
@@ -971,7 +971,7 @@ class Database_MySQL implements Database
 			)
 		);
 		$indexes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $this->fetch_assoc($result))
 		{
 			// IS this a primary key, unique index, or regular index?
 			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
@@ -1005,7 +1005,7 @@ class Database_MySQL implements Database
 				'table' => strtr($tableName, array('_' => '\\_', '%' => '\\%')),
 			)
 		);
-		$row = $smcFunc['db_fetch_assoc']($result);
+		$row = $this->fetch_assoc($result);
 		$smcFunc['db_free_result']($result);
 
 		// Probably MyISAM.... and it might have a comment.
@@ -1066,7 +1066,7 @@ class Database_MySQL implements Database
 					'table_name' => str_replace('_', '\_', $table),
 				)
 			);
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $this->fetch_assoc($request);
 		$smcFunc['db_free_result']($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
@@ -1086,7 +1086,7 @@ class Database_MySQL implements Database
 					'table' => str_replace('_', '\_', $table),
 				)
 			);
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $this->fetch_assoc($request);
 		$smcFunc['db_free_result']($request);
 
 		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;

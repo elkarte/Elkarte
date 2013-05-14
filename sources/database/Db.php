@@ -54,6 +54,21 @@ interface Database
 	function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
+	 * Fetch next result as association.
+	 *
+	 * @param resource $request
+	 * @param mixed counter = false
+	 */
+	function fetch_assoc($request, $counter = false);
+
+	/**
+	 * Fetch a row from the resultset given as parameter.
+	 *
+	 * @param resource $result
+	 */
+	function fetch_row($result);
+
+	/**
 	 * affected_rows
 	 * @param resource $connection
 	 */
