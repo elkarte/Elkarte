@@ -771,7 +771,7 @@ h3.catbg2 a, h3.catbg2 {
 }
 h3.catbg a:hover, h4.catbg a:hover, .table_list tbody.header td a:hover {
 	color: #333;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.4);
+	/* text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.4); */
 	text-decoration: none;
 }
 h3.catbg2 a:hover {
@@ -1012,7 +1012,7 @@ table.table_padding td {
 	font-weight: bold;
 	border: 1px solid #f49a3a;
 	box-shadow: 0 5px 5px rgba(255,255,255,0.2) inset;
-	text-shadow: 0 0 1px rgba(0,0,0,0.4);
+/* 	text-shadow: 0 0 1px rgba(0,0,0,0.4); */
 }
 /* Level 1 hover effects. */
 .dropmenu li a:hover, .dropmenu li:hover a, .dropmenu li a:focus {
@@ -1458,7 +1458,7 @@ div.buttonlist ul>li>ul {
 }
 /* The main title. */
 h1.forumtitle {
-	font-size: 1.8em;
+	font-size: 2em;
 	font-family: tahoma;
 	margin: 0;
 	padding: 22px 12px 6px 12px;
@@ -1467,7 +1467,7 @@ h1.forumtitle {
 }
 h1.forumtitle a {
 	color: #a85400;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
+	/* text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff; */
 }
 /* Float these items to the right */
 #siteslogan, #logo {
@@ -1591,7 +1591,7 @@ ul .greeting {
 	padding: 0;
 	line-height: 1.8em;
 	color: #444;
-	text-shadow: 1px 1px 0 #fff;
+	/* text-shadow: 1px 1px 0 #fff; */
 }
 .navigate_section ul li a, .navigate_section ul li em {
 	padding: 4px 0;
@@ -1600,7 +1600,7 @@ ul .greeting {
 .navigate_section ul li .dividers {
 	color: #3f6b8c;
 	font: 83.33%/150% Arial, sans-serif;
-	text-shadow: -2px -1px 0 rgba(0,0,0,0.4), -1px -1px 0 rgba(0,0,0,0.4), -2px 1px 0 rgba(0,0,0,0.4);
+	/* text-shadow: -2px -1px 0 rgba(0,0,0,0.4), -1px -1px 0 rgba(0,0,0,0.4), -2px 1px 0 rgba(0,0,0,0.4); */
 	padding: 0 2px 0 6px;
 }
 .navigate_section ul li .board_moderators a {
