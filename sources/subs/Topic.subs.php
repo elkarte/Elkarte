@@ -1551,3 +1551,35 @@ function getLoggedTopics($member, $topics)
 
 	return $logged_topics;
 }
+
+/**
+ * This function updates the total number of topics,
+ * or if parameter $increment is true it simply increments them.
+ * Used by updateStats('topic').
+ *
+ * @param bool $increment = null if true, increment + 1 the total topics, otherwise recount all topics
+ */
+function updateTopicStats($increment = null)
+{
+	global $smcFunc, $modSettings;
+
+	if ($increment === true)
+		updateSettings(array('totalTopics' => true), true);
+	else
+	{
+		// Get the number of topics - a SUM is better for InnoDB tables.
+		// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
+		$result = $smcFunc['db_query']('', '
+			SELECT SUM(num_topics + unapproved_topics) AS total_topics
+			FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			WHERE id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+			)
+		);
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
+
+		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
+	}
+}

@@ -999,7 +999,7 @@ function groupsAllowedTo($permission, $board_id = null)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
-			
+
 			if (empty($board_data))
 				fatal_lang_error('no_board');
 			$profile_id = $board_data['id_profile'];
@@ -1755,4 +1755,72 @@ function countMembersInGroup($id_group = 0)
 	$smcFunc['db_free_result']($request);
 
 	return $num_members;
+}
+
+
+/**
+ * This function updates the latest member, the total member
+ * count, and the number of unapproved members.
+ * It also only counts approved members when approval is on,
+ * but is much more efficient with it off.
+ *
+ * Used by updateStats('member').
+ *
+ * @param int $member = null If not an integer reload from the database
+ * @param string $real_name = null
+ */
+function updateMemberStats($id_member = null, $real_name = null)
+{
+	global $smcFunc, $modSettings;
+
+	$changes = array(
+		'memberlist_updated' => time(),
+	);
+
+	// #1 latest member ID, #2 the real name for a new registration.
+	if (is_int($id_member))
+	{
+		$changes['latestMember'] = $id_member;
+		$changes['latestRealName'] = $real_name;
+
+		updateSettings(array('totalMembers' => true), true);
+	}
+	// We need to calculate the totals.
+	else
+	{
+		// Update the latest activated member (highest id_member) and count.
+		$result = $smcFunc['db_query']('', '
+			SELECT COUNT(*), MAX(id_member)
+			FROM {db_prefix}members
+			WHERE is_activated = {int:is_activated}',
+			array(
+				'is_activated' => 1,
+			)
+		);
+		list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
+		$smcFunc['db_free_result']($result);
+
+		require_once(SUBSDIR . '/Members.subs.php');
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData((int) $changes['latestMember']);
+		$changes['latestRealName'] = $result['real_name'];
+
+		// Are we using registration approval?
+		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
+		{
+			// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
+			$result = $smcFunc['db_query']('', '
+				SELECT COUNT(*)
+				FROM {db_prefix}members
+				WHERE is_activated IN ({array_int:activation_status})',
+				array(
+					'activation_status' => array(3, 4),
+				)
+			);
+			list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
+			$smcFunc['db_free_result']($result);
+		}
+	}
+
+	updateSettings($changes);
 }
