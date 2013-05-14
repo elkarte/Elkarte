@@ -19,16 +19,6 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-/**
- * Initialize... while we still have something to do :P
- */
-function db_packages_init()
-{
-	global $db_package_log;
-
-	$db_package_log = array();
-}
-
 class DbTable_PostgreSQL
 {
 	private static $_tbl = null;
@@ -38,6 +28,14 @@ class DbTable_PostgreSQL
 	 * @var array
 	 */
 	private $_reservedTables = null;
+
+	/**
+	 * Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 *
+	 * @var array
+	 */
+	private $_package_log = null;
 
 	private function __construct()
 	{
@@ -89,7 +87,7 @@ class DbTable_PostgreSQL
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $db_package_log, $db_prefix;
+		global $db_prefix;
 
 		// Working with the db
 		$db = database();
@@ -106,7 +104,7 @@ class DbTable_PostgreSQL
 			return false;
 
 		// Log that we'll want to remove this on uninstall.
-		$db_package_log[] = array('remove_table', $table_name);
+		$this->_package_log[] = array('remove_table', $table_name);
 
 		// Grab ourselves one o' these.
 		$db = database();
@@ -265,7 +263,7 @@ class DbTable_PostgreSQL
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_package_log, $txt, $db_prefix;
+		global $txt, $db_prefix;
 
 		// Working with the db
 		$db = database();
@@ -273,7 +271,7 @@ class DbTable_PostgreSQL
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
-		$db_package_log[] = array('remove_column', $table_name, $column_info['name']);
+		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
 		$columns = $this->db_list_columns($table_name, false);
@@ -530,7 +528,7 @@ class DbTable_PostgreSQL
 	 */
 	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_package_log, $db_prefix;
+		global $db_prefix;
 
 		// Working with the db
 		$db = database();
@@ -555,7 +553,7 @@ class DbTable_PostgreSQL
 			$index_info['name'] = $table_name . $index_info['name'];
 
 		// Log that we are going to want to remove this!
-		$db_package_log[] = array('remove_index', $table_name, $index_info['name']);
+		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
 		$indexes = $this->db_list_indexes($table_name, true);
@@ -851,10 +849,7 @@ class DbTable_PostgreSQL
 	public static function db_table()
 	{
 		if (is_null(self::$_tbl))
-		{
 			self::$_tbl = new DbTable_MySQL();
-			db_packages_init();
-		}
 		return self::$_tbl;
 	}
 }

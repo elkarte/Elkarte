@@ -19,16 +19,6 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-/**
- * Initialize... while we still have something to do :P
- */
-function db_packages_init()
-{
-	global $db_package_log;
-
-	$db_package_log = array();
-}
-
 class DbTable_MySQL extends DbTable
 {
 	private static $_tbl = null;
@@ -38,6 +28,14 @@ class DbTable_MySQL extends DbTable
 	 * @var array
 	 */
 	private $_reservedTables = null;
+
+	/**
+	 * Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 *
+	 * @var array
+	 */
+	private $_package_log = null;
 
 	private function __construct()
 	{
@@ -54,6 +52,9 @@ class DbTable_MySQL extends DbTable
 			'themes', 'topics');
 		foreach ($this->_reservedTables as $k => $table_name)
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+		// lets be sure.
+		$this->_package_log = array();
 	}
 
 	/**
@@ -89,7 +90,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $db_package_log, $db_prefix, $db_character_set;
+		global $db_prefix, $db_character_set;
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -103,7 +104,7 @@ class DbTable_MySQL extends DbTable
 			return false;
 
 		// Log that we'll want to remove this on uninstall.
-		$db_package_log[] = array('remove_table', $table_name);
+		$this->_package_log[] = array('remove_table', $table_name);
 
 		// Grab ourselves one o'these.
 		$db = database();
@@ -208,7 +209,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_package_log, $txt, $db_prefix;
+		global $txt, $db_prefix;
 
 		// working hard with the db!
 		$db = database();
@@ -216,7 +217,7 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
-		$db_package_log[] = array('remove_column', $table_name, $column_info['name']);
+		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
 		$columns = $this->db_list_columns($table_name, false);
@@ -366,7 +367,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_package_log, $db_prefix;
+		global $db_prefix;
 
 		// need this thing
 		$db = database();
@@ -391,7 +392,7 @@ class DbTable_MySQL extends DbTable
 			$index_info['name'] = $index_info['name'];
 
 		// Log that we are going to want to remove this!
-		$db_package_log[] = array('remove_index', $table_name, $index_info['name']);
+		$this->$_db_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
 		$indexes = $this->db_list_indexes($table_name, true);
@@ -688,13 +689,15 @@ class DbTable_MySQL extends DbTable
 		return '`' .$column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
 	}
 
+	function package_log()
+	{
+		return $this->_package_log;
+	}
+
 	public static function db_table()
 	{
 		if (is_null(self::$_tbl))
-		{
 			self::$_tbl = new DbTable_MySQL();
-			db_packages_init();
-		}
 		return self::$_tbl;
 	}
 }
