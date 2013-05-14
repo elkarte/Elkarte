@@ -576,6 +576,15 @@ function removeMessage($message, $decreasePostCount = true)
 	// Only remove posts if they're not recycled.
 	if (!$recycle)
 	{
+		// Remove the likes!
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}message_likes
+			WHERE id_msg = {int:id_msg}',
+			array(
+				'id_msg' => $message,
+			)
+		);
+		
 		// Remove the message!
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}messages
@@ -718,4 +727,39 @@ function canAccessMessage($id_msg, $check_approval = true)
 
 	// Otherwise, nope.
 	return false;
+}
+
+/**
+ * For a given message, return only the basic message details.
+ * Does not check premissions, does not deal with attachments
+ *
+ * @param int $id_msg
+ * @return array of message values on success, false on failure
+ */
+function loadMessageBasics($id_msg)
+{
+	global $smcFunc;
+
+	$msg = false;
+
+	// Nothing to do here
+	if (empty($id_msg))
+		return $msg;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT m.id_msg, m.id_topic, m.id_board, m.poster_time, m.id_member, m.subject,
+			m.poster_name, m.poster_email, m.smileys_enabled, m.body, m.approved, t.id_first_msg
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+		WHERE m.id_msg = {int:id_msg}
+		LIMIT 1',
+		array(
+			'id_msg' => (int) $id_msg,
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) !== 0)
+		$msg = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $msg;
 }

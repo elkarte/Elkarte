@@ -416,6 +416,15 @@ function template_main()
 						echo '
 										<li><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
+			// Can they like this post
+			if ($message['can_like'])
+						echo '
+										<li><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="like_button">', $txt['like_post'], '</a></li>';
+			// Or remove the like they made
+			elseif ($message['can_unlike'])
+						echo '
+										<li><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="unlike_button">', $txt['unlike_post'], '</a></li>';
+
 			echo '
 									</ul>';
 		}
@@ -443,6 +452,11 @@ function template_main()
 										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="quotetonew_button">', $txt['quote_new'], '</a></li>
 									</ul>
 								</li>';
+
+		// Has anyone liked this post?
+		if (!empty($message['like_counter']))
+			echo '
+										<li class="quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
 
 		echo '
 							</ul>
@@ -612,6 +626,12 @@ function template_main()
 	else
 		echo '
 		<br class="clear" />';
+
+	// tooltips for likes
+	echo '
+		<script><!-- // --><![CDATA[
+			$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+		// ]]></script>';
 
 	// draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))

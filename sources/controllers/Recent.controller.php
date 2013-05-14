@@ -459,6 +459,7 @@ class Recent_Controller
 			'starter' => 'IFNULL(mems.real_name, ms.poster_name)',
 			'replies' => 't.num_replies',
 			'views' => 't.num_views',
+			'likes' => 't.num_likes',
 			'first_post' => 't.id_topic',
 			'last_post' => 't.id_last_msg'
 		);
@@ -520,7 +521,7 @@ class Recent_Controller
 		// This part is the same for each query.
 		$select_clause = '
 					ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
-					t.num_replies, t.num_views, ms.id_member AS id_first_member, ml.id_member AS id_last_member,
+					t.num_replies, t.num_views, t.num_likes, ms.id_member AS id_first_member, ml.id_member AS id_last_member,
 					ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_poster_name,
 					IFNULL(meml.real_name, ml.poster_name) AS last_poster_name, ml.subject AS last_subject,
 					ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
@@ -1131,8 +1132,8 @@ class Recent_Controller
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
 				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
-				'is_hot' => $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
+				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
+				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
 				'icon' => $row['first_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
@@ -1140,6 +1141,7 @@ class Recent_Controller
 				'pages' => $pages,
 				'replies' => comma_format($row['num_replies']),
 				'views' => comma_format($row['num_views']),
+				'likes' => comma_format($row['num_likes']),
 				'board' => array(
 					'id' => $row['id_board'],
 					'name' => $row['bname'],

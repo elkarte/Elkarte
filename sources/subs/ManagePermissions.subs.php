@@ -71,6 +71,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 	$groupLevels['global']['standard'] = array_merge($groupLevels['global']['restrict'], array(
 		'view_mlist',
 		'karma_edit',
+		'like_posts',
 		'pm_read',
 		'pm_send',
 		'send_email_to_members',
@@ -113,6 +114,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 		'poll_remove_any',
 		'poll_add_any',
 		'approve_posts',
+		'like_posts',
 	));
 
 	// Maintenance - wannabe admins.  They can do almost everything.
@@ -448,6 +450,7 @@ function loadAllPermissions($loadType = 'classic')
 			'who_view' => array(false, 'general', 'view_basic_info'),
 			'search_posts' => array(false, 'general', 'view_basic_info'),
 			'karma_edit' => array(false, 'general', 'moderate_general'),
+			'like_posts' => array(false, 'general', 'moderate_general'),
 			'disable_censor' => array(false, 'general', 'disable_censor'),
 			'pm_read' => array(false, 'pm', 'use_pm_system'),
 			'pm_send' => array(false, 'pm', 'use_pm_system'),
@@ -514,6 +517,7 @@ function loadAllPermissions($loadType = 'classic')
 			'post_unapproved_attachments' => array(false, 'attachment', 'make_unapproved_posts'),
 			'post_attachment' => array(false, 'attachment', 'attach'),
 			'postby_email' => array(false, 'topic', 'make_posts'),
+			'like_posts' => array(false, 'topic', 'moderate'),
 		),
 	);
 
@@ -552,6 +556,8 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';
 	}
+	if (!in_array('l', $context['admin_features']))
+		$hiddenPermissions[] = 'like_posts';
 	if (!in_array('dr', $context['admin_features']))
 	{
 		$hiddenPermissions[] = 'post_draft';
@@ -1306,7 +1312,7 @@ function deletePermissionProfiles($profiles)
 function permProfilesInUse($profiles)
 {
 	global $smcFunc, $txt;
-
+	
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, COUNT(id_board) AS board_count
 		FROM {db_prefix}boards
