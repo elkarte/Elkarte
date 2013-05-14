@@ -406,7 +406,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $webmaster_email;
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
@@ -671,6 +671,10 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	if (empty($all_to))
 		return $log;
 
+	// Track the pm count for our stats
+	if (!empty($modSettings['trackStats']))
+		trackStats(array('pm' => '+'));
+
 	// Insert the message itself and then grab the last insert id.
 	$smcFunc['db_insert']('',
 		'{db_prefix}personal_messages',
@@ -729,7 +733,15 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	}
 
 	censorText($subject);
-	if (empty($modSettings['disallow_sendBody']))
+	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_pm_enabled']);
+
+	// If they have post by email enabled, override disallow_sendBody
+	if ($maillist)
+	{
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+		pbe_prepare_text($message, $subject);
+	}
+	elseif (empty($modSettings['disallow_sendBody']))
 	{
 		censorText($message);
 		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc(htmlspecialchars($message), false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
@@ -754,14 +766,32 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		'REPLYLINK' => $scripturl . '?action=pm;sa=send;f=inbox;pmsg=' . $id_pm . ';quote;u=' . $from['id'],
 		'TOLIST' => implode(', ', $to_names),
 	);
-	$email_template = 'new_pm' . (empty($modSettings['disallow_sendBody']) ? '_body' : '') . (!empty($to_names) ? '_tolist' : '');
+
+	// Select the right template
+	$email_template = ($maillist ? 'pbe_' : '') . 'new_pm' . (empty($modSettings['disallow_sendBody']) ? '_body' : '') . (!empty($to_names) ? '_tolist' : '');
 
 	foreach ($notifications as $lang => $notification_list)
 	{
-		$mail = loadEmailTemplate($email_template, $replacements, $lang);
+		// Using maillist functionality
+		if ($maillist)
+		{
+			$sender_details = query_sender_wrapper($from['id']);
+			$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
 
-		// Off the notification email goes!
-		sendmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, false, 2, null, true);
+			// Add in the signature
+			$replacements['SIGNATURE'] = $sender_details['signature'];
+
+			// And off it goes, looking a bit more personal
+			$mail = loadEmailTemplate($email_template, $replacements, $lang);
+			$reference = !empty($pm_head) ? $pm_head : null;
+			sendmail($notification_list, $mail['subject'], $mail['body'], $from['name'], 'p' . $id_pm, false, 2, null, true, $from_wrapper, $reference);
+		}
+		else
+		{
+			// Off the notification email goes!
+			$mail = loadEmailTemplate($email_template, $replacements, $lang);
+			sendmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, false, 2, null, true);
+		}
 	}
 
 	// Integrated After PMs
