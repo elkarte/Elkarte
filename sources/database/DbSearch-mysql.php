@@ -14,7 +14,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbSearch_MySQL
+class DbSearch_MySQL implements DbSearch
 {
 	private static $_search = null;
 

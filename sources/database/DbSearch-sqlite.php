@@ -14,7 +14,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbSearch_SQLite
+class DbSearch_SQLite implements DbSearch
 {
 	private static $_search = null;
 

@@ -14,7 +14,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbSearch_PostgreSQL
+class DbSearch_PostgreSQL implements DbSearch
 {
 	private static $_search = null;
 

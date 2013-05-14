@@ -124,6 +124,7 @@ function db_search()
 {
 	global $db_type;
 
+	require_once(SOURCEDIR . '/database/DbSearch.php');
 	require_once(SOURCEDIR . '/database/DbSearch-' . $db_type . '.php');
 
 	$db_search = null;
