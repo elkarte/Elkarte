@@ -89,6 +89,9 @@ function db_table()
 {
 	global $db_type;
 
+	require_once(SOURCEDIR . '/database/DbTable.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+
 	$tbl = null;
 
 	// quick 'n dirty retrieval
