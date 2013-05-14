@@ -16,13 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_MySQL
 {
-	/**
-	 *  Initialize. (if necessary)
-	 */
-	function initialize()
-	{
-		// no more left to do :P
-	}
+	private $_search = null;
 
 	/**
 	 * Execute the appropriate query for the search.
@@ -79,5 +73,17 @@ class DbSearch_MySQL
 				'size' => $size,
 			)
 		);
+	}
+
+	/**
+	 * Static method that allows to retrieve or create an instance of this class.
+	 */
+	public static function db_search()
+	{
+		if (is_null(self::$_search))
+		{
+			self::$_search = new DbSearch_MySQL();
+		}
+		return self::$_search;
 	}
 }

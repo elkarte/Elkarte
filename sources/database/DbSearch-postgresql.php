@@ -16,13 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_PostgreSQL
 {
-	/**
-	 * Initialize. (if necessary)
-	 */
-	function initialize()
-	{
-		// if we still need to do something... here is the place
-	}
+	private $_search = null;
 
 	/**
 	 * This function will tell you whether this database type supports this search type.
@@ -114,5 +108,17 @@ class DbSearch_PostgreSQL
 				'string_zero' => '0',
 			)
 		);
+	}
+
+	/**
+	 * Static method that allows to retrieve or create an instance of this class.
+	 */
+	public static function db_search()
+	{
+		if (is_null(self::$_search))
+		{
+			self::$_search = new DbSearch_PostgreSQL();
+		}
+		return self::$_search;
 	}
 }

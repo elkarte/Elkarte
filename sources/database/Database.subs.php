@@ -38,7 +38,6 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 		return Database_PostgreSQL::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	elseif ($db_type == 'sqlite')
 		return Database_SQLite::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
-
 }
 
 /**
@@ -57,25 +56,22 @@ function db_extend ($type = 'extra')
 	{
 		// Bah. Quick 'n dirty :P
 		if ($db_type == 'mysql')
-			$db_search = new DbSearch_MySQL();
+			$db_search = DbSearch_MySQL::db_search();
 		elseif ($db_type == 'postgresql')
-			$db_search = new DbSearch_PostgreSQL();
+			$db_search = DbSearch_PostgreSQL::db_search();
 		elseif ($db_type == 'sqlite')
-			$db_search = new DbSearch_SQLite();
-
-		$db_search->initialize();
+			$db_search = DbSearch_SQLite::db_search();
 	}
 	elseif ($type == 'packages')
 	{
-		// packages... lets make sure the initialization of $smcFunc
-		// (for backwards compatibility) is called at least once.
+		// packages... lets make sure the initialization is called at least once.
 		db_table();
 	}
 	// Otherwise, for 'extra' we have loaded the file, so bye.
 }
 
 /**
- * Retrieve existing instance of the active database class
+ * Retrieve existing instance of the active database class.
  */
 function database()
 {
@@ -92,6 +88,10 @@ function database()
 	return $db;
 }
 
+/**
+ * This function retrieves an existing instance of DbTable
+ * and returns it.
+ */
 function db_table()
 {
 	$tbl = null;

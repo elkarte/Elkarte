@@ -16,13 +16,7 @@ if (!defined('ELKARTE'))
 
 class DbSearch_SQLite
 {
-	/**
-	 * Initialize. (if necessary)
-	 */
-	function initialize()
-	{
-		// initialize or let it go :P
-	}
+	private $_search = null;
 
 	/**
 	 * This function will tell you whether this database type supports this search type.
@@ -97,5 +91,17 @@ class DbSearch_SQLite
 				'string_zero' => '0',
 			)
 		);
+	}
+
+	/**
+	 * Static method that allows to retrieve or create an instance of this class.
+	 */
+	public static function db_search()
+	{
+		if (is_null(self::$_search))
+		{
+			self::$_search = new DbSearch_SQLite();
+		}
+		return self::$_search;
 	}
 }
