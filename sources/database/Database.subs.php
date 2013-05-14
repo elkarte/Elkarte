@@ -51,12 +51,7 @@ function db_extend ($type = 'extra')
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
 
-	// $type = 'search' is now handled by classes
-	if ($type == 'search')
-	{
-		// nothing...
-	}
-	elseif ($type == 'packages')
+	if ($type == 'packages')
 	{
 		// packages... lets make sure the initialization is called at least once.
 		db_table();
