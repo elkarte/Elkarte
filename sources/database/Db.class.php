@@ -7,14 +7,14 @@
  *
  * @version 1.0 Alpha
  *
- * This class is the abstract base class for database drivers implementations.
+ * This class is the base class for database drivers implementations.
  *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
-abstract class Database
+interface Database
 {
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
@@ -22,7 +22,7 @@ abstract class Database
 	 * @param string &db_prefix
 	 * @param string $db_name
 	 */
-	abstract function fix_prefix(&$db_prefix, $db_name);
+	function fix_prefix(&$db_prefix, $db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -32,7 +32,7 @@ abstract class Database
 	 *
 	 * @param $matches
 	 */
-	abstract function replacement__callback($matches);
+	function replacement__callback($matches);
 
 	/**
 	 * Just like the db_query, escape and quote a string, but not executing the query.
@@ -41,7 +41,7 @@ abstract class Database
 	 * @param array $db_values
 	 * @param resource $connection = null
 	 */
-	abstract function quote($db_string, $db_values, $connection = null);
+	function quote($db_string, $db_values, $connection = null);
 
 	/**
 	 * Do a query.  Takes care of errors too.
@@ -51,13 +51,13 @@ abstract class Database
 	 * @param array $db_values = array()
 	 * @param resource $connection = null
 	 */
-	abstract function query($identifier, $db_string, $db_values = array(), $connection = null);
+	function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
 	 * affected_rows
 	 * @param resource $connection
 	 */
-	abstract function affected_rows($connection = null);
+	function affected_rows($connection = null);
 
 	/**
 	 * insert_id
@@ -66,7 +66,7 @@ abstract class Database
 	 * @param string $field = null
 	 * @param resource $connection = null
 	 */
-	abstract function insert_id($table, $field = null, $connection = null);
+	function insert_id($table, $field = null, $connection = null);
 
 	/**
 	 * Do a transaction.
@@ -74,7 +74,7 @@ abstract class Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource $connection = null
 	 */
-	abstract function db_transaction($type = 'commit', $connection = null);
+	function db_transaction($type = 'commit', $connection = null);
 
 	/**
 	 * Database error!
@@ -83,7 +83,7 @@ abstract class Database
 	 * @param string $db_string
 	 * @param resource $connection = null
 	 */
-	abstract function error($db_string, $connection = null);
+	function error($db_string, $connection = null);
 
 	/**
 	 * insert
@@ -96,7 +96,7 @@ abstract class Database
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
 	 */
-	abstract function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
+	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
 
 	/**
 	 * This function tries to work out additional error information from a back trace.
@@ -107,7 +107,7 @@ abstract class Database
 	 * @param $file
 	 * @param $line
 	 */
-	abstract function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
+	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
@@ -115,12 +115,12 @@ abstract class Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	abstract function escape_wildcard_string($string, $translate_human_wildcards=false);
+	function escape_wildcard_string($string, $translate_human_wildcards=false);
 
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
 	 * @return bool
 	 */
-	abstract function support_ignore();
+	function support_ignore();
 }
