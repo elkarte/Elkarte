@@ -299,9 +299,6 @@ function action_plushsearch2()
 	require_once(SUBSDIR . '/Package.subs.php');
 	require_once(SUBSDIR . '/Search.subs.php');
 
-	// Search has a special database set.
-	db_extend('search');
-
 	// Load up the search API we are going to use.
 	$searchAPI = findSearchAPI();
 

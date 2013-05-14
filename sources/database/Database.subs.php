@@ -54,13 +54,7 @@ function db_extend ($type = 'extra')
 	// $type = 'search' is now handled by classes
 	if ($type == 'search')
 	{
-		// Bah. Quick 'n dirty :P
-		if ($db_type == 'mysql')
-			$db_search = DbSearch_MySQL::db_search();
-		elseif ($db_type == 'postgresql')
-			$db_search = DbSearch_PostgreSQL::db_search();
-		elseif ($db_type == 'sqlite')
-			$db_search = DbSearch_SQLite::db_search();
+		// nothing...
 	}
 	elseif ($type == 'packages')
 	{
@@ -117,7 +111,7 @@ function db_table()
  * This function returns an instance of DbSearch,
  * specifically designed for database utilities related to search.
  *
- * @return DbSearch_MySQL or DbSearch_PostgreSQL
+ * @return DbSearch
  *
  */
 function db_search()

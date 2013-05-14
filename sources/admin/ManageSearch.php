@@ -50,8 +50,6 @@ class ManageSearch_Controller
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
-		db_extend('search');
-
 		$subActions = array(
 			'settings' => array($this, 'action_searchSettings_display'),
 			'weights' => array($this, 'action_weight'),
