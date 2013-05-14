@@ -503,7 +503,7 @@ ALTER TABLE {$db_prefix}mail_queue
 ADD COLUMN message_id int(10)  NOT NULL DEFAULT '0';
  ---#
 
----# Updating board prfoiles...
+---# Updating board profiles...
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 ---#
