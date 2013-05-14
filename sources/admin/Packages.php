@@ -964,8 +964,8 @@ class Packages_Controller
 					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
 					global $db_package_log;
 
-					// We'll likely want the package specific database functionality!
-					db_extend('packages');
+					// We'll likely want to work with the database tables structure
+					db_table();
 
 					// Let the file work its magic ;)
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))

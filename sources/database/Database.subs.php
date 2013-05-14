@@ -50,13 +50,7 @@ function db_extend ($type = 'extra')
 	global $db_type;
 
 	require_once(SOURCEDIR . '/database/Db' . strtoupper($type[0]) . substr($type, 1) . '-' . $db_type . '.php');
-
-	if ($type == 'packages')
-	{
-		// packages... lets make sure the initialization is called at least once.
-		db_table();
-	}
-	// Otherwise, for 'extra' we have loaded the file, so bye.
+	// For 'extra' we have loaded the file, so bye.
 }
 
 /**
