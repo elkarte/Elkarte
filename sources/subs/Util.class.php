@@ -48,7 +48,7 @@ class Util
 
 	static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8')
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
 			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, 'UTF-8'));
@@ -60,7 +60,7 @@ class Util
 
 	static function htmltrim($string)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		// Preg_replace space characters
 		$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
@@ -75,7 +75,7 @@ class Util
 
 	static function strpos($haystack, $needle, $offset = 0)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
 
@@ -107,7 +107,7 @@ class Util
 
 	static function substr($string, $start, $length = null)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
 			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -141,7 +141,7 @@ class Util
 
 	static function truncate($string, $length)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		// Set a list of common functions.
 		$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
@@ -150,7 +150,7 @@ class Util
 			$string = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string);
 		else
 		{
-			preg_match('~^(' . $ent_list . '|.){' . $smcFunc['strlen'](substr($string, 0, $length)) . '}~u', $string, $matches);
+			preg_match('~^(' . $ent_list . '|.){' . Util::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 			$string = $matches[0];
 			while (strlen($string) > $length)
 				$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
@@ -160,24 +160,20 @@ class Util
 
 	static function ucfirst($string)
 	{
-		global $smcFunc;
-
-		return $smcFunc['strtoupper']($smcFunc['substr']($string, 0, 1)) . $smcFunc['substr']($string, 1);
+		return Util::strtoupper(Util::substr($string, 0, 1)) . Util::substr($string, 1);
 	}
 
 	static function ucwords($string)
 	{
-		global $smcFunc;
-
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
-			$words[$i] = $smcFunc['ucfirst']($words[$i]);
+			$words[$i] = Util::ucfirst($words[$i]);
 		return implode('', $words);
 	}
 
 	static function strlen($string)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
 		{
