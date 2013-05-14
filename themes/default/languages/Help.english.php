@@ -648,3 +648,7 @@ $helptxt['pbe_pm_enabled'] = 'Enable this to allow users to reply by email to PM
 $helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the posters Display Name, otherwise it will come from the Site Name.  This is simply a envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
 $helptxt['maillist_newtopic_change'] = 'This will allow a user to change the subject of a email notification and have it post as a new topic.  The new topic will be started on the same board as the reply was going to.';
 $helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the imap mailbox';
+
+$helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a frame or an iframe. You can use this additional security restriction on your site against attempts at clickjacking attacks, by ensuring that the content of your site is not embedded into other sites.
+	<br />
+	More information about this header may be found on the internet.';
