@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
 /**
  * Main email posting controller, reads, parses, checks and posts an email message or PM
  * Allows a user to reply to a topic on the board by emailing a reply to a
- * notification messages.
+ * notification message.
  * - It must have the security key in the email or it will be rejected
  * - It must be from the email of a registered user
  * - The key must have been sent to that user

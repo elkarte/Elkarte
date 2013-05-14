@@ -558,7 +558,7 @@ function action_notification()
 			),
 			array(
 				'position' => 'after_title',
-				'value' => list_getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
+				'value' => getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
 				'class' => 'windowbg2',
 			),
 		),
@@ -793,7 +793,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	return $notification_topics;
 }
 
-function list_getBoardNotificationsCount($memID)
+function getBoardNotificationsCount($memID)
 {
 	global $smcFunc, $user_info;
 

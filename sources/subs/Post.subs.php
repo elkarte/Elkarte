@@ -580,7 +580,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$boards_index = array();
 	while ($row = $smcFunc['db_fetch_assoc']($result))
 	{
-		// Any attachments, we just wqant the number of them for display
+		// Any attachments, we just want the number of them for display
 		$num_attachments = 0;
 		$request = $smcFunc['db_query']('', '
 			SELECT COUNT(id_attach)
