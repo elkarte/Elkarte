@@ -19,7 +19,6 @@ if (!defined('ELKARTE'))
 
 abstract class DbTable
 {
-
 	/**
 	 * This function can be used to create a table without worrying about schema
 	 *  compatabilities across supported database systems.
@@ -172,5 +171,4 @@ abstract class DbTable
 		// Only SQLite needed it.
 		return;
 	}
-
 }

@@ -24,6 +24,7 @@ class Database_SQLite extends Database
 
 	private function __construct()
 	{
+		// Private constructor.
 		// Objects should be created through initiate().
 	}
 
