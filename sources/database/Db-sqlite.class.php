@@ -73,7 +73,7 @@ class Database_SQLite implements Database
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_get_backup' => 'elk_db_get_backup',
-				'db_get_version' => 'elk_db_get_version',
+				'db_server_version' => 'elk_db_server_version',
 			);
 
 		if (substr($db_name, -3) != '.db')
@@ -1215,7 +1215,7 @@ class Database_SQLite implements Database
 	 *  Get the version number.
 	 *  @return string - the version
 	 */
-	function db_get_version()
+	function db_server_version()
 	{
 		return sqlite_libversion();
 	}

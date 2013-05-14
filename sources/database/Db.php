@@ -123,4 +123,9 @@ interface Database
 	 * @return bool
 	 */
 	function support_ignore();
+
+	/**
+	 * Get the name (title) of the database system.
+	 */
+	function db_title();
 }

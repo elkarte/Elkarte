@@ -89,9 +89,9 @@ function elk_db_table_sql($tableName)
  *
  *  @return string - the version
  */
-function elk_db_get_version()
+function elk_db_server_version()
 {
 	$db = database();
 
-	return $db->db_get_version();
+	return $db->db_server_version();
 }

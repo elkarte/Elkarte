@@ -74,7 +74,7 @@ class Database_PostgreSQL implements Database
 				'db_insert_sql' => 'elk_db_insert_sql',
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
-				'db_get_version' => 'elk_db_get_version',
+				'db_server_version' => 'elk_db_server_version',
 			);
 
 		if (!empty($db_options['persist']))
@@ -806,13 +806,21 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Get the current version.
+	 * Get the current client version.
 	 */
 	function db_version()
 	{
 		$version = pg_version();
 
 		return $version['client'];
+	}
+
+	/**
+	 * Get the name (title) of the database system.
+	 */
+	function db_title()
+	{
+		return 'PostgreSQL';
 	}
 
 	/**
@@ -1193,7 +1201,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 *  @return string - the version
 	 */
-	function elk_db_get_version()
+	function db_server_version()
 	{
 		global $smcFunc;
 

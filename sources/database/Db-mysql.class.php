@@ -73,7 +73,8 @@ class Database_MySQL implements Database
 				'db_insert_sql' => 'elk_db_insert_sql',
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
-				'db_get_version' => 'elk_db_get_version',
+				'db_server_version' => 'elk_db_server_version',
+				'db_client_version' => 'elk_db_client_version',
 			);
 
 		if (!empty($db_options['persist']))
@@ -1233,7 +1234,7 @@ class Database_MySQL implements Database
 	 *
 	 *  @return string - the version
 	 */
-	function db_get_version()
+	function db_server_version()
 	{
 		global $smcFunc;
 
@@ -1246,6 +1247,14 @@ class Database_MySQL implements Database
 		$smcFunc['db_free_result']($request);
 
 		return $ver;
+	}
+
+	/**
+	 * Get the name (title) of the database system.
+	 */
+	function db_title()
+	{
+		return 'MySQL';
 	}
 
 	/**

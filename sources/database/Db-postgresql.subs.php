@@ -220,3 +220,23 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 
 	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }
+
+/**
+ * Get the current version.
+ */
+function elk_db_version()
+{
+	$db = database();
+
+	return $db->db_version();
+}
+
+/**
+ * Get the current server version.
+ */
+function elk_db_server_version()
+{
+	$db = database();
+
+	return $db->db_server_version();
+}
