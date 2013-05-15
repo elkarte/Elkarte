@@ -566,7 +566,7 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * insert
+	 * Insert data.
 	 *
 	 * @param string $method, options 'replace', 'ignore', 'insert'
 	 * @param $table

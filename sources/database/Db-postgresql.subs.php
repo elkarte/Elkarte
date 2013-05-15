@@ -193,6 +193,21 @@ function elk_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 }
 
 /**
+ * Gets all the necessary INSERTs for the table named table_name.
+ * It goes in 250 row segments.
+ *
+ * @param string $tableName - the table to create the inserts for.
+ * @param bool new_table
+ * @return string the query to insert the data back in, or an empty string if the table was empty.
+ */
+function elk_db_insert_sql($tableName, $new_table = false)
+{
+	$db = database();
+
+	return $db->insert_sql($tableName, $new_table);
+}
+
+/**
  * This function tries to work out additional error information from a back trace.
  *
  * @param $error_message

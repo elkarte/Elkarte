@@ -77,13 +77,14 @@ interface Database
 	function free_result($result);
 
 	/**
-	 * affected_rows
+	 * Returns count of affected rows from the last transaction.
+	 *
 	 * @param resource $connection
 	 */
 	function affected_rows($connection = null);
 
 	/**
-	 * insert_id
+	 * Last insert id
 	 *
 	 * @param string $table
 	 * @param string $field = null
@@ -109,7 +110,7 @@ interface Database
 	function error($db_string, $connection = null);
 
 	/**
-	 * insert
+	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
 	 * @param $table
@@ -151,4 +152,14 @@ interface Database
 	 * Get the name (title) of the database system.
 	 */
 	function db_title();
+
+	/**
+	 * Gets all the necessary INSERTs for the table named table_name.
+	 * It goes in 250 row segments.
+	 *
+	 * @param string $tableName - the table to create the inserts for.
+	 * @param bool new_table
+	 * @return string the query to insert the data back in, or an empty string if the table was empty.
+	 */
+	function insert_sql($tableName, $new_table = false);
 }

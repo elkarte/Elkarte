@@ -51,9 +51,9 @@ class Database_MySQL implements Database
 				'db_quote' => 'elk_db_quote', //
 				'db_fetch_assoc' => 'mysql_fetch_assoc', //
 				'db_fetch_row' => 'mysql_fetch_row', //
-				'db_free_result' => 'mysql_free_result',
-				'db_insert' => 'elk_db_insert',
-				'db_insert_id' => 'elk_db_insert_id',
+				'db_free_result' => 'mysql_free_result', //
+				'db_insert' => 'elk_db_insert', //
+				'db_insert_id' => 'elk_db_insert_id', //
 				'db_num_rows' => 'mysql_num_rows',
 				'db_data_seek' => 'mysql_data_seek',
 				'db_num_fields' => 'mysql_num_fields',
@@ -70,7 +70,7 @@ class Database_MySQL implements Database
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 				'db_backup_table' => 'elk_db_backup_table',
 				'db_optimize_table' => 'elk_db_optimize_table',
-				'db_insert_sql' => 'elk_db_insert_sql',
+				'db_insert_sql' => 'elk_db_insert_sql', //
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_server_version' => 'elk_db_server_version',
@@ -681,7 +681,7 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * insert
+	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
 	 * @param $table

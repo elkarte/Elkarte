@@ -57,21 +57,6 @@ function elk_db_list_tables($db_name_str = false, $filter = false)
 }
 
 /**
- * Gets all the necessary INSERTs for the table named table_name.
- * It goes in 250 row segments.
- *
- * @param string $tableName - the table to create the inserts for.
- * @param bool new_table
- * @return string the query to insert the data back in, or an empty string if the table was empty.
- */
-function elk_db_insert_sql($tableName, $new_table = false)
-{
-	$db = database();
-
-	return $db->insert_sql($tableName, $new_table);
-}
-
-/**
  * Dumps the schema (CREATE) for a table.
  *
  * @param string $tableName - the table

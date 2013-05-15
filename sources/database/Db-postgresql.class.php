@@ -689,7 +689,7 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * insert
+	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
 	 * @param $table
@@ -1206,16 +1206,6 @@ class Database_PostgreSQL implements Database
 	function db_escape_string($string)
 	{
 		return pg_escape_string($string);
-	}
-
-	/**
-	 * Free resources used for the passed result set.
-	 *
-	 * @param resource $result
-	 */
-	function free_result($result)
-	{
-		return pg_free_result($result);
 	}
 
 	/**
