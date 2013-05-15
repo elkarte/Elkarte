@@ -947,7 +947,7 @@ function template_display_calendar()
  */
 function template_display_attachments($message, $ignoring)
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt, $scripturl, $settings;
 
 	echo '
 							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
