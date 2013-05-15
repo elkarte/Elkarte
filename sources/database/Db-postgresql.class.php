@@ -547,6 +547,17 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
+	 * Get the number of rows in the result.
+	 *
+	 * @param resource $result
+	 */
+	function num_rows($result)
+	{
+		// simply delegate to the native function
+		return pg_num_rows($result);
+	}
+
+	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')

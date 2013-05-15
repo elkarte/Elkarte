@@ -54,7 +54,7 @@ class Database_MySQL implements Database
 				'db_free_result' => 'mysql_free_result', //
 				'db_insert' => 'elk_db_insert', //
 				'db_insert_id' => 'elk_db_insert_id', //
-				'db_num_rows' => 'mysql_num_rows',
+				'db_num_rows' => 'mysql_num_rows', //
 				'db_data_seek' => 'mysql_data_seek',
 				'db_num_fields' => 'mysql_num_fields',
 				'db_escape_string' => 'addslashes',
@@ -460,6 +460,17 @@ class Database_MySQL implements Database
 	{
 		// Just delegate to MySQL's function
 		mysql_free_result($result);
+	}
+
+	/**
+	 * Get the number of rows in the result.
+	 *
+	 * @param resource $result
+	 */
+	function num_rows($result)
+	{
+		// simply delegate to the native function
+		return mysql_num_rows($result);
 	}
 
 	/**

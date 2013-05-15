@@ -77,6 +77,13 @@ interface Database
 	function free_result($result);
 
 	/**
+	 * Get the number of rows in the result.
+	 *
+	 * @param resource $result
+	 */
+	function num_rows($result);
+
+	/**
 	 * Returns count of affected rows from the last transaction.
 	 *
 	 * @param resource $connection
