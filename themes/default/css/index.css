@@ -999,18 +999,19 @@ table.table_padding td {
 	right: 0;
 }
 .dropmenu li a {
+	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
 	padding: 0 0.3em;
 	margin: 0;
 	display: block;
-	border: 1px solid transparent;
-	border-radius: 4px;
+	border: 1px solid #ccc;
+	border-radius: 2px;
 }
 /* Level 1 active button. */
 .dropmenu li a.active {
 /* 	background: orange; */
 	color: #666;
 	font-weight: bold;
-	border: 1px solid #f49a3a;
+	border: 1px solid #aaa;
 	box-shadow: 0 5px 5px rgba(255,255,255,0.2) inset;
 /* 	text-shadow: 0 0 1px rgba(0,0,0,0.4); */
 }
@@ -1063,7 +1064,7 @@ table.table_padding td {
 	border: solid 1px #999;
 	border-left: solid 1px #bbb;
 	border-top: solid 1px #ccc;
-	border-radius: 2px 7px 0 4px;
+	border-radius: 2px 2px 2px 2px;
 	box-shadow: 3px 3px 4px rgba(0,0,0,0.3);
 }
 /* Level 2 link background. */
