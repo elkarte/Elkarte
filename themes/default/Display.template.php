@@ -33,118 +33,11 @@ function template_main()
 
 	// Is this topic also a poll?
 	if ($context['is_poll'])
-	{
-		echo '
-			<div id="poll">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
-					</h3>
-				</div>
-				<div class="windowbg">
-					<div class="content" id="poll_options">
-						<h4 id="pollquestion">
-							', $context['poll']['question'], '
-						</h4>';
-
-		// Are they not allowed to vote but allowed to view the options?
-		if ($context['poll']['show_results'] || !$context['allow_vote'])
-		{
-			echo '
-					<dl class="options">';
-
-			// Show each option with its corresponding percentage bar.
-			foreach ($context['poll']['options'] as $option)
-			{
-				echo '
-						<dt class="', $option['voted_this'] ? ' voted' : '', '">', $option['option'], '</dt>
-						<dd class="statsbar', $option['voted_this'] ? ' voted' : '', '">';
-
-				if ($context['allow_poll_view'])
-					echo '
-							', $option['bar_ndt'], '
-							<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
-
-				echo '
-						</dd>';
-			}
-
-			echo '
-					</dl>';
-
-			if ($context['allow_poll_view'])
-				echo '
-						<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
-		}
-		// They are allowed to vote! Go to it!
-		else
-		{
-			echo '
-						<form action="', $scripturl, '?action=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
-
-			// Show a warning if they are allowed more than one option.
-			if ($context['poll']['allowed_warning'])
-				echo '
-							<p class="smallpadding">', $context['poll']['allowed_warning'], '</p>';
-
-			echo '
-							<ul class="reset options">';
-
-			// Show each option with its button - a radio likely.
-			foreach ($context['poll']['options'] as $option)
-				echo '
-								<li>', $option['vote_button'], ' <label for="', $option['id'], '">', $option['option'], '</label></li>';
-
-			echo '
-							</ul>
-							<div class="submitbutton">
-								<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
-								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							</div>
-						</form>';
-		}
-
-		// Is the clock ticking?
-		if (!empty($context['poll']['expire_time']))
-			echo '
-						<p><strong>', ($context['poll']['is_expired'] ? $txt['poll_expired_on'] : $txt['poll_expires_on']), ':</strong> ', $context['poll']['expire_time'], '</p>';
-
-		echo '
-					</div>
-				</div>
-			</div>
-			<div id="pollmoderation">';
-
-		template_button_strip($context['poll_buttons']);
-
-		echo '
-			</div>';
-	}
+		template_display_poll();
 
 	// Does this topic have some events linked to it?
 	if (!empty($context['linked_calendar_events']))
-	{
-		echo '
-			<div class="linked_events">
-				<div class="title_bar">
-					<h3 class="titlebg headerpadding">', $txt['calendar_linked_events'], '</h3>
-				</div>
-				<div class="windowbg">
-					<div class="content">
-						<ul class="reset">';
-
-		foreach ($context['linked_calendar_events'] as $event)
-			echo '
-							<li>
-								', ($event['can_edit'] ? '<a href="' . $event['modify_href'] . '"> <img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="" title="' . $txt['modify'] . '" class="edit_event" /></a> ' : ''), '<strong>', $event['title'], '</strong>: ', $event['start_date'], ($event['start_date'] != $event['end_date'] ? ' - ' . $event['end_date'] : ''), '
-							</li>';
-
-		echo '
-						</ul>
-					</div>
-				</div>
-			</div>';
-	}
+		template_display_calendar();
 
 	// Show the page index... "Pages: [1]".
 	echo '
@@ -998,3 +891,124 @@ function template_build_poster_div($message, $ignoring)
 
 	return $poster_div;
 }
+
+/**
+ * Used to display a polls / poll results
+ */
+function template_display_poll()
+{
+	global $settings, $context, $txt, $scripturl;
+	echo '
+			<div id="poll">
+				<div class="cat_bar">
+					<h3 class="catbg">
+						<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
+					</h3>
+				</div>
+				<div class="windowbg">
+					<div class="content" id="poll_options">
+						<h4 id="pollquestion">
+							', $context['poll']['question'], '
+						</h4>';
+
+	// Are they not allowed to vote but allowed to view the options?
+	if ($context['poll']['show_results'] || !$context['allow_vote'])
+	{
+		echo '
+					<dl class="options">';
+
+		// Show each option with its corresponding percentage bar.
+		foreach ($context['poll']['options'] as $option)
+		{
+			echo '
+						<dt class="', $option['voted_this'] ? ' voted' : '', '">', $option['option'], '</dt>
+						<dd class="statsbar', $option['voted_this'] ? ' voted' : '', '">';
+
+			if ($context['allow_poll_view'])
+				echo '
+							', $option['bar_ndt'], '
+							<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
+
+			echo '
+						</dd>';
+		}
+
+		echo '
+					</dl>';
+
+		if ($context['allow_poll_view'])
+			echo '
+						<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
+	}
+		// They are allowed to vote! Go to it!
+	else
+	{
+		echo '
+						<form action="', $scripturl, '?action=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
+
+		// Show a warning if they are allowed more than one option.
+		if ($context['poll']['allowed_warning'])
+			echo '
+							<p class="smallpadding">', $context['poll']['allowed_warning'], '</p>';
+
+		echo '
+							<ul class="reset options">';
+
+		// Show each option with its button - a radio likely.
+		foreach ($context['poll']['options'] as $option)
+			echo '
+								<li>', $option['vote_button'], ' <label for="', $option['id'], '">', $option['option'], '</label></li>';
+
+		echo '
+							</ul>
+							<div class="submitbutton">
+								<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+							</div>
+						</form>';
+	}
+
+	// Is the clock ticking?
+	if (!empty($context['poll']['expire_time']))
+		echo '
+						<p><strong>', ($context['poll']['is_expired'] ? $txt['poll_expired_on'] : $txt['poll_expires_on']), ':</strong> ', $context['poll']['expire_time'], '</p>';
+
+	echo '
+					</div>
+				</div>
+			</div>
+			<div id="pollmoderation">';
+
+		template_button_strip($context['poll_buttons']);
+
+	echo '
+			</div>';
+}
+
+/**
+ * Used to display an attached calendar event.
+ */
+function template_display_calendar()
+{
+	global $context, $txt, $settings;
+	echo '
+			<div class="linked_events">
+				<div class="title_bar">
+					<h3 class="titlebg headerpadding">', $txt['calendar_linked_events'], '</h3>
+				</div>
+				<div class="windowbg">
+					<div class="content">
+						<ul class="reset">';
+
+	foreach ($context['linked_calendar_events'] as $event)
+		echo '
+							<li>
+								', ($event['can_edit'] ? '<a href="' . $event['modify_href'] . '"> <img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="" title="' . $txt['modify'] . '" class="edit_event" /></a> ' : ''), '<strong>', $event['title'], '</strong>: ', $event['start_date'], ($event['start_date'] != $event['end_date'] ? ' - ' . $event['end_date'] : ''), '
+							</li>';
+
+	echo '
+						</ul>
+					</div>
+				</div>
+			</div>';
+	}
