@@ -422,6 +422,9 @@ function template_info_center()
 	// ]]></script>';
 }
 
+/**
+ * This is the newsfader
+ */
 function template_news_fader()
 {
 	global $settings, $options, $txt, $context;
