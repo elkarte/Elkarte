@@ -491,10 +491,8 @@ class Database_PostgreSQL implements Database
 
 	/**
 	 * Affected rows from previous operation.
-	 *
-	 * @param string $result
 	 */
-	function affected_rows($result = null)
+	function affected_rows()
 	{
 		global $db_last_result, $db_replace_result;
 
@@ -503,7 +501,7 @@ class Database_PostgreSQL implements Database
 		elseif ($result === null && !$db_last_result)
 			return 0;
 
-		return pg_affected_rows($result === null ? $db_last_result : $result);
+		return pg_affected_rows($db_last_result);
 	}
 
 	/**
@@ -555,6 +553,14 @@ class Database_PostgreSQL implements Database
 	{
 		// simply delegate to the native function
 		return pg_num_rows($result);
+	}
+
+	/**
+	 * Get the number of fields in the resultset.
+	 */
+	function num_fields($request)
+	{
+		return pg_num_fields($request);
 	}
 
 	/**
@@ -675,7 +681,7 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Reset the pointer...
+	 * Reset the internal result pointer.
 	 *
 	 * @param $request
 	 * @param $counter
@@ -808,10 +814,10 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Dummy function really. Doesn't do anything on PostgreSQL.
 	 *
-	 * @param unknown_type $db_name
-	 * @param unknown_type $db_connection
+	 * @param string $db_name = null
+	 * @param resource $db_connection = null
 	 */
-	function select_db($db_name, $db_connection)
+	function select_db($db_name = null, $db_connection = null)
 	{
 		return true;
 	}
@@ -950,7 +956,7 @@ class Database_PostgreSQL implements Database
 		if ($new_table)
 		{
 			$fields = array_keys($this->fetch_assoc($result));
-			$smcFunc['db_data_seek']($result, 0);
+			$this->data_seek($result, 0);
 		}
 
 		// Start it off with the basic INSERT INTO.

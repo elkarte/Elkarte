@@ -417,14 +417,12 @@ class Database_SQLite implements Database
 
 	/**
 	 * Affected rows from previous operation.
-	 *
-	 * @param resource $connection
 	 */
-	function affected_rows($connection = null)
+	function affected_rows()
 	{
 		global $db_connection;
 
-		return sqlite_changes($connection === null ? $db_connection : $connection);
+		return sqlite_changes($db_connection);
 	}
 
 	/**
@@ -657,6 +655,27 @@ class Database_SQLite implements Database
 	{
 		// simply delegate to the native function
 		return sqlite_num_rows($result);
+	}
+
+	/**
+	 * Get the number of fields in the resultset.
+	 */
+	function num_fields($request)
+	{
+		return sqlite_num_fields($request);
+	}
+
+	/**
+	 * Reset the internal result pointer.
+	 * SQLite implementation does not use the $request parameter, and will ignore it.
+	 *
+	 * @param $request
+	 * @param $counter
+	 */
+	function data_seek($request, $counter)
+	{
+		// delegate to native sqlite function
+		return sqlite_seek($counter);
 	}
 
 	/**
@@ -939,7 +958,7 @@ class Database_SQLite implements Database
 				if (is_numeric($name))
 					unset($fields[$key]);
 
-			$smcFunc['db_data_seek']($result, 0);
+			$this->data_seek($result, 0);
 		}
 
 		// Start it off with the basic INSERT INTO.
@@ -1276,6 +1295,17 @@ class Database_SQLite implements Database
 	function db_title()
 	{
 		return 'SQLite';
+	}
+
+/**
+	 * Select database.
+	 *
+	 * @param string $dbName = null
+	 * @param resource $connection = null
+	 */
+	function select_db($dbName = null, $connection = null)
+	{
+		return true;
 	}
 
 	/**

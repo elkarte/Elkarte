@@ -75,11 +75,11 @@ function elk_db_query($identifier, $db_string, $db_values = array(), $connection
  * affected_rows
  * @param resource $connection
  */
-function elk_db_affected_rows($connection = null)
+function elk_db_affected_rows()
 {
 	$db = database();
 
-	return $db->affected_rows($connection);
+	return $db->affected_rows();
 }
 
 /**

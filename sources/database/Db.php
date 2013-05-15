@@ -84,11 +84,22 @@ interface Database
 	function num_rows($result);
 
 	/**
-	 * Returns count of affected rows from the last transaction.
-	 *
-	 * @param resource $connection
+	 * Get the number of fields in the resultset.
 	 */
-	function affected_rows($connection = null);
+	function num_fields($request);
+
+	/**
+	 * Reset the internal result pointer.
+	 *
+	 * @param $request
+	 * @param $counter
+	 */
+	function data_seek($request, $counter);
+
+	/**
+	 * Returns count of affected rows from the last transaction.
+	 */
+	function affected_rows();
 
 	/**
 	 * Last insert id
@@ -169,4 +180,12 @@ interface Database
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
 	function insert_sql($tableName, $new_table = false);
+
+	/**
+	 * Select database.
+	 *
+	 * @param string $dbName = null
+	 * @param resource $connection = null
+	 */
+	function select_db($dbName = null, $connection = null);
 }

@@ -55,15 +55,15 @@ class Database_MySQL implements Database
 				'db_insert' => 'elk_db_insert', //
 				'db_insert_id' => 'elk_db_insert_id', //
 				'db_num_rows' => 'mysql_num_rows', //
-				'db_data_seek' => 'mysql_data_seek',
-				'db_num_fields' => 'mysql_num_fields',
+				'db_data_seek' => 'mysql_data_seek', //
+				'db_num_fields' => 'mysql_num_fields', //
 				'db_escape_string' => 'addslashes',
 				'db_unescape_string' => 'stripslashes',
 				'db_server_info' => 'mysql_get_server_info',
-				'db_affected_rows' => 'elk_db_affected_rows',
+				'db_affected_rows' => 'elk_db_affected_rows', //
 				'db_transaction' => 'elk_db_transaction', //
 				'db_error' => 'mysql_error',
-				'db_select_db' => 'mysql_select_db',
+				'db_select_db' => 'mysql_select_db', //
 				'db_title' => 'MySQL', // done
 				'db_sybase' => false,
 				'db_case_sensitive' => false,
@@ -411,14 +411,12 @@ class Database_MySQL implements Database
 
 	/**
 	 * Affected rows from previous operation.
-	 *
-	 * @param resource $connection
 	 */
-	function affected_rows($connection = null)
+	function affected_rows()
 	{
 		global $db_connection;
 
-		return mysql_affected_rows($connection === null ? $db_connection : $connection);
+		return mysql_affected_rows($db_connection);
 	}
 
 	/**
@@ -471,6 +469,26 @@ class Database_MySQL implements Database
 	{
 		// simply delegate to the native function
 		return mysql_num_rows($result);
+	}
+
+	/**
+	 * Get the number of fields in the resultset.
+	 */
+	function num_fields($request)
+	{
+		return mysql_num_fields($request);
+	}
+
+	/**
+	 * Reset the internal result pointer.
+	 *
+	 * @param $request
+	 * @param $counter
+	 */
+	function data_seek($request, $counter)
+	{
+		// delegate to native mysql function
+		return mysql_data_seek($request, $counter);
 	}
 
 	/**
@@ -882,7 +900,7 @@ class Database_MySQL implements Database
 		if ($new_table)
 		{
 			$fields = array_keys($this->fetch_assoc($result));
-			$smcFunc['db_data_seek']($result, 0);
+			$this->data_seek($result, 0);
 		}
 
 		// Start it off with the basic INSERT INTO.
@@ -1320,6 +1338,17 @@ class Database_MySQL implements Database
 		$this->free_result($request);
 
 		return $ver;
+	}
+
+	/**
+	 * Select database.
+	 *
+	 * @param string $dbName = null
+	 * @param resource $connection = null
+	 */
+	function select_db($dbName = null, $connection = null)
+	{
+		return mysql_select_db($dbName, $connection);
 	}
 
 	/**
