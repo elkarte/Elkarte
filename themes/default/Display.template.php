@@ -168,80 +168,7 @@ function template_main()
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
-		{
-			echo '
-							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
-
-			$last_approved_state = 1;
-			$attachments_per_line = 4;
-			$i = 0;
-
-			foreach ($message['attachment'] as $attachment)
-			{
-				// Show a special box for unapproved attachments...
-				if ($attachment['is_approved'] != $last_approved_state)
-				{
-					$last_approved_state = 0;
-					echo '
-								<fieldset>
-									<legend>', $txt['attach_awaiting_approve'];
-
-					if ($context['can_approve'])
-						echo '
-										&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>]';
-
-					echo '
-									</legend>';
-				}
-
-				echo '
-									<div class="floatleft">';
-
-				if ($attachment['is_image'])
-				{
-						echo '
-										<div class="attachments_top">';
-
-					if ($attachment['thumbnail']['has_thumb'])
-						echo '
-											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
-					else
-						echo '
-											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px"/>';
-
-						echo '
-										</div>';
-				}
-
-				echo '
-										<div class="attachments_bot">
-											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
-
-				if (!$attachment['is_approved'] && $context['can_approve'])
-					echo '
-											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
-				echo '
-											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
-										</div>';
-
-				echo '
-									</div>';
-
-				// Next attachment line ?
-				if (++$i % $attachments_per_line === 0)
-					echo '
-									<hr />';
-			}
-
-			// If we had unapproved attachments clean up.
-			if ($last_approved_state == 0)
-				echo '
-								</fieldset>';
-
-			echo '
-							</div>';
-		}
-
+			template_display_attachments($message, $ignoring);
 		if (empty($options['hide_poster_area']))
 			echo '
 						</div>';
@@ -1011,4 +938,86 @@ function template_display_calendar()
 					</div>
 				</div>
 			</div>';
+}
+
+/**
+ * Used to display attachments
+ * @param array $message
+ * @param bool $ignoring
+ */
+function template_display_attachments($message, $ignoring)
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
+
+	$last_approved_state = 1;
+	$attachments_per_line = 4;
+	$i = 0;
+
+	foreach ($message['attachment'] as $attachment)
+	{
+		// Show a special box for unapproved attachments...
+		if ($attachment['is_approved'] != $last_approved_state)
+		{
+			$last_approved_state = 0;
+			echo '
+								<fieldset>
+									<legend>', $txt['attach_awaiting_approve'];
+
+			if ($context['can_approve'])
+				echo '
+										&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>]';
+
+			echo '
+									</legend>';
+		}
+
+		echo '
+									<div class="floatleft">';
+
+		if ($attachment['is_image'])
+		{
+			echo '
+										<div class="attachments_top">';
+
+			if ($attachment['thumbnail']['has_thumb'])
+				echo '
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
+			else
+				echo '
+											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px"/>';
+
+				echo '
+										</div>';
+		}
+
+		echo '
+										<div class="attachments_bot">
+											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
+
+		if (!$attachment['is_approved'] && $context['can_approve'])
+			echo '
+											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
+		echo '
+											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
+										</div>';
+
+		echo '
+									</div>';
+
+		// Next attachment line ?
+		if (++$i % $attachments_per_line === 0)
+			echo '
+									<hr />';
 	}
+
+	// If we had unapproved attachments clean up.
+	if ($last_approved_state == 0)
+		echo '
+								</fieldset>';
+
+	echo '
+							</div>';
+}
