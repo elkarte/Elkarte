@@ -4498,7 +4498,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 /*--------------------------------------*/
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 @media screen and (min-width: 320px) and (max-width: 480px) {
-	.table_list td.stats, .table_list td.lastpost, .table_grid td.lastpost, .table_grid th.last_post, .table_grid td.stats, .table_grid th.stats {
+	#posting_icons, .table_list td.stats, .table_list td.lastpost, .table_grid td.lastpost, .table_grid th.last_post, .table_grid td.stats, .table_grid th.stats {
 		display: none;
 	}
 	#wrapper, .frame {
