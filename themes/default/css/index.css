@@ -529,17 +529,45 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 .selectbox, .pagelinks {
 	margin: 8px 0 0 0;
 }
-.navPages {
+.pagelinks {
 	padding: 0 1px;
+	margin: 8px 0 0 0;
+}
+.pagelinks  .pagelink:first-child {
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	border-left: 1px solid #ccc;
+}
+.pagelinks  .pagelink:last-child {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+.pagelink, .expand_pages {
+	border-top: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	padding: 1px 5px;
+	background: #efefef;
+	display: inline-block;
+}
+.navPages {
+}
+small .pagelink {
+	border: none !important;
+	padding: 1px;
+}
+.next_page, .previous_page {
+	text-transform: capitalize;
+}
+.current_page  {
+	color: #ccc;
 }
 .next_page, .previous_page {
 	text-transform: capitalize;
 	padding: 0 2px;
 }
 .current_page strong {
-	font-size: 1.2em;
-	padding: 0 4px 0 2px;
-	color: #b46100;
+	color: #333;
 	font-family: verdana, sans-serif;
 }
 /* Next and previous topic links for Display.template.php. */
@@ -551,6 +579,10 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 }
 .nextlinks a {
 	padding: 3px 0;
+}
+small span.pagelink, small span.expand_pages {
+	border: none;
+	background: none;
 }
 /* Go up and go down links. */
 .topbottom {

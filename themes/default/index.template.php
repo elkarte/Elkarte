@@ -80,9 +80,9 @@ function template_init()
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
 	$settings['page_index_template'] = array(
-		'base_link' => '<a class="navPages" href="{base_link}">%2$s</a> ',
+		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="current_page"><strong>%1$s</strong></span>',
+		'current_page' => '<span class="pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 	);
