@@ -25,7 +25,6 @@ class MarkRead_Controller
 {
 	/**
 	* This is the main function for markasread file.
-	* It forwards the request to the appropriate function.
 	*/
 	public function action_index()
 	{
@@ -42,6 +41,9 @@ class MarkRead_Controller
 		redirectexit($redir);
 	}
 
+	/**
+	* This function forwards the request to the appropriate function.
+	*/
 	private function _dispatch()
 	{
 		// sa=all action_markboards()
@@ -60,6 +62,9 @@ class MarkRead_Controller
 		return $this->{$sa}();
 	}
 
+	/**
+	* This is the main function for markasread file when using APIs.
+	*/
 	public function action_index_api()
 	{
 		global $context, $txt;
