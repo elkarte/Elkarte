@@ -58,13 +58,10 @@ class Database_MySQL implements Database
 				'db_num_fields' => 'mysql_num_fields', //
 				'db_escape_string' => 'addslashes', //
 				'db_unescape_string' => 'stripslashes', //
-				'db_server_info' => 'mysql_get_server_info', //
 				'db_affected_rows' => 'elk_db_affected_rows', //
 				'db_transaction' => 'elk_db_transaction', //
 				'last_error' => 'mysql_error', //
-				'db_select_db' => 'mysql_select_db', //
 				'db_case_sensitive' => false, //
-				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string', //
 			);
 
 		// initialize the instance.

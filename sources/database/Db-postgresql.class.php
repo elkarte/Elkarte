@@ -59,14 +59,10 @@ class Database_PostgreSQL implements Database
 				'db_num_fields' => 'pg_num_fields',
 				'db_escape_string' => 'pg_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
 				'last_error' => 'pg_last_error',
-				'db_select_db' => 'elk_db_select_db',
-				'db_title' => 'PostgreSQL',
 				'db_case_sensitive' => true,
-				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 			);
 
 		// initialize the instance.

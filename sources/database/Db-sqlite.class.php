@@ -57,14 +57,10 @@ class Database_SQLite implements Database
 				'db_num_fields' => 'sqlite_num_fields',
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
 				'last_error' => 'elk_db_last_error',
-				'db_select_db' => '',
-				'db_title' => 'SQLite',
 				'db_case_sensitive' => true,
-				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 			);
 
 		if (substr($db_name, -3) != '.db')

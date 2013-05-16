@@ -241,16 +241,6 @@ function elk_udf_dayofmonth($date)
 }
 
 /**
- * Server information.
- */
-function elk_db_server_info()
-{
-	$db = database();
-
-	return $db->db_server_info();
-}
-
-/**
  * This function uses variable argument lists so that it can handle more then two parameters.
  * Emulates the CONCAT function.
  */
@@ -285,19 +275,6 @@ function elk_udf_regexp($exp, $search)
 	$db = database();
 
 	return $db->udf_regexp($exp, $search);
-}
-
-/**
- * Escape the LIKE wildcards so that they match the character and not the wildcard.
- *
- * @param $string
- * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
- */
-function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false)
-{
-	$db = database();
-
-	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }
 
 function elk_db_unescape_string($string)

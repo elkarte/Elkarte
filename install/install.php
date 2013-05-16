@@ -815,7 +815,7 @@ function action_databaseSettings()
 			);
 
 			// Okay, let's try the prefix if it didn't work...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection) && $db_name != '')
+			if (!$db->select_db($db_name, $db_connection) && $db_name != '')
 			{
 				$smcFunc['db_query']('', "
 					CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
@@ -826,7 +826,7 @@ function action_databaseSettings()
 					$db_connection
 				);
 
-				if ($smcFunc['db_select_db']($_POST['db_prefix'] . $db_name, $db_connection))
+				if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
 				{
 					$db_name = $_POST['db_prefix'] . $db_name;
 					updateSettingsFile(array('db_name' => $db_name));
@@ -834,7 +834,7 @@ function action_databaseSettings()
 			}
 
 			// Okay, now let's try to connect...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection))
+			if (!$db->select_db($db_name, $db_connection))
 			{
 				$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 				return false;
