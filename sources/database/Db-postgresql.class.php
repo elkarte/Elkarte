@@ -63,7 +63,7 @@ class Database_PostgreSQL implements Database
 				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
-				'db_error' => 'pg_last_error',
+				'last_error' => 'pg_last_error',
 				'db_select_db' => 'elk_db_select_db',
 				'db_title' => 'PostgreSQL',
 				'db_sybase' => true,
@@ -76,6 +76,9 @@ class Database_PostgreSQL implements Database
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_server_version' => 'elk_db_server_version',
 			);
+
+		// initialize the instance.
+		self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @pg_pconnect('host=' . $db_server . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
@@ -94,9 +97,6 @@ class Database_PostgreSQL implements Database
 				display_db_error();
 			}
 		}
-
-		// initialize the instance.
-		self::$_db = new self();
 
 		return $connection;
 	}
@@ -584,6 +584,16 @@ class Database_PostgreSQL implements Database
 			return @pg_query($connection, 'COMMIT');
 
 		return false;
+	}
+
+	/**
+	 * Return last error string from the database server
+	 *
+	 * @param resource $connection = null
+	 */
+	function last_error($connection = null)
+	{
+		return pg_last_error($connection);
 	}
 
 	/**

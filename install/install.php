@@ -312,6 +312,8 @@ function load_database()
 		if (!$db_connection)
 			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist), $db_type);
 	}
+
+	return database();
 }
 
 /**
@@ -770,11 +772,12 @@ function action_databaseSettings()
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
 		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
 		if ($db_connection == null)
 		{
-			$db_error = @$smcFunc['db_error']();
+			$db_error = $db->last_error();
 
 			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
 			if ($db_connection != null)
@@ -941,7 +944,7 @@ function action_databasePopulation()
 
 	// Reload settings.
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
 	$result = $smcFunc['db_query']('', '
@@ -1042,7 +1045,7 @@ function action_databasePopulation()
 			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
 			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
 			{
-				$incontext['failures'][$count] = $smcFunc['db_error']();
+				$incontext['failures'][$count] = $db->last_error();
 			}
 		}
 		else
@@ -1142,7 +1145,7 @@ function action_databasePopulation()
 
 		if (!empty($db_messed))
 		{
-			$incontext['failures'][-1] = $smcFunc['db_error']();
+			$incontext['failures'][-1] = $db->last_error();
 			break;
 		}
 	}
@@ -1180,7 +1183,7 @@ function action_adminAccount()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	if (!isset($_POST['username']))
 		$_POST['username'] = '';
@@ -1317,7 +1320,7 @@ function action_adminAccount()
 			if ($request === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($smcFunc['db_error']($db_connection))) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection))) . '</div>';
 				return false;
 			}
 
@@ -1345,7 +1348,7 @@ function action_deleteInstall()
 	$incontext['continue'] = 0;
 
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	if (!defined('SUBSDIR'))
 		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');

@@ -2451,7 +2451,7 @@ function parse_sql($filename)
 					// Bit of a bodge - do we want the error?
 					if (!empty($upcontext['return_error']))
 					{
-						$upcontext['error_message'] = $smcFunc['db_error']($db_connection);
+						$upcontext['error_message'] = $db->last_error($db_connection);
 						return false;
 					}
 				}*/
@@ -2499,7 +2499,7 @@ function upgrade_query($string, $unbuffered = false)
 	if ($result !== false)
 		return $result;
 
-	$db_error_message = $smcFunc['db_error']($db_connection);
+	$db_error_message = $db->last_error($db_connection);
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{

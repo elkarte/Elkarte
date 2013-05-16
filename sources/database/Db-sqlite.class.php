@@ -61,7 +61,7 @@ class Database_SQLite implements Database
 				'db_server_info' => 'elk_db_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows',
 				'db_transaction' => 'elk_db_transaction',
-				'db_error' => 'elk_db_last_error',
+				'last_error' => 'elk_db_last_error',
 				'db_select_db' => '',
 				'db_title' => 'SQLite',
 				'db_sybase' => true,
@@ -78,6 +78,9 @@ class Database_SQLite implements Database
 
 		if (substr($db_name, -3) != '.db')
 			$db_name .= '.db';
+
+		// initialize the instance.
+		self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @sqlite_popen($db_name, 0666, $sqlite_error);
@@ -108,9 +111,6 @@ class Database_SQLite implements Database
 		sqlite_create_function($connection, 'concat', 'elk_udf_concat');
 		sqlite_create_function($connection, 'locate', 'elk_udf_locate', 2);
 		sqlite_create_function($connection, 'regexp', 'elk_udf_regexp', 2);
-
-		// initialize the instance.
-		self::$_db = new self();
 
 		return $connection;
 	}
@@ -483,6 +483,16 @@ class Database_SQLite implements Database
 		}
 
 		return false;
+	}
+
+	/**
+	 * Return last error string from the database server
+	 *
+	 * @param resource $database = null
+	 */
+	function last_error($database = null)
+	{
+		return sqlite_last_error($database);
 	}
 
 	/**

@@ -62,7 +62,7 @@ class Database_MySQL implements Database
 				'db_server_info' => 'mysql_get_server_info',
 				'db_affected_rows' => 'elk_db_affected_rows', //
 				'db_transaction' => 'elk_db_transaction', //
-				'db_error' => 'mysql_error',
+				'last_error' => 'mysql_error', //
 				'db_select_db' => 'mysql_select_db', //
 				'db_title' => 'MySQL', // done
 				'db_sybase' => false,
@@ -75,6 +75,9 @@ class Database_MySQL implements Database
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_server_version' => 'elk_db_server_version',
 			);
+
+		// initialize the instance.
+		self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @mysql_pconnect($db_server, $db_user, $db_passwd);
@@ -100,9 +103,6 @@ class Database_MySQL implements Database
 			array(),
 			false
 		);
-
-		// initialize the instance.
-		self::$_db = new self();
 
 		return $connection;
 	}
@@ -411,12 +411,14 @@ class Database_MySQL implements Database
 
 	/**
 	 * Affected rows from previous operation.
+	 *
+	 * @param resource $connection
 	 */
-	function affected_rows()
+	function affected_rows($connection = null)
 	{
 		global $db_connection;
 
-		return mysql_affected_rows($db_connection);
+		return mysql_affected_rows($connection === null ? $db_connection : $connection);
 	}
 
 	/**
@@ -515,7 +517,17 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Database error!
+	 * Return last error string from the database server
+	 *
+	 * @param resource $connection = null
+	 */
+	function last_error($connection = null)
+	{
+		return mysql_error($connection);
+	}
+
+	/**
+	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string

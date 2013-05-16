@@ -150,7 +150,7 @@ class AdminDebug_Controller
 				{
 					echo '
 		<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
-			<tr><td>', $smcFunc['db_error']($db_connection), '</td></tr>
+			<tr><td>', $db->last_error($db_connection), '</td></tr>
 		</table>';
 					continue;
 				}
