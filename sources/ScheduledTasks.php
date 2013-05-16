@@ -544,17 +544,22 @@ function scheduled_auto_optimize()
  */
 function scheduled_daily_digest()
 {
-	global $is_weekly, $txt, $mbname, $scripturl, $smcFunc, $context, $modSettings;
+	global $is_weekly, $txt, $mbname, $scripturl, $smcFunc, $context, $modSettings, $boardurl;
 
 	// We'll want this...
 	require_once(SUBSDIR . '/Mail.subs.php');
 	loadEssentialThemeData();
 
+	// If the maillist function is on then so is the enhanced digest
+	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
+	if ($maillist)
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+
 	$is_weekly = !empty($is_weekly) ? 1 : 0;
 
 	// Right - get all the notification data FIRST.
 	$request = $smcFunc['db_query']('', '
-		SELECT ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, mem.email_address, mem.member_name, mem.notify_types,
+		SELECT ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, mem.email_address, mem.member_name, mem.real_name, mem.notify_types,
 			mem.lngfile, mem.id_member
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -576,7 +581,7 @@ function scheduled_daily_digest()
 		{
 			$members[$row['id_member']] = array(
 				'email' => $row['email_address'],
-				'name' => $row['member_name'],
+				'name' => ($row['real_name'] == '') ? $row['member_name'] : un_htmlspecialchars($row['real_name']),
 				'id' => $row['id_member'],
 				'notifyMod' => $row['notify_types'] < 3 ? true : false,
 				'lang' => $row['lngfile'],
@@ -615,12 +620,13 @@ function scheduled_daily_digest()
 
 	// Get the actual topics...
 	$request = $smcFunc['db_query']('', '
-		SELECT ld.note_type, t.id_topic, t.id_board, t.id_member_started, m.id_msg, m.subject,
-			b.name AS board_name
+		SELECT ld.note_type, t.id_topic, t.id_board, t.id_member_started, m.id_msg, m.subject, m.body, ld.id_msg AS last_reply,
+			b.name AS board_name, ml.body as last_body
 		FROM {db_prefix}log_digest AS ld
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ld.id_topic
 				AND t.id_board IN ({array_int:board_list}))
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = ld.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE ' . ($is_weekly ? 'ld.daily != {int:daily_value}' : 'ld.daily IN (0, 2)'),
 		array(
@@ -634,30 +640,59 @@ function scheduled_daily_digest()
 		if (!isset($types[$row['note_type']][$row['id_board']]))
 			$types[$row['note_type']][$row['id_board']] = array(
 				'lines' => array(),
-				'name' => $row['board_name'],
+				'name' => un_htmlspecialchars($row['board_name']),
 				'id' => $row['id_board'],
 			);
 
-		if ($row['note_type'] == 'reply')
+		// A reply has been made
+		if ($row['note_type'] === 'reply')
 		{
+			// More than one reply to this topic?
 			if (isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
+			{
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['count']++;
+
+				// keep track of the highest numbered reply and body text for this topic ...
+				if ($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['body_id'] < $row['last_reply'])
+				{
+					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['body_id'] = $row['last_reply'];
+					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['body_text'] = $row['last_body'];
+				}
+			}
 			else
+			{
+				// First time we have seen a reply to this topic, so load our array
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 					'id' => $row['id_topic'],
 					'subject' => un_htmlspecialchars($row['subject']),
+					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 					'count' => 1,
+					'body_id' => $row['last_reply'],
+					'body_text' => $row['last_body'],
 				);
+			}
 		}
-		elseif ($row['note_type'] == 'topic')
+		// New topics are good too
+		elseif ($row['note_type'] === 'topic')
 		{
+			if ($maillist)
+			{
+				// Convert to markdown markup e.g. text ;)
+				pbe_prepare_text($row['body']);
+				$row['body'] = shorten_text($row['body']);
+				$row['body'] = preg_replace("~\n~s","\n  ", $row['body']);
+			}
+
+			// Topics are simple since we are only concerned with the first post
 			if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 					'id' => $row['id_topic'],
+					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 					'subject' => un_htmlspecialchars($row['subject']),
+					'body' => $row['body'],
 				);
 		}
-		else
+		elseif ($maillist && empty($modSettings['pbe_no_mod_notices']))
 		{
 			if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
@@ -668,8 +703,10 @@ function scheduled_daily_digest()
 		}
 
 		$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array();
+
 		if (!empty($notify['topics'][$row['id_topic']]))
 			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['topics'][$row['id_topic']]);
+
 		if (!empty($notify['boards'][$row['id_board']]))
 			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['boards'][$row['id_board']]);
 	}
@@ -678,13 +715,34 @@ function scheduled_daily_digest()
 	if (empty($types))
 		return true;
 
+	// Fix the last reply message so its suitable for previewing
+	if ($maillist)
+	{
+		foreach ($types['reply'] as $id => $board)
+		{
+			foreach ($board['lines'] as $topic)
+			{
+				// Replace the body array with the appropriate preview message
+				$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
+				pbe_prepare_text($body);
+				$body = shorten_text($body);
+				$body = preg_replace("~\n~s","\n  ", $body);
+				$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
+
+				unset($types['reply'][$id]['lines'][$topic['id']]['body_text'], $body);
+			}
+		}
+	}
+
 	// Let's load all the languages into a cache thingy.
 	$langtxt = array();
 	foreach ($langs as $lang)
 	{
 		loadLanguage('Post', $lang);
 		loadLanguage('index', $lang);
+		loadLanguage('Maillist', $lang);
 		loadLanguage('EmailTemplates', $lang);
+
 		$langtxt[$lang] = array(
 			'subject' => $txt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],
 			'char_set' => 'UTF-8',
@@ -702,12 +760,15 @@ function scheduled_daily_digest()
 			'move' => $txt['digest_mod_act_move'],
 			'merge' => $txt['digest_mod_act_merge'],
 			'split' => $txt['digest_mod_act_split'],
-			'bye' => $txt['regards_team'],
-		);
+			'bye' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '') . "\n" . $boardurl,
+			'preview' => $txt['digest_preview'],
+			'see_full' => $txt['digest_see_full'],
+			'reply_preview' => $txt['digest_reply_preview'],
+			'unread_reply_link' => $txt['digest_unread_reply_link'],
+			);
 	}
 
 	// Right - send out the silly things - this will take quite some space!
-	$emails = array();
 	foreach ($members as $mid => $member)
 	{
 		// Right character set!
@@ -720,21 +781,33 @@ function scheduled_daily_digest()
 			'email' => $member['email'],
 		);
 
-		// All new topics?
+		// All the new topics
 		if (isset($types['topic']))
 		{
 			$titled = false;
+
+			// Each type contains a board ID and then a topic number
 			foreach ($types['topic'] as $id => $board)
+			{
 				foreach ($board['lines'] as $topic)
+				{
+					// They have requested notification for new topics in this board
 					if (in_array($mid, $topic['members']))
 					{
+						// Start of the new topics with a heading bar
 						if (!$titled)
 						{
-							$email['body'] .= "\n" . $langtxt[$lang]['new_topics'] . ':' . "\n" . '-----------------------------------------------';
+							$email['body'] .= "\n" . $langtxt[$lang]['new_topics'] . ':' . "\n" . str_repeat('-', 78);
 							$titled = true;
 						}
+
 						$email['body'] .= "\n" . sprintf($langtxt[$lang]['topic_lines'], $topic['subject'], $board['name']);
+						if ($maillist)
+							$email['body'] .= $langtxt[$lang]['preview'] . $topic['body'] . $langtxt[$lang]['see_full'] . $topic['link'] . "\n";
 					}
+				}
+			}
+
 			if ($titled)
 				$email['body'] .= "\n";
 		}
@@ -743,17 +816,28 @@ function scheduled_daily_digest()
 		if (isset($types['reply']))
 		{
 			$titled = false;
+
+			// Each reply will have a board id and then a topic ID
 			foreach ($types['reply'] as $id => $board)
+			{
 				foreach ($board['lines'] as $topic)
+				{
+					// This member wants notices on replys to this topic
 					if (in_array($mid, $topic['members']))
 					{
+						// First one in the section gets a nice heading
 						if (!$titled)
 						{
-							$email['body'] .= "\n" . $langtxt[$lang]['new_replies'] . ':' . "\n" . '-----------------------------------------------';
+							$email['body'] .= "\n" . $langtxt[$lang]['new_replies'] . ':' . "\n" . str_repeat('-', 78);
 							$titled = true;
 						}
-						$email['body'] .= "\n" . ($topic['count'] == 1 ? sprintf($langtxt[$lang]['replies_one'], $topic['subject']) : sprintf($langtxt[$lang]['replies_many'], $topic['count'], $topic['subject']));
+
+						$email['body'] .= "\n" . ($topic['count'] === 1 ? sprintf($langtxt[$lang]['replies_one'], $topic['subject']) : sprintf($langtxt[$lang]['replies_many'], $topic['count'], $topic['subject']));
+						if ($maillist)
+							$email['body'] .= $langtxt[$lang]['reply_preview'] . $topic['body'] . $langtxt[$lang]['unread_reply_link'] . $topic['link'] . "\n";
 					}
+				}
+			}
 
 			if ($titled)
 				$email['body'] .= "\n";
@@ -763,31 +847,40 @@ function scheduled_daily_digest()
 		$titled = false;
 		foreach ($types as $note_type => $type)
 		{
-			if ($note_type == 'topic' || $note_type == 'reply')
+			if ($note_type === 'topic' || $note_type === 'reply')
 				continue;
 
 			foreach ($type as $id => $board)
+			{
 				foreach ($board['lines'] as $topic)
+				{
 					if (in_array($mid, $topic['members']))
 					{
 						if (!$titled)
 						{
-							$email['body'] .= "\n" . $langtxt[$lang]['mod_actions'] . ':' . "\n" . '-----------------------------------------------';
+							$email['body'] .= "\n" . $langtxt[$lang]['mod_actions'] . ':' . "\n" . str_repeat('-', 47);
 							$titled = true;
 						}
+
 						$email['body'] .= "\n" . sprintf($langtxt[$lang][$note_type], $topic['subject']);
 					}
-
+				}
+			}
 		}
+
 		if ($titled)
 			$email['body'] .= "\n";
 
 		// Then just say our goodbyes!
-		$email['body'] .= "\n\n" . $txt['regards_team'];
+		$email['body'] .= "\n\n" .$langtxt[$lang]['bye'];
 
 		// Send it - low priority!
 		sendmail($email['email'], $email['subject'], $email['body'], null, null, false, 4);
 	}
+
+	// Using the queue, do a final flush before we say thats all folks
+	if (!empty($modSettings['mail_queue']))
+		AddMailQueue(true);
 
 	// Clean up...
 	if ($is_weekly)
@@ -871,7 +964,7 @@ function scheduled_weekly_digest()
  */
 function ReduceMailQueue($number = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $context, $webmaster_email, $scripturl;
 
 	// Are we intending another script to be sending out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
@@ -888,6 +981,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// By default move the next sending on by 10 seconds, and require an affected row.
 	if (!$override_limit)
 	{
+		// Set our delay based on our per min limit (mail_limit)
 		$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_limit']) && $modSettings['mail_limit'] < 5 ? 10 : 5);
 
 		$smcFunc['db_query']('', '
@@ -909,30 +1003,31 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// If we're not overriding how many are we allow to send?
 	if (!$override_limit && !empty($modSettings['mail_limit']))
 	{
-		list ($mt, $mn) = @explode('|', $modSettings['mail_recent']);
+		// See if we have quota left to send another group this minute or if we have to wait
+		list ($mail_time, $mail_number) = @explode('|', $modSettings['mail_recent']);
 
 		// Nothing worth noting...
-		if (empty($mn) || $mt < time() - 60)
+		if (empty($mail_number) || $mail_time < time() - 60)
 		{
-			$mt = time();
-			$mn = $number;
+			$mail_time = time();
+			$mail_number = $number;
 		}
 		// Otherwise we have a few more we can spend?
-		elseif ($mn < $modSettings['mail_limit'])
+		elseif ($mail_number < $modSettings['mail_limit'])
 		{
-			$mn += $number;
+			$mail_number += $number;
 		}
 		// No more I'm afraid, return!
 		else
 			return false;
 
 		// Reflect that we're about to send some, do it now to be safe.
-		updateSettings(array('mail_recent' => $mt . '|' . $mn));
+		updateSettings(array('mail_recent' => $mail_time . '|' . $mail_number));
 	}
 
 	// Now we know how many we're sending, let's send them.
 	$request = $smcFunc['db_query']('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent
+		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
@@ -952,6 +1047,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			'headers' => $row['headers'],
 			'send_html' => $row['send_html'],
 			'time_sent' => $row['time_sent'],
+			'priority' => $row['priority'],
+			'message_id' => $row['message_id'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -986,14 +1083,21 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (empty($ids))
 		return false;
 
-	if (!empty($modSettings['mail_type']) && $modSettings['smtp_host'] != '')
-		require_once(SUBSDIR . '/Post.subs.php');
-
 	// Send each email, yea!
+	require_once(SUBSDIR . '/Mail.subs.php');
+	$sent = array();
 	$failed_emails = array();
+
+	// Use sendmail or SMTP
+	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
+
+	// Line breaks need to be \r\n only in windows or for SMTP.
+	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+
 	foreach ($emails as $key => $email)
 	{
-		if (empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '')
+		// Use the right mail resource
+		if ($use_sendmail)
 		{
 			$email['subject'] = strtr($email['subject'], array("\r" => '', "\n" => ''));
 			if (!empty($modSettings['mail_strip_carriage']))
@@ -1001,9 +1105,31 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				$email['body'] = strtr($email['body'], array("\r" => ''));
 				$email['headers'] = strtr($email['headers'], array("\r" => ''));
 			}
+			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
+
+			// Create our unique reply to email header, priority 3 and below only (4 = digest, 5 = newsletter)
+			$unq_id = '';
+			$unq_head = '';
+			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && $email['priority'] < 4 && empty($modSettings['mail_no_message_id']))
+			{
+				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
+				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
+			}
+			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
+				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
-			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers']);
+			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
+
+			// if it sent, keep a record so we can save it in our allowed to reply log
+			if (!empty($unq_head) && $result)
+				$sent[] = array($unq_head, time(), $email['to']);
+
+			// track total emails sent
+			if ($result && !empty($modSettings['trackStats']))
+				trackStats(array('email' => '+'));
 
 			// Try to stop a timeout, this would be bad...
 			@set_time_limit(300);
@@ -1011,11 +1137,27 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array($email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['time_sent']);
+			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['message_id']);
+	}
+
+	// Clear out the stat cache.
+	trackStats();
+
+	// Log each email.
+	if (!empty($sent))
+	{
+		$smcFunc['db_insert']('ignore',
+			'{db_prefix}postby_emails',
+			array(
+				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
+			),
+			$sent,
+			array('id_email')
+		);
 	}
 
 	// Any emails that didn't send?
@@ -1033,19 +1175,20 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		if ($modSettings['mail_failed_attempts'] > 5)
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}settings
-				SET value = {string:mail_next_send}
-				WHERE variable = {string:next_mail_send}
+				SET value = {string:next_mail_send}
+				WHERE variable = {string:mail_next_send}
 					AND value = {string:last_send}',
 				array(
 					'next_mail_send' => time() + 60,
 					'mail_next_send' => 'mail_next_send',
 					'last_send' => $modSettings['mail_next_send'],
-			));
+				)
+			);
 
 		// Add our email back to the queue, manually.
 		$smcFunc['db_insert']('insert',
 			'{db_prefix}mail_queue',
-			array('recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'string', 'time_sent' => 'string'),
+			array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
 			$failed_emails,
 			array('id_mail')
 		);
@@ -1061,7 +1204,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			array(
 				'zero' => '0',
 				'mail_failed_attempts' => 'mail_failed_attempts',
-		));
+			)
+		);
 
 	// Had something to send...
 	return true;
@@ -1751,6 +1895,18 @@ function scheduled_remove_old_drafts()
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		deleteDrafts($drafts, -1, false);
 	}
+
+	return true;
+}
+
+/**
+ * If we can't run this via cron, run it as a task instead
+ * Fetch emails from an imap box and process them
+ */
+function scheduled_maillist_fetch_IMAP()
+{
+	// Only should be run if the user can't set up a proper cron job and can not pipe emails
+	require_once(BOARDDIR . '/email_imap_cron.php');
 
 	return true;
 }

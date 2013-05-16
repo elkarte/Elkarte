@@ -62,6 +62,23 @@ function AdminMain()
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_support',
 				),
+				'maillist' => array(
+					'label' => $txt['mail_center'],
+					'file' => 'ManageMaillist.php',
+					'controller' => 'ManageMaillist_Controller',
+					'function' => 'action_index',
+					'icon' => 'mail.png',
+					'class' => 'admin_img_mail',
+					'permission' => array('approve_emails', 'admin_forum'),
+					'enabled' => in_array('pe', $context['admin_features']),
+					'subsections' => array(
+						'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
+						'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
+						'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
+						'emailtemplates' => array($txt['mm_emailtemplates'], 'approve_emails'),
+						'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
+					),
+				),
 				'news' => array(
 					'label' => $txt['news_title'],
 					'file' => 'ManageNews.php',
@@ -99,8 +116,9 @@ function AdminMain()
 					'select' => 'index'
 				),
 				'adminlogoff' => array(
+					'controller' => 'Admin_Controller',
+					'function' => 'action_endsession',
 					'label' => $txt['admin_logoff'],
-					'function' => 'AdminEndSession',
 					'enabled' => empty($modSettings['securityDisable']),
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_exit',
@@ -589,7 +607,7 @@ class Admin_Controller
 	 *
 	 *  It can be found by going to ?action=admin.
 	*/
-	function action_home()
+	public function action_home()
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
@@ -706,7 +724,7 @@ class Admin_Controller
 	 *
 	 *  Accessed by ?action=admin;area=credits
 	*/
-	function action_credits()
+	public function action_credits()
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
@@ -814,7 +832,7 @@ class Admin_Controller
 	/**
 	 * This function allocates out all the search stuff.
 	 */
-	function action_search()
+	public function action_search()
 	{
 		global $txt, $context, $smcFunc;
 
@@ -852,7 +870,7 @@ class Admin_Controller
 	/**
 	 * A complicated but relatively quick internal search.
 	 */
-	function action_search_internal()
+	public function action_search_internal()
 	{
 		global $context, $txt, $helptxt, $scripturl;
 
@@ -1009,7 +1027,7 @@ class Admin_Controller
 	/**
 	 * All this does is pass through to manage members.
 	 */
-	function action_search_member()
+	public function action_search_member()
 	{
 		global $context;
 
@@ -1026,7 +1044,7 @@ class Admin_Controller
 	 * This file allows the user to search the wiki documentation
 	 *  for a little help.
 	 */
-	function action_search_doc()
+	public function action_search_doc()
 	{
 		global $context;
 
@@ -1084,7 +1102,7 @@ class Admin_Controller
 	/**
 	 * This ends a admin session, requiring authentication to access the ACP again.
 	 */
-	function AdminEndSession()
+	public function action_endsession()
 	{
 		// This is so easy!
 		unset($_SESSION['admin_time']);

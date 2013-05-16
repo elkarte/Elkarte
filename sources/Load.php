@@ -1494,19 +1494,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
 
 	// This determines the server... not used in many places, except for login fixing.
-	$context['server'] = array(
-		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
-	);
-
-	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+	detectServer();
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
@@ -2688,6 +2676,7 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 }
 
 /**
+<<<<<<< HEAD
  * Load all of the membergroups
  * 
  * @global array $smcFunc
@@ -2722,3 +2711,25 @@ function loadMemberGroups($force = false)
 		cache_put_data('all-membegroups', $context['membergroups'], 180);
 	}
 }
+=======
+ * Get information about the server
+ */
+function detectServer()
+{
+	global $context;
+
+	$context['server'] = array(
+		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
+		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
+		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
+		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
+		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
+		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
+		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
+		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+	);
+
+	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
+	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+}
+>>>>>>> 55f7e1159d812982c91a54292499fca3a24c96c2
