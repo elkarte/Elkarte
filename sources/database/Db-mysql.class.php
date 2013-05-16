@@ -67,8 +67,6 @@ class Database_MySQL implements Database
 				'db_title' => 'MySQL', //
 				'db_case_sensitive' => false, //
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string', //
-				'db_backup_table' => 'elk_db_backup_table', //
-				'db_optimize_table' => 'elk_db_optimize_table', //
 			);
 
 		// initialize the instance.

@@ -66,9 +66,6 @@ class Database_SQLite implements Database
 				'db_title' => 'SQLite',
 				'db_case_sensitive' => true,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
-				'db_backup_table' => 'elk_db_backup_table',
-				'db_optimize_table' => 'elk_db_optimize_table',
-				'db_get_backup' => 'elk_db_get_backup',
 			);
 
 		if (substr($db_name, -3) != '.db')
@@ -1065,7 +1062,7 @@ class Database_SQLite implements Database
 	 * @param mixed $filter string to filter by, or false, default false
 	 * @return array an array of table names. (strings)
 	 */
-	function elk_db_list_tables($db_name_str = false, $filter = false)
+	function db_list_tables($db_name_str = false, $filter = false)
 	{
 		global $smcFunc;
 

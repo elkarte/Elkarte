@@ -68,8 +68,6 @@ class Database_PostgreSQL implements Database
 				'db_title' => 'PostgreSQL',
 				'db_case_sensitive' => true,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
-				'db_backup_table' => 'elk_db_backup_table',
-				'db_optimize_table' => 'elk_db_optimize_table',
 			);
 
 		// initialize the instance.

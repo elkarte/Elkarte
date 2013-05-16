@@ -27,27 +27,3 @@ function elk_db_backup_table($table, $backup_table)
 
 	return $db->db_backup_table($table, $backup_table);
 }
-
-/**
- * This function optimizes a table.
- *
- * @param string $table - the table to be optimized
- * @return how much it was gained
- */
-function elk_db_optimize_table($table)
-{
-	$db = database();
-
-	return $db->db_optimize_table($table);
-}
-
-/**
- * Simply return the database - and die!
- * Used by DumpDatabase.php.
- */
-function elk_db_get_backup()
-{
-	$db = database();
-
-	$db->db_get_backup();
-}

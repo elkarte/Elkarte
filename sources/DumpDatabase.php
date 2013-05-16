@@ -106,9 +106,9 @@ function DumpDatabase2()
 	$scripturl = '';
 
 	// If this database is flat file and has a handler function pass it to that.
-	if (!empty($smcFunc['db_get_backup']))
+	if (method_exists($database, 'db_get_backup'))
 	{
-		$smcFunc['db_get_backup']();
+		$database->db_get_backup();
 		exit;
 	}
 

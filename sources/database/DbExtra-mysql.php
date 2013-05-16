@@ -31,31 +31,3 @@ function elk_db_backup_table($table, $backup_table)
 
 	return $db->db_backup_table($table, $backup_table);
 }
-
-/**
- * This function optimizes a table.
- *
- * @param string $table - the table to be optimized
- * @return how much it was gained
- */
-function elk_db_optimize_table($table)
-{
-	$db = database();
-
-	return $db->db_optimize_table($table);
-}
-
-/**
- * This function lists all tables in the database.
- * The listing could be filtered according to $filter.
- *
- * @param mixed $db_name_str string holding the database name, or false, default false
- * @param mixed $filter string to filter by, or false, default false
- * @return array, an array of table names. (strings)
- */
-function elk_db_list_tables($db_name_str = false, $filter = false)
-{
-	$db = database();
-
-	return $db->db_list_tables($db_name_str, $filter);
-}

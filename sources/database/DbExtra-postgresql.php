@@ -27,16 +27,3 @@ function elk_db_backup_table($table, $backup_table)
 
 	return $db->db_backup_table($table, $backup_table);
 }
-
-/**
- * This function optimizes a table.
- *
- * @param string $table - the table to be optimized
- * @return how much it was gained
- */
-function elk_db_optimize_table($table)
-{
-	$db = database();
-
-	return $db->db_optimize_table($table);
-}
