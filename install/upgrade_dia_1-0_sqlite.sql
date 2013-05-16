@@ -463,3 +463,34 @@ CREATE TABLE {$db_prefix}follow_ups (
   PRIMARY KEY (follow_up, derived_from)
 );
 ---#
+
+/******************************************************************************/
+--- Adding likes support.
+/******************************************************************************/
+
+---# Creating likes log  table...
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target int NOT NULL default '0',
+  id_member int NOT NULL default '0',
+  log_time int NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member),
+);
+---#
+
+---# Creating likes log index ...
+CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+---#
+
+---# Creating likes message  table...
+CREATE TABLE {$db_prefix}message_likes (
+  id_member int NOT NULL default '0',
+  id_msg int NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member),
+);
+---#
+
+---# Adding new columns to topics...
+ALTER TABLE {$db_prefix}topics
+ADD COLUMN num_likes int NOT NULL default '0';
+---#
