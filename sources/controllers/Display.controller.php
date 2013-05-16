@@ -1181,6 +1181,7 @@ function loadAttachmentContext($id_msg)
 		{
 			$attachmentData[$i] = array(
 				'id' => $attachment['id_attach'],
+				'file_hash' => $attachment['file_hash'],
 				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'])),
 				'downloads' => $attachment['downloads'],
 				'size' => ($attachment['filesize'] < 1024000) ? round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'] : round($attachment['filesize'] / 1024 / 1024, 2) . ' ' . $txt['megabyte'],
@@ -1209,7 +1210,7 @@ function loadAttachmentContext($id_msg)
 				// A proper thumb doesn't exist yet? Create one!
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
-					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
+					$filename = getAttachmentFilename($attachment['file_hash'], $attachment['id_attach'], $attachment['filename'], $attachment['id_folder']);
 
 					require_once(SUBSDIR . '/Graphics.subs.php');
 					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
@@ -1236,7 +1237,8 @@ function loadAttachmentContext($id_msg)
 							$thumb_mime = 'image/' . $thumb_ext;
 
 						$thumb_filename = $attachment['filename'] . '_thumb';
-						$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
+						require_once(SUBSDIR . '/Attachments.subs.php');
+						$thumb_hash = getAttachmentFileHash($thumb_filename);
 
 						// Add this beauty to the database.
 						$smcFunc['db_insert']('',
@@ -1259,7 +1261,7 @@ function loadAttachmentContext($id_msg)
 								)
 							);
 
-							$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
+							$thumb_realname = getAttachmentFilename($thumb_hash, $attachment['id_thumb'], $thumb_filename, $id_folder_thumb);
 							rename($filename . '_thumb', $thumb_realname);
 
 							// Do we need to remove an old thumbnail?

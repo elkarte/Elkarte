@@ -81,7 +81,7 @@ class Attachment_Controller
 		if (empty($is_avatar) || $attachment_type != 3)
 			increaseDownloadCounter($id_attach);
 
-		$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		$filename = getAttachmentFilename($file_hash, $id_attach, $real_filename, $id_folder);
 
 		// This is done to clear any output that was made before now.
 		ob_end_clean();
