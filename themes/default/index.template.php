@@ -205,7 +205,7 @@ function template_body_above()
 	echo '
 	<div id="top_section">
 		<div class="frame">
-			<ul class="floatleft">';
+			<span id="top_section_notice" class="floatleft">';
 
 	// If the user is logged in, display the time, or a maintenance warning for admins.
 	if ($context['user']['is_logged'])
@@ -213,18 +213,16 @@ function template_body_above()
 		// Is the forum in maintenance mode?
 		if ($context['in_maintenance'] && $context['user']['is_admin'])
 			echo '
-				<li class="notice">', $txt['maintain_mode_on'], '</li>';
+				<span class="notice">', $txt['maintain_mode_on'], '</span>';
 		else
-			echo '
-				<li>', $context['current_time'], '</li>';
+			echo $context['current_time'];
 	}
 	// Otherwise they're a guest. Ask them to either register or login.
 	else
-		echo '
-				<li>', sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login'), '</li>';
+		echo sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login');
 
 	echo '
-			</ul>';
+			</span>';
 
 	if ($context['allow_search'])
 	{

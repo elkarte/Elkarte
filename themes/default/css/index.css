@@ -1402,15 +1402,12 @@ div.buttonlist ul>li>ul {
 	display: block;
 	clear: both;
 }
-#top_section ul {
+#top_section_notice {
 	margin: 0;
 	padding: 9px 9px 7px 9px;
 	line-height: 1.3em;
 }
-#top_section ul li {
-	display: inline;
-	font-size: 0.9em;
-}
+
 #search_form {
 	padding: 4px 0 0 0;
 	text-align: right;
