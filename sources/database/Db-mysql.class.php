@@ -64,12 +64,11 @@ class Database_MySQL implements Database
 				'db_transaction' => 'elk_db_transaction', //
 				'last_error' => 'mysql_error', //
 				'db_select_db' => 'mysql_select_db', //
-				'db_title' => 'MySQL', // done
-				'db_sybase' => false,
-				'db_case_sensitive' => false,
-				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
-				'db_backup_table' => 'elk_db_backup_table',
-				'db_optimize_table' => 'elk_db_optimize_table',
+				'db_title' => 'MySQL', //
+				'db_case_sensitive' => false, //
+				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string', //
+				'db_backup_table' => 'elk_db_backup_table', //
+				'db_optimize_table' => 'elk_db_optimize_table', //
 				'db_insert_sql' => 'elk_db_insert_sql', //
 				'db_table_sql' => 'elk_db_table_sql',
 				'db_list_tables' => 'elk_db_list_tables',
@@ -1142,7 +1141,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $table
 	 * @param string $backup_table
-	 * @return resource -the request handle to the table creation query
+	 * @return resource - the request handle to the table creation query
 	 */
 	function db_backup_table($table, $backup_table)
 	{
@@ -1297,6 +1296,16 @@ class Database_MySQL implements Database
 	function db_title()
 	{
 		return 'MySQL';
+	}
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return bool
+	 */
+	function db_case_sensitive()
+	{
+		return false;
 	}
 
 	/**

@@ -172,6 +172,13 @@ interface Database
 	function db_title();
 
 	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return bool
+	 */
+	function db_case_sensitive();
+
+	/**
 	 * Gets all the necessary INSERTs for the table named table_name.
 	 * It goes in 250 row segments.
 	 *

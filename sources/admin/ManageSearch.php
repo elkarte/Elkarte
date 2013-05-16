@@ -474,7 +474,7 @@ class ManageSearch_Controller
 			$temp_tables = $smcFunc['db_list_tables']();
 			foreach ($temp_tables as $table)
 				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-					$smcFunc['db_optimize_table']($table);
+					$db->db_optimize_table($table);
 
 			// PostGreSql has some hidden sizes.
 			$request = $smcFunc['db_query']('', '

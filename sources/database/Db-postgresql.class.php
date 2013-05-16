@@ -66,7 +66,6 @@ class Database_PostgreSQL implements Database
 				'last_error' => 'pg_last_error',
 				'db_select_db' => 'elk_db_select_db',
 				'db_title' => 'PostgreSQL',
-				'db_sybase' => true,
 				'db_case_sensitive' => true,
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string',
 				'db_backup_table' => 'elk_db_backup_table',
@@ -838,6 +837,16 @@ class Database_PostgreSQL implements Database
 	function db_title()
 	{
 		return 'PostgreSQL';
+	}
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return bool
+	 */
+	function db_case_sensitive()
+	{
+		return true;
 	}
 
 	/**

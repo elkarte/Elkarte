@@ -25,7 +25,7 @@ function elk_db_backup_table($table, $backup_table)
 {
 	$db = database();
 
-	return $db->db_list_table($table, $backup_table);
+	return $db->db_backup_table($table, $backup_table);
 }
 
 /**

@@ -1141,7 +1141,7 @@ function action_databasePopulation()
 	$tables = $smcFunc['db_list_tables']($db_name, $db_prefix . '%');
 	foreach ($tables as $table)
 	{
-		$smcFunc['db_optimize_table']($table) != -1 or $db_messed = true;
+		$db->db_optimize_table($table) != -1 or $db_messed = true;
 
 		if (!empty($db_messed))
 		{

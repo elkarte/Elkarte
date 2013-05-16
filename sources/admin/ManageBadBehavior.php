@@ -53,7 +53,7 @@ class ManageBadBehavior_Controller
 			$filter = array(
 				'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],
 				'value' => array(
-					'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+					'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->db_escape_wildcard_string($_GET['value']),
 				),
 				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 				'entity' => $filters[$_GET['filter']]
@@ -73,7 +73,7 @@ class ManageBadBehavior_Controller
 			// Make sure the session exists and the token is correct
 			checkSession();
 			validateToken('admin-bbl');
-			
+
 			$redirect = deleteBadBehavior($type, $filter);
 			if ($redirect === 'delete')
 			{

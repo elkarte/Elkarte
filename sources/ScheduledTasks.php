@@ -497,6 +497,9 @@ function scheduled_auto_optimize()
 	// By default do it now!
 	$delay = false;
 
+	// we're working with them databases but we shouldn't :P
+	$db = database();
+
 	// As a kind of hack, if the server load is too great delay, but only by a bit!
 	if (!empty($modSettings['load_average']) && !empty($modSettings['loadavg_auto_opt']) && $modSettings['load_average'] >= $modSettings['loadavg_auto_opt'])
 		$delay = true;
@@ -521,13 +524,11 @@ function scheduled_auto_optimize()
 	if ($delay)
 		return false;
 
-	db_extend();
-
 	// Get all the tables.
 	$tables = $smcFunc['db_list_tables'](false, $db_prefix . '%');
 
 	foreach ($tables as $table)
-		$smcFunc['db_optimize_table']($table);
+		$db->db_optimize_table($table);
 
 	// Return for the log...
 	return true;

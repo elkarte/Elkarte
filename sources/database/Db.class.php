@@ -54,7 +54,7 @@ abstract class Database
 	abstract function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
-	 * affected_rows
+	 * Affected rows from previous operation
 	 * @param resource $connection
 	 */
 	abstract function affected_rows($connection = null);

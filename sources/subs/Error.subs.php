@@ -50,7 +50,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 }
 
 /**
- * Counts error log entries 
+ * Counts error log entries
  *
  * @return int
  */
@@ -76,7 +76,7 @@ function numErrors()
 
 /**
  * Gets data from the error log
- * 
+ *
  * @param int $start
  * @param string $sort_direction
  * @param array $filter
@@ -85,7 +85,8 @@ function numErrors()
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
 	global $smcFunc, $modSettings, $scripturl, $txt;
-	
+
+	$db = database();
 	// Find and sort out the errors.
 	$request = $smcFunc['db_query']('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
@@ -102,9 +103,9 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
 	{
-		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $smcFunc['db_escape_wildcard_string']($row['message']));
+		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->db_escape_wildcard_string($row['message']));
 		if ($search_message == $filter['value']['sql'])
-			$search_message = $smcFunc['db_escape_wildcard_string']($row['message']);
+			$search_message = $db->db_escape_wildcard_string($row['message']);
 		$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
 
 		$log['errors'][$row['id_error']] = array(
@@ -118,7 +119,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 			'timestamp' => $row['log_time'],
 			'url' => array(
 				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url']),
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['url']))
+				'href' => base64_encode($db->db_escape_wildcard_string($row['url']))
 			),
 			'message' => array(
 				'html' => $show_message,
@@ -153,7 +154,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 }
 
 /**
- * Fetches errors and group them by error type 
+ * Fetches errors and group them by error type
  *
  * @param bool $sort
  * @param int $filter
@@ -166,6 +167,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 	$sum = 0;
 	$types = array();
 
+	$db = database();
 	// What type of errors do we have and how many do we have?
 	$request = $smcFunc['db_query']('', '
 		SELECT error_type, COUNT(*) AS num_errors
@@ -185,7 +187,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 			'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-			'is_selected' => isset($filter) && $filter['value']['sql'] == $smcFunc['db_escape_wildcard_string']($row['error_type']),
+			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->db_escape_wildcard_string($row['error_type']),
 		);
 	}
 	$smcFunc['db_free_result']($request);

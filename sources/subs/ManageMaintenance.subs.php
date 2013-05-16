@@ -196,8 +196,8 @@ function optimizeTable($tablename)
 {
 	global $smcFunc;
 
-	db_extend();
-	$smcFunc['db_optimize_table']($tablename);
+	$db = database();
+	$db->db_optimize_table($tablename);
 }
 
 /**

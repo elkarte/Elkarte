@@ -1407,7 +1407,8 @@ function backupTable($table)
 		flush();
 	}
 
-	$smcFunc['db_backup_table']($table, 'backup_' . $table);
+	$db = database();
+	$db->db_backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 		echo ' done.';
