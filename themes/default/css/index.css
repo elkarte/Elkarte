@@ -1404,7 +1404,7 @@ div.buttonlist ul>li>ul {
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	margin: 0 auto;
-	min-width: 750px;
+	/* min-width: 750px; */
 	width: 95%;
 	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
 	max-width: 100em;
@@ -4653,7 +4653,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 
 /* mobile devices with low screen resolutions */
 @media screen and (max-width: 400px) and (orientation: portrait) {
-	#logo, #topic_icons div p, .optional {
+	#top_section_notice, #logo, #topic_icons div p, .optional {
 		display: none;
 	}
 	
