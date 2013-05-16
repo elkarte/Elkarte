@@ -1286,7 +1286,9 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_topic = {int:current_topic}' . (empty($messages['excluded']) ? '' : '
+		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
+			AND m.id_msg < {int:msg_before}') . (empty($messages['after']) ? '' : '
+			AND m.id_msg > {int:msg_after}') . (empty($messages['excluded']) ? '' : '
 			AND m.id_msg NOT IN ({array_int:no_split_msgs})') . (empty($messages['included']) ? '' : '
 			AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
 			AND approved = {int:is_approved}') . '
@@ -1299,6 +1301,8 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'is_approved' => 1,
 			'start' => $start,
 			'messages_per_page' => $per_page,
+			'msg_before' => !empty($messages['before']) ? (int) $messages['before'] : 0,
+			'msg_after' => !empty($messages['after']) ? (int) $messages['after'] : 0,
 		)
 	);
 	$messages = array();
