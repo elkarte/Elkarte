@@ -165,3 +165,75 @@ function getPollInfo($topicID)
 
 	return $pollinfo;
 }
+
+/**
+ * Create a poll
+ * 
+ * @param string $question The title/question of the poll
+ * @param int|false $id_member = false The id of the creator (if false, the current user)
+ * @param string|false $poster_name = false The name of the poll creator (if false, the current user)
+ * @param int $max_votes = 1 The maximum number of votes you can do
+ * @param bool $hide_results = true If the results should be hidden
+ * @param int $expire = 0 The time in days that this poll will expire
+ * @param bool $can_change_vote = false If you can change your vote
+ * @param bool $can_guest_vote = false If guests can vote
+ * @param array $options = array() The poll options
+ * @return int the id of the created poll
+ */
+function createPoll($question, $id_member = false, $poster_name = false, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
+{
+	global $smcFunc, $user_info;
+
+	if ($id_member == false)
+		$id_member = $id_member === false ? $user_info['id'] : (int) $id_member;
+	if ($poster_name == false)
+		$poster_name = $poster_name === false ? $user_info['real_name'] : $poster_name;
+
+	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
+
+	$smcFunc['db_insert']('',
+		'{db_prefix}polls',
+		array(
+			'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
+			'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
+		),
+		array(
+			$question, $hide_results, $max_votes, $expire, $user_info['id'],
+			$poster_name, $can_change_vote, $can_guest_vote,
+		),
+		array('id_poll')
+	);
+
+	$id_poll = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
+
+	if (!empty($options))
+		addPollOptions($id_poll, $options);
+
+	call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
+
+	return $id_poll;
+}
+
+/**
+ * Add options to an already created poll
+ * 
+ * @param int $id_poll The id of the poll you're adding the options to
+ * @param array $options The options to choose from
+ */
+function addPollOptions($id_poll, array $options)
+{
+	global $smcFunc;
+
+	$pollOptions = array();
+	foreach ($options as $i => $option)
+	{
+		$pollOptions[] = array($id_poll, $i, $option);
+	}
+
+	$smcFunc['db_insert']('insert',
+		'{db_prefix}poll_choices',
+		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
+		$pollOptions,
+		array('id_poll', 'id_choice')
+	);
+}

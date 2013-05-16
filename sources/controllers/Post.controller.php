@@ -1487,38 +1487,18 @@ class Post_Controller
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
 		{
-			// Create the poll.
-			$smcFunc['db_insert']('',
-				'{db_prefix}polls',
-				array(
-					'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
-					'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
-				),
-				array(
-					$_POST['question'], $_POST['poll_hide'], $_POST['poll_max_votes'], (empty($_POST['poll_expire']) ? 0 : time() + $_POST['poll_expire'] * 3600 * 24), $user_info['id'],
-					$_POST['guestname'], $_POST['poll_change_vote'], $_POST['poll_guest_vote'],
-				),
-				array('id_poll')
+			require_once(SUBSDIR . '/Poll.subs.php');
+			createPoll(
+					$_POST['question'],
+					$user_info['id'],
+					$_POST['guestname'],
+					$_POST['poll_max_votes'],
+					$_POST['poll_hide'],
+					$_POST['poll_expire'],
+					$_POST['poll_change_vote'],
+					$_POST['poll_guest_vote'],
+					$_POST['options']
 			);
-			$id_poll = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
-
-			// Create each answer choice.
-			$i = 0;
-			$pollOptions = array();
-			foreach ($_POST['options'] as $option)
-			{
-				$pollOptions[] = array($id_poll, $i, $option);
-				$i++;
-			}
-
-			$smcFunc['db_insert']('insert',
-				'{db_prefix}poll_choices',
-				array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
-				$pollOptions,
-				array('id_poll', 'id_choice')
-			);
-
-			call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
 		}
 		else
 			$id_poll = 0;
@@ -1827,7 +1807,7 @@ class Post_Controller
 			loadJavascriptFile('post.js', array(), 'post_scripts');
 		}
 
-		include_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 
 		$moderate_boards = boardsAllowedTo('moderate_board');
 
