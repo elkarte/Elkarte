@@ -212,45 +212,17 @@ class Auth_Controller
 			return;
 		}
 
-		// Load the data up!
-		$request = $smcFunc['db_query']('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood
-			FROM {db_prefix}members
-			WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
-			LIMIT 1',
-			array(
-				'user_name' => $smcFunc['db_case_sensitive'] ? strtolower($_POST['user']) : $_POST['user'],
-			)
-		);
-		// Probably mistyped or their email, try it as an email address. (member_name first, though!)
-		if ($smcFunc['db_num_rows']($request) == 0 && strpos($_POST['user'], '@') !== false)
-		{
-			$smcFunc['db_free_result']($request);
-
-			$request = $smcFunc['db_query']('', '
-				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-				passwd_flood
-				FROM {db_prefix}members
-				WHERE email_address = {string:user_name}
-				LIMIT 1',
-				array(
-					'user_name' => $_POST['user'],
-				)
-			);
-		}
+		// Find them... if we can
+		$user_settings = loadExistingMember($_POST['user']);
 
 		// Let them try again, it didn't match anything...
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if (empty($user_settings))
 		{
 			$context['login_errors'] = array($txt['username_no_exist']);
 			return;
 		}
 
-		$user_settings = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
-
-		// Figure out the password using ELKARTE's encryption - if what they typed is right.
+		// Figure out the password using Elk's encryption - if what they typed is right.
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40)
 		{
 			// Needs upgrading?

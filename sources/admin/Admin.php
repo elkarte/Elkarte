@@ -895,13 +895,13 @@ class Admin_Controller
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
 			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
-			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
-			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
-			array('_initSecuritySettingsForm', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('_initSpamSettingsForm', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('_initModerationSettingsForm', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
+			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
+			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
+			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
+			array('signatureSettings', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
+			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
+			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
+			array('moderationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
 			array('settings', 'area=modsettings;sa=general', 'ManageAddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
@@ -915,17 +915,17 @@ class Admin_Controller
 			array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 			array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 			array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-			array('_initGeneralSettingsForm', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-			array('_initDatabaseSettingsForm', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-			array('_initCookieSettingsForm', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-			array('_initCacheSettingsForm', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-			array('_initLanguageSettingsForm', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
+			array('generalSettings', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+			array('databaseSettings', 'area=serversettings;sa=database', 'ManageServer_Controller'),
+			array('cookieSettings', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
+			array('cacheSettings', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
+			array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
 			array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
 			array('settings', 'area=managedrafts', 'ManageDrafts_Controller'),
-			array('_initBBSettingsForm', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller')
+			array('bbSettings', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller')
 		);
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));

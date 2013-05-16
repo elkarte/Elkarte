@@ -796,3 +796,53 @@ function generateValidationCode()
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
 }
+
+/**
+ * This function loads many settings of a user given by
+ * name or email.
+ *
+ * @param string $name
+ *
+ * @return mixed, array or false if nothing is found
+ */
+function loadExistingMember($name)
+{
+	global $smcFunc;
+
+	// Try to find the user, assuming a member_name was passed...
+	$request = $smcFunc['db_query']('', '
+		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+			openid_uri, passwd_flood
+		FROM {db_prefix}members
+		WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+		LIMIT 1',
+		array(
+			'user_name' => $smcFunc['db_case_sensitive'] ? strtolower($name) : $name,
+		)
+	);
+	// Didn't work. Try it as an email address.
+	if ($smcFunc['db_num_rows']($request) == 0 && strpos($name, '@') !== false)
+	{
+		$smcFunc['db_free_result']($request);
+
+		$request = $smcFunc['db_query']('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+			passwd_flood
+			FROM {db_prefix}members
+			WHERE email_address = {string:user_name}
+			LIMIT 1',
+			array(
+				'user_name' => $name,
+			)
+		);
+	}
+
+	// Nothing? Ah the horror...
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return false;
+
+	$user_settings = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $user_settings;
+}
