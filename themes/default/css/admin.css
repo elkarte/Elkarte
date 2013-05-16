@@ -126,7 +126,7 @@ body.action_admin .navigate_section ul li a {
 #core_features, #generate_reports_type,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper{
-	background: #f0f4f7;
+	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	border: 1px solid #ccc;
@@ -716,7 +716,7 @@ dl.settings dd.questions input {
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 #manage_boards {
-	background: #f0f4f7;
+	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	border: 1px solid #ccc;

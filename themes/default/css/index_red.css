@@ -1,0 +1,14 @@
+/* This is css file for the red color variant */
+
+.cat_bar {
+	background-color: #8d0505;
+	color: white;
+}
+
+.catbg a {
+	color: white;
+}
+
+#footer_section {
+	background-color: #8d0505;
+}
