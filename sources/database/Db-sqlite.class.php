@@ -1260,7 +1260,7 @@ class Database_SQLite implements Database
 	 *
 	 * @param string $string
 	 */
-	function db_escape_string($string)
+	function escape_string($string)
 	{
 		return sqlite_escape_string($string);
 	}

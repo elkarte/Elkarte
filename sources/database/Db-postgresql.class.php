@@ -1239,7 +1239,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function db_escape_string($string)
+	function escape_string($string)
 	{
 		return pg_escape_string($string);
 	}

@@ -1473,7 +1473,7 @@ function action_deleteInstall()
 	}
 
 	// Check if we need some stupid MySQL fix.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 

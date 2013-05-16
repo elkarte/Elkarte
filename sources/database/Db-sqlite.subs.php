@@ -315,6 +315,13 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 	return $db->escape_wildcard_string($string, $translate_human_wildcards);
 }
 
+function elk_db_unescape_string($string)
+{
+	$db = database();
+
+	return $db->unescape_string($string);
+}
+
 /**
  *  Get the version number.
  *

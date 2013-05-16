@@ -379,6 +379,9 @@ function scheduled_daily_maintenance()
 	// First clean out the cache.
 	clean_cache();
 
+	// We're working with databases here (do we)
+	$db = database();
+
 	// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 	list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 	if ($modSettings['warning_decrement'])
@@ -448,7 +451,7 @@ function scheduled_daily_maintenance()
 	}
 
 	// Check the database version - for some buggy MySQL version.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 	elseif (!empty($modSettings['db_mysql_group_by_fix']))

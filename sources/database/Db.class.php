@@ -110,12 +110,26 @@ abstract class Database
 	abstract function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
 	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 */
+	abstract function escape_string($string);
+
+	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
 	abstract function escape_wildcard_string($string, $translate_human_wildcards=false);
+
+	/**
+	 * Unescape an escaped string.
+	 *
+	 * @param string $string
+	 */
+	abstract function unescape_string($string);
 
 	/**
 	 * Returns whether the database system supports ignore.

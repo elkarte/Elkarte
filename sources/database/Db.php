@@ -152,6 +152,13 @@ interface Database
 	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
 	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 */
+	function escape_string($string);
+
+	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
 	 * @param $string

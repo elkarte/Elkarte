@@ -57,9 +57,9 @@ class Database_MySQL implements Database
 				'db_num_rows' => 'mysql_num_rows', //
 				'db_data_seek' => 'mysql_data_seek', //
 				'db_num_fields' => 'mysql_num_fields', //
-				'db_escape_string' => 'addslashes',
-				'db_unescape_string' => 'stripslashes',
-				'db_server_info' => 'mysql_get_server_info',
+				'db_escape_string' => 'addslashes', //
+				'db_unescape_string' => 'stripslashes', //
+				'db_server_info' => 'mysql_get_server_info', //
 				'db_affected_rows' => 'elk_db_affected_rows', //
 				'db_transaction' => 'elk_db_transaction', //
 				'last_error' => 'mysql_error', //
@@ -72,7 +72,7 @@ class Database_MySQL implements Database
 				'db_insert_sql' => 'elk_db_insert_sql', //
 				'db_table_sql' => 'elk_db_table_sql', //
 				'db_list_tables' => 'elk_db_list_tables',
-				'db_server_version' => 'elk_db_server_version',
+				'db_server_version' => 'elk_db_server_version', //
 			);
 
 		// initialize the instance.
@@ -859,6 +859,16 @@ class Database_MySQL implements Database
 	}
 
 	/**
+	 * Unescape an escaped string!
+	 *
+	 * @param $string
+	 */
+	function unescape_string($string)
+	{
+		return stripslashes($string);
+	}
+
+	/**
 	 * Returns whether the database system supports ignore.
 	 *
 	 * @return bool
@@ -1313,7 +1323,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function db_escape_string($string)
+	function escape_string($string)
 	{
 		return addslashes($string);
 	}
