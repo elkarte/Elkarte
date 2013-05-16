@@ -1653,7 +1653,7 @@ VALUES
 	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
 	(13, 0, 240, 1, 'd', 1, 'remove_old_drafts'),
 	(14, 0, 0, 6, 'h', 0, 'remove_old_followups');
-	
+
 # --------------------------------------------------------
 
 #
@@ -2047,6 +2047,7 @@ CREATE TABLE {$db_prefix}topics (
   id_previous_topic mediumint(8) NOT NULL default '0',
   num_replies int(10) unsigned NOT NULL default '0',
   num_views int(10) unsigned NOT NULL default '0',
+  num_likes int(10) unsigned NOT NULL default '0',
   locked tinyint(4) NOT NULL default '0',
   redirect_expires int(10) unsigned NOT NULL default '0',
   id_redirect_topic mediumint(8) unsigned NOT NULL default '0',
@@ -2117,4 +2118,27 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 	PRIMARY KEY (id),
 	INDEX ip (ip),
 	INDEX user_agent (user_agent)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target mediumint(8) unsigned NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  log_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member),
+  KEY log_time (log_time)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  id_msg mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member),
 ) ENGINE=MyISAM;
