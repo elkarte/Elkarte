@@ -69,7 +69,6 @@ class Database_MySQL implements Database
 				'db_escape_wildcard_string' => 'elk_db_escape_wildcard_string', //
 				'db_backup_table' => 'elk_db_backup_table', //
 				'db_optimize_table' => 'elk_db_optimize_table', //
-				'db_insert_sql' => 'elk_db_insert_sql', //
 			);
 
 		// initialize the instance.
