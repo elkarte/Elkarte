@@ -2746,13 +2746,13 @@ function setupThemeContext($forceload = false)
 
 	// Get some news...
 	$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
-	for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
+	foreach ($context['news_lines'] as $i => &$line)
 	{
-		if (trim($context['news_lines'][$i]) == '')
+		if (trim($line) == '')
 			continue;
 
 		// Clean it up for presentation ;).
-		$context['news_lines'][$i] = parse_bbc(stripslashes(trim($context['news_lines'][$i])), true, 'news' . $i);
+		$line = parse_bbc(stripslashes(trim($line)), true, 'news' . $i);
 	}
 	if (!empty($context['news_lines']))
 		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
