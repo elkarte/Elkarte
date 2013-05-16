@@ -384,7 +384,8 @@ function display_db_error()
 
 		// Language files aren't loaded yet :(.
 		$db_error = $db->last_error($db_connection);
-		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
+		$db = database();
+		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 	}
 
 	// What to do?  Language files haven't and can't be loaded yet...

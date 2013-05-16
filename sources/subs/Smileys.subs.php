@@ -55,6 +55,8 @@ function validateDuplicateSmiley($code, $current = null)
 {
 	global $smcFunc;
 
+	$db = database();
+
 	$request = $smcFunc['db_query']('', '
 		SELECT id_smiley
 		FROM {db_prefix}smileys
@@ -62,7 +64,7 @@ function validateDuplicateSmiley($code, $current = null)
 			AND id_smiley != {int:current_smiley}'),
 		array(
 			'current_smiley' => $current,
-			'mysql_binary_type' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
+			'mysql_binary_type' => $db->db_title() == 'MySQL' ? 'BINARY' : '',
 			'smiley_code' => $code,
 		)
 	);

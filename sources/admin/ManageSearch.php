@@ -368,7 +368,6 @@ class ManageSearch_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			db_extend();
 			$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 			if (!empty($tables))
 			{
@@ -471,7 +470,6 @@ class ManageSearch_Controller
 		elseif ($db_type == 'postgresql')
 		{
 			// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-			db_extend();
 			$temp_tables = $db->db_list_tables();
 			foreach ($temp_tables as $table)
 				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
@@ -625,7 +623,6 @@ class ManageSearch_Controller
 
 			if ($context['start'] === 0)
 			{
-				db_extend();
 				$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 				if (!empty($tables))
 				{

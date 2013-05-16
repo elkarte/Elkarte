@@ -329,8 +329,10 @@ class PersonalMessage_Controller
 		// First work out what messages we need to see - if grouped is a little trickier...
 		if ($context['display_mode'] == 2)
 		{
+			$db = database();
+
 			// On a non-default sort due to PostgreSQL we have to do a harder sort.
-			if ($smcFunc['db_title'] == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
+			if ($db->db_title() == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
 			{
 				$sub_request = $smcFunc['db_query']('', '
 					SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head

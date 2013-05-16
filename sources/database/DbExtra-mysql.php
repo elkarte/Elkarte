@@ -59,16 +59,3 @@ function elk_db_list_tables($db_name_str = false, $filter = false)
 
 	return $db->db_list_tables($db_name_str, $filter);
 }
-
-/**
- * Dumps the schema (CREATE) for a table.
- *
- * @param string $tableName - the table
- * @return string - the CREATE statement as string
- */
-function elk_db_table_sql($tableName)
-{
-	$db = database();
-
-	return $db->db_table_sql($tableName);
-}

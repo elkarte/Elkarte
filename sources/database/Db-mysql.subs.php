@@ -170,18 +170,6 @@ function elk_db_escape_wildcard_string($string, $translate_human_wildcards=false
 }
 
 /**
- *  Get the version number.
- *
- *  @return string - the version
- */
-function elk_db_server_version()
-{
-	$db = database();
-
-	return $db->db_server_version();
-}
-
-/**
  * Gets all the necessary INSERTs for the table named table_name.
  * It goes in 250 row segments.
  *

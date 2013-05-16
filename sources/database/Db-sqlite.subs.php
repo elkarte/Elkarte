@@ -321,15 +321,3 @@ function elk_db_unescape_string($string)
 
 	return $db->unescape_string($string);
 }
-
-/**
- *  Get the version number.
- *
- *  @return string - the version
- */
-function elk_db_server_version()
-{
-	$db = database();
-
-	return $db->db_server_version();
-}

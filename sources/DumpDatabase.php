@@ -39,7 +39,7 @@ function DumpDatabase2()
 		fatal_lang_error('no_dump_database', 'critical');
 
 	// We'll need a db to dump :P
-	$db = database();
+	$database = database();
 
 	// We don't need debug when dumping the database
 	$modSettings['disableQueryCheck'] = true;
@@ -143,7 +143,7 @@ function DumpDatabase2()
 	}
 
 	// Dump each table.
-	$tables = $db->db_list_tables(false, $db_prefix . '%');
+	$tables = $database->db_list_tables(false, $db_prefix . '%');
 	foreach ($tables as $tableName)
 	{
 		// Are we dumping the structures?
@@ -155,11 +155,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$db->db_table_sql($tableName) . ';' . $crlf;
+				$database->db_table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$db->db_table_sql($tableName);
+			$database->db_table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')
@@ -169,7 +169,7 @@ function DumpDatabase2()
 		$close_table = false;
 
 		// Are there any rows in this table?
-		while ($get_rows = $db->insert_sql($tableName, $first_round))
+		while ($get_rows = $database->insert_sql($tableName, $first_round))
 		{
 			if (empty($get_rows))
 				break;

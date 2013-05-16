@@ -244,13 +244,3 @@ function elk_db_server_info()
 
 	return $db->db_server_info();
 }
-
-/**
- * Get the current server version.
- */
-function elk_db_server_version()
-{
-	$db = database();
-
-	return $db->db_server_version();
-}
