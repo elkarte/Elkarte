@@ -1317,6 +1317,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'poster' => $row['real_name'],
+			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $context['user']['ignoreusers']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
