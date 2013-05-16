@@ -119,7 +119,7 @@ interface Database
 	function db_transaction($type = 'commit', $connection = null);
 
 	/**
-	 * Database error!
+	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
@@ -165,6 +165,20 @@ interface Database
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
 	function escape_wildcard_string($string, $translate_human_wildcards=false);
+
+	/**
+	 * Unescape an escaped string.
+	 *
+	 * @param string $string
+	 */
+	function unescape_string($string);
+
+	/**
+	 * Return last error string from the database server
+	 *
+	 * @param resource $connection = null
+	 */
+	abstract function last_error($connection = null);
 
 	/**
 	 * Returns whether the database system supports ignore.
