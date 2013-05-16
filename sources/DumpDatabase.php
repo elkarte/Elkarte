@@ -51,9 +51,6 @@ function DumpDatabase2()
 
 	checkSession('post');
 
-	// We will need this, badly!
-	db_extend();
-
 	// Attempt to stop from dying...
 	@set_time_limit(600);
 	$time_limit = ini_get('max_execution_time');

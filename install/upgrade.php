@@ -2230,10 +2230,6 @@ function parse_sql($filename)
 		- {$db_collation}
 */
 
-	// May want to use extended functionality.
-	db_extend();
-	db_extend('packages');
-
 	// Our custom error handler - does nothing but does stop public errors from XML!
 	if (!function_exists('sql_error_handler'))
 	{
