@@ -1383,7 +1383,7 @@ div.buttonlist ul>li>ul {
 	box-shadow: -1px -1px 2px rgba(0,0,0,0.1), -1px -2px 3px rgba(255,255,255,0.3) inset, 1px 2px 3px rgba(0,0,0,0.1) inset;
 }
 .buttonlist ul li a.active:hover {
-	color: #ffc187;
+	color: #ccc;
 }
 .align_top ul li a, .align_bottom ul li a {
 	margin: 0 12px 0 0;
