@@ -1443,7 +1443,7 @@ div.buttonlist ul>li>ul {
 #search_form {
 	padding: 4px 0 0 0;
 	text-align: right;
-	min-width: 30em;
+	min-width: 16em;
 }
 #search_form .input_text, #search_form select, #search_form .button_submit {
 	padding: 2px;
@@ -2121,7 +2121,7 @@ select.qaction, input.qaction {
 	float: left;
 	/* Don't set this in em.It will eat too much space if people nead to set large text sizes. */
 	/* Better to just break the few words here, and leave more space for actual topic content. */
-	width: 80px;
+	width: 160px;
 	word-break: hyphenate;
 	word-wrap: break-word;
 }
@@ -2292,7 +2292,7 @@ select.qaction, input.qaction {
 /* End nifty new flyout. */
 
 .postarea, .moderatorbar {
-	margin: 0 0 0 95px;
+	margin: 0 0 0 175px;
 }
 .postarea {
 	padding: 5px;
