@@ -1677,19 +1677,28 @@ class Post_Controller
 
 		// Marking read should be done even for editing messages....
 		// Mark all the parents read.  (since you just posted and they will be unread.)
-		if (!$user_info['is_guest'] && !empty($board_info['parent_boards']))
+		if (!$user_info['is_guest'])
 		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_boards
-				SET id_msg = {int:id_msg}
-				WHERE id_member = {int:current_member}
-					AND id_board IN ({array_int:board_list})',
-				array(
-					'current_member' => $user_info['id'],
-					'board_list' => array_keys($board_info['parent_boards']),
-					'id_msg' => $modSettings['maxMsgID'],
-				)
-			);
+			$board_list = !empty($board_info['parent_boards']) ? $board_info['parent_boards'] : array();
+
+			// Returning to the topic?
+			if (!empty($_REQUEST['goback']))
+				$board_list[] = $board;
+
+			if (!empty($board_list))
+			{
+				$smcFunc['db_query']('', '
+					UPDATE {db_prefix}log_boards
+					SET id_msg = {int:id_msg}
+					WHERE id_member = {int:current_member}
+						AND id_board IN ({array_int:board_list})',
+					array(
+						'current_member' => $user_info['id'],
+						'board_list' => array_keys($board_info['parent_boards']),
+						'id_msg' => $modSettings['maxMsgID'],
+					)
+				);
+			}
 		}
 
 		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
@@ -1748,23 +1757,6 @@ class Post_Controller
 				else
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
-		}
-
-		// Returning to the topic?
-		if (!empty($_REQUEST['goback']))
-		{
-			// Mark the board as read.... because it might get confusing otherwise.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_boards
-				SET id_msg = {int:maxMsgID}
-				WHERE id_member = {int:current_member}
-					AND id_board = {int:current_board}',
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'maxMsgID' => $modSettings['maxMsgID'],
-				)
-			);
 		}
 
 		if ($board_info['num_topics'] == 0)
