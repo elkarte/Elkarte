@@ -4567,10 +4567,17 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 }
 
-/* Tablets (landscape) */
+/* Desktops and laptops */
+@media screen and (min-width: 1224px) {
+}
+/* Large screens */
+@media screen and (min-width: 1824px) {
+}
+
+/* 10" Tablets (landscape) */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
 }
-/* Tablets (portrait) Drop the stats col replys/views and topics/messages */
+/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
 	.table_list td.stats .table_grid td.stats, .table_grid th.stats {
 		display: none;
@@ -4587,9 +4594,87 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		width: 30%;
 	}
 }
-/* Desktops and laptops */
-@media screen and (min-width: 1224px) {
+/* 7" Tablets like Google Nexus (landscape) or other mobile devices */
+@media screen and (max-width: 610px) and (orientation: portrait) {
+	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
+	 	 display: none !important;
+	 }
+	 #posting_icons, #top_section div ul{
+		 display: none !important;
+	 }
+	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
+	 	 display: none;
+	 }
+	#menu_nav {
+		padding: 0 !important;
+	}
+	.catbg img, .catbg span {
+		display: none;
+	}
+	.poster {
+		float: none;
+		margin-bottom: 5px;
+	}
+	.postarea{
+		margin: 0;
+	}
+	.mark_read {
+		margin-bottom: 15px !important;
+	}
+	#top_section {
+		padding-bottom: 5px;
+	}
+	.dropmenu li
+	{
+		padding: 0;
+	}
+	.unread_links
+	{
+		display: none;
+	}
+	td.info {
+		border-right: 1px solid #ccc;
+	}
+	.news {
+		display: none;
+	}
+	div.user {
+		float: none;
+		width: 95%;
+	}
+	#basicinfo, #detailedinfo {
+		float: none;
+		width: 95%;
+	}
+	.login {
+		width: 95%;
+	}
 }
-/* Large screens */
-@media screen and (min-width: 1824px) {
+
+/* mobile devices with low screen resolutions */
+@media screen and (max-width: 400px) and (orientation: portrait) {
+	#logo, #topic_icons div p, .optional {
+		display: none;
+	}
+	
+	#guest_form input {
+		width: 50px;
+	}
+	#message_index_jump_to {
+		display: block !important;
+		margin-bottom: 7px;
+	}
+	.buttonlist ul li {
+		font-size: 0.8em !important;
+		margin-left: 3px;
+	}
+	#description_board {
+		display: none;
+	}
+	.pagelinks, .buttonlist {
+		float: none !important;
+		width: 95%;
+	}
+	#main_menu ul li {
+	margin-bottom: 5px;
 }
