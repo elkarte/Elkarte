@@ -149,19 +149,6 @@ function elk_db_fetch_assoc($request, $counter = false)
 }
 
 /**
- * Reset the pointer...
- *
- * @param $request
- * @param $counter
- */
-function elk_db_data_seek($request, $counter)
-{
-	$db = database();
-
-	return $db->data_seek($request, $counter);
-}
-
-/**
  * Unescape an escaped string!
  *
  * @param $string

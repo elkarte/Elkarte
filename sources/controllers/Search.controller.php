@@ -2421,13 +2421,16 @@ function prepareSearchContext($reset = false)
 	if ($counter == null || $reset)
 		$counter = $_REQUEST['start'] + 1;
 
+	// we need this
+	$db = database();
+
 	// If the query returned false, bail.
 	if ($messages_request == false)
 		return false;
 
 	// Start from the beginning...
 	if ($reset)
-		return @$smcFunc['db_data_seek']($messages_request, 0);
+		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
 	$message = $smcFunc['db_fetch_assoc']($messages_request);

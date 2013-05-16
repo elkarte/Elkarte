@@ -33,7 +33,7 @@ class AdminDebug_Controller
 	 */
 	public function action_viewquery()
 	{
-		global $scripturl, $settings, $context, $db_connection, $smcFunc, $txt, $db_show_debug;
+		global $scripturl, $settings, $context, $db_connection, $txt, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
 		if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
@@ -76,6 +76,9 @@ class AdminDebug_Controller
 	</head>
 	<body id="help_popup">
 		<div class="tborder windowbg description">';
+
+		// db work...
+		$db = database();
 
 		foreach ($_SESSION['debug'] as $q => $query_data)
 		{
@@ -141,7 +144,7 @@ class AdminDebug_Controller
 			// Explain the query.
 			if ($query_id == $q && $is_select_query)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					EXPLAIN ' . $select,
 					array(
 					)
@@ -166,8 +169,8 @@ class AdminDebug_Controller
 				<th>', array_keys($row)) . '</th>
 			</tr>';
 
-				$smcFunc['db_data_seek']($result, 0);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				$db->data_seek($result, 0);
+				while ($row = $db->fetch_assoc($result))
 				{
 					echo '
 			<tr>
@@ -175,7 +178,7 @@ class AdminDebug_Controller
 				<td>', $row) . '</td>
 			</tr>';
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				echo '
 		</table>';

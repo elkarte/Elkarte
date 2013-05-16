@@ -1059,13 +1059,16 @@ function prepareDisplayContext($reset = false)
 	if ($messages_request == false)
 		return false;
 
+	// Can't work with a database without a database :P
+	$db = database();
+
 	// Remember which message this is.  (ie. reply #83)
 	if ($counter === null || $reset)
 		$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
 	// Start from the beginning...
 	if ($reset)
-		return @$smcFunc['db_data_seek']($messages_request, 0);
+		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
 	$message = $smcFunc['db_fetch_assoc']($messages_request);

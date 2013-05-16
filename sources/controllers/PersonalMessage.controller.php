@@ -2436,6 +2436,9 @@ function preparePMContext($type = 'subject', $reset = false)
 	if ($counter === null || $reset)
 		$counter = $context['start'];
 
+	// we need this
+	$db = database();
+
 	static $temp_pm_selected = null;
 	if ($temp_pm_selected === null)
 	{
@@ -2484,7 +2487,7 @@ function preparePMContext($type = 'subject', $reset = false)
 
 	// Reset the data?
 	if ($reset == true)
-		return @$smcFunc['db_data_seek']($messages_request, 0);
+		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.
 	$message = $smcFunc['db_fetch_assoc']($messages_request);
