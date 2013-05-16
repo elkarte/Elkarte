@@ -3967,20 +3967,6 @@ tr.windowbg2 .stats_day {
 	font-weight: bold;
 }
 
-/* Styles for print media.
-------------------------------------------------------- */
-
-@media print {
-	#headerarea
-	{
-		display: none;
-	}
-
-	.tborder
-	{
-		border: none;
-	}
-}
 
 /* Styles for the tooltips
 ------------------------------------------------------- */
@@ -4536,6 +4522,22 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		margin: 0 0 0 5px;
 	}
 }
+
+/* Styles for print media.
+------------------------------------------------------- */
+
+@media print {
+	#headerarea
+	{
+		display: none;
+	}
+
+	.tborder
+	{
+		border: none;
+	}
+}
+
 /* Tablets (landscape) */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
 }
