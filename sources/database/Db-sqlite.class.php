@@ -58,7 +58,6 @@ class Database_SQLite implements Database
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
 				'db_affected_rows' => 'elk_db_affected_rows',
-				'db_transaction' => 'elk_db_transaction',
 				'last_error' => 'elk_db_last_error',
 				'db_case_sensitive' => true,
 			);

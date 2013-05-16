@@ -96,19 +96,6 @@ function elk_db_insert_id($table, $field = null, $connection = null)
 }
 
 /**
- * Do a transaction.
- *
- * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
- * @param resource $connection = null
- */
-function elk_db_transaction($type = 'commit', $connection = null)
-{
-	$db = database();
-
-	return $db->db_transaction($type, $connection);
-}
-
-/**
  * Database error!
  * Backtrace, log, try to fix.
  *

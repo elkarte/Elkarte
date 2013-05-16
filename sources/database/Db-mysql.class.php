@@ -59,7 +59,6 @@ class Database_MySQL implements Database
 				'db_escape_string' => 'addslashes', //
 				'db_unescape_string' => 'stripslashes', //
 				'db_affected_rows' => 'elk_db_affected_rows', //
-				'db_transaction' => 'elk_db_transaction', //
 				'last_error' => 'mysql_error', //
 				'db_case_sensitive' => false, //
 			);
