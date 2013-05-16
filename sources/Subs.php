@@ -2963,12 +2963,93 @@ function template_rawdata()
 	echo $context['raw_data'];
 }
 
+function template_admin_warnings()
+{
+	global $context, $modSettings, $txt;
+
+	$security_files = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+
+	// Pretty much a hook
+	if (!empty($context['security_files']))
+		$security_files += $context['security_files'];
+
+	foreach ($security_files as $i => $securityFile)
+	{
+		if (!file_exists(BOARDDIR . '/' . $securityFile))
+			unset($security_files[$i]);
+	}
+
+	// We are already checking so many files...just few more doesn't make any difference! :P
+	require_once(SUBSDIR . '/Attachments.subs.php');
+	$path = getAttachmentPath();
+	secureDirectory($path, true);
+	secureDirectory(CACHEDIR);
+
+	// If agreement is enabled, at least the english version shall exists
+	if ($modSettings['requireAgreement'])
+		$agreement = !file_exists(BOARDDIR . '/agreement.txt');
+
+	if (!empty($security_files) || (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR)) || !empty($agreement))
+	{
+		echo '
+<div class="errorbox">
+	<p class="alert">!!</p>
+	<h3>', empty($security_files) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
+	<p>';
+
+		foreach ($security_files as $securityFile)
+		{
+			echo '
+		', $txt['not_removed'], '<strong>', $securityFile, '</strong>!<br />';
+
+			if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+				echo '
+		', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
+		}
+
+		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
+			echo '
+		<strong>', $txt['cache_writable'], '</strong><br />';
+
+		if (!empty($agreement))
+			echo '
+		<strong>', $txt['agreement_missing'], '</strong><br />';
+
+		echo '
+	</p>
+</div>';
+	}
+}
+
+function template_post_banned()
+{
+	global $txt, $user_info;
+
+	echo '
+		<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
+			', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+
+	if (!empty($_SESSION['ban']['cannot_post']['reason']))
+		echo '
+			<div style="padding-left: 4ex; padding-top: 1ex;">', $_SESSION['ban']['cannot_post']['reason'], '</div>';
+
+	if (!empty($_SESSION['ban']['expire_time']))
+		echo '
+			<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
+	else
+		echo '
+			<div>', $txt['your_ban_expires_never'], '</div>';
+
+	echo '
+		</div>';
+}
+
 /**
  * The header template
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $settings, $user_info;
+	global $context, $settings, $user_info;
 
 	setupThemeContext();
 
@@ -2993,80 +3074,20 @@ function template_header()
 	{
 		loadSubTemplate($layer . '_above', true);
 
-		// May seem contrived, but this is done in case the body and main layer aren't there...
-		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
+		if ($layer === 'body' || $layer === 'main')
 		{
-			$checked_securityFiles = true;
-			// @todo add a hook here
-			$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-			foreach ($securityFiles as $i => $securityFile)
+			// May seem contrived, but this is done in case the body and main layer aren't there...
+			if (allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
 			{
-				if (!file_exists(BOARDDIR . '/' . $securityFile))
-					unset($securityFiles[$i]);
+				$checked_securityFiles = true;
+				template_admin_warnings();
 			}
-
-			// We are already checking so many files...just few more doesn't make any difference! :P
-			require_once(SUBSDIR . '/Attachments.subs.php');
-			$path = getAttachmentPath();
-			secureDirectory($path, true);
-			secureDirectory(CACHEDIR);
-
-			// If agreement is enabled, at least the english version shall exists
-			if ($modSettings['requireAgreement'])
-				$agreement = !file_exists(BOARDDIR . '/agreement.txt');
-
-			if (!empty($securityFiles) || (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR)) || !empty($agreement))
+			// If the user is banned from posting inform them of it.
+			elseif (isset($_SESSION['ban']['cannot_post']) && !$showed_banned)
 			{
-				echo '
-		<div class="errorbox">
-			<p class="alert">!!</p>
-			<h3>', empty($securityFiles) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
-			<p>';
-
-				foreach ($securityFiles as $securityFile)
-				{
-					echo '
-				', $txt['not_removed'], '<strong>', $securityFile, '</strong>!<br />';
-
-					if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
-						echo '
-				', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
-				}
-
-				if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
-					echo '
-				<strong>', $txt['cache_writable'], '</strong><br />';
-
-				if (!empty($agreement))
-					echo '
-				<strong>', $txt['agreement_missing'], '</strong><br />';
-
-				echo '
-			</p>
-		</div>';
+				$showed_banned = true;
+				template_post_banned();
 			}
-		}
-		// If the user is banned from posting inform them of it.
-		elseif (in_array($layer, array('main', 'body')) && isset($_SESSION['ban']['cannot_post']) && !$showed_banned)
-		{
-			$showed_banned = true;
-			echo '
-				<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
-					', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
-
-			if (!empty($_SESSION['ban']['cannot_post']['reason']))
-				echo '
-					<div style="padding-left: 4ex; padding-top: 1ex;">', $_SESSION['ban']['cannot_post']['reason'], '</div>';
-
-			if (!empty($_SESSION['ban']['expire_time']))
-				echo '
-					<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
-			else
-				echo '
-					<div>', $txt['your_ban_expires_never'], '</div>';
-
-			echo '
-				</div>';
 		}
 	}
 
