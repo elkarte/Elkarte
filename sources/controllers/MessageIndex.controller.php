@@ -529,24 +529,12 @@ class MessageIndex_Controller
 
 			if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'] && !empty($topic_ids))
 			{
-				$result = $smcFunc['db_query']('', '
-					SELECT id_topic
-					FROM {db_prefix}messages
-					WHERE id_topic IN ({array_int:topic_list})
-						AND id_member = {int:current_member}
-					GROUP BY id_topic
-					LIMIT ' . count($topic_ids),
-					array(
-						'current_member' => $user_info['id'],
-						'topic_list' => $topic_ids,
-					)
-				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				$participated_topics = getTopicsParticipation($topic_ids);
+				foreach ($participated_topics as $id_topic)
 				{
-					$context['topics'][$row['id_topic']]['is_posted_in'] = true;
-					$context['topics'][$row['id_topic']]['class'] = 'my_' . $context['topics'][$row['id_topic']]['class'];
+					$context['topics'][$id_topic]['is_posted_in'] = true;
+					$context['topics'][$id_topic]['class'] = 'my_' . $context['topics'][$id_topic]['class'];
 				}
-				$smcFunc['db_free_result']($result);
 			}
 		}
 

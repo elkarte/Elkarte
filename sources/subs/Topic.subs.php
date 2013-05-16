@@ -1528,3 +1528,43 @@ function toggleTopicSticky($topics)
 
 	return $smcFunc['db_affected_rows']();
 }
+
+/**
+ * Get the topics which a member has participated in
+ * 
+ * @param array $topics an array of topic ids to be checked
+ * @param int $id_member = null The member id or null for the current user
+ * @return array of topic ids
+ */
+function getTopicsParticipation(array $topics, $id_member = null)
+{
+	global $user_info, $smcFunc;
+
+	if (empty($id_member))
+		$id_member = $user_info['id'];
+
+	// Guests don't participate
+	if (empty($id_member) || empty($topics))
+		return array();
+
+	$result = $smcFunc['db_query']('', '
+		SELECT id_topic
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})
+			AND id_member = {int:current_member}
+		GROUP BY id_topic
+		LIMIT ' . count($topics),
+		array(
+			'current_member' => $id_member,
+			'topic_list' => $topics,
+		)
+	);
+
+	$return = array();
+	while (list($id) = $smcFunc['db_fetch_row']($result))
+		$return[$id] = $id;
+
+	$smcFunc['db_free_result']($result);
+
+	return $return;
+}
