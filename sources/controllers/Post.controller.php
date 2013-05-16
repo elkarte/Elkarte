@@ -771,7 +771,26 @@ class Post_Controller
 
 		// Update the topic summary, needed to show new posts in a preview
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
-			getTopic();
+		{
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$only_approved = $modSettings['postmod_active'] || !allowedTo('approve_posts');
+			if (isset($_REQUEST['xml']))
+				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
+			else
+				$limit = empty($modSettings['topicSummaryPosts']) ? 0 : (int) $modSettings['topicSummaryPosts'];
+			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
+
+			$counter = 0;
+			$context['previous_posts'] = selectMessages($topic, 0, $limit, $before, $only_approved);
+			foreach ($context['previous_posts'] as &$post)
+			{
+				$post['is_new'] = !empty($context['new_replies']);
+				$post['counter'] = $counter++;
+
+				if (!empty($context['new_replies']))
+					$context['new_replies']--;
+			}
+		}
 
 		// Just ajax previewing then lets stop now
 		if (isset($_REQUEST['xml']))
@@ -2227,65 +2246,4 @@ class Post_Controller
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'spellcheck';
 	}
-}
-
-/**
- * Get the topic for display purposes.
- *
- * gets a summary of the most recent posts in a topic.
- * depends on the topicSummaryPosts setting.
- * if you are editing a post, only shows posts previous to that post.
- */
-function getTopic()
-{
-	global $topic, $modSettings, $context, $smcFunc, $counter, $options;
-
-	if (isset($_REQUEST['xml']))
-		$limit = '
-		LIMIT ' . (empty($context['new_replies']) ? '0' : $context['new_replies']);
-	else
-		$limit = empty($modSettings['topicSummaryPosts']) ? '' : '
-		LIMIT ' . (int) $modSettings['topicSummaryPosts'];
-
-	// If you're modifying, get only those posts before the current one. (otherwise get all.)
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
-			m.body, m.smileys_enabled, m.id_msg, m.id_member
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_topic = {int:current_topic}' . (isset($_REQUEST['msg']) ? '
-			AND m.id_msg < {int:id_msg}' : '') .(!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND m.approved = {int:approved}') . '
-		ORDER BY m.id_msg DESC' . $limit,
-		array(
-			'current_topic' => $topic,
-			'id_msg' => isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0,
-			'approved' => 1,
-		)
-	);
-	$context['previous_posts'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Censor, BBC, ...
-		censorText($row['body']);
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
-		// ...and store.
-		$context['previous_posts'][] = array(
-			'counter' => $counter++,
-			'alternate' => $counter % 2,
-			'poster' => $row['poster_name'],
-			'message' => $row['body'],
-			'time' => standardTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'id' => $row['id_msg'],
-			'is_new' => !empty($context['new_replies']),
-			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $context['user']['ignoreusers']),
-		);
-
-		if (!empty($context['new_replies']))
-			$context['new_replies']--;
-	}
-	$smcFunc['db_free_result']($request);
 }
