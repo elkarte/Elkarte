@@ -143,7 +143,7 @@ function DumpDatabase2()
 	}
 
 	// Dump each table.
-	$tables = $smcFunc['db_list_tables'](false, $db_prefix . '%');
+	$tables = $db->db_list_tables(false, $db_prefix . '%');
 	foreach ($tables as $tableName)
 	{
 		// Are we dumping the structures?
@@ -155,11 +155,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$smcFunc['db_table_sql']($tableName) . ';' . $crlf;
+				$db->db_table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$smcFunc['db_table_sql']($tableName);
+			$db->db_table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')

@@ -70,7 +70,7 @@ class Database_MySQL implements Database
 				'db_backup_table' => 'elk_db_backup_table', //
 				'db_optimize_table' => 'elk_db_optimize_table', //
 				'db_insert_sql' => 'elk_db_insert_sql', //
-				'db_table_sql' => 'elk_db_table_sql',
+				'db_table_sql' => 'elk_db_table_sql', //
 				'db_list_tables' => 'elk_db_list_tables',
 				'db_server_version' => 'elk_db_server_version',
 			);

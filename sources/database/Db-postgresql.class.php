@@ -72,7 +72,7 @@ class Database_PostgreSQL implements Database
 				'db_optimize_table' => 'elk_db_optimize_table',
 				'db_insert_sql' => 'elk_db_insert_sql',
 				'db_table_sql' => 'elk_db_table_sql',
-				'db_list_tables' => 'elk_db_list_tables',
+				'db_list_tables' => 'elk_db_list_tables', //
 				'db_server_version' => 'elk_db_server_version',
 			);
 
@@ -1191,7 +1191,7 @@ class Database_PostgreSQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Do we need to drop it first?
-		$tables = elk_db_list_tables(false, $backup_table);
+		$tables = $this->db_list_tables(false, $backup_table);
 		if (!empty($tables))
 			$smcFunc['db_query']('', '
 				DROP TABLE {raw:backup_table}',

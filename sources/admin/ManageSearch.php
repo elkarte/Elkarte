@@ -304,6 +304,7 @@ class ManageSearch_Controller
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
+		$db = database();
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_method_title'];
@@ -368,7 +369,7 @@ class ManageSearch_Controller
 			validateToken('admin-msm', 'get');
 
 			db_extend();
-			$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+			$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 			if (!empty($tables))
 			{
 				$db_search->search_query('drop_words_table', '
@@ -471,7 +472,7 @@ class ManageSearch_Controller
 		{
 			// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
 			db_extend();
-			$temp_tables = $smcFunc['db_list_tables']();
+			$temp_tables = $db->db_list_tables();
 			foreach ($temp_tables as $table)
 				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
 					$db->db_optimize_table($table);
@@ -559,6 +560,7 @@ class ManageSearch_Controller
 
 		// Get hang of db_search
 		$db_search = db_search();
+		$db = database();
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -624,7 +626,7 @@ class ManageSearch_Controller
 			if ($context['start'] === 0)
 			{
 				db_extend();
-				$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+				$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 				if (!empty($tables))
 				{
 					$db_search->search_query('drop_words_table', '

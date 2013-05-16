@@ -1137,8 +1137,7 @@ function action_databasePopulation()
 	}
 
 	// Let's optimize those new tables.
-	db_extend();
-	$tables = $smcFunc['db_list_tables']($db_name, $db_prefix . '%');
+	$tables = $db->db_list_tables($db_name, $db_prefix . '%');
 	foreach ($tables as $table)
 	{
 		$db->db_optimize_table($table) != -1 or $db_messed = true;

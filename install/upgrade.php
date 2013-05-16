@@ -1331,12 +1331,12 @@ function action_backupDatabase()
 		return true;
 
 	// Some useful stuff here.
-	db_extend();
+	$db = database();
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $smcFunc['db_list_tables']($db, $filter);
+	$tables = $db->db_list_tables($db, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)

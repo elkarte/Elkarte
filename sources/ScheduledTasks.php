@@ -525,7 +525,7 @@ function scheduled_auto_optimize()
 		return false;
 
 	// Get all the tables.
-	$tables = $smcFunc['db_list_tables'](false, $db_prefix . '%');
+	$tables = $db->db_list_tables(false, $db_prefix . '%');
 
 	foreach ($tables as $table)
 		$db->db_optimize_table($table);

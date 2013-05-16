@@ -174,13 +174,13 @@ function getElkTables()
 
 	$tables = array();
 
-	db_extend();
+	$db = database();
 
 	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
 	// Get a list of tables, as well as how many there are.
-	$temp_tables = $smcFunc['db_list_tables'](false, $real_prefix . '%');
+	$temp_tables = $db->db_list_tables(false, $real_prefix . '%');
 	foreach ($temp_tables as $table)
 			$tables[] = array('table_name' => $table);
 
