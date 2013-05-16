@@ -910,7 +910,7 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context;
+		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
 
 		// Sneaking off, are we?
@@ -1623,32 +1623,18 @@ class Post_Controller
 
 			// Delete it?
 			if (isset($_REQUEST['deleteevent']))
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}calendar
-					WHERE id_event = {int:id_event}',
-					array(
-						'id_event' => $_REQUEST['eventid'],
-					)
-				);
+				removeEvent($_REQUEST['eventid']);
 			// ... or just update it?
 			else
 			{
 				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
 				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
 
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}calendar
-					SET end_date = {date:end_date},
-						start_date = {date:start_date},
-						title = {string:title}
-					WHERE id_event = {int:id_event}',
-					array(
-						'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
-						'start_date' => strftime('%Y-%m-%d', $start_time),
-						'id_event' => $_REQUEST['eventid'],
-						'title' => $smcFunc['htmlspecialchars']($_REQUEST['evtitle'], ENT_QUOTES),
-					)
-				);
+				modifyEvent($_REQUEST['eventid'], array(
+					'start_date' => strftime('%Y-%m-%d', $start_time),
+					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
+					'title' => $smcFunc['htmlspecialchars']($_REQUEST['evtitle'], ENT_QUOTES),
+				));
 			}
 			updateSettings(array(
 				'calendar_updated' => time(),
