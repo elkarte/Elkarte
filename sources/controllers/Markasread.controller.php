@@ -79,21 +79,13 @@ class MarkRead_Controller
 		// For the time being this is a special case
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
 		{
-			$return = array(
-				'text' => $txt['unread_topics_visit_none'],
-			);
-
-			if (isset($_REQUEST['json']))
-			{
-				die(json_encode($return));
-			}
 			loadTemplate('Xml');
 
 			$context['template_layers'] = array();
 			$context['sub_template'] = 'generic_xml_buttons';
 
 			$context['xml_data'] = array(
-				$return,
+				'text' => $txt['unread_topics_visit_none'],
 			);
 		}
 		else

@@ -96,23 +96,15 @@ class Notify_Controller
 		// Attempt to turn notifications on/off.
 		setTopicNotification($user_info['id'], $topic, $_GET['sa'] == 'on');
 
-		$return = array(
-			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
-			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
-		);
-
-		if (isset($_REQUEST['json']))
-		{
-			die(json_encode($return));
-		}
 		loadTemplate('Xml');
 
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
-			$return,
+			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
 		);
 	}
 
@@ -192,23 +184,15 @@ class Notify_Controller
 		// Turn notification on/off for this board.
 		setBoardNotification($user_info['id'], $board, $_GET['sa'] == 'on');
 
-		$return = array(
-			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notifyboard;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
-			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
-		);
-
-		if (isset($_REQUEST['json']))
-		{
-			die(json_encode($return));
-		}
 		loadTemplate('Xml');
 
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
-			$return,
+			'text' => $_GET['sa'] == 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notifyboard;sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'confirm' => $_GET['sa'] == 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
 		);
 	}
 
@@ -262,22 +246,14 @@ class Notify_Controller
 
 		setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
 
-		$return = array(
-			'text' => $_GET['sa'] == 'on' ? $txt['undisregard'] : $txt['disregard'],
-			'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $_REQUEST['start'] . ';sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
-		);
-
-		if (isset($_REQUEST['json']))
-		{
-			die(json_encode($return));
-		}
 		loadTemplate('Xml');
 
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
-			$return,
+			'text' => $_GET['sa'] == 'on' ? $txt['undisregard'] : $txt['disregard'],
+			'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $_REQUEST['start'] . ';sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
 		);
 	}
 }
