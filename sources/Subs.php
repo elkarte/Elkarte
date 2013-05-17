@@ -3040,7 +3040,7 @@ function template_header()
 	$showed_banned = false;
 	foreach ($context['template_layers'] as $layer)
 	{
-		loadSubTemplate($layer . '_above', true);
+		loadSubTemplate($layer . '_above', 'ignore');
 
 		// May seem contrived, but this is done in case the body and main layer aren't there...
 		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
@@ -3166,7 +3166,7 @@ function template_footer()
 	}
 
 	foreach (array_reverse($context['template_layers']) as $layer)
-		loadSubTemplate($layer . '_below', true);
+		loadSubTemplate($layer . '_below', 'ignore');
 
 }
 
