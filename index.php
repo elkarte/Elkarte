@@ -77,6 +77,7 @@ require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
 require_once(SOURCEDIR . '/Errors.class.php');
+require_once(SUBSDIR . '/Util.class.php');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
@@ -90,6 +91,9 @@ loadDatabase();
 
 // It's time for settings loaded from the database.
 reloadSettings();
+
+// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
+Util::compat_init();
 
 // Clean the request!
 cleanRequest();

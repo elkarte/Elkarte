@@ -93,6 +93,7 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
+require_once(SUBSDIR . '/Util.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();
@@ -100,8 +101,11 @@ $smcFunc = array();
 // Initate the database connection and define some database functions to use.
 loadDatabase();
 
-// Load installed 'Mods' settings.
+// Load settings from the database.
 reloadSettings();
+
+// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
+Util::compat_init();
 
 // Clean the request variables.
 cleanRequest();
