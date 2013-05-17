@@ -931,7 +931,9 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from,
 			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list';
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, COUNT(ml.id_member) AS likes_given, mem.likes_received';
+			$select_tables .= '
+				LEFT JOIN {db_prefix}message_likes AS ml ON (ml.id_member = mem.id_member)';
 			break;
 		case 'minimal':
 			$select_columns = '
@@ -1125,6 +1127,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 			),
 			'ip' => htmlspecialchars($profile['member_ip']),
 			'ip2' => htmlspecialchars($profile['member_ip2']),
+			'likes_given' => comma_format($profile['likes_given']),
+			'likes_received' => comma_format($profile['likes_received']),
 			'online' => array(
 				'is_online' => $profile['is_online'],
 				'text' => $smcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
@@ -2272,10 +2276,10 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $smcFunc, $settings, $modSettings;
+	global $context, $smcFunc, $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
-	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
+	if (!$use_cache || ($context['languages'] = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
@@ -2307,7 +2311,7 @@ function getLanguages($use_cache = true)
 				if (!preg_match('~^index\.(.+)\.php$~', $entry, $matches))
 					continue;
 
-				$languages[$matches[1]] = array(
+				$context['languages'][$matches[1]] = array(
 					'name' => $smcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
 					'selected' => false,
 					'filename' => $matches[1],
@@ -2319,10 +2323,10 @@ function getLanguages($use_cache = true)
 
 		// Lets cash in on this deal.
 		if (!empty($modSettings['cache_enable']))
-			cache_put_data('known_languages', $languages, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+			cache_put_data('known_languages', $context['languages'], !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 	}
 
-	return $languages;
+	return $context['languages'];
 }
 
 /**
