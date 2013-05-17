@@ -21,9 +21,6 @@ function template_main()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
-	if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
-		template_display_child_boards();
-
 	// They can only mark read if they are logged in and it's enabled!
 	if (!$context['user']['is_logged'] || !$settings['show_mark_read'])
 		unset($context['normal_buttons']['markread']);
@@ -348,7 +345,7 @@ function template_main()
 /**
  * Used to display child boards.
  */
-function template_display_child_boards()
+function template_display_child_boards_above()
 {
 	global $context, $txt, $scripturl, $settings;
 
@@ -464,3 +461,6 @@ function template_display_child_boards()
 		</table>
 	</div>';
 }
+
+function template_display_child_boards_below()
+{}
