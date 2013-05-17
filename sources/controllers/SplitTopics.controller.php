@@ -106,7 +106,7 @@ class SplitTopics_Controller
 
 		// Check if this is the first message in the topic (if so, the first and second option won't be available)
 		if ($messageInfo['id_first_msg'] == $splitAt)
-			return action_splitSelectTopics();
+			return $this->action_splitSelectTopics();
 
 		// Basic template information....
 		$context['message'] = array(
@@ -157,7 +157,7 @@ class SplitTopics_Controller
 		if ($_POST['step2'] == 'selective')
 		{
 			$_REQUEST['subname'] = $_POST['subname'];
-			return action_splitSelectTopics();
+			return $this->action_splitSelectTopics();
 		}
 
 		// We work with them topics.
