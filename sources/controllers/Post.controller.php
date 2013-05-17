@@ -537,7 +537,7 @@ class Post_Controller
 					$post_errors->addError($error);
 
 			// Get the stuff ready for the form.
-			list($form_subject, $form_message) = $message['message'];
+			list($form_subject, $form_message) = $message;
 
 			censorText($form_message);
 			censorText($form_subject);
