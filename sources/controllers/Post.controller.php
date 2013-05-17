@@ -537,7 +537,8 @@ class Post_Controller
 					$post_errors->addError($error);
 
 			// Get the stuff ready for the form.
-			list($form_subject, $form_message) = $message;
+			$form_subject = $message['message']['subject'];
+			$form_message = $message['message']['body'];
 
 			censorText($form_message);
 			censorText($form_subject);
@@ -566,7 +567,7 @@ class Post_Controller
 
 			$context['submit_label'] = $txt['post'];
 
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic);
+			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
 
 		// Are we moving a discussion to its own topic?
