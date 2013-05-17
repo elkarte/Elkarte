@@ -14,40 +14,24 @@
  * @version 1.0 Alpha
  */
 
-function template_main()
+function template_report_sent_above()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $txt;
 
 	// Let them know, if their report was a success!
-	if ($context['report_sent'])
-	{
-		echo '
+	echo '
 			<div class="infobox">
 				', $txt['report_sent'], '
 			</div>';
-	}
+}
+function template_report_sent_below()
+{}
 
-	// Show the anchor for the top and for the first message. If the first message is new, say so.
-	echo '
-			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
-
-	// Is this topic also a poll?
-	if ($context['is_poll'])
-		template_display_poll();
-
-	// Does this topic have some events linked to it?
-	if (!empty($context['linked_calendar_events']))
-		template_display_calendar();
-
-	// Show the page index... "Pages: [1]".
-	echo '
-			<div class="pagesection">
-				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
-				<div class="pagelinks floatleft">
-					', $context['page_index'], '
-				</div>
-			</div>';
+function template_main()
+{
+	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+		// Yeah, I know, though at the moment is the only way...
+	global $removableMessageIDs, $ignoredMsgs;
 
 	// Show the topic information - icon, subject, etc.
 	echo '
@@ -313,26 +297,17 @@ function template_main()
 	echo '
 				</form>
 			</div>';
+}
 
-	// Show the page index... "Pages: [1]".
-	echo '
-			<div class="pagesection">
-				', template_button_strip($context['normal_buttons'], 'right'), '
-				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-				<div class="pagelinks floatleft">
-					', $context['page_index'], '
-				</div>
-			</div>';
+function template_quickreply_above()
+{}
 
-	// Show the lower breadcrumbs.
-	theme_linktree();
 
-	echo '
-			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
-
-	// Show the jumpto box, or actually...let Javascript do it.
-	echo '
-			<div class="plainbox" id="display_jump_to">&nbsp;</div>';
+function template_quickreply_below()
+{
+	global $context, $options, $settings, $txt, $modSettings, $scripturl;
+	// Yeah, I know, though at the moment is the only way...
+	global $removableMessageIDs, $ignoredMsgs;
 
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
@@ -822,7 +797,7 @@ function template_build_poster_div($message, $ignoring)
 /**
  * Used to display a polls / poll results
  */
-function template_display_poll()
+function template_display_poll_above()
 {
 	global $settings, $context, $txt, $scripturl;
 	echo '
@@ -912,10 +887,13 @@ function template_display_poll()
 			</div>';
 }
 
+function template_display_poll_below()
+{}
+
 /**
  * Used to display an attached calendar event.
  */
-function template_display_calendar()
+function template_display_calendar_above()
 {
 	global $context, $txt, $settings;
 	echo '
@@ -940,6 +918,53 @@ function template_display_calendar()
 			</div>';
 }
 
+function template_display_calendar_below()
+{}
+
+function template_pages_and_buttons_above()
+{
+	global $context, $txt, $modSettings;
+
+	// Show the anchor for the top and for the first message. If the first message is new, say so.
+	echo '
+			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
+
+	// Show the page index... "Pages: [1]".
+	echo '
+			<div class="pagesection">
+				', template_button_strip($context['normal_buttons'], 'right'), '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
+				<div class="pagelinks floatleft">
+					', $context['page_index'], '
+				</div>
+			</div>';
+}
+
+function template_pages_and_buttons_below()
+{
+	global $context, $txt, $modSettings;
+
+
+	// Show the page index... "Pages: [1]".
+	echo '
+			<div class="pagesection">
+				', template_button_strip($context['normal_buttons'], 'right'), '
+				', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
+				<div class="pagelinks floatleft">
+					', $context['page_index'], '
+				</div>
+			</div>';
+
+	// Show the lower breadcrumbs.
+	theme_linktree();
+
+	echo '
+			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
+
+	// Show the jumpto box, or actually...let Javascript do it.
+	echo '
+			<div class="plainbox" id="display_jump_to">&nbsp;</div>';
+}
 /**
  * Used to display attachments
  * @param array $message
