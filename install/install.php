@@ -1361,6 +1361,7 @@ function action_deleteInstall()
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Util.class.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1437,10 +1438,6 @@ function action_deleteInstall()
 	updateStats('member');
 	updateStats('message');
 	updateStats('topic');
-
-	// This function is needed to do the updateStats('subject') call.
-	$smcFunc['strtolower'] = create_function('$string', '
-		return $string;');
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg
