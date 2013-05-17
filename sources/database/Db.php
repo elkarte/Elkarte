@@ -178,7 +178,7 @@ interface Database
 	 *
 	 * @param resource $connection = null
 	 */
-	abstract function last_error($connection = null);
+	function last_error($connection = null);
 
 	/**
 	 * Returns whether the database system supports ignore.
