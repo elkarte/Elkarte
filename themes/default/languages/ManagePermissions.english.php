@@ -201,6 +201,11 @@ $txt['permissionhelp_delete_replies'] = 'This permission allows a user that star
 $txt['permissionname_announce_topic'] = 'Announce topic';
 $txt['permissionhelp_announce_topic'] = 'This allows a user to send an announcement e-mail about a topic to all members or to a few membergroups.';
 
+$txt['permissionname_approve_emails'] = 'Moderate Post by Email Failures';
+$txt['permissionhelp_approve_emails'] = 'Allow Moderators to access the Post by Email failure log to perform actions including approve, delete, view and bounce.  Note, since the system may not allways know what board a post goes to, this permission should be only be given to members with full board access';
+$txt['permissionname_postby_email'] = 'Post by Email';
+$txt['permissionhelp_postby_email'] = 'This permission allows users to start new topics as well as reply to topic and PM notifications by email.';
+
 $txt['permissiongroup_post'] = 'Posts';
 $txt['permissionname_delete'] = 'Delete posts';
 $txt['permissionhelp_delete'] = 'Remove posts. This does not allow a user to delete the first post of a topic.';

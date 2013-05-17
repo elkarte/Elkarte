@@ -957,25 +957,16 @@ class Display_Controller
 			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topic_info = getTopicInfo($topic);
+
 		// Allowed to delete any message?
 		if (allowedTo('delete_any'))
 			$allowed_all = true;
 		// Allowed to delete replies to their messages?
 		elseif (allowedTo('delete_replies'))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member_started
-				FROM {db_prefix}topics
-				WHERE id_topic = {int:current_topic}
-				LIMIT 1',
-				array(
-					'current_topic' => $topic,
-				)
-			);
-			list ($starter) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
-			$allowed_all = $starter == $user_info['id'];
+			$allowed_all = $topic_info['id_member_started'] == $user_info['id'];
 		}
 		else
 			$allowed_all = false;
@@ -1009,17 +1000,8 @@ class Display_Controller
 		$smcFunc['db_free_result']($request);
 
 		// Get the first message in the topic - because you can't delete that!
-		$request = $smcFunc['db_query']('', '
-			SELECT id_first_msg, id_last_msg
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		list ($first_message, $last_message) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$first_message = $topic_info['id_first_msg'];
+		$last_message = $topic_info['id_last_msg'];
 
 		// Delete all the messages we know they can delete. ($messages)
 		foreach ($messages as $message => $info)

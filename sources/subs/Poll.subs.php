@@ -12,10 +12,14 @@
  */
 
 /**
- * Retrieve the poll ID associated with this topic ID.
+ * This function deals with the poll ID associated to a topic.
+ * It allows to retrieve or update the poll ID associated with this topic ID.
  *
- * @param int $topicID
- * @param int $pollID
+ * If $pollID is not passed, the current poll ID of the topic, if any, is returned.
+ * If $pollID is passed, the topic is updated to point to the new poll.
+ *
+ * @param int $topicID the ID of the topic
+ * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrives the current ID.
  *
  */
 function associatedPoll($topicID, $pollID = null)

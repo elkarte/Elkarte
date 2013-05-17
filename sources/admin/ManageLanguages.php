@@ -1063,4 +1063,23 @@ class ManageLanguages_Controller
 		// initialize the little form
 		return $this->_languageSettings->settings($config_vars);
 	}
+
+	public function settings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
+			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
+		);
+
+		call_integration_hook('integrate_language_settings', array(&$config_vars));
+
+		// Get all languages we speak.
+		$languages = getLanguages(false);
+		foreach ($languages as $lang)
+			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+
+		return $config_vars;
+	}
 }

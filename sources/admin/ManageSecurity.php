@@ -186,6 +186,8 @@ class ManageSecurity_Controller
 			'',
 				// Reporting of personal messages?
 				array('check', 'enableReportPM'),
+			'',
+				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
 		);
 
 		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
@@ -378,7 +380,7 @@ class ManageSecurity_Controller
 			'questions',
 		);
 		call_integration_hook('integrate_control_verification', array(&$known_verifications));
-		
+
 		foreach ($known_verifications as $verification)
 		{
 			$class_name = 'Control_Verification_' . ucfirst($verification);
@@ -557,5 +559,158 @@ class ManageSecurity_Controller
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
 		$context['sub_action'] = $_REQUEST['sa'];
+	}
+
+	/**
+	 * Moderation settings.
+	 * Used in admin panel search.
+	 */
+	public function moderationSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Warning system?
+			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
+			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
+			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
+			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
+			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
+			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
+		);
+
+		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Security settings.
+	 * Used in admin panel search.
+	 */
+	public function securitySettings()
+	{
+		global $txt;
+
+		// initialize it with our settings
+		$config_vars = array(
+				array('check', 'guest_hideContacts'),
+				array('check', 'make_email_viewable'),
+			'',
+				array('int', 'failed_login_threshold'),
+				array('int', 'loginHistoryDays'),
+			'',
+				array('check', 'enableErrorLogging'),
+				array('check', 'enableErrorQueryLogging'),
+			'',
+				array('check', 'securityDisable'),
+				array('check', 'securityDisable_moderate'),
+			'',
+				// Reactive on email, and approve on delete
+				array('check', 'send_validation_onChange'),
+				array('check', 'approveAccountDeletion'),
+			'',
+				// Password strength.
+				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
+				array('check', 'enable_password_conversion'),
+			'',
+				// Reporting of personal messages?
+				array('check', 'enableReportPM'),
+			'',
+				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
+		);
+
+		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Spam settings.
+	 * Used in admin panel search.
+	 */
+	public function spamSettings()
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Editor.subs.php');
+
+		// Build up our options array
+		$config_vars = array(
+			array('title', 'antispam_Settings'),
+				array('check', 'reg_verification'),
+				array('check', 'search_enable_captcha'),
+				// This, my friend, is a cheat :p
+				'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
+				array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+				array('check', 'guests_report_require_captcha'),
+			// PM Settings
+			array('title', 'antispam_PM'),
+				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+		);
+
+		// @todo: maybe move the list to $modSettings instead of hooking it?
+		// Used in create_control_verification too
+		$known_verifications = array(
+			'captcha',
+			'questions',
+		);
+		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+
+		foreach ($known_verifications as $verification)
+		{
+			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$current_instance = new $class_name();
+
+			$new_settings = $current_instance->settings();
+			if (!empty($new_settings) && is_array($new_settings))
+				foreach ($new_settings as $new_setting)
+				$config_vars[] = $new_setting;
+		}
+
+		// @todo: it may be removed, it may stay, the two hooks may have different functions
+		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Bad Behavior settings.
+	 * Used in admin panel search.
+	 */
+	public function bbSettings()
+	{
+		global $txt, $context;
+
+		// Build up our options array
+		$config_vars = array(
+			array('title', 'badbehavior_title'),
+				array('desc', 'badbehavior_desc'),
+				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
+				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
+				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
+				'',
+				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
+				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
+				array('text', 'badbehavior_reverse_proxy_addresses', 30),
+				'',
+				array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
+				array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
+				array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
+			array('title', 'badbehavior_whitelist_title'),
+				array('desc', 'badbehavior_wl_desc'),
+				array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
+				array('callback', 'badbehavior_add_ip'),
+				array('callback', 'badbehavior_add_url'),
+				array('callback', 'badbehavior_add_useragent'),
+		);
+
+		return $config_vars;
 	}
 }

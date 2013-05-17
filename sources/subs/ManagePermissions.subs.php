@@ -477,6 +477,7 @@ function loadAllPermissions($loadType = 'classic')
 			'profile_server_avatar' => array(false, 'profile', 'use_avatar'),
 			'profile_upload_avatar' => array(false, 'profile', 'use_avatar'),
 			'profile_remote_avatar' => array(false, 'profile', 'use_avatar'),
+			'approve_emails' => array(false, 'member_admin', 'administrate'),
 		),
 		'board' => array(
 			'moderate_board' => array(false, 'general_board', 'moderate'),
@@ -512,6 +513,7 @@ function loadAllPermissions($loadType = 'classic')
 			'view_attachments' => array(false, 'attachment', 'participate'),
 			'post_unapproved_attachments' => array(false, 'attachment', 'make_unapproved_posts'),
 			'post_attachment' => array(false, 'attachment', 'attach'),
+			'postby_email' => array(false, 'topic', 'make_posts'),
 		),
 	);
 
@@ -545,6 +547,11 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'issue_warning';
 	if (!in_array('k', $context['admin_features']))
 		$hiddenPermissions[] = 'karma_edit';
+	if (!in_array('pe', $context['admin_features']))
+	{
+		$hiddenPermissions[] = 'approve_emails';
+		$hiddenPermissions[] = 'postby_email';
+	}
 	if (!in_array('dr', $context['admin_features']))
 	{
 		$hiddenPermissions[] = 'post_draft';
@@ -1097,7 +1104,7 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
 }
 
 /**
- * Deletes a membergroup's board permissions from a specified permission profile. 
+ * Deletes a membergroup's board permissions from a specified permission profile.
  *
  * @param int $id_group
  * @param profile $id_profile
@@ -1141,7 +1148,7 @@ function clearDenyPermissions()
 }
 
 /**
- * Permissions for post based groups disabled? We need to clean the permission 
+ * Permissions for post based groups disabled? We need to clean the permission
  * tables, too.
  */
 function clearPostgroupPermissions()
@@ -1299,7 +1306,7 @@ function deletePermissionProfiles($profiles)
 function permProfilesInUse($profiles)
 {
 	global $smcFunc, $txt;
-	
+
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, COUNT(id_board) AS board_count
 		FROM {db_prefix}boards

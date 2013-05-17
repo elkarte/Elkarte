@@ -146,27 +146,10 @@ function markBoardsRead($boards, $unread = false)
  */
 function getMsgMemberID($messageID)
 {
-	global $smcFunc;
+	require_once(SUBSDIR . '/Messages.subs.php');
+	$message_info = getMessageInfo((int) $messageID, true);
 
-	// Find the topic and make sure the member still exists.
-	$result = $smcFunc['db_query']('', '
-		SELECT IFNULL(mem.id_member, 0)
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_msg = {int:selected_message}
-		LIMIT 1',
-		array(
-			'selected_message' => (int) $messageID,
-		)
-	);
-	if ($smcFunc['db_num_rows']($result) > 0)
-		list ($memberID) = $smcFunc['db_fetch_row']($result);
-	// The message doesn't even exist.
-	else
-		$memberID = 0;
-	$smcFunc['db_free_result']($result);
-
-	return (int) $memberID;
+	return empty($message_info['id_member']) ? 0 : (int) $message_info['id_member'];
 }
 
 /**
@@ -938,6 +921,8 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
+	global $smcFunc;
+
 	// Find out if they have notification set for this board already.
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member
@@ -1026,8 +1011,6 @@ function accessibleBoards()
 function boardInfo($board_id, $topic_id = null)
 {
 	global $smcFunc;
-
-	$returns = array();
 
 	if (!empty($topic_id))
 	{

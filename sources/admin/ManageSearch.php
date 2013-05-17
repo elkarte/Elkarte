@@ -43,7 +43,7 @@ class ManageSearch_Controller
 	 */
 	function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 
@@ -1004,8 +1004,6 @@ function detectFulltextIndex()
 function createSphinxConfig()
 {
 	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_character_set, $modSettings;
-
-	$humungousTopicPosts = 200;
 
 	// set up to ouput a file to the users browser
 	ob_end_clean();

@@ -1217,6 +1217,166 @@ class ManageFeatures_Controller
 
 		createToken('admin-ecp');
 	}
+
+	/**
+	 * Return basic feature settings.
+	 * Used in admin center search.
+	 */
+	public function basicSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Big Options... polls, sticky, bbc....
+				array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
+			'',
+				// Basic stuff, titles, flash, permissions...
+				array('check', 'allow_guestAccess'),
+				array('check', 'enable_buddylist'),
+				array('check', 'enable_disregard'),
+				array('check', 'allow_editDisplayName'),
+				array('check', 'allow_hideOnline'),
+				array('check', 'titlesEnable'),
+				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
+			'',
+				// Javascript and CSS options
+				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
+				array('check', 'minify_css_js'),
+			'',
+				// SEO stuff
+				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong>'),
+				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
+			'',
+				// Number formatting, timezones.
+				array('text', 'time_format'),
+				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
+				'default_timezone' => array('select', 'default_timezone', array()),
+			'',
+				// Who's online?
+				array('check', 'who_enabled'),
+				array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
+			'',
+				// Statistics.
+				array('check', 'trackStats'),
+				array('check', 'hitStats'),
+			'',
+				// Option-ish things... miscellaneous sorta.
+				array('check', 'allow_disableAnnounce'),
+				array('check', 'disallow_sendBody'),
+				array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
+		);
+
+		// Get all the time zones.
+		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
+		{
+			$all_zones = timezone_identifiers_list();
+			// Make sure we set the value to the same as the printed value.
+			foreach ($all_zones as $zone)
+				$config_vars['default_timezone'][2][$zone] = $zone;
+		}
+		else
+		{
+			// we don't know this, huh?
+			unset($config_vars['default_timezone']);
+		}
+
+		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return layout settings.
+	 * Used in admin center search.
+	 */
+	public function layoutSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Pagination stuff.
+				array('check', 'compactTopicPagesEnable'),
+				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
+				array('int', 'defaultMaxMembers'),
+			'',
+				// Stuff that just is everywhere - today, search, online, etc.
+				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
+				array('check', 'topbottomEnable'),
+				array('check', 'onlineEnable'),
+				array('check', 'enableVBStyleLogin'),
+			'',
+				// Automagic image resizing.
+				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				// This is like debugging sorta.
+				array('check', 'timeLoadPageEnable'),
+		);
+
+		call_integration_hook('integrate_layout_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return karma settings.
+	 * Used in admin center search.
+	 */
+	public function karmaSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Karma - On or off?
+				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
+			'',
+				// Who can do it.... and who is restricted by time limits?
+				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
+				array('check', 'karmaTimeRestrictAdmins'),
+			'',
+				// What does it look like?  [smite]?
+				array('text', 'karmaLabel'),
+				array('text', 'karmaApplaudLabel'),
+				array('text', 'karmaSmiteLabel'),
+		);
+
+		call_integration_hook('integrate_karma_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return signature settings.
+	 * Used in admin center search.
+	 */
+	public function signatureSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Are signatures even enabled?
+				array('check', 'signature_enable'),
+			'',
+				// Tweaking settings!
+				array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
+				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
+				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				// Image settings.
+				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
+				array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				array('bbc', 'signature_bbc'),
+		);
+
+		call_integration_hook('integrate_signature_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
 }
 
 /**

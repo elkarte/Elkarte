@@ -639,3 +639,16 @@ $helptxt['badbehavior_postcount_wl'] = 'This allows you to bypass bad behavior c
 $helptxt['badbehavior_ip_wl'] = 'IP address ranges use the CIDR format.  To remove an address just leave it blank and then save';
 $helptxt['badbehavior_useragent_wl'] = 'User agents are matched by exact match only.';
 $helptxt['badbehavior_url_wl'] = 'URLs are matched from the first / after the server name up to, but not including, the ? (if any). The URL to be whitelisted is a URL on YOUR site. A partial URL match is permitted, so URL whitelist entries should be as specific as possible, but no more specific than necessary.<br />For instance, /example would match /example.php and /example/address';
+
+$helptxt['filter_to'] = 'Replace the found text with this, leave blank to replace with found text with nothing i.e. remove it';
+$helptxt['filter_from'] = 'Enter the text you want to find/replace.  If type is set to regex then this must be a valid regular expression, including delimiters.  If not regex it will do a simple text match and replace it with the replacement text';
+$helptxt['filter_type'] = 'Standard will find the exact phase and replace it with the text in the replace field.  Regular Expression is a wildcard option, but it must in in a valid regex format.';
+$helptxt['pbe_post_enabled'] = 'Enable this to allow users to respond to email notifications and have them post as a reply.  They are still required to have posting permissions.';
+$helptxt['pbe_pm_enabled'] = 'Enable this to allow users to reply by email to PM notifications.  They are still required to have PM permissions, this setting only allows them to receive and reply to notifications';
+$helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the posters Display Name, otherwise it will come from the Site Name.  This is simply a envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
+$helptxt['maillist_newtopic_change'] = 'This will allow a user to change the subject of a email notification and have it post as a new topic.  The new topic will be started on the same board as the reply was going to.';
+$helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the imap mailbox';
+
+$helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a frame or an iframe. You can use this additional security restriction on your site against attempts at clickjacking attacks, by ensuring that the content of your site is not embedded into other sites.
+	<br />
+	More information about this header may be found on the internet.';

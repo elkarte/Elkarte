@@ -203,7 +203,7 @@ class ManagePermissions_Controller
 
 		// Query the database defined membergroups.
 		$groupData = getExtendedMembergroupData();
-		
+
 		foreach ($groupData as $row)
 		{
 			// If it's inherited, just add it as a child.
@@ -365,7 +365,7 @@ class ManagePermissions_Controller
 	 */
 	public function action_quick()
 	{
-		global $context, $smcFunc;
+		global $context;
 
 		checkSession();
 		validateToken('admin-mpq', 'quick');
@@ -808,7 +808,7 @@ class ManagePermissions_Controller
 	public function action_profiles()
 	{
 		global $context, $txt;
-	
+
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Setup the template, first for fun.
@@ -856,7 +856,7 @@ class ManagePermissions_Controller
 
 		// Work out what ones are in use.
 		$context['profiles'] = permProfilesInUse($context['profiles']);
-	
+
 		// What can we do with these?
 		$context['can_edit_something'] = false;
 		foreach ($context['profiles'] as $id => $profile)

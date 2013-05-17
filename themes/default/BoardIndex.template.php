@@ -16,7 +16,7 @@
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $txt, $scripturl;
 
 	// Show some statistics if stat info is off.
 	if (!$settings['show_stats_index'])
@@ -28,60 +28,7 @@ function template_main()
 
 	// Show the news fader?  (assuming there are things to show...)
 	if ($settings['show_newsfader'] && !empty($context['news_lines']))
-	{
-		echo '
-	<div id="newsfader">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img id="newsupshrink" src="', $settings['images_url'], '/collapse.png" alt="*" title="', $txt['hide'], '" style="display: none;vertical-align: bottom" />
-				', $txt['news'], '
-			</h3>
-		</div>
-		<ul class="reset" id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
-			<li>
-				', implode('</li><li>', $context['news_lines']), '
-			</li>
-		</ul>
-	</div>
-	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
-	<script><!-- // --><![CDATA[
-
-		// Create a news fader object.
-		var oNewsFader = new smc_NewsFader({
-			sFaderControlId: \'smfFadeScroller\',
-			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
-			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-		});
-
-		// Create the news fader toggle.
-		var smfNewsFadeToggle = new smc_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
-			aSwappableContainers: [
-				\'smfFadeScroller\'
-			],
-			aSwapImages: [
-				{
-					sId: \'newsupshrink\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'collapse_news_fader\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id
-			},
-			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-				sCookieName: \'newsupshrink\'
-			}
-		});
-	// ]]></script>';
-	}
+		template_news_fader();
 
 	echo '
 	<div id="boardindex_table" class="boardindex_table">
@@ -470,6 +417,67 @@ function template_info_center()
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
 				sCookieName: \'upshrinkIC\'
+			}
+		});
+	// ]]></script>';
+}
+
+/**
+ * This is the newsfader
+ */
+function template_news_fader()
+{
+	global $settings, $options, $txt, $context;
+
+	echo '
+	<div id="newsfader">
+		<div class="cat_bar">
+			<h3 class="catbg">
+				<img id="newsupshrink" src="', $settings['images_url'], '/collapse.png" alt="*" title="', $txt['hide'], '" style="display: none;vertical-align: bottom" />
+				', $txt['news'], '
+			</h3>
+		</div>
+		<ul class="reset" id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
+			<li>
+				', implode('</li><li>', $context['news_lines']), '
+			</li>
+		</ul>
+	</div>
+	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
+	<script><!-- // --><![CDATA[
+
+		// Create a news fader object.
+		var oNewsFader = new smc_NewsFader({
+			sFaderControlId: \'smfFadeScroller\',
+			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
+			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
+		});
+
+		// Create the news fader toggle.
+		var smfNewsFadeToggle = new smc_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
+			aSwappableContainers: [
+				\'smfFadeScroller\'
+			],
+			aSwapImages: [
+				{
+					sId: \'newsupshrink\',
+					srcExpanded: smf_images_url + \'/collapse.png\',
+					altExpanded: ', JavaScriptEscape($txt['hide']), ',
+					srcCollapsed: smf_images_url + \'/expand.png\',
+					altCollapsed: ', JavaScriptEscape($txt['show']), '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				sOptionName: \'collapse_news_fader\',
+				sSessionVar: smf_session_var,
+				sSessionId: smf_session_id
+			},
+			oCookieOptions: {
+				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+				sCookieName: \'newsupshrink\'
 			}
 		});
 	// ]]></script>';

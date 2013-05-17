@@ -822,6 +822,41 @@ function shorten_subject($subject, $len)
 }
 
 /**
+ * Shorten a string of text
+ *
+ * - shortens a text string so that it is approximately a certain length or under
+ * - attempts to break the string on the first word boundary after the allowed length
+ * - if resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
+ * - respects internationalization characters and entities as one character.
+ * - returns the shortened string.
+ *
+ * @param string $text
+ * @param int $len
+ * @param int $buffer maximum length overflow to allow cutting on a word boundary
+ */
+function shorten_text($text, $len = 384, $buffer = 12)
+{
+	global $smcFunc;
+
+	$current = $smcFunc['strlen']($text);
+
+	// Its to long so lets cut it down to size
+	if ($current > $len)
+	{
+		// Look for len characters and cut on first word boundary after
+		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
+
+		// Always one clown in the audience who likes long words or not using the spacebar
+		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
+			$matches[1] = substr($matches[1], 0, $len);
+
+		return rtrim($matches[1]) . '...';
+	}
+	else
+		return $text;
+}
+
+/**
  * Gets the current time with offset.
  *
  * - always applies the offset in the time_offset setting.
@@ -3648,6 +3683,11 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
 						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
@@ -3868,6 +3908,12 @@ function setupMenuContext()
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
+			}
+
+			if (!empty($mod_count['emailmod']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= ' [<strong>' . $mod_count['emailmod'] . '</strong>]';
 			}
 
 			if (!empty($mod_count['attachments']))

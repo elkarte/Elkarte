@@ -1802,6 +1802,13 @@ function action_modcenter($dont_call = false)
 						'topics' => array($txt['mc_unapproved_topics']),
 					),
 				),
+				'emailmod' => array(
+					'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
+					'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					'file' => 'admin/ManageMaillist.php',
+					'function' => 'UnapprovedEmails',
+					'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+				),
 				'attachmod' => array(
 					'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 					'enabled' => $context['can_moderate_approvals'],

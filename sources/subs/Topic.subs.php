@@ -1045,7 +1045,7 @@ function setTopicRegard($id_member, $topic, $on = false)
  * - uses any integration information (value selects, tables and parameters) if passed and full is true
  *
  * @param array $topic_parameters can also accept a int value for a topic
- * @param int $full defines the values returned by the function:
+ * @param string $full defines the values returned by the function:
  *             - if empty returns only the data from {db_prefix}topics
  *             - if 'message' returns also informations about the message (subject, body, etc.)
  *             - if 'all' returns additional infos about the read/disregard status
