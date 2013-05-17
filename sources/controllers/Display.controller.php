@@ -1220,7 +1220,6 @@ function loadAttachmentContext($id_msg)
 					$attachment = $attachment + updateAttachmentThumbnail($filename, $attachment['id_thumb']);
 				}
 	
-
 				// Only adjust dimensions on successful thumbnail creation.
 				if (!empty($attachment['thumb_width']) && !empty($attachment['thumb_height']))
 				{
