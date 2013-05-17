@@ -24,8 +24,6 @@ function template_report_sent_above()
 				', $txt['report_sent'], '
 			</div>';
 }
-function template_report_sent_below()
-{}
 
 function template_main()
 {
@@ -298,10 +296,6 @@ function template_main()
 				</form>
 			</div>';
 }
-
-function template_quickreply_above()
-{}
-
 
 function template_quickreply_below()
 {
@@ -887,9 +881,6 @@ function template_display_poll_above()
 			</div>';
 }
 
-function template_display_poll_below()
-{}
-
 /**
  * Used to display an attached calendar event.
  */
@@ -917,9 +908,6 @@ function template_display_calendar_above()
 				</div>
 			</div>';
 }
-
-function template_display_calendar_below()
-{}
 
 function template_pages_and_buttons_above()
 {
