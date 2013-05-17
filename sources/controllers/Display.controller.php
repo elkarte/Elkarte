@@ -271,6 +271,8 @@ class Display_Controller
 
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($_GET['reportsent']);
+		if ($context['report_sent'])
+			$context['template_layers'][] = 'report_sent';
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -428,12 +430,16 @@ class Display_Controller
 			$smcFunc['db_free_result']($request);
 
 			if (!empty($context['linked_calendar_events']))
+			{
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
+				$context['template_layers'][] = 'display_calendar';
+			}
 		}
 
 		// Create the poll info if it exists.
 		if ($context['is_poll'])
 		{
+			$context['template_layers'][] = 'display_poll';
 			// Get the question and if it's locked.
 			$request = $smcFunc['db_query']('', '
 				SELECT
@@ -920,6 +926,10 @@ class Display_Controller
 		// Restore topic. eh?  No monkey business.
 		if ($context['can_restore_topic'])
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
+
+		if ($context['can_reply'] && !empty($options['display_quick_reply']))
+			$context['template_layers'][] = 'quickreply';
+		$context['template_layers'][] = 'pages_and_buttons';
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
