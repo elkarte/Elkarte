@@ -355,9 +355,6 @@ function template_display_child_boards_above()
 	</div>';
 }
 
-function template_display_child_boards_below()
-{}
-
 function template_pages_and_buttons_above()
 {
 	global $modSettings, $context, $txt, $options;
