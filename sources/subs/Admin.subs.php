@@ -50,13 +50,13 @@ function getServerVersions($checkFor)
 	// Now lets check for the Database.
 	if (in_array('db_server', $checkFor))
 	{
-		db_extend();
+		$db = database();
 		if (!isset($db_connection) || $db_connection === false)
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 		else
 		{
-			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $smcFunc['db_title']), 'version' => '');
-			$versions['db_server']['version'] = $smcFunc['db_get_version']();
+			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->db_title()), 'version' => '');
+			$versions['db_server']['version'] = $db->db_server_version();
 		}
 	}
 

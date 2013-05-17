@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
+	global $modSettings, $smcFunc, $txt, $db_character_set, $context, $ent_check;
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
@@ -67,81 +67,10 @@ function reloadSettings()
 			cache_put_data('modSettings', $modSettings, 90);
 	}
 
-	// Set a list of common functions.
-	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
-	$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
-
-	// Preg_replace space characters
-	$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
-
-	// global array of anonymous helper functions, used mosly to properly handle multi byte strings
-	$smcFunc += array(
-		'entity_fix' => create_function('$string', '
-			$num = $string[0] === \'x\' ? hexdec(substr($string, 1)) : (int) $string;
-			return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? \'\' : \'&#\' . $num . \';\';'),
-		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', '
-			global $smcFunc;
-			return ' . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, \'UTF-8\')' . $ent_check[1] . ';'),
-		'htmltrim' => create_function('$string', '
-			global $smcFunc;
-			return preg_replace(\'~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+$~u\', \'\', ' . implode('$string', $ent_check) . ');'),
-		'strlen' => create_function('$string', '
-			global $smcFunc;
-			return strlen(preg_replace(\'~' . $ent_list . '|.~u' . '\', \'_\', ' . implode('$string', $ent_check) . '));'),
-		'strpos' => create_function('$haystack, $needle, $offset = 0', '
-			global $smcFunc;
-			$haystack_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$haystack', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			$haystack_size = count($haystack_arr);
-			if (strlen($needle) === 1)
-			{
-				$result = array_search($needle, array_slice($haystack_arr, $offset));
-				return is_int($result) ? $result + $offset : false;
-			}
-			else
-			{
-				$needle_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$needle', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-				$needle_size = count($needle_arr);
-
-				$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
-				while ((int) $result === $result)
-				{
-					$offset += $result;
-					if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-						return $offset;
-					$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
-				}
-				return false;
-			}'),
-		'substr' => create_function('$string, $start, $length = null', '
-			global $smcFunc;
-			$ent_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$string', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			return $length === null ? implode(\'\', array_slice($ent_arr, $start)) : implode(\'\', array_slice($ent_arr, $start, $length));'),
-		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
-			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtolower($string);'),
-		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
-			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtoupper($string);'),
-		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
-			global $smcFunc;
-			$string = ' . implode('$string', $ent_check) . ';' : '') . '
-			preg_match(\'~^(' . $ent_list . '|.){\' . $smcFunc[\'strlen\'](substr($string, 0, $length)) . \'}~u\', $string, $matches);
-			$string = $matches[0];
-			while (strlen($string) > $length)
-				$string = preg_replace(\'~(?:' . $ent_list . '|.)$~u\', \'\', $string);
-			return $string;'),
-		'ucfirst' => create_function('$string', '
-			global $smcFunc;
-			return $smcFunc[\'strtoupper\']($smcFunc[\'substr\']($string, 0, 1)) . $smcFunc[\'substr\']($string, 1);'),
-		'ucwords' => create_function('$string', '
-			global $smcFunc;
-			$words = preg_split(\'~([\s\r\n\t]+)~\', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-			for ($i = 0, $n = count($words); $i < $n; $i += 2)
-				$words[$i] = $smcFunc[\'ucfirst\']($words[$i]);
-			return implode(\'\', $words);'),
-	);
+	// load utility class
+	require_once(SUBSDIR . '/Util.class.php');
+	// temporary, compatibility enabled by default
+	Util::compat_init();
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']) && function_exists('date_default_timezone_set'))
@@ -2554,20 +2483,20 @@ function loadDatabase()
 	global $db_persist, $db_connection, $db_server, $db_user, $db_passwd;
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
+	// Database stuffs
+	require_once(SOURCEDIR . '/database/Database.subs.php');
+
 	// Figure out what type of database we are using.
 	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
-	// Load the file for the database.
-	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
-
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)

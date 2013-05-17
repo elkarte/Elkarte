@@ -379,6 +379,9 @@ function scheduled_daily_maintenance()
 	// First clean out the cache.
 	clean_cache();
 
+	// We're working with databases here (do we)
+	$db = database();
+
 	// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 	list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 	if ($modSettings['warning_decrement'])
@@ -448,7 +451,7 @@ function scheduled_daily_maintenance()
 	}
 
 	// Check the database version - for some buggy MySQL version.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 	elseif (!empty($modSettings['db_mysql_group_by_fix']))
@@ -497,6 +500,9 @@ function scheduled_auto_optimize()
 	// By default do it now!
 	$delay = false;
 
+	// we're working with them databases but we shouldn't :P
+	$db = database();
+
 	// As a kind of hack, if the server load is too great delay, but only by a bit!
 	if (!empty($modSettings['load_average']) && !empty($modSettings['loadavg_auto_opt']) && $modSettings['load_average'] >= $modSettings['loadavg_auto_opt'])
 		$delay = true;
@@ -521,17 +527,11 @@ function scheduled_auto_optimize()
 	if ($delay)
 		return false;
 
-	db_extend();
-
 	// Get all the tables.
-	$tables = $smcFunc['db_list_tables'](false, $db_prefix . '%');
+	$tables = $db->db_list_tables(false, $db_prefix . '%');
 
-	// Actually do the optimisation.
-	if ($db_type == 'sqlite')
-		$smcFunc['db_optimize_table']($tables[0]);
-	else
-		foreach ($tables as $table)
-			$smcFunc['db_optimize_table']($table);
+	foreach ($tables as $table)
+		$db->db_optimize_table($table);
 
 	// Return for the log...
 	return true;

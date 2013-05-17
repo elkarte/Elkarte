@@ -63,7 +63,7 @@ class Custom_Search
 	 * What databases support the custom index?
 	 * @var array
 	 */
-	protected $supported_databases = array('mysql', 'postgresql', 'sqlite');
+	protected $supported_databases = array('mysql', 'postgresql');
 
 	/**
 	 * constructor function
@@ -192,6 +192,9 @@ class Custom_Search
 	{
 		global $modSettings, $smcFunc;
 
+		// we can't do anything without this
+		$db_search = db_search();
+
 		$query_select = array(
 			'id_msg' => 'm.id_msg',
 		);
@@ -255,7 +258,7 @@ class Custom_Search
 			}
 		}
 
-		$ignoreRequest = $smcFunc['db_search_query']('insert_into_log_messages_fulltext', ($smcFunc['db_support_ignore'] ? ( '
+		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ( '
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '

@@ -93,10 +93,11 @@ function ml_CustomProfile()
  */
 function ml_memberCache($cache_step_size)
 {
-	global $smcFunc;
+	// Get hold of our database
+	$db = database();
 
 	// Get all of the activated members
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT real_name
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}
@@ -108,21 +109,21 @@ function ml_memberCache($cache_step_size)
 
 	$memberlist_cache = array(
 		'last_update' => time(),
-		'num_members' => $smcFunc['db_num_rows']($request),
+		'num_members' => $db->num_rows($request),
 		'index' => array(),
 	);
 
 	// Get/Set our pointers in this list, used to later help limit our query
-	for ($i = 0, $n = $smcFunc['db_num_rows']($request); $i < $n; $i += $cache_step_size)
+	for ($i = 0, $n = $db->num_rows($request); $i < $n; $i += $cache_step_size)
 	{
-		$smcFunc['db_data_seek']($request, $i);
-		list($memberlist_cache['index'][$i]) = $smcFunc['db_fetch_row']($request);
+		$db->data_seek($request, $i);
+		list($memberlist_cache['index'][$i]) = $db->fetch_row($request);
 	}
 
 	// Set the last one
-	$smcFunc['db_data_seek']($request, $memberlist_cache['num_members'] - 1);
-	list ($memberlist_cache['index'][$i]) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->data_seek($request, $memberlist_cache['num_members'] - 1);
+	list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Now we've got the cache...store it.
 	updateSettings(array('memberlist_cache' => serialize($memberlist_cache)));

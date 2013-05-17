@@ -38,12 +38,6 @@ $databases = array(
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
 	),
-	'sqlite' => array(
-		'name' => 'SQLite',
-		'version' => '1',
-		'version_check' => 'return 1;',
-		'always_has_db' => true,
-	),
 );
 
 // General options for the script.
@@ -847,7 +841,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
 
 		// Oh dear god!!
 		if ($db_connection === null)
@@ -1337,12 +1331,12 @@ function action_backupDatabase()
 		return true;
 
 	// Some useful stuff here.
-	db_extend();
+	$db = database();
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $smcFunc['db_list_tables']($db, $filter);
+	$tables = $db->db_list_tables($db, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1413,7 +1407,8 @@ function backupTable($table)
 		flush();
 	}
 
-	$smcFunc['db_backup_table']($table, 'backup_' . $table);
+	$db = database();
+	$db->db_backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 		echo ' done.';
@@ -1900,6 +1895,9 @@ function action_deleteUpgrade()
 	if (empty($user_info['id']))
 		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
 
+	// We need to log in the database
+	$db = database();
+
 	// Log the action manually, so CLI still works.
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_actions',
@@ -1916,7 +1914,7 @@ function action_deleteUpgrade()
 	$user_info['id'] = 0;
 
 	// Save the current database version.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
@@ -2232,10 +2230,6 @@ function parse_sql($filename)
 		- {$db_collation}
 */
 
-	// May want to use extended functionality.
-	db_extend();
-	db_extend('packages');
-
 	// Our custom error handler - does nothing but does stop public errors from XML!
 	if (!function_exists('sql_error_handler'))
 	{
@@ -2457,7 +2451,7 @@ function parse_sql($filename)
 					// Bit of a bodge - do we want the error?
 					if (!empty($upcontext['return_error']))
 					{
-						$upcontext['error_message'] = $smcFunc['db_error']($db_connection);
+						$upcontext['error_message'] = $db->last_error($db_connection);
 						return false;
 					}
 				}*/
@@ -2505,7 +2499,7 @@ function upgrade_query($string, $unbuffered = false)
 	if ($result !== false)
 		return $result;
 
-	$db_error_message = $smcFunc['db_error']($db_connection);
+	$db_error_message = $db->last_error($db_connection);
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{
@@ -2623,13 +2617,13 @@ function protected_alter($change, $substep, $is_test = false)
 {
 	global $db_prefix, $smcFunc;
 
-	db_extend('packages');
+	$table = db_table();
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $smcFunc['db_list_columns']('{db_prefix}' . $change['table'], true);
+		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?

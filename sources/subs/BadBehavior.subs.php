@@ -55,7 +55,7 @@ function deleteBadBehavior($type ,$filter)
 			)
 		);
 
-		return 'delete';	
+		return 'delete';
 	}
 
 	return 'delall';
@@ -101,6 +101,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 
 	$bb_entries = array();
 
+	$db = database();
 	$request = $smcFunc['db_query']('', '
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
@@ -133,7 +134,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'server_protocol' => $row['server_protocol'],
 			'user_agent' => array(
 				'html' => $row['user_agent'],
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['user_agent']))
+				'href' => base64_encode($db->db_escape_wildcard_string($row['user_agent']))
 			),
 			'request_entity' => $row['request_entity'],
 			'valid' => array(
@@ -151,7 +152,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'timestamp' => $row['date'],
 			'request_uri' => array(
 				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri']),
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['request_uri']))
+				'href' => base64_encode($db->db_escape_wildcard_string($row['request_uri']))
 			),
 			'http_headers' => array(
 				'html' => str_replace("\n", '<br />', $row['http_headers']),

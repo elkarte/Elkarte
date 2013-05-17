@@ -5,9 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
@@ -45,6 +43,7 @@ function loadSession()
 		if (preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) == 0 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
 			@ini_set('session.cookie_domain', '.' . $parts[1]);
 	}
+
 	// @todo Set the session cookie path?
 
 	// If it's already been started... probably best to skip this.
@@ -131,13 +130,14 @@ function sessionClose()
  */
 function sessionRead($session_id)
 {
-	global $smcFunc;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
+	// Get our database, quick
+	$db = database();
+
 	// Look for it in the database.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT data
 		FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}
@@ -146,8 +146,8 @@ function sessionRead($session_id)
 			'session_id' => $session_id,
 		)
 	);
-	list ($sess_data) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($sess_data) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	return $sess_data;
 }
@@ -161,13 +161,14 @@ function sessionRead($session_id)
  */
 function sessionWrite($session_id, $data)
 {
-	global $smcFunc;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
+	// Better safe than sorry
+	$db = database();
+
 	// First try to update an existing row...
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		UPDATE {db_prefix}sessions
 		SET data = {string:data}, last_update = {int:last_update}
 		WHERE session_id = {string:session_id}',
@@ -179,8 +180,8 @@ function sessionWrite($session_id, $data)
 	);
 
 	// If that didn't work, try inserting a new one.
-	if ($smcFunc['db_affected_rows']() == 0)
-		$result = $smcFunc['db_insert']('ignore',
+	if ($db->affected_rows() == 0)
+		$result = $db->insert('ignore',
 			'{db_prefix}sessions',
 			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 			array($session_id, $data, time()),
@@ -198,13 +199,14 @@ function sessionWrite($session_id, $data)
  */
 function sessionDestroy($session_id)
 {
-	global $smcFunc;
-
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
+	// Better safe than sorry
+	$db = database();
+
 	// Just delete the row...
-	return $smcFunc['db_query']('', '
+	return $db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 		array(
@@ -222,14 +224,17 @@ function sessionDestroy($session_id)
  */
 function sessionGC($max_lifetime)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 	if (!empty($modSettings['databaseSession_lifetime']) && ($max_lifetime <= 1440 || $modSettings['databaseSession_lifetime'] > $max_lifetime))
 		$max_lifetime = max($modSettings['databaseSession_lifetime'], 60);
 
+	// Try hard... just this time.
+	$db = database();
+
 	// Clean up after yerself ;).
-	return $smcFunc['db_query']('', '
+	return $db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 		array(

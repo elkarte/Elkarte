@@ -329,8 +329,10 @@ class PersonalMessage_Controller
 		// First work out what messages we need to see - if grouped is a little trickier...
 		if ($context['display_mode'] == 2)
 		{
+			$db = database();
+
 			// On a non-default sort due to PostgreSQL we have to do a harder sort.
-			if ($smcFunc['db_title'] == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
+			if ($db->db_title() == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
 			{
 				$sub_request = $smcFunc['db_query']('', '
 					SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
@@ -2434,6 +2436,9 @@ function preparePMContext($type = 'subject', $reset = false)
 	if ($counter === null || $reset)
 		$counter = $context['start'];
 
+	// we need this
+	$db = database();
+
 	static $temp_pm_selected = null;
 	if ($temp_pm_selected === null)
 	{
@@ -2482,7 +2487,7 @@ function preparePMContext($type = 'subject', $reset = false)
 
 	// Reset the data?
 	if ($reset == true)
-		return @$smcFunc['db_data_seek']($messages_request, 0);
+		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.
 	$message = $smcFunc['db_fetch_assoc']($messages_request);
