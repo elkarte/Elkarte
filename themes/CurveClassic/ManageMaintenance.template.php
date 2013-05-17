@@ -54,23 +54,17 @@ function template_maintain_database()
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
 					<p>', $txt['maintain_backup_info'], '</p>';
 
-	if ($db_type == 'sqlite')
+	if ($context['safe_mode_enable'])
 		echo '
-					<hr class="hrcolor" />
-					<input type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" class="button_submit" />';
-	else
-	{
-		if ($context['safe_mode_enable'])
-			echo '
 					<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
-		else
-			echo '
+	else
+		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
-						', $txt[$context['suggested_method']],
-						$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
+					', $txt[$context['suggested_method']],
+					$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
 					'</div>';
 
-		echo '
+	echo '
 					<p>
 						<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
 						<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
@@ -80,7 +74,6 @@ function template_maintain_database()
 					<p>
 						<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />
 					</p>';
-	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

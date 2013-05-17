@@ -38,9 +38,6 @@ function findSearchAPI()
 
 	require_once(SUBSDIR . '/Package.subs.php');
 
-	// Search has a special database set.
-	db_extend('search');
-
 	// Load up the search API we are going to use.
 	$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 	if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
