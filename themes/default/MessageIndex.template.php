@@ -21,10 +21,6 @@ function template_main()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
-	// They can only mark read if they are logged in and it's enabled!
-	if (!$context['user']['is_logged'] || !$settings['show_mark_read'])
-		unset($context['normal_buttons']['markread']);
-
 	if (!$context['no_topic_listing'])
 	{
 		echo '
