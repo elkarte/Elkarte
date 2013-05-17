@@ -37,6 +37,7 @@ class BoardIndex_Controller
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;
+		$context['template_layers'][] = 'boardindex_outer';
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
 		if (!empty($_GET))
