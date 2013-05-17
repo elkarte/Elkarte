@@ -21,243 +21,6 @@ function template_main()
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings, $counter;
 
-	// Start the javascript... and boy is there a lot.
-	echo '
-		<script><!-- // --><![CDATA[';
-
-	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
-	if (isBrowser('is_firefox'))
-		echo '
-			window.addEventListener("pageshow", reActivate, false);';
-
-	// Start with message icons - and any missing from this theme.
-	echo '
-			var icon_urls = {';
-	foreach ($context['icons'] as $icon)
-		echo '
-				\'', $icon['value'], '\': \'', $icon['url'], '\'', $icon['is_last'] ? '' : ',';
-	echo '
-			};';
-
-	// End of the javascript
-	echo '
-		// ]]></script>';
-
-	// Start the form and display the link tree.
-	echo '
-		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
-
-	// If the user wants to see how their message looks - the preview section is where it's at!
-	echo '
-			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-					</h3>
-				</div>
-				<div class="windowbg">
-					<div class="content">
-						<div class="post" id="preview_body">
-							', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
-						</div>
-					</div>
-				</div>
-			</div><br />';
-
-	if ($context['make_event'] && (!$context['event']['new'] || !empty($context['current_board'])))
-		echo '
-			<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
-
-	// Start the main table.
-	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
-			<div>
-				<div class="roundframe">', isset($context['current_topic']) ? '
-					<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '';
-
-	// If an error occurred, explain what happened.
-	template_show_error('post_error');
-
-	// If this won't be approved let them know!
-	if (!$context['becomes_approved'])
-	{
-		echo '
-					<div class="infobox">
-						', $txt['wait_for_approval'], '
-						<input type="hidden" name="not_approved" value="1" />
-					</div>';
-	}
-
-	// If it's locked, show a message to warn the replyer.
-	echo '
-					<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
-						', $txt['topic_locked_no_reply'], '
-					</p>';
-
-	if (!empty($modSettings['drafts_post_enabled']))
-		echo '
-				<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
-					sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
-				</div>';
-
-	// The post header... important stuff
-	echo '
-					<dl id="post_header">';
-
-	// Guests have to put in their name and email...
-	if (isset($context['name']) && isset($context['email']))
-	{
-		echo '
-						<dt>
-							<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
-						</dt>
-						<dd>
-							<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-						</dd>';
-
-		if (empty($modSettings['guest_post_no_email']))
-			echo '
-						<dt>
-							<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
-						</dt>
-						<dd>
-							<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-						</dd>';
-	}
-
-	// Now show the subject box for this post.
-	echo '
-						<dt class="clear">
-							<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
-						</dt>
-						<dd>
-							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
-						</dd>
-						<dt class="clear_left">
-							', $txt['message_icon'], ':
-						</dt>
-						<dd>
-							<select name="icon" id="icon" onchange="showimage()">';
-
-	// Loop through each message icon allowed, adding it to the drop down list.
-	foreach ($context['icons'] as $icon)
-		echo '
-								<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
-
-	echo '
-							</select>
-							<img src="', $context['icon_url'], '" id="icons" style="margin:0 7px" alt="" /> 
-						</dd>';
-	if (!empty($context['show_boards_dropdown']))
-		echo '
-						<dt class="clear_left">
-							', $txt['post_in_board'], ':
-						</dt>
-						<dd>', template_select_boards('post_in_board'), '
-						</dd>';
-	echo '
-					</dl>';
-
-	// Are you posting a calendar event?
-	if ($context['make_event'])
-	{
-		echo '
-					<hr class="clear" />
-					<div id="post_event">
-						<fieldset id="event_main">
-							<legend><span', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</span></legend>
-							<input type="text" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div class="smalltext" style="white-space: nowrap;">
-								<input type="hidden" name="calendar" value="1" />', $txt['calendar_year'], '
-								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
-
-		// Show a list of all the years we allow...
-		for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
-			echo '
-									<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
-
-		echo '
-								</select>
-								', $txt['calendar_month'], '
-								<select name="month" id="month" onchange="generateDays();">';
-
-		// There are 12 months per year - ensure that they all get listed.
-		for ($month = 1; $month <= 12; $month++)
-			echo '
-									<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
-
-		echo '
-								</select>
-								', $txt['calendar_day'], '
-								<select name="day" id="day">';
-
-		// This prints out all the days in the current month - this changes dynamically as we switch months.
-		for ($day = 1; $day <= $context['event']['last_day']; $day++)
-			echo '
-									<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
-
-		echo '
-								</select>
-							</div>
-						</fieldset>';
-
-		if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
-		{
-			echo '
-						<fieldset id="event_options">
-							<legend>', $txt['calendar_event_options'], '</legend>
-							<div class="event_options smalltext">
-								<ul class="event_options">';
-
-			// If events can span more than one day then allow the user to select how long it should last.
-			if (!empty($modSettings['cal_allowspan']))
-			{
-				echo '
-									<li>
-										', $txt['calendar_numb_days'], '
-										<select name="span">';
-
-				for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
-					echo '
-											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
-
-				echo '
-										</select>
-									</li>';
-			}
-
-			// If this is a new event let the user specify which board they want the linked post to be put into.
-			if ($context['event']['new'] && $context['is_new_post'])
-			{
-				echo '
-									<li>
-										', template_select_boards('board', $txt['calendar_post_in']), '
-									</li>';
-			}
-
-			echo '
-								</ul>
-							</div>
-						</fieldset>';
-		}
-
-		echo '
-					</div>';
-	}
-
-	// If this is a poll then display all the poll options!
-	if ($context['make_poll'])
-	{
-		echo '
-					<hr class="clear" />
-					<div id="edit_poll">';
-		template_poll_edit();
-		echo '
-					</div>';
-	}
-
 	// Show the actual posting area...
 	echo '
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
@@ -385,9 +148,14 @@ function template_main()
 
 	echo '
 					</div>';
+}
+
+function template_load_drafts_below()
+{
+	global $context, $settings, $txt, $modSettings, $options;
 
 	// If the admin enabled the drafts feature, show a draft selection box
-	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
+	if (!empty($options['drafts_show_saved_enabled']))
 	{
 		echo '
 					<div id="postDraftOptionsHeader" class="title_bar">
@@ -411,7 +179,272 @@ function template_main()
 		echo '
 						</dl>
 					</div>';
+
+		// Code for showing and hiding drafts
+		echo '
+		<script><!-- // --><![CDATA[
+			var oSwapDraftOptions = new smc_Toggle({
+				bToggleEnabled: true,
+				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
+				aSwappableContainers: [
+					\'postDraftOptions\',
+				],
+				aSwapImages: [
+					{
+						sId: \'postDraftExpand\',
+						srcExpanded: smf_images_url + \'/collapse.png\',
+						altExpanded: \'-\',
+						srcCollapsed: smf_images_url + \'/expand.png\',
+						altCollapsed: \'+\'
+					}
+				],
+				aSwapLinks: [
+					{
+						sId: \'postDraftExpandLink\',
+						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
+						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
+					}
+				],
+				oThemeOptions: {
+					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					sOptionName: \'minmax_preferences\',
+					sSessionId: smf_session_id,
+					sSessionVar: smf_session_var,
+					sAdditionalVars: \';minmax_key=draft\'
+				},
+			});
+		// ]]></script>';
 	}
+}
+
+function template_topic_replies_below()
+{
+	global $context, $txt;
+
+	// If the user is replying to a topic show the previous posts.
+	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
+	{
+		echo '
+		<div id="recent" class="flow_hidden main_section">
+			<div class="cat_bar">
+				<h3 class="catbg">', $txt['topic_summary'], '</h3>
+			</div>
+			<span id="new_replies"></span>';
+
+		$ignored_posts = array();
+		foreach ($context['previous_posts'] as $post)
+		{
+			$ignoring = false;
+			if (!empty($post['is_ignored']))
+				$ignored_posts[] = $ignoring = $post['id'];
+
+			echo '
+				<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', ' core_posts">
+				<div class="content" id="msg', $post['id'], '">
+					<h5 class="floatleft">
+						<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '
+					</h5>&nbsp;-&nbsp;', $post['time'];
+
+			if ($context['can_quote'])
+			{
+				echo '
+					<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
+						<li><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="quote_button">',$txt['bbc_quote'],'</a></li>
+					</ul>';
+			}
+
+			echo '
+					<br class="clear" />';
+
+			if ($ignoring)
+			{
+				echo '
+					<div id="msg_', $post['id'], '_ignored_prompt" class="smalltext">
+						', $txt['ignoring_user'], '
+						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+					</div>';
+			}
+
+			echo '
+					<div class="list_posts smalltext" id="msg_', $post['id'], '_body">', $post['body'], '</div>
+				</div>
+			</div>';
+		}
+
+		echo '
+		</div>
+		<script><!-- // --><![CDATA[
+			var post_box_name = "', $context['post_box_name'], '";
+			var aIgnoreToggles = new Array();';
+
+		foreach ($ignored_posts as $post_id)
+		{
+			echo '
+			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+				bToggleEnabled: true,
+				bCurrentlyCollapsed: true,
+				aSwappableContainers: [
+					\'msg_', $post_id, '_body\',
+					\'msg_', $post_id, '_quote\',
+				],
+				aSwapLinks: [
+					{
+						sId: \'msg_', $post_id, '_ignored_link\',
+						msgExpanded: \'\',
+						msgCollapsed: ', JavaScriptEscape($txt['show_ignore_user_post']), '
+					}
+				]
+			});';
+		}
+
+		echo '
+		// ]]></script>';
+	}
+}
+
+function template_postarea_above()
+{
+	global $context, $scripturl, $txt;
+
+	// Start the javascript...
+	echo '
+		<script><!-- // --><![CDATA[';
+
+	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
+	if (isBrowser('is_firefox'))
+		echo '
+			window.addEventListener("pageshow", reActivate, false);';
+
+	// Start with message icons - and any missing from this theme.
+	echo '
+			var icon_urls = {';
+	foreach ($context['icons'] as $icon)
+		echo '
+				\'', $icon['value'], '\': \'', $icon['url'], '\'', $icon['is_last'] ? '' : ',';
+	echo '
+			};';
+
+	// End of the javascript
+	echo '
+		// ]]></script>';
+
+	// Start the form and display the link tree.
+	echo '
+		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
+
+	// If the user wants to see how their message looks - the preview section is where it's at!
+	echo '
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+				<div class="cat_bar">
+					<h3 class="catbg">
+						<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
+					</h3>
+				</div>
+				<div class="windowbg">
+					<div class="content">
+						<div class="post" id="preview_body">
+							', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
+						</div>
+					</div>
+				</div>
+			</div><br />';
+
+	// Start the main table.
+	echo '
+			<div class="cat_bar">
+				<h3 class="catbg">', $context['page_title'], '</h3>
+			</div>
+			<div>
+				<div class="roundframe">', isset($context['current_topic']) ? '
+					<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '';
+
+	// If an error occurred, explain what happened.
+	template_show_error('post_error');
+
+	// If this won't be approved let them know!
+	if (!$context['becomes_approved'])
+	{
+		echo '
+					<div class="infobox">
+						', $txt['wait_for_approval'], '
+						<input type="hidden" name="not_approved" value="1" />
+					</div>';
+	}
+
+	// If it's locked, show a message to warn the replyer.
+	echo '
+					<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+						', $txt['topic_locked_no_reply'], '
+					</p>';
+
+	if (!empty($modSettings['drafts_post_enabled']))
+		echo '
+				<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+					sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+				</div>';
+
+	// The post header... important stuff
+	echo '
+					<dl id="post_header">';
+
+	// Guests have to put in their name and email...
+	if (isset($context['name']) && isset($context['email']))
+	{
+		echo '
+						<dt>
+							<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
+						</dt>
+						<dd>
+							<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+						</dd>';
+
+		if (empty($modSettings['guest_post_no_email']))
+			echo '
+						<dt>
+							<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
+						</dt>
+						<dd>
+							<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+						</dd>';
+	}
+
+	// Now show the subject box for this post.
+	echo '
+						<dt class="clear">
+							<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
+						</dt>
+						<dd>
+							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
+						</dd>
+						<dt class="clear_left">
+							', $txt['message_icon'], ':
+						</dt>
+						<dd>
+							<select name="icon" id="icon" onchange="showimage()">';
+
+	// Loop through each message icon allowed, adding it to the drop down list.
+	foreach ($context['icons'] as $icon)
+		echo '
+								<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
+
+	echo '
+							</select>
+							<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+						</dd>';
+	if (!empty($context['show_boards_dropdown']))
+		echo '
+						<dt class="clear_left">
+							', $txt['post_in_board'], ':
+						</dt>
+						<dd>', template_select_boards('post_in_board'), '
+						</dd>';
+	echo '
+					</dl>';
+}
+
+function template_postarea_below()
+{
+	global $context, $txt, $counter, $settings;
 
 	// Is visual verification enabled?
 	if ($context['require_verification'])
@@ -555,85 +588,110 @@ function template_main()
 	echo '
 		// ]]></script>';
 
-	// If the user is replying to a topic show the previous posts.
-	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
+	template_topic_replies_below();
+}
+
+function template_poll_edit_above()
+{
+	echo '
+					<hr class="clear" />
+					<div id="edit_poll">';
+	template_poll_edit();
+	echo '
+					</div>';
+}
+
+function template_make_event_above()
+{
+	global $context, $txt, $modSettings;
+
+	// Are you posting a calendar event?
+	echo '
+					<hr class="clear" />
+					<div id="post_event">
+						<fieldset id="event_main">
+							<legend><span', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</span></legend>
+							<input type="text" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+							<div class="smalltext" style="white-space: nowrap;">
+								<input type="hidden" name="calendar" value="1" />', $txt['calendar_year'], '
+								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
+
+	// Show a list of all the years we allow...
+	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
+		echo '
+									<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
+
+	echo '
+								</select>
+								', $txt['calendar_month'], '
+								<select name="month" id="month" onchange="generateDays();">';
+
+	// There are 12 months per year - ensure that they all get listed.
+	for ($month = 1; $month <= 12; $month++)
+		echo '
+									<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
+
+	echo '
+								</select>
+								', $txt['calendar_day'], '
+								<select name="day" id="day">';
+
+	// This prints out all the days in the current month - this changes dynamically as we switch months.
+	for ($day = 1; $day <= $context['event']['last_day']; $day++)
+		echo '
+									<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
+
+	echo '
+								</select>
+							</div>
+						</fieldset>';
+
+	if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
 	{
 		echo '
-		<div id="recent" class="flow_hidden main_section">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['topic_summary'], '</h3>
-			</div>
-			<span id="new_replies"></span>';
+						<fieldset id="event_options">
+							<legend>', $txt['calendar_event_options'], '</legend>
+							<div class="event_options smalltext">
+								<ul class="event_options">';
 
-		$ignored_posts = array();
-		foreach ($context['previous_posts'] as $post)
+		// If events can span more than one day then allow the user to select how long it should last.
+		if (!empty($modSettings['cal_allowspan']))
 		{
-			$ignoring = false;
-			if (!empty($post['is_ignored']))
-				$ignored_posts[] = $ignoring = $post['id'];
-
 			echo '
-				<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', ' core_posts">
-				<div class="content" id="msg', $post['id'], '">
-					<h5 class="floatleft">
-						<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '
-					</h5>&nbsp;-&nbsp;', $post['time'];
+									<li>
+										', $txt['calendar_numb_days'], '
+										<select name="span">';
 
-			if ($context['can_quote'])
-			{
+			for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 				echo '
-					<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-						<li><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="quote_button">',$txt['bbc_quote'],'</a></li>
-					</ul>';
-			}
+											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
 
 			echo '
-					<br class="clear" />';
+										</select>
+									</li>';
+		}
 
-			if ($ignoring)
-			{
-				echo '
-					<div id="msg_', $post['id'], '_ignored_prompt" class="smalltext">
-						', $txt['ignoring_user'], '
-						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
-					</div>';
-			}
-
+		// If this is a new event let the user specify which board they want the linked post to be put into.
+		if ($context['event']['new'] && $context['is_new_post'])
+		{
 			echo '
-					<div class="list_posts smalltext" id="msg_', $post['id'], '_body">', $post['body'], '</div>
-				</div>
-			</div>';
+									<li>
+										', template_select_boards('board', $txt['calendar_post_in']), '
+									</li>';
 		}
 
 		echo '
-		</div>
-		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var aIgnoreToggles = new Array();';
-
-		foreach ($ignored_posts as $post_id)
-		{
-			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
-				bToggleEnabled: true,
-				bCurrentlyCollapsed: true,
-				aSwappableContainers: [
-					\'msg_', $post_id, '_body\',
-					\'msg_', $post_id, '_quote\',
-				],
-				aSwapLinks: [
-					{
-						sId: \'msg_', $post_id, '_ignored_link\',
-						msgExpanded: \'\',
-						msgCollapsed: ', JavaScriptEscape($txt['show_ignore_user_post']), '
-					}
-				]
-			});';
-		}
-
-		echo '
-		// ]]></script>';
+								</ul>
+							</div>
+						</fieldset>';
 	}
+
+	if ($context['make_event'] && (!$context['event']['new'] || !empty($context['current_board'])))
+		echo '
+			<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
+
+	echo '
+					</div>';
 }
 
 /**

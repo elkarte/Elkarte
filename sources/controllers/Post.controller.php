@@ -56,10 +56,14 @@ class Post_Controller
 		// Posting an event?
 		$context['make_event'] = isset($_REQUEST['calendar']);
 		$context['robot_no_index'] = true;
+		$context['template_layers'][] = 'postarea';
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
 			fatal_lang_error('no_board', false);
+
+		if ($context['make_event'])
+			$context['template_layers'][] = 'make_event';
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -799,6 +803,8 @@ class Post_Controller
 			require_once(CONTROLLERDIR . '/Draft.controller.php');
 			$controller = new Draft_Controller();
 			$controller->action_showDrafts($user_info['id'], $topic);
+			if (!empty($context['drafts']))
+				$context['template_layers'][] = 'load_drafts';
 		}
 
 		// Needed for the editor and message icons.
@@ -827,7 +833,10 @@ class Post_Controller
 		$context['attached'] = '';
 		$context['make_poll'] = isset($_REQUEST['poll']);
 		if ($context['make_poll'])
+		{
 			loadTemplate('Poll');
+			$context['template_layers'][] = 'poll_edit';
+		}
 
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
