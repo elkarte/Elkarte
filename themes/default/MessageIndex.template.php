@@ -41,7 +41,7 @@ function template_main()
 			<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
 			<p>';
 
-			if (!empty($options['show_board_desc']) && $context['description'] != '')
+			if (!empty($options['show_board_desc']) && !empty($context['description']))
 				echo '
 			', $context['description'], '&nbsp;';
 
