@@ -997,19 +997,12 @@ function groupsAllowedTo($permission, $board_id = null)
 			$profile_id = $board_info['profile'];
 		elseif ($board_id !== 0)
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_profile
-				FROM {db_prefix}boards
-				WHERE id_board = {int:id_board}
-				LIMIT 1',
-				array(
-					'id_board' => $board_id,
-				)
-			);
-			if ($smcFunc['db_num_rows']($request) == 0)
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
+			
+			if (empty($board_data))
 				fatal_lang_error('no_board');
-			list ($profile_id) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$profile_id = $board_data['id_profile'];
 		}
 		else
 			$profile_id = 1;

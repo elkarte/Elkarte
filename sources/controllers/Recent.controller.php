@@ -41,40 +41,27 @@ class Recent_Controller
 		$query_parameters = array();
 		if (!empty($_REQUEST['c']) && empty($board))
 		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $i => $c)
-				$_REQUEST['c'][$i] = (int) $c;
+			$categories = array_map('intval', explode(',', $_REQUEST['c']));
 
-			if (count($_REQUEST['c']) == 1)
+			if (count($categories) == 1)
 			{
-				$name = categoryName($_REQUEST['c'][0]);
+				require_once(SUBSDIR . '/Categories.subs.php');
+				$name = categoryName($categories[0]);
 
 				if (empty($name))
 					fatal_lang_error('no_access', false);
 
 				$context['linktree'][] = array(
-					'url' => $scripturl . '#c' . (int) $_REQUEST['c'],
+					'url' => $scripturl . '#c' . $categories[0],
 					'name' => $name
 				);
 			}
 
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.num_posts
-				FROM {db_prefix}boards AS b
-				WHERE b.id_cat IN ({array_int:category_list})
-					AND {query_see_board}',
-				array(
-					'category_list' => $_REQUEST['c'],
-				)
-			);
-			$total_cat_posts = 0;
-			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$boards[] = $row['id_board'];
-				$total_cat_posts += $row['num_posts'];
-			}
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$boards_posts = boardsPosts(array(), $categories);
+			$total_cat_posts = array_sum($boards_posts);
+			$boards = array_keys($boards_posts);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -90,7 +77,7 @@ class Recent_Controller
 				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 400 - $_REQUEST['start'] * 7);
 			}
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;c=' . implode(',', $_REQUEST['c']), $_REQUEST['start'], min(100, $total_cat_posts), 10, false);
+			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;c=' . implode(',', $categories), $_REQUEST['start'], min(100, $total_cat_posts), 10, false);
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
@@ -136,30 +123,21 @@ class Recent_Controller
 		}
 		elseif (!empty($board))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT num_posts
-				FROM {db_prefix}boards
-				WHERE id_board = {int:current_board}
-				LIMIT 1',
-				array(
-					'current_board' => $board,
-				)
-			);
-			list ($total_posts) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$board_data = fetchBoardsInfo(array('boards' => $board),  array('selects' => 'posts'));
 
 			$query_this_board = 'b.id_board = {int:board}';
 			$query_parameters['board'] = $board;
 
 			// If this board has a significant number of posts in it...
-			if ($total_posts > 80 && $total_posts > $modSettings['totalMessages'] / 10)
+			if ($board_data['num_posts'] > 80 && $board_data['num_posts'] > $modSettings['totalMessages'] / 10)
 			{
 				$query_this_board .= '
 						AND m.id_msg >= {int:max_id_msg}';
 				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 600 - $_REQUEST['start'] * 10);
 			}
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $total_posts), 10, true);
+			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $board_data['num_posts']), 10, true);
 		}
 		else
 		{
@@ -174,7 +152,7 @@ class Recent_Controller
 		}
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($_REQUEST['c']) ? '' : ';c=' . (int) $_REQUEST['c']) : ';board=' . $board . '.0'),
+			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
 			'name' => $context['page_title']
 		);
 
@@ -339,25 +317,7 @@ class Recent_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board, b.id_parent
-				FROM {db_prefix}boards AS b
-				WHERE {query_wanna_see_board}
-					AND b.child_level > {int:no_child}
-					AND b.id_board NOT IN ({array_int:boards})
-				ORDER BY child_level ASC
-				',
-				array(
-					'no_child' => 0,
-					'boards' => $boards,
-				)
-			);
-
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				if (in_array($row['id_parent'], $boards))
-					$boards[] = $row['id_board'];
-
-			$smcFunc['db_free_result']($request);
+			addChildBoards($boards);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -401,24 +361,11 @@ class Recent_Controller
 		}
 		elseif (!empty($_REQUEST['c']))
 		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $i => $c)
-				$_REQUEST['c'][$i] = (int) $c;
+			$categories = array_map('intval', explode(',', $_REQUEST['c']));
 
-			$see_board = isset($_REQUEST['action']) && $_REQUEST['action'] == 'unreadreplies' ? 'query_see_board' : 'query_wanna_see_board';
-			$request = $smcFunc['db_query']('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE ' . $user_info[$see_board] . '
-					AND b.id_cat IN ({array_int:id_cat})',
-				array(
-					'id_cat' => $_REQUEST['c'],
-				)
-			);
-			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$boards[] = $row['id_board'];
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$boards = array_keys(boardsPosts(array(), $categories, isset($_REQUEST['action']) && $_REQUEST['action'] != 'unreadreplies'));
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -1188,7 +1135,7 @@ class Recent_Controller
 			if ($is_topics)
 			{
 				$context['recent_buttons'] = array(
-					'markread' => array('text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id']),
+					'markread' => array('text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markunreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id']),
 				);
 
 				if ($context['showCheckboxes'])

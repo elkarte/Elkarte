@@ -156,7 +156,7 @@ class Site_Dispatcher
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
 			'logout' => array('Auth.controller.php', 'Auth_Controller', 'action_logout'),
-			'markasread' => array('Markasread.controller.php', 'markasread'),
+			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
 			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
 			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_modcenter'),
@@ -290,6 +290,9 @@ class Site_Dispatcher
 				$this->_function_name = $default_action['function'];
 			}
 		}
+
+		if (isset($_REQUEST['api']))
+			$this->_function_name .= '_api';
 	}
 
 	/**

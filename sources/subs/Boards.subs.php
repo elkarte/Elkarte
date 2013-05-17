@@ -506,24 +506,14 @@ function createBoard($boardOptions)
 
 		if (!empty($boards[$board_id]['parent']))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_profile
-				FROM {db_prefix}boards
-				WHERE id_board = {int:board_parent}
-				LIMIT 1',
-				array(
-					'board_parent' => (int) $boards[$board_id]['parent'],
-				)
-			);
-			list ($boardOptions['profile']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$board_data = fetchBoardsInfo(array('boards' => $boards[$board_id]['parent']), array('selects' => 'permissions'));
 
 			$smcFunc['db_query']('', '
 				UPDATE {db_prefix}boards
 				SET id_profile = {int:new_profile}
 				WHERE id_board = {int:current_board}',
 				array(
-					'new_profile' => $boardOptions['profile'],
+					'new_profile' => $board_data['id_profile'],
 					'current_board' => $board_id,
 				)
 			);
@@ -1181,4 +1171,183 @@ function getBoardProperties($idboard)
 	$smcFunc['db_free_result']($request);
 
 	return $properties;
+}
+
+/**
+ * Fetch the number of posts in an array of boards based on board IDs or category IDs
+ * @param array $boards an array of board IDs
+ * @param array $categories an array of category IDs
+ * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
+ */
+function boardsPosts($boards, $categories, $wanna_see_board = false)
+{
+	global $smcFunc;
+
+	$clauses = array();
+	$clauseParameters = array();
+	if (!empty($categories))
+	{
+		$clauses[] = 'id_cat IN ({array_int:category_list})';
+		$clauseParameters['category_list'] = $categories;
+	}
+	if (!empty($boards))
+	{
+		$clauses[] = 'id_board IN ({array_int:board_list})';
+		$clauseParameters['board_list'] = $boards;
+	}
+
+	if (empty($clauses))
+		return array();
+
+	$request = $smcFunc['db_query']('', '
+		SELECT b.id_board, b.num_posts
+		FROM {db_prefix}boards AS b
+		WHERE ' . ($wanna_see_board ? '{query_wanna_see_board}' : '{query_see_board}') . '
+			AND b.' . implode(' OR b.', $clauses),
+		array_merge($clauseParameters, array(
+		))
+	);
+	$return = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$return[$row['id_board']] = $row['num_posts'];
+	$smcFunc['db_free_result']($request);
+
+	return $return;
+}
+
+/**
+ * Returns information of a set of boards based on board IDs or category IDs
+ *
+ * @param mixed $conditions is an associative array that holds the board or the cat IDs
+ *              'categories' => an array of category IDs (it accepts a single ID too)
+ *              'boards' => an array of board IDs (it accepts a single ID too)
+ *              if conditions is set to 'all' (not an array) all the boards are queried
+ * @param array $params is an optional array that allows to control the results returned:
+ *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
+ *              'count' => (bool) the number of boards found is returned
+ *              'selects' => (string) determines what informations are retrieved and returned
+ *                           Allowed values: 'name', 'posts', 'detailed', 'permissions'; 
+ *                           default: 'name';
+ *                           see the function for detailes on the fields associated to each value
+ *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
+ *              'exclude_recycle' => (bool) recycle board is not included (default false)
+ *              'exclude_redirects' => (bool) redirects are not included (default false)
+ *
+ * @todo unify the two queries?
+ */
+function fetchBoardsInfo($conditions, $params = array())
+{
+	global $smcFunc, $modSettings;
+
+	$clauses = array();
+	$clauseParameters = array();
+	$allowed_sort = array(
+		'id_board',
+		'name'
+	);
+
+	if (!empty($params['sort_by']) && in_array($params['sort_by'], $allowed_sort))
+		$sort_by = 'ORDER BY ' . $params['sort_by'];
+	else
+		$sort_by = '';
+
+	if (!is_array($conditions) && $conditions == 'all')
+	{
+		// id_board, name, id_profile => used in admin/Reports.php
+		$request = $smcFunc['db_query']('', '
+			SELECT ' . (!empty($params['count']) ? 'COUNT(*)' : 'id_board, name, id_profile') . '
+			FROM {db_prefix}boards',
+			array()
+		);
+	}
+	else
+	{
+		if (!empty($conditions['categories']))
+		{
+			$clauses[] = 'id_cat IN ({array_int:category_list})';
+			$clauseParameters['category_list'] = is_array($conditions['categories']) ? $conditions['categories'] : array($conditions['categories']);
+		}
+		if (!empty($conditions['boards']))
+		{
+			$clauses[] = 'id_board IN ({array_int:board_list})';
+			$clauseParameters['board_list'] = is_array($conditions['boards']) ? $conditions['boards'] : array($conditions['boards']);
+		}
+
+		// @todo: memos for optimization
+		/*
+			id_board    => MergeTopic + MergeTopic + MessageIndex + Search + ScheduledTasks
+			name        => MergeTopic + ScheduledTasks + News
+			count_posts => MessageIndex
+			num_posts   => News
+		*/
+		$known_selects = array(
+			'name' => 'b.id_board, b.name',
+			'posts' => 'b.id_board, b.count_posts, b.num_posts',
+			'detailed' => 'b.id_board, b.name, b.count_posts, b.num_posts',
+			'permissions' => 'b.member_groups, b.id_profile',
+		);
+		if (!empty($params['count']))
+			$select = 'COUNT(*)';
+		else
+			$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
+
+		$request = $smcFunc['db_query']('', '
+			SELECT ' . $select . '
+			FROM {db_prefix}boards AS b
+			WHERE ' . (!empty($params['wanna_see_board']) ? '{query_wanna_see_board}' : '{query_see_board}') . (!empty($clauses) ? '
+				AND b.' . implode(' OR b.', $clauses) : '') . (!empty($params['exclude_recycle']) ? '
+				AND b.id_board != {int:recycle_board}' : '') . (!empty($params['exclude_redirects']) ? '
+				AND b.redirect = {string:empty_string}' : ''),
+			array_merge($clauseParameters, array(
+				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+				'empty_string' => '',
+			))
+		);
+	}
+
+	if (!empty($params['count']))
+	{
+		list($return) = $smcFunc['db_fetch_row']($request);
+	}
+	else
+	{
+		$return = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$return[$row['id_board']] = $row;
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $return;
+}
+
+/**
+ * Retrieve the all the child boards of an array of boards
+ * and add the ids to the same array
+ * @param mixed $boards an array of board IDs (it accepts a single board too
+ *              The param is passed by ref and the result it returned through the param itself
+ */
+function addChildBoards(&$boards)
+{
+	global $smcFunc;
+
+	if (!is_array($boards))
+		$boards = array($boards);
+
+	$request = $smcFunc['db_query']('', '
+		SELECT b.id_board, b.id_parent
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}
+			AND b.child_level > {int:no_parents}
+			AND b.id_board NOT IN ({array_int:board_list})
+		ORDER BY child_level ASC
+		',
+		array(
+			'no_parents' => 0,
+			'board_list' => $boards,
+		)
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		if (in_array($row['id_parent'], $boards))
+			$boards[] = $row['id_board'];
+	$smcFunc['db_free_result']($request);
 }

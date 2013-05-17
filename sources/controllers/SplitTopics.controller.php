@@ -86,7 +86,9 @@ class SplitTopics_Controller
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 		// Retrieve message info for the message at the split point.
-		$messageInfo = messageInfo($topic, $splitAt);
+		$messageInfo = messageInfo($topic, $splitAt, true);
+		if (empty($messageInfo))
+			fatal_lang_error('cant_find_messages');
 
 		// If not approved validate they can see it.
 		if ($modSettings['postmod_active'] && !$messageInfo['approved'])

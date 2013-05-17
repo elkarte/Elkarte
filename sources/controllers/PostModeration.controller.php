@@ -499,46 +499,34 @@ class PostModeration_Controller
 
 		checkSession('get');
 
-		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
+		$current_msg = (int) $_REQUEST['msg'];
 
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		isAllowedTo('approve_posts');
 
-		$request = $smcFunc['db_query']('', '
-			SELECT t.id_member_started, t.id_first_msg, m.id_member, m.subject, m.approved
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-			WHERE m.id_msg = {int:id_msg}
-				AND m.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-				'id_msg' => $_REQUEST['msg'],
-			)
-		);
-		list ($starter, $first_msg, $poster, $subject, $approved) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$message_info = messageInfo($topic, $current_msg);
 
 		// If it's the first in a topic then the whole topic gets approved!
-		if ($first_msg == $_REQUEST['msg'])
+		if ($message_info['id_first_msg'] == $current_msg)
 		{
-			approveTopics($topic, !$approved);
+			approveTopics($topic, !$message_info['approved']);
 
-			if ($starter != $user_info['id'])
-				logAction(($approved ? 'un' : '') . 'approve_topic', array('topic' => $topic, 'subject' => $subject, 'member' => $starter, 'board' => $board));
+			if ($message_info['id_member_started'] != $user_info['id'])
+				logAction(($message_info['approved'] ? 'un' : '') . 'approve_topic', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member_started'], 'board' => $board));
 		}
 		else
 		{
-			approvePosts($_REQUEST['msg'], !$approved);
+			approvePosts($current_msg, !$message_info['approved']);
 
-			if ($poster != $user_info['id'])
-				logAction(($approved ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $subject, 'member' => $poster, 'board' => $board));
+			if ($message_info['id_member'] != $user_info['id'])
+				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
 		}
 
 		cache_put_data('num_menu_errors', null, 900);
 
-		redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg']. '#msg' . $_REQUEST['msg']);
+		redirectexit('topic=' . $topic . '.msg' . $current_msg. '#msg' . $current_msg);
 	}
 }
 

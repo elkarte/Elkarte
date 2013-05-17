@@ -443,23 +443,17 @@ function action_plushsearch2()
 		$smcFunc['db_free_result']($request);
 	}
 
-	// If the boards were passed by URL (params=), temporarily put them back in $_REQUEST.
+	// Ensure that boards are an array of integers (or nothing).
 	if (!empty($search_params['brd']) && is_array($search_params['brd']))
-		$_REQUEST['brd'] = $search_params['brd'];
-
-	// Ensure that brd is an array.
-	if ((!empty($_REQUEST['brd']) && !is_array($_REQUEST['brd'])) || (!empty($_REQUEST['search_selection']) && $_REQUEST['search_selection'] == 'board'))
-	{
-		if (!empty($_REQUEST['brd']))
-			$_REQUEST['brd'] = strpos($_REQUEST['brd'], ',') !== false ? explode(',', $_REQUEST['brd']) : array($_REQUEST['brd']);
-		else
-			$_REQUEST['brd'] = isset($_REQUEST['sd_brd']) ? array($_REQUEST['sd_brd']) : array();
-	}
-
-	// Make sure all boards are integers.
-	if (!empty($_REQUEST['brd']))
-		foreach ($_REQUEST['brd'] as $id => $brd)
-			$_REQUEST['brd'][$id] = (int) $brd;
+		$query_boards = array_map('intval', $search_params['brd']);
+	elseif (!empty($_REQUEST['brd']) && is_array($_REQUEST['brd']))
+		$query_boards = array_map('intval', $_REQUEST['brd']);
+	elseif (!empty($_REQUEST['brd']))
+		$query_boards = array_map('intval', explode(',', $_REQUEST['brd']));
+	elseif (isset($_REQUEST['sd_brd']) && (int) $_REQUEST['sd_brd'] !== 0)
+		$query_boards = array((int) $_REQUEST['sd_brd']);
+	else
+		$query_boards = array();
 
 	// Special case for boards: searching just one topic?
 	if (!empty($search_params['topic']))
@@ -486,29 +480,12 @@ function action_plushsearch2()
 		$smcFunc['db_free_result']($request);
 	}
 	// Select all boards you've selected AND are allowed to see.
-	elseif ($user_info['is_admin'] && (!empty($search_params['advanced']) || !empty($_REQUEST['brd'])))
-		$search_params['brd'] = empty($_REQUEST['brd']) ? array() : $_REQUEST['brd'];
+	elseif ($user_info['is_admin'] && (!empty($search_params['advanced']) || !empty($query_boards)))
+		$search_params['brd'] = $query_boards;
 	else
 	{
-		$see_board = empty($search_params['advanced']) ? 'query_wanna_see_board' : 'query_see_board';
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {raw:boards_allowed_to_see}
-				AND redirect = {string:empty_string}' . (empty($_REQUEST['brd']) ? (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board_id}' : '') : '
-				AND b.id_board IN ({array_int:selected_search_boards})'),
-			array(
-				'boards_allowed_to_see' => $user_info[$see_board],
-				'empty_string' => '',
-				'selected_search_boards' => empty($_REQUEST['brd']) ? array() : $_REQUEST['brd'],
-				'recycle_board_id' => $modSettings['recycle_board'],
-			)
-		);
-		$search_params['brd'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$search_params['brd'][] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('exclude_recycle' => true, 'exclude_redirects' => true, 'wanna_see_board' => empty($search_params['advanced']))));
 
 		// This error should pro'bly only happen for hackers.
 		if (empty($search_params['brd']))
