@@ -1940,6 +1940,7 @@ class Post_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Assume the first message if no message ID was given.
+		// @todo: candidate for messageInfo
 		$request = $smcFunc['db_query']('', '
 			SELECT
 				t.locked, t.num_replies, t.id_member_started, t.id_first_msg,

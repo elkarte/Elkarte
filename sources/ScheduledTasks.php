@@ -601,19 +601,10 @@ function scheduled_daily_digest()
 	if (empty($boards))
 		return true;
 
+	require_once(SUBSDIR . '/Boards.subs.php');
 	// Just get the board names.
-	$request = $smcFunc['db_query']('', '
-		SELECT id_board, name
-		FROM {db_prefix}boards
-		WHERE id_board IN ({array_int:board_list})',
-		array(
-			'board_list' => $boards,
-		)
-	);
-	$boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$boards[$row['id_board']] = $row['name'];
-	$smcFunc['db_free_result']($request);
+	
+	$boards = fetchBoardsInfo(array('boards' => $boards));
 
 	if (empty($boards))
 		return true;

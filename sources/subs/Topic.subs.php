@@ -1027,18 +1027,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	global $smcFunc, $user_info;
 
 	// find the current entry if it exists that is
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg
-		FROM {db_prefix}log_topics
-		WHERE id_member = {int:current_user}
-			AND id_topic = {int:current_topic}',
-		array(
-			'current_user' => $user_info['id'],
-			'current_topic' => $topic,
-		)
-	);
-	list($was_set) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$was_set = getLoggedTopics($user_info['id'], array($topic));
 
 	// Set topic disregard on/off for this topic.
 	$smcFunc['db_insert'](empty($was_set) ? 'ignore' : 'replace',
@@ -1244,11 +1233,14 @@ function messagesAfter($topic, $message)
 
 /**
  * Retrieve a few data on a particular message.
+ * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * and doesn't use {query_see_board}
  *
- * @param int $topic
- * @param int $message
+ * @param int $topic topic ID
+ * @param int $message message ID
+ * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message)
+function messageInfo($topic, $message, $topic_approved = false)
 {
 	global $smcFunc, $modSettings;
 
@@ -1256,20 +1248,20 @@ function messageInfo($topic, $message)
 
 	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved
+		SELECT m.id_member, m.subject,' . ($topic_approved ? ' t.approved,' : 'm.approved,') . '
+			t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+		WHERE m.id_msg = {int:message_id}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 			AND m.approved = 1') . '
 			AND m.id_topic = {int:current_topic}
 		LIMIT 1',
 		array(
 			'current_topic' => $topic,
-			'split_at' => $message,
+			'message_id' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('cant_find_messages');
+
 	$messageInfo = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 
@@ -1527,4 +1519,35 @@ function toggleTopicSticky($topics)
 	);
 
 	return $smcFunc['db_affected_rows']();
+}
+
+/**
+ * Get topics from the log_topics table belonging to a certain user
+ *
+ * @param int $member a member id
+ * @param array $topics an array of topics
+ * @return array an array of topics in the table (key) and its disregard status (value)
+ *
+ * @todo find a better name
+ */
+function getLoggedTopics($member, $topics)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_topic, disregarded
+		FROM {db_prefix}log_topics
+		WHERE id_topic IN ({array_int:selected_topics})
+			AND id_member = {int:current_user}',
+		array(
+			'selected_topics' => $topics,
+			'current_user' => $member,
+		)
+	);
+	$logged_topics = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$logged_topics[$row['id_topic']] = $row['disregarded'];
+	$smcFunc['db_free_result']($request);
+
+	return $logged_topics;
 }

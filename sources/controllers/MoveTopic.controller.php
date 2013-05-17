@@ -273,19 +273,9 @@ class MoveTopic_Controller
 			createPost($msgOptions, $topicOptions, $posterOptions);
 		}
 
-		$request = $smcFunc['db_query']('', '
-			SELECT count_posts
-			FROM {db_prefix}boards
-			WHERE id_board = {int:current_board}
-			LIMIT 1',
-			array(
-				'current_board' => $board,
-			)
-		);
-		list ($pcounter_from) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$board_from = boardInfo($board);
 
-		if ($pcounter_from != $board_info['count_posts'])
+		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
 			$request = $smcFunc['db_query']('', '
 				SELECT id_member
@@ -310,7 +300,7 @@ class MoveTopic_Controller
 			foreach ($posters as $id_member => $posts)
 			{
 				// The board we're moving from counted posts, but not to.
-				if (empty($pcounter_from))
+				if (empty($board_from['count_posts']))
 					updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
 				// The reverse: from didn't, to did.
 				else

@@ -112,7 +112,7 @@ class BoardIndex_Controller
 
 		// Mark read button
 		$context['mark_read_button'] = array(
-			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id']),
+			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id']),
 		);
 
 		// Allow mods to add additional buttons here

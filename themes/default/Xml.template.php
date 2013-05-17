@@ -329,6 +329,28 @@ function template_check_username()
 </smf>';
 }
 
+function template_generic_xml_buttons()
+{
+	global $context;
+
+	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+<elk>
+	<buttons>';
+	foreach ($context['xml_data'] as $button)
+	{
+		echo '
+		<button>';
+		foreach ($button as $key => $val)
+			echo '
+			<', $key, '><![CDATA[', cleanXml($val), ']]></', $key, '>';
+		echo '
+		</button>';
+	}
+	echo '
+	</buttons>
+</elk>';
+}
+
 // This prints XML in it's most generic form.
 function template_generic_xml()
 {

@@ -1796,6 +1796,9 @@ ul .greeting {
 	border-top: 1px solid #ddd;
 	height: 18px;
 }
+.board_new_posts {
+	font-weight: 700;
+}
 
 /* the posting icons */
 #posting_icons {
