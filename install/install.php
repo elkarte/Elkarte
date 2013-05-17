@@ -1456,7 +1456,7 @@ function action_deleteInstall()
 		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
 	$smcFunc['db_free_result']($request);
 
-	// Now is the perfect time to fetch the SM files.
+	// Now is the perfect time to fetch remote files.
 	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// Sanity check that they loaded earlier!

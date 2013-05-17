@@ -1491,7 +1491,7 @@ function getBasicMemberData($member_ids, $options = array())
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		if (!empty($single))
-				$members = $row;
+			$members = $row;
 		else
 			$members[$row['id_member']] = $row;
 	}
