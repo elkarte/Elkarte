@@ -5,9 +5,8 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
+ * This file contains code also covered by:
  *
- * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
@@ -32,10 +31,9 @@ if (!defined('ELKARTE'))
  * - sets up $board, $topic, and $scripturl and $_REQUEST['start'].
  * - determines, or rather tries to determine, the client's IP.
  */
-
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl, $modSettings, $smcFunc;
+	global $board, $topic, $boardurl, $scripturl, $smcFunc;
 
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
@@ -89,12 +87,12 @@ function cleanRequest()
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 		// Magic quotes still applies with parse_str - so clean it up.
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 			$_GET = $removeMagicQuoteFunction($_GET);
 	}
 	elseif (strpos(ini_get('arg_separator.input'), ';') !== false)
 	{
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 			$_GET = $removeMagicQuoteFunction($_GET);
 
 		// Search engines will send action=profile%3Bu=1, which confuses PHP.
@@ -136,7 +134,7 @@ function cleanRequest()
 		if (strpos($request, basename($scripturl) . '/') !== false)
 		{
 			parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($scripturl)) + strlen(basename($scripturl)))), '/', '&')), 1), $temp);
-			if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+			if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 				$temp = $removeMagicQuoteFunction($temp);
 			$_GET += $temp;
 		}
@@ -558,8 +556,6 @@ function htmltrim__recursive($var, $level = 0)
  */
 function cleanXml($string)
 {
-	global $context;
-
 	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
 	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
 }
@@ -596,8 +592,6 @@ function JavaScriptEscape($string)
  * - handles rewriting URLs for the queryless URLs option.
  * - can be turned off entirely by setting $scripturl to an empty
  *   string, ''. (it wouldn't work well like that anyway.)
- * - because of bugs in certain builds of PHP, does not function in
- *   versions lower than 4.3.0 - please upgrade if this hurts you.
  *
  * @param string $buffer
  * @return string
