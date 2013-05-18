@@ -5,15 +5,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered also by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
- * This file contains functions that are specifically done by administrators.
+ * This file contains utility functions related to charsets.
  *
  */
 

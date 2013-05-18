@@ -67,11 +67,6 @@ function reloadSettings()
 			cache_put_data('modSettings', $modSettings, 90);
 	}
 
-	// load utility class
-	require_once(SUBSDIR . '/Util.class.php');
-	// temporary, compatibility enabled by default
-	Util::compat_init();
-
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']) && function_exists('date_default_timezone_set'))
 		date_default_timezone_set($modSettings['default_timezone']);

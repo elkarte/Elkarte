@@ -1361,6 +1361,7 @@ function action_deleteInstall()
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Util.class.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1438,10 +1439,6 @@ function action_deleteInstall()
 	updateStats('message');
 	updateStats('topic');
 
-	// This function is needed to do the updateStats('subject') call.
-	$smcFunc['strtolower'] = create_function('$string', '
-		return $string;');
-
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
@@ -1456,7 +1453,7 @@ function action_deleteInstall()
 		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
 	$smcFunc['db_free_result']($request);
 
-	// Now is the perfect time to fetch the SM files.
+	// Now is the perfect time to fetch remote files.
 	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// Sanity check that they loaded earlier!
