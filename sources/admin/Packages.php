@@ -1016,8 +1016,9 @@ class Packages_Controller
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
+				$table_log = $table->package_log();
 				if (!empty($old_db_changes))
-					$db_package_log = empty($table->package_log()) ? $old_db_changes : array_merge($old_db_changes, $table->package_log());
+					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
