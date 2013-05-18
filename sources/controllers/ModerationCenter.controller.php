@@ -37,11 +37,13 @@ class ModerationCenter_Controller
 
 		// Load what blocks the user actually can see...
 		$valid_blocks = array(
-		'n' => 'LatestNews',
-		'p' => 'Notes',
+			'n' => 'LatestNews',
+			'p' => 'Notes',
 		);
+
 		if ($context['can_moderate_groups'])
-		$valid_blocks['g'] = 'GroupRequests';
+			$valid_blocks['g'] = 'GroupRequests';
+
 		if ($context['can_moderate_boards'])
 		{
 			$valid_blocks['r'] = 'ReportedPosts';
@@ -49,9 +51,9 @@ class ModerationCenter_Controller
 		}
 
 		if (empty($user_settings['mod_prefs']))
-		$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 		else
-		list (, $user_blocks) = explode('|', $user_settings['mod_prefs']);
+			list (, $user_blocks) = explode('|', $user_settings['mod_prefs']);
 
 		$user_blocks = str_split($user_blocks);
 
@@ -62,7 +64,7 @@ class ModerationCenter_Controller
 			{
 				$block = 'ModBlock' . $block;
 				if (function_exists($block))
-				$context['mod_blocks'][] = $block();
+					$context['mod_blocks'][] = $block();
 			}
 		}
 	}
@@ -77,8 +79,8 @@ class ModerationCenter_Controller
 
 		// Clean any moderator tokens as well.
 		foreach ($_SESSION['token'] as $key => $token)
-		if (strpos($key, '-mod') !== false)
-		unset($_SESSION['token'][$key]);
+			if (strpos($key, '-mod') !== false)
+				unset($_SESSION['token'][$key]);
 
 		redirectexit('action=moderate');
 	}
@@ -478,8 +480,10 @@ class ModerationCenter_Controller
 				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
 				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
 				$context['template_data']['personal'] = !empty($_POST['make_personal']);
+
 				if (empty($template_title))
 					$context['warning_errors'][] = $txt['mc_warning_template_error_no_title'];
+
 				if (empty($template_body))
 					$context['warning_errors'][] = $txt['mc_warning_template_error_no_body'];
 			}
@@ -772,6 +776,7 @@ class ModerationCenter_Controller
 			if (!empty($toDelete))
 			{
 				require_once(SUBSDIR . '/Messages.subs.php');
+
 				// If they don't have permission we'll let it error - either way no chance of a security slip here!
 				foreach ($toDelete as $did)
 					removeMessage($did);
@@ -1271,6 +1276,7 @@ function ModBlockNotes()
 		checkSession();
 
 		$_POST['new_note'] = $smcFunc['htmlspecialchars'](trim($_POST['new_note']));
+
 		// Make sure they actually entered something.
 		if (!empty($_POST['new_note']) && $_POST['new_note'] !== $txt['mc_click_add_note'])
 		{

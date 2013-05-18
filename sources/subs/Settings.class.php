@@ -110,12 +110,13 @@ class Settings_Form
 			else
 			{
 				$varname = $config_var[0];
-				global $$varname;
+				global $varname;
 
 				// Set the subtext in case it's part of the label.
 				// @todo Temporary. Preventing divs inside label tags.
 				$divPos = strpos($config_var[1], '<div');
 				$subtext = '';
+
 				if ($divPos !== false)
 				{
 					$subtext = preg_replace('~</?div[^>]*>~', '', substr($config_var[1], $divPos));
@@ -345,6 +346,7 @@ class Settings_Form
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
 			elseif (substr($_POST['boardurl'], -1) == '/')
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+
 			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
 				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 		}
@@ -383,16 +385,19 @@ class Settings_Form
 			if (isset($_POST[$config_var][1]) && $_POST[$config_var][0] == $_POST[$config_var][1])
 				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var][0], '\'\\') . '\'';
 		}
+
 		foreach ($config_strs as $config_var)
 		{
 			if (isset($_POST[$config_var]))
 				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
 		}
+
 		foreach ($config_ints as $config_var)
 		{
 			if (isset($_POST[$config_var]))
 				$new_settings[$config_var] = (int) $_POST[$config_var];
 		}
+
 		foreach ($config_bools as $key)
 		{
 			if (!empty($_POST[$key]))
