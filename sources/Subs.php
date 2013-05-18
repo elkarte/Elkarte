@@ -717,7 +717,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 /**
  * Calculates the relative time between now and a given timestamp.
  * If relative time is disabled we can just bypass to standardTime();
- * This function is based on ideas from user "Eye" at 
+ * This function is based on ideas from user "Eye" at
  * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
  *
  * @param int $date
@@ -738,7 +738,7 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 
     $past_time = time() - $timestamp;
 
-	// Within the first 60 seconds it is just now. 
+	// Within the first 60 seconds it is just now.
     if ($past_time < 60)
         return $txt['rt_now'];
 
@@ -2110,7 +2110,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 		if ($smileys !== false && $tag === null && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] == ']' && !isset($disabled['list']) && !isset($disabled['li']))
 		{
-			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>'))) 
+			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>')))
 				continue;
 
 			$tag = $itemcodes[$message[$pos + 1]];
@@ -3913,7 +3913,7 @@ function setupMenuContext()
 			if (!empty($mod_count['emailmod']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= ' [<strong>' . $mod_count['emailmod'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['emailmod']);
 			}
 
 			if (!empty($mod_count['attachments']))
