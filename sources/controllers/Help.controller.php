@@ -22,7 +22,6 @@ if (!defined('ELKARTE'))
 
 class Help_Controller
 {
-<<<<<<< HEAD
 	/**
 	 * Redirect to the user help ;).
 	 * It loads information needed for the help section.
