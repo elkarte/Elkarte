@@ -2308,8 +2308,7 @@ function WrapAction()
 
 	// Any special layers?
 	if (isset($settings['catch_action']['layers']))
-		foreach ($settings['catch_action']['layers'] as $layer)
-			template_layers::getInstance()->add($layer);
+		template_layers::getInstance()->add($settings['catch_action']['layers']);
 
 	// Just call a function?
 	if (isset($settings['catch_action']['function']))
