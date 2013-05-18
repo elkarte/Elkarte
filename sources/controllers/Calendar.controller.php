@@ -245,6 +245,8 @@ class Calendar_Controller
 					'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
 					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
 					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
+					'board' => isset($id_board) ? (int) $id_board : 0,
+					'topic' => isset($id_topic) ? (int) $id_topic : 0,
 				);
 
 				modifyEvent($_REQUEST['eventid'], $eventOptions);

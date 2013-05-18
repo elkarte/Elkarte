@@ -2360,12 +2360,13 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			fatal_lang_error('no_message', false);
 
 		$errors = checkMessagePermissions($message['message']);
-		if (!empty($errors))
-			return array('errors' => $errors);
 
 		prepareMessageContext($message);
 
-		return array($message['message']['subject'], un_preparsecode($message['message']['body']));
+		if (!empty($errors))
+			$message['errors'] = $errors;
+
+		return $message;
 	}
 	else
 	{
