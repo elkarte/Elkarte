@@ -1279,7 +1279,7 @@ function messageInfo($topic, $message, $topic_approved = false)
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-	global $smcFunc;
+	global $smcFunc, $modSettings, $options, $context;
 
 	// Get the messages and stick them into an array.
 	$request = $smcFunc['db_query']('', '
