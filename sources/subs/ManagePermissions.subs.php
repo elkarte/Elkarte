@@ -71,6 +71,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 	$groupLevels['global']['standard'] = array_merge($groupLevels['global']['restrict'], array(
 		'view_mlist',
 		'karma_edit',
+		'like_posts',
 		'pm_read',
 		'pm_send',
 		'send_email_to_members',
@@ -113,6 +114,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 		'poll_remove_any',
 		'poll_add_any',
 		'approve_posts',
+		'like_posts',
 	));
 
 	// Maintenance - wannabe admins.  They can do almost everything.
