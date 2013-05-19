@@ -134,7 +134,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'server_protocol' => $row['server_protocol'],
 			'user_agent' => array(
 				'html' => $row['user_agent'],
-				'href' => base64_encode($db->db_escape_wildcard_string($row['user_agent']))
+				'href' => base64_encode($db->escape_wildcard_string($row['user_agent']))
 			),
 			'request_entity' => $row['request_entity'],
 			'valid' => array(
@@ -152,7 +152,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'timestamp' => $row['date'],
 			'request_uri' => array(
 				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri']),
-				'href' => base64_encode($db->db_escape_wildcard_string($row['request_uri']))
+				'href' => base64_encode($db->escape_wildcard_string($row['request_uri']))
 			),
 			'http_headers' => array(
 				'html' => str_replace("\n", '<br />', $row['http_headers']),
