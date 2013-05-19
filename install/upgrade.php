@@ -836,9 +836,9 @@ function loadEssentialData()
 	// Get the database going!
 	if (empty($db_type))
 		$db_type = 'mysql';
-	if (file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
+		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Make the connection...
 		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
@@ -870,7 +870,7 @@ function loadEssentialData()
 	}
 	else
 	{
-		return throw_error('Cannot find ' . SOURCEDIR . '/database/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
+		return throw_error('Cannot find ' . SOURCEDIR . '/database/Database.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
 	}
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
