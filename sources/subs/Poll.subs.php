@@ -182,7 +182,7 @@ function getPollInfo($topicID)
  */
 function createPoll($question, $id_member = false, $poster_name = false, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
 {
-	global $smcFunc, $user_info;
+	global $user_info, $db;
 
 	if ($id_member == false)
 		$id_member = $id_member === false ? $user_info['id'] : (int) $id_member;
@@ -191,7 +191,7 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
 
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}polls',
 		array(
 			'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
@@ -204,7 +204,7 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
 		array('id_poll')
 	);
 
-	$id_poll = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
+	$id_poll = $db->insert_id('{db_prefix}polls', 'id_poll');
 
 	if (!empty($options))
 		addPollOptions($id_poll, $options);
@@ -222,7 +222,7 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
  */
 function addPollOptions($id_poll, array $options)
 {
-	global $smcFunc;
+	global $db;
 
 	$pollOptions = array();
 	foreach ($options as $i => $option)
@@ -230,7 +230,7 @@ function addPollOptions($id_poll, array $options)
 		$pollOptions[] = array($id_poll, $i, $option);
 	}
 
-	$smcFunc['db_insert']('insert',
+	$db->insert('insert',
 		'{db_prefix}poll_choices',
 		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
 		$pollOptions,
