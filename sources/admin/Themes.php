@@ -131,25 +131,8 @@ class Themes_Controller
 			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',',$modSettings['knownThemes']) : array();
 
 			// Load up all the themes.
-			$request = $smcFunc['db_query']('', '
-				SELECT id_theme, value AS name
-				FROM {db_prefix}themes
-				WHERE variable = {string:name}
-					AND id_member = {int:no_member}
-				ORDER BY id_theme',
-				array(
-					'no_member' => 0,
-					'name' => 'name',
-				)
-			);
-			$context['themes'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$context['themes'][] = array(
-					'id' => $row['id_theme'],
-					'name' => $row['name'],
-					'known' => in_array($row['id_theme'], $knownThemes),
-				);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$context['themes'] = loadThemes($knownThemes);
 
 			// Can we create a new theme?
 			$context['can_create_new'] = is_writable(BOARDDIR . '/themes');
@@ -1455,6 +1438,8 @@ class Themes_Controller
 			else
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 		}
+		else
+			fatal_lang_error('theme_install_general', false);
 
 		// Something go wrong?
 		if ($theme_dir != '' && basename($theme_dir) != 'themes')
@@ -2293,7 +2278,7 @@ function get_file_listing($path, $relative)
 				'is_editable' => is_writable($path . '/' . $entry) && preg_match('~\.(php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py)$~', $entry) != 0,
 				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
 				'size' => $size,
-				'last_modified' => timeformat(filemtime($path . '/' . $entry)),
+				'last_modified' => standardTime(filemtime($path . '/' . $entry)),
 			);
 		}
 	}

@@ -67,30 +67,6 @@ $databases = array(
 			return true;
 		'),
 	),
-	'sqlite' => array(
-		'name' => 'SQLite',
-		'version' => '1',
-		'function_check' => 'sqlite_open',
-		'version_check' => 'return 1;',
-		'supported' => function_exists('sqlite_open'),
-		'always_has_db' => true,
-		'utf8_support' => false,
-		'validate_prefix' => create_function('&$value', '
-			global $incontext, $txt;
-
-			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
-
-			// Is it reserved?
-			if ($value == \'sqlite_\')
-				return $txt[\'error_db_prefix_reserved\'];
-
-			// Is the prefix numeric?
-			if (preg_match(\'~^\d~\', $value))
-				return $txt[\'error_db_prefix_numeric\'];
-
-			return true;
-		'),
-	),
 );
 
 // Initialize everything and load the language files.
@@ -330,11 +306,14 @@ function load_database()
 	// Connect the database.
 	if (!$db_connection)
 	{
+		require_once(SOURCEDIR . '/database/Database.subs.php');
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
-			$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist));
+			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist), $db_type);
 	}
+
+	return database();
 }
 
 /**
@@ -705,7 +684,7 @@ function action_databaseSettings()
 	if (isset($_POST['db_user']))
 	{
 		$incontext['db']['user'] = $_POST['db_user'];
-		$incontext['db']['name'] = $_POST['db_type'] == 'sqlite' && isset($_POST['db_filename']) ? $_POST['db_filename'] : $_POST['db_name'];
+		$incontext['db']['name'] = $_POST['db_name'];
 		$incontext['db']['server'] = $_POST['db_server'];
 		$incontext['db']['prefix'] = $_POST['db_prefix'];
 	}
@@ -753,7 +732,7 @@ function action_databaseSettings()
 		// Take care of these variables...
 		$vars = array(
 			'db_type' => $db_type,
-			'db_name' => $_POST['db_type'] == 'sqlite' && isset($_POST['db_filename']) ? $_POST['db_filename'] : $_POST['db_name'],
+			'db_name' => $_POST['db_name'],
 			'db_user' => $_POST['db_user'],
 			'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
 			'db_server' => $_POST['db_server'],
@@ -792,14 +771,15 @@ function action_databaseSettings()
 
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
 		if ($db_connection == null)
 		{
-			$db_error = @$smcFunc['db_error']();
+			$db_error = $db->last_error();
 
-			$db_connection = smf_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
+			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
@@ -835,7 +815,7 @@ function action_databaseSettings()
 			);
 
 			// Okay, let's try the prefix if it didn't work...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection) && $db_name != '')
+			if (!$db->select_db($db_name, $db_connection) && $db_name != '')
 			{
 				$smcFunc['db_query']('', "
 					CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
@@ -846,7 +826,7 @@ function action_databaseSettings()
 					$db_connection
 				);
 
-				if ($smcFunc['db_select_db']($_POST['db_prefix'] . $db_name, $db_connection))
+				if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
 				{
 					$db_name = $_POST['db_prefix'] . $db_name;
 					updateSettingsFile(array('db_name' => $db_name));
@@ -854,7 +834,7 @@ function action_databaseSettings()
 			}
 
 			// Okay, now let's try to connect...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection))
+			if (!$db->select_db($db_name, $db_connection))
 			{
 				$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 				return false;
@@ -916,7 +896,7 @@ function action_forumSettings()
 			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
-			'extdir' => addslashes(dirname(__FILE__)) . '/sources/subs',
+			'extdir' => addslashes(dirname(__FILE__)) . '/sources/ext',
 		);
 
 		// Must save!
@@ -964,7 +944,7 @@ function action_databasePopulation()
 
 	// Reload settings.
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
 	$result = $smcFunc['db_query']('', '
@@ -1065,7 +1045,7 @@ function action_databasePopulation()
 			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
 			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
 			{
-				$incontext['failures'][$count] = $smcFunc['db_error']();
+				$incontext['failures'][$count] = $db->last_error();
 			}
 		}
 		else
@@ -1157,19 +1137,14 @@ function action_databasePopulation()
 	}
 
 	// Let's optimize those new tables.
-	db_extend();
-	$tables = $smcFunc['db_list_tables']($db_name, $db_prefix . '%');
+	$tables = $db->db_list_tables($db_name, $db_prefix . '%');
 	foreach ($tables as $table)
 	{
-		$smcFunc['db_optimize_table']($table) != -1 or $db_messed = true;
-
-		// Optimizing one sqlite table, optimizes them all
-		if ($db_type == 'sqlite')
-			break;
+		$db->db_optimize_table($table) != -1 or $db_messed = true;
 
 		if (!empty($db_messed))
 		{
-			$incontext['failures'][-1] = $smcFunc['db_error']();
+			$incontext['failures'][-1] = $db->last_error();
 			break;
 		}
 	}
@@ -1207,7 +1182,7 @@ function action_adminAccount()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	if (!isset($_POST['username']))
 		$_POST['username'] = '';
@@ -1217,7 +1192,7 @@ function action_adminAccount()
 	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']));
 	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']));
 
-	$incontext['require_db_confirm'] = empty($db_type) || $db_type != 'sqlite';
+	$incontext['require_db_confirm'] = empty($db_type);
 
 	// Only allow skipping if we think they already have an account setup.
 	$request = $smcFunc['db_query']('', '
@@ -1344,7 +1319,7 @@ function action_adminAccount()
 			if ($request === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($smcFunc['db_error']($db_connection))) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection))) . '</div>';
 				return false;
 			}
 
@@ -1372,7 +1347,7 @@ function action_deleteInstall()
 	$incontext['continue'] = 0;
 
 	require(dirname(__FILE__) . '/Settings.php');
-	load_database();
+	$db = load_database();
 
 	if (!defined('SUBSDIR'))
 		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
@@ -1386,6 +1361,7 @@ function action_deleteInstall()
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Util.class.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1463,10 +1439,6 @@ function action_deleteInstall()
 	updateStats('message');
 	updateStats('topic');
 
-	// This function is needed to do the updateStats('subject') call.
-	$smcFunc['strtolower'] = create_function('$string', '
-		return $string;');
-
 	$request = $smcFunc['db_query']('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
@@ -1481,7 +1453,7 @@ function action_deleteInstall()
 		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
 	$smcFunc['db_free_result']($request);
 
-	// Now is the perfect time to fetch the SM files.
+	// Now is the perfect time to fetch remote files.
 	require_once(SOURCEDIR . '/ScheduledTasks.php');
 
 	// Sanity check that they loaded earlier!
@@ -1498,7 +1470,7 @@ function action_deleteInstall()
 	}
 
 	// Check if we need some stupid MySQL fix.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
@@ -2322,7 +2294,6 @@ function template_database_settings()
 						<option value="', $key, '"', isset($_POST['db_type']) && $_POST['db_type'] == $key ? ' selected="selected"' : '', '>', $db['name'], '</option>';
 
 	echo '
-					</select><div id="db_sqlite_warning" style="color: blue; display: none;" class="smalltext">', $txt['db_sqlite_warning'], '</div>
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_type_info'], '</div>
 				</td>
 			</tr>';
@@ -2385,16 +2356,13 @@ function template_database_settings()
 		{
 			// What state is it?';
 
-	if (!isset($incontext['supported_databases']['sqlite']))
-		echo '
-			var showAll = true;';
-	elseif (count($incontext['supported_databases']) < 2)
+	if (count($incontext['supported_databases']) < 2)
 		echo '
 			var showAll = false;';
-	// If we have more than one DB including SQLite, what should we be doing?
+	// If we have more than one DB, what should we be doing?
 	else
 		echo '
-			var showAll = document.getElementById(\'db_type_input\').value == \'sqlite\' ? false : true;';
+			var showAll = true;';
 
 	echo '
 			document.getElementById(\'db_passwd_contain\').style.display = showAll ? \'\' : \'none\';
@@ -2402,7 +2370,6 @@ function template_database_settings()
 			document.getElementById(\'db_user_contain\').style.display = showAll ? \'\' : \'none\';
 			document.getElementById(\'db_name_contain\').style.display = showAll ? \'\' : \'none\';
 			document.getElementById(\'db_filename_contain\').style.display = !showAll ? \'\' : \'none\';
-			document.getElementById(\'db_sqlite_warning\').style.display = !showAll ? \'\' : \'none\';
 			if (document.getElementById(\'db_type_input\').value == \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
 			else

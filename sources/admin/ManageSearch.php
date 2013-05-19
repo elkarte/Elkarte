@@ -43,14 +43,12 @@ class ManageSearch_Controller
 	 */
 	function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
-
-		db_extend('search');
 
 		$subActions = array(
 			'settings' => array($this, 'action_searchSettings_display'),
@@ -207,6 +205,9 @@ class ManageSearch_Controller
 				array('callback', 'external_search_engines'),
 		);
 
+		addInlineJavascript('
+		document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
+
 		return $this->_searchSettings->settings($config_vars);
 	}
 
@@ -301,10 +302,14 @@ class ManageSearch_Controller
 	{
 		global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
 
+		// need to work with some db search stuffs
+		$db_search = db_search();
+		$db = database();
+
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_method_title'];
 		$context['sub_template'] = 'select_search_method';
-		$context['supports_fulltext'] = $smcFunc['db_search_support']('fulltext');
+		$context['supports_fulltext'] = $db_search->search_support('fulltext');
 
 		// Load any apis.
 		$context['search_apis'] = loadSearchAPIs();
@@ -363,11 +368,10 @@ class ManageSearch_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			db_extend();
-			$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+			$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 			if (!empty($tables))
 			{
-				$smcFunc['db_search_query']('drop_words_table', '
+				$db_search->search_query('drop_words_table', '
 					DROP TABLE {db_prefix}log_search_words',
 					array(
 					)
@@ -466,11 +470,10 @@ class ManageSearch_Controller
 		elseif ($db_type == 'postgresql')
 		{
 			// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-			db_extend();
-			$temp_tables = $smcFunc['db_list_tables']();
+			$temp_tables = $db->db_list_tables();
 			foreach ($temp_tables as $table)
 				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-					$smcFunc['db_optimize_table']($table);
+					$db->db_optimize_table($table);
 
 			// PostGreSql has some hidden sizes.
 			$request = $smcFunc['db_query']('', '
@@ -513,6 +516,7 @@ class ManageSearch_Controller
 				);
 		}
 		else
+			// Here may be wolves.
 			$context['table_info'] = array(
 				'data_length' => $txt['not_applicable'],
 				'index_length' => $txt['not_applicable'],
@@ -551,6 +555,10 @@ class ManageSearch_Controller
 	function action_create()
 	{
 		global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+
+		// Get hang of db_search
+		$db_search = db_search();
+		$db = database();
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -615,18 +623,17 @@ class ManageSearch_Controller
 
 			if ($context['start'] === 0)
 			{
-				db_extend();
-				$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+				$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 				if (!empty($tables))
 				{
-					$smcFunc['db_search_query']('drop_words_table', '
+					$db_search->search_query('drop_words_table', '
 						DROP TABLE {db_prefix}log_search_words',
 						array(
 						)
 					);
 				}
 
-				$smcFunc['db_create_word_search']($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
+				$db_search->create_word_search($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
 
 				// Temporarily switch back to not using a search index.
 				if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
@@ -1001,8 +1008,6 @@ function detectFulltextIndex()
 function createSphinxConfig()
 {
 	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_character_set, $modSettings;
-
-	$humungousTopicPosts = 200;
 
 	// set up to ouput a file to the users browser
 	ob_end_clean();

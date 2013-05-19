@@ -83,6 +83,39 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 }
 
 /**
+ * Get some basic info of a certain message
+ *
+ * @param int $id_msg
+ */
+function getMessageInfo($id_msg, $override_permissions = false)
+{
+	global $smcFunc;
+
+	if (empty($id_msg))
+		return false;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			m.id_member, m.id_topic, m.id_board,
+			m.body, m.subject,
+			m.poster_name, m.poster_email, m.poster_time,
+			m.approved
+		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
+		WHERE id_msg = {int:message}
+		LIMIt 1',
+		array(
+			'message' => $id_msg,
+		)
+	);
+
+	$row = $smcFunc['db_fetch_assoc']($request);
+	$smcFunc['db_free_result']($request);
+
+	return empty($row) ? false : $row;
+}
+
+/**
  * Checks permissions to modify a message.
  * This function will give a fatal error if the current user
  * doesn't have permissions to modify the message.
@@ -144,7 +177,7 @@ function prepareMessageContext($message)
 	// When was it last modified?
 	if (!empty($message['message']['modified_time']))
 	{
-		$context['last_modified'] = timeformat($message['message']['modified_time']);
+		$context['last_modified'] = relativeTime($message['message']['modified_time']);
 		$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $message['message']['modified_name']);
 	}
 
@@ -622,33 +655,54 @@ function removeMessage($message, $decreasePostCount = true)
 }
 
 /**
- * Retrieve the topic associated with a message.
+ * This function deals with the topic associated to a message.
+ * It allows to retrieve or update the topic to which the message belongs.
  *
+ * If $topicID is not passed, the current topic ID of the message is returned.
+ * If $topicID is passed, the message is updated to point to the new topic.
+ *
+ * @param int $msg_id message ID
+ * @param int $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return mixed, int topic ID if any, or false
  */
-function associatedTopic($msg_id)
+function associatedTopic($msg_id, $topicID = null)
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_topic
-		FROM {db_prefix}messages
-		WHERE id_msg = {int:msg}',
-		array(
-			'msg' => $msg_id,
-	));
-	if ($smcFunc['db_num_rows']($request) != 1)
-		$topic = false;
-	else
-		list ($topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	if ($topicID === null)
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT id_topic
+			FROM {db_prefix}messages
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+		));
+		if ($smcFunc['db_num_rows']($request) != 1)
+			$topic = false;
+		else
+			list ($topic) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
 
-	return $topic;
+		return $topic;
+	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}messages
+			SET id_topic = {int:topic}
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+				'topic' => $topicID,
+			)
+		);
+	}
 }
 
 /**
- * Small function that simply query the database to verify
- * if the current user can access a specific message
+ * Small function that simply verifies if the current
+ * user can access a specific message
  *
  * @param int $id_msg a message id
  * @param bool $check_approval if true messages are checked for approval (default true)
@@ -656,33 +710,22 @@ function associatedTopic($msg_id)
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg, id_member, approved
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => $id_msg,
-		)
-	);
-	$exists = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$message_info = getMessageInfo($id_msg);
 
-	// It doesn't exists or is not accessible
-	if (empty($exists))
+	// Do we even have a message to speak of?
+	if (empty($message_info))
 		return false;
-	// We have to check for approval...
-	elseif ($check_approval)
+
+	// Check for approval status?
+	if ($check_approval)
 	{
-		// Message approved or user is owner
-		if (!empty($exists['approved']) || $exists['id_member'] == $user_info['id'])
-			return true;
+		// The user can access this message if it's approved or they're owner
+		return (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id']);
 	}
 
-	// Any other case should be false.
+	// Otherwise, nope.
 	return false;
 }
 

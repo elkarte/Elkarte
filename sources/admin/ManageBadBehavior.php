@@ -22,7 +22,7 @@ class ManageBadBehavior_Controller
 	 *
 	 * @uses the BadBehavior template and badbehavior_log sub template.
 	 */
-	function action_badbehaviorlog()
+	public function action_badbehaviorlog()
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
 
@@ -53,7 +53,7 @@ class ManageBadBehavior_Controller
 			$filter = array(
 				'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],
 				'value' => array(
-					'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+					'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->db_escape_wildcard_string($_GET['value']),
 				),
 				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 				'entity' => $filters[$_GET['filter']]
@@ -68,7 +68,21 @@ class ManageBadBehavior_Controller
 
 		// Deleting or just doing a little weeding?
 		if (isset($_POST['delall']) || isset($_POST['delete']))
-			deleteBadBehavior($filter);
+		{
+			$type = isset($_POST['delall']) ? 'delall' : 'delete';
+			// Make sure the session exists and the token is correct
+			checkSession();
+			validateToken('admin-bbl');
+
+			$redirect = deleteBadBehavior($type, $filter);
+			if ($redirect === 'delete')
+			{
+				$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+				// Go back to where we were.
+				redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
+			}
+			redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+		}
 
 		// Just how many entries are there?
 		$num_errors = getBadBehaviorLogEntryCount($filter);
@@ -87,7 +101,11 @@ class ManageBadBehavior_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
 
 		// Find and sort out the log entries.
-		getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $members, $filter);
+		$context['bb_entries'] = getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $filter);
+
+		$members = array();
+		foreach($context['bb_entries'] as $member)
+			$members[] = $member['member']['id'];
 
 		// Load the member data so we have more information available
 		if (!empty($members))

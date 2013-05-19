@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Set the user theme options.
+ */
 function template_options()
 {
 	global $context, $txt;
@@ -161,6 +164,9 @@ function template_options()
 	);
 }
 
+/**
+ * Set the theme settings for display and edit in admin panel.
+ */
 function template_settings()
 {
 	global $context, $txt;

@@ -111,12 +111,42 @@ function recountUnapprovedPosts($approve_query = null)
 }
 
 /**
+ * How many falied emails (that they can see) do we have?
+ * 
+ * @param string $approve_query
+ */
+function recountFailedEmails($approve_query = null)
+{
+	global $context, $smcFunc;
+	
+	if ($approve_query === null)
+		return 0;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}postby_emails_error as m
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE {query_see_board}
+			' . $approve_query . '
+			OR m.id_board = -1',
+		array(
+		)
+	);
+	list ($failed_emails) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	$context['failed_emails'] = $failed_emails;
+	return $failed_emails;
+}
+
+/**
  * Loads the number of items awaiting moderation attention
  *  - Only loads the value a given permission level can see
  *  - If supplied a board number will load the values only for that board
  *  - Unapproved posts
  *  - Unapproved topics
  *  - Unapproved attachments
+ *  - Failed emails
  *  - Reported posts
  *
  * @param int $brd
@@ -155,6 +185,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Starting out with nothing is a good start
 		$menu_errors[$cache_key]['attachments'] = 0;
 		$menu_errors[$cache_key]['reports'] = 0;
+		$menu_errors[$cache_key]['emailmod'] = 0;
 		$menu_errors[$cache_key]['postmod'] = 0;
 		$menu_errors[$cache_key]['topics'] = 0;
 		$menu_errors[$cache_key]['posts'] = 0;
@@ -172,7 +203,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(CONTROLLERDIR . '/PostModeration.controller.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
@@ -180,8 +211,12 @@ function loadModeratorMenuCounts($brd = null)
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
 			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
 
+		// Email failures that require attention
+		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
+			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
+
 		// Grand Totals for the top most menu
-		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
 
 		// Add this key in to the array, technically this resets the cache time for all keys
 		// done this way as the entire thing needs to go null once *any* moderation action is taken
@@ -325,7 +360,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 		$templates[] = array(
 			'id_comment' => $row['id_comment'],
 			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'title' => $row['template_title'],
 			'body' => $smcFunc['htmlspecialchars']($row['body']),
 		);
@@ -394,7 +429,7 @@ function list_getWarnings($start, $items_per_page, $sort)
 		$warnings[] = array(
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
 			'recipient_link' => $row['id_recipient'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_recipient'] . '">' . $row['recipient_name'] . '</a>') : $row['recipient_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],

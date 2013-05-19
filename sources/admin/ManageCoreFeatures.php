@@ -243,6 +243,15 @@ class ManageCoreFeatures_Controller
 					'modlog_enabled' => 1,
 				),
 			),
+			// pe = post email
+			'pe' => array(
+				'url' => 'action=admin;area=maillist',
+				'settings' => array(
+					'maillist_enabled' => 1,
+					'pbe_post_enabled' => 2,
+					'pbe_pm_enabled' => 2,
+				),
+			),
 			// pm = post moderation.
 			'pm' => array(
 				'url' => 'action=admin;area=permissions;sa=postmod',

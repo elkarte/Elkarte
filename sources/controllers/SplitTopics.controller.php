@@ -21,276 +21,429 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-/**
- * Splits a topic into two topics.
- * delegates to the other functions (based on the URL parameter 'sa').
- * loads the SplitTopics template.
- * requires the split_any permission.
- * is accessed with ?action=splittopics.
- */
-function action_splittopics()
+class SplitTopics_Controller
 {
-	global $topic;
-
-	// And... which topic were you splitting, again?
-	if (empty($topic))
-		fatal_lang_error('numbers_one_to_nine', false);
-
-	// Are you allowed to split topics?
-	isAllowedTo('split_any');
-
-	// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
-	if (!isset($_REQUEST['xml']))
-		loadTemplate('SplitTopics');
-	require_once(SUBSDIR . '/Boards.subs.php');
-	require_once(SUBSDIR . '/Post.subs.php');
-
-	$subActions = array(
-		'selectTopics' => 'action_splitSelectTopics',
-		'execute' => 'action_splitExecute',
-		'index' => 'action_splitIndex',
-		'splitSelection' => 'action_splitSelection',
-	);
-
-	// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
-	if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		action_splitIndex();
-	else
-		$subActions[$_REQUEST['sa']]();
-}
-
-/**
- * Screen shown before the actual split.
- * is accessed with ?action=splittopics;sa=index.
- * default sub action for ?action=splittopics.
- * uses 'ask' sub template of the SplitTopics template.
- * redirects to action_splitSelectTopics if the message given turns out to be
- * the first message of a topic.
- * shows the user three ways to split the current topic.
- */
-function action_splitIndex()
-{
-	global $txt, $topic, $context, $smcFunc, $modSettings;
-
-	// Validate "at".
-	if (empty($_GET['at']))
-		fatal_lang_error('numbers_one_to_nine', false);
-	$splitAt = (int) $_GET['at'];
-
-	// We deal with topics here.
-	require_once(SUBSDIR . '/Topic.subs.php');
-	require_once(SUBSDIR . '/MessageIndex.subs.php');
-	// Let's load up the boards in case they are useful.
-	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
-
-	// Retrieve message info for the message at the split point.
-	$messageInfo = messageInfo($topic, $splitAt);
-
-	// If not approved validate they can see it.
-	if ($modSettings['postmod_active'] && !$messageInfo['approved'])
-		isAllowedTo('approve_posts');
-
-	// If this topic has unapproved posts, we need to count them too...
-	if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
-		$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['approved'] ? 0 : 1);
-
-	$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
-
-	// Check if there is more than one message in the topic.  (there should be.)
-	if ($messageInfo['num_replies'] < 1)
-		fatal_lang_error('topic_one_post', false);
-
-	// Check if this is the first message in the topic (if so, the first and second option won't be available)
-	if ($messageInfo['id_first_msg'] == $splitAt)
-		return action_splitSelectTopics();
-
-	// Basic template information....
-	$context['message'] = array(
-		'id' => $splitAt,
-		'subject' => $messageInfo['subject']
-	);
-	$context['sub_template'] = 'ask';
-	$context['page_title'] = $txt['split'];
-}
-
-/**
- * Do the actual split.
- * is accessed with ?action=splittopics;sa=execute.
- * uses the main SplitTopics template.
- * supports three ways of splitting:
- * (1) only one message is split off.
- * (2) all messages after and including a given message are split off.
- * (3) select topics to split (redirects to action_splitSelectTopics()).
- * uses splitTopic function to do the actual splitting.
- */
-function action_splitExecute()
-{
-	global $txt, $context, $user_info, $smcFunc, $modSettings;
-	global $board, $topic, $language, $scripturl;
-
-	// Check the session to make sure they meant to do this.
-	checkSession();
-
-	// Clean up the subject.
-	// @todo: actually clean the subject?
-	if (!isset($_POST['subname']) || $_POST['subname'] == '')
-		$_POST['subname'] = $txt['new_topic'];
-
-	if (empty($_SESSION['move_to_board']))
+	/**
+	 * Splits a topic into two topics.
+	 * delegates to the other functions (based on the URL parameter 'sa').
+	 * loads the SplitTopics template.
+	 * requires the split_any permission.
+	 * is accessed with ?action=splittopics.
+	 */
+	function action_splittopics()
 	{
-		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-		$context['reason'] = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
-	}
-	else
-	{
-		$context['move_to_board'] = (int) $_SESSION['move_to_board'];
-		$context['reason'] = trim($smcFunc['htmlspecialchars']($_SESSION['reason']));
-	}
-	$_SESSION['move_to_board'] = $context['move_to_board'];
-	$_SESSION['reason'] = $context['reason'];
+		global $topic;
 
-	// Redirect to the selector if they chose selective.
-	if ($_POST['step2'] == 'selective')
-	{
-		$_REQUEST['subname'] = $_POST['subname'];
-		return action_splitSelectTopics();
+		// And... which topic were you splitting, again?
+		if (empty($topic))
+			fatal_lang_error('numbers_one_to_nine', false);
+
+		// Are you allowed to split topics?
+		isAllowedTo('split_any');
+
+		// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
+		if (!isset($_REQUEST['xml']))
+			loadTemplate('SplitTopics');
+		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		$subActions = array(
+			'selectTopics' => 'action_splitSelectTopics',
+			'execute' => 'action_splitExecute',
+			'index' => 'action_splitIndex',
+			'splitSelection' => 'action_splitSelection',
+		);
+
+		// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
+		if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
+			$this->action_splitIndex();
+		else
+			$this->{$subActions[$_REQUEST['sa']]}();
 	}
 
-	// We work with them topics.
-	require_once(SUBSDIR . '/Topic.subs.php');
-	require_once(SUBSDIR . '/Boards.subs.php');
-
-	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-	if (!empty($_POST['messageRedirect']) && empty($context['reason']))
-				fatal_lang_error('splittopic_no_reason', false);
-
-	// Before the actual split because of the fatal_lang_errors
-	$boards = splitDestinationBoard();
-
-	$splitAt = (int) $_POST['at'];
-	$messagesToBeSplit = array();
-
-	// Fetch the message IDs of the topic that are at or after the message.
-	if ($_POST['step2'] == 'afterthis')
-		$messagesToBeSplit = messagesAfter($topic, $splitAt);
-	// Only the selected message has to be split. That should be easy.
-	elseif ($_POST['step2'] == 'onlythis')
-		$messagesToBeSplit[] = $splitAt;
-	// There's another action?!
-	else
-		fatal_lang_error('no_access', false);
-
-	$context['old_topic'] = $topic;
-	$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $_POST['subname']);
-	$context['page_title'] = $txt['split'];
-
-	splitAttemptMove($boards, $context['new_topic']);
-}
-
-/**
- * If we are also moving the topic somewhere else, let's try do to it
- * Includes checks for permissions move_own/any, etc.
- *
- * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
- * @param int $totopic id of the destination topic
- */
-function splitAttemptMove($boards, $totopic)
-{
-	global $board, $user_info, $context;
-
-	// If the starting and final boards are different we have to check some permissions and stuff
-	if ($boards['destination']['id'] != $board)
+	/**
+	 * Screen shown before the actual split.
+	 * is accessed with ?action=splittopics;sa=index.
+	 * default sub action for ?action=splittopics.
+	 * uses 'ask' sub template of the SplitTopics template.
+	 * redirects to action_splitSelectTopics if the message given turns out to be
+	 * the first message of a topic.
+	 * shows the user three ways to split the current topic.
+	 */
+	function action_splitIndex()
 	{
-		$doMove = false;
-		$new_topic = array();
-		if (allowedTo('move_any'))
-			$doMove = true;
+		global $txt, $topic, $context, $smcFunc, $modSettings;
+
+		// Validate "at".
+		if (empty($_GET['at']))
+			fatal_lang_error('numbers_one_to_nine', false);
+		$splitAt = (int) $_GET['at'];
+
+		// We deal with topics here.
+		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		// Let's load up the boards in case they are useful.
+		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+
+		// Retrieve message info for the message at the split point.
+		$messageInfo = messageInfo($topic, $splitAt, true);
+		if (empty($messageInfo))
+			fatal_lang_error('cant_find_messages');
+
+		// If not approved validate they can see it.
+		if ($modSettings['postmod_active'] && !$messageInfo['approved'])
+			isAllowedTo('approve_posts');
+
+		// If this topic has unapproved posts, we need to count them too...
+		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
+			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['approved'] ? 0 : 1);
+
+		$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
+
+		// Check if there is more than one message in the topic.  (there should be.)
+		if ($messageInfo['num_replies'] < 1)
+			fatal_lang_error('topic_one_post', false);
+
+		// Check if this is the first message in the topic (if so, the first and second option won't be available)
+		if ($messageInfo['id_first_msg'] == $splitAt)
+			return $this->action_splitSelectTopics();
+
+		// Basic template information....
+		$context['message'] = array(
+			'id' => $splitAt,
+			'subject' => $messageInfo['subject']
+		);
+		$context['sub_template'] = 'ask';
+		$context['page_title'] = $txt['split'];
+	}
+
+	/**
+	 * Do the actual split.
+	 * is accessed with ?action=splittopics;sa=execute.
+	 * uses the main SplitTopics template.
+	 * supports three ways of splitting:
+	 * (1) only one message is split off.
+	 * (2) all messages after and including a given message are split off.
+	 * (3) select topics to split (redirects to action_splitSelectTopics()).
+	 * uses splitTopic function to do the actual splitting.
+	 */
+	function action_splitExecute()
+	{
+		global $txt, $context, $user_info, $smcFunc, $modSettings;
+		global $board, $topic, $language, $scripturl;
+
+		// Check the session to make sure they meant to do this.
+		checkSession();
+
+		// Clean up the subject.
+		// @todo: actually clean the subject?
+		if (!isset($_POST['subname']) || $_POST['subname'] == '')
+			$_POST['subname'] = $txt['new_topic'];
+
+		if (empty($_SESSION['move_to_board']))
+		{
+			$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+			$context['reason'] = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+		}
 		else
 		{
-			$new_topic = getTopicInfo($totopic);
-			if ($new_topic['id_member_started'] == $user_info['id'] && allowedTo('move_own'))
-				$doMove = true;
+			$context['move_to_board'] = (int) $_SESSION['move_to_board'];
+			$context['reason'] = trim($smcFunc['htmlspecialchars']($_SESSION['reason']));
+		}
+		$_SESSION['move_to_board'] = $context['move_to_board'];
+		$_SESSION['reason'] = $context['reason'];
+
+		// Redirect to the selector if they chose selective.
+		if ($_POST['step2'] == 'selective')
+		{
+			$_REQUEST['subname'] = $_POST['subname'];
+			return $this->action_splitSelectTopics();
 		}
 
-		if ($doMove)
+		// We work with them topics.
+		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
+		if (!empty($_POST['messageRedirect']) && empty($context['reason']))
+			fatal_lang_error('splittopic_no_reason', false);
+
+		// Before the actual split because of the fatal_lang_errors
+		$boards = splitDestinationBoard();
+
+		$splitAt = (int) $_POST['at'];
+		$messagesToBeSplit = array();
+
+		// Fetch the message IDs of the topic that are at or after the message.
+		if ($_POST['step2'] == 'afterthis')
+			$messagesToBeSplit = messagesAfter($topic, $splitAt);
+		// Only the selected message has to be split. That should be easy.
+		elseif ($_POST['step2'] == 'onlythis')
+			$messagesToBeSplit[] = $splitAt;
+		// There's another action?!
+		else
+			fatal_lang_error('no_access', false);
+
+		$context['old_topic'] = $topic;
+		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $_POST['subname']);
+		$context['page_title'] = $txt['split'];
+
+		splitAttemptMove($boards, $context['new_topic']);
+	}
+
+	/**
+	 * Do the actual split of a selection of topics.
+	 * is accessed with ?action=splittopics;sa=splitSelection.
+	 * uses the main SplitTopics template.
+	 * uses splitTopic function to do the actual splitting.
+	 */
+	function action_splitSelection()
+	{
+		global $txt, $board, $topic, $context, $user_info;
+
+		// Make sure the session id was passed with post.
+		checkSession();
+
+		// Default the subject in case it's blank.
+		if (!isset($_POST['subname']) || $_POST['subname'] == '')
+			$_POST['subname'] = $txt['new_topic'];
+
+		// You must've selected some messages!  Can't split out none!
+		if (empty($_SESSION['split_selection'][$topic]))
+			fatal_lang_error('no_posts_selected', false);
+
+		if (!empty($_POST['messageRedirect']) && empty($context['reason']))
+			fatal_lang_error('splittopic_no_reason', false);
+
+		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+		$reason = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+
+		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
+		if (!empty($_POST['messageRedirect']) && empty($reason))
+			fatal_lang_error('splittopic_no_reason', false);
+
+		// This is here because there are two fatal_lang_errors in there
+		$boards = splitDestinationBoard();
+
+		$context['old_topic'] = $topic;
+		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $_POST['subname']);
+		$context['page_title'] = $txt['split'];
+
+		splitAttemptMove($boards, $context['new_topic']);
+	}
+
+	/**
+	 * Allows the user to select the messages to be split.
+	 * is accessed with ?action=splittopics;sa=selectTopics.
+	 * uses 'select' sub template of the SplitTopics template or (for
+	 * XMLhttp) the 'split' sub template of the Xml template.
+	 * supports XMLhttp for adding/removing a message to the selection.
+	 * uses a session variable to store the selected topics.
+	 * shows two independent page indexes for both the selected and
+	 * not-selected messages (;topic=1.x;start2=y).
+	 */
+	function action_splitSelectTopics()
+	{
+		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
+		global $smcFunc;
+
+		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
+		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+
+		// Haven't selected anything have we?
+		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
+
+		// This is a special case for split topics from quick-moderation checkboxes
+		if (isset($_REQUEST['subname_enc']))
+			$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
+
+		$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
+		$context['reason'] = !empty($_SESSION['reason']) ? trim($smcFunc['htmlspecialchars']($_SESSION['reason'])) : '';
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		$context['not_selected'] = array(
+			'num_messages' => 0,
+			'start' => empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'],
+			'messages' => array(),
+		);
+
+		$context['selected'] = array(
+			'num_messages' => 0,
+			'start' => empty($_REQUEST['start2']) ? 0 : (int) $_REQUEST['start2'],
+			'messages' => array(),
+		);
+
+		$context['topic'] = array(
+			'id' => $topic,
+			'subject' => urlencode($_REQUEST['subname']),
+		);
+
+		// Some stuff for our favorite template.
+		$context['new_subject'] = $_REQUEST['subname'];
+
+		// Using the "select" sub template.
+		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
+
+		// Are we using a custom messages per page?
+		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+
+		// Get the message ID's from before the move.
+		if (isset($_REQUEST['xml']))
 		{
-			// Update member statistics if needed
-			// @todo this should probably go into a function...
-			if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
+			$original_msgs = array(
+				'not_selected' => array(),
+				'selected' => array(),
+			);
+			$request = $smcFunc['db_query']('', '
+				SELECT id_msg
+				FROM {db_prefix}messages
+				WHERE id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
+					AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+					AND approved = {int:is_approved}') . '
+				ORDER BY id_msg DESC
+				LIMIT {int:start}, {int:messages_per_page}',
+				array(
+					'current_topic' => $topic,
+					'no_split_msgs' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+					'is_approved' => 1,
+					'start' => $context['not_selected']['start'],
+					'messages_per_page' => $context['messages_per_page'],
+				)
+			);
+			// You can't split the last message off.
+			if (empty($context['not_selected']['start']) && $smcFunc['db_num_rows']($request) <= 1 && $_REQUEST['move'] == 'down')
+				$_REQUEST['move'] = '';
+			while ($row = $smcFunc['db_fetch_assoc']($request))
+				$original_msgs['not_selected'][] = $row['id_msg'];
+			$smcFunc['db_free_result']($request);
+			if (!empty($_SESSION['split_selection'][$topic]))
 			{
 				$request = $smcFunc['db_query']('', '
-					SELECT id_member
+					SELECT id_msg
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
-						AND approved = {int:is_approved}',
+						AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+						AND approved = {int:is_approved}') . '
+					ORDER BY id_msg DESC
+					LIMIT {int:start}, {int:messages_per_page}',
 					array(
-						'current_topic' => $totopic,
+						'current_topic' => $topic,
+						'split_msgs' => $_SESSION['split_selection'][$topic],
 						'is_approved' => 1,
+						'start' => $context['selected']['start'],
+						'messages_per_page' => $context['messages_per_page'],
 					)
 				);
-				$posters = array();
 				while ($row = $smcFunc['db_fetch_assoc']($request))
-				{
-					if (!isset($posters[$row['id_member']]))
-						$posters[$row['id_member']] = 0;
-
-					$posters[$row['id_member']]++;
-				}
+					$original_msgs['selected'][] = $row['id_msg'];
 				$smcFunc['db_free_result']($request);
+			}
+		}
 
-				foreach ($posters as $id_member => $posts)
+		// (De)select a message..
+		if (!empty($_REQUEST['move']))
+		{
+			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
+
+			if ($_REQUEST['move'] == 'reset')
+				$_SESSION['split_selection'][$topic] = array();
+			elseif ($_REQUEST['move'] == 'up')
+				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_REQUEST['msg']));
+			else
+				$_SESSION['split_selection'][$topic][] = $_REQUEST['msg'];
+		}
+
+		// Make sure the selection is still accurate.
+		if (!empty($_SESSION['split_selection'][$topic]))
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_msg
+				FROM {db_prefix}messages
+				WHERE id_topic = {int:current_topic}
+					AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+					AND approved = {int:is_approved}'),
+				array(
+					'current_topic' => $topic,
+					'split_msgs' => $_SESSION['split_selection'][$topic],
+					'is_approved' => 1,
+				)
+			);
+			$_SESSION['split_selection'][$topic] = array();
+			while ($row = $smcFunc['db_fetch_assoc']($request))
+				$_SESSION['split_selection'][$topic][] = $row['id_msg'];
+			$smcFunc['db_free_result']($request);
+		}
+
+		// Get the number of messages (not) selected to be split.
+		$request = $smcFunc['db_query']('', '
+			SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
+			FROM {db_prefix}messages AS m
+			WHERE m.id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+				AND approved = {int:is_approved}') . (empty($_SESSION['split_selection'][$topic]) ? '' : '
+			GROUP BY is_selected'),
+			array(
+				'current_topic' => $topic,
+				'split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
+				'is_approved' => 1,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
+		$smcFunc['db_free_result']($request);
+
+		// Fix an oversized starting page (to make sure both pageindexes are properly set).
+		if ($context['selected']['start'] >= $context['selected']['num_messages'])
+			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
+
+		// Build a page list of the not-selected topics...
+		$context['not_selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
+		// ...and one of the selected topics.
+		$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
+
+		// Retrieve the unselected messages.
+		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : array('excluded' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+
+		// Now retrieve the selected messages.
+		if (!empty($_SESSION['split_selection'][$topic]))
+			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+
+		// The XMLhttp method only needs the stuff that changed, so let's compare.
+		if (isset($_REQUEST['xml']))
+		{
+			$changes = array(
+				'remove' => array(
+					'not_selected' => array_diff($original_msgs['not_selected'], array_keys($context['not_selected']['messages'])),
+					'selected' => array_diff($original_msgs['selected'], array_keys($context['selected']['messages'])),
+				),
+				'insert' => array(
+					'not_selected' => array_diff(array_keys($context['not_selected']['messages']), $original_msgs['not_selected']),
+					'selected' => array_diff(array_keys($context['selected']['messages']), $original_msgs['selected']),
+				),
+			);
+
+			$context['changes'] = array();
+			foreach ($changes as $change_type => $change_array)
+			{
+				foreach ($change_array as $section => $msg_array)
 				{
-					// The board we're moving from counted posts, but not to.
-					if (empty($boards['current']['count_posts']))
-						updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
-					// The reverse: from didn't, to did.
-					else
-						updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+					if (empty($msg_array))
+						continue;
+
+					foreach ($msg_array as $id_msg)
+					{
+						$context['changes'][$change_type . $id_msg] = array(
+							'id' => $id_msg,
+							'type' => $change_type,
+							'section' => $section,
+						);
+						if ($change_type == 'insert')
+							$context['changes']['insert' . $id_msg]['insert_value'] = $context[$section]['messages'][$id_msg];
+					}
 				}
 			}
-			// And finally move it!
-			moveTopics($totopic, $boards['destination']['id']);
-		}
-		else
-			$boards['destination'] = $boards['current'];
-	}
-
-	// Create a link to this in the old topic.
-	// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
-	if (!empty($_POST['messageRedirect']))
-		postSplitRedirect($context['reason'], $_POST['subname'], $boards['destination'], $context['new_topic']);
-}
-
-/**
- * Retrives informations of the current and destination board of a split topic
- *
- * @return array
- */
-function splitDestinationBoard()
-{
-	global $board, $topic;
-
-	$current_board = boardInfo($board, $topic);
-	if (empty($current_board))
-		fatal_lang_error('no_board');
-
-	if (!empty($_POST['move_new_topic']))
-	{
-		$toboard =  !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
-		if (!empty($toboard) && $board !== $toboard)
-		{
-			$destination_board = boardInfo($toboard);
-			if (empty($destination_board))
-				fatal_lang_error('no_board');
 		}
 	}
-
-	if (!isset($destination_board))
-		$destination_board = array_merge($current_board, array('id' => $board));
-	else
-		$destination_board['id'] = $toboard;
-
-	return array('current' => $current_board, 'destination' => $destination_board);
 }
 
 /**
@@ -332,258 +485,6 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 		'update_post_count' => empty($board_info['count_posts']),
 	);
 	createPost($msgOptions, $topicOptions, $posterOptions);
-}
-
-/**
- * Allows the user to select the messages to be split.
- * is accessed with ?action=splittopics;sa=selectTopics.
- * uses 'select' sub template of the SplitTopics template or (for
- * XMLhttp) the 'split' sub template of the Xml template.
- * supports XMLhttp for adding/removing a message to the selection.
- * uses a session variable to store the selected topics.
- * shows two independent page indexes for both the selected and
- * not-selected messages (;topic=1.x;start2=y).
- */
-function action_splitSelectTopics()
-{
-	global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-	global $smcFunc;
-
-	$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
-	$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-
-	// Haven't selected anything have we?
-	$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
-
-	// This is a special case for split topics from quick-moderation checkboxes
-	if (isset($_REQUEST['subname_enc']))
-		$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
-
-	$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
-	$context['reason'] = !empty($_SESSION['reason']) ? trim($smcFunc['htmlspecialchars']($_SESSION['reason'])) : '';
-
-	require_once(SUBSDIR . '/Topic.subs.php');
-
-	$context['not_selected'] = array(
-		'num_messages' => 0,
-		'start' => empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'],
-		'messages' => array(),
-	);
-
-	$context['selected'] = array(
-		'num_messages' => 0,
-		'start' => empty($_REQUEST['start2']) ? 0 : (int) $_REQUEST['start2'],
-		'messages' => array(),
-	);
-
-	$context['topic'] = array(
-		'id' => $topic,
-		'subject' => urlencode($_REQUEST['subname']),
-	);
-
-	// Some stuff for our favorite template.
-	$context['new_subject'] = $_REQUEST['subname'];
-
-	// Using the "select" sub template.
-	$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
-
-	// Are we using a custom messages per page?
-	$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-
-	// Get the message ID's from before the move.
-	if (isset($_REQUEST['xml']))
-	{
-		$original_msgs = array(
-			'not_selected' => array(),
-			'selected' => array(),
-		);
-		$request = $smcFunc['db_query']('', '
-			SELECT id_msg
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
-				AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-				AND approved = {int:is_approved}') . '
-			ORDER BY id_msg DESC
-			LIMIT {int:start}, {int:messages_per_page}',
-			array(
-				'current_topic' => $topic,
-				'no_split_msgs' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
-				'is_approved' => 1,
-				'start' => $context['not_selected']['start'],
-				'messages_per_page' => $context['messages_per_page'],
-			)
-		);
-		// You can't split the last message off.
-		if (empty($context['not_selected']['start']) && $smcFunc['db_num_rows']($request) <= 1 && $_REQUEST['move'] == 'down')
-			$_REQUEST['move'] = '';
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$original_msgs['not_selected'][] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
-		if (!empty($_SESSION['split_selection'][$topic]))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_msg
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-					AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-					AND approved = {int:is_approved}') . '
-				ORDER BY id_msg DESC
-				LIMIT {int:start}, {int:messages_per_page}',
-				array(
-					'current_topic' => $topic,
-					'split_msgs' => $_SESSION['split_selection'][$topic],
-					'is_approved' => 1,
-					'start' => $context['selected']['start'],
-					'messages_per_page' => $context['messages_per_page'],
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$original_msgs['selected'][] = $row['id_msg'];
-			$smcFunc['db_free_result']($request);
-		}
-	}
-
-	// (De)select a message..
-	if (!empty($_REQUEST['move']))
-	{
-		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
-
-		if ($_REQUEST['move'] == 'reset')
-			$_SESSION['split_selection'][$topic] = array();
-		elseif ($_REQUEST['move'] == 'up')
-			$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_REQUEST['msg']));
-		else
-			$_SESSION['split_selection'][$topic][] = $_REQUEST['msg'];
-	}
-
-	// Make sure the selection is still accurate.
-	if (!empty($_SESSION['split_selection'][$topic]))
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_msg
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}
-				AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-				AND approved = {int:is_approved}'),
-			array(
-				'current_topic' => $topic,
-				'split_msgs' => $_SESSION['split_selection'][$topic],
-				'is_approved' => 1,
-			)
-		);
-		$_SESSION['split_selection'][$topic] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$_SESSION['split_selection'][$topic][] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
-	}
-
-	// Get the number of messages (not) selected to be split.
-	$request = $smcFunc['db_query']('', '
-		SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
-		FROM {db_prefix}messages AS m
-		WHERE m.id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND approved = {int:is_approved}') . (empty($_SESSION['split_selection'][$topic]) ? '' : '
-		GROUP BY is_selected'),
-		array(
-			'current_topic' => $topic,
-			'split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
-			'is_approved' => 1,
-		)
-	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
-	$smcFunc['db_free_result']($request);
-
-	// Fix an oversized starting page (to make sure both pageindexes are properly set).
-	if ($context['selected']['start'] >= $context['selected']['num_messages'])
-		$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
-
-	// Build a page list of the not-selected topics...
-	$context['not_selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
-	// ...and one of the selected topics.
-	$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
-
-	// Retrieve the unselected messages.
-	$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : array('excluded' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
-
-	// Now retrieve the selected messages.
-	if (!empty($_SESSION['split_selection'][$topic]))
-		$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
-
-	// The XMLhttp method only needs the stuff that changed, so let's compare.
-	if (isset($_REQUEST['xml']))
-	{
-		$changes = array(
-			'remove' => array(
-				'not_selected' => array_diff($original_msgs['not_selected'], array_keys($context['not_selected']['messages'])),
-				'selected' => array_diff($original_msgs['selected'], array_keys($context['selected']['messages'])),
-			),
-			'insert' => array(
-				'not_selected' => array_diff(array_keys($context['not_selected']['messages']), $original_msgs['not_selected']),
-				'selected' => array_diff(array_keys($context['selected']['messages']), $original_msgs['selected']),
-			),
-		);
-
-		$context['changes'] = array();
-		foreach ($changes as $change_type => $change_array)
-			foreach ($change_array as $section => $msg_array)
-			{
-				if (empty($msg_array))
-					continue;
-
-				foreach ($msg_array as $id_msg)
-				{
-					$context['changes'][$change_type . $id_msg] = array(
-						'id' => $id_msg,
-						'type' => $change_type,
-						'section' => $section,
-					);
-					if ($change_type == 'insert')
-						$context['changes']['insert' . $id_msg]['insert_value'] = $context[$section]['messages'][$id_msg];
-				}
-			}
-	}
-}
-
-/**
- * Do the actual split of a selection of topics.
- * is accessed with ?action=splittopics;sa=splitSelection.
- * uses the main SplitTopics template.
- * uses splitTopic function to do the actual splitting.
- */
-function action_splitSelection()
-{
-	global $txt, $board, $topic, $context, $user_info;
-
-	// Make sure the session id was passed with post.
-	checkSession();
-
-	// Default the subject in case it's blank.
-	if (!isset($_POST['subname']) || $_POST['subname'] == '')
-		$_POST['subname'] = $txt['new_topic'];
-
-	// You must've selected some messages!  Can't split out none!
-	if (empty($_SESSION['split_selection'][$topic]))
-		fatal_lang_error('no_posts_selected', false);
-
-	if (!empty($_POST['messageRedirect']) && empty($context['reason']))
-			fatal_lang_error('splittopic_no_reason', false);
-
-		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-		$reason = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
-
-	// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-	if (!empty($_POST['messageRedirect']) && empty($reason))
-			fatal_lang_error('splittopic_no_reason', false);
-
-	// This is here because there are two fatal_lang_errors in there
-	$boards = splitDestinationBoard();
-
-	$context['old_topic'] = $topic;
-	$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $_POST['subname']);
-	$context['page_title'] = $txt['split'];
-
-	splitAttemptMove($boards, $context['new_topic']);
 }
 
 /**
@@ -780,6 +681,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		updateStats('subject', $split2_ID_TOPIC, $new_subject);
 	}
 
+	// @fixme refactor this section, Topic.subs has the function.
 	// Any associated reported posts better follow...
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}log_reported
@@ -897,4 +799,110 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Return the ID of the newly created topic.
 	return $split2_ID_TOPIC;
+}
+
+/**
+ * If we are also moving the topic somewhere else, let's try do to it
+ * Includes checks for permissions move_own/any, etc.
+ *
+ * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
+ * @param int $totopic id of the destination topic
+ */
+function splitAttemptMove($boards, $totopic)
+{
+	global $board, $user_info, $context, $smcFunc;
+
+	// If the starting and final boards are different we have to check some permissions and stuff
+	if ($boards['destination']['id'] != $board)
+	{
+		$doMove = false;
+		$new_topic = array();
+		if (allowedTo('move_any'))
+			$doMove = true;
+		else
+		{
+			$new_topic = getTopicInfo($totopic);
+			if ($new_topic['id_member_started'] == $user_info['id'] && allowedTo('move_own'))
+				$doMove = true;
+		}
+
+		if ($doMove)
+		{
+			// Update member statistics if needed
+			// @todo this should probably go into a function...
+			if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
+			{
+				$request = $smcFunc['db_query']('', '
+					SELECT id_member
+					FROM {db_prefix}messages
+					WHERE id_topic = {int:current_topic}
+						AND approved = {int:is_approved}',
+					array(
+						'current_topic' => $totopic,
+						'is_approved' => 1,
+					)
+				);
+				$posters = array();
+				while ($row = $smcFunc['db_fetch_assoc']($request))
+				{
+					if (!isset($posters[$row['id_member']]))
+						$posters[$row['id_member']] = 0;
+
+					$posters[$row['id_member']]++;
+				}
+				$smcFunc['db_free_result']($request);
+
+				foreach ($posters as $id_member => $posts)
+				{
+					// The board we're moving from counted posts, but not to.
+					if (empty($boards['current']['count_posts']))
+						updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+					// The reverse: from didn't, to did.
+					else
+						updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+				}
+			}
+			// And finally move it!
+			moveTopics($totopic, $boards['destination']['id']);
+		}
+		else
+			$boards['destination'] = $boards['current'];
+	}
+
+	// Create a link to this in the old topic.
+	// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
+	if (!empty($_POST['messageRedirect']))
+		postSplitRedirect($context['reason'], $_POST['subname'], $boards['destination'], $context['new_topic']);
+}
+
+/**
+ * Retrives informations of the current and destination board of a split topic
+ *
+ * @return array
+ */
+function splitDestinationBoard()
+{
+	global $board, $topic;
+
+	$current_board = boardInfo($board, $topic);
+	if (empty($current_board))
+		fatal_lang_error('no_board');
+
+	if (!empty($_POST['move_new_topic']))
+	{
+		$toboard =  !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
+		if (!empty($toboard) && $board !== $toboard)
+		{
+			$destination_board = boardInfo($toboard);
+			if (empty($destination_board))
+				fatal_lang_error('no_board');
+		}
+	}
+
+	if (!isset($destination_board))
+		$destination_board = array_merge($current_board, array('id' => $board));
+	else
+		$destination_board['id'] = $toboard;
+
+	return array('current' => $current_board, 'destination' => $destination_board);
 }

@@ -90,7 +90,7 @@ class ManageLanguages_Controller
 		{
 			// Need fetch_web_data.
 			require_once(SUBSDIR . '/Package.subs.php');
-			require_once(SUBSDIR . '/ManageLanguages.subs.php');
+			require_once(SUBSDIR . '/Language.subs.php');
 
 			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
 
@@ -159,7 +159,7 @@ class ManageLanguages_Controller
 	{
 		global $txt, $context, $scripturl, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 
 		// Setting a new default?
 		if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -625,7 +625,7 @@ class ManageLanguages_Controller
 	{
 		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
 
 		// Select the languages tab.
@@ -1062,5 +1062,24 @@ class ManageLanguages_Controller
 
 		// initialize the little form
 		return $this->_languageSettings->settings($config_vars);
+	}
+
+	public function settings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
+			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
+		);
+
+		call_integration_hook('integrate_language_settings', array(&$config_vars));
+
+		// Get all languages we speak.
+		$languages = getLanguages(false);
+		foreach ($languages as $lang)
+			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+
+		return $config_vars;
 	}
 }

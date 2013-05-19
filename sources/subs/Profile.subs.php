@@ -19,6 +19,47 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
+ * Find the ID of the "current" member
+ *
+ * @param $fatal if the function ends in a fatal error in case of problems (default true)
+ * @param $reload_id if true the already set value is ignored (default false)
+ *
+ * @return mixed and integer if no error, false in case of problems if $fatal is false
+ */
+function currentMemberID($fatal = true, $reload_id = false)
+{
+	global $user_info;
+	static $memID;
+
+	// If we already 
+	if (isset($memID) && !$reload_id)
+		return $memID;
+
+	// Did we get the user by name...
+	if (isset($_REQUEST['user']))
+		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
+	// ... or by id_member?
+	elseif (!empty($_REQUEST['u']))
+		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
+	// If it was just ?action=profile, edit your own profile.
+	else
+		$memberResult = loadMemberData($user_info['id'], false, 'profile');
+
+	// Check if loadMemberData() has returned a valid result.
+	if (!is_array($memberResult))
+	{
+		if ($fatal)
+			fatal_lang_error('not_a_user', false);
+		else
+			return false;
+	}
+
+	// If all went well, we have a valid member ID!
+	list ($memID) = $memberResult;
+	return $memID;
+}
+
+/**
  * Setup the context for a page load!
  *
  * @param array $fields
@@ -397,7 +438,7 @@ function loadProfileFields($force_reload = false)
 				// Do they need to revalidate? If so schedule the function!
 				if ($isValid === true && !empty($modSettings[\'send_validation_onChange\']) && !allowedTo(\'moderate_forum\'))
 				{
-					require_once(SUBSDIR . \'/Members.subs.php\');
+					require_once(SUBSDIR . \'/Auth.subs.php\');
 					$profile_vars[\'validation_code\'] = generateValidationCode();
 					$profile_vars[\'is_activated\'] = 2;
 					$context[\'profile_execute_on_save\'][] = \'profileSendActivation\';
@@ -786,7 +827,7 @@ function loadProfileFields($force_reload = false)
 				);
 
 				$context[\'member\'][\'time_format\'] = $cur_profile[\'time_format\'];
-				$context[\'current_forum_time\'] = timeformat(time() - $user_info[\'time_offset\'] * 3600, false);
+				$context[\'current_forum_time\'] = standardTime(time() - $user_info[\'time_offset\'] * 3600, false);
 				$context[\'current_forum_time_js\'] = strftime(\'%Y,\' . ((int) strftime(\'%m\', time() + $modSettings[\'time_offset\'] * 3600) - 1) . \',%d,%H,%M,%S\', time() + $modSettings[\'time_offset\'] * 3600);
 				$context[\'current_forum_time_hour\'] = (int) strftime(\'%H\', forum_time(false));
 				return true;
@@ -1269,24 +1310,58 @@ function makeNotificationChanges($memID)
 	global $smcFunc;
 
 	// Update the boards they are being notified on.
-	if (isset($_POST['edit_notify_boards']) && !empty($_POST['notify_boards']))
+	if (isset($_POST['edit_notify_boards']))
 	{
-		// Make sure only integers are deleted.
+		if (!isset($_POST['notify_boards']))
+			$_POST['notify_boards'] = array();
+
+		// Make sure only integers are added/deleted.
 		foreach ($_POST['notify_boards'] as $index => $id)
 			$_POST['notify_boards'][$index] = (int) $id;
 
-		// id_board = 0 is reserved for topic notifications.
-		$_POST['notify_boards'] = array_diff($_POST['notify_boards'], array(0));
+		// id_board = 0 is reserved for topic notifications only
+		$notification_wanted = array();
+		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_board IN ({array_int:board_list})
-				AND id_member = {int:selected_member}',
+		// Gather up any any existing board notifications.
+		$request = $smcFunc['db_query']('', '
+			SELECT id_board
+			FROM {db_prefix}log_notify
+			WHERE id_member = {int:selected_member}',
 			array(
-				'board_list' => $_POST['notify_boards'],
 				'selected_member' => $memID,
 			)
 		);
+		$notification_current = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$notification_current[] = $row['id_board'];
+		$smcFunc['db_free_result']($request);
+
+		// And remove what they no longer want
+		$notification_deletes = array_diff($notification_current, $notification_wanted);
+		if (!empty($notification_deletes))
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}log_notify
+				WHERE id_board IN ({array_int:board_list})
+					AND id_member = {int:selected_member}',
+				array(
+					'board_list' =>$notification_deletes,
+					'selected_member' => $memID,
+				)
+			);
+
+		// Now add in what they do want
+		$notification_inserts = array();
+		foreach ($notification_wanted as $id)
+			$notification_inserts[] = array($memID, $id);
+
+		if (!empty($notification_inserts));
+			$smcFunc['db_insert']('ignore',
+				'{db_prefix}log_notify',
+				array('id_member' => 'int', 'id_board' => 'int'),
+				$notification_inserts,
+				array('id_member', 'id_board')
+			);
 	}
 
 	// We are editing topic notifications......
@@ -2261,7 +2336,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 				'id' => $row['id_member'],
 				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
 			),
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],

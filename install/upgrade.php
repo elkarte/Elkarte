@@ -38,12 +38,6 @@ $databases = array(
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
 	),
-	'sqlite' => array(
-		'name' => 'SQLite',
-		'version' => '1',
-		'version_check' => 'return 1;',
-		'always_has_db' => true,
-	),
 );
 
 // General options for the script.
@@ -98,6 +92,35 @@ else
 
 // Load this now just because we can.
 require_once($upgrade_path . '/Settings.php');
+
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
+if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
+
+// Time to forget about variables and go with constants!
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('SOURCEDIR', $sourcedir);
+
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
 
 // Are we logged in?
 if (isset($upgradeData))
@@ -818,7 +841,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		// Make the connection...
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
 
 		// Oh dear god!!
 		if ($db_connection === null)
@@ -921,14 +944,14 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php')
-		&& @file_exists(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
+		&& @file_exists(dirname(__FILE__) . '/upgrade_elk_1-0_' . $db_type . '.sql');
 
-	// Need legacy scripts?
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.1)
+	// Need scripts to migrate from SMF?
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 2.0)
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.0)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < 1.1)
+	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	if (!$check)
@@ -1308,12 +1331,12 @@ function action_backupDatabase()
 		return true;
 
 	// Some useful stuff here.
-	db_extend();
+	$db = database();
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $smcFunc['db_list_tables']($db, $filter);
+	$tables = $db->db_list_tables($db, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1384,7 +1407,8 @@ function backupTable($table)
 		flush();
 	}
 
-	$smcFunc['db_backup_table']($table, 'backup_' . $table);
+	$db = database();
+	$db->db_backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 		echo ' done.';
@@ -1410,7 +1434,7 @@ function action_databaseChanges()
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
 		array('upgrade_2-0_' . $db_type . '.sql', '2.1', '2.1 dev0'),
 		// array('upgrade_2-1_' . $db_type . '.sql', '3.0', '3.0 dev0'),
-		array('upgrade_dia_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
+		array('upgrade_elk_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
 	);
 
 	// How many files are there in total?
@@ -1421,9 +1445,9 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_dia_') === false && $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_elk_') === false && $modSettings['smfVersion'] < $file[1])
 				$upcontext['file_count']++;
-			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_dia_') !== false && $modSettings['elkVersion'] < $file[1]))
+			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_elk_') !== false && $modSettings['elkVersion'] < $file[1]))
 				$upcontext['file_count']++;
 		}
 	}
@@ -1871,6 +1895,9 @@ function action_deleteUpgrade()
 	if (empty($user_info['id']))
 		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
 
+	// We need to log in the database
+	$db = database();
+
 	// Log the action manually, so CLI still works.
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_actions',
@@ -1887,7 +1914,7 @@ function action_deleteUpgrade()
 	$user_info['id'] = 0;
 
 	// Save the current database version.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $db->db_server_info();
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
@@ -2203,10 +2230,6 @@ function parse_sql($filename)
 		- {$db_collation}
 */
 
-	// May want to use extended functionality.
-	db_extend();
-	db_extend('packages');
-
 	// Our custom error handler - does nothing but does stop public errors from XML!
 	if (!function_exists('sql_error_handler'))
 	{
@@ -2428,7 +2451,7 @@ function parse_sql($filename)
 					// Bit of a bodge - do we want the error?
 					if (!empty($upcontext['return_error']))
 					{
-						$upcontext['error_message'] = $smcFunc['db_error']($db_connection);
+						$upcontext['error_message'] = $db->last_error($db_connection);
 						return false;
 					}
 				}*/
@@ -2476,7 +2499,7 @@ function upgrade_query($string, $unbuffered = false)
 	if ($result !== false)
 		return $result;
 
-	$db_error_message = $smcFunc['db_error']($db_connection);
+	$db_error_message = $db->last_error($db_connection);
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{
@@ -2594,13 +2617,13 @@ function protected_alter($change, $substep, $is_test = false)
 {
 	global $db_prefix, $smcFunc;
 
-	db_extend('packages');
+	$table = db_table();
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $smcFunc['db_list_columns']('{db_prefix}' . $change['table'], true);
+		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?
@@ -3633,7 +3656,6 @@ function template_welcome_message()
 				', $upcontext['warning'], '
 			</div>
 		</div>';
-
 	// Paths are incorrect?
 	echo '
 		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #804840; color: black; background: #fe5a44; ', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? 'display: none;' : ''), '" id="js_script_missing_error">

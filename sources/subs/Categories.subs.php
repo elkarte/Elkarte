@@ -197,18 +197,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	// With no category set to move the boards to, delete them all.
 	if ($moveBoardsTo === null)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_board
-			FROM {db_prefix}boards
-			WHERE id_cat IN ({array_int:category_list})',
-			array(
-				'category_list' => $categories,
-			)
-		);
-		$boards_inside = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$boards_inside[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$boards_inside = array_keys(fetchBoardsInfo(array('categories' => $categories)));
 
 		if (!empty($boards_inside))
 			deleteBoards($boards_inside, null);
@@ -351,4 +340,28 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				)
 			);
 	}
+}
+
+/**
+ * Return the name of the given category
+ *
+ * @param int $id_cat
+ */
+function categoryName($id_cat)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT name
+		FROM {db_prefix}categories
+		WHERE id_cat = {int:id_cat}
+		LIMIT 1',
+		array(
+			'id_cat' => $id_cat,
+		)
+	);
+	list ($name) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $name;
 }

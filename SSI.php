@@ -45,9 +45,19 @@ require_once(dirname(__FILE__) . '/Settings.php');
 if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
 
-// Make absolutely sure the new directories are defined.
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -59,7 +69,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
-unset($boarddir, $cachedir, $sourcedir);
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -83,6 +93,7 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
+require_once(SUBSDIR . '/Util.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();
@@ -90,8 +101,11 @@ $smcFunc = array();
 // Initate the database connection and define some database functions to use.
 loadDatabase();
 
-// Load installed 'Mods' settings.
+// Load settings from the database.
 reloadSettings();
+
+// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
+Util::compat_init();
 
 // Clean the request variables.
 cleanRequest();
@@ -442,7 +456,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			'short_subject' => shorten_subject($row['subject'], 25),
 			'preview' => $smcFunc['strlen']($preview) > 128 ? $smcFunc['substr']($preview, 0, 128) . '...' : $preview,
 			'body' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
@@ -579,7 +593,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'views' => $row['num_views'],
 			'short_subject' => shorten_subject($row['subject'], 25),
 			'preview' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#new" rel="nofollow">' . $row['subject'] . '</a>',
@@ -1933,7 +1947,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'message_id' => $row['id_msg'],
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -2177,7 +2191,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				'subject' => $row['subject'],
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-				'time' => timeformat($row['poster_time']),
+				'time' => standardTime($row['poster_time']),
 			),
 		);
 

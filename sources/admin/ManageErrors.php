@@ -38,7 +38,7 @@ class ManageErrors_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
 
-		require_once(SUBSDIR . '/ManageErrors.subs.php');
+		require_once(SUBSDIR . '/Error.subs.php');
 
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
@@ -68,7 +68,7 @@ class ManageErrors_Controller
 			$filter = array(
 				'variable' => $_GET['filter'],
 				'value' => array(
-					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->db_escape_wildcard_string($_GET['value']),
 				),
 				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 				'entity' => $filters[$_GET['filter']]
@@ -91,7 +91,7 @@ class ManageErrors_Controller
 			// // Go back to where we were.
 			if ($type == 'delete')
 				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
-		
+
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 		}
@@ -119,7 +119,7 @@ class ManageErrors_Controller
 			$context['errors'] = $logdata['errors'];
 			$members = $logdata['members'];
 		}
-		
+
 		// Load the member data.
 		if (!empty($members))
 		{
@@ -166,38 +166,19 @@ class ManageErrors_Controller
 
 		$context['error_types'] = array();
 
+		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
+		// What type of errors do we have and how many do we have?
+		$context['error_types'] = fetchErrorsByType($filter, $sort);
+		$sum = 0;
+		foreach ($context['error_types'] as $key => $value)
+			$sum += $key;
+
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
 			'is_selected' => empty($filter),
 		);
-
-		$sum = 0;
-		// What type of errors do we have and how many do we have?
-		$request = $smcFunc['db_query']('', '
-			SELECT error_type, COUNT(*) AS num_errors
-			FROM {db_prefix}log_errors
-			GROUP BY error_type
-			ORDER BY error_type = {string:critical_type} DESC, error_type ASC',
-			array(
-				'critical_type' => 'critical',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// Total errors so far?
-			$sum += $row['num_errors'];
-
-			$context['error_types'][$sum] = array(
-				'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
-				'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-				'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-				'is_selected' => isset($filter) && $filter['value']['sql'] == $smcFunc['db_escape_wildcard_string']($row['error_type']),
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 

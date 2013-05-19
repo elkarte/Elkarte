@@ -1,0 +1,23 @@
+/* This is css file for the green color variant */
+
+.cat_bar {
+	background-color: #007929;
+	color: white;
+	box-shadow: 0 16px 20px rgba(135,234,0,0.15) inset;
+}
+div.cat_bar {
+	border-radius: 0;
+}
+
+.catbg a {
+	color: white;
+}
+
+#footer_section {
+	background-color: #007929;
+}
+
+.table_list .info .subject {
+	color: #024e86;
+}
+

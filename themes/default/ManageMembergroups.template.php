@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Regular membergroups list template
+ */
 function template_regular_membergroups_list()
 {
 	template_show_list('regular_membergroups_list');
@@ -22,6 +25,9 @@ function template_regular_membergroups_list()
 
 }
 
+/**
+ * Template for a new group
+ */
 function template_new_group()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -159,6 +165,9 @@ function template_new_group()
 	</div>';
 }
 
+/**
+ * Template edit group
+ */
 function template_edit_group()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -400,6 +409,12 @@ function template_edit_group()
 		// ]]></script>';
 }
 
+/**
+ * Template to edit the boards and groups access to them
+ *
+ * @param int $form_id
+ * @param bool $collapse
+ */
 function template_add_edit_group_boards_list($form_id, $collapse = true)
 {
 	global $context, $txt, $modSettings;
@@ -489,7 +504,9 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 							// ]]></script>';
 }
 
-// Templating for viewing the members of a group.
+/**
+ * Templating for viewing the members of a group.
+ */
 function template_group_members()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -689,7 +706,9 @@ function template_group_members()
 		// ]]></script>';
 }
 
-// Allow the moderator to enter a reason to each user being rejected.
+/**
+ * Allow the moderator to enter a reason to each user being rejected.
+ */
 function template_group_request_reason()
 {
 	global $context, $txt, $scripturl;

@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function AdminMain()
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $smcFunc;
+	global $txt, $context, $scripturl, $modSettings, $settings;
 
 	// Load the language and templates....
 	loadLanguage('Admin');
@@ -61,6 +61,23 @@ function AdminMain()
 					'function' => 'action_credits',
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_support',
+				),
+				'maillist' => array(
+					'label' => $txt['mail_center'],
+					'file' => 'ManageMaillist.php',
+					'controller' => 'ManageMaillist_Controller',
+					'function' => 'action_index',
+					'icon' => 'mail.png',
+					'class' => 'admin_img_mail',
+					'permission' => array('approve_emails', 'admin_forum'),
+					'enabled' => in_array('pe', $context['admin_features']),
+					'subsections' => array(
+						'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
+						'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
+						'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
+						'emailtemplates' => array($txt['mm_emailtemplates'], 'approve_emails'),
+						'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
+					),
 				),
 				'news' => array(
 					'label' => $txt['news_title'],
@@ -99,8 +116,9 @@ function AdminMain()
 					'select' => 'index'
 				),
 				'adminlogoff' => array(
+					'controller' => 'Admin_Controller',
+					'function' => 'action_endsession',
 					'label' => $txt['admin_logoff'],
-					'function' => 'AdminEndSession',
 					'enabled' => empty($modSettings['securityDisable']),
 					'icon' => 'transparent.png',
 					'class' => 'admin_img_exit',
@@ -590,9 +608,9 @@ class Admin_Controller
 	 *
 	 *  It can be found by going to ?action=admin.
 	*/
-	function action_home()
+	public function action_home()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -707,9 +725,9 @@ class Admin_Controller
 	 *
 	 *  Accessed by ?action=admin;area=credits
 	*/
-	function action_credits()
+	public function action_credits()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info, $boardurl, $modSettings, $smcFunc;
+		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -815,7 +833,7 @@ class Admin_Controller
 	/**
 	 * This function allocates out all the search stuff.
 	 */
-	function action_search()
+	public function action_search()
 	{
 		global $txt, $context, $smcFunc;
 
@@ -853,7 +871,7 @@ class Admin_Controller
 	/**
 	 * A complicated but relatively quick internal search.
 	 */
-	function action_search_internal()
+	public function action_search_internal()
 	{
 		global $context, $txt, $helptxt, $scripturl;
 
@@ -878,14 +896,14 @@ class Admin_Controller
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
 			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
-			array('_initBasicSettingsForm', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
-			array('_initLayoutSettingsForm', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
-			array('_initKarmaSettingsForm', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('_initLikesSettingsForm', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
-			array('_initSignatureSettingsForm', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
-			array('_initSecuritySettingsForm', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('_initSpamSettingsForm', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('_initModerationSettingsForm', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
+			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
+			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
+			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
+			array('likesSettings', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'
+			array('signatureSettings', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
+			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
+			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
+			array('moderationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
 			array('settings', 'area=modsettings;sa=general', 'ManageAddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
@@ -899,17 +917,17 @@ class Admin_Controller
 			array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 			array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
 			array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-			array('_initGeneralSettingsForm', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-			array('_initDatabaseSettingsForm', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-			array('_initCookieSettingsForm', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-			array('_initCacheSettingsForm', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-			array('_initLanguageSettingsForm', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
+			array('generalSettings', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+			array('databaseSettings', 'area=serversettings;sa=database', 'ManageServer_Controller'),
+			array('cookieSettings', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
+			array('cacheSettings', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
+			array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
 			array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
 			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
 			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
 			array('settings', 'area=managedrafts', 'ManageDrafts_Controller'),
-			array('_initBBSettingsForm', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller')
+			array('bbSettings', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller')
 		);
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
@@ -1011,7 +1029,7 @@ class Admin_Controller
 	/**
 	 * All this does is pass through to manage members.
 	 */
-	function action_search_member()
+	public function action_search_member()
 	{
 		global $context;
 
@@ -1028,7 +1046,7 @@ class Admin_Controller
 	 * This file allows the user to search the wiki documentation
 	 *  for a little help.
 	 */
-	function action_search_doc()
+	public function action_search_doc()
 	{
 		global $context;
 
@@ -1086,7 +1104,7 @@ class Admin_Controller
 	/**
 	 * This ends a admin session, requiring authentication to access the ACP again.
 	 */
-	function AdminEndSession()
+	public function action_endsession()
 	{
 		// This is so easy!
 		unset($_SESSION['admin_time']);

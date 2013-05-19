@@ -23,12 +23,13 @@ if (!defined('ELKARTE'))
 /**
  * Issue/manage an user's warning status.
  *
- * @param int $memID
  */
-function action_issuewarning($memID)
+function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
 	global $context, $cur_profile, $memberContext, $smcFunc;
+
+	$memID = currentMemberID();
 
 	// make sure the sub-template is set...
 	$context['sub_template'] = 'issueWarning';
@@ -45,7 +46,7 @@ function action_issuewarning($memID)
 
 	// Get the base (errors related) stuff done.
 	loadLanguage('Errors');
-	$context['custom_error_title'] = $txt['profile_warning_errors_occured'];
+	$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 	// Make sure things which are disabled stay disabled.
 	$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;
@@ -313,30 +314,18 @@ function action_issuewarning($memID)
 	);
 
 	// Create the list for viewing.
-	require_once(SUBSDIR . '/List.subs.php');
 	createList($listOptions);
 
 	// Are they warning because of a message?
 	if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT subject
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE id_msg = {int:message}
-				AND {query_see_board}
-			LIMIT 1',
-			array(
-				'message' => (int) $_REQUEST['msg'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$message = getExistingMessage((int) $_REQUEST['msg']);
+		if (!empty($message))
 		{
 			$context['warning_for_message'] = (int) $_REQUEST['msg'];
-			list ($context['warned_message_subject']) = $smcFunc['db_fetch_row']($request);
+			$context['warned_message_subject'] = $message['subject'];
 		}
-		$smcFunc['db_free_result']($request);
-
 	}
 
 	// Didn't find the message?
@@ -388,9 +377,8 @@ function action_issuewarning($memID)
 /**
  * Present a screen to make sure the user wants to be deleted.
  *
- * @param int $memID the member ID
  */
-function action_deleteaccount($memID)
+function action_deleteaccount()
 {
 	global $txt, $context, $user_info, $modSettings, $cur_profile, $smcFunc;
 
@@ -413,9 +401,8 @@ function action_deleteaccount($memID)
 /**
  * Actually delete an account.
  *
- * @param int $memID the member ID
  */
-function action_deleteaccount2($memID)
+function action_deleteaccount2()
 {
 	global $user_info, $context, $cur_profile, $modSettings, $smcFunc;
 
@@ -430,6 +417,8 @@ function action_deleteaccount2($memID)
 		isAllowedTo('profile_remove_own');
 
 	checkSession();
+
+	$memID = currentMemberID();
 
 	$old_profile = &$cur_profile;
 
@@ -511,8 +500,9 @@ function action_deleteaccount2($memID)
 	{
 		deleteMembers($memID);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
-		action_logout(true);
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
+		$controller = new Auth_Controller();
+		$controller->action_logout(true);
 
 		redirectexit();
 	}

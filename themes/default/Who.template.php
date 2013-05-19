@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The only template in the file.
+/**
+ * Who's online page.
+ */
 function template_main()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -131,6 +133,9 @@ function template_main()
 	</div>';
 }
 
+/**
+ * Display the credits page.
+ */
 function template_credits()
 {
 	global $context, $txt;
@@ -207,18 +212,11 @@ function template_credits()
 		<div class="windowbg">
 			<div class="content">';
 
-		if (!empty($context['credits_software_graphics']['graphics']))
+		foreach ($context['credits_software_graphics'] as $section => $credits)
 			echo '
 				<dl>
-					<dt><strong>', $txt['credits_graphics'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['graphics']), '</dd>
-				</dl>';
-
-		if (!empty($context['credits_software_graphics']['software']))
-			echo '
-				<dl>
-					<dt><strong>', $txt['credits_software'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['software']), '</dd>
+					<dt><strong>', $txt['credits_' . $section], '</strong></dt>
+					<dd>', implode('</dd><dd>', $credits), '</dd>
 				</dl>';
 
 		echo '

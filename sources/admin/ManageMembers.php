@@ -35,9 +35,9 @@ class ManageMembers_Controller
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings;
 
 		$subActions = array(
 			'all' => array(
@@ -78,21 +78,11 @@ class ManageMembers_Controller
 		loadTemplate('ManageMembers');
 
 		// Get counts on every type of activation - for sections and filtering alike.
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(*) AS total_members, is_activated
-			FROM {db_prefix}members
-			WHERE is_activated != {int:is_activated}
-			GROUP BY is_activated',
-			array(
-				'is_activated' => 1,
-			)
-		);
-		$context['activation_numbers'] = array();
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		$context['awaiting_activation'] = 0;
 		$context['awaiting_approval'] = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['activation_numbers'][$row['is_activated']] = $row['total_members'];
-		$smcFunc['db_free_result']($request);
+		$context['activation_numbers'] = countInactiveMembers();
 
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
@@ -171,7 +161,7 @@ class ManageMembers_Controller
 	 *
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $scripturl, $context, $modSettings, $smcFunc, $user_info;
 
@@ -203,40 +193,12 @@ class ManageMembers_Controller
 		if ($context['sub_action'] == 'query')
 		{
 			// Retrieving the membergroups and postgroups.
-			$context['membergroups'] = array(
-				array(
-					'id' => 0,
-					'name' => $txt['membergroups_members'],
-					'can_be_additional' => false
-				)
-			);
-			$context['postgroups'] = array();
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, group_name, min_posts
-				FROM {db_prefix}membergroups
-				WHERE id_group != {int:moderator_group}
-				ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-				array(
-					'moderator_group' => 3,
-					'newbie_group' => 4,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				if ($row['min_posts'] == -1)
-					$context['membergroups'][] = array(
-						'id' => $row['id_group'],
-						'name' => $row['group_name'],
-						'can_be_additional' => true
-					);
-				else
-					$context['postgroups'][] = array(
-						'id' => $row['id_group'],
-						'name' => $row['group_name']
-					);
-			}
-			$smcFunc['db_free_result']($request);
+			$context['membergroups'] = $groups['membergroups'];
+			$context['postgroups'] = $groups['groups'];
+			unset($groups);
 
 			// Some data about the form fields and how they are linked to the database.
 			$params = array(
@@ -558,6 +520,7 @@ class ManageMembers_Controller
 						'function' => create_function('$rowData', '
 							global $txt;
 
+							require_once(SUBSDIR . \'/Members.subs.php\');
 							// Calculate number of days since last online.
 							if (empty($rowData[\'last_login\']))
 								$difference = $txt[\'never\'];
@@ -649,48 +612,20 @@ class ManageMembers_Controller
 	 *
 	 * @uses the search_members sub template of the ManageMembers template.
 	 */
-	function action_search()
+	public function action_search()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt;
 
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Get a list of all the membergroups and postgroups that can be selected.
-		$context['membergroups'] = array(
-			array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'can_be_additional' => false
-			)
-		);
-		$context['postgroups'] = array();
+		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, min_posts
-			FROM {db_prefix}membergroups
-			WHERE id_group != {int:moderator_group}
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'moderator_group' => 3,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			if ($row['min_posts'] == -1)
-				$context['membergroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name'],
-					'can_be_additional' => true
-				);
-			else
-				$context['postgroups'][] = array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name']
-				);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['membergroups'] = $groups['membergroups'];
+		$context['postgroups'] = $groups['postgroups'];
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'search_members';
+
+		unset($groups);
 	}
 
 	/**
@@ -703,9 +638,9 @@ class ManageMembers_Controller
 	 *
 	 * @uses the admin_browse sub template of the ManageMembers template.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
@@ -929,7 +864,7 @@ class ManageMembers_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '\']);
+							return standardTime($rowData[\'' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '\']);
 						'),
 					),
 					'sort' => array(
@@ -1039,20 +974,20 @@ class ManageMembers_Controller
 	 * Redirects to ?action=admin;area=viewmembers;sa=browse
 	 * with the same parameters as the calling page.
 	 */
-	function action_approve()
+	public function action_approve()
 	{
-		global $txt, $context, $scripturl, $modSettings, $language, $user_info, $smcFunc;
+		global $scripturl, $modSettings;
 
 		// First, check our session.
 		checkSession();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
 
 		// Sort out where we are going...
-		$browse_type = isset($_REQUEST['type']) ? $_REQUEST['type'] : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 		$current_filter = (int) $_REQUEST['orig_filter'];
 
 		// If we are applying a filter do just that - then redirect.
@@ -1080,58 +1015,18 @@ class ManageMembers_Controller
 				AND id_member IN ({array_int:members})';
 		}
 
-		// Get information on each of the members, things that are important to us, like email address...
-		$request = $smcFunc['db_query']('', '
-			SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
-			FROM {db_prefix}members
-			WHERE is_activated = {int:activated_status}' . $condition . '
-			ORDER BY lngfile',
-			array(
-				'activated_status' => $current_filter,
-				'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-				'members' => empty($members) ? array() : $members,
-			)
-		);
-
-		$member_count = $smcFunc['db_num_rows']($request);
-
-		// If no results then just return!
-		if ($member_count == 0)
+		$data = retrieveMemberData($condition, $current_filter, $timeBefore, $members);
+		if($data['member_count'] == 0)
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 
-		$member_info = array();
-		$members = array();
-		// Fill the info array.
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$members[] = $row['id_member'];
-			$member_info[] = array(
-				'id' => $row['id_member'],
-				'username' => $row['member_name'],
-				'name' => $row['real_name'],
-				'email' => $row['email_address'],
-				'language' => empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'],
-				'code' => $row['validation_code']
-			);
-		}
-		$smcFunc['db_free_result']($request);
+		$member_info = $data['member_info'];
+		$members = $data['members'];
 
 		// Are we activating or approving the members?
 		if ($_POST['todo'] == 'ok' || $_POST['todo'] == 'okemail')
 		{
-			// Approve/activate this member.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
-				WHERE is_activated = {int:activated_status}' . $condition,
-				array(
-					'is_activated' => 1,
-					'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-					'members' => empty($members) ? array() : $members,
-					'activated_status' => $current_filter,
-					'blank_string' => '',
-				)
-			);
+			// Approve / activate this member.
+			approveMembers($members, $condition, $timeBefore, $current_filter);
 
 			// Do we have to let the integration code know about the activations?
 			if (!empty($modSettings['integrate_activate']))
@@ -1169,21 +1064,7 @@ class ManageMembers_Controller
 				$validation_code = generateValidationCode();
 
 				// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}members
-					SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
-					WHERE is_activated = {int:activated_status}
-						' . $condition . '
-						AND id_member = {int:selected_member}',
-					array(
-						'not_activated' => 0,
-						'activated_status' => $current_filter,
-						'selected_member' => $member['id'],
-						'validation_code' => $validation_code,
-						'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-						'members' => empty($members) ? array() : $members,
-					)
-				);
+				enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code);
 
 				$replacements = array(
 					'USERNAME' => $member['name'],
@@ -1253,19 +1134,10 @@ class ManageMembers_Controller
 			}
 		}
 
-		// @todo current_language is never set, no idea what this is for. Remove?
-		// Back to the user's language!
-		if (isset($current_language) && $current_language != $user_info['language'])
-		{
-			loadLanguage('index');
-			loadLanguage('ManageMembers');
-		}
-
 		// Log what we did?
 		if (!empty($modSettings['modlog_enabled']) && in_array($_POST['todo'], array('ok', 'okemail', 'require_activation', 'remind')))
 		{
 			$log_action = $_POST['todo'] == 'remind' ? 'remind_member' : 'approve_member';
-			$log_inserts = array();
 
 			require_once(SOURCEDIR . '/Logging.php');
 			foreach ($member_info as $member)
@@ -1274,7 +1146,7 @@ class ManageMembers_Controller
 
 		// Although updateStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, array(3, 4)))
-			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $member_count ? $modSettings['unapprovedMembers'] - $member_count : 0)));
+			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
 		updateStats('member', false);
@@ -1285,33 +1157,4 @@ class ManageMembers_Controller
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 	}
-}
-
-/**
- * Nifty function to calculate the number of days ago a given date was.
- * Requires a unix timestamp as input, returns an integer.
- * Named in honour of Jeff Lewis, the original creator of...this function.
- *
- * @param $old
- * @return int, the returned number of days, based on the forum time.
- */
-function jeffsdatediff($old)
-{
-	// Get the current time as the user would see it...
-	$forumTime = forum_time();
-
-	// Calculate the seconds that have passed since midnight.
-	$sinceMidnight = date('H', $forumTime) * 60 * 60 + date('i', $forumTime) * 60 + date('s', $forumTime);
-
-	// Take the difference between the two times.
-	$dis = time() - $old;
-
-	// Before midnight?
-	if ($dis < $sinceMidnight)
-		return 0;
-	else
-		$dis -= $sinceMidnight;
-
-	// Divide out the seconds in a day to get the number of days.
-	return ceil($dis / (24 * 60 * 60));
 }

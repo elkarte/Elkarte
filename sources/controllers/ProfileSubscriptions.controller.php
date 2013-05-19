@@ -23,9 +23,8 @@ if (!defined('ELKARTE'))
 /**
  * Function for doing all the paid subscription stuff - kinda.
  *
- * @param int $memID
  */
-function action_subscriptions($memID)
+function action_subscriptions()
 {
 	global $context, $txt, $modSettings, $smcFunc, $scripturl;
 
@@ -33,8 +32,10 @@ function action_subscriptions($memID)
 	loadTemplate('ManagePaid');
 	loadLanguage('ManagePaid');
 
+	$memID = currentMemberID();
+
 	// Load all of the subscriptions.
-	require_once(ADMINDIR . '/ManagePaid.php');
+	require_once(SUBSDIR . '/ManagePaid.subs.php');
 	loadSubscriptions();
 	$context['member']['id'] = $memID;
 
@@ -102,8 +103,8 @@ function action_subscriptions($memID)
 			'sub_id' => $row['id_subscribe'],
 			'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
 			'name' => $context['subscriptions'][$row['id_subscribe']]['name'],
-			'start' => timeformat($row['start_time'], false),
-			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : timeformat($row['end_time'], false),
+			'start' => standardTime($row['start_time'], false),
+			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
 			'pending_details' => $row['pending_details'],
 			'status' => $row['status'],
 			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
@@ -283,13 +284,14 @@ function action_subscriptions($memID)
  * Activate an account.
  * This function is called from the profile account actions area.
  *
- * @param int $memID the member ID
  */
-function action_activateaccount($memID)
+function action_activateaccount()
 {
 	global $context, $user_profile, $modSettings, $user_info;
 
 	isAllowedTo('moderate_forum');
+
+	$memID = currentMemberID();
 
 	if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
 	{

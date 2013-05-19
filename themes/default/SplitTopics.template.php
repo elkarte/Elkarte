@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Show an interface to ask the user the options for split topics.
+ */
 function template_ask()
 {
 	global $context, $txt, $scripturl;
@@ -75,6 +78,9 @@ function template_ask()
 	</div>';
 }
 
+/**
+ * Split topics main page.
+ */
 function template_main()
 {
 	global $context, $txt, $scripturl;
@@ -103,6 +109,9 @@ function template_main()
 	</div>';
 }
 
+/**
+ * Interface to allow selection of messages to split.
+ */
 function template_select()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -200,7 +209,7 @@ function template_select()
 			else
 				return true;
 		}
-		
+
 		function onDocReceived(XMLDoc)
 		{
 			var i, j, pageIndex;

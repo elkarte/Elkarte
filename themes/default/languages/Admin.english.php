@@ -571,6 +571,13 @@ $txt['managedrafts_settings_description'] = 'Here you can set all settings invol
 $txt['managedrafts_submit'] = 'Save';
 $txt['manage_drafts'] = 'Drafts';
 
+$txt['mail_center'] = 'Maillist Center';
+$txt['mm_emailerror'] = 'Failed Emails';
+$txt['mm_emailfilters'] = 'Filters';
+$txt['mm_emailparsers'] = 'Parsers';
+$txt['mm_emailtemplates'] = 'Templates';
+$txt['mm_emailsettings'] = 'Settings';
+
 $txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';
 $txt['enableEmbeddedFlash'] = 'Embed flash into posts';
 $txt['enableEmbeddedFlash_warning'] = 'may be a security risk!';

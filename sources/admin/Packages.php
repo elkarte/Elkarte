@@ -899,6 +899,9 @@ class Packages_Controller
 
 		$context['install_finished'] = false;
 
+		// We're gonna be needing the table db functions! ...Sometimes.
+		$table = db_table();
+
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
 		{
@@ -962,10 +965,6 @@ class Packages_Controller
 				{
 					// These can also be there for database changes.
 					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
-					global $db_package_log;
-
-					// We'll likely want the package specific database functionality!
-					db_extend('packages');
 
 					// Let the file work its magic ;)
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
@@ -1017,8 +1016,9 @@ class Packages_Controller
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
+				$table_log = $table->package_log();
 				if (!empty($old_db_changes))
-					$db_package_log = empty($db_package_log) ? $old_db_changes : array_merge($old_db_changes, $db_package_log);
+					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
@@ -1072,17 +1072,14 @@ class Packages_Controller
 		// If there's database changes - and they want them removed - let's do it last!
 		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
 		{
-			// We're gonna be needing the package db functions!
-			db_extend('packages');
-
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
-					$smcFunc['db_drop_table']($change[1]);
+					$table->db_drop_table($change[1]);
 				elseif ($change[0] == 'remove_column' && isset($change[2]))
-					$smcFunc['db_remove_column']($change[1], $change[2]);
+					$table->db_remove_column($change[1], $change[2]);
 				elseif ($change[0] == 'remove_index' && isset($change[2]))
-					$smcFunc['db_remove_index']($change[1], $change[2]);
+					$table->db_remove_index($change[1], $change[2]);
 			}
 		}
 

@@ -1685,3 +1685,118 @@ function doAutoSubmit()
 
 	setTimeout("doAutoSubmit();", 1000);
 }
+
+function toggleButtonAJAX(btn, text_confirm)
+{
+	ajax_indicator(true);
+
+	var oXMLDoc = getXMLDocument(btn.href + ';api');
+
+	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
+	{
+		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+		var url = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
+		var confirm_elem = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('confirm');
+		if (confirm_elem.length == 1)
+			var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+
+		$('.' + btn.className).each(function() {
+			// @todo: the span should be moved somewhere in themes.js?
+			$(this).html('<span>' + text + '</span>');
+			$(this).attr('href', url);
+			if (typeof(confirm_text) != 'undefined')
+				eval(text_confirm + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+		});
+	}
+
+	ajax_indicator(false);
+
+}
+
+function toggleHeaderAJAX(btn, container_id)
+{
+	ajax_indicator(true);
+
+	var oXMLDoc = getXMLDocument(btn.href + ';api');
+	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
+
+	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
+	{
+		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+		$('#' + container_id + ' .pagesection').remove();
+		$('#' + container_id + ' .topic_table').remove();
+		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+	}
+
+	ajax_indicator(false);
+
+}
+
+function notifyButton(btn)
+{
+	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
+		return false;
+
+	toggleButtonAJAX(btn, 'notification_topic_notice');
+	return false;
+}
+
+function notifyboardButton(btn)
+{
+	if (typeof(notification_board_notice) != 'undefined' && !confirm(notification_board_notice))
+		return false;
+
+	toggleButtonAJAX(btn, 'notification_board_notice');
+	return false;
+}
+
+function disregardButton(btn)
+{
+	toggleButtonAJAX(btn);
+	return false;
+}
+
+function markboardreadButton(btn)
+{
+	toggleButtonAJAX(btn);
+
+	// Remove all the "new" icons next to the topics subjects
+	$('.new_posts').each(function() {
+		$(this).parent().remove();
+	});
+
+	$('.boardicon').each(function() {
+		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
+		$(this).attr("src", src);
+	});
+
+	return false;
+}
+
+function markallreadButton(btn)
+{
+	toggleButtonAJAX(btn);
+
+	// Remove all the "new" icons next to the topics subjects
+	$('.new_posts').each(function() {
+		$(this).parent().remove();
+	});
+
+	$('.boardicon').each(function() {
+		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
+		$(this).attr("src", src);
+	});
+
+	$('.board_new_posts').each(function() {
+		$(this).removeClass('board_new_posts');
+	});
+
+	return false;
+}
+
+function markunreadButton(btn)
+{
+	toggleHeaderAJAX(btn, 'recentposts');
+	return false;
+}

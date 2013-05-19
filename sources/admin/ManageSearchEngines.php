@@ -38,7 +38,7 @@ class ManageSearchEngines_Controller
  	*/
 	function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 
@@ -81,7 +81,7 @@ class ManageSearchEngines_Controller
 	 */
 	function action_engineSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initEngineSettingsForm();
@@ -111,21 +111,11 @@ class ManageSearchEngines_Controller
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// We need to load the groups for the spider group thingy.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name
-			FROM {db_prefix}membergroups
-			WHERE id_group != {int:admin_group}
-				AND id_group != {int:moderator_group}',
-			array(
-				'admin_group' => 1,
-				'moderator_group' => 3,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$config_vars['spider_group'][2][$row['id_group']] = $row['group_name'];
-		$smcFunc['db_free_result']($request);
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		foreach ($groups as $row)
+			$config_vars['spider_group'][2][$row['id']] = $row['name'];
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))
@@ -320,7 +310,7 @@ class ManageSearchEngines_Controller
 						'function' => create_function('$rowData', '
 							global $context, $txt;
 
-							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? timeformat($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
+							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? standardTime($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
 						'),
 					),
 				),
@@ -545,7 +535,7 @@ class ManageSearchEngines_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return timeformat($rowData[\'log_time\']);
+							return standardTime($rowData[\'log_time\']);
 						'),
 					),
 					'sort' => array(

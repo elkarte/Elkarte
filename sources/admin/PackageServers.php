@@ -29,9 +29,9 @@ class PackageServers_Controller
 	/**
 	 * Browse the list of package servers, add servers...
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -100,32 +100,18 @@ class PackageServers_Controller
 	/**
 	 * Load a list of package servers.
 	 */
-	function action_list()
+	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Ensure we use the correct template, and page title.
 		$context['sub_template'] = 'servers';
 		$context['page_title'] .= ' - ' . $txt['download_packages'];
 
 		// Load the list of servers.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_server, name, url
-			FROM {db_prefix}package_servers',
-			array(
-			)
-		);
-		$context['servers'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['servers'][] = array(
-				'name' => $row['name'],
-				'url' => $row['url'],
-				'id' => $row['id_server'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['servers'] = fetchPackageServers();
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
 		if ($context['package_download_broken'])
@@ -195,9 +181,11 @@ class PackageServers_Controller
 	/**
 	 * Browse a server's list of packages.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
-		global $txt, $boardurl, $context, $scripturl, $forum_version, $context, $smcFunc;
+		global $txt, $context, $scripturl, $forum_version, $context, $smcFunc;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		if (isset($_GET['server']))
 		{
@@ -207,18 +195,10 @@ class PackageServers_Controller
 			$server = (int) $_GET['server'];
 
 			// Query the server list to find the current server.
-			$request = $smcFunc['db_query']('', '
-				SELECT name, url
-				FROM {db_prefix}package_servers
-				WHERE id_server = {int:current_server}
-				LIMIT 1',
-				array(
-					'current_server' => $server,
-				)
-			);
-			list ($name, $url) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
+			$name = $packageserver[0]['name'];
+			
 			// If the server does not exist, dump out.
 			if (empty($url))
 				fatal_lang_error('couldnt_connect', false);
@@ -527,9 +507,11 @@ class PackageServers_Controller
 	/**
 	 * Download a package.
 	 */
-	function action_download()
+	public function action_download()
 	{
-		global $txt, $scripturl, $context, $smcFunc;
+		global $txt, $scripturl, $context;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Use the downloaded sub template.
 		$context['sub_template'] = 'downloaded';
@@ -546,17 +528,8 @@ class PackageServers_Controller
 			$server = (int) $_GET['server'];
 
 			// Query the server table to find the requested server.
-			$request = $smcFunc['db_query']('', '
-				SELECT name, url
-				FROM {db_prefix}package_servers
-				WHERE id_server = {int:current_server}
-				LIMIT 1',
-				array(
-					'current_server' => $server,
-				)
-			);
-			list ($name, $url) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
 
 			// If server does not exist then dump out.
 			if (empty($url))
@@ -636,7 +609,7 @@ class PackageServers_Controller
 	/**
 	 * Upload a new package to the directory.
 	 */
-	function action_update()
+	public function action_update()
 	{
 		global $txt, $scripturl, $context;
 
@@ -723,10 +696,11 @@ class PackageServers_Controller
 	/**
 	 * Add a package server to the list.
 	 */
-	function action_add()
+	public function action_add()
 	{
 		global $smcFunc;
 
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 		// Validate the user.
 		checkSession();
 
@@ -742,16 +716,7 @@ class PackageServers_Controller
 		if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
 			$serverurl = 'http://' . $serverurl;
 
-		$smcFunc['db_insert']('',
-			'{db_prefix}package_servers',
-			array(
-				'name' => 'string-255', 'url' => 'string-255',
-			),
-			array(
-				$servername, $serverurl,
-			),
-			array('id_server')
-		);
+		addPackageServer($servername, $serverurl);
 
 		redirectexit('action=admin;area=packages;get');
 	}
@@ -759,19 +724,14 @@ class PackageServers_Controller
 	/**
 	 * Remove a server from the list.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
-		global $smcFunc;
-
 		checkSession('get');
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}package_servers
-			WHERE id_server = {int:current_server}',
-			array(
-				'current_server' => (int) $_GET['server'],
-			)
-		);
+		require_once(SUBSDIR . '/PackageServer.subs.php');
+
+		$_GET['server'] = (int) $_GET['server'];
+		deletePackageServer($_GET['server']);
 
 		redirectexit('action=admin;area=packages;get');
 	}

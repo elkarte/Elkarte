@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the mail queue
+ */
 function template_mail_queue()
 {
 	global $context, $txt;

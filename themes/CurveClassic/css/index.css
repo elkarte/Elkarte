@@ -630,6 +630,9 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 .error {
 	color: red;
 }
+.border_error {
+	border: 1px solid red;
+}
 
 /* Messages that somehow need to attract the attention. */
 .alert {

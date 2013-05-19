@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Template for the profile side bar - goes before any other profile template.
+/**
+ * Template for the profile side bar - goes before any other profile template.
+ */
 function template_profile_above()
 {
 	global $context, $settings;
@@ -41,12 +43,16 @@ function template_profile_above()
 					</div>';
 }
 
-// Template for closing off table started in profile_above.
+/**
+ * Template for closing off table started in profile_above.
+ */
 function template_profile_below()
 {
 }
 
-// This template displays users details without any option to edit them.
+/**
+ * This template displays users details without any option to edit them.
+ */
 function template_action_summary()
 {
 	global $context, $settings, $scripturl, $modSettings, $txt;
@@ -332,7 +338,9 @@ function template_action_summary()
 </div>';
 }
 
-// Template for showing all the posts of the user, in chronological order.
+/**
+ * Template for showing all the posts of the user, in chronological order.
+ */
 function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
@@ -428,7 +436,9 @@ function template_action_showPosts()
 		</div>';
 }
 
-// Template for showing all the drafts of the user.
+/**
+ * Template for showing all the drafts of the user.
+ */
 function template_showDrafts()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -491,7 +501,9 @@ function template_showDrafts()
 		</div>';
 }
 
-// Template for showing all the buddies of the current user.
+/**
+ * Template for showing all the buddies of the current user.
+ */
 function template_editBuddies()
 {
 	global $context, $settings, $scripturl, $modSettings, $txt;
@@ -608,7 +620,9 @@ function template_editBuddies()
 	// ]]></script>';
 }
 
-// Template for showing the ignore list of the current user.
+/**
+ * Template for showing the ignore list of the current user.
+ */
 function template_editIgnoreList()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -706,7 +720,9 @@ function template_editIgnoreList()
 	// ]]></script>';
 }
 
-// This template shows an admin information on a users IP addresses used and errors attributed to them.
+/**
+ * This template shows an admin information on a users IP addresses used and errors attributed to them.
+ */
 function template_trackActivity()
 {
 	global $context, $scripturl, $txt;
@@ -765,7 +781,9 @@ function template_trackActivity()
 	template_show_list('track_name_user_list');
 }
 
-// The template for trackIP, allowing the admin to see where/who a certain IP has been used.
+/**
+ * The template for trackIP, allowing the admin to see where/who a certain IP has been used.
+ */
 function template_trackIP()
 {
 	global $context, $txt;
@@ -1020,7 +1038,9 @@ function template_action_showPermissions()
 	}
 }
 
-// Template for user statistics, showing graphs and the like.
+/**
+ * Template for user statistics, showing graphs and the like.
+ */
 function template_action_statPanel()
 {
 	global $context, $settings, $txt;
@@ -1178,7 +1198,9 @@ function template_action_statPanel()
 	</div>';
 }
 
-// Template for editing profile options.
+/**
+ * Template for editing profile options.
+ */
 function template_edit_options()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -1423,7 +1445,9 @@ function template_edit_options()
 		<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 }
 
-// Personal Message settings.
+/**
+ * Personal Message settings.
+ */
 function template_profile_pm_settings()
 {
 	global $context, $modSettings, $txt;
@@ -1507,7 +1531,9 @@ function template_profile_pm_settings()
 
 }
 
-// Template for showing theme settings. Note: template_options() actually adds the theme specific options.
+/**
+ * Template for showing theme settings. Note: template_options() actually adds the theme specific options.
+ */
 function template_profile_theme_settings()
 {
 	global $context, $settings, $modSettings, $txt;
@@ -1774,9 +1800,16 @@ function template_action_notification()
 							<label for="notify_types">', $txt['notify_send_types'], ':</label>
 						</dt>
 						<dd>
-							<select name="notify_types" id="notify_types">
+							<select name="notify_types" id="notify_types">';
+
+	if (!empty($modSettings['pbe_no_mod_notices']) && !empty($modSettings['maillist_enabled']))
+	{
+		echo '
 								<option value="1"', $context['member']['notify_types'] == 1 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything'], '</option>
-								<option value="2"', $context['member']['notify_types'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything_own'], '</option>
+								<option value="2"', $context['member']['notify_types'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything_own'], '</option>';
+	}
+
+	echo '
 								<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies'], '</option>
 								<option value="4"', $context['member']['notify_types'] == 4 ? ' selected="selected"' : '', '>', $txt['notify_send_type_nothing'], '</option>
 							</select>
@@ -1795,15 +1828,17 @@ function template_action_notification()
 		</form>
 		<br />';
 
-	template_show_list('topic_notification_list');
+	template_show_list('board_notification_list');
 
 	echo '
 		<br />';
 
-	template_show_list('board_notification_list');
+	template_show_list('topic_notification_list');
 }
 
-// Template for choosing group membership.
+/**
+ * Template for choosing group membership.
+ */
 function template_groupMembership()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -2032,7 +2067,9 @@ function template_ignoreboards()
 	<br />';
 }
 
-// Simple load some theme variables common to several warning templates.
+/**
+ * Simple load some theme variables common to several warning templates.
+ */
 function template_load_warning_variables()
 {
 	global $modSettings, $context;
@@ -2054,7 +2091,9 @@ function template_load_warning_variables()
 			$context['current_color'] = $color;
 }
 
-// Show all warnings of a user?
+/**
+ * Show all warnings of a user
+ */
 function template_viewWarning()
 {
 	global $context, $txt, $settings;
@@ -2110,7 +2149,9 @@ function template_viewWarning()
 	template_show_list('view_warnings');
 }
 
-// Show a lovely interface for issuing warnings.
+/**
+ * Show a lovely interface for issuing warnings.
+ */
 function template_issueWarning()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -2440,7 +2481,9 @@ function template_issueWarning()
 	// ]]></script>';
 }
 
-// Template to show for deleting a users account - now with added delete post capability!
+/**
+ * Template to show for deleting a users account - now with added delete post capability!
+ */
 function template_deleteAccount()
 {
 	global $context, $settings, $scripturl, $txt, $scripturl;
@@ -2530,7 +2573,9 @@ function template_deleteAccount()
 		</form>';
 }
 
-// Template for the password box/save button stuck at the bottom of every profile page.
+/**
+ * Template for the password box/save button stuck at the bottom of every profile page.
+ */
 function template_profile_save()
 {
 	global $context, $txt;
@@ -2561,7 +2606,9 @@ function template_profile_save()
 					</div>';
 }
 
-// Small template for showing an error message upon a save problem in the profile.
+/**
+ * Small template for showing an error message upon a save problem in the profile.
+ */
 function template_error_message()
 {
 	global $context, $txt;
@@ -2588,7 +2635,9 @@ function template_error_message()
 		</div>';
 }
 
-// Display a load of drop down selectors for allowing the user to change group.
+/**
+ * Display a load of drop down selectors for allowing the user to change group.
+ */
 function template_profile_group_manage()
 {
 	global $context, $txt, $scripturl;
@@ -2634,7 +2683,9 @@ function template_profile_group_manage()
 
 }
 
-// Callback function for entering a birthdate!
+/**
+ * Callback function for entering a birthdate!
+ */
 function template_profile_birthdate()
 {
 	global $txt, $context;
@@ -2652,7 +2703,9 @@ function template_profile_birthdate()
 							</dd>';
 }
 
-// Show the signature editing box?
+/**
+ * Show the signature editing box.
+ */
 function template_profile_signature_modify()
 {
 	global $txt, $context;
@@ -2714,6 +2767,9 @@ function template_profile_signature_modify()
 							</dd>';
 }
 
+/**
+ * Interface to select an avatar in profile.
+ */
 function template_profile_avatar_select()
 {
 	global $context, $txt, $modSettings;
@@ -2870,7 +2926,9 @@ function template_profile_avatar_select()
 							</dd>';
 }
 
-// Callback for modifying karam.
+/**
+ * Callback for modifying karam.
+ */
 function template_profile_karma_modify()
 {
 	global $context, $modSettings, $txt;
@@ -2885,7 +2943,9 @@ function template_profile_karma_modify()
 							</dd>';
 }
 
-// Select the time format!
+/**
+ * Select the time format!.
+ */
 function template_profile_timeformat_modify()
 {
 	global $context, $txt, $scripturl, $settings;
@@ -2909,7 +2969,9 @@ function template_profile_timeformat_modify()
 							</dd>';
 }
 
-// Time offset?
+/**
+ * Time offset.
+ */
 function template_profile_timeoffset_modify()
 {
 	global $txt, $context;
@@ -2924,7 +2986,9 @@ function template_profile_timeoffset_modify()
 							</dd>';
 }
 
-// Theme?
+/**
+ * Interface to allow the member to pick a theme.
+ */
 function template_profile_theme_pick()
 {
 	global $txt, $context, $scripturl;
@@ -2938,7 +3002,9 @@ function template_profile_theme_pick()
 							</dd>';
 }
 
-// Smiley set picker.
+/**
+ * Smiley set picker.
+ */
 function template_profile_smiley_pick()
 {
 	global $txt, $context, $modSettings, $settings;
@@ -2957,7 +3023,9 @@ function template_profile_smiley_pick()
 							</dd>';
 }
 
-// Change the way you login to the forum.
+/**
+ * Interface to allow the member to change the way they login to the forum.
+ */
 function template_authentication_method()
 {
 	global $context, $settings, $scripturl, $modSettings, $txt;

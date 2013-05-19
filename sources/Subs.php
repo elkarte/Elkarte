@@ -498,7 +498,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show_prevnext = true)
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $context, $txt, $settings;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
@@ -516,23 +516,23 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	$context['current_page'] = $start / $num_per_page;
 
-	$base_link = '<a class="navPages" href="' . ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d') . '">%2$s</a> ';
+	$base_link = str_replace('{base_link}', ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
 	// Compact pages is off or on?
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid ? '<span class="current_page"><strong>' . $display_page++ . '</strong></span> ' : sprintf($base_link, $counter, $display_page++);
+			$pageindex .= $start == $counter && !$start_invalid ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
 		if ($start != $counter - $max_value && !$start_invalid)
-			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 	else
 	{
@@ -541,7 +541,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
 		if (!empty($start) && $show_prevnext)
-			$pageindex = sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+			$pageindex = sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 		else
 			$pageindex = '';
 
@@ -551,7 +551,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor = \'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -563,7 +563,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
 		if (!$start_invalid)
-			$pageindex .= '<span class="current_page"><strong>' . ($start / $num_per_page + 1) . '</strong></span>';
+			$pageindex .= sprintf($settings['page_index_template']['current_page'], ($start / $num_per_page + 1));
 		else
 			$pageindex .= sprintf($base_link, $start, $start / $num_per_page + 1);
 
@@ -578,7 +578,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)
@@ -586,7 +586,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
 		if ($start != $tmpMaxPages && $show_prevnext)
-			$pageindex .= sprintf($base_link, $start + $num_per_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 
 	return $pageindex;
@@ -636,7 +636,7 @@ function comma_format($number, $override_decimal_count = false)
  * @param bool $show_today = true
  * @param string $offset_type = false
  */
-function timeformat($log_time, $show_today = true, $offset_type = false)
+function standardTime($log_time, $show_today = true, $offset_type = false)
 {
 	global $context, $user_info, $txt, $modSettings, $smcFunc;
 	static $non_twelve_hour;
@@ -675,11 +675,11 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 		// Same day of the year, same year.... Today!
 		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
-			return $txt['today'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['today'] . standardTime($log_time, $today_fmt, $offset_type);
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
 		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
-			return $txt['yesterday'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['yesterday'] . standardTime($log_time, $today_fmt, $offset_type);
 	}
 
 	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];
@@ -712,6 +712,71 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 	// Format any other characters..
 	return strftime($str, $time);
+}
+
+/**
+ * Calculates the relative time between now and a given timestamp.
+ * If relative time is disabled we can just bypass to standardTime();
+ * This function is based on ideas from user "Eye" at
+ * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
+ *
+ * @param int $date
+ * @param bool $show_today = true
+ * @param string $offset_type = false
+ * @return string
+ */
+function relativeTime($timestamp, $show_today = true, $offset_type = false)
+{
+	global $modSettings, $txt;
+
+	// We don't want relative times? Bypass to standardTime();
+	if ($modSettings['todayMod'] < 3)
+	{
+		$past_time = standardTime($timestamp, $show_today, $offset_type);
+		return $past_time;
+	}
+
+    $past_time = time() - $timestamp;
+
+	// Within the first 60 seconds it is just now.
+    if ($past_time < 60)
+        return $txt['rt_now'];
+
+	// Within the first hour?
+    $past_time = floor($past_time/60);
+
+    if ($past_time < 60)
+        return sprintf($past_time > 1 ? $txt['rt_minutes'] : $txt['rt_minute'], $past_time);
+
+	// Some hours but less than a day?
+    $past_time = floor($past_time/60);
+
+    if ($past_time < 24)
+        return sprintf($past_time > 1 ? $txt['rt_hours'] : $txt['rt_hour'], $past_time);
+
+	// Some days ago but less than a week?
+    $past_time = floor($past_time/24);
+
+    if ($past_time < 7)
+        return sprintf($past_time > 1 ? $txt['rt_days'] : $txt['rt_day'], $past_time);
+
+	// Weeks ago but less than a month?
+    if ($past_time < 30)
+    {
+        $past_time = floor($past_time / 7);
+        return sprintf($past_time > 1 ? $txt['rt_weeks'] : $txt['rt_week'], $past_time);
+    }
+
+	// Months ago but less than a year?
+    $past_time = floor($past_time/30);
+
+    if ($past_time < 12)
+       return sprintf($past_time > 1 ? $txt['rt_months'] : $txt['rt_month'], $past_time);
+
+	// Oha, we've passed at least a year?
+    $past_time = date('Y', time()) - date('Y', $timestamp);
+
+    return sprintf($past_time > 1 ? $txt['rt_years'] : $txt['rt_year'], $past_time);
 }
 
 /**
@@ -754,6 +819,41 @@ function shorten_subject($subject, $len)
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
 	return $smcFunc['substr']($subject, 0, $len) . '...';
+}
+
+/**
+ * Shorten a string of text
+ *
+ * - shortens a text string so that it is approximately a certain length or under
+ * - attempts to break the string on the first word boundary after the allowed length
+ * - if resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
+ * - respects internationalization characters and entities as one character.
+ * - returns the shortened string.
+ *
+ * @param string $text
+ * @param int $len
+ * @param int $buffer maximum length overflow to allow cutting on a word boundary
+ */
+function shorten_text($text, $len = 384, $buffer = 12)
+{
+	global $smcFunc;
+
+	$current = $smcFunc['strlen']($text);
+
+	// Its to long so lets cut it down to size
+	if ($current > $len)
+	{
+		// Look for len characters and cut on first word boundary after
+		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
+
+		// Always one clown in the audience who likes long words or not using the spacebar
+		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
+			$matches[1] = substr($matches[1], 0, $len);
+
+		return rtrim($matches[1]) . '...';
+	}
+	else
+		return $text;
 }
 
 /**
@@ -1362,7 +1462,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '([^<>]{1,192}?)'),
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
-					'date' => array('match' => '(\d+)', 'validate' => 'timeformat'),
+					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
 				),
 				'before' => '<div class="quoteheader"><div class="topslice_quote"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . $txt['search_on'] . ' {date}</a></div></div><blockquote>',
 				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
@@ -1479,7 +1579,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '$1',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					if (is_numeric($data))
-						$data = timeformat($data);
+						$data = standardTime($data);
 					else
 						$tag[\'content\'] = \'[time]$1[/time]\';'),
 			),
@@ -2010,7 +2110,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 		if ($smileys !== false && $tag === null && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] == ']' && !isset($disabled['list']) && !isset($disabled['li']))
 		{
-			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", '>')))
+			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>')))
 				continue;
 
 			$tag = $itemcodes[$message[$pos + 1]];
@@ -2675,7 +2775,7 @@ function setupThemeContext($forceload = false)
 	$loaded = true;
 
 	$context['in_maintenance'] = !empty($maintenance);
-	$context['current_time'] = timeformat(time(), false);
+	$context['current_time'] = standardTime(time(), false);
 	$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 
@@ -2914,13 +3014,19 @@ function template_header()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
 		// Are we debugging the template/html content?
-		if (!isset($_REQUEST['xml']) && isset($_GET['debug']) && !isBrowser('ie'))
+		if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
 			header('Content-Type: application/xhtml+xml');
-		elseif (!isset($_REQUEST['xml']))
+		elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
 			header('Content-Type: text/html; charset=UTF-8');
 	}
 
-	header('Content-Type: text/' . (isset($_REQUEST['xml']) ? 'xml' : 'html') . '; charset=UTF-8');
+	// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+	if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+		header('Content-Type: application/json; charset=UTF-8');
+	elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+		header('Content-Type: text/xml; charset=UTF-8');
+	else
+		header('Content-Type: text/html; charset=UTF-8');
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
@@ -2995,7 +3101,7 @@ function template_header()
 
 			if (!empty($_SESSION['ban']['expire_time']))
 				echo '
-					<div>', sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)), '</div>';
+					<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
 			else
 				echo '
 					<div>', $txt['your_ban_expires_never'], '</div>';
@@ -3420,13 +3526,13 @@ function host_from_ip($ip)
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
-	global $smcFunc, $context;
+	global $context;
 
 	// Step 1: Remove entities/things we don't consider words:
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars($smcFunc['strtolower']($words));
+	$words = un_htmlspecialchars(Util::strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -3495,7 +3601,7 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
  */
 function setupMenuContext()
 {
-	global $context, $modSettings, $user_info, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $txt, $scripturl, $settings;
 
 	// Set up the menu privileges.
 	$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));
@@ -3576,6 +3682,11 @@ function setupMenuContext()
 						'title' => $txt['mc_unapproved_poststopics'],
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
@@ -3769,11 +3880,16 @@ function setupMenuContext()
 	if (isset($context['menu_buttons'][$current_action]))
 		$context['menu_buttons'][$current_action]['active_button'] = true;
 
+	// No need for accurate text if we are in xml mode
+	if (isset($_REQUEST['xml']))
+		return;
+
 	// Update the PM menu item if they have unread messages
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
-		$context['menu_buttons']['pm']['title'] .= ' [<strong>' . $context['user']['unread_messages'] . '</strong>]';
+		if (!empty($settings['menu_numeric_notice']))
+			$context['menu_buttons']['pm']['title'] .= sprintf($settings['menu_numeric_notice'], $context['user']['unread_messages']);
 	}
 
 	// Update the Moderation menu items with action item totals
@@ -3786,24 +3902,30 @@ function setupMenuContext()
 		if (!empty($mod_count['total']))
 		{
 			$context['menu_buttons']['moderate']['alttitle'] = $context['menu_buttons']['moderate']['title'] . ' [' . $mod_count['total'] . ']';
-			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? ' [<strong>' . $mod_count['total'] . '</strong>]' : '';
+			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? sprintf($settings['menu_numeric_notice'], $mod_count['total']) : '';
 
 			if (!empty($mod_count['postmod']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= ' [<strong>' . $mod_count['postmod'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
+			}
+
+			if (!empty($mod_count['emailmod']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['emailmod']);
 			}
 
 			if (!empty($mod_count['attachments']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= ' [<strong>' . $mod_count['attachments'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['attachments']);
 			}
 
 			if (!empty($mod_count['reports']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['reports']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] . ' [' . $mod_count['reports'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= ' [<strong>' . $mod_count['reports'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['reports']);
 			}
 		}
 	}

@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
+	global $modSettings, $smcFunc, $txt, $db_character_set, $context, $ent_check;
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
@@ -66,82 +66,6 @@ function reloadSettings()
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('modSettings', $modSettings, 90);
 	}
-
-	// Set a list of common functions.
-	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
-	$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
-
-	// Preg_replace space characters
-	$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
-
-	// global array of anonymous helper functions, used mosly to properly handle multi byte strings
-	$smcFunc += array(
-		'entity_fix' => create_function('$string', '
-			$num = $string[0] === \'x\' ? hexdec(substr($string, 1)) : (int) $string;
-			return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? \'\' : \'&#\' . $num . \';\';'),
-		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', '
-			global $smcFunc;
-			return ' . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, \'UTF-8\')' . $ent_check[1] . ';'),
-		'htmltrim' => create_function('$string', '
-			global $smcFunc;
-			return preg_replace(\'~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+$~u\', \'\', ' . implode('$string', $ent_check) . ');'),
-		'strlen' => create_function('$string', '
-			global $smcFunc;
-			return strlen(preg_replace(\'~' . $ent_list . '|.~u' . '\', \'_\', ' . implode('$string', $ent_check) . '));'),
-		'strpos' => create_function('$haystack, $needle, $offset = 0', '
-			global $smcFunc;
-			$haystack_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$haystack', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			$haystack_size = count($haystack_arr);
-			if (strlen($needle) === 1)
-			{
-				$result = array_search($needle, array_slice($haystack_arr, $offset));
-				return is_int($result) ? $result + $offset : false;
-			}
-			else
-			{
-				$needle_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$needle', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-				$needle_size = count($needle_arr);
-
-				$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
-				while ((int) $result === $result)
-				{
-					$offset += $result;
-					if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-						return $offset;
-					$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
-				}
-				return false;
-			}'),
-		'substr' => create_function('$string, $start, $length = null', '
-			global $smcFunc;
-			$ent_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$string', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			return $length === null ? implode(\'\', array_slice($ent_arr, $start)) : implode(\'\', array_slice($ent_arr, $start, $length));'),
-		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
-			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtolower($string);'),
-		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
-			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtoupper($string);'),
-		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
-			global $smcFunc;
-			$string = ' . implode('$string', $ent_check) . ';' : '') . '
-			preg_match(\'~^(' . $ent_list . '|.){\' . $smcFunc[\'strlen\'](substr($string, 0, $length)) . \'}~u\', $string, $matches);
-			$string = $matches[0];
-			while (strlen($string) > $length)
-				$string = preg_replace(\'~(?:' . $ent_list . '|.)$~u\', \'\', $string);
-			return $string;'),
-		'ucfirst' => create_function('$string', '
-			global $smcFunc;
-			return $smcFunc[\'strtoupper\']($smcFunc[\'substr\']($string, 0, 1)) . $smcFunc[\'substr\']($string, 1);'),
-		'ucwords' => create_function('$string', '
-			global $smcFunc;
-			$words = preg_split(\'~([\s\r\n\t]+)~\', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-			for ($i = 0, $n = count($words); $i < $n; $i += 2)
-				$words[$i] = $smcFunc[\'ucfirst\']($words[$i]);
-			return implode(\'\', $words);'),
-	);
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']) && function_exists('date_default_timezone_set'))
@@ -300,7 +224,7 @@ function loadUserSettings()
 				$check = false;
 
 			// Wrong password or not activated - either way, you're going nowhere.
-			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
+			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? (int) $user_settings['id_member'] : 0;
 		}
 		else
 			$id_member = 0;
@@ -322,22 +246,13 @@ function loadUserSettings()
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
-			$result = $smcFunc['db_query']('', '
-				SELECT poster_time
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}
-				LIMIT 1',
-				array(
-					'id_msg' => $user_settings['id_msg_last_visit'],
-				)
-			);
-			list ($visitTime) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$visitOpt = getMessageInfo($user_settings['id_msg_last_visit'], true);
 
 			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
 
 			// If it was *at least* five hours ago...
-			if ($visitTime < time() - 5 * 3600)
+			if ($visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $_SERVER['REMOTE_ADDR'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']));
 				$user_settings['last_login'] = time();
@@ -509,21 +424,14 @@ function loadBoard()
 		// Looking through the message table can be slow, so try using the cache first.
 		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === NULL)
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}
-				LIMIT 1',
-				array(
-					'id_msg' => $_REQUEST['msg'],
-				)
-			);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$topic = associatedTopic($_REQUEST['msg']);
 
 			// So did it find anything?
-			if ($smcFunc['db_num_rows']($request))
+			if ($topic !== false)
 			{
-				list ($topic) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				$topic = $msgOptions['id_topic'];
+
 				// Save save save.
 				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
 			}
@@ -913,7 +821,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
 			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
 			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
-			mem.is_activated, mem.warning' . (!empty($modSettings['titlesEnable']) ? ', mem.usertitle, ' : '') . '
+			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '') . '
 			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
 	$select_tables = '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
@@ -1088,7 +996,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		'link' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '">' . $profile['real_name'] . '</a>',
 		'email' => $profile['email_address'],
 		'show_email' => showEmailAddress(!empty($profile['hide_email']), $profile['id_member']),
-		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : timeformat($profile['date_registered']),
+		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : standardTime($profile['date_registered']),
 		'registered_timestamp' => empty($profile['date_registered']) ? 0 : forum_time(true, $profile['date_registered']),
 	);
 
@@ -1117,7 +1025,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
 			'avatar' => determineAvatar($profile, $avatar_width, $avatar_height),
-			'last_login' => empty($profile['last_login']) ? $txt['never'] : timeformat($profile['last_login']),
+			'last_login' => empty($profile['last_login']) ? $txt['never'] : standardTime($profile['last_login']),
 			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
 			'karma' => array(
 				'good' => $profile['karma_good'],
@@ -1151,7 +1059,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
-			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
+			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
 
 	// Are we also loading the members custom fields into context?
@@ -1500,19 +1408,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
 
 	// This determines the server... not used in many places, except for login fixing.
-	$context['server'] = array(
-		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
-	);
-
-	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+	detectServer();
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
@@ -1641,6 +1537,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'smf_theme_url' => '"' . $settings['theme_url'] . '"',
 		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'smf_images_url' => '"' . $settings['images_url'] . '"',
+		'smf_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
 		'smf_scripturl' => '"' . $scripturl . '"',
 		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
@@ -2585,20 +2482,20 @@ function loadDatabase()
 	global $db_persist, $db_connection, $db_server, $db_user, $db_passwd;
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
+	// Database stuffs
+	require_once(SOURCEDIR . '/database/Database.subs.php');
+
 	// Figure out what type of database we are using.
 	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
-	// Load the file for the database.
-	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
-
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)
@@ -2690,4 +2587,26 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
+}
+
+/**
+ * Get information about the server
+ */
+function detectServer()
+{
+	global $context;
+
+	$context['server'] = array(
+		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
+		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
+		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
+		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
+		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
+		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
+		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
+		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+	);
+
+	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
+	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
 }

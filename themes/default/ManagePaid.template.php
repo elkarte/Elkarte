@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The template for adding or editing a subscription.
+/**
+ * The template for adding or editing a subscription.
+ */
 function template_modify_subscription()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -71,9 +73,9 @@ function template_modify_subscription()
 								<option value="0" ', $context['sub']['prim_group'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_mod_no_group'], '</option>';
 
 	// Put each group into the box.
-	foreach ($context['groups'] as $id => $name)
+	foreach ($context['groups'] as $groups)
 		echo '
-								<option value="', $id, '" ', $context['sub']['prim_group'] == $id ? 'selected="selected"' : '', '>', $name, '</option>';
+								<option value="', $groups['id_group'], '" ', $context['sub']['prim_group'] == $groups['id_group'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
 
 	echo '
 							</select>
@@ -84,9 +86,9 @@ function template_modify_subscription()
 						<dd>';
 
 	// Put a checkbox in for each group
-	foreach ($context['groups'] as $id => $name)
+	foreach ($context['groups'] as $groups)
 		echo '
-							<label for="addgroup_', $id, '"><input type="checkbox" id="addgroup_', $id, '" name="addgroup[', $id, ']"', in_array($id, $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<span class="smalltext">', $name, '</span></label><br />';
+							<label for="addgroup_', $groups['id_group'], '"><input type="checkbox" id="addgroup_', $groups['id_group'], '" name="addgroup[', $groups['id_group'], ']"', in_array($groups['id_group'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<span class="smalltext">', $groups['name'], '</span></label><br />';
 
 	echo '
 						</dd>
@@ -199,6 +201,9 @@ function template_modify_subscription()
 
 }
 
+/**
+ * Template to delete a paid subscription
+ */
 function template_delete_subscription()
 {
 	global $context, $scripturl, $txt;
@@ -223,7 +228,9 @@ function template_delete_subscription()
 
 }
 
-// Add or edit an existing subscriber.
+/**
+ * Add or edit an existing subscriber.
+ */
 function template_modify_user_subscription()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -391,7 +398,9 @@ function template_modify_user_subscription()
 		</div>';
 }
 
-// Template for a user to edit/pick their subscriptions.
+/**
+ * Template for a user to edit/pick their subscriptions.
+ */
 function template_user_subscription()
 {
 	global $context, $txt, $scripturl, $modSettings;
@@ -529,7 +538,9 @@ function template_user_subscription()
 	</div>';
 }
 
-// The "choose payment" dialog.
+/**
+ * The "choose payment" dialog.
+ */
 function template_choose_payment()
 {
 	global $context, $txt;
@@ -595,7 +606,9 @@ function template_choose_payment()
 	<br class="clear" />';
 }
 
-// The "thank you" bit...
+/**
+ * The "thank you" bit, when paid subscription is completed.
+ */
 function template_paid_done()
 {
 	global $context, $txt, $scripturl;

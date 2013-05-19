@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template for the bit to show when merge topics is finished.
+ */
 function template_merge_done()
 {
 	global $context, $txt, $scripturl;
@@ -41,6 +44,9 @@ function template_merge_done()
 	<br class="clear" />';
 }
 
+/**
+ * Template to allow merge of two topics.
+ */
 function template_merge()
 {
 	global $context, $txt, $scripturl;
@@ -132,6 +138,9 @@ function template_merge()
 		</div>';
 }
 
+/**
+ * Template for the extra options for a topics merge.
+ */
 function template_merge_extra_options()
 {
 	global $context, $txt, $scripturl;

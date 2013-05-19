@@ -199,6 +199,10 @@ function action_plushsearch2()
 	global $user_info, $context, $options, $messages_request, $boards_can;
 	global $excludedWords, $participants, $smcFunc;
 
+	// We shouldn't be working with the db, but we do :P
+	$db = database();
+	$db_search = db_search();
+
 	// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 	// Coming from quick search box and going to some custome place?
 	if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
@@ -294,9 +298,6 @@ function action_plushsearch2()
 	require_once(CONTROLLERDIR . '/Display.controller.php');
 	require_once(SUBSDIR . '/Package.subs.php');
 	require_once(SUBSDIR . '/Search.subs.php');
-
-	// Search has a special database set.
-	db_extend('search');
 
 	// Load up the search API we are going to use.
 	$searchAPI = findSearchAPI();
@@ -443,23 +444,17 @@ function action_plushsearch2()
 		$smcFunc['db_free_result']($request);
 	}
 
-	// If the boards were passed by URL (params=), temporarily put them back in $_REQUEST.
+	// Ensure that boards are an array of integers (or nothing).
 	if (!empty($search_params['brd']) && is_array($search_params['brd']))
-		$_REQUEST['brd'] = $search_params['brd'];
-
-	// Ensure that brd is an array.
-	if ((!empty($_REQUEST['brd']) && !is_array($_REQUEST['brd'])) || (!empty($_REQUEST['search_selection']) && $_REQUEST['search_selection'] == 'board'))
-	{
-		if (!empty($_REQUEST['brd']))
-			$_REQUEST['brd'] = strpos($_REQUEST['brd'], ',') !== false ? explode(',', $_REQUEST['brd']) : array($_REQUEST['brd']);
-		else
-			$_REQUEST['brd'] = isset($_REQUEST['sd_brd']) ? array($_REQUEST['sd_brd']) : array();
-	}
-
-	// Make sure all boards are integers.
-	if (!empty($_REQUEST['brd']))
-		foreach ($_REQUEST['brd'] as $id => $brd)
-			$_REQUEST['brd'][$id] = (int) $brd;
+		$query_boards = array_map('intval', $search_params['brd']);
+	elseif (!empty($_REQUEST['brd']) && is_array($_REQUEST['brd']))
+		$query_boards = array_map('intval', $_REQUEST['brd']);
+	elseif (!empty($_REQUEST['brd']))
+		$query_boards = array_map('intval', explode(',', $_REQUEST['brd']));
+	elseif (isset($_REQUEST['sd_brd']) && (int) $_REQUEST['sd_brd'] !== 0)
+		$query_boards = array((int) $_REQUEST['sd_brd']);
+	else
+		$query_boards = array();
 
 	// Special case for boards: searching just one topic?
 	if (!empty($search_params['topic']))
@@ -486,29 +481,12 @@ function action_plushsearch2()
 		$smcFunc['db_free_result']($request);
 	}
 	// Select all boards you've selected AND are allowed to see.
-	elseif ($user_info['is_admin'] && (!empty($search_params['advanced']) || !empty($_REQUEST['brd'])))
-		$search_params['brd'] = empty($_REQUEST['brd']) ? array() : $_REQUEST['brd'];
+	elseif ($user_info['is_admin'] && (!empty($search_params['advanced']) || !empty($query_boards)))
+		$search_params['brd'] = $query_boards;
 	else
 	{
-		$see_board = empty($search_params['advanced']) ? 'query_wanna_see_board' : 'query_see_board';
-		$request = $smcFunc['db_query']('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {raw:boards_allowed_to_see}
-				AND redirect = {string:empty_string}' . (empty($_REQUEST['brd']) ? (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board_id}' : '') : '
-				AND b.id_board IN ({array_int:selected_search_boards})'),
-			array(
-				'boards_allowed_to_see' => $user_info[$see_board],
-				'empty_string' => '',
-				'selected_search_boards' => empty($_REQUEST['brd']) ? array() : $_REQUEST['brd'],
-				'recycle_board_id' => $modSettings['recycle_board'],
-			)
-		);
-		$search_params['brd'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$search_params['brd'][] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('exclude_recycle' => true, 'exclude_redirects' => true, 'wanna_see_board' => empty($search_params['advanced']))));
 
 		// This error should pro'bly only happen for hackers.
 		if (empty($search_params['brd']))
@@ -973,7 +951,7 @@ function action_plushsearch2()
 			);
 
 			// Clear the previous cache of the final results cache.
-			$smcFunc['db_search_query']('delete_log_search_results', '
+			$db_search->search_query('delete_log_search_results', '
 				DELETE FROM {db_prefix}log_search_results
 				WHERE id_search = {int:search_id}',
 				array(
@@ -1065,8 +1043,8 @@ function action_plushsearch2()
 					}
 					$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
-					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_subject',
-						($smcFunc['db_support_ignore'] ? '
+					$ignoreRequest = $db_search->search_query('insert_log_search_results_subject',
+						($db->support_ignore() ? '
 						INSERT IGNORE INTO {db_prefix}log_search_results
 							(id_search, id_topic, relevance, id_msg, num_matches)' : '') . '
 						SELECT
@@ -1093,7 +1071,7 @@ function action_plushsearch2()
 					);
 
 					// If the database doesn't support IGNORE to make this fast we need to do some tracking.
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 						{
@@ -1190,13 +1168,13 @@ function action_plushsearch2()
 				{
 					$inserts = array();
 					// Create a temporary table to store some preliminary results in.
-					$smcFunc['db_search_query']('drop_tmp_log_search_topics', '
+					$db_search->search_query('drop_tmp_log_search_topics', '
 						DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
 						array(
 							'db_error_skip' => true,
 						)
 					);
-					$createTemporary = $smcFunc['db_search_query']('create_tmp_log_search_topics', '
+					$createTemporary = $db_search->search_query('create_tmp_log_search_topics', '
 						CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
 							id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
 							PRIMARY KEY (id_topic)
@@ -1209,7 +1187,7 @@ function action_plushsearch2()
 
 					// Clean up some previous cache.
 					if (!$createTemporary)
-						$smcFunc['db_search_query']('delete_log_search_topics', '
+						$db_search->search_query('delete_log_search_topics', '
 							DELETE FROM {db_prefix}log_search_topics
 							WHERE id_search = {int:search_id}',
 							array(
@@ -1306,7 +1284,7 @@ function action_plushsearch2()
 						if (empty($subject_query['where']))
 							continue;
 
-						$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_topics', ($smcFunc['db_support_ignore'] ? ( '
+						$ignoreRequest = $db_search->search_query('insert_log_search_topics', ($db->support_ignore() ? ( '
 							INSERT IGNORE INTO {db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics
 								(' . ($createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
 							SELECT ' . ($createTemporary ? '' : $_SESSION['search_cache']['id_search'] . ', ') . 't.id_topic
@@ -1321,7 +1299,7 @@ function action_plushsearch2()
 							$subject_query['params']
 						);
 						// Don't do INSERT IGNORE? Manually fix this up!
-						if (!$smcFunc['db_support_ignore'])
+						if (!$db->support_ignore())
 						{
 							while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 							{
@@ -1368,14 +1346,14 @@ function action_plushsearch2()
 				if ($searchAPI->supportsMethod('indexedWordQuery', $query_params))
 				{
 					$inserts = array();
-					$smcFunc['db_search_query']('drop_tmp_log_search_messages', '
+					$db_search->search_query('drop_tmp_log_search_messages', '
 						DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
 						array(
 							'db_error_skip' => true,
 						)
 					);
 
-					$createTemporary = $smcFunc['db_search_query']('create_tmp_log_search_messages', '
+					$createTemporary = $db_search->search_query('create_tmp_log_search_messages', '
 						CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
 							id_msg int(10) unsigned NOT NULL default {string:string_zero},
 							PRIMARY KEY (id_msg)
@@ -1388,7 +1366,7 @@ function action_plushsearch2()
 
 					// Clear, all clear!
 					if (!$createTemporary)
-						$smcFunc['db_search_query']('delete_log_search_messages', '
+						$db_search->search_query('delete_log_search_messages', '
 							DELETE FROM {db_prefix}log_search_messages
 							WHERE id_search = {int:id_search}',
 							array(
@@ -1423,7 +1401,7 @@ function action_plushsearch2()
 
 							$ignoreRequest = $searchAPI->indexedWordQuery($words, $search_data);
 
-							if (!$smcFunc['db_support_ignore'])
+							if (!$db->support_ignore())
 							{
 								while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
 								{
@@ -1535,7 +1513,7 @@ function action_plushsearch2()
 					}
 					$main_query['select']['relevance'] = substr($relevance, 0, -3) . ') / ' . $new_weight_total . ' AS relevance';
 
-					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_no_index', ($smcFunc['db_support_ignore'] ? ( '
+					$ignoreRequest = $db_search->search_query('insert_log_search_results_no_index', ($db->support_ignore() ? ( '
 						INSERT IGNORE INTO ' . '{db_prefix}log_search_results
 							(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 						SELECT
@@ -1554,7 +1532,7 @@ function action_plushsearch2()
 					);
 
 					// We love to handle non-good databases that don't support our ignore!
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						$inserts = array();
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
@@ -1603,7 +1581,7 @@ function action_plushsearch2()
 					$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
 					$usedIDs = array_flip(empty($inserts) ? array() : array_keys($inserts));
-					$ignoreRequest = $smcFunc['db_search_query']('insert_log_search_results_sub_only', ($smcFunc['db_support_ignore'] ? ( '
+					$ignoreRequest = $db_search->search_query('insert_log_search_results_sub_only', ($db->support_ignore() ? ( '
 						INSERT IGNORE INTO {db_prefix}log_search_results
 							(id_search, id_topic, relevance, id_msg, num_matches)') : '') . '
 						SELECT
@@ -1625,7 +1603,7 @@ function action_plushsearch2()
 						)
 					);
 					// Once again need to do the inserts if the database don't support ignore!
-					if (!$smcFunc['db_support_ignore'])
+					if (!$db->support_ignore())
 					{
 						$inserts = array();
 						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
@@ -1661,7 +1639,7 @@ function action_plushsearch2()
 
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
-		$request = $smcFunc['db_search_query']('', '
+		$request = $db_search->search_query('', '
 			SELECT ' . (empty($search_params['topic']) ? 'lsr.id_topic' : $search_params['topic'] . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($search_params['sort'] == 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
@@ -2372,7 +2350,7 @@ function MessageSearch2()
 				'member' => &$memberContext[$row['id_member_from']],
 				'subject' => $subject_highlighted,
 				'body' => $body_highlighted,
-				'time' => timeformat($row['msgtime']),
+				'time' => relativeTime($row['msgtime']),
 				'recipients' => &$recipients[$row['id_pm']],
 				'labels' => &$context['message_labels'][$row['id_pm']],
 				'fully_labeled' => count($context['message_labels'][$row['id_pm']]) == count($context['labels']),
@@ -2420,13 +2398,16 @@ function prepareSearchContext($reset = false)
 	if ($counter == null || $reset)
 		$counter = $_REQUEST['start'] + 1;
 
+	// we need this
+	$db = database();
+
 	// If the query returned false, bail.
 	if ($messages_request == false)
 		return false;
 
 	// Start from the beginning...
 	if ($reset)
-		return @$smcFunc['db_data_seek']($messages_request, 0);
+		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
 	$message = $smcFunc['db_fetch_assoc']($messages_request);
@@ -2552,7 +2533,7 @@ function prepareSearchContext($reset = false)
 		'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
 		'first_post' => array(
 			'id' => $message['first_msg'],
-			'time' => timeformat($message['first_poster_time']),
+			'time' => relativeTime($message['first_poster_time']),
 			'timestamp' => forum_time(true, $message['first_poster_time']),
 			'subject' => $message['first_subject'],
 			'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
@@ -2568,7 +2549,7 @@ function prepareSearchContext($reset = false)
 		),
 		'last_post' => array(
 			'id' => $message['last_msg'],
-			'time' => timeformat($message['last_poster_time']),
+			'time' => relativeTime($message['last_poster_time']),
 			'timestamp' => forum_time(true, $message['last_poster_time']),
 			'subject' => $message['last_subject'],
 			'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
@@ -2645,11 +2626,11 @@ function prepareSearchContext($reset = false)
 		'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 		'subject' => $message['subject'],
 		'subject_highlighted' => $subject_highlighted,
-		'time' => timeformat($message['poster_time']),
+		'time' => relativeTime($message['poster_time']),
 		'timestamp' => forum_time(true, $message['poster_time']),
 		'counter' => $counter,
 		'modified' => array(
-			'time' => timeformat($message['modified_time']),
+			'time' => relativeTime($message['modified_time']),
 			'timestamp' => forum_time(true, $message['modified_time']),
 			'name' => $message['modified_name']
 		),

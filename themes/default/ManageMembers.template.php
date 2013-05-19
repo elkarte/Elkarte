@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Template to search forum members according to criteria
+ */
 function template_search_members()
 {
 	global $context, $scripturl, $txt;
@@ -235,6 +238,9 @@ function template_search_members()
 	</div>';
 }
 
+/**
+ * Template to browse members in admin panel
+ */
 function template_admin_browse()
 {
 	global $context, $scripturl, $txt;

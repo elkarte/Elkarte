@@ -25,11 +25,12 @@ if (!defined('ELKARTE'))
 /**
  * Show all the users buddies, as well as a add/delete interface.
  *
- * @param int $memID id_member
  */
-function action_editBuddyIgnoreLists($memID)
+function action_editBuddyIgnoreLists()
 {
 	global $context, $txt, $scripturl, $modSettings, $user_profile;
+
+	$memID = currentMemberID();
 
 	// Do a quick check to ensure people aren't getting here illegally!
 	if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
@@ -282,14 +283,12 @@ function action_editIgnoreList($memID)
 /**
  * Allows the user to see or change their account info.
  *
- * @param int $memID id_member
  */
-function action_account($memID)
+function action_account()
 {
 	global $context, $txt;
 
-	// be sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -312,14 +311,12 @@ function action_account($memID)
 /**
  * Allow the user to change the forum options in their profile.
  *
- * @param int $memID id_member
  */
-function action_forumProfile($memID)
+function action_forumProfile()
 {
 	global $context, $user_profile, $user_info, $txt, $modSettings;
 
-	// make sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -343,13 +340,12 @@ function action_forumProfile($memID)
 /**
  * Allow the edit of *someone elses* personal message settings.
  *
- * @param int $memID id_member
  */
-function action_pmprefs($memID)
+function action_pmprefs()
 {
 	global $context, $txt, $scripturl;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
@@ -367,13 +363,12 @@ function action_pmprefs($memID)
 /**
  * Allow the user to pick a theme.
  *
- * @param int $memID id_member
  */
-function action_themepick($memID)
+function action_themepick()
 {
 	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -480,11 +475,12 @@ function action_authentication($memID, $saving = false)
 /**
  * Display the notifications and settings for changes.
  *
- * @param int $memID id_member
  */
-function action_notification($memID)
+function action_notification()
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $settings;
+
+	$memID = currentMemberID();
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -534,12 +530,13 @@ function action_notification($memID)
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" />',
+						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" %2$s />',
 						'params' => array(
 							'id' => false,
+							'checked' => false,
 						),
-					),
 					'class' => 'centertext',
+					),
 				),
 			),
 		),
@@ -557,8 +554,12 @@ function action_notification($memID)
 		'additional_rows' => array(
 			array(
 				'position' => 'bottom_of_list',
-				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_update'] . '" class="button_submit" />',
-				'align' => 'right',
+				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="button_submit" />',
+			),
+			array(
+				'position' => 'after_title',
+				'value' => getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
+				'class' => 'windowbg2',
 			),
 		),
 	);
@@ -696,7 +697,8 @@ function action_notification($memID)
 }
 
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
+ * Retrieve topic notifications count.
  *
  * @param int $memID id_member
  * @return string
@@ -726,7 +728,7 @@ function list_getTopicNotificationCount($memID)
 }
 
 /**
- * @todo Needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page
@@ -780,7 +782,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
-			'updated' => timeformat($row['poster_time']),
+			'updated' => relativeTime($row['poster_time']),
 			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
 			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
 			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
@@ -791,8 +793,31 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	return $notification_topics;
 }
 
+function getBoardNotificationsCount($memID)
+{
+	global $smcFunc, $user_info;
+
+	// All the boards that you have notification enabled
+	$request = $smcFunc['db_query']('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+			AND {query_see_board}',
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $memID,
+		)
+	);
+	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $totalNotifications;
+}
+
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page
@@ -802,8 +827,9 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info;
+	global $smcFunc, $txt, $scripturl, $user_info, $modSettings;
 
+	// All the boards that you have notification enabled
 	$request = $smcFunc['db_query']('', '
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
@@ -817,14 +843,43 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'selected_member' => $memID,
 		)
 	);
+
 	$notification_boards = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$notification_boards[] = array(
+			'id' => $row['id_board'],
+			'name' =>  $row['name'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' .'<strong>' . $row['name'] . '</strong></a>',
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => 'checked="checked"',
+		);
+	$smcFunc['db_free_result']($request);
+
+	// and all the boards that you can see but don't have notify turned on for
+	$request = $smcFunc['db_query']('', '
+		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE {query_see_board}
+			AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+		ORDER BY ' . $sort,
+		array(
+			'selected_member' => $memID,
+			'current_member' => $user_info['id'],
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
 			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-			'new' => $row['board_read'] < $row['id_msg_updated']
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => '',
 		);
 	$smcFunc['db_free_result']($request);
 
@@ -890,11 +945,12 @@ function loadThemeOptions($memID)
  * Allows the user to see the list of their ignored boards.
  * (and un-ignore them)
  *
- * @param int $memID id_member
  */
-function action_ignoreboards($memID)
+function action_ignoreboards()
 {
 	global $context, $modSettings, $cur_profile;
+
+	$memID = currentMemberID();
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
@@ -914,11 +970,12 @@ function action_ignoreboards($memID)
 /**
  * Function to allow the user to choose group membership etc...
  *
- * @param int $memID id_member
  */
-function action_groupMembership($memID)
+function action_groupMembership()
 {
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc;
+
+	$memID = currentMemberID();
 
 	$curMember = $user_profile[$memID];
 	$context['primary_group'] = $curMember['id_group'];

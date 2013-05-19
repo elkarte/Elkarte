@@ -116,7 +116,7 @@ function validateSession($type = 'admin')
  *
  * @param string $message = ''
  */
-function is_not_guest($message = '')
+function is_not_guest($message = '', $is_fatal = true)
 {
 	global $user_info, $txt, $context, $scripturl;
 
@@ -131,7 +131,7 @@ function is_not_guest($message = '')
 	writeLog(true);
 
 	// Just die.
-	if (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['xml']) || !$is_fatal)
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
@@ -358,7 +358,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
+		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
 
 		// If we get here, something's gone wrong.... but let's try anyway.
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -401,10 +401,11 @@ function is_not_banned($forceCheck = false)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
-		Logout(true, false);
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
+		$controller = new Auth_Controller();
+		$controller->action_logout(true, false);
 
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
@@ -702,7 +703,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// A session error occurred, show the error.
 	elseif ($is_fatal)
 	{
-		if (isset($_GET['xml']))
+		if (isset($_GET['xml']) || isset($_REQUEST['api']))
 		{
 			ob_end_clean();
 			header('HTTP/1.1 403 Forbidden - Session timeout');
@@ -1429,4 +1430,28 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
 
+}
+
+/**
+* This sets the X-Frame-Options header.
+*
+* @param string $option the frame option, defaults to deny.
+* @return void.
+*/
+function frameOptionsHeader($override = null)
+{
+	global $modSettings;
+
+	$option = 'SAMEORIGIN';
+	if (is_null($override) && !empty($modSettings['frame_security']))
+		$option = $modSettings['frame_security'];
+	elseif (in_array($override, array('SAMEORIGIN', 'DENY', 'SAMEORIGIN')))
+		$option = $override;
+
+	// Don't bother setting the header if we have disabled it.
+	if ($option == 'DISABLE')
+		return;
+
+	// Finally set it.
+	header('X-Frame-Options: ' . $option);
 }

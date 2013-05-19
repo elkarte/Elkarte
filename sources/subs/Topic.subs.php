@@ -1053,18 +1053,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	global $smcFunc, $user_info;
 
 	// find the current entry if it exists that is
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg
-		FROM {db_prefix}log_topics
-		WHERE id_member = {int:current_user}
-			AND id_topic = {int:current_topic}',
-		array(
-			'current_user' => $user_info['id'],
-			'current_topic' => $topic,
-		)
-	);
-	list($was_set) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$was_set = getLoggedTopics($user_info['id'], array($topic));
 
 	// Set topic disregard on/off for this topic.
 	$smcFunc['db_insert'](empty($was_set) ? 'ignore' : 'replace',
@@ -1082,7 +1071,7 @@ function setTopicRegard($id_member, $topic, $on = false)
  * - uses any integration information (value selects, tables and parameters) if passed and full is true
  *
  * @param array $topic_parameters can also accept a int value for a topic
- * @param int $full defines the values returned by the function:
+ * @param string $full defines the values returned by the function:
  *             - if empty returns only the data from {db_prefix}topics
  *             - if 'message' returns also informations about the message (subject, body, etc.)
  *             - if 'all' returns additional infos about the read/disregard status
@@ -1270,11 +1259,14 @@ function messagesAfter($topic, $message)
 
 /**
  * Retrieve a few data on a particular message.
+ * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * and doesn't use {query_see_board}
  *
- * @param int $topic
- * @param int $message
+ * @param int $topic topic ID
+ * @param int $message message ID
+ * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message)
+function messageInfo($topic, $message, $topic_approved = false)
 {
 	global $smcFunc, $modSettings;
 
@@ -1282,20 +1274,20 @@ function messageInfo($topic, $message)
 
 	// Retrieve a few info on the specific message.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved
+		SELECT m.id_member, m.subject,' . ($topic_approved ? ' t.approved,' : 'm.approved,') . '
+			t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-		WHERE m.id_msg = {int:split_at}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+		WHERE m.id_msg = {int:message_id}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 			AND m.approved = 1') . '
 			AND m.id_topic = {int:current_topic}
 		LIMIT 1',
 		array(
 			'current_topic' => $topic,
-			'split_at' => $message,
+			'message_id' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		fatal_lang_error('cant_find_messages');
+
 	$messageInfo = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 
@@ -1347,7 +1339,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'id' => $row['id_msg'],
 			'alternate' => $counter % 2,
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'poster' => $row['real_name'],
@@ -1388,4 +1380,200 @@ function unapprovedPosts($id_topic, $id_member)
 	$smcFunc['db_free_result']($request);
 
 	return $myUnapprovedPosts;
+}
+
+/**
+ * Update topic info after a successful split of a topic.
+ *
+ * @param array $options
+ * @param int $id_board
+ */
+function updateSplitTopics($options, $id_board)
+{
+	global $smcFunc;
+
+	// Any associated reported posts better follow...
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}log_reported
+		SET id_topic = {int:id_topic}
+		WHERE id_msg IN ({array_int:split_msgs})',
+		array(
+			'split_msgs' => $options['splitMessages'],
+			'id_topic' => $options['split2_ID_TOPIC'],
+		)
+	);
+
+	// Mess with the old topic's first, last, and number of messages.
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET
+			num_replies = {int:num_replies},
+			id_first_msg = {int:id_first_msg},
+			id_last_msg = {int:id_last_msg},
+			id_member_started = {int:id_member_started},
+			id_member_updated = {int:id_member_updated},
+			unapproved_posts = {int:unapproved_posts}
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'num_replies' => $options['split1_replies'],
+			'id_first_msg' => $options['split1_first_msg'],
+			'id_last_msg' => $options['split1_last_msg'],
+			'id_member_started' => $options['split1_firstMem'],
+			'id_member_updated' => $options['split1_lastMem'],
+			'unapproved_posts' => $options['split1_unapprovedposts'],
+			'id_topic' => $options['split1_ID_TOPIC'],
+		)
+	);
+
+	// Now, put the first/last message back to what they should be.
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET
+			id_first_msg = {int:id_first_msg},
+			id_last_msg = {int:id_last_msg}
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'id_first_msg' => $options['split2_first_msg'],
+			'id_last_msg' => $options['split2_last_msg'],
+			'id_topic' => $options['split2_ID_TOPIC'],
+		)
+	);
+
+	// If the new topic isn't approved ensure the first message flags
+	// this just in case.
+	if (!$split2_approved)
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}messages
+			SET approved = {int:approved}
+			WHERE id_msg = {int:id_msg}
+				AND id_topic = {int:id_topic}',
+			array(
+				'approved' => 0,
+				'id_msg' => $options['split2_first_msg'],
+				'id_topic' => $options['split2_ID_TOPIC'],
+			)
+		);
+
+	// The board has more topics now (Or more unapproved ones!).
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}boards
+		SET ' . ($options['split2_approved'] ? '
+			num_topics = num_topics + 1' : '
+			unapproved_topics = unapproved_topics + 1') . '
+		WHERE id_board = {int:id_board}',
+		array(
+			'id_board' => $id_board,
+		)
+	);
+}
+
+function topicStarter($topic)
+{
+	global $smcFunc;
+
+	// Find out who started the topic - in case User Topic Locking is enabled.
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member_started, locked
+		FROM {db_prefix}topics
+		WHERE id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topic,
+		)
+	);
+	$starter = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $starter;
+}
+
+/**
+ * Set attributes for a topic, i.e. locked, sticky.
+ * Parameter $attributes is an array with:
+ *  - 'locked' => lock_value,
+ *  - 'sticky' => sticky_value
+ *
+ * @param int $topic
+ * @param array $attributes
+ */
+function setTopicAttribute($topic, $attributes)
+{
+	global $smcFunc;
+
+	if (isset($attributes['locked']))
+		// Lock the topic in the database with the new value.
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics
+			SET locked = {int:locked}
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic,
+				'locked' => $attributes['locked'],
+			)
+		);
+	if (isset($attributes['sticky']))
+		// Toggle the sticky value... pretty simple ;).
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics
+			SET is_sticky = {int:is_sticky}
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic,
+				'is_sticky' => empty($attributes['sticky']) ? 1 : 0,
+			)
+		);
+}
+
+/**
+ * Toggle sticky status for the passed topics.
+ *
+ * @param array $topics
+ */
+function toggleTopicSticky($topics)
+{
+	global $smcFunc;
+
+	$topics = is_array($topics) ? $topics : array($topics);
+
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}topics
+		SET is_sticky = CASE WHEN is_sticky = 1 THEN 0 ELSE 1 END
+		WHERE id_topic IN ({array_int:sticky_topic_ids})',
+		array(
+			'sticky_topic_ids' => $topics,
+		)
+	);
+
+	return $smcFunc['db_affected_rows']();
+}
+
+/**
+ * Get topics from the log_topics table belonging to a certain user
+ *
+ * @param int $member a member id
+ * @param array $topics an array of topics
+ * @return array an array of topics in the table (key) and its disregard status (value)
+ *
+ * @todo find a better name
+ */
+function getLoggedTopics($member, $topics)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_topic, disregarded
+		FROM {db_prefix}log_topics
+		WHERE id_topic IN ({array_int:selected_topics})
+			AND id_member = {int:current_user}',
+		array(
+			'selected_topics' => $topics,
+			'current_user' => $member,
+		)
+	);
+	$logged_topics = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$logged_topics[$row['id_topic']] = $row['disregarded'];
+	$smcFunc['db_free_result']($request);
+
+	return $logged_topics;
 }
