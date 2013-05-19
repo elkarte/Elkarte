@@ -742,6 +742,14 @@ class Display_Controller
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 				loadMemberData($posters);
+
+			// Load in the likes for this group of messages
+			if (!empty($modSettings['likes_enabled']))
+			{
+				require_once(SUBSDIR . '/Likes.subs.php');
+				$context['likes'] = loadLikes($messages, true);
+			}
+
 			$messages_request = $smcFunc['db_query']('', '
 				SELECT
 					id_msg, icon, subject, poster_time, poster_ip, id_member, modified_time, modified_name, body,
