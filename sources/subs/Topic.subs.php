@@ -1279,7 +1279,7 @@ function messageInfo($topic, $message, $topic_approved = false)
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-	global $smcFunc, $modSettings, $options, $context;
+	global $smcFunc, $modSettings, $options, $user_info;
 
 	// Get the messages and stick them into an array.
 	$request = $smcFunc['db_query']('', '
@@ -1321,7 +1321,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'poster' => $row['real_name'],
-			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $context['user']['ignoreusers']),
+			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $user_info['ignoreusers']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
