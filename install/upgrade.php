@@ -35,6 +35,7 @@ $databases = array(
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
 		'version' => '8.0',
+		'utf8_support' => true,
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
 	),
@@ -592,7 +593,7 @@ if (!class_exists('Ftp_Connection'))
 	}
 }
 
-// Don't do security check if on Yabbse
+// Don't do security check if on Yabbse or SMF
 if (!isset($modSettings['elkVersion']))
 	$disable_security = true;
 
@@ -630,7 +631,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your Elkarte Install!' : isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your Elkarte Install!' : (isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!');
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -836,9 +837,9 @@ function loadEssentialData()
 	// Get the database going!
 	if (empty($db_type))
 		$db_type = 'mysql';
-	if (file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
+		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Make the connection...
 		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
@@ -870,7 +871,7 @@ function loadEssentialData()
 	}
 	else
 	{
-		return throw_error('Cannot find ' . SOURCEDIR . '/database/Db-' . $db_type . '.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
+		return throw_error('Cannot find ' . SOURCEDIR . '/database/Database.subs.php' . '. Please check you have uploaded all source files and have the correct paths set.');
 	}
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
@@ -2307,7 +2308,7 @@ function parse_sql($filename)
 	$upcontext['current_item_name'] = '';
 	$upcontext['current_debug_item_num'] = 0;
 	$upcontext['current_debug_item_name'] = '';
-	// This array keeps a record of what we've done in case java is dead...
+	// This array keeps a record of what we've done in case javascript is dead...
 	$upcontext['actioned_items'] = array();
 
 	$done_something = false;
