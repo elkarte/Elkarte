@@ -509,6 +509,7 @@ class MessageIndex_Controller
 					'pages' => $pages,
 					'replies' => comma_format($row['num_replies']),
 					'views' => comma_format($row['num_views']),
+					'likes' => comma_format($row['num_likes']),
 					'approved' => $row['approved'],
 					'unapproved_posts' => $row['unapproved_posts'],
 				);
