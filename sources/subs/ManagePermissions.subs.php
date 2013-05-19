@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  * @param int $group
  * @param mixed $profile = null, int expected
  */
-function setPermissionLevel($level, $group, $profile = 'null')
+function setPermissionLevel($level, $group = null, $profile = null)
 {
 	global $smcFunc, $context;
 
@@ -201,7 +201,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 	updateSettings(array('settings_updated' => time()));
 
 	// Setting group permissions.
-	if ($profile === 'null' && $group !== 'null')
+	if ($profile === null && $group !== null)
 	{
 		$group = (int) $group;
 
@@ -250,7 +250,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 		);
 	}
 	// Setting profile permissions for a specific group.
-	elseif ($profile !== 'null' && $group !== 'null' && ($profile == 1 || $profile > 4))
+	elseif ($profile !== null && $group !== null && ($profile == 1 || $profile > 4))
 	{
 		$group = (int) $group;
 		$profile = (int) $profile;
@@ -283,7 +283,7 @@ function setPermissionLevel($level, $group, $profile = 'null')
 		}
 	}
 	// Setting profile permissions for all groups.
-	elseif ($profile !== 'null' && $group === 'null' && ($profile == 1 || $profile > 4))
+	elseif ($profile !== null && $group === null && ($profile == 1 || $profile > 4))
 	{
 		$profile = (int) $profile;
 
@@ -342,7 +342,6 @@ function setPermissionLevel($level, $group, $profile = 'null')
 	else
 		fatal_lang_error('no_access', false);
 }
-
 
 /**
  * Load permissions profiles.

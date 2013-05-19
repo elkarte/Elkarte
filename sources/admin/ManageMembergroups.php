@@ -387,7 +387,7 @@ class ManageMembergroups_Controller
 			{
 				// Set default permission level.
 				require_once(ADMINDIR . '/ManagePermissions.php');
-				setPermissionLevel($_POST['level'], $id_group, 'null');
+				setPermissionLevel($_POST['level'], $id_group, null);
 			}
 			// Copy or inherit the permissions!
 			elseif ($_POST['perm_type'] == 'copy' || $_POST['perm_type'] == 'inherit')
