@@ -103,9 +103,9 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
 	{
-		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->db_escape_wildcard_string($row['message']));
+		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->escape_wildcard_string($row['message']));
 		if ($search_message == $filter['value']['sql'])
-			$search_message = $db->db_escape_wildcard_string($row['message']);
+			$search_message = $db->escape_wildcard_string($row['message']);
 		$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
 
 		$log['errors'][$row['id_error']] = array(
@@ -119,7 +119,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 			'timestamp' => $row['log_time'],
 			'url' => array(
 				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url']),
-				'href' => base64_encode($db->db_escape_wildcard_string($row['url']))
+				'href' => base64_encode($db->escape_wildcard_string($row['url']))
 			),
 			'message' => array(
 				'html' => $show_message,
@@ -187,7 +187,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 			'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->db_escape_wildcard_string($row['error_type']),
+			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}
 	$smcFunc['db_free_result']($request);

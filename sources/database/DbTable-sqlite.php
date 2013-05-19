@@ -131,7 +131,7 @@ class DbTable_SQLite
 				continue;
 			}
 			elseif (isset($column['default']) && $column['default'] !== null)
-				$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
+				$default = 'default \'' . $db->escape_string($column['default']) . '\'';
 			else
 				$default = '';
 

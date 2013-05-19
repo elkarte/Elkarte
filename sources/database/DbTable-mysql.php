@@ -348,7 +348,7 @@ class DbTable_MySQL extends DbTable
 		$db->query('', '
 			ALTER TABLE ' . $table_name . '
 			CHANGE COLUMN `' . $old_column . '` `' . $column_info['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (empty($column_info['null']) ? 'NOT NULL' : '') . ' ' .
-				(!isset($column_info['default']) ? '' : 'default \'' . $db->db_escape_string($column_info['default']) . '\'') . ' ' .
+				(!isset($column_info['default']) ? '' : 'default \'' . $db->escape_string($column_info['default']) . '\'') . ' ' .
 				(empty($column_info['auto']) ? '' : 'auto_increment') . ' ',
 			array(
 				'security_override' => true,
@@ -671,7 +671,7 @@ class DbTable_MySQL extends DbTable
 			$default = 'auto_increment';
 		}
 		elseif (isset($column['default']) && $column['default'] !== null)
-			$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
+			$default = 'default \'' . $db->escape_string($column['default']) . '\'';
 		else
 			$default = '';
 
