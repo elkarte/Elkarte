@@ -170,8 +170,8 @@ function getPollInfo($topicID)
  * Create a poll
  * 
  * @param string $question The title/question of the poll
- * @param int|false $id_member = false The id of the creator (if false, the current user)
- * @param string|false $poster_name = false The name of the poll creator (if false, the current user)
+ * @param int $id_member = false The id of the creator
+ * @param string $poster_name The name of the poll creator
  * @param int $max_votes = 1 The maximum number of votes you can do
  * @param bool $hide_results = true If the results should be hidden
  * @param int $expire = 0 The time in days that this poll will expire
@@ -180,15 +180,8 @@ function getPollInfo($topicID)
  * @param array $options = array() The poll options
  * @return int the id of the created poll
  */
-function createPoll($question, $id_member = false, $poster_name = false, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
+function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
 {
-	global $user_info;
-
-	if ($id_member == false)
-		$id_member = $id_member === false ? $user_info['id'] : (int) $id_member;
-	if ($poster_name == false)
-		$poster_name = $poster_name === false ? $user_info['real_name'] : $poster_name;
-
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
 	$db = database();
@@ -199,7 +192,7 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
 			'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
 		),
 		array(
-			$question, $hide_results, $max_votes, $expire, $user_info['id'],
+			$question, $hide_results, $max_votes, $expire, $id_member,
 			$poster_name, $can_change_vote, $can_guest_vote,
 		),
 		array('id_poll')
