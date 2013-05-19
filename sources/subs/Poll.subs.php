@@ -182,7 +182,7 @@ function getPollInfo($topicID)
  */
 function createPoll($question, $id_member = false, $poster_name = false, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
 {
-	global $user_info, $db;
+	global $user_info;
 
 	if ($id_member == false)
 		$id_member = $id_member === false ? $user_info['id'] : (int) $id_member;
@@ -191,6 +191,7 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
 
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
+	$db = database();
 	$db->insert('',
 		'{db_prefix}polls',
 		array(
@@ -222,14 +223,13 @@ function createPoll($question, $id_member = false, $poster_name = false, $max_vo
  */
 function addPollOptions($id_poll, array $options)
 {
-	global $db;
-
 	$pollOptions = array();
 	foreach ($options as $i => $option)
 	{
 		$pollOptions[] = array($id_poll, $i, $option);
 	}
 
+	$db = database();
 	$db->insert('insert',
 		'{db_prefix}poll_choices',
 		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
