@@ -786,6 +786,7 @@ class Post_Controller
 			{
 				$post['is_new'] = !empty($context['new_replies']);
 				$post['counter'] = $counter++;
+				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $user_info['ignoreusers']);
 
 				if (!empty($context['new_replies']))
 					$context['new_replies']--;
