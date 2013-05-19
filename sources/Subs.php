@@ -47,7 +47,7 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $context;
 
 	switch ($type)
 	{
@@ -188,28 +188,15 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		if ($parameter2 !== null && !in_array('posts', $parameter2))
 			return;
 
-		$postgroups = cache_get_data('updateStats:postgroups', 360);
-		if ($postgroups === null || $parameter1 === null)
-		{
-			// Fetch the postgroups!
-			$request = $smcFunc['db_query']('', '
-				SELECT id_group, min_posts
-				FROM {db_prefix}membergroups
-				WHERE min_posts != {int:min_posts}',
-				array(
-					'min_posts' => -1,
-				)
-			);
-			$postgroups = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$postgroups[$row['id_group']] = $row['min_posts'];
-			$smcFunc['db_free_result']($request);
+		if (empty($context['membergroups']))
+			loadMemberGroups();
 
-			// Sort them this way because if it's done with MySQL it causes a filesort :(.
-			arsort($postgroups);
+		$postgroups = array();
+		foreach ($context['membergroups'] as $group)
+			if ($group['min_posts'] != -1)
+				$postgroups[$group['id_group']] = $group['min_posts'];
 
-			cache_put_data('updateStats:postgroups', $postgroups, 360);
-		}
+		arsort($postgroups);
 
 		// Oh great, they've screwed their post groups.
 		if (empty($postgroups))
