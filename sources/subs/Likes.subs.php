@@ -42,8 +42,6 @@ function like_post($id_liker, $liked_message, $direction)
  */
 function loadLikes($messages, $prepare = true)
 {
-	global $smcFunc;
-
 	$likes = array();
 
 	if (empty($messages))
@@ -53,7 +51,8 @@ function loadLikes($messages, $prepare = true)
 		$messages = (array((int) $messages));
 
 	// Load up them likes from the db
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+	$db->query('', '
 		SELECT l.id_member, l.id_msg, m.real_name
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
@@ -62,14 +61,14 @@ function loadLikes($messages, $prepare = true)
 			'id_messages' => $messages,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
 
 	// total likes for this group
 	foreach ($likes as $msg_id => $like)
 		$likes[$msg_id]['count'] = count($like['member']);
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if ($prepare)
 		$likes = prepareLikes($likes);
@@ -129,10 +128,9 @@ function prepareLikes($likes)
  */
 function clearLikes($likeWaitTime)
 {
-	global $smcFunc;
-
 	// Delete all older items from the log
-	$smcFunc['db_query']('', '
+	$db = database();
+	$db->query('', '
 		DELETE FROM {db_prefix}log_likes
 		WHERE {int:current_time} - log_time > {int:wait_time}',
 		array(
@@ -153,14 +151,15 @@ function clearLikes($likeWaitTime)
  */
 function lastLikeOn($id_liker)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
 	$actions = 0;
 	if (empty($modSettings['likeWaitCount']))
 		return true;
 
 	// Find out if, and how many, this user has done recently...
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+	$db->query('', '
 		SELECT action
 		FROM {db_prefix}log_likes
 		WHERE id_executor = {int:current_member}',
@@ -168,8 +167,8 @@ function lastLikeOn($id_liker)
 			'current_member' => $id_liker,
 		)
 	);
-	$actions = $smcFunc['db_num_rows']($request);
-	$smcFunc['db_free_result']($request);
+	$actions = $db->num_rows($request);
+	$db->free_result($request);
 
 	return $actions < $modSettings['likeWaitCount'];
 }
@@ -183,10 +182,9 @@ function lastLikeOn($id_liker)
  */
 function addLike($id_liker, $liked_message, $direction)
 {
-	global $smcFunc;
-
 	// See if they already likeyed this message
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+	$db->query('', '
 		SELECT id_member
 		FROM {db_prefix}message_likes
 		WHERE id_member = {int:id_member}
@@ -197,13 +195,13 @@ function addLike($id_liker, $liked_message, $direction)
 			'id_msg' => $liked_message['id_msg'],
 		)
 	);
-	$count = $smcFunc['db_num_rows']($request);
-	$smcFunc['db_free_result']($request);
+	$count = $db->num_rows($request);
+	$db->free_result($request);
 
 	// Not previosly liked, and you want to
 	if ($count === 0 && $direction === '+')
 	{
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}message_likes',
 			array('id_member' => 'int', 'id_msg' => 'int'),
 			array($id_liker, $liked_message['id_msg']),
@@ -217,7 +215,7 @@ function addLike($id_liker, $liked_message, $direction)
 	// Or you are just being fickle?
 	elseif ($count !==0 && $direction === '-')
 	{
-		$smcFunc['db_query']('','
+		$db->query('','
 			DELETE FROM {db_prefix}message_likes
 			WHERE id_member = {int:id_member}
 				AND id_msg = {int:id_msg}',
@@ -233,7 +231,7 @@ function addLike($id_liker, $liked_message, $direction)
 	}
 
 	// Put it in the log so we can prevent flooding the system with likes
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}log_likes',
 		array('action' => 'string', 'id_target' => 'int', 'id_member' => 'int', 'log_time' => 'int'),
 		array($direction, $liked_message['id_msg'], $id_liker, time()),
@@ -249,9 +247,8 @@ function addLike($id_liker, $liked_message, $direction)
  */
 function increaseTopicLikes($id_topic, $direction)
 {
-	global $smcFunc;
-
-	$smcFunc['db_query']('', '
+	$db = database();
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
 		WHERE id_topic = {int:current_topic}',
