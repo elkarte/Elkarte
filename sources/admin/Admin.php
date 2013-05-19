@@ -899,7 +899,7 @@ class Admin_Controller
 			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
 			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
 			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('likesSettings', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'
+			array('likesSettings', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
 			array('signatureSettings', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
 			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
