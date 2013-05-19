@@ -253,7 +253,7 @@ class ManageScheduledTasks_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
@@ -433,7 +433,7 @@ class ManageScheduledTasks_Controller
 
 		createToken('admin-tl');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';

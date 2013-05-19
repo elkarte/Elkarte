@@ -613,7 +613,7 @@ class ManageAttachments_Controller
 		);
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1782,7 +1782,7 @@ class ManageAttachments_Controller
 				),
 			),
 		);
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))

@@ -185,7 +185,7 @@ class ManageCalendar_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['manage_holidays'];

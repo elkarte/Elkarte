@@ -528,7 +528,7 @@ class ManageSmileys_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1071,7 +1071,7 @@ class ManageSmileys_Controller
 					}',
 			);
 
-			require_once(SUBSDIR . '/List.subs.php');
+			require_once(SUBSDIR . '/List.class.php');
 			createList($listOptions);
 
 			// The list is the only thing to show, so make it the main template.
@@ -1327,7 +1327,7 @@ class ManageSmileys_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// If we're adding/editing an icon we'll need a list of boards

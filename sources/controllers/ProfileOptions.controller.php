@@ -483,7 +483,7 @@ function action_notification()
 	$memID = currentMemberID();
 
 	// Gonna want this for the list.
-	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/List.class.php');
 
 	// Fine, start with the board list.
 	$listOptions = array(

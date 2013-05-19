@@ -276,7 +276,7 @@ class ManageBans_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -323,7 +323,7 @@ class ManageBans_Controller
 				$context['ban_group_id'] = $ban_group_id;
 
 				// We're going to want this for making our list.
-				require_once(SUBSDIR . '/List.subs.php');
+				require_once(SUBSDIR . '/List.class.php');
 
 				$listOptions = array(
 					'id' => 'ban_items',
@@ -625,7 +625,7 @@ class ManageBans_Controller
 
 		createToken('admin-bl');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['ban_log'];
@@ -1036,7 +1036,7 @@ class ManageBans_Controller
 		}
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 }

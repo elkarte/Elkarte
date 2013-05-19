@@ -1256,7 +1256,7 @@ class Packages_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;

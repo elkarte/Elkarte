@@ -161,7 +161,7 @@ class ManageNews_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/ManageNews.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
