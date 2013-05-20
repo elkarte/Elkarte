@@ -748,7 +748,7 @@ class Poll_Controller
 			);
 
 			// Set the poll ID.
-			$bcinfo['id_poll'] = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
+			$bcinfo['id_poll'] = $db->insert_id('{db_prefix}polls', 'id_poll');
 
 			// Link the poll to the topic
 			$db->query('', '

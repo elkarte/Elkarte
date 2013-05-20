@@ -460,7 +460,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 		// Capture the ID of the new topic...
-		$topicID = empty($id_recycle_topic) ? $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
+		$topicID = empty($id_recycle_topic) ? $db->insert_id('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
 
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)

@@ -1259,7 +1259,7 @@ function loadAttachmentContext($id_msg)
 							array('id_attach')
 						);
 						$old_id_thumb = $attachment['id_thumb'];
-						$attachment['id_thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+						$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 						if (!empty($attachment['id_thumb']))
 						{
 							$db->query('', '

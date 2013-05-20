@@ -524,7 +524,7 @@ class ManagePaid_Controller
 
 				updateSubscription($update, $ignore_active);
 			}
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $smcFunc['db_insert_id']('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $db->insert_id('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}

@@ -1085,7 +1085,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$message_parameters,
 		array('id_msg')
 	);
-	$msgOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}messages', 'id_msg');
+	$msgOptions['id'] = $db->insert_id('{db_prefix}messages', 'id_msg');
 
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
@@ -1127,7 +1127,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$topic_parameters,
 			array('id_topic')
 		);
-		$topicOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+		$topicOptions['id'] = $db->insert_id('{db_prefix}topics', 'id_topic');
 
 		// The topic couldn't be created for some reason.
 		if (empty($topicOptions['id']))

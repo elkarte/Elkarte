@@ -533,7 +533,7 @@ function logActions($logs)
 		array('id_action')
 	);
 
-	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
+	return $db->insert_id('{db_prefix}log_actions', 'id_action');
 }
 
 /**

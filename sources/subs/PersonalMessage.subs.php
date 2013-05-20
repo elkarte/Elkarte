@@ -702,7 +702,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		),
 		array('id_pm')
 	);
-	$id_pm = $smcFunc['db_insert_id']('{db_prefix}personal_messages', 'id_pm');
+	$id_pm = $db->insert_id('{db_prefix}personal_messages', 'id_pm');
 
 	// Add the recipients.
 	if (!empty($id_pm))

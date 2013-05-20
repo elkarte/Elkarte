@@ -685,7 +685,7 @@ function insertBanGroup($ban_info = array())
 		),
 		array('id_ban_group')
 	);
-	$ban_info['id'] = $smcFunc['db_insert_id']('{db_prefix}ban_groups', 'id_ban_group');
+	$ban_info['id'] = $db->insert_id('{db_prefix}ban_groups', 'id_ban_group');
 
 	if (empty($ban_info['id']))
 		$ban_errors->addError('impossible_insert_new_bangroup');

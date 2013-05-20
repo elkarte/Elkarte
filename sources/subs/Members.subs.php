@@ -724,7 +724,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		$values,
 		array('id_member')
 	);
-	$memberID = $smcFunc['db_insert_id']('{db_prefix}members', 'id_member');
+	$memberID = $db->insert_id('{db_prefix}members', 'id_member');
 
 	// Update the number of members and latest member's info - and pass the name, but remove the 's.
 	if ($regOptions['register_vars']['is_activated'] == 1)

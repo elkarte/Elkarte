@@ -888,7 +888,7 @@ function insertEvent(&$eventOptions)
 	);
 
 	// Store the just inserted id_event for future reference.
-	$eventOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}calendar', 'id_event');
+	$eventOptions['id'] = $db->insert_id('{db_prefix}calendar', 'id_event');
 
 	// Update the settings to show something calendarish was updated.
 	updateSettings(array(

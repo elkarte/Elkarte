@@ -760,7 +760,7 @@ function createAttachment(&$attachmentOptions)
 		),
 		array('id_attach')
 	);
-	$attachmentOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 	// @todo Add an error here maybe?
 	if (empty($attachmentOptions['id']))
@@ -846,7 +846,7 @@ function createAttachment(&$attachmentOptions)
 				),
 				array('id_attach')
 			);
-			$attachmentOptions['thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 			if (!empty($attachmentOptions['thumb']))
 			{
@@ -1263,7 +1263,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		),
 		array('id_attach')
 	);
-	$attachID = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 	// First, the temporary file will have the .tmp extension.
 	$tempName = getAvatarPath() . '/' . $destName . '.tmp';

@@ -660,7 +660,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		),
 		array('id_topic')
 	);
-	$split2_ID_TOPIC = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
 		fatal_lang_error('cant_insert_topic');
 

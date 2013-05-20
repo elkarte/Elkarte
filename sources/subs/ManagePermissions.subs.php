@@ -1253,7 +1253,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 		),
 		array('id_profile')
 	);
-	$profile_id = $smcFunc['db_insert_id']('{db_prefix}permission_profiles', 'id_profile');
+	$profile_id = $db->insert_id('{db_prefix}permission_profiles', 'id_profile');
 
 	// Load the permissions from the one it's being copied from.
 	$request = $db->query('', '

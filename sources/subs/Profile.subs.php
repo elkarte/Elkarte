@@ -2208,7 +2208,7 @@ function profileSaveAvatarData(&$value)
 					array('id_attach')
 				);
 
-				$cur_profile['id_attach'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+				$cur_profile['id_attach'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 				$cur_profile['filename'] = $destName;
 				$cur_profile['attachment_type'] = empty($modSettings['custom_avatar_enabled']) ? 0 : 1;
 

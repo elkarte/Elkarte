@@ -50,7 +50,7 @@ function create_pm_draft($draft, $recipientList)
 	);
 
 	// get the new id
-	$draft['id_draft'] = $smcFunc['db_insert_id']('{db_prefix}user_drafts', 'id_draft');
+	$draft['id_draft'] = $db->insert_id('{db_prefix}user_drafts', 'id_draft');
 
 	return $draft['id_draft'];
 }
@@ -138,7 +138,7 @@ function create_post_draft($draft)
 	);
 
 	// get the id of the new draft
-	$draft['id_draft'] = $smcFunc['db_insert_id']('{db_prefix}user_drafts', 'id_draft');
+	$draft['id_draft'] = $db->insert_id('{db_prefix}user_drafts', 'id_draft');
 
 	return $draft['id_draft'];
 }
