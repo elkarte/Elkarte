@@ -1775,20 +1775,17 @@ function action_modcenter($dont_call = false)
 				),
 				'settings' => array(
 					'label' => $txt['mc_settings'],
-					'file' => 'admin/Modlog.php',
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_moderationSettings',
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
-					'file' => 'admin/Modlog.php',
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_modEndSession',
 					'enabled' => empty($modSettings['securityDisable_moderate']),
 				),
 				'notice' => array(
-					'file' => 'admin/Modlog.php',
-					'controller' => 'Modlog_Controller',
+					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_showNotice',
 					'select' => 'index'
 				),
@@ -1876,7 +1873,7 @@ function action_modcenter($dont_call = false)
 				'groups' => array(
 					'label' => $txt['mc_group_requests'],
 					'file' => 'controllers/Groups.controller.php',
-					'controller' => 'controllers/Groups_Controller',
+					'controller' => 'Groups_Controller',
 					'function' => 'action_groups',
 					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				),
