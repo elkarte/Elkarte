@@ -19,7 +19,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbTable_SQLite
+class DbTable_SQLite extends DbTable
 {
 	private static $_tbl = null;
 

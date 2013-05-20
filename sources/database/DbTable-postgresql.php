@@ -19,7 +19,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbTable_PostgreSQL
+class DbTable_PostgreSQL extends DbTable
 {
 	private static $_tbl = null;
 
