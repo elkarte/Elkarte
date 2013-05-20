@@ -401,7 +401,7 @@ function action_plushsearch2()
 		// Create a list of database-escaped search names.
 		$realNameMatches = array();
 		foreach ($possible_users as $possible_user)
-			$realNameMatches[] = $smcFunc['db_quote'](
+			$realNameMatches[] = $db->quote(
 				'{string:possible_user}',
 				array(
 					'possible_user' => $possible_user
@@ -423,7 +423,7 @@ function action_plushsearch2()
 			$userQuery = '';
 		elseif ($db->num_rows($request) == 0)
 		{
-			$userQuery = $smcFunc['db_quote'](
+			$userQuery = $db->quote(
 				'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
 				array(
 					'id_member_guest' => 0,
@@ -436,7 +436,7 @@ function action_plushsearch2()
 			$memberlist = array();
 			while ($row = $db->fetch_assoc($request))
 				$memberlist[] = $row['id_member'];
-			$userQuery = $smcFunc['db_quote'](
+			$userQuery = $db->quote(
 				'(m.id_member IN ({array_int:matched_members}) OR (m.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})))',
 				array(
 					'matched_members' => $memberlist,
@@ -2037,7 +2037,7 @@ function MessageSearch2()
 
 			$labelStatements = array();
 			foreach ($_REQUEST['searchlabel'] as $label)
-				$labelStatements[] = $smcFunc['db_quote']('FIND_IN_SET({string:label}, pmr.labels) != 0', array(
+				$labelStatements[] = $db->quote('FIND_IN_SET({string:label}, pmr.labels) != 0', array(
 					'label' => $label,
 				));
 

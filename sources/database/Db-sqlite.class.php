@@ -1187,7 +1187,7 @@ class Database_SQLite implements Database
 			)
 		);
 
-		$request = $smcFunc['db_quote']('
+		$request = $db->quote('
 			CREATE TABLE {raw:backup_table} {raw:create}',
 			array(
 				'backup_table' => $backup_table,

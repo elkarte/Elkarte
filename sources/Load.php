@@ -493,7 +493,7 @@ function loadBoard()
 			WHERE b.id_board = {raw:board_link}',
 			array(
 				'current_topic' => $topic,
-				'board_link' => empty($topic) ? $smcFunc['db_quote']('{int:current_board}', array('current_board' => $board)) : 't.id_board',
+				'board_link' => empty($topic) ? $db->quote('{int:current_board}', array('current_board' => $board)) : 't.id_board',
 			)
 		);
 		// If there aren't any, skip.
