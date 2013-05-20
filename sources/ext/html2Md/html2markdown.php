@@ -471,7 +471,9 @@ class Convert_Md
 	 */
 	private function _convert_header($level, $content)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$level = (int) ltrim($level, 'h');
 
@@ -547,7 +549,9 @@ class Convert_Md
 	 */
 	function _convert_table($node)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
@@ -823,7 +827,9 @@ class Convert_Md
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$lines = array();
 		while (!empty($string))

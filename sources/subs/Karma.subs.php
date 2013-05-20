@@ -13,7 +13,9 @@
 
 function clearKarma($karmaWaitTime)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Delete any older items from the log. (karmaWaitTime is by hour.)
 	$smcFunc['db_query']('', '
@@ -34,7 +36,9 @@ function clearKarma($karmaWaitTime)
  */
 function lastActionOn($id_executor, $id_target)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find out if this user has done this recently...
 	$request = $smcFunc['db_query']('', '
@@ -64,7 +68,9 @@ function lastActionOn($id_executor, $id_target)
  */
 function addKarma($id_executor, $id_target, $direction)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Put it in the log.
 	$smcFunc['db_insert']('replace',
@@ -87,7 +93,9 @@ function addKarma($id_executor, $id_target, $direction)
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// You decided to go back on your previous choice?
 	$smcFunc['db_query']('', '

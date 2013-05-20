@@ -47,7 +47,9 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	switch ($type)
 	{
@@ -264,7 +266,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info, ;
+
+	$db = database();
 
 	$parameters = array();
 	if (is_array($members))
@@ -416,7 +420,9 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -638,7 +644,9 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings, $smcFunc;
+	global $context, $user_info, $txt, $modSettings, ;
+
+	$db = database();
 	static $non_twelve_hour;
 
 	// Offset the time.
@@ -811,7 +819,9 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// It was already short enough!
 	if ($smcFunc['strlen']($subject) <= $len)
@@ -836,7 +846,9 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$current = $smcFunc['strlen']($text);
 
@@ -928,7 +940,9 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $user_info, ;
+
+	$db = database();
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -2467,7 +2481,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, $smcFunc;
+	global $modSettings, $txt, $user_info, $context, ;
+
+	$db = database();
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	// No smiley set at all?!
@@ -2626,7 +2642,9 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, $smcFunc;
+	global $context, $settings, $modSettings, $txt, ;
+
+	$db = database();
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
 	// Attempt to prevent a recursive loop.
@@ -2764,7 +2782,9 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings, $smcFunc;
+	global $user_settings, ;
+
+	$db = database();
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
@@ -3319,7 +3339,9 @@ function template_css()
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Just make up a nice hash...
 	if ($new)
@@ -4024,7 +4046,9 @@ function call_integration_hook($hook, $parameters = array())
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file) && $file !== true) ? $function . ':' . $file : $function;
 
@@ -4078,7 +4102,9 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file)) ? $function . ':' . $file : $function;
 

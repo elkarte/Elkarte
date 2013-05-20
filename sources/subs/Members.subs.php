@@ -39,7 +39,9 @@ if (!defined('ELKARTE'))
  */
 function deleteMembers($users, $check_not_admin = false)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info, ;
+
+	$db = database();
 
 	// Try give us a while to sort this out...
 	@set_time_limit(600);
@@ -435,7 +437,9 @@ function deleteMembers($users, $check_not_admin = false)
 function registerMember(&$regOptions, $return_errors = false)
 {
 	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings, $smcFunc;
+	global $user_info, $options, $settings, ;
+
+	$db = database();
 
 	loadLanguage('Login');
 
@@ -861,7 +865,9 @@ function registerMember(&$regOptions, $return_errors = false)
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
-	global $user_info, $modSettings, $smcFunc, $context;
+	global $user_info, $modSettings, $context;
+
+	$db = database();
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
 	$checkName = $smcFunc['strtolower']($name);
@@ -965,7 +971,9 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  */
 function groupsAllowedTo($permission, $board_id = null)
 {
-	global $modSettings, $board_info, $smcFunc;
+	global $modSettings, $board_info, ;
+
+	$db = database();
 
 	// Admins are allowed to do anything.
 	$member_groups = array(
@@ -1041,7 +1049,9 @@ function groupsAllowedTo($permission, $board_id = null)
  */
 function membersAllowedTo($permission, $board_id = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$member_groups = groupsAllowedTo($permission, $board_id);
 
@@ -1087,7 +1097,9 @@ function membersAllowedTo($permission, $board_id = null)
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Firstly, if email and username aren't passed find out the members email address and name.
 	if ($email === false && $membername === false)
@@ -1171,7 +1183,9 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
@@ -1209,7 +1223,9 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
  */
 function list_getNumMembers($where, $where_params = array())
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// We know how many members there are in total.
 	if (empty($where) || $where == '1=1')
@@ -1239,7 +1255,9 @@ function list_getNumMembers($where, $where_params = array())
  */
 function populateDuplicateMembers(&$members)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// This will hold all the ip addresses.
 	$ips = array();
@@ -1358,7 +1376,9 @@ function populateDuplicateMembers(&$members)
  */
 function isAnotherAdmin($memberID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member
@@ -1386,7 +1406,9 @@ function isAnotherAdmin($memberID)
  */
 function admins($id_admin = 0)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Now let's get out and loop through the admins.
 	$request = $smcFunc['db_query']('', '
@@ -1415,7 +1437,9 @@ function admins($id_admin = 0)
  */
 function maxMemberID()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT MAX(id_member)
@@ -1445,7 +1469,9 @@ function maxMemberID()
  */
 function getBasicMemberData($member_ids, $options = array())
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$members = array();
 
@@ -1506,7 +1532,9 @@ function getBasicMemberData($member_ids, $options = array())
  */
 function countInactiveMembers()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$inactive_members = array();
 
@@ -1534,7 +1562,9 @@ function countInactiveMembers()
  */
 function getMemberByName($name)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$member = array();
 
@@ -1558,7 +1588,9 @@ function getMemberByName($name)
 
 function getMember($search, $buddies = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find the member.
 	$request = $smcFunc['db_query']('', '
@@ -1635,7 +1667,9 @@ function jeffsdatediff($old)
  */
 function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 {
-	global $smcFunc, $modSettings, $language;
+	global , $modSettings, $language;
+
+	$db = database();
 
 	$data = array();
 
@@ -1685,7 +1719,9 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
  */
 function approveMembers($members, $condition, $timeBefore, $current_filter)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Approve/activate this member.
 	$smcFunc['db_query']('', '
@@ -1714,7 +1750,9 @@ function approveMembers($members, $condition, $timeBefore, $current_filter)
  */
 function enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}members
@@ -1740,7 +1778,9 @@ function enforceReactivation($member, $condition, $current_filter, $members, $ti
  */
 function countMembersInGroup($id_group = 0)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Determine the number of ungrouped members.
 	$request = $smcFunc['db_query']('', '

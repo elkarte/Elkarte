@@ -75,7 +75,9 @@ function action_loadlocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $context, $txt, $settings, $smcFunc;
+	global $modSettings, $context, $txt, $settings, ;
+
+	$db = database();
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -147,7 +149,9 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $smcFunc;
+	global $txt, $modSettings, $options, ;
+
+	$db = database();
 	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
@@ -697,7 +701,9 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $txt, $modSettings, $options, $smcFunc, $language;
+	global $txt, $modSettings, $options, $language;
+
+	$db = database();
 	global $context, $settings, $user_info, $scripturl;
 	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
 	static $all_instances;
@@ -887,7 +893,9 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $smcFunc, $modSettings;
+		global $context, $modSettings;
+
+		$db = database();
 
 		if (!$this->_show_captcha)
 			return;
@@ -1061,7 +1069,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function prepareContext()
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
@@ -1099,7 +1109,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $smcFunc, $language;
+		global $txt, $context, $language;
+
+		$db = database();
 
 		// Load any question and answers!
 		$filter = null;
@@ -1193,7 +1205,9 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _verifyAnswers()
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// Get the answers and see if they are all right!
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
@@ -1217,7 +1231,9 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _refreshQuestionsCache()
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
 		{
@@ -1244,7 +1260,9 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _loadAntispamQuestions($filter = null)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$available_filters = array(
 			'language' => 'language = {string:current_filter}',
@@ -1277,7 +1295,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _delete($id)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}antispam_questions
@@ -1290,7 +1310,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _update($id, $question, $answers, $language)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$request = $smcFunc['db_query']('', '
 			UPDATE {db_prefix}antispam_questions
@@ -1311,7 +1333,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _insert($questions)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$smcFunc['db_insert']('',
 			'{db_prefix}antispam_questions',
@@ -1348,7 +1372,9 @@ function theme_postbox($msg)
  */
 function bbc_to_html($text, $compat_mode = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	if (!$compat_mode)
 		return $text;
@@ -1413,7 +1439,9 @@ function bbc_to_html($text, $compat_mode = false)
  */
 function html_to_bbc($text)
 {
-	global $modSettings, $smcFunc, $scripturl, $context;
+	global $modSettings, $scripturl, $context;
+
+	$db = database();
 
 	// Replace newlines with spaces, as that's how browsers usually interpret them.
 	$text = preg_replace("~\s*[\r\n]+\s*~", ' ', $text);

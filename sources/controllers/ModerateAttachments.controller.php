@@ -27,7 +27,9 @@ class ModerateAttachments_Controller
 	 */
 	function action_attachapprove()
 	{
-		global $smcFunc, $user_info;
+		global , $user_info;
+
+		$db = database();
 
 		// Security is our primary concern...
 		checkSession('get');

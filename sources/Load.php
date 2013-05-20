@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context, $ent_check;
+	global $modSettings, $txt, $db_character_set, $context, $ent_check;
+
+	$db = database();
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
@@ -146,7 +148,9 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $smcFunc;
+	global $modSettings, $user_settings, ;
+
+	$db = database();
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -406,7 +410,9 @@ function loadUserSettings()
 function loadBoard()
 {
 	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic, $user_info, $smcFunc;
+	global $board_info, $board, $topic, $user_info, ;
+
+	$db = database();
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -664,7 +670,9 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, $smcFunc;
+	global $user_info, $board, $board_info, $modSettings, ;
+
+	$db = database();
 
 	if ($user_info['is_admin'])
 	{
@@ -784,7 +792,9 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $smcFunc, $context;
+	global $user_profile, $modSettings, $board_info, $context;
+
+	$db = database();
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -937,7 +947,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
 	global $context, $modSettings, $board_info, $settings;
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1140,7 +1152,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $ssi_theme, $smcFunc;
+	global $context, $settings, $options, $ssi_theme, ;
+
+	$db = database();
 
 	// The theme was specified by parameter.
 	if (!empty($id_theme))
@@ -1605,7 +1619,9 @@ function loadTheme($id_theme = 0, $initialize = true)
  */
 function loadEssentialThemeData()
 {
-	global $settings, $modSettings, $smcFunc, $mbname, $context;
+	global $settings, $modSettings, $mbname, $context;
+
+	$db = database();
 
 	// Get all the default theme variables.
 	$result = $smcFunc['db_query']('', '
@@ -2101,7 +2117,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
  */
 function getBoardParents($id_parent)
 {
-	global $scripturl, $smcFunc;
+	global $scripturl, ;
+
+	$db = database();
 
 	// First check if we have this cached already.
 	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
@@ -2169,7 +2187,9 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $smcFunc, $settings, $modSettings;
+	global , $settings, $modSettings;
+
+	$db = database();
 
 	// Either we don't use the cache, or its expired.
 	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)

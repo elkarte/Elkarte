@@ -33,7 +33,9 @@ class MoveTopic_Controller
 	 */
 	function action_movetopic()
 	{
-		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $modSettings;
+		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $modSettings;
+
+		$db = database();
 		global $cat_tree, $boards, $boardList;
 
 		if (empty($topic))
@@ -111,7 +113,9 @@ class MoveTopic_Controller
 	function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
-		global $board, $language, $user_info, $smcFunc;
+		global $board, $language, $user_info, ;
+
+		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);

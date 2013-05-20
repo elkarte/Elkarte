@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
 
 function loadMessageLimit()
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	if ($user_info['is_admin'])
 		$context['message_limit'] = 0;
@@ -52,7 +54,9 @@ function loadMessageLimit()
 
 function loadPMLabels()
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	// Looks like we need to reseek!
 	$result = $smcFunc['db_query']('', '
@@ -84,7 +88,9 @@ function loadPMLabels()
 
 function getPMCount($descending = false, $pmID = null, $labelQuery)
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	// Figure out how many messages there are.
 	if ($context['folder'] == 'sent')
@@ -134,7 +140,9 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
-	global $user_info, $smcFunc;
+	global $user_info, ;
+
+	$db = database();
 
 	if ($owner === null)
 		$owner = array($user_info['id']);
@@ -272,7 +280,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	if ($owner === null)
 		$owner = $user_info['id'];
@@ -345,7 +355,9 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
-	global $user_info, $smcFunc;
+	global $user_info, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
@@ -406,7 +418,9 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
-	global $modSettings, $smcFunc, $webmaster_email;
+	global $modSettings, $webmaster_email;
+
+	$db = database();
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
@@ -821,7 +835,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
  */
 function markPMsRead($memberID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}pm_recipients
@@ -852,7 +868,9 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
-	global $smcFunc, $context, $modSettings;
+	global , $context, $modSettings;
+
+	$db = database();
 
 	// First work out what messages we need to see - if grouped is a little trickier...
 	// Conversation mode
@@ -1004,7 +1022,9 @@ function loadPMs($pm_options, $id_member)
  */
 function pmCount($id_member, $time)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(pr.id_pm) AS post_count

@@ -41,7 +41,9 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$replacements = array(
 			'create_tmp_log_search_topics' => array(
@@ -93,7 +95,9 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$size = 'int';
 

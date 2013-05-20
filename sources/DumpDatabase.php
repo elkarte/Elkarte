@@ -32,7 +32,9 @@ if (!defined('ELKARTE'))
 function DumpDatabase2()
 {
 	global $db_name, $scripturl, $context, $modSettings, $crlf;
-	global $smcFunc, $db_prefix, $db_show_debug;
+	global , $db_prefix, $db_show_debug;
+
+	$db = database();
 
 	// Administrators only!
 	if (!allowedTo('admin_forum'))

@@ -31,7 +31,9 @@ if (!defined('ELKARTE'))
  */
 function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = array())
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Get the total amount of users.
 	$request = $smcFunc['db_query']('', '
@@ -65,7 +67,9 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  */
 function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars = array())
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT ls.id_sublog, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name, ls.start_time, ls.end_time,
@@ -108,7 +112,9 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
  */
 function reapplySubscriptions($users)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Make it an array.
 	if (!is_array($users))
@@ -189,7 +195,9 @@ function reapplySubscriptions($users)
  */
 function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTime = 0, $forceEndTime = 0)
 {
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	// Take the easy way out...
 	loadSubscriptions();
@@ -431,7 +439,9 @@ function loadPaymentGateways()
  */
 function loadSubscriptions()
 {
-	global $context, $txt, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, ;
+
+	$db = database();
 
 	if (!empty($context['subscriptions']))
 		return;
@@ -541,7 +551,9 @@ function loadSubscriptions()
 
 function deleteSubscription($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('delete_subscription', '
 		DELETE FROM {db_prefix}subscriptions
@@ -559,7 +571,9 @@ function deleteSubscription($id)
  */
 function insertSubscription($insert)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 	'{db_prefix}subscriptions',
@@ -585,7 +599,9 @@ function insertSubscription($insert)
  */
 function countActiveSubscriptions($sub_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Don't do groups if there are active members
 	$request = $smcFunc['db_query']('', '
@@ -612,7 +628,9 @@ function countActiveSubscriptions($sub_id)
  */
 function updateSubscription($update, $ignore_active)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('substring', '
 		UPDATE {db_prefix}subscriptions
@@ -646,7 +664,9 @@ function updateSubscription($update, $ignore_active)
  */
 function getSubscriptionDetails($sub_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT name, description, cost, length, id_group, add_groups, active, repeatable, allow_partial, email_complete, reminder
@@ -709,7 +729,9 @@ function getSubscriptionDetails($sub_id)
  */
 function getSubscription($id_sub)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Load the subscription information.
 	$request = $smcFunc['db_query']('', '
@@ -745,7 +767,9 @@ function getSubscription($id_sub)
  */
 function validateSubscriptionID($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_subscribe
@@ -772,7 +796,9 @@ function validateSubscriptionID($id)
  */
 function alreadySubscribed($id_sub, $id_member)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Ensure the member doesn't already have a subscription!
 	$request = $smcFunc['db_query']('', '
@@ -801,7 +827,9 @@ function alreadySubscribed($id_sub, $id_member)
  */
 function getSubscriptionStatus($log_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$status = array();
 
@@ -829,7 +857,9 @@ function getSubscriptionStatus($log_id)
  */
 function updateSubscriptionItem($item)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}log_subscribed
@@ -852,7 +882,9 @@ function updateSubscriptionItem($item)
  */
 function prepareDeleteSubscriptions($toDelete)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_subscribe, id_member
@@ -877,7 +909,9 @@ function prepareDeleteSubscriptions($toDelete)
  */
 function getPendingSubscriptions($log_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT ls.id_sublog, ls.id_subscribe, ls.id_member, start_time, end_time, status, payments_pending, pending_details,
@@ -903,7 +937,9 @@ function getPendingSubscriptions($log_id)
  */
 function logSubscription($details)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_subscribed',
@@ -927,7 +963,9 @@ function logSubscription($details)
  */
 function updatePendingSubscription($log_id, $details)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Update the entry.
 	$smcFunc['db_query']('', '
@@ -950,7 +988,9 @@ function updatePendingSubscription($log_id, $details)
  */
 function removeSubscription($id_subscribe, $id_member, $delete = false)
 {
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	loadSubscriptions();
 

@@ -179,7 +179,9 @@ function is_not_guest($message = '', $is_fatal = true)
 function is_not_banned($forceCheck = false)
 {
 	global $txt, $modSettings, $context, $user_info;
-	global $cookiename, $user_settings, $smcFunc;
+	global $cookiename, $user_settings, ;
+
+	$db = database();
 
 	// You cannot be banned if you are an admin - doesn't help if you log out.
 	if ($user_info['is_admin'])
@@ -505,7 +507,9 @@ function banPermissions()
  */
 function log_ban($ban_ids = array(), $email = null)
 {
-	global $user_info, $smcFunc;
+	global $user_info, ;
+
+	$db = database();
 
 	// Don't log web accelerators, it's very confusing...
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -541,7 +545,9 @@ function log_ban($ban_ids = array(), $email = null)
  */
 function isBannedEmail($email, $restriction, $error)
 {
-	global $txt, $smcFunc;
+	global $txt, ;
+
+	$db = database();
 
 	// Can't ban an empty email
 	if (empty($email) || trim($email) == '')
@@ -905,7 +911,9 @@ function checkSubmitOnce($action, $is_fatal = true)
  */
 function allowedTo($permission, $boards = null)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, ;
+
+	$db = database();
 
 	// You're always allowed to do nothing. (unless you're a working man, MR. LAZY :P!)
 	if (empty($permission))
@@ -1040,7 +1048,9 @@ function isAllowedTo($permission, $boards = null)
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, ;
+
+	$db = database();
 
 	// Arrays are nice, most of the time.
 	if (!is_array($permissions))
@@ -1177,7 +1187,9 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  */
 function spamProtection($error_type)
 {
-	global $modSettings, $txt, $user_info, $smcFunc;
+	global $modSettings, $txt, $user_info, ;
+
+	$db = database();
 
 	// Certain types take less/more time.
 	$timeOverrides = array(
@@ -1388,7 +1400,9 @@ function loadBadBehavior()
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
-	global $smcFunc, $cookiename;
+	global , $cookiename;
+
+	$db = database();
 
 	// As this is only brute protection, we allow 5 attempts every 10 seconds.
 

@@ -33,7 +33,9 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $smcFunc, $cur_profile;
+		global $language, $scripturl, $cur_profile;
+
+		$db = database();
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
@@ -225,7 +227,9 @@ class Register_Controller
 	function action_register2($verifiedOpenID = false)
 	{
 		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings, $smcFunc;
+		global $user_info, $options, $settings, ;
+
+		$db = database();
 
 		checkSession();
 		validateToken('register');
@@ -530,7 +534,9 @@ class Register_Controller
 	 */
 	function action_activate()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc, $language, $user_info;
+		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
+
+		$db = database();
 
 		// Logged in users should not bother to activate their accounts
 		if (!empty($user_info['id']))
@@ -689,7 +695,9 @@ class Register_Controller
 	 */
 	function action_coppa()
 	{
-		global $context, $modSettings, $txt, $smcFunc;
+		global $context, $modSettings, $txt, ;
+
+		$db = database();
 
 		loadLanguage('Login');
 		loadTemplate('Register');
@@ -833,7 +841,9 @@ class Register_Controller
 	 */
 	function action_contact()
 	{
-		global $context, $txt, $smcFunc, $user_info, $modSettings;
+		global $context, $txt, $user_info, $modSettings;
+
+		$db = database();
 
 		// Already inside, no need to use this, just send a PM
 		// Disabled, you cannot enter.
@@ -920,7 +930,9 @@ class Register_Controller
  */
 function registerCheckUsername()
 {
-	global $smcFunc, $context, $txt;
+	global , $context, $txt;
+
+	$db = database();
 
 	// This is XML!
 	loadTemplate('Xml');

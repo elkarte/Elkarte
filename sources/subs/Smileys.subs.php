@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function smileyExists($smileys)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$found = array();
 	$request = $smcFunc['db_query']('', '
@@ -53,7 +55,9 @@ function smileyExists($smileys)
  */
 function validateDuplicateSmiley($code, $current = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$db = database();
 
@@ -83,7 +87,9 @@ function validateDuplicateSmiley($code, $current = null)
  */
 function nextSmileyLocation($location)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT MAX(smiley_order) + 1
@@ -108,7 +114,9 @@ function nextSmileyLocation($location)
  */
 function addSmiley($param)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}smileys',
@@ -127,7 +135,9 @@ function addSmiley($param)
  */
 function deleteSmileys($smileys)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}smileys
@@ -146,7 +156,9 @@ function deleteSmileys($smileys)
  */
 function updateSmileyDisplayType($smileys, $display_type)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}smileys
@@ -166,7 +178,9 @@ function updateSmileyDisplayType($smileys, $display_type)
  */
 function updateSmiley($param)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}smileys
@@ -194,7 +208,9 @@ function updateSmiley($param)
  */
 function getSmiley($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new
@@ -221,7 +237,9 @@ function getSmiley($id)
  */
 function getSmileyPosition($location, $id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smiley = array();
 
@@ -250,7 +268,9 @@ function getSmileyPosition($location, $id)
  */
 function moveSmileyPosition($smiley, $source)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}smileys
@@ -290,7 +310,9 @@ function moveSmileyPosition($smiley, $source)
  */
 function updateSmileyRow($id, $row, $location)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}smileys
@@ -313,7 +335,9 @@ function updateSmileyRow($id, $row, $location)
  */
 function updateSmileyOrder($id, $order)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}smileys
@@ -333,7 +357,9 @@ function updateSmileyOrder($id, $order)
  */
 function getSmileys()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
@@ -378,7 +404,9 @@ function getSmileys()
  */
 function isSmileySetInstalled($set)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT version, themes_installed, db_changes
@@ -406,7 +434,9 @@ function isSmileySetInstalled($set)
  */
 function logPackageInstall($param)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_packages',
@@ -433,7 +463,9 @@ function logPackageInstall($param)
  */
 function getMaxSmileyOrder()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT MAX(smiley_order)
@@ -458,7 +490,9 @@ function getMaxSmileyOrder()
  */
 function sortSmileyTable()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$table = db_table();
 
@@ -552,7 +586,9 @@ function list_getNumSmileySets()
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
@@ -575,7 +611,9 @@ function list_getSmileys($start, $items_per_page, $sort)
  */
 function list_getNumSmileys()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)

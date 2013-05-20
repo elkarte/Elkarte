@@ -55,7 +55,9 @@ class Emailuser_Controller
 	 */
 	function action_sendtopic()
 	{
-		global $topic, $txt, $context, $scripturl, $smcFunc, $modSettings;
+		global $topic, $txt, $context, $scripturl, $modSettings;
+
+		$db = database();
 
 		// Check permissions...
 		isAllowedTo('send_topic');
@@ -148,7 +150,9 @@ class Emailuser_Controller
 	 */
 	function action_email()
 	{
-		global $context, $modSettings, $user_info, $smcFunc, $txt, $scripturl;
+		global $context, $modSettings, $user_info, $txt, $scripturl;
+
+		$db = database();
 
 		// Can the user even see this information?
 		if ($user_info['is_guest'] && !empty($modSettings['guest_hideContacts']))
@@ -275,7 +279,9 @@ class Emailuser_Controller
 	 */
 	function action_reporttm()
 	{
-		global $txt, $topic, $modSettings, $user_info, $context, $smcFunc;
+		global $txt, $topic, $modSettings, $user_info, $context, ;
+
+		$db = database();
 
 		$context['robot_no_index'] = true;
 
@@ -361,7 +367,9 @@ class Emailuser_Controller
 	 */
 	function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, $smcFunc;
+		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, ;
+
+		$db = database();
 
 		// You must have the proper permissions!
 		isAllowedTo('report_any');

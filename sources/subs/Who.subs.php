@@ -16,7 +16,9 @@ if (!defined('ELKARTE'))
 
 function viewers($id, $session, $type = 'topic')
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!in_array($type, array('topic', 'board')))
 	{

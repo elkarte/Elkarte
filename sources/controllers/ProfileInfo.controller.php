@@ -24,7 +24,9 @@ if (!defined('ELKARTE'))
 function action_summary()
 {
 	global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
-	global $scripturl, $smcFunc, $settings;
+	global $scripturl, $settings;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -269,7 +271,9 @@ function action_summary()
 function action_showPosts()
 {
 	global $txt, $user_info, $scripturl, $modSettings;
-	global $context, $user_profile, $smcFunc, $board;
+	global $context, $user_profile, $board;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -593,7 +597,9 @@ function action_showPosts()
 function action_showAttachments()
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile, $smcFunc;
+	global $context, $user_profile, ;
+
+	$db = database();
 
 	// OBEY permissions!
 	$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -709,7 +715,9 @@ function action_showAttachments()
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
-	global $smcFunc, $board, $modSettings, $context;
+	global , $board, $modSettings, $context;
+
+	$db = database();
 
 	// Retrieve some attachments.
 	$request = $smcFunc['db_query']('', '
@@ -774,7 +782,9 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
  */
 function list_getNumAttachments($boardsAllowed, $memID)
 {
-	global $board, $smcFunc, $modSettings, $context;
+	global $board, $modSettings, $context;
+
+	$db = database();
 
 	// Get the total number of attachments they have posted.
 	$request = $smcFunc['db_query']('', '
@@ -809,7 +819,9 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function action_showDisregarded()
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context, $smcFunc;
+	global $txt, $user_info, $scripturl, $modSettings, $board, $context, ;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -936,7 +948,9 @@ function action_showDisregarded()
  */
 function list_getDisregarded($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the list of topics we can see
 	$request = $smcFunc['db_query']('', '
@@ -994,7 +1008,9 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
  */
 function list_getNumDisregarded($memID)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	// Get the total number of attachments they have posted.
 	$request = $smcFunc['db_query']('', '
@@ -1021,7 +1037,9 @@ function list_getNumDisregarded($memID)
  */
 function action_statPanel()
 {
-	global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings, ;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -1221,7 +1239,9 @@ function action_statPanel()
 function action_showPermissions()
 {
 	global $scripturl, $txt, $board, $modSettings;
-	global $user_profile, $context, $user_info, $smcFunc;
+	global $user_profile, $context, $user_info, ;
+
+	$db = database();
 
 	// Verify if the user has sufficient permissions.
 	isAllowedTo('manage_permissions');

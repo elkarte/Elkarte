@@ -31,7 +31,9 @@ if (!defined('ELKARTE'))
  */
 function getSignatureFromMembers($start_member)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$members = array();
 
@@ -62,7 +64,9 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}members
@@ -85,7 +89,9 @@ function updateSignature($id_member, $signature)
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
-	global $txt, $modSettings, $smcFunc;
+	global $txt, $modSettings, ;
+
+	$db = database();
 
 	$list = array();
 
@@ -132,7 +138,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
  */
 function list_getProfileFieldSize()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -155,7 +163,9 @@ function list_getProfileFieldSize()
  */
 function getProfileField($id_field)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$field = array();
 
@@ -221,7 +231,9 @@ function getProfileField($id_field)
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
-	global $smcFunc;
+
+
+	$db = database();
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
 	for ($i = 0; !$unique && $i < 9; $i ++)
@@ -254,7 +266,9 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}themes
@@ -278,7 +292,9 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  */
 function updateProfileField($field_data)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}custom_fields
@@ -323,7 +339,9 @@ function updateProfileField($field_data)
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}themes
@@ -345,7 +363,9 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  */
 function addProfileField($field)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}custom_fields',
@@ -373,7 +393,9 @@ function addProfileField($field)
 
 function reOrderProfileFields()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('alter_table_boards', '
 		ALTER TABLE {db_prefix}custom_fields
@@ -391,7 +413,9 @@ function reOrderProfileFields()
  */
 function deleteProfileFieldUserData($name)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Delete the user data first.
 	$smcFunc['db_query']('', '
@@ -412,7 +436,9 @@ function deleteProfileFieldUserData($name)
  */
 function deleteProfileField($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}custom_fields
@@ -428,7 +454,9 @@ function deleteProfileField($id)
  */
 function updateDisplayCache()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT col_name, field_name, field_type, bbc, enclose, placement

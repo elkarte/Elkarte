@@ -20,7 +20,9 @@ if (!defined('ELKARTE'))
  */
 function fetchPackageServers($server = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 	
 	$servers = array();
 
@@ -54,7 +56,9 @@ function fetchPackageServers($server = null)
  */
 function deletePackageServer($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}package_servers
@@ -73,7 +77,9 @@ function deletePackageServer($id)
  */
 function addPackageServer($name, $url)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}package_servers',

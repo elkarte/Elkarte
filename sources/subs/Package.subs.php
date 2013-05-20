@@ -386,7 +386,9 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// First, check that the database is valid, installed.list is still king.
 	$install_file = implode('', file(BOARDDIR . '/packages/installed.list'));
@@ -449,7 +451,9 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false)
@@ -2898,7 +2902,9 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$files = array();
 
@@ -3217,7 +3223,9 @@ if (!function_exists('crc32_compat'))
  */
 function isPackageInstalled($id)
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	$result = array(
 		'package_id' => '',
@@ -3267,7 +3275,9 @@ function isPackageInstalled($id)
  */
 function setPackageState($id)
 {
-	global $smcFunc, $context, $user_info;
+	global , $context, $user_info;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}log_packages
@@ -3293,7 +3303,9 @@ function setPackageState($id)
  */
 function checkPackageDependency()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$version = false;
 
@@ -3328,7 +3340,9 @@ function checkPackageDependency()
  */
 function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$smcFunc['db_insert']('', '{db_prefix}log_packages',
 		array(
@@ -3352,7 +3366,9 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
  */
 function setPackagesAsUninstalled()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Set everything as uninstalled, just like that
 	$smcFunc['db_query']('', '

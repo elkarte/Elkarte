@@ -34,7 +34,9 @@ class Display_Controller
 	 */
 	function action_index()
 	{
-		global $scripturl, $txt, $modSettings, $context, $settings, $smcFunc;
+		global $scripturl, $txt, $modSettings, $context, $settings, ;
+
+		$db = database();
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request, $topicinfo, $language, $all_posters;
 
@@ -932,7 +934,9 @@ class Display_Controller
 	 */
 	function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $smcFunc, $modSettings, $context;
+		global $topic, $board, $user_info, $modSettings, $context;
+
+		$db = database();
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -1034,7 +1038,9 @@ class Display_Controller
  */
 function prepareDisplayContext($reset = false)
 {
-	global $settings, $txt, $modSettings, $scripturl, $options, $user_info, $smcFunc;
+	global $settings, $txt, $modSettings, $scripturl, $options, $user_info, ;
+
+	$db = database();
 	global $memberContext, $context, $messages_request, $topic, $attachments, $topicinfo;
 
 	static $counter = null;
@@ -1175,7 +1181,9 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic, ;
+
+	$db = database();
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();

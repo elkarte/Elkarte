@@ -33,7 +33,9 @@ class PersonalMessage_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $scripturl, $context, $user_info, $user_settings, $smcFunc, $modSettings;
+		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
+
+		$db = database();
 
 		// No guests!
 		is_not_guest();
@@ -194,7 +196,9 @@ class PersonalMessage_Controller
 	function action_messagefolder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $user_info, $recipients, $options, $smcFunc, $memberContext, $user_settings;
+		global $messages_request, $user_info, $recipients, $options, $memberContext, $user_settings;
+
+		$db = database();
 
 		// Changing view?
 		if (isset($_GET['view']))
@@ -651,7 +655,9 @@ class PersonalMessage_Controller
 	function action_sendmessage()
 	{
 		global $txt, $scripturl, $modSettings;
-		global $context, $options, $smcFunc, $language, $user_info;
+		global $context, $options, $language, $user_info;
+
+		$db = database();
 
 		isAllowedTo('pm_send');
 
@@ -937,7 +943,9 @@ class PersonalMessage_Controller
 	function action_sendmessage2()
 	{
 		global $txt, $context;
-		global $user_info, $modSettings, $scripturl, $smcFunc;
+		global $user_info, $modSettings, $scripturl, ;
+
+		$db = database();
 
 		isAllowedTo('pm_send');
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -1217,7 +1225,9 @@ class PersonalMessage_Controller
 	 */
 	function action_messageactions()
 	{
-		global $txt, $context, $user_info, $options, $smcFunc;
+		global $txt, $context, $user_info, $options, ;
+
+		$db = database();
 
 		checkSession('request');
 
@@ -1411,7 +1421,9 @@ class PersonalMessage_Controller
 	 */
 	function action_messageprune()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl, ;
+
+		$db = database();
 
 		// Actually delete the messages.
 		if (isset($_REQUEST['age']))
@@ -1481,7 +1493,9 @@ class PersonalMessage_Controller
 	 */
 	function action_messagelabels()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl, ;
+
+		$db = database();
 
 		// Build the link tree elements...
 		$context['linktree'][] = array(
@@ -1695,7 +1709,9 @@ class PersonalMessage_Controller
 	 */
 	function action_messagesettings()
 	{
-		global $txt, $user_settings, $user_info, $context, $smcFunc;
+		global $txt, $user_settings, $user_info, $context, ;
+
+		$db = database();
 		global $scripturl, $profile_vars, $cur_profile, $user_profile;
 
 		// We want them to submit back to here.
@@ -1755,7 +1771,9 @@ class PersonalMessage_Controller
 	function action_reportmessage()
 	{
 		global $txt, $context, $scripturl;
-		global $user_info, $language, $modSettings, $smcFunc;
+		global $user_info, $language, $modSettings, ;
+
+		$db = database();
 
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($_REQUEST['pmsg']))
@@ -1902,7 +1920,9 @@ class PersonalMessage_Controller
 	 */
 	function action_messagerules()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl, ;
+
+		$db = database();
 
 		// The link tree - gotta have this :o
 		$context['linktree'][] = array(
@@ -2126,7 +2146,9 @@ class PersonalMessage_Controller
  */
 function applyRules($all_messages = false)
 {
-	global $user_info, $smcFunc, $context, $options;
+	global $user_info, $context, $options;
+
+	$db = database();
 
 	// Want this - duh!
 	loadRules();
@@ -2233,7 +2255,9 @@ function applyRules($all_messages = false)
  */
 function loadRules($reload = false)
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	if (isset($context['rules']) && !$reload)
 		return;
@@ -2428,7 +2452,9 @@ function messageIndexBar($area)
  */
 function preparePMContext($type = 'subject', $reset = false)
 {
-	global $txt, $scripturl, $modSettings, $settings, $context, $messages_request, $memberContext, $recipients, $smcFunc;
+	global $txt, $scripturl, $modSettings, $settings, $context, $messages_request, $memberContext, $recipients, ;
+
+	$db = database();
 	global $user_info, $subjects_request;
 
 	// Count the current message number....
@@ -2566,7 +2592,9 @@ function preparePMContext($type = 'subject', $reset = false)
 function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	if (!isset($_REQUEST['xml']))
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';

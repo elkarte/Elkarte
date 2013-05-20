@@ -90,7 +90,9 @@ class ModerationCenter_Controller
 	 */
 	function action_showNotice()
 	{
-		global $smcFunc, $txt, $context;
+		global , $txt, $context;
+
+		$db = database();
 
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
@@ -122,7 +124,9 @@ class ModerationCenter_Controller
 	 */
 	function action_reportedPosts()
 	{
-		global $txt, $context, $scripturl, $user_info, $smcFunc;
+		global $txt, $context, $scripturl, $user_info, ;
+
+		$db = database();
 
 		loadTemplate('ModerationCenter');
 
@@ -397,7 +401,9 @@ class ModerationCenter_Controller
 	 */
 	function action_modifyWarningTemplate()
 	{
-		global $smcFunc, $context, $txt, $user_info;
+		global , $context, $txt, $user_info;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -498,7 +504,9 @@ class ModerationCenter_Controller
 	 */
 	function action_modReport()
 	{
-		global $user_info, $context, $scripturl, $txt, $smcFunc;
+		global $user_info, $context, $scripturl, $txt, ;
+
+		$db = database();
 
 		// Have to at least give us something
 		if (empty($_REQUEST['report']))
@@ -1225,7 +1233,9 @@ function ModBlockLatestNews()
  */
 function ModBlockWatchedUsers()
 {
-	global $context, $smcFunc, $scripturl, $modSettings;
+	global $context, $scripturl, $modSettings;
+
+	$db = database();
 
 	if (($watched_users = cache_get_data('recent_user_watches', 240)) === null)
 	{
@@ -1268,7 +1278,9 @@ function ModBlockWatchedUsers()
  */
 function ModBlockNotes()
 {
-	global $context, $smcFunc, $scripturl, $txt, $user_info;
+	global $context, $scripturl, $txt, $user_info;
+
+	$db = database();
 
 	// Are we saving a note?
 	if (isset($_POST['makenote']) && isset($_POST['new_note']))
@@ -1395,7 +1407,9 @@ function ModBlockNotes()
  */
 function ModBlockReportedPosts()
 {
-	global $context, $user_info, $scripturl, $smcFunc;
+	global $context, $user_info, $scripturl, ;
+
+	$db = database();
 
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
@@ -1460,7 +1474,9 @@ function ModBlockReportedPosts()
  */
 function ModBlockGroupRequests()
 {
-	global $context, $user_info, $scripturl, $smcFunc;
+	global $context, $user_info, $scripturl, ;
+
+	$db = database();
 
 	$context['group_requests'] = array();
 	// Make sure they can even moderate someone!
@@ -1509,7 +1525,9 @@ function ModBlockGroupRequests()
  */
 function list_getWatchedUserCount($approve_query)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1536,7 +1554,9 @@ function list_getWatchedUserCount($approve_query)
  */
 function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 {
-	global $smcFunc, $txt, $modSettings, $user_info;
+	global , $txt, $modSettings, $user_info;
+
+	$db = database();
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, real_name, last_login, posts, warning
 		FROM {db_prefix}members
@@ -1634,7 +1654,9 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
  */
 function list_getWatchedUserPostsCount($approve_query)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1665,7 +1687,9 @@ function list_getWatchedUserPostsCount($approve_query)
  */
 function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
-	global $smcFunc, $scripturl, $modSettings;
+	global , $scripturl, $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
@@ -1711,7 +1735,9 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
  */
 function action_modcenter($dont_call = false)
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options, $smcFunc;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options, ;
+
+	$db = database();
 
 	// Don't run this twice... and don't conflict with the admin bar.
 	if (isset($context['admin_area']))

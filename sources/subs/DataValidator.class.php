@@ -424,7 +424,9 @@ class Data_Validator
 	 */
 	protected function _validate_max_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		if (!isset($input[$field]))
 			return;
@@ -452,7 +454,9 @@ class Data_Validator
 	 */
 	protected function _validate_min_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		if (!isset($input[$field]))
 			return;
@@ -480,7 +484,9 @@ class Data_Validator
 	 */
 	protected function _validate_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		if (!isset($input[$field]))
 			return;

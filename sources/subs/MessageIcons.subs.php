@@ -25,7 +25,9 @@ if (!defined('ELKARTE'))
  */
 function getMessageIcons()
 {
-	global $smcFunc, $settings, $txt;
+	global , $settings, $txt;
+
+	$db = database();
 
 	$icons = array();
 
@@ -66,7 +68,9 @@ function getMessageIcons()
  */
 function deleteMessageIcon($icons)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Do the actual delete!
 	$smcFunc['db_query']('', '
@@ -85,7 +89,9 @@ function deleteMessageIcon($icons)
  */
 function updateMessageIcon($icon)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}message_icons',
@@ -102,7 +108,9 @@ function updateMessageIcon($icon)
  */
 function addMessageIcon($icon)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}message_icons',
@@ -117,7 +125,9 @@ function addMessageIcon($icon)
  */
 function sortMessageIconTable()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('alter_table_icons', '
 		ALTER TABLE {db_prefix}message_icons
@@ -137,7 +147,9 @@ function sortMessageIconTable()
  */
 function list_getMessageIcons($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name

@@ -20,7 +20,9 @@ if (!defined('ELKARTE'))
  */
 function followupTopics($messages, $include_approved = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT fu.derived_from, fu.follow_up, m.subject
@@ -48,7 +50,9 @@ function followupTopics($messages, $include_approved = false)
  */
 function topicStartedHere($topic, $include_approved = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT fu.derived_from, m.subject
@@ -76,7 +80,9 @@ function topicStartedHere($topic, $include_approved = false)
  */
 function linkMessages($msg, $topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_insert']('ignore',
 		'{db_prefix}follow_ups',
@@ -93,7 +99,9 @@ function linkMessages($msg, $topic)
  */
 function unlinkMessages($msg, $topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}follow_ups
@@ -112,7 +120,9 @@ function unlinkMessages($msg, $topic)
  */
 function removeFollowUpsByTopic($topics)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}follow_ups
@@ -128,7 +138,9 @@ function removeFollowUpsByTopic($topics)
  */
 function removeFollowUpsByMessage($msgs)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}follow_ups

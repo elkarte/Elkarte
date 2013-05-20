@@ -35,7 +35,9 @@ if (!defined('ELKARTE'))
  */
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	if (empty($id_msg))
 		return false;
@@ -89,7 +91,9 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (empty($id_msg))
 		return false;
@@ -199,7 +203,9 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $modSettings, $user_info, $context;
+
+	$db = database();
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -658,7 +664,9 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function associatedTopic($msg_id, $topicID = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($topicID === null)
 	{

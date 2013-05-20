@@ -40,7 +40,9 @@ class Post_Controller
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
 		global $user_info, $context, $settings;
-		global $options, $smcFunc, $language;
+		global $options, $language;
+
+		$db = database();
 
 		loadLanguage('Post');
 
@@ -930,8 +932,10 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
+		global $board, $topic, $txt, $modSettings, $context;
+		global $user_info, $board_info, $options, $scripturl, $settings;
+
+		$db = database();
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -1798,7 +1802,9 @@ class Post_Controller
 	function action_quotefast()
 	{
 		global $modSettings, $user_info, $txt, $settings, $context;
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		loadLanguage('Post');
 		if (!isset($_REQUEST['xml']))
@@ -1903,7 +1909,9 @@ class Post_Controller
 	function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
-		global $user_info, $context, $smcFunc, $language;
+		global $user_info, $context, $language;
+
+		$db = database();
 
 		// We have to have a topic!
 		if (empty($topic))
@@ -2160,7 +2168,9 @@ class Post_Controller
 	 */
 	function action_spellcheck()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context, ;
+
+		$db = database();
 
 		// A list of "words" we know about but pspell doesn't.
 		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');

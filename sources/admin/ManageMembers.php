@@ -163,7 +163,9 @@ class ManageMembers_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc, $user_info;
+		global $txt, $scripturl, $context, $modSettings, $user_info;
+
+		$db = database();
 
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';

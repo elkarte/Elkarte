@@ -28,7 +28,9 @@ if (!defined('ELKARTE'))
  */
 function AutoTask()
 {
-	global $time_start, $modSettings, $smcFunc;
+	global $time_start, $modSettings, ;
+
+	$db = database();
 
 	// Special case for doing the mail queue.
 	if (isset($_GET['scheduled']) && $_GET['scheduled'] == 'mailq')
@@ -152,7 +154,9 @@ function AutoTask()
  */
 function scheduled_approval_notification()
 {
-	global $scripturl, $modSettings, $mbname, $txt, $smcFunc;
+	global $scripturl, $modSettings, $mbname, $txt, ;
+
+	$db = database();
 
 	// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
 	$request = $smcFunc['db_query']('', '
@@ -374,7 +378,9 @@ function scheduled_approval_notification()
  */
 function scheduled_daily_maintenance()
 {
-	global $smcFunc, $modSettings, $db_type;
+	global , $modSettings, $db_type;
+
+	$db = database();
 
 	// First clean out the cache.
 	clean_cache();
@@ -495,7 +501,9 @@ function scheduled_daily_maintenance()
  */
 function scheduled_auto_optimize()
 {
-	global $modSettings, $smcFunc, $db_prefix, $db_type;
+	global $modSettings, $db_prefix, $db_type;
+
+	$db = database();
 
 	// By default do it now!
 	$delay = false;
@@ -544,7 +552,9 @@ function scheduled_auto_optimize()
  */
 function scheduled_daily_digest()
 {
-	global $is_weekly, $txt, $mbname, $scripturl, $smcFunc, $context, $modSettings, $boardurl;
+	global $is_weekly, $txt, $mbname, $scripturl, $context, $modSettings, $boardurl;
+
+	$db = database();
 
 	// We'll want this...
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -955,7 +965,9 @@ function scheduled_weekly_digest()
  */
 function ReduceMailQueue($number = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $smcFunc, $context, $webmaster_email, $scripturl;
+	global $modSettings, $context, $webmaster_email, $scripturl;
+
+	$db = database();
 
 	// Are we intending another script to be sending out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
@@ -1210,7 +1222,9 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$task_query = '';
 	if (!is_array($tasks))
@@ -1346,7 +1360,9 @@ function next_time($regularity, $unit, $offset)
  */
 function scheduled_fetchFiles()
 {
-	global $txt, $language, $settings, $forum_version, $modSettings, $smcFunc;
+	global $txt, $language, $settings, $forum_version, $modSettings, ;
+
+	$db = database();
 
 	// What files do we want to get
 	$request = $smcFunc['db_query']('', '
@@ -1414,7 +1430,9 @@ function scheduled_fetchFiles()
  */
 function scheduled_birthdayemails()
 {
-	global $modSettings, $mbname, $txt, $smcFunc, $birthdayEmails;
+	global $modSettings, $mbname, $txt, $birthdayEmails;
+
+	$db = database();
 
 	// Need this in order to load the language files.
 	loadEssentialThemeData();
@@ -1499,7 +1517,9 @@ function scheduled_birthdayemails()
  */
 function scheduled_weekly_maintenance()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Delete some settings that needn't be set if they are otherwise empty.
 	$emptySettings = array(
@@ -1701,7 +1721,9 @@ function scheduled_weekly_maintenance()
  */
 function scheduled_paid_subscriptions()
 {
-	global $txt, $scripturl, $smcFunc, $modSettings, $language;
+	global $txt, $scripturl, $modSettings, $language;
+
+	$db = database();
 
 	// Start off by checking for removed subscriptions.
 	$request = $smcFunc['db_query']('', '
@@ -1817,7 +1839,9 @@ function scheduled_remove_temp_attachments()
  */
 function scheduled_remove_topic_redirect()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// init
 	$topics = array();
@@ -1855,7 +1879,9 @@ function scheduled_remove_topic_redirect()
  */
 function scheduled_remove_old_drafts()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	if (empty($modSettings['drafts_keep_days']))
 		return true;
@@ -1907,7 +1933,9 @@ function scheduled_maillist_fetch_IMAP()
  */
 function scheduled_remove_old_followups()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT fu.derived_from

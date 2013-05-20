@@ -115,7 +115,9 @@ class ManageNews_Controller
 	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -345,7 +347,9 @@ class ManageNews_Controller
 	 */
 	public function action_mailingcompose()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context, ;
+
+		$db = database();
 
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];

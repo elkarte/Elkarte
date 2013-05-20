@@ -58,7 +58,9 @@ class MergeTopics_Controller
 	 */
 	function action_mergeIndex()
 	{
-		global $txt, $board, $context, $smcFunc;
+		global $txt, $board, $context, ;
+
+		$db = database();
 		global $scripturl, $topic, $user_info, $modSettings;
 
 		if (!isset($_GET['from']))
@@ -194,7 +196,9 @@ class MergeTopics_Controller
 	function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
-		global $smcFunc, $language, $modSettings;
+		global , $language, $modSettings;
+
+		$db = database();
 
 		// Check the session.
 		checkSession('request');

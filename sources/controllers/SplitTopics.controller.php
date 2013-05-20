@@ -72,7 +72,9 @@ class SplitTopics_Controller
 	 */
 	function action_splitIndex()
 	{
-		global $txt, $topic, $context, $smcFunc, $modSettings;
+		global $txt, $topic, $context, $modSettings;
+
+		$db = database();
 
 		// Validate "at".
 		if (empty($_GET['at']))
@@ -129,7 +131,9 @@ class SplitTopics_Controller
 	 */
 	function action_splitExecute()
 	{
-		global $txt, $context, $user_info, $smcFunc, $modSettings;
+		global $txt, $context, $user_info, $modSettings;
+
+		$db = database();
 		global $board, $topic, $language, $scripturl;
 
 		// Check the session to make sure they meant to do this.
@@ -245,7 +249,9 @@ class SplitTopics_Controller
 	function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
@@ -455,7 +461,9 @@ class SplitTopics_Controller
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $smcFunc, $user_info, $topic, $board;
+	global $scripturl, $user_info, $language, $txt, $user_info, $topic, $board;
+
+	$db = database();
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
@@ -503,7 +511,9 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $context;
+	global $user_info, $topic, $board, $modSettings, $txt, $context;
+
+	$db = database();
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -810,7 +820,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context, $smcFunc;
+	global $board, $user_info, $context, ;
+
+	$db = database();
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)

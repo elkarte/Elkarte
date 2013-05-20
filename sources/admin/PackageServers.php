@@ -183,7 +183,9 @@ class PackageServers_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $forum_version, $context, $smcFunc;
+		global $txt, $context, $scripturl, $forum_version, $context, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
@@ -698,7 +700,9 @@ class PackageServers_Controller
 	 */
 	public function action_add()
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 		// Validate the user.

@@ -32,7 +32,9 @@ class Stats_Controller
 	 */
 	function action_stats()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc;
+		global $txt, $scripturl, $modSettings, $user_info, $context, ;
+
+		$db = database();
 
 		isAllowedTo('view_stats');
 		// Page disabled - redirect them out
@@ -643,7 +645,9 @@ class Stats_Controller
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	// Activity by day.
 	$days_result = $smcFunc['db_query']('', '

@@ -31,7 +31,9 @@ class MaillistSettingsClass extends Settings_Form
 {
 	static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// Init
 		$insert_type = array();

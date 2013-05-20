@@ -42,7 +42,9 @@ if (!defined('ELKARTE'))
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global $smcFunc, $boardurl;
+	global , $boardurl;
+
+	$db = database();
 
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
@@ -289,7 +291,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings, ;
+
+	$db = database();
 
 	static $cur_insert = array();
 	static $cur_insert_len = 0;
@@ -874,7 +878,9 @@ function user_info_callback($matches)
  */
 function list_getMailQueue($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
@@ -908,7 +914,9 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// How many items do we have?
 	$request = $smcFunc['db_query']('', '
@@ -929,7 +937,9 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}mail_queue
@@ -946,7 +956,9 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$items = array();
 

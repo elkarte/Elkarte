@@ -37,7 +37,9 @@ class Poll_Controller
 	 */
 	function action_vote()
 	{
-		global $topic, $txt, $user_info, $smcFunc, $modSettings;
+		global $topic, $txt, $user_info, $modSettings;
+
+		$db = database();
 
 		// Make sure you can vote.
 		isAllowedTo('poll_vote');
@@ -240,7 +242,9 @@ class Poll_Controller
 	 */
 	function action_lockvoting()
 	{
-		global $topic, $user_info, $smcFunc;
+		global $topic, $user_info, ;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -306,7 +310,9 @@ class Poll_Controller
 	 */
 	function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board, $smcFunc, $scripturl;
+		global $txt, $user_info, $context, $topic, $board, $scripturl;
+
+		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -584,7 +590,9 @@ class Poll_Controller
 	function action_editpoll2()
 	{
 		global $txt, $topic, $board, $context;
-		global $modSettings, $user_info, $smcFunc;
+		global $modSettings, $user_info, ;
+
+		$db = database();
 
 		// Sneaking off, are we?
 		if (empty($_POST))
@@ -857,7 +865,9 @@ class Poll_Controller
 	 */
 	function action_removepoll()
 	{
-		global $topic, $user_info, $smcFunc;
+		global $topic, $user_info, ;
+
+		$db = database();
 
 		// Make sure the topic is not empty.
 		if (empty($topic))

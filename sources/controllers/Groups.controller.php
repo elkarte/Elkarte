@@ -203,7 +203,9 @@ class Groups_Controller
 	 */
 	function action_groupmembers()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, ;
+
+		$db = database();
 
 		$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
@@ -445,7 +447,9 @@ class Groups_Controller
 	 */
 	function action_grouprequests()
 	{
-		global $txt, $context, $scripturl, $user_info, $smcFunc, $modSettings, $language;
+		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
+
+		$db = database();
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -761,7 +765,9 @@ class Groups_Controller
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -794,7 +800,9 @@ function list_getGroupRequestCount($where, $where_parameters)
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
-	global $smcFunc, $txt, $scripturl;
+	global , $txt, $scripturl;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,

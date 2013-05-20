@@ -66,7 +66,9 @@ function currentMemberID($fatal = true, $reload_id = false)
  */
 function setupProfileContext($fields)
 {
-	global $profile_fields, $context, $cur_profile, $smcFunc, $txt;
+	global $profile_fields, $context, $cur_profile, $txt;
+
+	$db = database();
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -155,7 +157,9 @@ function setupProfileContext($fields)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $smcFunc, $user_info, $settings, $scripturl;
+	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
+
+	$db = database();
 
 	// Get the right restrictions in place...
 	$where = 'active = 1';
@@ -286,7 +290,9 @@ function loadCustomFields($memID, $area = 'summary')
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $smcFunc, $cur_profile, $language;
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $cur_profile, $language;
+
+	$db = database();
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -481,7 +487,9 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'enabled' => $modSettings['theme_allow'] || allowedTo('admin_forum'),
 			'preload' => create_function('', '
-				global $smcFunc, $context, $cur_profile, $txt;
+				global , $context, $cur_profile, $txt;
+
+				$db = database();
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT value
@@ -611,7 +619,9 @@ function loadProfileFields($force_reload = false)
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
 			'input_validate' => create_function('&$value', '
-				global $user_info, $smcFunc, $cur_profile;
+				global $user_info, $cur_profile;
+
+				$db = database();
 
 				// If we didn\'t try it then ignore it!
 				if ($value == \'\')
@@ -651,7 +661,9 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
+				global , ;
+
+				$db = database();
 
 				if ($smcFunc[\'strlen\']($value) > 50)
 					return \'personal_text_too_long\';
@@ -708,7 +720,9 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $smcFunc, $cur_profile;
+				global $context, $cur_profile;
+
+				$db = database();
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
@@ -861,7 +875,9 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
+				global , ;
+
+				$db = database();
 
 				if ($smcFunc[\'strlen\'] > 50)
 					return \'user_title_too_long\';
@@ -922,7 +938,9 @@ function loadProfileFields($force_reload = false)
 function saveProfileFields()
 {
 	global $profile_fields, $profile_vars, $context, $old_profile;
-	global $post_errors, $modSettings, $cur_profile, $smcFunc;
+	global $post_errors, $modSettings, $cur_profile, ;
+
+	$db = database();
 
 	// Load them up.
 	loadProfileFields();
@@ -1062,7 +1080,9 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	$email = strtr($email, array('&#039;' => '\''));
 
@@ -1103,7 +1123,9 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 {
 	global $user_info, $txt, $modSettings, $user_profile;
 	global $context, $settings;
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// These make life easier....
 	$old_profile = &$user_profile[$memID];
@@ -1189,7 +1211,9 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
  */
 function makeThemeChanges($memID, $id_theme)
 {
-	global $modSettings, $smcFunc, $context, $user_info;
+	global $modSettings, $context, $user_info;
+
+	$db = database();
 
 	$reservedVars = array(
 		'actual_theme_url',
@@ -1307,7 +1331,9 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Update the boards they are being notified on.
 	if (isset($_POST['edit_notify_boards']))
@@ -1394,7 +1420,9 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $smcFunc, $user_profile, $user_info, $modSettings;
+	global $context, $user_profile, $user_info, $modSettings;
+
+	$db = database();
 
 	if ($sanitize && isset($_POST['customfield']))
 		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
@@ -1500,7 +1528,9 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
  */
 function profileSendActivation()
 {
-	global $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
+	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -1551,7 +1581,9 @@ function profileSendActivation()
  */
 function profileLoadSignatureData()
 {
-	global $modSettings, $context, $txt, $cur_profile, $smcFunc, $memberContext;
+	global $modSettings, $context, $txt, $cur_profile, $memberContext;
+
+	$db = database();
 
 	// Signature limits.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
@@ -1683,7 +1715,9 @@ function profileLoadAvatarData()
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $txt, $context, $smcFunc, $user_settings;
+	global $cur_profile, $txt, $context, $user_settings;
+
+	$db = database();
 
 	$context['member_groups'] = array(
 		0 => array(
@@ -1739,7 +1773,9 @@ function profileLoadGroups()
  */
 function profileLoadLanguages()
 {
-	global $context, $modSettings, $settings, $cur_profile, $language, $smcFunc;
+	global $context, $modSettings, $settings, $cur_profile, $language, ;
+
+	$db = database();
 
 	$context['profile_languages'] = array();
 
@@ -1761,7 +1797,9 @@ function profileLoadLanguages()
  */
 function profileReloadUser()
 {
-	global $modSettings, $context, $cur_profile, $smcFunc, $profile_vars;
+	global $modSettings, $context, $cur_profile, $profile_vars;
+
+	$db = database();
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
@@ -1782,7 +1820,9 @@ function profileReloadUser()
  */
 function profileValidateSignature(&$value)
 {
-	global $modSettings, $smcFunc, $txt;
+	global $modSettings, $txt;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
@@ -1966,7 +2006,9 @@ function profileValidateSignature(&$value)
  */
 function profileSaveAvatarData(&$value)
 {
-	global $modSettings, $smcFunc, $profile_vars, $cur_profile, $context;
+	global $modSettings, $profile_vars, $cur_profile, $context;
+
+	$db = database();
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -2208,7 +2250,9 @@ function profileSaveAvatarData(&$value)
  */
 function profileSaveGroups(&$value)
 {
-	global $profile_vars, $old_profile, $context, $smcFunc, $cur_profile;
+	global $profile_vars, $old_profile, $context, $cur_profile;
+
+	$db = database();
 
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
@@ -2312,7 +2356,9 @@ function profileSaveGroups(&$value)
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $scripturl;
+	global , $scripturl;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
@@ -2355,7 +2401,9 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  */
 function list_getUserWarningCount($memID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)

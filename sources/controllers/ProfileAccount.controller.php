@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
 function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc;
+	global $context, $cur_profile, $memberContext, ;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -380,7 +382,9 @@ function action_issuewarning()
  */
 function action_deleteaccount()
 {
-	global $txt, $context, $user_info, $modSettings, $cur_profile, $smcFunc;
+	global $txt, $context, $user_info, $modSettings, $cur_profile, ;
+
+	$db = database();
 
 	if (!$context['user']['is_owner'])
 		isAllowedTo('profile_remove_any');
@@ -404,7 +408,9 @@ function action_deleteaccount()
  */
 function action_deleteaccount2()
 {
-	global $user_info, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $context, $cur_profile, $modSettings, ;
+
+	$db = database();
 
 	// Try get more time...
 	@set_time_limit(600);

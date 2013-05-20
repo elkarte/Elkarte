@@ -24,7 +24,9 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($pollID === null)
 	{
@@ -64,7 +66,9 @@ function associatedPoll($topicID, $pollID = null)
  */
 function removePoll($pollID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Remove votes.
 	$smcFunc['db_query']('', '
@@ -101,7 +105,9 @@ function removePoll($pollID)
  */
 function resetVotes($pollID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}polls
@@ -138,7 +144,9 @@ function resetVotes($pollID)
  */
 function getPollInfo($topicID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Check if a poll currently exists on this topic, and get the id, question and starter.
 	$request = $smcFunc['db_query']('', '

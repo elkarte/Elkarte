@@ -125,7 +125,9 @@ class MarkRead_Controller
 	*/
 	public function action_markreplies()
 	{
-		global $user_info, $modSettings, $smcFunc;
+		global $user_info, $modSettings, ;
+
+		$db = database();
 
 		// Make sure all the topics are integers!
 		$topics = array_map('intval', explode('-', $_REQUEST['topics']));
@@ -151,7 +153,9 @@ class MarkRead_Controller
 	*/
 	public function action_marktopic()
 	{
-		global $board, $topic, $user_info, $smcFunc;
+		global $board, $topic, $user_info, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -222,7 +226,9 @@ class MarkRead_Controller
 	*/
 	public function action_markasread()
 	{
-		global $board, $user_info, $board_info, $modSettings, $smcFunc;
+		global $board, $user_info, $board_info, $modSettings, ;
+
+		$db = database();
 
 		checkSession('get');
 

@@ -116,7 +116,9 @@ function openID_revalidate()
  */
 function openID_getAssociation($server, $handle = null, $no_delete = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!$no_delete)
 	{
@@ -160,7 +162,9 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
  */
 function openID_makeAssociation($server)
 {
-	global $smcFunc, $modSettings, $p;
+	global , $modSettings, $p;
+
+	$db = database();
 
 	$parameters = array(
 		'openid.mode=associate',
@@ -238,7 +242,9 @@ function openID_makeAssociation($server)
  */
 function openID_removeAssociation($handle)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('openid_remove_association', '
 		DELETE FROM {db_prefix}openid_assoc
@@ -254,7 +260,9 @@ function openID_removeAssociation($handle)
  */
 function action_openidreturn()
 {
-	global $smcFunc, $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+	global , $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+
+	$db = database();
 
 	// Is OpenID even enabled?
 	if (empty($modSettings['enableOpenID']))
@@ -426,7 +434,9 @@ function openID_canonize($uri)
  */
 function openid_member_exists($url)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('openid_member_exists', '
 		SELECT mem.id_member, mem.member_name

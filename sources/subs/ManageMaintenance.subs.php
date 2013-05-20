@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function countMessages()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -45,7 +47,9 @@ function countMessages()
  */
 function flushLogTables()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_online');
@@ -84,7 +88,9 @@ function flushLogTables()
  */
 function getMessageTableColumns()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$table = db_table();
 	$colData = $table->db_list_columns('{db_prefix}messages', true);
@@ -99,7 +105,9 @@ function getMessageTableColumns()
  */
 function resizeMessageTableBody($type)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$table = db_table();
 	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
@@ -114,7 +122,9 @@ function resizeMessageTableBody($type)
  */
 function detectExceedingMessages($start, $increment)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$id_msg_exceeding = array();
 
@@ -143,7 +153,9 @@ function detectExceedingMessages($start, $increment)
  */
 function getExceedingMessages($msg)
 {
-	global $smcFunc, $scripturl;
+	global , $scripturl;
+
+	$db = database();
 
 	$exceeding_messages = array();
 
@@ -170,7 +182,9 @@ function getExceedingMessages($msg)
  */
 function getElkTables()
 {
-	global $smcFunc, $db_prefix;
+	global , $db_prefix;
+
+	$db = database();
 
 	$tables = array();
 
@@ -194,7 +208,9 @@ function getElkTables()
  */
 function optimizeTable($tablename)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$db = database();
 	$db->db_optimize_table($tablename);
@@ -207,7 +223,9 @@ function optimizeTable($tablename)
  */
 function getMaxTopicID()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT MAX(id_topic)
@@ -229,7 +247,9 @@ function getMaxTopicID()
  */
 function recountApprovedMessages($start, $increment)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Recount approved messages
 	$request = $smcFunc['db_query']('', '
@@ -268,7 +288,9 @@ function recountApprovedMessages($start, $increment)
  */
 function recountUnapprovedMessages($start, $increment)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Recount unapproved messages
 	$request = $smcFunc['db_query']('', '
@@ -308,7 +330,9 @@ function recountUnapprovedMessages($start, $increment)
  */
 function resetBoardsCounter($column)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
 
@@ -335,7 +359,9 @@ function resetBoardsCounter($column)
  */
 function updateBoardsCounter($type, $start, $increment)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	switch ($type)
 	{
@@ -457,7 +483,9 @@ function updateBoardsCounter($type, $start, $increment)
  */
 function updatePersonalMessagesCounter()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
@@ -500,7 +528,9 @@ function updatePersonalMessagesCounter()
  */
 function updateMessagesBoardID($start, $increment)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
@@ -535,7 +565,9 @@ function updateMessagesBoardID($start, $increment)
  */
 function updateBoardsLastMessage()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Update the latest message of each board.
 	$request = $smcFunc['db_query']('', '
@@ -606,7 +638,9 @@ function updateBoardsLastMessage()
  */
 function countTopicsFromBoard($id_board)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -630,7 +664,9 @@ function countTopicsFromBoard($id_board)
  */
 function getTopicsToMove($id_board)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$topics = array();
 
@@ -660,7 +696,9 @@ function getTopicsToMove($id_board)
  */
 function countContributors()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(DISTINCT m.id_member)
@@ -688,7 +726,9 @@ function countContributors()
  */
 function updateMembersPostCount($start, $increment)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
@@ -733,7 +773,9 @@ function updateMembersPostCount($start, $increment)
  */
 function updateZeroPostMembers()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$createTemporary = $smcFunc['db_query']('', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
@@ -796,7 +838,9 @@ function updateZeroPostMembers()
  */
 function purgeMembers($type, $groups, $time_limit)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$where_vars = array(
 		'time_limit' => $time_limit,

@@ -31,7 +31,9 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// We need to search for any birthday in this range, and whatever year that birthday is on.
 	$year_low = (int) substr($low_date, 0, 4);
@@ -101,7 +103,9 @@ function getBirthdayRange($low_date, $high_date)
  */
 function getEventRange($low_date, $high_date, $use_permissions = true)
 {
-	global $scripturl, $modSettings, $user_info, $smcFunc, $context;
+	global $scripturl, $modSettings, $user_info, $context;
+
+	$db = database();
 
 	$low_date_time = sscanf($low_date, '%04d-%02d-%02d');
 	$low_date_time = mktime(0, 0, 0, $low_date_time[1], $low_date_time[2], $low_date_time[0]);
@@ -206,7 +210,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
  */
 function getHolidayRange($low_date, $high_date)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the lowest and highest dates for "all years".
 	if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
@@ -254,7 +260,9 @@ function getHolidayRange($low_date, $high_date)
  */
 function canLinkEvent()
 {
-	global $user_info, $topic, $board, $smcFunc;
+	global $user_info, $topic, $board, ;
+
+	$db = database();
 
 	// If you can't post, you can't link.
 	isAllowedTo('calendar_post');
@@ -740,7 +748,9 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	if (!isset($_POST['deleteevent']))
 	{
@@ -801,7 +811,9 @@ function validateEventPost()
  */
 function getEventPoster($event_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// A simple database query, how hard can that be?
 	$request = $smcFunc['db_query']('', '
@@ -834,7 +846,9 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Add special chars to the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
@@ -892,7 +906,9 @@ function insertEvent(&$eventOptions)
  */
 function modifyEvent($event_id, &$eventOptions)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Properly sanitize the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
@@ -954,7 +970,9 @@ function modifyEvent($event_id, &$eventOptions)
  */
 function removeEvent($event_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}calendar
@@ -979,7 +997,9 @@ function removeEvent($event_id)
  */
 function getEventProperties($event_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
@@ -1040,7 +1060,9 @@ function getEventProperties($event_id)
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
@@ -1066,7 +1088,9 @@ function list_getHolidays($start, $items_per_page, $sort)
  */
 function list_getNumHolidays()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1087,7 +1111,9 @@ function list_getNumHolidays()
  */
 function removeHolidays($holiday_ids)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}calendar_holidays
@@ -1111,7 +1137,9 @@ function removeHolidays($holiday_ids)
  */
 function editHoliday($holiday, $date, $title)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}calendar_holidays
@@ -1137,7 +1165,9 @@ function editHoliday($holiday, $date, $title)
  */
 function insert_holiday($date, $title)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}calendar_holidays',
@@ -1163,7 +1193,9 @@ function insert_holiday($date, $title)
  */
 function getHoliday($id_holiday)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title

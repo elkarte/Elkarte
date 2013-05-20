@@ -30,7 +30,9 @@ class RemoveTopic_Controller
 	 */
 	function action_removetopic2()
 	{
-		global $user_info, $topic, $board, $smcFunc, $context, $modSettings;
+		global $user_info, $topic, $board, $context, $modSettings;
+
+		$db = database();
 
 		// Make sure they aren't being lead around by someone. (:@)
 		checkSession('get');
@@ -82,7 +84,9 @@ class RemoveTopic_Controller
 	 */
 	function action_deletemsg()
 	{
-		global $user_info, $topic, $board, $modSettings, $smcFunc;
+		global $user_info, $topic, $board, $modSettings, ;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -150,7 +154,9 @@ class RemoveTopic_Controller
 	 */
 	function action_restoretopic()
 	{
-		global $context, $smcFunc, $modSettings;
+		global $context, $modSettings;
+
+		$db = database();
 
 		// Check session.
 		checkSession('get');
@@ -383,7 +389,9 @@ class RemoveTopic_Controller
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $smcFunc, $modSettings;
+	global $context, $modSettings;
+
+	$db = database();
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
@@ -639,7 +647,9 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
  */
 function removeDeleteConcurrence()
 {
-	global $modSettings, $board, $topic, $smcFunc, $scripturl, $context;
+	global $modSettings, $board, $topic, $scripturl, $context;
+
+	$db = database();
 
 	// No recycle no need to go further
 	if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))

@@ -30,7 +30,9 @@ if (!defined('ELKARTE'))
  */
 function recountOpenReports($flush = true)
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -69,7 +71,9 @@ function recountOpenReports($flush = true)
  */
 function recountUnapprovedPosts($approve_query = null)
 {
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	if ($approve_query === null)
 		return array('posts' => 0, 'topics' => 0);
@@ -117,7 +121,9 @@ function recountUnapprovedPosts($approve_query = null)
  */
 function recountFailedEmails($approve_query = null)
 {
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 	
 	if ($approve_query === null)
 		return 0;
@@ -239,7 +245,9 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Log warning notice.
 	$smcFunc['db_insert']('',
@@ -268,7 +276,9 @@ function logWarningNotice($subject, $body)
  */
 function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_comments',
@@ -291,7 +301,9 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	// Log the actions.
 	$request = $smcFunc['db_query']('', '
@@ -336,7 +348,9 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global $smcFunc, $scripturl, $user_info;
+	global , $scripturl, $user_info;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
@@ -379,7 +393,9 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
  */
 function list_getWarningTemplateCount($template_type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -407,7 +423,9 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
  */
 function list_getWarnings($start, $items_per_page, $sort)
 {
-	global $smcFunc, $scripturl;
+	global , $scripturl;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
@@ -445,7 +463,9 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function list_getWarningCount()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -468,7 +488,9 @@ function list_getWarningCount()
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global $smcFunc, $user_info, $context;
+	global , $user_info, $context;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, id_recipient, recipient_name AS template_title, body
@@ -506,7 +528,9 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	if ($edit)
 	{
@@ -553,7 +577,9 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  */
 function modReportDetails($id_report)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,

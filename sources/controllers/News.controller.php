@@ -40,7 +40,9 @@ class News_Controller
 	function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $query_this_board, $smcFunc, $forum_version, $cdata_override, $settings;
+		global $query_this_board, $forum_version, $cdata_override, $settings;
+
+		$db = database();
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -318,7 +320,9 @@ class News_Controller
 	 */
 	function action_xmlmembers($xml_format)
 	{
-		global $scripturl, $smcFunc;
+		global $scripturl, ;
+
+		$db = database();
 
 		if (!allowedTo('view_mlist'))
 			return array();
@@ -384,7 +388,9 @@ class News_Controller
 	function action_xmlnews($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $smcFunc, $settings, $context;
+		global $query_this_board, $settings, $context;
+
+		$db = database();
 
 		/* Find the latest posts that:
 			- are the first post in their topic.
@@ -530,7 +536,9 @@ class News_Controller
 	function action_xmlrecent($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $smcFunc, $settings, $context;
+		global $query_this_board, $settings, $context;
+
+		$db = database();
 
 		$done = false;
 		$loops = 0;
@@ -846,7 +854,9 @@ function fix_possible_url($val)
  */
 function cdata_parse($data, $ns = '')
 {
-	global $smcFunc, $cdata_override;
+	global , $cdata_override;
+
+	$db = database();
 
 	// Are we not doing it?
 	if (!empty($cdata_override))

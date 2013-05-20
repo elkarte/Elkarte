@@ -372,7 +372,9 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Load up the parsers from the database
 	$request = $smcFunc['db_query']('', '
@@ -434,7 +436,9 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// load up the text filters from the database, regex first and ordered by id number
 	$request = $smcFunc['db_query']('', '
@@ -643,7 +647,9 @@ function pbe_check_moderation(&$pbe)
  */
 function pbe_emailError($error, $email_message)
 {
-	global $txt, $smcFunc;
+	global $txt, ;
+
+	$db = database();
 
 	loadLanguage('EmailTemplates');
 
@@ -1010,7 +1016,9 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  */
 function query_load_user_info($email)
 {
-	global $smcFunc, $user_profile, $modSettings, $language;
+	global , $user_profile, $modSettings, $language;
+
+	$db = database();
 
 	if (empty($email))
 		return false;
@@ -1088,7 +1096,9 @@ function query_load_user_info($email)
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$where_query = ($type === 'board' ? '({array_int:member_groups}) AND id_profile = {int:id_profile}' : '({array_int:member_groups})');
 
@@ -1128,7 +1138,9 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  */
 function query_sender_wrapper($from)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$result = array();
 
@@ -1163,7 +1175,9 @@ function query_sender_wrapper($from)
  */
 function query_user_keys($email)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$keys = array();
 
@@ -1192,7 +1206,9 @@ function query_user_keys($email)
  */
 function query_key_owner($key)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$email_to = false;
 
@@ -1222,7 +1238,9 @@ function query_key_owner($key)
  */
 function query_load_subject($message_id, $message_type, $email)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$subject = '';
 
@@ -1310,7 +1328,9 @@ function query_load_subject($message_id, $message_type, $email)
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Load up the topic details
 	if ($message_type === 't')
@@ -1382,7 +1402,9 @@ function query_load_message($message_type, $message_id, $pbe)
  */
 function query_load_board($message_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_board
@@ -1406,7 +1428,9 @@ function query_load_board($message_id)
  */
 function query_load_board_details($board_id, $pbe)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$board_info = array();
 
@@ -1436,7 +1460,9 @@ function query_load_board_details($board_id, $pbe)
  */
 function query_get_theme($id_member, $id_theme, $board_info)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// Verify the id_theme...
 	// Allow the board specific theme, if they are overriding.
@@ -1485,7 +1511,9 @@ function query_get_theme($id_member, $id_theme, $board_info)
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// First see if they have a board notification on for this board
 	// so we don't set both board and individual topic notifications
@@ -1540,7 +1568,9 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
  */
 function query_mark_pms($email_message, $pbe)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}pm_recipients
@@ -1599,7 +1629,9 @@ function query_mark_pms($email_message, $pbe)
  */
 function query_key_maintenance($email_message)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
 	$delete_old = time() - ($days * 24 * 60 * 60);
@@ -1641,7 +1673,9 @@ function query_key_maintenance($email_message)
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$last_login = time();
 	$do_delete = false;

@@ -330,7 +330,9 @@ function attachments_init_dir (&$tree, &$count)
  */
 function processAttachments()
 {
-	global $context, $modSettings, $smcFunc, $txt, $user_info;
+	global $context, $modSettings, $txt, $user_info;
+
+	$db = database();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -515,7 +517,9 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context, ;
+
+	$db = database();
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if ( empty($_SESSION['temp_attachments'][$attachID]))
@@ -695,7 +699,9 @@ function attachmentChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $smcFunc, $context;
+	global $modSettings, $context;
+
+	$db = database();
 	global $txt;
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
@@ -871,7 +877,9 @@ function createAttachment(&$attachmentOptions)
 */
 function getAvatar($id_attach)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Use our cache when possible
 	if (($cache = cache_get_data('getAvatar_id-' . $id_attach)) !== null)
@@ -911,7 +919,9 @@ function getAvatar($id_attach)
 */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Make sure this attachment is on this board.
 
@@ -944,7 +954,9 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 */
 function increaseDownloadCounter($id_attach)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('attach_download_increase', '
 		UPDATE LOW_PRIORITY {db_prefix}attachments
@@ -963,7 +975,9 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (empty($attachments))
 		return 0;
@@ -1056,7 +1070,9 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// @todo This might need more work!
 	$new_condition = array();
@@ -1220,7 +1236,9 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1490,7 +1508,9 @@ function getAvatarPathID()
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$attachments = array();
 	$request = $smcFunc['db_query']('', '
@@ -1536,7 +1556,9 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
  */
 function getAttachmentCount()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the number of attachments....
 	$request = $smcFunc['db_query']('', '
@@ -1562,7 +1584,9 @@ function getAttachmentCount()
  */
 function getAvatarCount()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the avatar amount....
 	$request = $smcFunc['db_query']('', '
@@ -1605,7 +1629,9 @@ function getAttachmentDirs()
  */
 function getAvatarsDefault()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
@@ -1719,7 +1745,9 @@ function getServerStoredAvatars($directory, $level)
  */
 function removeOrphanAttachments($attach_ids)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}attachments
@@ -1747,7 +1775,9 @@ function removeOrphanAttachments($attach_ids)
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($filesize === null)
 	{
@@ -1789,7 +1819,9 @@ function attachment_filesize($attach_id, $filesize = null)
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($folder_id === null)
 	{
@@ -1828,7 +1860,9 @@ function attachment_folder($attach_id, $folder_id = null)
  */
 function maxThumbnails()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$result = $smcFunc['db_query']('', '
 		SELECT MAX(id_attach)
@@ -1852,7 +1886,9 @@ function maxThumbnails()
  */
 function validateAttachments($attachments, $approve_query)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// double check the attachments array, pick only what is returned from the database
 	$request = $smcFunc['db_query']('', '
@@ -1891,7 +1927,9 @@ function validateAttachments($attachments, $approve_query)
  */
 function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
 {
-	global $smcFunc, $scripturl;
+	global , $scripturl;
+
+	$db = database();
 
 	// Get all unapproved attachments.
 	$request = $smcFunc['db_query']('', '
@@ -1968,7 +2006,9 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// How many unapproved attachments in total?
 	$request = $smcFunc['db_query']('', '
@@ -1997,7 +2037,9 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function list_getAttachDirs()
 {
-	global $smcFunc, $modSettings, $context, $txt;
+	global , $modSettings, $context, $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_folder, COUNT(id_attach) AS num_attach, SUM(size) AS size_attach
@@ -2166,7 +2208,9 @@ function list_getBaseDirs()
  */
 function list_getNumFiles($browse_type)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Depending on the type of file, different queries are used.
 	if ($browse_type === 'avatars')
@@ -2211,7 +2255,9 @@ function list_getNumFiles($browse_type)
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	// Choose a query depending on what we are viewing.
 	if ($browse_type === 'avatars')
@@ -2269,7 +2315,9 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
  */
 function overallAttachmentsSize()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Check the size of all the directories.
 	$request = $smcFunc['db_query']('', '
@@ -2295,7 +2343,9 @@ function overallAttachmentsSize()
  */
 function currentAttachDirProperties()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$current_dir = array();
 
@@ -2321,7 +2371,9 @@ function currentAttachDirProperties()
  */
 function moveAvatars()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
@@ -2363,7 +2415,9 @@ function moveAvatars()
  */
 function setRemovalNotice($messages, $notice)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}messages

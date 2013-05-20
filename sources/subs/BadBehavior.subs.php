@@ -22,7 +22,9 @@ if (!defined('ELKARTE'))
  */
 function deleteBadBehavior($type ,$filter)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Delete all or just some?
 	if ($type === 'delall' && empty($filter))
@@ -69,7 +71,9 @@ function deleteBadBehavior($type ,$filter)
  */
 function getBadBehaviorLogEntryCount($filter)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$result = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -95,7 +99,9 @@ function getBadBehaviorLogEntryCount($filter)
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
-	global $scripturl, $smcFunc;
+	global $scripturl, ;
+
+	$db = database();
 
 	require_once(EXTDIR . '/bad-behavior/bad-behavior/responses.inc.php');
 

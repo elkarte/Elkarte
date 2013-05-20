@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function onlineCount()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$result = $smcFunc['db_query']('', '
 		SELECT COUNT(*)

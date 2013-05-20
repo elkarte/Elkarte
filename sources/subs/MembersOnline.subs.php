@@ -30,7 +30,9 @@ if (!defined('ELKARTE'))
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $smcFunc, $context, $scripturl, $user_info, $modSettings, $txt;
+	global , $context, $scripturl, $user_info, $modSettings, $txt;
+
+	$db = database();
 
 	// The list can be sorted in several ways.
 	$allowed_sort_options = array(
@@ -203,7 +205,9 @@ function getMembersOnlineStats($membersOnlineOptions)
  */
 function trackStatsUsersOnline($total_users_online)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$settingsToUpdate = array();
 

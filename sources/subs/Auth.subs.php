@@ -260,7 +260,9 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($v))
 		return '
@@ -328,7 +330,9 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $user_info, $modSettings, ;
+
+	$db = database();
 
 	// If it's not already an array, make it one.
 	if (!is_array($names))
@@ -415,7 +419,9 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $modSettings, $smcFunc, $language;
+	global $modSettings, $language;
+
+	$db = database();
 
 	// Language... and a required file.
 	loadLanguage('Login');
@@ -473,7 +479,9 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $txt, $smcFunc, $user_info;
+	global $txt, $user_info;
+
+	$db = database();
 
 	$errors = array();
 
@@ -525,7 +533,9 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Perform basic requirements first.
 	if ($smcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
@@ -559,7 +569,9 @@ function validatePassword($password, $username, $restrict_in = array())
  */
 function rebuildModCache()
 {
-	global $user_info, $smcFunc;
+	global $user_info, ;
+
+	$db = database();
 
 	// What groups can they moderate?
 	$group_query = allowedTo('manage_membergroups') ? '1=1' : '0=1';
@@ -685,7 +697,9 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function logOnline($ids, $on = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($ids))
 		$ids = array($ids);
@@ -710,7 +724,9 @@ function logOnline($ids, $on = false)
  */
 function deleteOnline($session)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_online
@@ -728,7 +744,9 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$isFirstLogin = false;
 
@@ -741,7 +759,9 @@ function isFirstLogin($id_member)
 
 function findUser($where, $whereparams)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find the user!
 	$request = $smcFunc['db_query']('', '
@@ -783,7 +803,9 @@ function findUser($where, $whereparams)
  */
 function generateValidationCode()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('get_random_number', '
 		SELECT RAND()',
@@ -807,7 +829,9 @@ function generateValidationCode()
  */
 function loadExistingMember($name)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Try to find the user, assuming a member_name was passed...
 	$request = $smcFunc['db_query']('', '

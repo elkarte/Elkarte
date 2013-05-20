@@ -339,7 +339,9 @@ class ManageScheduledTasks_Controller
 	 */
 	function action_log()
 	{
-		global $scripturl, $context, $txt, $smcFunc;
+		global $scripturl, $context, $txt, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
 		// Lets load the language just incase we are outside the Scheduled area.

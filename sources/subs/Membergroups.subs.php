@@ -32,7 +32,9 @@ if (!defined('ELKARTE'))
  */
 function deleteMembergroups($groups)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// Make sure it's an array.
 	if (!is_array($groups))
@@ -209,7 +211,9 @@ function deleteMembergroups($groups)
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// You're getting nowhere without this permission, unless of course you are the group's moderator.
 	if (!$permissionCheckDone)
@@ -426,7 +430,9 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -549,7 +555,9 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl, $txt, $smcFunc;
+	global $scripturl, $txt, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, real_name
@@ -584,7 +592,9 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
  */
 function cache_getMembergroupList()
 {
-	global $scripturl, $smcFunc;
+	global $scripturl, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_group, group_name, online_color
@@ -626,7 +636,9 @@ function cache_getMembergroupList()
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
 {
-	global $scripturl, $smcFunc;
+	global $scripturl, ;
+
+	$db = database();
 
 	$groups = array();
 
@@ -726,7 +738,9 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$groups = array();
 
@@ -821,7 +835,9 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  */
 function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!isset($group_id))
 		return false;
@@ -889,7 +905,9 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  */
 function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
 {
-	global $smcFunc, $txt, $modSettings;
+	global , $txt, $modSettings;
+
+	$db = database();
 
 	//No $includes parameters given? Let's set some default values
 	if(empty($includes))
@@ -1007,7 +1025,9 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$groups = array();
 	if (in_array(0, $groups))
@@ -1051,7 +1071,9 @@ function getGroups($groupList)
  */
 function getMaxGroupID()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
     $request = $smcFunc['db_query']('', '
 		SELECT MAX(id_group)
@@ -1074,7 +1096,9 @@ function getMaxGroupID()
  */
 function addMembergroup($id_group, $groupname, $minposts, $type)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}membergroups',
@@ -1099,7 +1123,9 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$inserts = array();
 
@@ -1137,7 +1163,9 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  */
 function copyBoardPermissions($id_group, $copy_from)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$inserts = array();
 
@@ -1171,7 +1199,9 @@ function copyBoardPermissions($id_group, $copy_from)
  */
 function updateCopiedGroup($id_group, $copy_from)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 	$group_info = membergroupsById($copy_from, 1, true);
@@ -1201,7 +1231,9 @@ function updateCopiedGroup($id_group, $copy_from)
  */
 function updateInheritedGroup($id_group, $copy_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}membergroups
@@ -1220,7 +1252,9 @@ function updateInheritedGroup($id_group, $copy_id)
  */
 function updateMembergroupProperties($properties)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}membergroups
@@ -1252,7 +1286,9 @@ function updateMembergroupProperties($properties)
  */
 function detachGroupFromBoards($id_group, $boards, $access_list)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find all board this group is in, but shouldn't be in.
 	$request = $smcFunc['db_query']('', '
@@ -1282,7 +1318,9 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
@@ -1307,7 +1345,9 @@ function assignGroupToBoards($id_group, $boards, $access_list)
  */
 function detachDeletedGroupFromMembers($id_group)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$updates = array();
 
@@ -1345,7 +1385,9 @@ function detachDeletedGroupFromMembers($id_group)
  */
 function setGroupToHidden($id_group)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$updates = array();
 
@@ -1382,7 +1424,9 @@ function setGroupToHidden($id_group)
  */
 function validateShowGroupMembership()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1406,7 +1450,9 @@ function validateShowGroupMembership()
  */
 function detachGroupModerators($id_group)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}group_moderators
@@ -1425,7 +1471,9 @@ function detachGroupModerators($id_group)
  */
 function getIDMemberFromGroupModerators($moderators)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$group_moderators = array();
 
@@ -1454,7 +1502,9 @@ function getIDMemberFromGroupModerators($moderators)
  */
 function assignGroupModerators($id_group, $group_moderators)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$mod_insert = array();
 		foreach ($group_moderators as $moderator)
@@ -1476,7 +1526,9 @@ function assignGroupModerators($id_group, $group_moderators)
  */
 function getGroupModerators($id_group)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$moderators = array();
 
@@ -1503,7 +1555,9 @@ function getGroupModerators($id_group)
  */
 function getInheritableGroups($id_group)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$inheritable_groups = array();
 
@@ -1538,7 +1592,9 @@ function getInheritableGroups($id_group)
  */
 function getExtendedMembergroupData()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$groups = array();
 
@@ -1577,7 +1633,9 @@ function getExtendedMembergroupData()
  */
 function prepareMembergroupPermissions()
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$profile_groups = array();
 

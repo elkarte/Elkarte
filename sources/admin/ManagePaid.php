@@ -407,7 +407,9 @@ class ManagePaid_Controller
 	 */
 	public function action_modify()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/ManagePaid.subs.php');
 

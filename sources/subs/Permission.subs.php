@@ -84,7 +84,9 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// All the parent groups to sort out.
 	if (!is_array($parents))
@@ -210,7 +212,9 @@ class InlinePermissions_Form
 	 */
 	static function save_inline_permissions($permissions)
 	{
-		global $context, $smcFunc;
+		global $context, ;
+
+		$db = database();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -277,7 +281,9 @@ class InlinePermissions_Form
 	 */
 	static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $modSettings, ;
+
+		$db = database();
 
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');

@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function loadTasks($tasks)
 {
-	global $smcFunc;
+
+
+	$db = database();
 	
 	$request = $smcFunc['db_query']('', '
 		SELECT id_task, task
@@ -52,7 +54,9 @@ function loadTasks($tasks)
  */
 function logTask($task_id, $total_time)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}log_scheduled_tasks',
@@ -69,7 +73,9 @@ function logTask($task_id, $total_time)
  */
 function updateTaskStatus($enablers)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}scheduled_tasks
@@ -91,7 +97,9 @@ function updateTaskStatus($enablers)
  */
 function updateTask($id_task, $disabled, $offset, $interval, $unit)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}scheduled_tasks
@@ -116,7 +124,9 @@ function updateTask($id_task, $disabled, $offset, $interval, $unit)
  */
 function loadTaskDetails($id_task)
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$task = array();
 
@@ -162,7 +172,9 @@ function loadTaskDetails($id_task)
  */
 function list_getScheduledTasks()
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
@@ -202,7 +214,9 @@ function list_getScheduledTasks()
  */
 function list_getTaskLogEntries($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
@@ -231,7 +245,9 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumaction_logEntries()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)

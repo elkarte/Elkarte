@@ -20,7 +20,9 @@ if (!defined('ELKARTE'))
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Delete all or just some?
 	if ($type == 'delall' && !isset($filter))
@@ -56,7 +58,9 @@ function deleteErrors($type, $filter = null, $error_list = null)
  */
 function numErrors()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Just how many errors are there?
 	$result = $smcFunc['db_query']('', '
@@ -84,7 +88,9 @@ function numErrors()
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
-	global $smcFunc, $modSettings, $scripturl, $txt;
+	global , $modSettings, $scripturl, $txt;
+
+	$db = database();
 
 	$db = database();
 	// Find and sort out the errors.
@@ -162,7 +168,9 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {
-	global $smcFunc, $txt, $scripturl;
+	global , $txt, $scripturl;
+
+	$db = database();
 
 	$sum = 0;
 	$types = array();

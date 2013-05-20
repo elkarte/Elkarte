@@ -30,7 +30,9 @@ if (!defined('ELKARTE'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$catUpdates = array();
 	$catParameters = array();
@@ -130,7 +132,9 @@ function modifyCategory($category_id, $catOptions)
  */
 function createCategory($catOptions)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Check required values.
 	if (!isset($catOptions['cat_name']) || trim($catOptions['cat_name']) == '')
@@ -186,7 +190,9 @@ function createCategory($catOptions)
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $smcFunc, $cat_tree;
+	global , $cat_tree;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -258,7 +264,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Collapse or expand the categories.
 	if ($new_status === 'collapse' || $new_status === 'expand')
@@ -349,7 +357,9 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  */
 function categoryName($id_cat)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT name

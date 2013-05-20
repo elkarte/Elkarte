@@ -29,7 +29,9 @@ if (!defined('ELKARTE'))
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	// we'll need to init illegal permissions.
 	require_once(SUBSDIR . '/Permission.subs.php');
@@ -348,7 +350,9 @@ function setPermissionLevel($level, $group = null, $profile = null)
  */
 function loadPermissionProfiles()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, profile_name
@@ -720,7 +724,9 @@ function loadAllPermissions($loadType = 'classic')
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_group, COUNT(*) AS num_permissions, add_deny
@@ -749,7 +755,9 @@ function countPermissions($groups, $hidden_permissions = null)
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, id_group, COUNT(*) AS num_permissions, add_deny
@@ -779,7 +787,9 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
  */
 function assignPermissionProfileToBoard($profile, $board)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
@@ -802,7 +812,9 @@ function assignPermissionProfileToBoard($profile, $board)
  */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Retrieve current permissions of group.
 	$request = $smcFunc['db_query']('', '
@@ -867,7 +879,9 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
  */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Now do the same for the board permissions.
 	$request = $smcFunc['db_query']('', '
@@ -929,7 +943,9 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
  */
 function deletePermission($groups, $permission, $illegal_permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
@@ -953,7 +969,9 @@ function deletePermission($groups, $permission, $illegal_permissions)
  */
 function deleteBoardPermission($group, $profile_id, $permission)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}board_permissions
@@ -975,7 +993,9 @@ function deleteBoardPermission($group, $profile_id, $permission)
  */
 function replacePermission($permChange)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}permissions',
@@ -992,7 +1012,9 @@ function replacePermission($permChange)
  */
 function replaceBoardPermission($permChange)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}board_permissions',
@@ -1007,7 +1029,9 @@ function replaceBoardPermission($permChange)
  */
 function removeModeratorPermissions()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
@@ -1025,7 +1049,9 @@ function removeModeratorPermissions()
  */
 function fetchPermissions($id_group)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$permissions = array(
 		'allowed' => array(),
@@ -1057,7 +1083,9 @@ function fetchPermissions($id_group)
  */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$permissions = array(
 		'allowed' => array(),
@@ -1089,7 +1117,9 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
  */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
@@ -1110,7 +1140,9 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  */
 function deleteAllBoardPermissions($id_group, $id_profile)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}board_permissions
@@ -1128,7 +1160,9 @@ function deleteAllBoardPermissions($id_group, $id_profile)
  */
 function clearDenyPermissions()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
@@ -1152,7 +1186,9 @@ function clearDenyPermissions()
  */
 function clearPostgroupPermissions()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$post_groups = array();
 	$request = $smcFunc['db_query']('', '
@@ -1201,7 +1237,9 @@ function clearPostgroupPermissions()
  */
 function copyPermissionProfile($profile_name, $copy_from)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$profile_name = $smcFunc['htmlspecialchars']($profile_name);
 	// Insert the profile itself.
@@ -1248,7 +1286,9 @@ function copyPermissionProfile($profile_name, $copy_from)
  */
 function renamePermissionProfile($id_profile, $name)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$name = $smcFunc['htmlspecialchars']($name);
 
@@ -1270,7 +1310,9 @@ function renamePermissionProfile($id_profile, $name)
  */
 function deletePermissionProfiles($profiles)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Verify it's not in use...
 	$request = $smcFunc['db_query']('', '
@@ -1304,7 +1346,9 @@ function deletePermissionProfiles($profiles)
  */
 function permProfilesInUse($profiles)
 {
-	global $smcFunc, $txt;
+	global , $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_profile, COUNT(id_board) AS board_count
@@ -1334,7 +1378,9 @@ function permProfilesInUse($profiles)
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Start by deleting all the permissions relevant.
 	$smcFunc['db_query']('', '
@@ -1357,7 +1403,9 @@ function deleteBoardPermissions($groups, $profile, $permissions)
  */
 function insertBoardPermission($new_permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_insert']('',
 		'{db_prefix}board_permissions',
@@ -1377,7 +1425,9 @@ function insertBoardPermission($new_permissions)
  */
 function getPermission($group, $profile, $permissions)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$groups = array();
 

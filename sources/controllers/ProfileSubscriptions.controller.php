@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function action_subscriptions()
 {
-	global $context, $txt, $modSettings, $smcFunc, $scripturl;
+	global $context, $txt, $modSettings, $scripturl;
+
+	$db = database();
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');

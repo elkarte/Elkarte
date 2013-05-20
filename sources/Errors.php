@@ -36,7 +36,9 @@ if (!defined('ELKARTE'))
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
-	global $txt, $modSettings, $sc, $user_info, $smcFunc, $scripturl, $last_error;
+	global $txt, $modSettings, $sc, $user_info, $scripturl, $last_error;
+
+	$db = database();
 	static $tried_hook = false;
 
 	// Check if error logging is actually on.
@@ -361,7 +363,9 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $smcFunc;
+	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, ;
+
+	$db = database();
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)

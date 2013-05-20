@@ -206,7 +206,9 @@ class ManageSearchEngines_Controller
 	 */
 	function action_spiders()
 	{
-		global $context, $txt, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl, ;
+
+		$db = database();
 
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -382,7 +384,9 @@ class ManageSearchEngines_Controller
 	 */
 	function action_editspiders()
 	{
-		global $context, $smcFunc, $txt;
+		global $context, $txt;
+
+		$db = database();
 
 		// Some standard stuff.
 		$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
@@ -479,7 +483,9 @@ class ManageSearchEngines_Controller
 	 */
 	function action_logs()
 	{
-		global $context, $txt, $scripturl, $smcFunc, $modSettings;
+		global $context, $txt, $scripturl, $modSettings;
+
+		$db = database();
 
 		// Load the template and language just incase.
 		loadLanguage('Search');
@@ -606,7 +612,9 @@ class ManageSearchEngines_Controller
 	 */
 	function action_stats()
 	{
-		global $context, $txt, $scripturl, $smcFunc;
+		global $context, $txt, $scripturl, ;
+
+		$db = database();
 
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -786,7 +794,9 @@ class ManageSearchEngines_Controller
  */
 function list_getSpiders($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_spider, spider_name, user_agent, ip_info
@@ -810,7 +820,9 @@ function list_getSpiders($start, $items_per_page, $sort)
  */
 function list_getNumSpiders()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS num_spiders
@@ -834,7 +846,9 @@ function list_getNumSpiders()
  */
 function list_getSpiderLogs($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT sl.id_spider, sl.url, sl.log_time, s.spider_name
@@ -859,7 +873,9 @@ function list_getSpiderLogs($start, $items_per_page, $sort)
  */
 function list_getNumSpiderLogs()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS num_logs
@@ -884,7 +900,9 @@ function list_getNumSpiderLogs()
  */
 function list_getSpiderStats($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT ss.id_spider, ss.stat_date, ss.page_hits, s.spider_name
@@ -911,7 +929,9 @@ function list_getSpiderStats($start, $items_per_page, $sort)
  */
 function list_getNumSpiderStats()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS num_stats

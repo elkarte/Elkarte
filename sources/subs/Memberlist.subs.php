@@ -29,7 +29,9 @@ if (!defined('ELKARTE'))
  */
 function ml_CustomProfile()
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	$context['custom_profile_fields'] = array();
 
@@ -136,7 +138,9 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -159,7 +163,9 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('substring', '
 		SELECT COUNT(*)
@@ -188,7 +194,9 @@ function ml_alphaStart($start)
  */
 function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = '')
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings, ;
+
+	$db = database();
 
 	// Select the members from the database.
 	$request = $smcFunc['db_query']('', '
@@ -220,7 +228,9 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  */
 function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limit = 0)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Get the number of results
 	$request = $smcFunc['db_query']('', '
@@ -263,7 +273,9 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
  */
 function ml_findSearchableCustomFields()
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT col_name, field_name, field_desc
@@ -298,7 +310,9 @@ function ml_findSearchableCustomFields()
  */
 function printMemberListRows($request)
 {
-	global $txt, $context, $scripturl, $memberContext, $settings, $smcFunc;
+	global $txt, $context, $scripturl, $memberContext, $settings, ;
+
+	$db = database();
 
 	// Get the max post number for the bar graph
 	$result = $smcFunc['db_query']('', '

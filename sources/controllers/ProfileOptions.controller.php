@@ -70,7 +70,9 @@ function action_editBuddyIgnoreLists()
 function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext, ;
+
+	$db = database();
 
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editBuddies';
@@ -183,7 +185,9 @@ function action_editBuddies($memID)
 function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext, ;
+
+	$db = database();
 
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editIgnoreList';
@@ -366,7 +370,9 @@ function action_pmprefs()
  */
 function action_themepick()
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
+	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, ;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -478,7 +484,9 @@ function action_authentication($memID, $saving = false)
  */
 function action_notification()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $settings;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $settings;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -705,7 +713,9 @@ function action_notification()
  */
 function list_getTopicNotificationCount($memID)
 {
-	global $smcFunc, $user_info, $context, $modSettings;
+	global , $user_info, $context, $modSettings;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -738,7 +748,9 @@ function list_getTopicNotificationCount($memID)
  */
 function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info, $context, $modSettings;
+	global , $txt, $scripturl, $user_info, $context, $modSettings;
+
+	$db = database();
 
 	// All the topics with notification on...
 	$request = $smcFunc['db_query']('', '
@@ -795,7 +807,9 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 
 function getBoardNotificationsCount($memID)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	// All the boards that you have notification enabled
 	$request = $smcFunc['db_query']('', '
@@ -827,7 +841,9 @@ function getBoardNotificationsCount($memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info, $modSettings;
+	global , $txt, $scripturl, $user_info, $modSettings;
+
+	$db = database();
 
 	// All the boards that you have notification enabled
 	$request = $smcFunc['db_query']('', '
@@ -893,7 +909,9 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
  */
 function loadThemeOptions($memID)
 {
-	global $context, $options, $cur_profile, $smcFunc;
+	global $context, $options, $cur_profile, ;
+
+	$db = database();
 
 	if (isset($_POST['default_options']))
 		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
@@ -973,7 +991,9 @@ function action_ignoreboards()
  */
 function action_groupMembership()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, ;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
@@ -1076,7 +1096,9 @@ function action_groupMembership()
  */
 function action_groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
+	global $user_info, $context, $user_profile, $modSettings, $txt, $scripturl, $language;
+
+	$db = database();
 
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))

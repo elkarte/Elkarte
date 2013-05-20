@@ -103,7 +103,9 @@ class ManageSearch_Controller
 	 */
 	function action_searchSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc;
+		global $txt, $context, $scripturl, $modSettings, ;
+
+		$db = database();
 
 		// initialize the form
 		$this->_initSearchSettingsForm();
@@ -300,7 +302,9 @@ class ManageSearch_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
+		global $txt, $context, $modSettings, $db_type, $db_prefix;
+
+		$db = database();
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
@@ -554,7 +558,9 @@ class ManageSearch_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+		global $modSettings, $context, $db_prefix, $txt;
+
+		$db = database();
 
 		// Get hang of db_search
 		$db_search = db_search();
@@ -957,7 +963,9 @@ function loadSearchAPIs()
  */
 function detectFulltextIndex()
 {
-	global $smcFunc, $context, $db_prefix;
+	global , $context, $db_prefix;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SHOW INDEX

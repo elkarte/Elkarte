@@ -35,7 +35,9 @@ class Topic_Controller
 	*/
 	function action_lock()
 	{
-		global $topic, $user_info, $board, $smcFunc;
+		global $topic, $user_info, $board, ;
+
+		$db = database();
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
@@ -95,7 +97,9 @@ class Topic_Controller
 	 */
 	function action_sticky()
 	{
-		global $modSettings, $topic, $board, $smcFunc;
+		global $modSettings, $topic, $board, ;
+
+		$db = database();
 
 		// Make sure the user can sticky it, and they are stickying *something*.
 		isAllowedTo('make_sticky');
@@ -151,7 +155,9 @@ class Topic_Controller
 	function action_printpage()
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
-		global $board_info, $smcFunc, $modSettings, $settings;
+		global $board_info, $modSettings, $settings;
+
+		$db = database();
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))

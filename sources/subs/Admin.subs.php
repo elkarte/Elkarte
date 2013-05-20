@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $db_connection, $_PHPA, $smcFunc, $memcached, $modSettings;
+	global $txt, $db_connection, $_PHPA, $memcached, $modSettings;
+
+	$db = database();
 
 	loadLanguage('Admin');
 
@@ -259,7 +261,9 @@ function updateDbLastError($time)
  */
 function updateAdminPreferences()
 {
-	global $options, $context, $smcFunc, $settings, $user_info;
+	global $options, $context, $settings, $user_info;
+
+	$db = database();
 
 	// This must exist!
 	if (!isset($context['admin_preferences']))
@@ -303,7 +307,9 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global $smcFunc, $language, $modSettings;
+	global , $language, $modSettings;
+
+	$db = database();
 
 	// We certainly want this.
 	require_once(SUBSDIR . '/Mail.subs.php');

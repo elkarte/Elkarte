@@ -28,7 +28,9 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $smcFunc, $context;
+	global $scripturl, $txt, $user_info, $modSettings, $context;
+
+	$db = database();
 
 	// Find all the posts.  Newer ones will have higher IDs.  (assuming the last 20 * number are accessable...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
@@ -117,7 +119,9 @@ function cache_getLastPosts($latestPostOptions)
 
 function getRecentPosts($messages, $start)
 {
-	global $smcFunc, $user_info, $scripturl;
+	global , $user_info, $scripturl;
+
+	$db = database();
 
 	// Get all the most recent posts.
 	$request = $smcFunc['db_query']('', '

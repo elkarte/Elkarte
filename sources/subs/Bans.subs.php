@@ -78,7 +78,9 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($group_id !== false)
 		$group_id = (int) $group_id;
@@ -124,7 +126,9 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  */
 function removeBanGroups($group_ids)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($group_ids))
 		$group_ids = array($group_ids);
@@ -154,7 +158,9 @@ function removeBanGroups($group_ids)
  */
 function removeBanLogs($ids = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (empty($ids))
 		$smcFunc['db_query']('truncate_table', '
@@ -192,7 +198,9 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
 	if (empty($triggers))
@@ -365,7 +373,9 @@ function validateTriggers(&$triggers)
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -459,7 +469,9 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -561,7 +573,9 @@ function logTriggersUpdates($logs, $new = true)
  */
 function updateBanGroup($ban_info = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -625,7 +639,9 @@ function updateBanGroup($ban_info = array())
  */
 function insertBanGroup($ban_info = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
 
@@ -743,7 +759,9 @@ function range2ip($low, $high)
  */
 function checkExistingTriggerIP($ip_array, $fullip = '')
 {
-	global $smcFunc, $scripturl;
+	global , $scripturl;
+
+	$db = database();
 
 	if (count($ip_array) == 4 || count($ip_array) == 8)
 		$values = array(
@@ -802,7 +820,9 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
  */
 function updateBanMembers()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$updates = array();
 	$allMembers = array();
@@ -928,7 +948,9 @@ function updateBanMembers()
 
 function getMemberData($id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$suggestions = array();
 	require_once(SUBSDIR . '/Members.subs.php');
@@ -957,7 +979,9 @@ function getMemberData($id)
  */
 function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$where = array(
 		'ip' => 'bi.ip_low1 > 0',
@@ -996,7 +1020,9 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  */
 function list_getNumBanTriggers($trigger_type)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$where = array(
 		'ip' => 'bi.ip_low1 > 0',
@@ -1029,7 +1055,9 @@ function list_getNumBanTriggers($trigger_type)
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT lb.id_ban_log, lb.id_member, IFNULL(lb.ip, {string:dash}) AS ip, IFNULL(lb.email, {string:dash}) AS email, lb.log_time, IFNULL(mem.real_name, {string:blank_string}) AS real_name
@@ -1055,7 +1083,9 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumBanLogEntries()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -1076,7 +1106,9 @@ function list_getNumBanLogEntries()
  */
 function list_getNumBans()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS num_bans
@@ -1101,7 +1133,9 @@ function list_getNumBans()
  */
 function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group_id = 0)
 {
-	global $context, $smcFunc, $scripturl;
+	global $context, $scripturl;
+
+	$db = database();
 
 	$ban_items = array();
 	$request = $smcFunc['db_query']('', '
@@ -1204,7 +1238,9 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  */
 function list_getBans($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes, COUNT(bi.id_ban) AS num_triggers
@@ -1235,7 +1271,9 @@ function list_getBans($start, $items_per_page, $sort)
  */
 function list_getNumBanItems()
 {
-	global $smcFunc, $context;
+	global , $context;
+
+	$db = database();
 
 	$ban_group_id = isset($context['ban_group_id']) ? (int) $context['ban_group_id'] : 0;
 
@@ -1262,7 +1300,9 @@ function list_getNumBanItems()
  */
 function banLoadAdditionalIPsMember($member_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find some additional IP's used by this member.
 	$message_ips = array();
@@ -1291,7 +1331,9 @@ function banLoadAdditionalIPsMember($member_id)
  */
 function banLoadAdditionalIPsError($member_id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$error_ips = array();
 	$request = $smcFunc['db_query']('ban_suggest_error_ips', '
@@ -1344,7 +1386,9 @@ function banLoadAdditionalIPs($member_id)
  */
 function banDetails($ban_id, $ban_group)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT

@@ -53,7 +53,9 @@ class DbSearch_MySQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		if ($size == 'small')
 			$size = 'smallint(5)';

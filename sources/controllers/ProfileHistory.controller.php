@@ -73,7 +73,9 @@ function action_history()
 function action_trackactivity($memID)
 {
 	global $scripturl, $txt, $modSettings;
-	global $user_profile, $context, $smcFunc;
+	global $user_profile, $context, ;
+
+	$db = database();
 
 	// Verify if the user has sufficient permissions.
 	isAllowedTo('moderate_forum');
@@ -290,7 +292,9 @@ function action_trackactivity($memID)
  */
 function list_getUserErrorCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS error_count
@@ -317,7 +321,9 @@ function list_getUserErrorCount($where, $where_vars = array())
  */
 function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global , $txt, $scripturl;
+
+	$db = database();
 
 	// Get a list of error messages from this ip (range).
 	$request = $smcFunc['db_query']('', '
@@ -357,7 +363,9 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
  */
 function list_getIPMessageCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS message_count
@@ -385,7 +393,9 @@ function list_getIPMessageCount($where, $where_vars = array())
  */
 function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global , $txt, $scripturl;
+
+	$db = database();
 
 	// Get all the messages fitting this where clause.
 	// @todo SLOW This query is using a filesort.
@@ -432,7 +442,9 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 function action_trackip($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
@@ -718,7 +730,9 @@ function action_trackip($memID = 0)
 function action_tracklogin($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, $smcFunc;
+	global $context, ;
+
+	$db = database();
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -799,7 +813,9 @@ function action_tracklogin($memID = 0)
  */
 function list_getLoginCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS message_count
@@ -828,7 +844,9 @@ function list_getLoginCount($where, $where_vars = array())
  */
 function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global , $txt, $scripturl;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT time, ip, ip2
@@ -858,7 +876,9 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $context, $smcFunc;
+	global $scripturl, $txt, $modSettings, $context, ;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/List.subs.php');
 
@@ -960,7 +980,9 @@ function action_trackedits($memID)
  */
 function list_getProfileEditCount($memID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*) AS edit_count
@@ -990,7 +1012,9 @@ function list_getProfileEditCount($memID)
  */
 function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $context;
+	global , $txt, $scripturl, $context;
+
+	$db = database();
 
 	// Get a list of error messages from this ip (range).
 	$request = $smcFunc['db_query']('', '

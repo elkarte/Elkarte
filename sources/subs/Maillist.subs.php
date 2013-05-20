@@ -25,7 +25,9 @@ if (!defined('ELKARTE'))
  */
 function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 {
-	global $smcFunc, $txt, $boardurl, $user_info;
+	global , $txt, $boardurl, $user_info;
+
+	$db = database();
 
 	// Init
 	$i = 0;
@@ -105,7 +107,9 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
  */
 function list_maillist_count_unapproved()
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$total= 0;
 
@@ -144,7 +148,9 @@ function list_maillist_count_unapproved()
  */
 function maillist_delete_entry($id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// bye bye error log entry
 	$smcFunc['db_query']('', '
@@ -170,7 +176,9 @@ function maillist_delete_entry($id)
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Init
 	$i = 0;
@@ -223,7 +231,9 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
  */
 function list_count_filter_parser($id, $style)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$total = 0;
 
@@ -255,7 +265,9 @@ function list_count_filter_parser($id, $style)
  */
 function maillist_load_filter_parser($id, $style)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$row = array();
 
@@ -288,7 +300,9 @@ function maillist_load_filter_parser($id, $style)
  */
 function maillist_delete_filter_parser($id)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Delete the rows from the database for the filter selected
 	$smcFunc['db_query']('', '
@@ -311,7 +325,9 @@ function maillist_delete_filter_parser($id)
  */
 function maillist_board_list()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the board and the id's, we need these for the templates
 	$request = $smcFunc['db_query']('', '
@@ -339,7 +355,9 @@ function maillist_board_list()
  */
 function enable_maillist_imap_cron($switch)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Enable or disable the fake cron
 	$smcFunc['db_query']('', '
@@ -359,7 +377,9 @@ function enable_maillist_imap_cron($switch)
  */
 function maillist_templates()
 {
-	global $smcFunc, $user_info, $txt;
+	global , $user_info, $txt;
+
+	$db = database();
 
 	$notification_templates = array();
 

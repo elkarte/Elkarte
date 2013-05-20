@@ -157,7 +157,9 @@ class Custom_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		$subwords = text2words($word, $this->min_word_length, true);
 
@@ -190,7 +192,9 @@ class Custom_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		// we can't do anything without this
 		$db_search = db_search();
@@ -285,7 +289,9 @@ class Custom_Search
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
 
@@ -311,7 +317,9 @@ class Custom_Search
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		if (isset($msgOptions['body']))
 		{

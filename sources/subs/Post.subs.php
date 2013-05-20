@@ -538,7 +538,9 @@ function resizeBBCImages(&$message)
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
 	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
 	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
@@ -922,7 +924,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function validateAccess($row, $maillist, &$email_perm = true)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 	static $board_profile = array();
 
 	// No need to check for you ;)
@@ -984,7 +988,9 @@ function validateAccess($row, $maillist, &$email_perm = true)
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc;
+	global $user_info, $txt, $modSettings, ;
+
+	$db = database();
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -1322,7 +1328,9 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, ;
+
+	$db = database();
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -1468,7 +1476,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($msgs))
 		$msgs = array($msgs);
@@ -1691,7 +1701,9 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($topics))
 		$topics = array($topics);
@@ -1727,7 +1739,9 @@ function approveTopics($topics, $approve = true)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $language, $user_info, $modSettings, ;
+
+	$db = database();
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -1883,7 +1897,9 @@ function sendApprovalNotifications(&$topicData)
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
-	global $board_info, $board, $smcFunc;
+	global $board_info, $board, ;
+
+	$db = database();
 
 	// Please - let's be sane.
 	if (empty($setboards))
@@ -2021,7 +2037,9 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info, $smcFunc;
+	global $modSettings, $language, $scripturl, $user_info, ;
+
+	$db = database();
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -2113,7 +2131,9 @@ function adminNotify($type, $memberID, $member_name = null)
  */
 function notifyMembersBoard(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc, $webmaster_email;
+	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -2302,7 +2322,9 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, $smcFunc;
+	global $user_info, $scripturl, $modSettings, ;
+
+	$db = database();
 
 	// Find it by the board - better to order by board than sort the entire messages table.
 	$request = $smcFunc['db_query']('substring', '
@@ -2348,7 +2370,9 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global $smcFunc, $modSettings, $context;
+	global , $modSettings, $context;
+
+	$db = database();
 
 	if ($editing)
 	{

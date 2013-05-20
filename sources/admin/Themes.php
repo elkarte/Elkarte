@@ -117,7 +117,9 @@ class Themes_Controller
 	 */
 	function action_admin()
 	{
-		global $context, $modSettings, $smcFunc;
+		global $context, $modSettings, ;
+
+		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -180,7 +182,9 @@ class Themes_Controller
 	 */
 	function action_list()
 	{
-		global $context, $boardurl, $smcFunc;
+		global $context, $boardurl, ;
+
+		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -304,7 +308,9 @@ class Themes_Controller
 	 */
 	function action_options()
 	{
-		global $txt, $context, $settings, $modSettings, $smcFunc;
+		global $txt, $context, $settings, $modSettings, ;
+
+		$db = database();
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
@@ -687,7 +693,9 @@ class Themes_Controller
 	 */
 	function action_setthemesettings()
 	{
-		global $txt, $context, $settings, $modSettings, $smcFunc;
+		global $txt, $context, $settings, $modSettings, ;
+
+		$db = database();
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
@@ -864,7 +872,9 @@ class Themes_Controller
 	 */
 	function action_remove()
 	{
-		global $modSettings, $context, $smcFunc;
+		global $modSettings, $context, ;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -935,7 +945,9 @@ class Themes_Controller
 	 */
 	function action_pick()
 	{
-		global $txt, $context, $modSettings, $user_info, $language, $smcFunc, $settings, $scripturl;
+		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
+
+		$db = database();
 
 		loadLanguage('Profile');
 		loadTemplate('Themes');
@@ -1268,7 +1280,9 @@ class Themes_Controller
 	 */
 	function action_install()
 	{
-		global $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
+		global $boardurl, $txt, $context, $settings, $modSettings, ;
+
+		$db = database();
 
 		checkSession('request');
 
@@ -1579,7 +1593,9 @@ class Themes_Controller
 	 */
 	function action_jsoption()
 	{
-		global $settings, $user_info, $smcFunc, $options;
+		global $settings, $user_info, $options;
+
+		$db = database();
 
 		// Check the session id.
 		checkSession('get');
@@ -1679,7 +1695,9 @@ class Themes_Controller
 	 */
 	function action_edit()
 	{
-		global $context, $settings, $scripturl, $smcFunc;
+		global $context, $settings, $scripturl, ;
+
+		$db = database();
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');
@@ -2072,7 +2090,9 @@ class Themes_Controller
 	 */
 	function action_copy()
 	{
-		global $context, $settings, $smcFunc;
+		global $context, $settings, ;
+
+		$db = database();
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');

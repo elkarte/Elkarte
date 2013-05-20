@@ -18,7 +18,9 @@ if (!defined('ELKARTE'))
  */
 function removeLanguageFromMember($lang_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}members
@@ -48,7 +50,9 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $smcFunc, $language, $context, $txt;
+	global $settings, $language, $context, $txt;
+
+	$db = database();
 
 	$languages = array();
 	// Keep our old entries.
@@ -119,7 +123,9 @@ function list_getLanguages()
  */
 function cleanLangString($string, $to_display = true)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// If going to display we make sure it doesn't have any HTML in it - etc.
 	$new_string = '';
@@ -325,7 +331,9 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $txt, $scripturl;
+
+	$db = database();
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again

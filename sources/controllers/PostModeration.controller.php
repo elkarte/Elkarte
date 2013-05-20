@@ -51,7 +51,9 @@ class PostModeration_Controller
 	 */
 	function action_unapproved()
 	{
-		global $txt, $scripturl, $context, $user_info, $smcFunc;
+		global $txt, $scripturl, $context, $user_info, ;
+
+		$db = database();
 
 		$context['current_view'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
@@ -289,7 +291,9 @@ class PostModeration_Controller
 	 */
 	function action_unapproved_attachments()
 	{
-		global $txt, $scripturl, $context, $user_info, $smcFunc, $modSettings;
+		global $txt, $scripturl, $context, $user_info, $modSettings;
+
+		$db = database();
 
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -495,7 +499,9 @@ class PostModeration_Controller
  	 */
 	function action_approve()
 	{
-		global $user_info, $topic, $board, $smcFunc;
+		global $user_info, $topic, $board, ;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -565,7 +571,9 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Start with messages and topics.
 	$request = $smcFunc['db_query']('', '

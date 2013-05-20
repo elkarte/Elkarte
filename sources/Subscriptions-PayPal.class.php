@@ -334,7 +334,9 @@ class paypal_payment
 	 */
 	public function close()
 	{
-		global $smcFunc, $subscription_id;
+		global , $subscription_id;
+
+		$db = database();
 
 		// If it's a subscription record the reference.
 		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
@@ -361,7 +363,9 @@ class paypal_payment
 	 */
 	private function _findSubscription()
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// Assume we have this?
 		if (empty($_POST['subscr_id']))

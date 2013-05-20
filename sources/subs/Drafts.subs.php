@@ -16,7 +16,9 @@
  */
 function create_pm_draft($draft, $recipientList)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$draft_columns = array(
 		'id_reply' => 'int',
@@ -61,7 +63,9 @@ function create_pm_draft($draft, $recipientList)
  */
 function modify_pm_draft($draft, $recipientList)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}user_drafts
@@ -94,7 +98,9 @@ function modify_pm_draft($draft, $recipientList)
  */
 function create_post_draft($draft)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$draft_columns = array(
 		'id_topic' => 'int',
@@ -144,7 +150,9 @@ function create_post_draft($draft)
  */
 function modify_post_draft($draft)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}user_drafts
@@ -187,7 +195,9 @@ function modify_post_draft($draft)
  */
 function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// load in a draft from the DB
 	$request = $smcFunc['db_query']('', '
@@ -233,7 +243,9 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  */
 function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// load the drafts that the user has available for the given type & action
 	$user_drafts = array();
@@ -275,7 +287,9 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
  */
 function deleteDrafts($id_draft, $member_id = -1, $check = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Only a single draft.
 	if (is_numeric($id_draft))
@@ -306,7 +320,9 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  */
 function draftsCount($member_id, $draft_type)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(id_draft)
@@ -336,7 +352,9 @@ function draftsCount($member_id, $draft_type)
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// holds our results
 	$recipients = array(
@@ -364,7 +382,9 @@ function draftsRecipients($allRecipients, $recipient_ids)
  */
 function getOldDrafts($days)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$drafts = array();
 

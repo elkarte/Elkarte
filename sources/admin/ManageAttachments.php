@@ -830,7 +830,9 @@ class ManageAttachments_Controller
 	 */
 	public function action_repair()
 	{
-		global $modSettings, $context, $txt, $smcFunc;
+		global $modSettings, $context, $txt, ;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -1354,7 +1356,9 @@ class ManageAttachments_Controller
 	 */
 	public function action_attachpaths()
 	{
-		global $modSettings, $scripturl, $context, $txt, $smcFunc;
+		global $modSettings, $scripturl, $context, $txt, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -1873,7 +1877,9 @@ class ManageAttachments_Controller
 	 */
 	public function action_transfer()
 	{
-		global $modSettings, $smcFunc, $txt;
+		global $modSettings, $txt;
+
+		$db = database();
 
 		checkSession();
 

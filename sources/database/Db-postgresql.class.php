@@ -43,7 +43,9 @@ class Database_PostgreSQL implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global $smcFunc, $mysql_set_mode;
+		global , $mysql_set_mode;
+
+		$db = database();
 
 		// Map some database specific functions, only do this once.
 		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'postg_fetch_assoc')
@@ -501,7 +503,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_connection, $smcFunc, $db_prefix;
+		global $db_connection, $db_prefix;
+
+		$db = database();
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
@@ -596,7 +600,9 @@ class Database_PostgreSQL implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -716,7 +722,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_replace_result, $db_in_transact, $smcFunc, $db_connection, $db_prefix;
+		global $db_replace_result, $db_in_transact, $db_connection, $db_prefix;
+
+		$db = database();
 
 		$connection = $connection === null ? $db_connection : $connection;
 
@@ -931,7 +939,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_sql($tableName, $new_table = false)
 	{
-		global $smcFunc, $db_prefix;
+		global , $db_prefix;
+
+		$db = database();
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -1008,7 +1018,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_table_sql($tableName)
 	{
-		global $smcFunc, $db_prefix;
+		global , $db_prefix;
+
+		$db = database();
 
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
@@ -1114,7 +1126,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		$request = $smcFunc['db_query']('', '
 			SELECT tablename
@@ -1144,7 +1158,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global $smcFunc, $db_prefix;
+		global , $db_prefix;
+
+		$db = database();
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
@@ -1175,7 +1191,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_backup_table($table, $backup_table)
 	{
-		global $smcFunc, $db_prefix;
+		global , $db_prefix;
+
+		$db = database();
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 

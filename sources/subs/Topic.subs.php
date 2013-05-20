@@ -32,7 +32,9 @@ if (!defined('ELKARTE'))
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	// Nothing to do?
 	if (empty($topics))
@@ -374,7 +376,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopics($topics, $toBoard)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, ;
+
+	$db = database();
 
 	// Empty array?
 	if (empty($topics))
@@ -683,7 +687,9 @@ function moveTopics($topics, $toBoard)
  */
 function moveTopicConcurrence()
 {
-	global $board, $topic, $smcFunc, $scripturl;
+	global $board, $topic, $scripturl;
+
+	$db = database();
 
 	if (isset($_GET['current_board']))
 		$move_from = (int) $_GET['current_board'];
@@ -722,7 +728,9 @@ function moveTopicConcurrence()
  */
 function increaseViewCounter($id_topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}topics
@@ -742,7 +750,9 @@ function increaseViewCounter($id_topic)
  */
 function markTopicsRead($mark_topics, $was_set = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($mark_topics))
 		return;
@@ -766,7 +776,9 @@ function markTopicsRead($mark_topics, $was_set = false)
  */
 function updateReadNotificationsFor($id_topic, $id_board)
 {
-	global $smcFunc, $user_info, $context;
+	global , $user_info, $context;
+
+	$db = database();
 
 	// Check for notifications on this topic OR board.
 	$request = $smcFunc['db_query']('', '
@@ -817,7 +829,9 @@ function updateReadNotificationsFor($id_topic, $id_board)
  */
 function getUnreadCountSince($id_board, $id_msg_last_visit)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT COUNT(*)
@@ -850,7 +864,9 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
  */
 function hasTopicNotification($id_member, $id_topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find out if they have notification set for this topic already.
 	$request = $smcFunc['db_query']('', '
@@ -879,7 +895,9 @@ function hasTopicNotification($id_member, $id_topic)
  */
 function setTopicNotification($id_member, $id_topic, $on = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($on)
 	{
@@ -949,7 +967,9 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT t2.id_topic
@@ -1024,7 +1044,9 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
  */
 function setTopicRegard($id_member, $topic, $on = false)
 {
-	global $smcFunc, $user_info;
+	global , $user_info;
+
+	$db = database();
 
 	// find the current entry if it exists that is
 	$was_set = getLoggedTopics($user_info['id'], array($topic));
@@ -1054,7 +1076,9 @@ function setTopicRegard($id_member, $topic, $on = false)
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
-	global $smcFunc, $user_info, $modSettings, $board;
+	global , $user_info, $modSettings, $board;
+
+	$db = database();
 
 	// Nothing to do
 	if (empty($topic_parameters))
@@ -1111,7 +1135,9 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	isAllowedTo('admin_forum');
 	checkSession('post', 'admin');
@@ -1185,7 +1211,9 @@ function removeOldTopics()
  */
 function topicsStartedBy($memberID)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Fetch all topics started by this user.
 	$request = $smcFunc['db_query']('', '
@@ -1211,7 +1239,9 @@ function topicsStartedBy($memberID)
  */
 function messagesAfter($topic, $message)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Fetch the message IDs of the topic that are at or after the message.
 	$request = $smcFunc['db_query']('', '
@@ -1242,7 +1272,9 @@ function messagesAfter($topic, $message)
  */
 function messageInfo($topic, $message, $topic_approved = false)
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// @todo isn't this a duplicate?
 
@@ -1279,7 +1311,9 @@ function messageInfo($topic, $message, $topic_approved = false)
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Get the messages and stick them into an array.
 	$request = $smcFunc['db_query']('', '
@@ -1338,7 +1372,9 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
  */
 function unapprovedPosts($id_topic, $id_member)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// not all guests are the same!
 	if (empty($id_member))
@@ -1369,7 +1405,9 @@ function unapprovedPosts($id_topic, $id_member)
  */
 function updateSplitTopics($options, $id_board)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Any associated reported posts better follow...
 	$smcFunc['db_query']('', '
@@ -1448,7 +1486,9 @@ function updateSplitTopics($options, $id_board)
 
 function topicStarter($topic)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find out who started the topic - in case User Topic Locking is enabled.
 	$request = $smcFunc['db_query']('', '
@@ -1477,7 +1517,9 @@ function topicStarter($topic)
  */
 function setTopicAttribute($topic, $attributes)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (isset($attributes['locked']))
 		// Lock the topic in the database with the new value.
@@ -1510,7 +1552,9 @@ function setTopicAttribute($topic, $attributes)
  */
 function toggleTopicSticky($topics)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$topics = is_array($topics) ? $topics : array($topics);
 
@@ -1537,7 +1581,9 @@ function toggleTopicSticky($topics)
  */
 function getLoggedTopics($member, $topics)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_topic, disregarded

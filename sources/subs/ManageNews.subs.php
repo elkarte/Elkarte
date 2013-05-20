@@ -55,7 +55,9 @@ function list_getNews()
  */
 function excludeBannedMembers()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$excludes = array();
 
@@ -123,7 +125,9 @@ function excludeBannedMembers()
  */
 function getModerators()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$mods = array();
 
@@ -155,7 +159,9 @@ function getModerators()
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$recipients = array();
 

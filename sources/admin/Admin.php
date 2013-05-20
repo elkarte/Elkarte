@@ -834,7 +834,9 @@ class Admin_Controller
 	 */
 	public function action_search()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context, ;
+
+		$db = database();
 
 		isAllowedTo('admin_forum');
 

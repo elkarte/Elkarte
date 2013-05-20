@@ -29,7 +29,9 @@ if (!defined('ELKARTE'))
  */
 function markBoardsRead($boards, $unread = false)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings, ;
+
+	$db = database();
 
 	// Force $boards to be an array.
 	if (!is_array($boards))
@@ -161,7 +163,9 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards, $smcFunc;
+	global $cat_tree, $boards, ;
+
+	$db = database();
 
 	// Get some basic information about all boards and categories.
 	getBoardTree();
@@ -452,7 +456,9 @@ function modifyBoard($board_id, &$boardOptions)
  */
 function createBoard($boardOptions)
 {
-	global $boards, $smcFunc;
+	global $boards, ;
+
+	$db = database();
 
 	// Trigger an error if one of the required values is not set.
 	if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) == '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
@@ -544,7 +550,9 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $boards, $smcFunc;
+	global $boards, ;
+
+	$db = database();
 
 	// No boards to delete? Return!
 	if (empty($boards_to_remove))
@@ -681,7 +689,9 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
  */
 function reorderBoards()
 {
-	global $cat_tree, $boardList, $boards, $smcFunc;
+	global $cat_tree, $boardList, $boards, ;
+
+	$db = database();
 
 	getBoardTree();
 
@@ -722,7 +732,9 @@ function reorderBoards()
  */
 function fixChildren($parent, $newLevel, $newParent)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Grab all children of $parent...
 	$result = $smcFunc['db_query']('', '
@@ -764,7 +776,9 @@ function fixChildren($parent, $newLevel, $newParent)
  */
 function getBoardTree()
 {
-	global $cat_tree, $boards, $boardList, $smcFunc;
+	global $cat_tree, $boards, $boardList, ;
+
+	$db = database();
 
 	// Getting all the board and category information you'd ever wanted.
 	$request = $smcFunc['db_query']('', '
@@ -921,7 +935,9 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find out if they have notification set for this board already.
 	$request = $smcFunc['db_query']('', '
@@ -950,7 +966,9 @@ function hasBoardNotification($id_member, $id_board)
  */
 function setBoardNotification($id_member, $id_board, $on = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if ($on)
 	{
@@ -982,7 +1000,9 @@ function setBoardNotification($id_member, $id_board, $on = false)
  */
 function accessibleBoards()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Find all the boards this user can see.
 	$result = $smcFunc['db_query']('', '
@@ -1010,7 +1030,9 @@ function accessibleBoards()
  */
 function boardInfo($board_id, $topic_id = null)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!empty($topic_id))
 	{
@@ -1060,7 +1082,9 @@ function boardInfo($board_id, $topic_id = null)
  */
 function getOtherGroups($curBoard)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$groups = array();
 
@@ -1100,7 +1124,9 @@ function getOtherGroups($curBoard)
  */
 function getBoardModerators($idboard)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$moderators = array();
 
@@ -1127,7 +1153,9 @@ function getBoardModerators($idboard)
  */
 function getAllThemes()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$themes = array();
 
@@ -1155,7 +1183,9 @@ function getAllThemes()
  */
 function getBoardProperties($idboard)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$properties = array();
 
@@ -1181,7 +1211,9 @@ function getBoardProperties($idboard)
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$clauses = array();
 	$clauseParameters = array();
@@ -1237,7 +1269,9 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  */
 function fetchBoardsInfo($conditions, $params = array())
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	$clauses = array();
 	$clauseParameters = array();
@@ -1328,7 +1362,9 @@ function fetchBoardsInfo($conditions, $params = array())
  */
 function addChildBoards(&$boards)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	if (!is_array($boards))
 		$boards = array($boards);

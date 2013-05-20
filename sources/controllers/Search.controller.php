@@ -39,7 +39,9 @@ $GLOBALS['search_versions'] = array(
  */
 function action_plushsearch1()
 {
-	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc;
+	global $txt, $scripturl, $modSettings, $user_info, $context, ;
+
+	$db = database();
 
 	// Is the load average too high to allow searching just now?
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
@@ -197,7 +199,9 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, $smcFunc;
+	global $excludedWords, $participants, ;
+
+	$db = database();
 
 	// We shouldn't be working with the db, but we do :P
 	$db = database();
@@ -1799,7 +1803,9 @@ function action_plushsearch2()
  */
 function MessageSearch()
 {
-	global $context, $txt, $scripturl, $modSettings, $smcFunc;
+	global $context, $txt, $scripturl, $modSettings, ;
+
+	$db = database();
 
 	if (isset($_REQUEST['params']))
 	{
@@ -1877,7 +1883,9 @@ function MessageSearch()
 function MessageSearch2()
 {
 	global $scripturl, $modSettings, $user_info, $context, $txt;
-	global $memberContext, $smcFunc;
+	global $memberContext, ;
+
+	$db = database();
 
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
 		fatal_lang_error('loadavg_search_disabled', false);
@@ -2391,7 +2399,9 @@ function prepareSearchContext($reset = false)
 {
 	global $txt, $modSettings, $scripturl, $user_info;
 	global $memberContext, $context, $settings, $options, $messages_request;
-	global $boards_can, $participants, $smcFunc;
+	global $boards_can, $participants, ;
+
+	$db = database();
 
 	// Remember which message this is.  (ie. reply #83)
 	static $counter = null;

@@ -67,7 +67,9 @@ class Suggest_Controller
 	 */
 	function action_suggest_member()
 	{
-		global $user_info, $txt, $smcFunc, $context;
+		global $user_info, $txt, $context;
+
+		$db = database();
 
 		$search = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
 		$search = strtr($search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));

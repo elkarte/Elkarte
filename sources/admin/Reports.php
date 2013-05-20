@@ -142,7 +142,9 @@ class Reports_Controller
 	 */
 	function action_boards()
 	{
-		global $context, $txt, $smcFunc, $modSettings;
+		global $context, $txt, $modSettings;
+
+		$db = database();
 
 		// Load the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
@@ -270,7 +272,9 @@ class Reports_Controller
 	 */
 	function action_board_perms()
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $modSettings, ;
+
+		$db = database();
 
 		// Get as much memory as possible as this can be big.
 		setMemoryLimit('256M');
@@ -435,7 +439,9 @@ class Reports_Controller
 	 */
 	function action_member_groups()
 	{
-		global $context, $txt, $settings, $modSettings, $smcFunc;
+		global $context, $txt, $settings, $modSettings, ;
+
+		$db = database();
 
 		// Fetch all the board names.
 		$request = $smcFunc['db_query']('', '
@@ -558,7 +564,9 @@ class Reports_Controller
 	 */
 	function action_group_perms()
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $modSettings, ;
+
+		$db = database();
 
 		if (isset($_REQUEST['groups']))
 		{
@@ -661,7 +669,9 @@ class Reports_Controller
 	 */
 	function action_staff()
 	{
-		global $context, $txt, $smcFunc;
+		global $context, $txt, ;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Members.subs.php');
 

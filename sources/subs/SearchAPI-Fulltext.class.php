@@ -114,7 +114,9 @@ class Fulltext_Search
 	 */
 	protected function _getMinWordLength()
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// need some search specific database tricks
 		$db_search = db_search();
@@ -150,7 +152,9 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords, $smcFunc;
+		global $excludedWords, ;
+
+		$db = database();
 
 		$x = $smcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = $smcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);
@@ -171,7 +175,9 @@ class Fulltext_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		$subwords = text2words($word, null, false);
 
@@ -213,7 +219,9 @@ class Fulltext_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, ;
+
+		$db = database();
 
 		$db_search = db_search();
 

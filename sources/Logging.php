@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $smcFunc;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, ;
+
+	$db = database();
 
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
@@ -335,7 +337,9 @@ function displayDebug()
  */
 function trackStats($stats = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 	static $cache_stats = array();
 
 	if (empty($modSettings['trackStats']))
@@ -414,7 +418,9 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info, ;
+
+	$db = database();
 
 	$inserts = array();
 	$log_types = array(
@@ -540,7 +546,9 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$smcFunc['db_insert']('insert',
 		'{db_prefix}member_logins',

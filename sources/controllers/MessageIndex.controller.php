@@ -29,7 +29,9 @@ class MessageIndex_Controller
 	function action_messageindex()
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
-		global $options, $settings, $board_info, $user_info, $smcFunc;
+		global $options, $settings, $board_info, $user_info, ;
+
+		$db = database();
 
 		// If this is a redirection board head off.
 		if ($board_info['redirect'])
@@ -624,7 +626,9 @@ class MessageIndex_Controller
 	 */
 	function action_quickmod()
 	{
-		global $board, $user_info, $modSettings, $smcFunc, $context;
+		global $board, $user_info, $modSettings, $context;
+
+		$db = database();
 
 		// Check the session = get or post.
 		checkSession('request');

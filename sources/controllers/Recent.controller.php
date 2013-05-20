@@ -28,7 +28,9 @@ class Recent_Controller
 	 */
 	function action_recent()
 	{
-		global $txt, $scripturl, $user_info, $context, $modSettings, $board, $smcFunc;
+		global $txt, $scripturl, $user_info, $context, $modSettings, $board, ;
+
+		$db = database();
 
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
@@ -264,7 +266,9 @@ class Recent_Controller
 	function action_unread()
 	{
 		global $board, $txt, $scripturl;
-		global $user_info, $context, $settings, $modSettings, $smcFunc, $options;
+		global $user_info, $context, $settings, $modSettings, $options;
+
+		$db = database();
 
 		// Guests can't have unread things, we don't know anything about them.
 		is_not_guest();

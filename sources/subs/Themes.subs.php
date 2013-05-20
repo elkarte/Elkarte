@@ -21,7 +21,9 @@ if (!defined('ELKARTE'))
  */
 function installedThemes()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_theme, variable, value
@@ -59,7 +61,9 @@ function installedThemes()
  */
 function themeDirectory($id_theme)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT value
@@ -85,7 +89,9 @@ function themeDirectory($id_theme)
  */
 function themeUrl($id_theme)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT value
@@ -114,7 +120,9 @@ function themeUrl($id_theme)
  */
 function validateThemeName($indexes, $value_data)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_theme, value
@@ -149,7 +157,9 @@ function validateThemeName($indexes, $value_data)
  */
 function getBasicThemeInfos($themes)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$themelist = array();
 
@@ -179,7 +189,9 @@ function getBasicThemeInfos($themes)
  */
 function getCustomThemes()
 {
-	global $smcFunc, $settings, $txt;
+	global , $settings, $txt;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_theme, variable, value
@@ -216,7 +228,9 @@ function getCustomThemes()
  */
 function getThemesPathbyID($theme_list = array())
 {
-	global $smcFunc, $modSettings;
+	global , $modSettings;
+
+	$db = database();
 
 	// Nothing passed then we use the defaults
 	if (empty($theme_list))
@@ -254,7 +268,9 @@ function getThemesPathbyID($theme_list = array())
  */
 function loadThemes($knownThemes)
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	// Load up all the themes.
 	$request = $smcFunc['db_query']('', '

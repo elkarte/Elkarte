@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  */
 function spiderCheck()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, ;
+
+	$db = database();
 
 	if (isset($_SESSION['id_robot']))
 		unset($_SESSION['id_robot']);
@@ -103,7 +105,9 @@ function spiderCheck()
  */
 function logSpider()
 {
-	global $smcFunc, $modSettings, $context;
+	global , $modSettings, $context;
+
+	$db = database();
 
 	if (empty($modSettings['spider_mode']) || empty($_SESSION['id_robot']))
 		return;
@@ -166,7 +170,9 @@ function logSpider()
  */
 function consolidateSpiderStats()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('consolidate_spider_stats', '
 		SELECT id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
@@ -233,7 +239,9 @@ function consolidateSpiderStats()
  */
 function recacheSpiderNames()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_spider, spider_name
@@ -254,7 +262,9 @@ function recacheSpiderNames()
  */
 function sortSpiderTable()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$table = db_table();
 

@@ -173,7 +173,9 @@ class Email_Parse
 	 */
 	private function _query_load_email($id)
 	{
-		global $smcFunc;
+		global , ;
+
+		$db = database();
 
 		// Nothing to load then
 		if (empty($id))

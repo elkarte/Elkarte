@@ -559,7 +559,9 @@ function utf8_strtoupper($string)
  */
 function fix_serialized_columns()
 {
-	global $smcFunc;
+	global , ;
+
+	$db = database();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_action, extra

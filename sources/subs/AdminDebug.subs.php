@@ -20,7 +20,9 @@ if (!defined('ELKARTE'))
  */
 function list_getAdminInfoFile($filename)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$file = array();
 	$request = $smcFunc['db_query']('', '
