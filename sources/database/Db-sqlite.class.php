@@ -433,17 +433,6 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Last error on SQLite.
-	 */
-	function last_error()
-	{
-		global $db_connection, $sqlite_error;
-
-		$query_errno = sqlite_last_error($db_connection);
-		return $query_errno || empty($sqlite_error) ? sqlite_error_string($query_errno) : $sqlite_error;
-	}
-
-	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
@@ -482,7 +471,10 @@ class Database_SQLite implements Database
 	 */
 	function last_error($database = null)
 	{
-		return sqlite_last_error($database);
+		global $db_connection, $sqlite_error;
+
+		$query_errno = sqlite_last_error(empty($database) ? $db_connection : $database);
+		return $query_errno || empty($sqlite_error) ? sqlite_error_string($query_errno) : $sqlite_error;
 	}
 
 	/**
