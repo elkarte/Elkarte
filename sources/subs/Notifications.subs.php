@@ -207,24 +207,32 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					$current_language = loadLanguage('Post', $needed_language, false);
 
 				$message_type = 'notification_' . $type;
-				$replacements = array(
-					'TOPICSUBJECT' => $data['subject'],
-					'POSTERNAME' => un_htmlspecialchars($data['name']),
-					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
-					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $boards_index[$data['id_board']]['name'] . '.0',
-					'SIGNATURE' => $data['signature'],
-					'BOARDNAME' => $data['board_name'],
-				);
+				$replacements = getNotificationReplacementTokens(array(
+					'topic' => array(
+						'id' => $id,
+						'subject' => $data['subject'],
+						'last_id' => $data['last_id'],
+						'attachments' => $data['attachments'],
+					),
+					'board' => array(
+						'id' => $data['id_board'],
+						'name' => $data['board_name'],
+					),
+					'member' => array(
+						'name' => $data['name'],
+						'signature' => $data['signature'],
+					)
+				));
 
 				if ($type === 'remove')
-					unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
+					unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK'], $replacements['UNSUBSCRIBEBOARDLINK']);
+				else
+					$replacements['UNSUBSCRIBELINK'] = $replacements['UNSUBSCRIBEBOARDLINK'];
 
 				// Do they want the body of the message sent too?
 				if (!empty($row['notify_send_body']) && $type === 'reply')
 				{
 					$message_type .= '_body';
-					$replacements['MESSAGE'] = $data['body'];
 
 					// Any attachments? if so lets make a big deal about them!
 					if ($data['attachments'] != 0)
@@ -310,16 +318,21 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			$current_language = loadLanguage('Post', $needed_language, false);
 
 		$message_type = 'notification_' . $type;
-		$replacements = array(
-			'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-			'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-			'TOPICLINKNEW' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
-			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
-			'BOARDNAME' => $topicData[$row['id_topic']]['board']['name'],
-		);
-
+		$replacements = getNotificationReplacementTokens(array(
+			'topic' => array(
+				'id' => $row['id_topic'],
+				'subject' => $topicData[$row['id_topic']]['subject'],
+				'last_id' => $data['last_id'],
+			),
+			'board' => array(
+				'id' => $topicData[$row['id_topic']]['board']['id'],
+				'name' => $topicData[$row['id_topic']]['board']['name'],
+			),
+			'member' => array(
+				'signature' => $topicData[$row['id_topic']]['signature'],
+				'name' => $topicData[$row['id_topic']]['name'],				
+			),
+		));
 		if ($type == 'remove')
 			unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
 
@@ -327,12 +340,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		if (!empty($row['notify_send_body']) && $type == 'reply')
 		{
 			$message_type .= '_body';
-			$replacements['MESSAGE'] = $topicData[$row['id_topic']]['body'];
 		}
 		if (!empty($row['notify_regularity']) && $type == 'reply')
 			$message_type .= '_once';
-
-		call_integration_hook('integrate_notification_replacements', array(&$replacements, $row, $type, $current_language, $boards_index, $topicData));
 
 		// Send only if once is off or it's on and it hasn't been sent.
 		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
@@ -532,16 +542,22 @@ function notifyMembersBoard(&$topicData)
 			// Setup the string for adding the body to the message, if a user wants it.
 			$send_body = $maillist || (empty($modSettings['disallow_sendBody']) && !empty($rowmember['notify_send_body']));
 
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$key]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$key]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
-				'TOPICLINKNEW' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
-				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
-				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
-				'BOARDNAME' => $board_names[$topicData[$key]['board']],
-			);
+
+			$replacements = getNotificationReplacementTokens(array(
+				'topic' => array(
+					'id' => $topicData[$key]['topic'],
+					'subject' => $topicData[$key]['subject'],
+					'body' => $send_body ? $topicData[$key]['body'] : '',
+				),
+				'board' => array(
+					'id' => $topicData[$key]['board'],
+					'name' => $board_names[$topicData[$key]['board']],
+				),
+				'member' => array(
+					'signature' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
+					'name' => $topicData[$key]['name'],				
+				),
+			));
 
 			// Figure out which email to send
 			$emailtype = '';
@@ -598,7 +614,7 @@ function notifyMembersBoard(&$topicData)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings;
+	global $language, $user_info, $modSettings;
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -695,19 +711,22 @@ function sendApprovalNotifications(&$topicData)
 		// Now loop through all the messages to send.
 		foreach ($topicData[$row['id_topic']] as $msg)
 		{
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
-			);
+			$replacements = getNotificationReplacementTokens(array(
+				'topic' => array(
+					'id' => $row['id_topic'],
+					'subject' => $topicData[$row['id_topic']]['subject'],
+					'body' => $topicData[$topic][$msgKey]['body'],
+				),
+				'member' => array(
+					'name' => $topicData[$row['id_topic']]['name'],
+				),
+			));
 
 			$message_type = 'notification_reply';
 			// Do they want the body of the message sent too?
 			if (!empty($row['notify_send_body']) && empty($modSettings['disallow_sendBody']))
 			{
 				$message_type .= '_body';
-				$replacements['BODY'] = $topicData[$row['id_topic']]['body'];
 			}
 			if (!empty($row['notify_regularity']))
 				$message_type .= '_once';
@@ -823,7 +842,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info;
+	global $modSettings, $language, $user_info;
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -881,16 +900,18 @@ function adminNotify($type, $memberID, $member_name = null)
 	$current_language = $user_info['language'];
 	while ($row = $db->fetch_assoc($request))
 	{
-		$replacements = array(
-			'USERNAME' => $member_name,
-			'PROFILELINK' => $scripturl . '?action=profile;u=' . $memberID
-		);
+		$replacements = getNotificationReplacementTokens(array(
+			'member' => array(
+				'id' => $memberID,
+				'name' => $member_name,
+			),
+		));
+
 		$emailtype = 'admin_notify';
 
 		// If they need to be approved add more info...
 		if ($type == 'approval')
 		{
-			$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
 			$emailtype .= '_approval';
 		}
 
@@ -903,4 +924,57 @@ function adminNotify($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
+}
+
+/**
+ * Get the tokens and values for notification replacements
+ * 
+ * @param array $options the values that will be replaced, must have topic, member, or board keys. member is for the *current* member
+ * @return array
+ */
+function getNotificationReplacementTokens(array $options)
+{
+	global $scripturl;
+
+	$replacements = array(
+		'APPROVALLINK' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
+	);
+
+	// Setup the *current* member replacements
+	if (!empty($options['member']))
+	{
+		$member = $options['member'];
+		$replacements += array(
+			'USERNAME' => $member['name'],
+			'PROFILELINK' => $scripturl . '?action=profile;u=' . $member['id'],
+			'SIGNATURE' => !empty($member['signature']) ? $member['signature'] : '',
+			'POSTERNAME' => un_htmlspecialchars($member['name']),
+		);
+	}
+	// Setup the topic replacements
+	if (!empty($options['topic']))
+	{
+		$topic = $options['topic'];
+		$replacements += array(
+			'TOPICSUBJECT' => $topic['subject'],
+			'TOPICLINK' => $scripturl . '?topic=' . $topic['id'] . !empty($topic['last_id']) ? '.msg' . $topic['last_id'] . '#msg' . $topic['last_id'] : '',
+			'TOPICLINKNEW' => $scripturl . '?topic=' . $topic['id'] . '.new;topicseen#new',
+			'BODY' => empty($topic['body']) ? '' : $topic['body'],
+			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $topic['id'] . '.0',
+			'MESSAGE' => empty($topic['body']) ? '' : $topic['body'],
+		);
+	}
+	// Setup the board replacements
+	if (!empty($options['board']))
+	{
+		$board = $options['board'];
+		$replacements += array(
+			'BOARDNAME' => $board['name'],
+			'UNSUBSCRIBEBOARDLINK' => $scripturl . '?action=notifyboard;board=' . $board['name'] . '.0',
+		);
+	}
+
+	call_integration_hook('integrate_notification_replacements', array(&$replacements, $options));
+
+	return $replacements;
 }
