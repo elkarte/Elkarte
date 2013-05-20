@@ -1650,12 +1650,9 @@ class Post_Controller
 				modifyEvent($_REQUEST['eventid'], array(
 					'start_date' => strftime('%Y-%m-%d', $start_time),
 					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
-					'title' => $smcFunc['htmlspecialchars']($_REQUEST['evtitle'], ENT_QUOTES),
+					'title' => $_REQUEST['evtitle'],
 				));
 			}
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
 		}
 
 		// Marking read should be done even for editing messages....
