@@ -361,7 +361,7 @@ class Emailuser_Controller
 	 */
 	function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, $smcFunc;
+		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
 
 		// You must have the proper permissions!
 		isAllowedTo('report_any');
@@ -379,11 +379,11 @@ class Emailuser_Controller
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
+		if (!isset($_POST['comment']) || Util::htmltrim($_POST['comment']) === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
 
-		if ($smcFunc['strlen']($poster_comment) > 254)
+		if (Util::strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
 
 		// Guests need to provide their address!
@@ -416,12 +416,13 @@ class Emailuser_Controller
 
 		// Any errors?
 		if ($report_errors->hasErrors())
-			return action_reporttm();
+			return $this->action_reporttm();
 
 		// Get the basic topic information, and make sure they can see it.
 		$_POST['msg'] = (int) $_POST['msg'];
 
-		$request = $smcFunc['db_query']('', '
+		$db = database();
+		$request = $db->query('', '
 			SELECT m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
@@ -433,10 +434,10 @@ class Emailuser_Controller
 				'id_msg' => $_POST['msg'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
-		$message = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$message = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
@@ -458,7 +459,7 @@ class Emailuser_Controller
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))
 		{
-			$request2 = $smcFunc['db_query']('', '
+			$request2 = $db->query('', '
 				SELECT id_report, ignore_all
 				FROM {db_prefix}log_reported
 				WHERE id_msg = {int:id_msg}
@@ -470,9 +471,9 @@ class Emailuser_Controller
 					'ignored' => 1,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request2) != 0)
-				list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request2);
-			$smcFunc['db_free_result']($request2);
+			if ($db->num_rows($request2) != 0)
+				list ($id_report, $ignore) = $db->fetch_row($request2);
+			$db->free_result($request2);
 
 			// If we're just going to ignore these, then who gives a monkeys...
 			if (!empty($ignore))
@@ -480,7 +481,7 @@ class Emailuser_Controller
 
 			// Already reported? My god, we could be dealing with a real rogue here...
 			if (!empty($id_report))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_reported
 					SET num_reports = num_reports + 1, time_updated = {int:current_time}
 					WHERE id_report = {int:id_report}',
@@ -495,7 +496,7 @@ class Emailuser_Controller
 				if (empty($message['real_name']))
 					$message['real_name'] = $message['poster_name'];
 
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}log_reported',
 					array(
 						'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -508,13 +509,13 @@ class Emailuser_Controller
 					),
 					array('id_report')
 				);
-				$id_report = $smcFunc['db_insert_id']('{db_prefix}log_reported', 'id_report');
+				$id_report = $db->insert_id('{db_prefix}log_reported', 'id_report');
 			}
 
 			// Now just add our report...
 			if ($id_report)
 			{
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}log_reported_comments',
 					array(
 						'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string', 'email_address' => 'string',
@@ -530,7 +531,7 @@ class Emailuser_Controller
 		}
 
 		// Find out who the real moderators are - for mod preferences.
-		$request2 = $smcFunc['db_query']('', '
+		$request2 = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',
@@ -539,9 +540,9 @@ class Emailuser_Controller
 			)
 		);
 		$real_mods = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request2))
+		while ($row = $db->fetch_assoc($request2))
 			$real_mods[] = $row['id_member'];
-		$smcFunc['db_free_result']($request2);
+		$db->free_result($request2);
 
 		// Send every moderator an email.
 		foreach ($mod_to_notify as $row)
@@ -568,7 +569,7 @@ class Emailuser_Controller
 			// Send it to the moderator.
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $user_info['email'], null, false, 2);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.
 		updateSettings(array('last_mod_report_action' => time()));
