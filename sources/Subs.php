@@ -123,7 +123,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'blank_redirect' => '',
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
+			$row = $db->fetch_assoc($result);
 			$db->free_result($result);
 
 			updateSettings(array(
@@ -178,7 +178,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
+			$row = $db->fetch_assoc($result);
 			$db->free_result($result);
 
 			updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
@@ -203,7 +203,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			$postgroups = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$postgroups[$row['id_group']] = $row['min_posts'];
 			$db->free_result($request);
 
@@ -331,7 +331,7 @@ function updateMemberData($members, $data)
 					WHERE ' . $condition,
 					$parameters
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$member_names[] = $row['member_name'];
 				$db->free_result($request);
 			}
@@ -2514,7 +2514,7 @@ function parsesmileys(&$message)
 				$smileysfrom = array();
 				$smileysto = array();
 				$smileysdescs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);

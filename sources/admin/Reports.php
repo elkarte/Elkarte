@@ -160,7 +160,7 @@ class Reports_Controller
 			)
 		);
 		$moderators = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$moderators[$row['id_board']][] = $row['real_name'];
 		$db->free_result($request);
 
@@ -172,7 +172,7 @@ class Reports_Controller
 			)
 		);
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
 		$db->free_result($request);
 
@@ -209,7 +209,7 @@ class Reports_Controller
 			)
 		);
 		$boards = array(0 => array('name' => $txt['global_boards']));
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Each board has it's own table.
 			newTable($row['name'], '', 'left', 'auto', 'left', 200, 'left');
@@ -328,7 +328,7 @@ class Reports_Controller
 			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']);
 		else
 			$member_groups = array('col' => '');
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$member_groups[$row['id_group']] = $row['group_name'];
 		$db->free_result($request);
 
@@ -351,7 +351,7 @@ class Reports_Controller
 				'groups' => $query_groups,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			foreach ($boards as $id => $board)
 				if ($board['id_profile'] == $row['id_profile'])
@@ -450,7 +450,7 @@ class Reports_Controller
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (trim($row['member_groups']) == '')
 				$groups = array(1);
@@ -530,7 +530,7 @@ class Reports_Controller
 				'icons' => ''
 			),
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$rows[] = $row;
 		$db->free_result($request);
 
@@ -601,7 +601,7 @@ class Reports_Controller
 			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']);
 		else
 			$groups = array('col' => '');
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$groups[$row['id_group']] = $row['group_name'];
 		$db->free_result($request);
 
@@ -632,7 +632,7 @@ class Reports_Controller
 		);
 		$lastPermission = null;
 		$curData = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// If this is a new permission flush the last row.
 			if ($row['permission'] != $lastPermission)
@@ -683,7 +683,7 @@ class Reports_Controller
 			)
 		);
 		$boards = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$boards[$row['id_board']] = $row['name'];
 		$db->free_result($request);
 
@@ -696,7 +696,7 @@ class Reports_Controller
 		);
 		$moderators = array();
 		$local_mods = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$moderators[$row['id_member']][] = $row['id_board'];
 			$local_mods[$row['id_member']] = $row['id_member'];
@@ -724,7 +724,7 @@ class Reports_Controller
 			)
 		);
 		$groups = array(0 => $txt['full_member']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
 		$db->free_result($request);
 

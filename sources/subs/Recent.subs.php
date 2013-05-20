@@ -58,7 +58,7 @@ function getLastPosts($latestPostOptions)
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and post for the preview ;).
 		censorText($row['subject']);
@@ -147,7 +147,7 @@ function getRecentPosts($messages, $start)
 	$counter = $_REQUEST['start'] + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor everything.
 		censorText($row['body']);

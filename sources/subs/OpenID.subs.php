@@ -148,7 +148,7 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 	if ($db->num_rows($request) == 0)
 		return null;
 
-	$return = $smcFunc['db_fetch_assoc']($request);
+	$return = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $return;
@@ -385,7 +385,7 @@ function action_openidreturn()
 	}
 	else
 	{
-		$user_settings = $smcFunc['db_fetch_assoc']($result);
+		$user_settings = $db->fetch_assoc($result);
 		$db->free_result($result);
 
 		$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
@@ -446,7 +446,7 @@ function openid_member_exists($url)
 			'openid_uri' => $url,
 		)
 	);
-	$member = $smcFunc['db_fetch_assoc']($request);
+	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $member;

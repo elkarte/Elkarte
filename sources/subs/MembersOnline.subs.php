@@ -88,7 +88,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'reg_mem_group' => 0,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['real_name']))
 		{

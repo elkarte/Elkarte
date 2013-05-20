@@ -181,7 +181,7 @@ class Emailuser_Controller
 					'id_msg' => (int) $_REQUEST['msg'],
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $db->fetch_assoc($request);
 			$db->free_result($request);
 
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
@@ -443,7 +443,7 @@ class Emailuser_Controller
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
-		$message = $smcFunc['db_fetch_assoc']($request);
+		$message = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
@@ -547,7 +547,7 @@ class Emailuser_Controller
 			)
 		);
 		$real_mods = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request2))
+		while ($row = $db->fetch_assoc($request2))
 			$real_mods[] = $row['id_member'];
 		$db->free_result($request2);
 

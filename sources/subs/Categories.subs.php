@@ -59,7 +59,7 @@ function modifyCategory($category_id, $catOptions)
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_cat'] != $category_id)
 				$cats[] = $row['id_cat'];
@@ -319,7 +319,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				'member_list' => $members,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
 				$updates['insert'][] = array($row['id_member'], $row['id_cat']);

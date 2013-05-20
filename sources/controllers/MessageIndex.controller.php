@@ -308,7 +308,7 @@ class MessageIndex_Controller
 				)
 			);
 			$topic_ids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$topic_ids[] = $row['id_topic'];
 		}
 
@@ -356,7 +356,7 @@ class MessageIndex_Controller
 			);
 
 			// Begin 'printing' the message index for current board.
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				if ($row['id_poll'] > 0 && $modSettings['pollMode'] == '0')
 					continue;
@@ -543,7 +543,7 @@ class MessageIndex_Controller
 						'topic_list' => $topic_ids,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$context['topics'][$row['id_topic']]['is_posted_in'] = true;
 					$context['topics'][$row['id_topic']]['class'] = 'my_' . $context['topics'][$row['id_topic']]['class'];
@@ -740,7 +740,7 @@ class MessageIndex_Controller
 					'action_topic_ids' => array_keys($_REQUEST['actions']),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!empty($board))
 				{
@@ -828,7 +828,7 @@ class MessageIndex_Controller
 			);
 			$stickyCacheBoards = array();
 			$stickyCacheStatus = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
 				$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
@@ -855,7 +855,7 @@ class MessageIndex_Controller
 			$moveTos = array();
 			$moveCache2 = array();
 			$countPosts = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$to = $moveCache[1][$row['id_topic']];
 
@@ -918,7 +918,7 @@ class MessageIndex_Controller
 						)
 					);
 
-					while ($row = $smcFunc['db_fetch_assoc']($request))
+					while ($row = $db->fetch_assoc($request))
 					{
 						if (!isset($members[$row['id_member']]))
 							$members[$row['id_member']] = 0;
@@ -957,7 +957,7 @@ class MessageIndex_Controller
 
 			$removeCache = array();
 			$removeCacheBoards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				$removeCache[] = $row['id_topic'];
 				$removeCacheBoards[$row['id_topic']] = $row['id_board'];
@@ -996,7 +996,7 @@ class MessageIndex_Controller
 			);
 			$approveCache = array();
 			$approveCacheMembers = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$approveCache[] = $row['id_topic'];
 				$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
@@ -1038,7 +1038,7 @@ class MessageIndex_Controller
 				);
 				$lockCache = array();
 				$lockCacheBoards = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$lockCache[] = $row['id_topic'];
 					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
@@ -1058,7 +1058,7 @@ class MessageIndex_Controller
 					)
 				);
 				$lockCacheBoards = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$lockStatus[$row['id_topic']] = empty($row['locked']);
 					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
@@ -1095,7 +1095,7 @@ class MessageIndex_Controller
 				)
 			);
 			$logged_topics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$logged_topics[$row['id_topic']] = $row['disregarded'];
 			$db->free_result($request);
 

@@ -163,7 +163,7 @@ function action_who()
 	$context['members'] = array();
 	$member_ids = array();
 	$url_data = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$actions = @unserialize($row['url']);
 		if ($actions === false)
@@ -461,7 +461,7 @@ function determineActions($urls, $preferred_prefix = false)
 				'limit' => count($topic_ids),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			// Show the topic's subject for each of the actions.
 			foreach ($topic_ids[$row['id_topic']] as $k => $session_text)
@@ -590,7 +590,7 @@ function action_credits($in_admin = false)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$credit_info = unserialize($row['credits']);
 

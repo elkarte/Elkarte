@@ -996,7 +996,7 @@ function approveAttachments($attachments)
 		)
 	);
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Update the thumbnail too...
 		if (!empty($row['id_thumb']))
@@ -1033,7 +1033,7 @@ function approveAttachments($attachments)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		logAction(
 			'approve_attach',
 			array(
@@ -1129,7 +1129,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		WHERE ' . $condition,
 		$query_parameter
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Figure out the "encrypted" filename and unlink it ;).
 		if ($row['attachment_type'] == 1)
@@ -1192,7 +1192,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			logAction(
 				'remove_attach',
 				array(
@@ -1528,7 +1528,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
 		)
 	);
 	$temp = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row)))
 			continue;
@@ -1645,7 +1645,7 @@ function getAvatarsDefault()
 	);
 
 	$avatars = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$avatars[] = $row;
 	$db->free_result($request);
 
@@ -1908,7 +1908,7 @@ function validateAttachments($attachments, $approve_query)
 		)
 	);
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$attachments[] = $row['id_attach'];
 	$db->free_result($request);
 
@@ -1959,7 +1959,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 	);
 
 	$unapproved_items = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$unapproved_items[] = array(
 			'id' => $row['id_attach'],
@@ -2053,7 +2053,7 @@ function list_getAttachDirs()
 
 	$expected_files = array();
 	$expected_size = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$expected_files[$row['id_folder']] = $row['num_attach'];
 		$expected_size[$row['id_folder']] = $row['size_attach'];
@@ -2301,7 +2301,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 			)
 		);
 	$files = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$files[] = $row;
 	$db->free_result($request);
 
@@ -2386,7 +2386,7 @@ function moveAvatars()
 		)
 	);
 	$updatedAvatars = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 

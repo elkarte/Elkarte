@@ -168,7 +168,7 @@ function getPollInfo($topicID)
 		return false;
 
 	// Get the poll information.
-	$pollinfo = $smcFunc['db_fetch_assoc']($request);
+	$pollinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $pollinfo;

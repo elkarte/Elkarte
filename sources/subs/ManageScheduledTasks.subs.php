@@ -39,7 +39,7 @@ function loadTasks($tasks)
 			'tasks' => $tasks,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$task[$row['id_task']] = $row['task'];
 	$db->free_result($request);
 
@@ -143,7 +143,7 @@ function loadTaskDetails($id_task)
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(
 			'id' => $row['id_task'],
@@ -183,7 +183,7 @@ function list_getScheduledTasks()
 		)
 	);
 	$known_tasks = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Find the next for regularity - don't offset as it's always server time!
 		$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
@@ -228,7 +228,7 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 		)
 	);
 	$log_entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$log_entries[] = array(
 			'id' => $row['id_log'],
 			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],

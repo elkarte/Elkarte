@@ -153,7 +153,7 @@ class MergeTopics_Controller
 			)
 		);
 		$context['topics'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			censorText($row['subject']);
 
@@ -249,7 +249,7 @@ class MergeTopics_Controller
 		$boards = array();
 		$polls = array();
 		$firstTopic = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Make a note for the board counts...
 			if (!isset($boardTotals[$row['id_board']]))
@@ -351,7 +351,7 @@ class MergeTopics_Controller
 						'polls' => $polls,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$context['polls'][] = array(
 						'id' => $row['id_poll'],
 						'topic' => array(
@@ -425,7 +425,7 @@ class MergeTopics_Controller
 		);
 		$topic_approved = 1;
 		$first_msg = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// If this is approved, or is fully unapproved.
 			if ($row['approved'] || !isset($first_msg))
@@ -646,7 +646,7 @@ class MergeTopics_Controller
 		if ($db->num_rows($request) > 0)
 		{
 			$replaceEntries = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
 
 			require_once(SUBSDIR . '/Topic.subs.php');
@@ -680,7 +680,7 @@ class MergeTopics_Controller
 			if ($db->num_rows($request) > 0)
 			{
 				$replaceEntries = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
 
 				$smcFunc['db_insert']('replace',

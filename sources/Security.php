@@ -254,7 +254,7 @@ function is_not_banned($forceCheck = false)
 				$ban_query_vars
 			);
 			// Store every type of ban that applies to you in your session.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				foreach ($restrictions as $restriction)
 					if (!empty($row[$restriction]))
@@ -304,7 +304,7 @@ function is_not_banned($forceCheck = false)
 				'current_time' => time(),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
 			$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
@@ -571,7 +571,7 @@ function isBannedEmail($email, $restriction, $error)
 			'now' => time(),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['cannot_access']))
 		{
@@ -967,7 +967,7 @@ function allowedTo($permission, $boards = null)
 		return false;
 
 	$result = true;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$result &= !empty($row['add_deny']);
 	$db->free_result($request);
 
@@ -1099,7 +1099,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	);
 	$boards = array();
 	$deny_boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($simple)
 		{

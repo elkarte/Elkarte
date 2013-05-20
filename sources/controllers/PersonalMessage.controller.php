@@ -362,7 +362,7 @@ class PersonalMessage_Controller
 					)
 				);
 				$sub_pms = array();
-				while ($row = $smcFunc['db_fetch_assoc']($sub_request))
+				while ($row = $db->fetch_assoc($sub_request))
 					$sub_pms[$row['id_pm_head']] = $row['sort_param'];
 
 				$db->free_result($sub_request);
@@ -448,7 +448,7 @@ class PersonalMessage_Controller
 		$posters = $context['folder'] == 'sent' ? array($user_info['id']) : array();
 		$recipients = array();
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($recipients[$row['id_pm']]))
 			{
@@ -503,7 +503,7 @@ class PersonalMessage_Controller
 						'not_deleted' => 0,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
 					if ($context['folder'] == 'sent' && $row['id_member_from'] == $user_info['id'] && $row['deleted_by_sender'] == 1)
@@ -539,7 +539,7 @@ class PersonalMessage_Controller
 			$context['message_labels'] = array();
 			$context['message_replied'] = array();
 			$context['message_unread'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if ($context['folder'] == 'sent' || empty($row['bcc']))
 					$recipients[$row['id_pm']][empty($row['bcc']) ? 'to' : 'bcc'][] = empty($row['id_member_to']) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . '">' . $row['to_name'] . '</a>';
@@ -731,7 +731,7 @@ class PersonalMessage_Controller
 			);
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('pm_not_yours', false);
-			$row_quoted = $smcFunc['db_fetch_assoc']($request);
+			$row_quoted = $db->fetch_assoc($request);
 			$db->free_result($request);
 
 			// Censor the message.
@@ -828,7 +828,7 @@ class PersonalMessage_Controller
 						'not_bcc' => 0,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$context['recipients']['to'][] = array(
 						'id' => $row['id_member'],
 						'name' => $row['real_name'],
@@ -1259,7 +1259,7 @@ class PersonalMessage_Controller
 				)
 			);
 			$pm_heads = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$pm_heads[$row['id_pm_head']] = $row['id_pm'];
 			$db->free_result($request);
 
@@ -1272,7 +1272,7 @@ class PersonalMessage_Controller
 				)
 			);
 			// Copy the action from the single to PM to the others.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (isset($pm_heads[$row['id_pm_head']]) && isset($_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]]))
 					$_REQUEST['pm_actions'][$row['id_pm']] = $_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]];
@@ -1331,7 +1331,7 @@ class PersonalMessage_Controller
 					'to_label' => array_keys($to_label),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
 
@@ -1467,7 +1467,7 @@ class PersonalMessage_Controller
 					'msgtime' => $deleteTime,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$toDelete[] = $row['id_pm'];
 			$db->free_result($request);
 
@@ -1606,7 +1606,7 @@ class PersonalMessage_Controller
 						'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					// Do the long task of updating them...
 					$toChange = explode(',', $row['labels']);
@@ -1846,7 +1846,7 @@ class PersonalMessage_Controller
 			);
 			$recipients = array();
 			$hidden_recipients = 0;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// If it's hidden still don't reveal their names - privacy after all ;)
 				if ($row['bcc'])
@@ -1953,7 +1953,7 @@ class PersonalMessage_Controller
 			)
 		);
 		$context['groups'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Hide hidden groups!
 			if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
@@ -2177,7 +2177,7 @@ function applyRules($all_messages = false)
 		)
 	);
 	$actions = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		foreach ($context['rules'] as $rule)
 		{
@@ -2273,7 +2273,7 @@ function loadRules($reload = false)
 	);
 	$context['rules'] = array();
 	// Simply fill in the data!
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
@@ -2475,7 +2475,7 @@ function preparePMContext($type = 'subject', $reset = false)
 	// If we're in non-boring view do something exciting!
 	if ($context['display_mode'] != 0 && $subjects_request && $type == 'subject')
 	{
-		$subject = $smcFunc['db_fetch_assoc']($subjects_request);
+		$subject = $db->fetch_assoc($subjects_request);
 		if (!$subject)
 		{
 			$db->free_result($subjects_request);
@@ -2516,7 +2516,7 @@ function preparePMContext($type = 'subject', $reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.
-	$message = $smcFunc['db_fetch_assoc']($messages_request);
+	$message = $db->fetch_assoc($messages_request);
 	if (!$message)
 	{
 		if ($type != 'subject')
@@ -2664,7 +2664,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 			else
 				$error_types->addError('pm_not_yours');
 		}
-		$row_quoted = $smcFunc['db_fetch_assoc']($request);
+		$row_quoted = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		censorText($row_quoted['subject']);

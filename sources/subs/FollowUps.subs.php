@@ -39,7 +39,7 @@ function followupTopics($messages, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$returns[$row['derived_from']][] = $row;
 
 	return $returns;
@@ -69,7 +69,7 @@ function topicStartedHere($topic, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$returns = $row;
 
 	return $returns;

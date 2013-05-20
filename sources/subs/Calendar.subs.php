@@ -65,7 +65,7 @@ function getBirthdayRange($low_date, $high_date)
 		)
 	);
 	$bday = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		if ($year_low != $year_high)
 			$age_year = substr($row['birthdate'], 5) < substr($high_date, 5) ? $year_high : $year_low;
@@ -130,7 +130,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 		)
 	);
 	$events = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// If the attached topic is not approved then for the moment pretend it doesn't exist
 		if (!empty($row['id_first_msg']) && $modSettings['postmod_active'] && !$row['approved'])
@@ -237,7 +237,7 @@ function getHolidayRange($low_date, $high_date)
 		)
 	);
 	$holidays = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
 			$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
@@ -286,7 +286,7 @@ function canLinkEvent()
 				'current_topic' => $topic,
 			)
 		);
-		if ($row = $smcFunc['db_fetch_assoc']($result))
+		if ($row = $db->fetch_assoc($result))
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
@@ -1022,7 +1022,7 @@ function getEventProperties($event_id)
 	if ($db->num_rows($request) === 0)
 		return false;
 
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	$return_value = array(
@@ -1074,7 +1074,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 		)
 	);
 	$holidays = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$holidays[] = $row;
 	$db->free_result($request);
 
@@ -1206,7 +1206,7 @@ function getHoliday($id_holiday)
 				'selected_holiday' => $id_holiday,
 			)
 		);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$holiday = array(
 			'id' => $row['id_holiday'],
 			'day' => $row['day'],

@@ -260,7 +260,7 @@ class Post_Controller
 						'id_event' => $context['event']['id'],
 					)
 				);
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $db->fetch_assoc($request);
 				$db->free_result($request);
 
 				// Make sure the user is allowed to edit this event.
@@ -1838,7 +1838,7 @@ class Post_Controller
 			)
 		);
 		$context['close_window'] = $db->num_rows($request) == 0;
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		$context['sub_template'] = 'quotefast';
@@ -1943,7 +1943,7 @@ class Post_Controller
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		// Change either body or subject requires permissions to modify messages.

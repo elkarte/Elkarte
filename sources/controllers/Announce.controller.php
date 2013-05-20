@@ -174,7 +174,7 @@ class Announce_Controller
 
 		$announcements = array();
 		// Loop through all members that'll receive an announcement in this batch.
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 

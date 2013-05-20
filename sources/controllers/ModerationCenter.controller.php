@@ -239,7 +239,7 @@ class ModerationCenter_Controller
 		);
 		$context['reports'] = array();
 		$report_ids = array();
-		for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i++)
+		for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 		{
 			$report_ids[] = $row['id_report'];
 			$context['reports'][$row['id_report']] = array(
@@ -278,7 +278,7 @@ class ModerationCenter_Controller
 					'report_list' => $report_ids,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$context['reports'][$row['id_report']]['comments'][] = array(
 					'id' => $row['id_comment'],
@@ -587,7 +587,7 @@ class ModerationCenter_Controller
 				'id_report' => $context['report']['id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$context['report']['comments'][] = array(
 				'id' => $row['id_comment'],
@@ -617,7 +617,7 @@ class ModerationCenter_Controller
 				'reportc' => 'reportc',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$context['report']['mod_comments'][] = array(
 				'id' => $row['id_comment'],
@@ -1251,7 +1251,7 @@ function ModBlockWatchedUsers()
 			)
 		);
 		$watched_users = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$watched_users[] = $row;
 		$db->free_result($request);
 
@@ -1373,7 +1373,7 @@ function ModBlockNotes()
 			)
 		);
 		$moderator_notes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$moderator_notes[] = $row;
 		$db->free_result($request);
 
@@ -1437,7 +1437,7 @@ function ModBlockReportedPosts()
 			)
 		);
 		$reported_posts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$reported_posts[] = $row;
 		$db->free_result($request);
 
@@ -1495,7 +1495,7 @@ function ModBlockGroupRequests()
 		array(
 		)
 	);
-	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
+	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
 	{
 		$context['group_requests'][] = array(
 			'id' => $row['id_request'],
@@ -1570,7 +1570,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 	);
 	$watched_users = array();
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$watched_users[$row['id_member']] = array(
 			'id' => $row['id_member'],
@@ -1601,7 +1601,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 			)
 		);
 		$latest_posts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$latest_posts[$row['id_member']] = $row['last_post_id'];
 
 		if (!empty($latest_posts))
@@ -1615,7 +1615,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 					'message_list' => $latest_posts,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$watched_users[$row['id_member']]['last_post'] = standardTime($row['poster_time']);
 				$watched_users[$row['id_member']]['last_post_id'] = $latest_posts[$row['id_member']];
@@ -1636,7 +1636,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 				'is_approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$watched_users[$row['id_member']]['last_post'] = standardTime($row['last_post']);
 			$watched_users[$row['id_member']]['last_post_id'] = $row['last_post_id'];
@@ -1707,7 +1707,7 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
 		)
 	);
 	$member_posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$row['subject'] = censorText($row['subject']);
 		$row['body'] = censorText($row['body']);

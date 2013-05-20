@@ -92,7 +92,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 	$admins = array();
 	$user_log_details = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['is_admin'])
 			$admins[] = $row['id_member'];
@@ -391,7 +391,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
@@ -668,7 +668,7 @@ function registerMember(&$regOptions, $return_errors = false)
 				'is_protected' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$unassignableGroups[] = $row['id_group'];
 		$db->free_result($request);
 
@@ -992,7 +992,7 @@ function groupsAllowedTo($permission, $board_id = null)
 				'permission' => $permission,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
 		$db->free_result($request);
 	}
@@ -1025,7 +1025,7 @@ function groupsAllowedTo($permission, $board_id = null)
 				'permission' => $permission,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
 		$db->free_result($request);
 	}
@@ -1076,7 +1076,7 @@ function membersAllowedTo($permission, $board_id = null)
 		)
 	);
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$members[] = $row['id_member'];
 	$db->free_result($request);
 
@@ -1204,7 +1204,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 	);
 
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$members[] = $row;
 	$db->free_result($request);
 
@@ -1291,7 +1291,7 @@ function populateDuplicateMembers(&$members)
 	);
 	$duplicate_members = array();
 	$duplicate_ids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		//$duplicate_ids[] = $row['id_member'];
 
@@ -1327,7 +1327,7 @@ function populateDuplicateMembers(&$members)
 	);
 
 	$had_ips = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Don't collect lots of the same.
 		if (isset($had_ips[$row['poster_ip']]) && in_array($row['id_member'], $had_ips[$row['poster_ip']]))
@@ -1424,7 +1424,7 @@ function admins($id_admin = 0)
 	);
 
 	$admins = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$admins[$row['id_member']] = array($row['real_name'], $row['lngfile']);
 	$db->free_result($request);
 
@@ -1514,7 +1514,7 @@ function getBasicMemberData($member_ids, $options = array())
 			'sort' => isset($options['sort']) ? $options['sort'] : '',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($single))
 			$members = $row;
@@ -1548,7 +1548,7 @@ function countInactiveMembers()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$inactive_members[$row['is_activated']] = $row['total_members'];
 	$db->free_result($request);
 
@@ -1611,7 +1611,7 @@ function getMember($search, $buddies = array())
 			'children' => array(),
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -1692,7 +1692,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 		return $data;
 
 	// Fill the info array.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$data['members'][] = $row['id_member'];
 		$data['member_info'][] = array(

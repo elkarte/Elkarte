@@ -338,7 +338,7 @@ class News_Controller
 			)
 		);
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Make the data look rss-ish.
 			if ($xml_format == 'rss' || $xml_format == 'rss2')
@@ -443,7 +443,7 @@ class News_Controller
 				$done = true;
 		}
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
@@ -577,7 +577,7 @@ class News_Controller
 				$done = true;
 		}
 		$messages = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$messages[] = $row['id_msg'];
 		$db->free_result($request);
 
@@ -609,7 +609,7 @@ class News_Controller
 			)
 		);
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])

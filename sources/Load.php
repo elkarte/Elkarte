@@ -205,7 +205,7 @@ function loadUserSettings()
 					'id_member' => $id_member,
 				)
 			);
-			$user_settings = $smcFunc['db_fetch_assoc']($request);
+			$user_settings = $db->fetch_assoc($request);
 			$db->free_result($request);
 
 			if (!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
@@ -499,7 +499,7 @@ function loadBoard()
 		// If there aren't any, skip.
 		if ($db->num_rows($request) > 0)
 		{
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $db->fetch_assoc($request);
 
 			// Set the current board.
 			if (!empty($row['id_board']))
@@ -545,7 +545,7 @@ function loadBoard()
 						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
 			}
-			while ($row = $smcFunc['db_fetch_assoc']($request));
+			while ($row = $db->fetch_assoc($request));
 
 			// If the board only contains unapproved posts and the user isn't an approver then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
@@ -717,7 +717,7 @@ function loadPermissions()
 			)
 		);
 		$removals = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
@@ -749,7 +749,7 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
@@ -877,7 +877,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			)
 		);
 		$new_loaded_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$new_loaded_ids[] = $row['id_member'];
 			$loaded_ids[] = $row['id_member'];
@@ -897,7 +897,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
 		$db->free_result($request);
 	}
@@ -1222,7 +1222,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			)
 		);
 		// Pick between $settings and $options depending on whose data it is.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			// There are just things we shouldn't be able to change as members.
 			if ($row['id_member'] != 0 && in_array($row['variable'], array('actual_theme_url', 'actual_images_url', 'base_theme_dir', 'base_theme_url', 'default_images_url', 'default_theme_dir', 'default_theme_url', 'default_template', 'images_url', 'number_recent_posts', 'smiley_sets_default', 'theme_dir', 'theme_id', 'theme_layers', 'theme_templates', 'theme_url')))
@@ -1634,7 +1634,7 @@ function loadEssentialThemeData()
 			'theme_guests' => $modSettings['theme_guests'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$settings[$row['variable']] = $row['value'];
 
@@ -2145,7 +2145,7 @@ function getBoardParents($id_parent)
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
 				fatal_lang_error('parent_not_found', 'critical');
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
 				{

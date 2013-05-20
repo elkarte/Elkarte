@@ -190,7 +190,7 @@ function loadCustomFields($memID, $area = 'summary')
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
 		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
@@ -1248,7 +1248,7 @@ function makeThemeChanges($memID, $id_theme)
 		)
 	);
 	$custom_fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$custom_fields[] = $row['col_name'];
 	$db->free_result($request);
 
@@ -1359,7 +1359,7 @@ function makeNotificationChanges($memID)
 			)
 		);
 		$notification_current = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$notification_current[] = $row['id_board'];
 		$db->free_result($request);
 
@@ -1442,7 +1442,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	);
 	$changes = array();
 	$log_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		/* This means don't save if:
 			- The user is NOT an admin.
@@ -1745,7 +1745,7 @@ function profileLoadGroups()
 			'newbie_group' => 4,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// We should skip the administrator group if they don't have the admin_forum permission!
 		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
@@ -2266,7 +2266,7 @@ function profileSaveGroups(&$value)
 			)
 		);
 		$protected_groups = array(1);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$protected_groups[] = $row['id_group'];
 		$db->free_result($request);
 
@@ -2375,7 +2375,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$previous_warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$previous_warnings[] = array(
 			'issuer' => array(

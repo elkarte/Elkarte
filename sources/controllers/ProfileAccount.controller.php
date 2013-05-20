@@ -351,7 +351,7 @@ function action_issuewarning()
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// If we're not warning for a message skip any that are.
 		if (!$context['warning_for_message'] && strpos($row['body'], '{MESSAGE}') !== false)
@@ -479,7 +479,7 @@ function action_deleteaccount2()
 				)
 			);
 			// This could take a while... but ya know it's gonna be worth it in the end.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();

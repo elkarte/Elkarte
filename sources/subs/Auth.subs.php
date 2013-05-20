@@ -389,7 +389,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'limit' => $max,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$results[$row['id_member']] = array(
 			'id' => $row['id_member'],
@@ -587,7 +587,7 @@ function rebuildModCache()
 			)
 		);
 		$groups = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$groups[] = $row['id_group'];
 		$db->free_result($request);
 
@@ -622,7 +622,7 @@ function rebuildModCache()
 				'current_member' => $user_info['id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$boards_mod[] = $row['id_board'];
 		$db->free_result($request);
 	}
@@ -790,7 +790,7 @@ function findUser($where, $whereparams)
 			fatal_lang_error('no_user_with_email', false);
 	}
 
-	$member = $smcFunc['db_fetch_assoc']($request);
+	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $member;
@@ -865,7 +865,7 @@ function loadExistingMember($name)
 	if ($db->num_rows($request) == 0)
 		return false;
 
-	$user_settings = $smcFunc['db_fetch_assoc']($request);
+	$user_settings = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $user_settings;

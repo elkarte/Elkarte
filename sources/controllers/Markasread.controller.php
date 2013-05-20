@@ -287,7 +287,7 @@ class MarkRead_Controller
 			if ($db->num_rows($result) > 0)
 			{
 				$logBoardInserts = '';
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $row['id_board']);
 					$smcFunc['db_insert']('replace',
 					'{db_prefix}log_boards',

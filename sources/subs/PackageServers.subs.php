@@ -36,7 +36,7 @@ function fetchPackageServers($server = null)
 		)
 	);
 	
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$servers[] = array(
 			'name' => $row['name'],

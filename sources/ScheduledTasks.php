@@ -55,7 +55,7 @@ function AutoTask()
 		if ($db->num_rows($request) != 0)
 		{
 			// The two important things really...
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $db->fetch_assoc($request);
 
 			// When should this next be run?
 			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
@@ -171,7 +171,7 @@ function scheduled_approval_notification()
 	);
 	$notices = array();
 	$profiles = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// If this is no longer around we'll ignore it.
 		if (empty($row['id_topic']))
@@ -222,7 +222,7 @@ function scheduled_approval_notification()
 	);
 	$perms = array();
 	$addGroups = array(1);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
 		if ($row['id_group'] < 2)
@@ -247,7 +247,7 @@ function scheduled_approval_notification()
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$mods[$row['id_member']][$row['id_board']] = true;
 			// Make sure they get included in the big loop.
@@ -271,7 +271,7 @@ function scheduled_approval_notification()
 		)
 	);
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Check whether they are interested.
 		if (!empty($row['mod_prefs']))
@@ -402,7 +402,7 @@ function scheduled_daily_maintenance()
 			)
 		);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$members[$row['id_member']] = $row['warning'];
 		$db->free_result($request);
 
@@ -422,7 +422,7 @@ function scheduled_daily_maintenance()
 				)
 			);
 			$member_changes = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// More than 24 hours ago?
 				if ($row['last_warning'] <= time() - 86400)
@@ -585,7 +585,7 @@ function scheduled_daily_digest()
 	$members = array();
 	$langs = array();
 	$notify = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($members[$row['id_member']]))
 		{
@@ -636,7 +636,7 @@ function scheduled_daily_digest()
 		)
 	);
 	$types = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($types[$row['note_type']][$row['id_board']]))
 			$types[$row['note_type']][$row['id_board']] = array(
@@ -1039,7 +1039,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	);
 	$ids = array();
 	$emails = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// We want to delete these from the database ASAP, so just get the data and go.
 		$ids[] = $row['id_mail'];
@@ -1252,7 +1252,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
@@ -1375,7 +1375,7 @@ function scheduled_fetchFiles()
 	$js_files = array();
 	$errors = 0;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$js_files[$row['id_file']] = array(
 			'filename' => $row['filename'],
@@ -1465,7 +1465,7 @@ function scheduled_birthdayemails()
 
 	// Group them by languages.
 	$birthdays = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		if (!isset($birthdays[$row['lngfile']]))
 			$birthdays[$row['lngfile']] = array();
@@ -1736,7 +1736,7 @@ function scheduled_paid_subscriptions()
 			'time_now' => time(),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		require_once(ADMINDIR . '/ManagePaid.php');
 		removeSubscription($row['id_subscribe'], $row['id_member']);
@@ -1761,7 +1761,7 @@ function scheduled_paid_subscriptions()
 		)
 	);
 	$subs_reminded = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// If this is the first one load the important bits.
 		if (empty($subs_reminded))
@@ -1949,7 +1949,7 @@ function scheduled_remove_old_followups()
 	);
 
 	$remove = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$remove[] = $row['derived_from'];
 	$db->free_result($request);
 

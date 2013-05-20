@@ -47,7 +47,7 @@ function getSignatureFromMembers($start_member)
 			'admin_group' => 1,
 		)
 	);
-	while ($result = $smcFunc['db_fetch_assoc']($request))
+	while ($result = $db->fetch_assoc($request))
 	{
 		$members[$result['id_member']]['id_member'] = $result['id_member'];
 		$members[$result['id_member']]['signature'] = $result['signature'];
@@ -125,7 +125,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'items_per_page' => $items_per_page,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$list[] = $row;
 		$db->free_result($request);
 	}
@@ -181,7 +181,7 @@ function getProfileField($id_field)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['field_type'] == 'textarea')
 			@list ($rows, $cols) = explode(',', $row['default_value']);
@@ -474,7 +474,7 @@ function updateDisplayCache()
 	);
 
 	$fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$fields[] = array(
 			'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),

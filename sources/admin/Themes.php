@@ -213,7 +213,7 @@ class Themes_Controller
 				)
 			);
 			$themes = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$themes[$row['id_theme']][$row['variable']] = $row['value'];
 			$db->free_result($request);
 
@@ -266,7 +266,7 @@ class Themes_Controller
 			)
 		);
 		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($context['themes'][$row['id_theme']]))
 				$context['themes'][$row['id_theme']] = array(
@@ -330,7 +330,7 @@ class Themes_Controller
 				)
 			);
 			$context['themes'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($context['themes'][$row['id_theme']]))
 					$context['themes'][$row['id_theme']] = array(
@@ -351,7 +351,7 @@ class Themes_Controller
 					'guest_member' => -1,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
 			$db->free_result($request);
 
@@ -363,7 +363,7 @@ class Themes_Controller
 				)
 			);
 			$customFields = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$customFields[] = $row['col_name'];
 			$db->free_result($request);
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
@@ -379,7 +379,7 @@ class Themes_Controller
 					'custom_fields' => empty($customFields) ? array() : $customFields,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
 			$db->free_result($request);
 
@@ -583,7 +583,7 @@ class Themes_Controller
 					)
 				);
 				$customFields = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$customFields[] = $row['col_name'];
 				$db->free_result($request);
 			}
@@ -636,7 +636,7 @@ class Themes_Controller
 				)
 			);
 			$context['theme_options'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['theme_options'][$row['variable']] = $row['value'];
 			$db->free_result($request);
 
@@ -1123,7 +1123,7 @@ class Themes_Controller
 					'known_themes' => explode(',', $modSettings['knownThemes']),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($context['available_themes'][$row['id_theme']]))
 					$context['available_themes'][$row['id_theme']] = array(
@@ -1155,7 +1155,7 @@ class Themes_Controller
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Figure out which theme it is they are REALLY using.
 			if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
@@ -1185,7 +1185,7 @@ class Themes_Controller
 					'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $context['current_member']) : array(-1),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$variant_preferences[$row['id_theme']] = $row['value'];
 			$db->free_result($request);
 		}
@@ -1377,7 +1377,7 @@ class Themes_Controller
 					'theme_layers' => 'theme_layers',
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if ($row['variable'] == 'theme_templates')
 					$theme_templates = $row['value'];
@@ -1534,7 +1534,7 @@ class Themes_Controller
 							'based_on_path' => '%' . "\\" . $install_info['based_on'],
 						)
 					);
-					$temp = $smcFunc['db_fetch_assoc']($request);
+					$temp = $db->fetch_assoc($request);
 					$db->free_result($request);
 
 					// @todo An error otherwise?

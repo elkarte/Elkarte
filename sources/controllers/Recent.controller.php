@@ -100,7 +100,7 @@ class Recent_Controller
 			);
 			$total_posts = 0;
 			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$boards[] = $row['id_board'];
 				$total_posts += $row['num_posts'];
@@ -192,7 +192,7 @@ class Recent_Controller
 					$done = true;
 			}
 			$messages = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$messages[] = $row['id_msg'];
 			$db->free_result($request);
 			if (!empty($cache_results))
@@ -352,7 +352,7 @@ class Recent_Controller
 				)
 			);
 			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$boards[] = $row['id_board'];
 			$db->free_result($request);
 
@@ -392,7 +392,7 @@ class Recent_Controller
 				)
 			);
 			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$boards[] = $row['id_board'];
 			$db->free_result($request);
 
@@ -918,7 +918,7 @@ class Recent_Controller
 				);
 
 			$topics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$topics[] = $row['id_topic'];
 			$db->free_result($request);
 
@@ -956,7 +956,7 @@ class Recent_Controller
 		$context['topics'] = array();
 		$topic_ids = array();
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_poll'] > 0 && $modSettings['pollMode'] == '0')
 				continue;
@@ -1119,7 +1119,7 @@ class Recent_Controller
 					'limit' => count($topic_ids),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				if (empty($context['topics'][$row['id_topic']]['is_posted_in']))
 				{

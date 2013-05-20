@@ -41,7 +41,7 @@ function getMessageIcons()
 	);
 	$last_icon = 0;
 	$trueOrder = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$icons[$row['id_icon']] = array(
 			'id' => $row['id_icon'],
@@ -161,7 +161,7 @@ function list_getMessageIcons($start, $items_per_page, $sort)
 	);
 
 	$message_icons = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$message_icons[] = $row;
 	$db->free_result($request);
 

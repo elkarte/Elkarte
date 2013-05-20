@@ -248,7 +248,7 @@ class Groups_Controller
 			)
 		);
 		$context['group']['moderators'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$context['group']['moderators'][] = array(
 				'id' => $row['id_member'],
@@ -338,7 +338,7 @@ class Groups_Controller
 						'id_group' => $_REQUEST['group'],
 					))
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$members[] = $row['id_member'];
 				$db->free_result($request);
 			}
@@ -414,7 +414,7 @@ class Groups_Controller
 			)
 		);
 		$context['members'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
 
@@ -510,7 +510,7 @@ class Groups_Controller
 				);
 				$email_details = array();
 				$group_changes = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -818,7 +818,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		))
 	);
 	$group_requests = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$group_requests[] = array(
 			'id' => $row['id_request'],

@@ -74,7 +74,7 @@ function excludeBannedMembers()
 			'current_time' => time(),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$excludes[] = $row['id_member'];
 	$db->free_result($request);
 
@@ -95,7 +95,7 @@ function excludeBannedMembers()
 	$condition_array = array();
 	$condition_array_params = array();
 	$count = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$condition_array[] = '{string:email_' . $count . '}';
 		$condition_array_params['email_' . $count++] = $row['email_address'];
@@ -110,7 +110,7 @@ function excludeBannedMembers()
 			WHERE email_address IN(' . implode(', ', $condition_array) .')',
 			$condition_array_params
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$excludes['exclude_members'][] = $row['id_member'];
 		$db->free_result($request);
 	}
@@ -140,7 +140,7 @@ function getModerators()
 			'is_activated' => 1,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$mods[] = $row['identifier'];
 	$db->free_result($request);
 
@@ -184,7 +184,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 		))
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$recipients[] = $row;
 	$db->free_result($result);
 

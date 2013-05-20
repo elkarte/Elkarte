@@ -119,7 +119,7 @@ function getMessageIcons($board_id)
 				)
 			);
 			$icon_data = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$icon_data[] = $row;
 			$db->free_result($request);
 
@@ -607,7 +607,7 @@ function create_control_richedit($editorOptions)
 					array(
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					$row['filename'] = htmlspecialchars($row['filename']);
 					$row['description'] = htmlspecialchars($row['description']);
@@ -1243,7 +1243,7 @@ class Control_Verification_Questions implements Control_Verifications
 				array()
 			);
 			$modSettings['question_id_cache'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
 			$db->free_result($request);
 
@@ -1279,7 +1279,7 @@ class Control_Verification_Questions implements Control_Verifications
 				'current_filter' => $filter['value'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
@@ -1519,7 +1519,7 @@ function html_to_bbc($text)
 					)
 				);
 				$mappings = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$mappings[$row['filename']] = htmlspecialchars($row['code']);
 				$db->free_result($request);
 

@@ -65,10 +65,10 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 	// The message they were trying to edit was most likely deleted.
 	if ($db->num_rows($request) == 0)
 		return false;
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 
 	$attachment_stuff = array($row);
-	while ($row2 = $smcFunc['db_fetch_assoc']($request))
+	while ($row2 = $db->fetch_assoc($request))
 		$attachment_stuff[] = $row2;
 	$db->free_result($request);
 
@@ -113,7 +113,7 @@ function getMessageInfo($id_msg, $override_permissions = false)
 		)
 	);
 
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return empty($row) ? false : $row;
@@ -227,7 +227,7 @@ function removeMessage($message, $decreasePostCount = true)
 	);
 	if ($db->num_rows($request) == 0)
 		return false;
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	if (empty($board) || $row['id_board'] != $board)
@@ -372,7 +372,7 @@ function removeMessage($message, $decreasePostCount = true)
 				'id_msg' => $message,
 			)
 		);
-		$row2 = $smcFunc['db_fetch_assoc']($request);
+		$row2 = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		$db->query('', '

@@ -163,7 +163,7 @@ function action_summary()
 			WHERE (' . implode(' OR ', $ban_query) . ')',
 			$ban_query_vars
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Work out what restrictions we actually have.
 			$ban_restrictions = array();
@@ -486,7 +486,7 @@ function action_showPosts()
 	$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 	$context['posts'] = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor....
 		censorText($row['body']);
@@ -749,7 +749,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 		)
 	);
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$attachments[] = array(
 			'id' => $row['id_attach'],
 			'filename' => $row['filename'],
@@ -973,7 +973,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$topics[] = $row['id_topic'];
 	$db->free_result($request);
 
@@ -993,7 +993,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 				'topics' => $topics,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$topicsInfo[] = $row;
 		$db->free_result($request);
 	}
@@ -1126,7 +1126,7 @@ function action_statPanel()
 		)
 	);
 	$context['popular_boards'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$context['popular_boards'][$row['id_board']] = array(
 			'id' => $row['id_board'],
@@ -1157,7 +1157,7 @@ function action_statPanel()
 		)
 	);
 	$context['board_activity'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$context['board_activity'][$row['id_board']] = array(
 			'id' => $row['id_board'],
@@ -1188,7 +1188,7 @@ function action_statPanel()
 	);
 	$maxPosts = $realPosts = 0;
 	$context['posts_by_time'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// Cast as an integer to remove the leading 0.
 		$row['hour'] = (int) $row['hour'];
@@ -1283,7 +1283,7 @@ function action_showPermissions()
 	);
 	$context['boards'] = array();
 	$context['no_access_boards'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
 			$context['no_access_boards'][] = array(
@@ -1329,7 +1329,7 @@ function action_showPermissions()
 			'newbie_group' => 4,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))
@@ -1385,7 +1385,7 @@ function action_showPermissions()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))

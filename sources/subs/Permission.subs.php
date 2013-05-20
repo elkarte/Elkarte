@@ -106,7 +106,7 @@ function updateChildPermissions($parents, $profile = null)
 	$children = array();
 	$parents = array();
 	$child_groups = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$children[$row['id_parent']][] = $row['id_group'];
 		$child_groups[] = $row['id_group'];
@@ -133,7 +133,7 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['permission'], $row['add_deny']);
 		$db->free_result($request);
@@ -175,7 +175,7 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
 		$db->free_result($request);
@@ -322,7 +322,7 @@ class InlinePermissions_Form
 				'on' => 'on',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
 		$db->free_result($request);
 
@@ -341,7 +341,7 @@ class InlinePermissions_Form
 				'permissions' => $permissions,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Initialize each permission as being 'off' until proven otherwise.
 			foreach ($permissions as $permission)

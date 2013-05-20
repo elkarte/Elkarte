@@ -405,7 +405,7 @@ class Display_Controller
 				)
 			);
 			$context['linked_calendar_events'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// Prepare the dates for being formatted.
 				$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
@@ -449,7 +449,7 @@ class Display_Controller
 					'id_poll' => $topicinfo['id_poll'],
 				)
 			);
-			$pollinfo = $smcFunc['db_fetch_assoc']($request);
+			$pollinfo = $db->fetch_assoc($request);
 			$db->free_result($request);
 
 			$request = $db->query('', '
@@ -483,7 +483,7 @@ class Display_Controller
 			$pollOptions = array();
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				censorText($row['label']);
 				$pollOptions[$row['id_choice']] = $row;
@@ -663,7 +663,7 @@ class Display_Controller
 
 		$messages = array();
 		$all_posters = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!empty($row['id_member']))
 				$all_posters[$row['id_msg']] = $row['id_member'];
@@ -994,7 +994,7 @@ class Display_Controller
 			)
 		);
 		$messages = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 				continue;
@@ -1061,7 +1061,7 @@ function prepareDisplayContext($reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
-	$message = $smcFunc['db_fetch_assoc']($messages_request);
+	$message = $db->fetch_assoc($messages_request);
 	if (!$message)
 	{
 		$db->free_result($messages_request);

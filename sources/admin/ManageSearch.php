@@ -436,7 +436,7 @@ class ManageSearch_Controller
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $db->fetch_assoc($request);
 				$context['table_info']['data_length'] = $row['Data_length'];
 				$context['table_info']['index_length'] = $row['Index_length'];
 				$context['table_info']['fulltext_length'] = $row['Index_length'];
@@ -465,7 +465,7 @@ class ManageSearch_Controller
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $db->fetch_assoc($request);
 				$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
 				$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
 				$db->free_result($request);
@@ -492,7 +492,7 @@ class ManageSearch_Controller
 
 			if ($request !== false && $db->num_rows($request) > 0)
 			{
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					if ($row['relname'] == $db_prefix . 'messages')
 					{
@@ -663,7 +663,7 @@ class ManageSearch_Controller
 					'starting_id' => $context['start'],
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
 
 			if (empty($num_messages['todo']))
@@ -692,7 +692,7 @@ class ManageSearch_Controller
 					);
 					$forced_break = false;
 					$number_processed = 0;
-					while ($row = $smcFunc['db_fetch_assoc']($request))
+					while ($row = $db->fetch_assoc($request))
 					{
 						// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 						if ($stop < time())
@@ -761,7 +761,7 @@ class ManageSearch_Controller
 							'minimum_messages' => $max_messages,
 						)
 					);
-					while ($row = $smcFunc['db_fetch_assoc']($request))
+					while ($row = $db->fetch_assoc($request))
 						$stop_words[] = $row['id_word'];
 					$db->free_result($request);
 
@@ -976,7 +976,7 @@ function detectFulltextIndex()
 	$context['fulltext_index'] = '';
 	if ($request !== false || $db->num_rows($request) != 0)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 				$context['fulltext_index'][] = $row['Key_name'];
 		$db->free_result($request);
@@ -1006,7 +1006,7 @@ function detectFulltextIndex()
 
 	if ($request !== false)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
 		$db->free_result($request);

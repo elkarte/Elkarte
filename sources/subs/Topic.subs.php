@@ -65,7 +65,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 		if ($db->num_rows($requestMembers) > 0)
 		{
-			while ($rowMembers = $smcFunc['db_fetch_assoc']($requestMembers))
+			while ($rowMembers = $db->fetch_assoc($requestMembers))
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
 		}
 		$db->free_result($requestMembers);
@@ -89,7 +89,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		{
 			// Get topics that will be recycled.
 			$recycleTopics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
@@ -165,7 +165,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
@@ -226,7 +226,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 	$polls = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$polls[] = $row['id_poll'];
 	$db->free_result($request);
 
@@ -278,7 +278,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
@@ -411,7 +411,7 @@ function moveTopics($topics, $toBoard)
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
 	if ($db->num_rows($request) == 0)
 		return;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($fromBoards[$row['id_board']]['num_posts']))
 		{
@@ -451,7 +451,7 @@ function moveTopics($topics, $toBoard)
 		)
 	);
 	$log_topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg'], $row['disregarded']);
 
@@ -546,7 +546,7 @@ function moveTopics($topics, $toBoard)
 			)
 		);
 		$approval_msgs = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$approval_msgs[] = $row['id_msg'];
 		$db->free_result($request);
 
@@ -572,7 +572,7 @@ function moveTopics($topics, $toBoard)
 			)
 		);
 		$topicMaxMin = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$topicMaxMin[$row['id_topic']] = array(
 				'min' => $row['id_first_msg'],
@@ -591,7 +591,7 @@ function moveTopics($topics, $toBoard)
 				'topics' => $topics,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// If not, update.
 			if ($row['first_msg'] != $topicMaxMin[$row['id_topic']]['min'] || $row['last_msg'] != $topicMaxMin[$row['id_topic']]['max'])
@@ -794,7 +794,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Find if this topic is marked for notification...
 		if (!empty($row['id_topic']))
@@ -1123,7 +1123,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	);
 	$topic_info = array();
 	if ($request !== false)
-		$topic_info = $smcFunc['db_fetch_assoc']($request);
+		$topic_info = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $topic_info;
@@ -1192,7 +1192,7 @@ function removeOldTopics()
 		$condition_params
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$topics[] = $row['id_topic'];
 	$db->free_result($request);
 
@@ -1225,7 +1225,7 @@ function topicsStartedBy($memberID)
 			)
 		);
 	$topicIDs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$topicIDs[] = $row['id_topic'];
 	$db->free_result($request);
 
@@ -1254,7 +1254,7 @@ function messagesAfter($topic, $message)
 			'split_at' => $message,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$messages[] = $row['id_msg'];
 	$db->free_result($request);
 
@@ -1294,7 +1294,7 @@ function messageInfo($topic, $message, $topic_approved = false)
 		)
 	);
 
-	$messageInfo = $smcFunc['db_fetch_assoc']($request);
+	$messageInfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $messageInfo;
@@ -1340,7 +1340,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 		)
 	);
 	$messages = array();
-	for ($counter = 0; $row = $smcFunc['db_fetch_assoc']($request); $counter ++)
+	for ($counter = 0; $row = $db->fetch_assoc($request); $counter ++)
 	{
 		censorText($row['subject']);
 		censorText($row['body']);
@@ -1596,7 +1596,7 @@ function getLoggedTopics($member, $topics)
 		)
 	);
 	$logged_topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$logged_topics[$row['id_topic']] = $row['disregarded'];
 	$db->free_result($request);
 

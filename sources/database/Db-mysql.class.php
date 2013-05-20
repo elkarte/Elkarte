@@ -47,7 +47,7 @@ class Database_MySQL implements Database
 		$db = database();
 
 		// Map some database specific functions, only do this once.
-		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'mysql_fetch_assoc')
+		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'mysql_fetch_assoc')
 			$smcFunc += array(
 				'db_query' => 'elk_db_query', //
 				'db_quote' => 'elk_db_quote', //

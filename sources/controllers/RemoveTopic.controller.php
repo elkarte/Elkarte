@@ -197,7 +197,7 @@ class RemoveTopic_Controller
 
 			$actioned_messages = array();
 			$previous_topics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// Restoring the first post means topic.
 				if ($row['id_msg'] == $row['id_first_msg'] && $row['id_previous_topic'] == $row['id_topic'])
@@ -249,7 +249,7 @@ class RemoveTopic_Controller
 					)
 				);
 				$previous_topics = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$previous_topics[$row['id_topic']] = array(
 						'board' => $row['id_board'],
 						'subject' => $row['subject'],
@@ -319,7 +319,7 @@ class RemoveTopic_Controller
 				)
 			);
 
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// We can only restore if the previous board is set.
 				if (empty($row['id_previous_board']))
@@ -360,7 +360,7 @@ class RemoveTopic_Controller
 						)
 					);
 
-					while ($member = $smcFunc['db_fetch_assoc']($request2))
+					while ($member = $db->fetch_assoc($request2))
 						updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
 					$db->free_result($request2);
 				}
@@ -444,7 +444,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			updateMemberData($row['id_member'], array('posts' => '+'));
 	}
 
@@ -481,7 +481,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			'target_topic' => $target_topic,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['id_first_msg'] < $target_topic_data['id_first_msg'])
 			$target_topic_data['id_first_msg'] = $row['id_first_msg'];
@@ -547,7 +547,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 				'from_topic' => $from_topic,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_first_msg'] < $source_topic_data['id_first_msg'])
 				$source_topic_data['id_first_msg'] = $row['id_first_msg'];
@@ -634,7 +634,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 				'first_messages' => $cache_updates,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			updateStats('subject', $row['id_topic'], $row['subject']);
 		$db->free_result($request);
 	}

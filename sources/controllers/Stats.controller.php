@@ -100,7 +100,7 @@ class Stats_Controller
 			array(
 			)
 		);
-		$row = $smcFunc['db_fetch_assoc']($result);
+		$row = $db->fetch_assoc($result);
 		$db->free_result($result);
 
 		// This would be the amount of time the forum has been up... in days...
@@ -163,7 +163,7 @@ class Stats_Controller
 				)
 			);
 			$context['gender'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				// Assuming we're telling... male or female?
 				if (!empty($row['gender']))
@@ -222,7 +222,7 @@ class Stats_Controller
 		);
 		$context['top_posters'] = array();
 		$max_num_posts = 1;
-		while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+		while ($row_members = $db->fetch_assoc($members_result))
 		{
 			$context['top_posters'][] = array(
 				'name' => $row_members['real_name'],
@@ -259,7 +259,7 @@ class Stats_Controller
 		);
 		$context['top_boards'] = array();
 		$max_num_posts = 1;
-		while ($row_board = $smcFunc['db_fetch_assoc']($boards_result))
+		while ($row_board = $db->fetch_assoc($boards_result))
 		{
 			$context['top_boards'][] = array(
 				'id' => $row_board['id_board'],
@@ -296,7 +296,7 @@ class Stats_Controller
 				)
 			);
 			$topic_ids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$topic_ids[] = $row['id_topic'];
 			$db->free_result($request);
 		}
@@ -323,7 +323,7 @@ class Stats_Controller
 		);
 		$context['top_topics_replies'] = array();
 		$max_num_replies = 1;
-		while ($row_topic_reply = $smcFunc['db_fetch_assoc']($topic_reply_result))
+		while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 		{
 			censorText($row_topic_reply['subject']);
 
@@ -366,7 +366,7 @@ class Stats_Controller
 				)
 			);
 			$topic_ids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$topic_ids[] = $row['id_topic'];
 			$db->free_result($request);
 		}
@@ -393,7 +393,7 @@ class Stats_Controller
 		);
 		$context['top_topics_views'] = array();
 		$max_num_views = 1;
-		while ($row_topic_views = $smcFunc['db_fetch_assoc']($topic_view_result))
+		while ($row_topic_views = $db->fetch_assoc($topic_view_result))
 		{
 			censorText($row_topic_views['subject']);
 
@@ -437,7 +437,7 @@ class Stats_Controller
 				)
 			);
 			$members = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$members[$row['id_member_started']] = $row['hits'];
 			$db->free_result($request);
 
@@ -461,7 +461,7 @@ class Stats_Controller
 		);
 		$context['top_starters'] = array();
 		$max_num_topics = 1;
-		while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+		while ($row_members = $db->fetch_assoc($members_result))
 		{
 			$context['top_starters'][] = array(
 				'name' => $row_members['real_name'],
@@ -497,7 +497,7 @@ class Stats_Controller
 		$context['top_time_online'] = array();
 		$temp2 = array();
 		$max_time_online = 1;
-		while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+		while ($row_members = $db->fetch_assoc($members_result))
 		{
 			$temp2[] = (int) $row_members['id_member'];
 			if (count($context['top_time_online']) >= 10)
@@ -546,7 +546,7 @@ class Stats_Controller
 		);
 
 		$context['yearly'] = array();
-		while ($row_months = $smcFunc['db_fetch_assoc']($months_result))
+		while ($row_months = $db->fetch_assoc($months_result))
 		{
 			$ID_MONTH = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
 			$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
@@ -657,7 +657,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 		ORDER BY stats_day DESC',
 		$condition_parameters
 	);
-	while ($row_days = $smcFunc['db_fetch_assoc']($days_result))
+	while ($row_days = $db->fetch_assoc($days_result))
 		$context['yearly'][$row_days['stats_year']]['months'][(int) $row_days['stats_month']]['days'][] = array(
 			'day' => sprintf('%02d', $row_days['stats_day']),
 			'month' => sprintf('%02d', $row_days['stats_month']),

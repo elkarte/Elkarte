@@ -207,7 +207,7 @@ function action_trackactivity($memID)
 		)
 	);
 	$context['ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
 		$ips[] = $row['poster_ip'];
@@ -225,7 +225,7 @@ function action_trackactivity($memID)
 		)
 	);
 	$context['error_ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
 		$ips[] = $row['ip'];
@@ -251,7 +251,7 @@ function action_trackactivity($memID)
 			)
 		);
 		$message_members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$message_members[] = $row['id_member'];
 		$db->free_result($request);
 
@@ -275,7 +275,7 @@ function action_trackactivity($memID)
 				'ip_list' => $ips,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		$db->free_result($request);
 	}
@@ -340,7 +340,7 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
 		))
 	);
 	$error_messages = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$error_messages[] = array(
 			'ip' => $row['ip'],
 			'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
@@ -413,7 +413,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 		))
 	);
 	$messages = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$messages[] = array(
 			'ip' => $row['poster_ip'],
 			'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
@@ -486,7 +486,7 @@ function action_trackip($memID = 0)
 		)
 	);
 	$context['ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['ips'][$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
 	$db->free_result($request);
 
@@ -858,7 +858,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 		)
 	);
 	$logins = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$logins[] = array(
 			'time' => relativeTime($row['time']),
 			'ip' => $row['ip'],
@@ -890,7 +890,7 @@ function action_trackedits($memID)
 		)
 	);
 	$context['custom_field_titles'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['custom_field_titles']['customfield_' . $row['col_name']] = array(
 			'title' => $row['field_name'],
 			'parse_bbc' => $row['bbc'],
@@ -1032,7 +1032,7 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$extra = @unserialize($row['extra']);
 		if (!empty($extra['applicator']))

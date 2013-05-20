@@ -41,7 +41,7 @@ function viewers($id, $session, $type = 'topic')
 			'session' => $session
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$viewers[] = $row;
 	}

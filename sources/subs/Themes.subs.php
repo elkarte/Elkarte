@@ -39,7 +39,7 @@ function installedThemes()
 		)
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($themes[$row['id_theme']]))
 			$themes[$row['id_theme']] = array(
@@ -137,7 +137,7 @@ function validateThemeName($indexes, $value_data)
 		))
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Find the right one.
 		foreach ($indexes as $index)
@@ -175,7 +175,7 @@ function getBasicThemeInfos($themes)
 			'name' => 'name',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themelist[$themes[$row['id_theme']]] = $row['value'];
 
 	$db->free_result($request);
@@ -214,7 +214,7 @@ function getCustomThemes()
 			'theme_dir' => $settings['default_theme_dir'],
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	$db->free_result($request);
 
@@ -253,7 +253,7 @@ function getThemesPathbyID($theme_list = array())
 		)
 	);
 	$theme_paths = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
 	$db->free_result($request);
 
@@ -285,7 +285,7 @@ function loadThemes($knownThemes)
 		)
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themes[] = array(
 			'id' => $row['id_theme'],
 			'name' => $row['name'],

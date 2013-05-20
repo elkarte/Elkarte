@@ -63,7 +63,7 @@ class Poll_Controller
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('poll_error', false);
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		// If this is a guest can they vote?
@@ -384,7 +384,7 @@ class Poll_Controller
 					)
 				);
 				$context['choices'] = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					// Get the highest id so we can add more without reusing.
 					if ($row['id_choice'] >= $last_id)
@@ -506,7 +506,7 @@ class Poll_Controller
 				);
 				$context['choices'] = array();
 				$number = 1;
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					censorText($row['label']);
 
@@ -629,7 +629,7 @@ class Poll_Controller
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board');
-		$bcinfo = $smcFunc['db_fetch_assoc']($request);
+		$bcinfo = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		// Check their adding/editing is valid.
@@ -772,7 +772,7 @@ class Poll_Controller
 			)
 		);
 		$choices = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$choices[] = $row['id_choice'];
 		$db->free_result($request);
 

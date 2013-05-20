@@ -221,7 +221,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 		return false;
 
 	// load up the data
-	$draft_info = $smcFunc['db_fetch_assoc']($request);
+	$draft_info = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	// a little cleaning
@@ -269,7 +269,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 	);
 
 	// place them in the draft array
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$user_drafts[] = $row;
 	$db->free_result($request);
 

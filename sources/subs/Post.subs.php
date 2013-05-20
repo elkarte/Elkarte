@@ -580,7 +580,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	);
 	$topicData = array();
 	$boards_index = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// Any attachments, we just want the number of them for display
 		$num_attachments = 0;
@@ -690,7 +690,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		);
 		$boards = array();
 		$sent = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($members))
+		while ($row = $db->fetch_assoc($members))
 		{
 			// for this member/board, loop through the topics and see if we should send it
 			foreach ($topicData as $id => $data) 
@@ -801,7 +801,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		// Don't do the excluded...
 		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
@@ -963,7 +963,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
 						'permission' => 'postby_email',
 					)
 				);
-				while ($row_perm = $smcFunc['db_fetch_assoc']($request))
+				while ($row_perm = $db->fetch_assoc($request))
 					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
 				$db->free_result($request);
 			}
@@ -1509,7 +1509,7 @@ function approvePosts($msgs, $approve = true)
 	$notification_topics = array();
 	$notification_posts = array();
 	$member_post_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -1611,7 +1611,7 @@ function approvePosts($msgs, $approve = true)
 				'approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
 		$db->free_result($request);
 	}
@@ -1725,7 +1725,7 @@ function approveTopics($topics, $approve = true)
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$msgs[] = $row['id_msg'];
 	$db->free_result($request);
 
@@ -1815,7 +1815,7 @@ function sendApprovalNotifications(&$topicData)
 	$sent = 0;
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		if ($row['id_group'] != 1)
 		{
@@ -1924,7 +1924,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 			)
 		);
 		$lastMsg = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
 		$db->free_result($request);
 	}
@@ -2072,7 +2072,7 @@ function adminNotify($type, $memberID, $member_name = null)
 			'moderate_forum' => 'moderate_forum',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
 	$db->free_result($request);
 
@@ -2095,7 +2095,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	);
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$replacements = array(
 			'USERNAME' => $member_name,
@@ -2190,7 +2190,7 @@ function notifyMembersBoard(&$topicData)
 			'board_list' => $board_index,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$board_names[$row['id_board']] = $row['name'];
 	$db->free_result($request);
 
@@ -2231,7 +2231,7 @@ function notifyMembersBoard(&$topicData)
 		)
 	);
 	// While we have members with board notifications 
-	while ($rowmember = $smcFunc['db_fetch_assoc']($members))
+	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
 		if (validateAccess($rowmember, $maillist, $email_perm) === false)
@@ -2344,7 +2344,7 @@ function lastPost()
 	);
 	if ($db->num_rows($request) == 0)
 		return array();
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	// Censor the subject and post...

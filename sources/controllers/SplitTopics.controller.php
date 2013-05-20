@@ -320,7 +320,7 @@ class SplitTopics_Controller
 			// You can't split the last message off.
 			if (empty($context['not_selected']['start']) && $db->num_rows($request) <= 1 && $_REQUEST['move'] == 'down')
 				$_REQUEST['move'] = '';
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$original_msgs['not_selected'][] = $row['id_msg'];
 			$db->free_result($request);
 			if (!empty($_SESSION['split_selection'][$topic]))
@@ -341,7 +341,7 @@ class SplitTopics_Controller
 						'messages_per_page' => $context['messages_per_page'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$original_msgs['selected'][] = $row['id_msg'];
 				$db->free_result($request);
 			}
@@ -376,7 +376,7 @@ class SplitTopics_Controller
 				)
 			);
 			$_SESSION['split_selection'][$topic] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$_SESSION['split_selection'][$topic][] = $row['id_msg'];
 			$db->free_result($request);
 		}
@@ -394,7 +394,7 @@ class SplitTopics_Controller
 				'is_approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
 		$db->free_result($request);
 
@@ -555,7 +555,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	$split1_first_msg = null;
 	$split1_last_msg = null;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Get the right first and last message dependant on approved state...
 		if (empty($split1_first_msg) || $row['myid_first_msg'] < $split1_first_msg)
@@ -598,7 +598,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => $split1_ID_TOPIC,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// As before get the right first and last message dependant on approved state...
 		if (empty($split2_first_msg) || $row['myid_first_msg'] < $split2_first_msg)
@@ -783,7 +783,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	if ($db->num_rows($request) > 0)
 	{
 		$replaceEntries = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -855,7 +855,7 @@ function splitAttemptMove($boards, $totopic)
 					)
 				);
 				$posters = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					if (!isset($posters[$row['id_member']]))
 						$posters[$row['id_member']] = 0;

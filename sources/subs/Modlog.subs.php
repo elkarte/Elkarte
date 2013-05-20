@@ -114,7 +114,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$members = array();
 	$messages = array();
 	$entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$row['extra'] = @unserialize($row['extra']);
 
@@ -234,7 +234,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'topic_list' => array_keys($topics),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			foreach ($topics[$row['id_topic']] as $action)
 			{
@@ -269,7 +269,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'message_list' => array_keys($messages),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			foreach ($messages[$row['id_msg']] as $action)
 			{

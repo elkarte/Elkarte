@@ -328,7 +328,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		)
 	);
 	$groups = array(1);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
 	$db->free_result($request);
 
@@ -345,7 +345,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		)
 	);
 	$emails_sent = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Stick their particulars in the replacement data.
 		$replacements['IDMEMBER'] = $row['id_member'];

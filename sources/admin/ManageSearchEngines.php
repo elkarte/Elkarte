@@ -269,7 +269,7 @@ class ManageSearchEngines_Controller
 		);
 
 		$context['spider_last_seen'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context['spider_last_seen'][$row['id_spider']] = $row['last_seen_time'];
 		$db->free_result($request);
 
@@ -465,7 +465,7 @@ class ManageSearchEngines_Controller
 					'current_spider' => $context['id_spider'],
 				)
 			);
-			if ($row = $smcFunc['db_fetch_assoc']($request))
+			if ($row = $db->fetch_assoc($request))
 				$context['spider'] = array(
 					'id' => $row['id_spider'],
 					'name' => $row['spider_name'],
@@ -807,7 +807,7 @@ function list_getSpiders($start, $items_per_page, $sort)
 		)
 	);
 	$spiders = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spiders[$row['id_spider']] = $row;
 	$db->free_result($request);
 
@@ -860,7 +860,7 @@ function list_getSpiderLogs($start, $items_per_page, $sort)
 		)
 	);
 	$spider_logs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spider_logs[] = $row;
 	$db->free_result($request);
 
@@ -914,7 +914,7 @@ function list_getSpiderStats($start, $items_per_page, $sort)
 		)
 	);
 	$spider_stats = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spider_stats[] = $row;
 	$db->free_result($request);
 

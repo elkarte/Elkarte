@@ -418,7 +418,7 @@ function loadInstalledPackages()
 	);
 	$installed = array();
 	$found = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Already found this? If so don't add it twice!
 		if (in_array($row['package_id'], $found))
@@ -2932,7 +2932,7 @@ function package_create_backup($id = 'backup')
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$db->free_result($request);
 
@@ -3253,7 +3253,7 @@ function isPackageInstalled($id)
 			'install_id' => $context['install_id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),

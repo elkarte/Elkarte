@@ -124,7 +124,7 @@ function markBoardsRead($boards, $unread = false)
 		)
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$topics[] = $row['id_topic'];
 	$db->free_result($result);
 
@@ -411,7 +411,7 @@ function modifyBoard($board_id, &$boardOptions)
 						'moderator_list' => $moderators,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$boardOptions['moderators'][] = $row['id_member'];
 				$db->free_result($request);
 			}
@@ -597,7 +597,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		)
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$topics[] = $row['id_topic'];
 	$db->free_result($request);
 
@@ -746,7 +746,7 @@ function fixChildren($parent, $newLevel, $newParent)
 		)
 	);
 	$children = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$children[] = $row['id_board'];
 	$db->free_result($result);
 
@@ -795,7 +795,7 @@ function getBoardTree()
 	$cat_tree = array();
 	$boards = array();
 	$last_board_order = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($cat_tree[$row['id_cat']]))
 		{
@@ -1013,7 +1013,7 @@ function accessibleBoards()
 		)
 	);
 	$boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$boards[] = $row['id_board'];
 	$db->free_result($result);
 
@@ -1068,7 +1068,7 @@ function boardInfo($board_id, $topic_id = null)
 		);
 	}
 
-	$returns = $smcFunc['db_fetch_assoc']($request);
+	$returns = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $returns;
@@ -1099,7 +1099,7 @@ function getOtherGroups($curBoard)
 			'global_moderator' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($_REQUEST['sa'] == 'newboard' && $row['min_posts'] == -1)
 			$curBoard['member_groups'][] = $row['id_group'];
@@ -1140,7 +1140,7 @@ function getBoardModerators($idboard)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$moderators[$row['id_member']] = $row['real_name'];
 	$db->free_result($request);
 
@@ -1169,7 +1169,7 @@ function getAllThemes()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themes[] = $row;
 	$db->free_result($request);
 
@@ -1240,7 +1240,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 		))
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$return[$row['id_board']] = $row['num_posts'];
 	$db->free_result($request);
 
@@ -1346,7 +1346,7 @@ function fetchBoardsInfo($conditions, $params = array())
 	else
 	{
 		$return = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$return[$row['id_board']] = $row;
 	}
 	$db->free_result($request);
@@ -1382,7 +1382,7 @@ function addChildBoards(&$boards)
 			'board_list' => $boards,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		if (in_array($row['id_parent'], $boards))
 			$boards[] = $row['id_board'];
 	$db->free_result($request);

@@ -292,7 +292,7 @@ class MoveTopic_Controller
 				)
 			);
 			$posters = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($posters[$row['id_member']]))
 					$posters[$row['id_member']] = 0;

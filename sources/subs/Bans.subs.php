@@ -846,7 +846,7 @@ function updateBanMembers()
 	$memberIDs = array();
 	$memberEmails = array();
 	$memberEmailWild = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['id_member'])
 			$memberIDs[$row['id_member']] = $row['id_member'];
@@ -890,7 +890,7 @@ function updateBanMembers()
 			WHERE ' . implode( ' OR ', $queryPart),
 			$queryValues
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!in_array($row['id_member'], $allMembers))
 			{
@@ -927,7 +927,7 @@ function updateBanMembers()
 			'ban_flag' => 10,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Don't do this twice!
 		if (!in_array($row['id_member'], $allMembers))
@@ -1005,7 +1005,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 		)
 	);
 	$ban_triggers = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$ban_triggers[] = $row;
 	$db->free_result($request);
 
@@ -1071,7 +1071,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 		)
 	);
 	$log_entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$log_entries[] = $row;
 	$db->free_result($request);
 
@@ -1159,7 +1159,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('ban_not_found', false);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))
 		{
@@ -1256,7 +1256,7 @@ function list_getBans($start, $items_per_page, $sort)
 		)
 	);
 	$bans = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$bans[] = $row;
 
 	$db->free_result($request);
@@ -1317,7 +1317,7 @@ function banLoadAdditionalIPsMember($member_id)
 			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$message_ips[] = $row['poster_ip'];
 	$db->free_result($request);
 
@@ -1347,7 +1347,7 @@ function banLoadAdditionalIPsError($member_id)
 			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$error_ips[] = $row['ip'];
 	$db->free_result($request);
 
@@ -1406,7 +1406,7 @@ function banDetails($ban_id, $ban_group)
 			'ban_group' => $ban_group,
 		)
 	);
-	$details = $smcFunc['db_fetch_assoc']($request);
+	$details = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $details;

@@ -48,7 +48,7 @@ function ml_CustomProfile()
 			'private_level' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Avoid collisions
 		$curField = 'cust_' . $row['col_name'];
@@ -293,7 +293,7 @@ function ml_findSearchableCustomFields()
 		)
 	);
 	$context['custom_search_fields'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['custom_search_fields'][$row['col_name']] = array(
 			'colname' => $row['col_name'],
 			'name' => $row['field_name'],
@@ -329,7 +329,7 @@ function printMemberListRows($request)
 		$most_posts = 1;
 
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.

@@ -70,7 +70,7 @@ function loadPMLabels()
 			'not_deleted' => 0,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
@@ -196,7 +196,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 			)
 		);
 		// ...And update the statistics accordingly - now including unread messages!.
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['is_read'])
 				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages']));
@@ -244,7 +244,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		)
 	);
 	$remove_pms = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$remove_pms[] = $row['sender'];
 	$db->free_result($request);
 
@@ -323,7 +323,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 			)
 		);
 		$total_unread = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			$total_unread += $row['num'];
 
@@ -380,7 +380,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 		return false;
 	}
 
-	$validationResult = $smcFunc['db_fetch_assoc']($request);
+	$validationResult = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	switch ($validFor)
@@ -485,7 +485,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 				'usernames' => array_keys($usernames),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if (isset($usernames[$smcFunc['strtolower']($row['member_name'])]))
 				$usernames[$smcFunc['strtolower']($row['member_name'])] = $row['id_member'];
 		$db->free_result($request);
@@ -532,7 +532,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	);
 	$deletes = array();
 	// Check whether we have to apply anything...
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$criteria = unserialize($row['criteria']);
 
@@ -565,7 +565,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$message_limit_cache[$row['id_group']] = $row['max_messages'];
 		$db->free_result($request);
 	}
@@ -583,7 +583,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['add_deny']))
 			$disallowed_groups[] = $row['id_group'];
@@ -619,7 +619,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		)
 	);
 	$notifications = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Don't do anything for members to be deleted!
 		if (isset($deletes[$row['id_member']]))
@@ -903,7 +903,7 @@ function loadPMs($pm_options, $id_member)
 				)
 			);
 			$sub_pms = array();
-			while ($row = $smcFunc['db_fetch_assoc']($sub_request))
+			while ($row = $db->fetch_assoc($sub_request))
 				$sub_pms[$row['id_pm_head']] = $row['sort_param'];
 
 			$db->free_result($sub_request);
@@ -989,7 +989,7 @@ function loadPMs($pm_options, $id_member)
 	$posters = $context['folder'] == 'sent' ? array($id_member) : array();
 	$recipients = array();
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($recipients[$row['id_pm']]))
 		{

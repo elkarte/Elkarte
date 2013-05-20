@@ -362,7 +362,7 @@ function loadPermissionProfiles()
 		)
 	);
 	$context['profiles'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Format the label nicely.
 		if (isset($txt['permissions_profile_' . $row['profile_name']]))
@@ -737,7 +737,7 @@ function countPermissions($groups, $hidden_permissions = null)
 			'hidden_permissions' => !isset($hidden_permissions) ? $hidden_permissions : array(),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
 			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] = $row['num_permissions'];
 	$db->free_result($request);
@@ -771,7 +771,7 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
 			'current_profile' => $profile_id,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
 			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] += $row['num_permissions'];
 	$db->free_result($request);
@@ -826,7 +826,7 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
 		)
 	);
 	$target_perm = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$target_perm[$row['permission']] = $row['add_deny'];
 	$db->free_result($request);
 
@@ -895,7 +895,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 		)
 	);
 	$target_perm = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$target_perm[$row['permission']] = $row['add_deny'];
 	$db->free_result($request);
 
@@ -1066,7 +1066,7 @@ function fetchPermissions($id_group)
 			'current_group' => $id_group,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
 	$db->free_result($result);
 
@@ -1102,7 +1102,7 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 			'current_profile' => $permission_type == 'membergroup' ? 1 : $profile_id,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
 	$db->free_result($result);
 
@@ -1199,7 +1199,7 @@ function clearPostgroupPermissions()
 			'min_posts' => -1,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$post_groups[] = $row['id_group'];
 	$db->free_result($request);
 
@@ -1265,7 +1265,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 		)
 	);
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$inserts[] = array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
 	$db->free_result($request);
 
@@ -1357,7 +1357,7 @@ function permProfilesInUse($profiles)
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		if (isset($profiles[$row['id_profile']]))
 		{
 			$profiles[$row['id_profile']]['in_use'] = true;
@@ -1443,7 +1443,7 @@ function getPermission($group, $profile, $permissions)
 			'permissions' => $permissions,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[$row['id_group']] = $row;
 
 	$db->free_result($request);

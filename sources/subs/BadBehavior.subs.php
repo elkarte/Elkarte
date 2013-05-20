@@ -119,7 +119,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		)
 	);
 
-	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i++)
+	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 	{
 		// Turn the key in to something nice to show
 		$key_response = bb2_get_response($row['valid']);

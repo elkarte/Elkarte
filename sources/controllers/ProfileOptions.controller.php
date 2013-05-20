@@ -136,7 +136,7 @@ function action_editBuddies($memID)
 			);
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$buddiesArray[] = (int) $row['id_member'];
 			$db->free_result($request);
 
@@ -246,7 +246,7 @@ function action_editIgnoreList($memID)
 			);
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$ignoreArray[] = (int) $row['id_member'];
 			$db->free_result($request);
 
@@ -781,7 +781,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$notification_topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['subject']);
 
@@ -861,7 +861,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	);
 
 	$notification_boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' =>  $row['name'],
@@ -888,7 +888,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'recycle_board' => $modSettings['recycle_board'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
@@ -936,7 +936,7 @@ function loadThemeOptions($memID)
 			)
 		);
 		$temp = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_member'] == -1)
 			{
@@ -1041,7 +1041,7 @@ function action_groupMembership()
 		'member' => array(),
 		'available' => array()
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Can they edit their primary group?
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
@@ -1241,7 +1241,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 			)
 		);
 		$moderators = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$moderators[] = $row['id_member'];
 		$db->free_result($request);
 

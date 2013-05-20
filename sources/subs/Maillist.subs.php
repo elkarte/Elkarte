@@ -64,7 +64,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 			'id' => $id,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
@@ -204,7 +204,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 			'style' => $style
 		)
 	);
-	while($row = $smcFunc['db_fetch_assoc']($request))
+	while($row = $db->fetch_assoc($request))
 	{
 		$email_filters[$i] = array(
 			'id_filter' => $row['id_filter'],
@@ -283,7 +283,7 @@ function maillist_load_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	// Check that the filter does exist
@@ -394,7 +394,7 @@ function maillist_templates()
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$notification_templates[] = array(
 			'title' => $row['template_title'],

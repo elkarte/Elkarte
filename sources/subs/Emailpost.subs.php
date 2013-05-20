@@ -388,7 +388,7 @@ function pbe_parse_email_message(&$body)
 
 	// Build an array of valid expressions
 	$expressions = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -452,7 +452,7 @@ function pbe_filter_email_message($text)
 	);
 
 	// Remove all the excess things as defined, i.e. sent from my iPhone, I hate those >:D
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -1115,7 +1115,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 	$removals = array();
 	$pbe['user_info']['permissions'] = array();
 	// While we have results, put them in our yeah or nay arrays
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['add_deny']))
 			$removals[] = $row['permission'];
@@ -1156,7 +1156,7 @@ function query_sender_wrapper($from)
 			'act' => 1,
 		)
 	);
-	$result = $smcFunc['db_fetch_assoc']($request);
+	$result = $db->fetch_assoc($request);
 
 	// Clean up the signature line
 	if (!empty($result['signature']))
@@ -1191,7 +1191,7 @@ function query_user_keys($email)
 			'email' => $email,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$keys[] = $row;
 	$db->free_result($request);
 
@@ -1388,7 +1388,7 @@ function query_load_message($message_type, $message_id, $pbe)
 	$topic_info = array();
 	// Found the information, load the topic_info array with the data for this topic and board
 	if ($db->num_rows($request) !== 0)
-		$topic_info = $smcFunc['db_fetch_assoc']($request);
+		$topic_info = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	// Return the results or false
@@ -1444,7 +1444,7 @@ function query_load_board_details($board_id, $pbe)
 			'query_see_board' => $pbe['user_info']['query_see_board'],
 		)
 	);
-	$board_info = $smcFunc['db_fetch_assoc']($request);
+	$board_info = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $board_info;
@@ -1493,7 +1493,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 
 	// Put everything about this member/theme into a theme setting array
 	$theme_settings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$theme_settings[$row['variable']] = $row['value'];
 
 	$db->free_result($result);
@@ -1600,7 +1600,7 @@ function query_mark_pms($email_message, $pbe)
 			)
 		);
 		$total_unread = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 			$total_unread += $row['num'];
 		$db->free_result($result);
 

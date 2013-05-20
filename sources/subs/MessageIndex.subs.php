@@ -97,7 +97,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	if ($simple)
 	{
 		$return_value = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$return_value[$row['id_board']] = array(
 				'id_cat' => $row['id_cat'],
@@ -116,7 +116,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			'boards_current_disabled' => true,
 			'categories' => array(),
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// This category hasn't been set up yet..
 			if (!isset($return_value['categories'][$row['id_cat']]))

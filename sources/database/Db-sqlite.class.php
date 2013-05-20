@@ -46,7 +46,7 @@ class Database_SQLite implements Database
 		$db = database();
 
 		// Map some database specific functions, only do this once.
-		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'sqlite_fetch_array')
+		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'sqlite_fetch_array')
 			$smcFunc += array(
 				'db_query' => 'elk_db_query',
 				'db_quote' => 'elk_db_quote',

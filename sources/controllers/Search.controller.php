@@ -434,7 +434,7 @@ function action_plushsearch2()
 		else
 		{
 			$memberlist = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$memberlist[] = $row['id_member'];
 			$userQuery = $smcFunc['db_quote'](
 				'(m.id_member IN ({array_int:matched_members}) OR (m.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})))',
@@ -1654,7 +1654,7 @@ function action_plushsearch2()
 				'id_search' => $_SESSION['search_cache']['id_search'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$context['topics'][$row['id_msg']] = array(
 				'relevance' => round($row['relevance'] / 10, 1) . '%',
@@ -1702,7 +1702,7 @@ function action_plushsearch2()
 			)
 		);
 		$posters = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$posters[] = $row['id_member'];
 		$db->free_result($request);
 
@@ -1761,7 +1761,7 @@ function action_plushsearch2()
 					'topic_list' => array_keys($participants),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 				$participants[$row['id_topic']] = true;
 			$db->free_result($result);
 		}
@@ -1982,7 +1982,7 @@ function MessageSearch2()
 		else
 		{
 			$memberlist = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$memberlist[] = $row['id_member'];
 
 			// Use the name as as sent from or sent to
@@ -2221,7 +2221,7 @@ function MessageSearch2()
 	$foundMessages = array();
 	$posters = array();
 	$head_pms = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$foundMessages[] = $row['id_pm'];
 		$posters[] = $row['id_member_from'];
@@ -2249,7 +2249,7 @@ function MessageSearch2()
 			)
 		);
 		$real_pm_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$real_pm_ids[$row['id_pm_head']] = $row['id_pm'];
 		$db->free_result($request);
 	}
@@ -2280,7 +2280,7 @@ function MessageSearch2()
 				'message_list' => $foundMessages,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($context['folder'] == 'sent' || empty($row['bcc']))
 				$recipients[$row['id_pm']][empty($row['bcc']) ? 'to' : 'bcc'][] = empty($row['id_member_to']) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . '">' . $row['to_name'] . '</a>';
@@ -2315,7 +2315,7 @@ function MessageSearch2()
 			)
 		);
 		$counter = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// If there's no subject, use the default.
 			$row['subject'] = $row['subject'] == '' ? $txt['no_subject'] : $row['subject'];
@@ -2420,7 +2420,7 @@ function prepareSearchContext($reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
-	$message = $smcFunc['db_fetch_assoc']($messages_request);
+	$message = $db->fetch_assoc($messages_request);
 	if (!$message)
 		return false;
 

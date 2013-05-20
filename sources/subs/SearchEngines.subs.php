@@ -45,7 +45,7 @@ function spiderCheck()
 			)
 		);
 		$spider_data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$spider_data[] = $row;
 		$db->free_result($request);
 
@@ -184,7 +184,7 @@ function consolidateSpiderStats()
 		)
 	);
 	$spider_hits = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spider_hits[] = $row;
 	$db->free_result($request);
 
@@ -250,7 +250,7 @@ function recacheSpiderNames()
 		)
 	);
 	$spiders = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spiders[$row['id_spider']] = $row['spider_name'];
 	$db->free_result($request);
 

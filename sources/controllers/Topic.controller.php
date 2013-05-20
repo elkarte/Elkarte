@@ -189,7 +189,7 @@ class Topic_Controller
 		// Redirect to the boardindex if no valid topic id is provided.
 		if ($db->num_rows($request) == 0)
 			redirectexit();
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		if (!empty($row['id_poll']))
@@ -208,7 +208,7 @@ class Topic_Controller
 					'id_poll' => $row['id_poll'],
 				)
 			);
-			$pollinfo = $smcFunc['db_fetch_assoc']($request);
+			$pollinfo = $db->fetch_assoc($request);
 			$db->free_result($request);
 
 			$request = $db->query('', '
@@ -242,7 +242,7 @@ class Topic_Controller
 			$pollOptions = array();
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				censorText($row['label']);
 				$pollOptions[$row['id_choice']] = $row;
@@ -380,7 +380,7 @@ class Topic_Controller
 			)
 		);
 		$context['posts'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Censor the subject and message.
 			censorText($row['subject']);
@@ -421,7 +421,7 @@ class Topic_Controller
 				)
 			);
 			$temp = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$temp[$row['id_attach']] = $row;
 				if (!isset($context['printattach'][$row['id_msg']]))

@@ -39,7 +39,7 @@ function smileyExists($smileys)
 			'smiley_list' => $smileys,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$found[] = $row['filename'];
 	$db->free_result($request);
 
@@ -222,7 +222,7 @@ function getSmiley($id)
 	);
 	if ($db->num_rows($request) != 1)
 		fatal_lang_error('smiley_not_found');
-	$current_smiley = $smcFunc['db_fetch_assoc']($request);
+	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $current_smiley;
@@ -378,7 +378,7 @@ function getSmileys()
 			'rows' => array(),
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$location = empty($row['hidden']) ? 'postform' : 'popup';
 		$smileys[$location]['rows'][$row['smiley_row']][] = array(
@@ -599,7 +599,7 @@ function list_getSmileys($start, $items_per_page, $sort)
 		)
 	);
 	$smileys = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$smileys[] = $row;
 	$db->free_result($request);
 

@@ -133,7 +133,7 @@ class PostModeration_Controller
 			);
 			$toAction = array();
 			$details = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// If it's not within what our view is ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] != 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] != 'replies'))
@@ -236,7 +236,7 @@ class PostModeration_Controller
 			)
 		);
 		$context['unapproved_items'] = array();
-		for ($i = 1; $row = $smcFunc['db_fetch_assoc']($request); $i++)
+		for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 		{
 			// Can delete is complicated, let's solve it first... is it their own post?
 			if ($row['id_member'] == $user_info['id'] && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))

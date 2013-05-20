@@ -915,7 +915,7 @@ class ManageAttachments_Controller
 						'substep' => $_GET['substep'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					// Only do anything once... just in case
 					if (!isset($to_remove[$row['id_attach']]))
@@ -976,7 +976,7 @@ class ManageAttachments_Controller
 						'substep' => $_GET['substep'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$to_update[] = $row['id_attach'];
 					$context['repair_errors']['parent_missing_thumbnail']++;
@@ -1030,7 +1030,7 @@ class ManageAttachments_Controller
 						'substep' => $_GET['substep'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					// Get the filename.
 					if ($row['attachment_type'] == 1)
@@ -1144,7 +1144,7 @@ class ManageAttachments_Controller
 						'substep' => $_GET['substep'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$to_remove[] = $row['id_attach'];
 					$context['repair_errors']['avatar_no_member']++;
@@ -1215,7 +1215,7 @@ class ManageAttachments_Controller
 						'substep' => $_GET['substep'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$to_remove[] = $row['id_attach'];
 					$context['repair_errors']['attachment_no_msg']++;
@@ -1998,7 +1998,7 @@ class ManageAttachments_Controller
 
 				// Move them
 				$moved = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					// Size and file count check
 					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))

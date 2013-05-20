@@ -319,7 +319,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		logAction('delete_warn_template', array('template' => $row['recipient_name']));
 	$db->free_result($request);
 
@@ -369,7 +369,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 		)
 	);
 	$templates = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$templates[] = array(
 			'id_comment' => $row['id_comment'],
@@ -442,7 +442,7 @@ function list_getWarnings($start, $items_per_page, $sort)
 		)
 	);
 	$warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$warnings[] = array(
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
@@ -505,7 +505,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
@@ -599,7 +599,7 @@ function modReportDetails($id_report)
 	if (!$db->num_rows($request))
 		$row = false;
 	else
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 
 	$db->free_result($request);
 

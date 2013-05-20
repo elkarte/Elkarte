@@ -55,7 +55,7 @@ class ModerateAttachments_Controller
 					'attachment_type' => 0,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$attachments[] = $row['id_attach'];
 			$db->free_result($request);
 		}
@@ -84,7 +84,7 @@ class ModerateAttachments_Controller
 			)
 		);
 		$attachments = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// We can only add it if we can approve in this board!
 			if ($allowed_boards == array(0) || in_array($row['id_board'], $allowed_boards))
