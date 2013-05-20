@@ -773,7 +773,7 @@ class Post_Controller
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
-			$only_approved = $modSettings['postmod_active'] || !allowedTo('approve_posts');
+			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
 			if (isset($_REQUEST['xml']))
 				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
 			else
@@ -786,7 +786,7 @@ class Post_Controller
 			{
 				$post['is_new'] = !empty($context['new_replies']);
 				$post['counter'] = $counter++;
-				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $user_info['ignoreusers']);
+				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($post['id_poster'], $user_info['ignoreusers']);
 
 				if (!empty($context['new_replies']))
 					$context['new_replies']--;

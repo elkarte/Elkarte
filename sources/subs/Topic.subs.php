@@ -1283,7 +1283,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 
 	// Get the messages and stick them into an array.
 	$request = $smcFunc['db_query']('', '
-		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
+		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled, m.id_member
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
@@ -1321,6 +1321,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'poster' => $row['real_name'],
+			'id_poster' => $row['id_member'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
