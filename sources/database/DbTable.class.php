@@ -50,7 +50,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal');
+	abstract function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal');
 
 	/**
 	 * Drop a table.
@@ -59,7 +59,7 @@ abstract class DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_drop_table($table_name, $parameters = array(), $error = 'fatal');
+	abstract function db_drop_table($table_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * This function adds a column.
@@ -70,7 +70,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
 
 	/**
 	 * Removes a column.
@@ -80,7 +80,7 @@ abstract class DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal');
+	abstract function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Change a column.
@@ -91,7 +91,7 @@ abstract class DbTable
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal');
+	abstract function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Add an index.
@@ -102,7 +102,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
 
 	/**
 	 * Remove an index.
@@ -112,7 +112,7 @@ abstract class DbTable
 	 * @param array$parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	abstract function elk_db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');
+	abstract function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Get the schema formatted name for a type.
@@ -121,7 +121,7 @@ abstract class DbTable
 	 * @param $type_size
 	 * @param $reverse
 	 */
-	abstract function elk_db_calculate_type($type_name, $type_size = null, $reverse = false);
+	abstract function db_calculate_type($type_name, $type_size = null, $reverse = false);
 
 	/**
 	 * Get table structure.
@@ -129,7 +129,7 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param array $parameters default array()
 	 */
-	abstract function elk_db_table_structure($table_name, $parameters = array());
+	abstract function db_table_structure($table_name, $parameters = array());
 
 	/**
 	 * Return column information for a table.
@@ -139,7 +139,7 @@ abstract class DbTable
 	 * @param array $parameters default array()
 	 * @return mixed
 	 */
-	abstract function elk_db_list_columns($table_name, $detail = false, $parameters = array());
+	abstract function db_list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Get index information.
@@ -149,7 +149,7 @@ abstract class DbTable
 	 * @param array $parameters
 	 * @return mixed
 	 */
-	abstract function elk_db_list_indexes($table_name, $detail = false, $parameters = array());
+	abstract function db_list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Creates a query for a column
@@ -157,7 +157,7 @@ abstract class DbTable
 	 * @param array $column
 	 * @return type
 	 */
-	abstract function elk_db_create_query_column($column);
+	abstract function db_create_query_column($column);
 
 	/**
 	 * Alter table.
@@ -165,7 +165,7 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param array $columns
 	 */
-	function elk_db_alter_table($table_name, $columns)
+	function db_alter_table($table_name, $columns)
 	{
 		// Not implemented by default.
 		// Only SQLite needed it.

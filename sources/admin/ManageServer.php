@@ -730,7 +730,7 @@ class ManageServer_Controller
 			array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
-		return $$config_vars;
+		return $config_vars;
 	}
 
 	/**
