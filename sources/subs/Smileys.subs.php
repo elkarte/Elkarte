@@ -41,7 +41,7 @@ function smileyExists($smileys)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$found[] = $row['filename'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $found;
 }
@@ -74,7 +74,7 @@ function validateDuplicateSmiley($code, $current = null)
 	);
 	if ($db->num_rows($request) > 0)
 		return true;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return false;
 }
@@ -102,7 +102,7 @@ function nextSmileyLocation($location)
 		)
 	);
 	list ($smiley_order) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $smiley_order;
 }
@@ -223,7 +223,7 @@ function getSmiley($id)
 	if ($db->num_rows($request) != 1)
 		fatal_lang_error('smiley_not_found');
 	$current_smiley = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $current_smiley;
 }
@@ -255,7 +255,7 @@ function getSmileyPosition($location, $id)
 	);
 	list ($smiley['row'], $smiley['order'], $smiley['location']) = $smcFunc['db_fetch_row']($request);
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $smiley;
 }
@@ -391,7 +391,7 @@ function getSmileys()
 			'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $smileys;
 }
@@ -478,7 +478,7 @@ function getMaxSmileyOrder()
 		)
 	);
 	list ($smiley_order) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $smiley_order;
 }
@@ -601,7 +601,7 @@ function list_getSmileys($start, $items_per_page, $sort)
 	$smileys = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$smileys[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $smileys;
 }
@@ -622,7 +622,7 @@ function list_getNumSmileys()
 		)
 	);
 	list($numSmileys) = $smcFunc['db_fetch_row'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numSmileys;
 }

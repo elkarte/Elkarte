@@ -54,7 +54,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 		))
 	);
 	list ($entry_count) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $entry_count;
 }
@@ -200,7 +200,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			'action_text' => isset($row['action_text']) ? $row['action_text'] : '',
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	if (!empty($boards))
 	{
@@ -255,7 +255,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['new_topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($messages))
@@ -288,7 +288,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($members))

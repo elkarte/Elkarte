@@ -101,7 +101,7 @@ class Post_Controller
 				)
 			);
 			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If this topic already has a poll, they sure can't add another.
 			if (isset($_REQUEST['poll']) && $pollID > 0)
@@ -261,7 +261,7 @@ class Post_Controller
 					)
 				);
 				$row = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				// Make sure the user is allowed to edit this event.
 				if ($row['id_member'] != $user_info['id'])
@@ -339,7 +339,7 @@ class Post_Controller
 					)
 				);
 				list ($context['new_replies']) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				if (!empty($context['new_replies']))
 				{
@@ -1839,7 +1839,7 @@ class Post_Controller
 		);
 		$context['close_window'] = $db->num_rows($request) == 0;
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
@@ -1944,7 +1944,7 @@ class Post_Controller
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Change either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))

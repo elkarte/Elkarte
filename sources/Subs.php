@@ -80,7 +80,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			// Get the latest activated member's display name.
@@ -100,7 +100,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					)
 				);
 				list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 			}
 		}
 
@@ -124,7 +124,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			updateSettings(array(
 				'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
@@ -179,7 +179,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 		}
@@ -205,7 +205,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			$postgroups = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$postgroups[$row['id_group']] = $row['min_posts'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Sort them this way because if it's done with MySQL it causes a filesort :(.
 			arsort($postgroups);
@@ -333,7 +333,7 @@ function updateMemberData($members, $data)
 				);
 				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$member_names[] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			if (!empty($member_names))
@@ -2520,7 +2520,7 @@ function parsesmileys(&$message)
 					$smileysto[] = htmlspecialchars($row['filename']);
 					$smileysdescs[] = $row['description'];
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
@@ -3363,7 +3363,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 			return false;
 
 		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// In case of files from the old system, do a legacy call.
@@ -4064,7 +4064,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 			)
 		);
 		list($current_functions) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (!empty($current_functions))
 		{
@@ -4118,7 +4118,7 @@ function remove_integration_function($hook, $function, $file = '')
 		)
 	);
 	list($current_functions) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($current_functions))
 	{

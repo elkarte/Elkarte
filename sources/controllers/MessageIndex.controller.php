@@ -198,7 +198,7 @@ class MessageIndex_Controller
 					);
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 		else
 			$context['is_marked_notify'] = false;
@@ -523,7 +523,7 @@ class MessageIndex_Controller
 
 				determineTopicClass($context['topics'][$row['id_topic']]);
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 			if ($fake_ascending)
@@ -548,7 +548,7 @@ class MessageIndex_Controller
 					$context['topics'][$row['id_topic']]['is_posted_in'] = true;
 					$context['topics'][$row['id_topic']]['class'] = 'my_' . $context['topics'][$row['id_topic']]['class'];
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 			}
 		}
 
@@ -767,7 +767,7 @@ class MessageIndex_Controller
 						unset($_REQUEST['actions'][$row['id_topic']]);
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		$stickyCache = array();
@@ -833,7 +833,7 @@ class MessageIndex_Controller
 				$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
 				$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Move sucka! (this is, by the by, probably the most complicated part....)
@@ -873,7 +873,7 @@ class MessageIndex_Controller
 				// For reporting...
 				$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$moveCache = $moveCache2;
 
@@ -929,7 +929,7 @@ class MessageIndex_Controller
 							$members[$row['id_member']] -= 1;
 					}
 
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					// And now update them member's post counts
 					foreach ($members as $id_member => $post_adj)
@@ -962,7 +962,7 @@ class MessageIndex_Controller
 				$removeCache[] = $row['id_topic'];
 				$removeCacheBoards[$row['id_topic']] = $row['id_board'];
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			// Maybe *none* were their own topics.
 			if (!empty($removeCache))
@@ -1001,7 +1001,7 @@ class MessageIndex_Controller
 				$approveCache[] = $row['id_topic'];
 				$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Any topics to approve?
 			if (!empty($approveCache))
@@ -1044,7 +1044,7 @@ class MessageIndex_Controller
 					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
 					$lockStatus[$row['id_topic']] = empty($row['locked']);
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 			}
 			else
 			{
@@ -1063,7 +1063,7 @@ class MessageIndex_Controller
 					$lockStatus[$row['id_topic']] = empty($row['locked']);
 					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 			}
 
 			// It could just be that *none* were their own topics...
@@ -1097,7 +1097,7 @@ class MessageIndex_Controller
 			$logged_topics = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$logged_topics[$row['id_topic']] = $row['disregarded'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$markArray = array();
 			foreach ($markCache as $topic)

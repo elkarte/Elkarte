@@ -84,7 +84,7 @@ function getBadBehaviorLogEntryCount($filter)
 		)
 	);
 	list ($entry_count) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $entry_count;
 }
@@ -167,7 +167,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'id' => $row['id'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $bb_entries;
 }

@@ -196,7 +196,7 @@ class Display_Controller
 						)
 					);
 					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					// Handle view_newest_first options, and get the correct start value.
 					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
@@ -229,7 +229,7 @@ class Display_Controller
 						)
 					);
 					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 				}
 
 				// We need to reverse the start as well in this case.
@@ -427,7 +427,7 @@ class Display_Controller
 					'is_last' => false
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($context['linked_calendar_events']))
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
@@ -450,7 +450,7 @@ class Display_Controller
 				)
 			);
 			$pollinfo = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
@@ -463,7 +463,7 @@ class Display_Controller
 				)
 			);
 			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Total voters needs to include guest voters
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
@@ -490,7 +490,7 @@ class Display_Controller
 				$realtotal += $row['votes'];
 				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -669,7 +669,7 @@ class Display_Controller
 				$all_posters[$row['id_msg']] = $row['id_member'];
 			$messages[] = $row['id_msg'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		$posters = array_unique($all_posters);
 
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
@@ -1001,7 +1001,7 @@ class Display_Controller
 
 			$messages[$row['id_msg']] = array($row['subject'], $row['id_member']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
@@ -1064,7 +1064,7 @@ function prepareDisplayContext($reset = false)
 	$message = $smcFunc['db_fetch_assoc']($messages_request);
 	if (!$message)
 	{
-		$smcFunc['db_free_result']($messages_request);
+		$db->free_result($messages_request);
 		return false;
 	}
 

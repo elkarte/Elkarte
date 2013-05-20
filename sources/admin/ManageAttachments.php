@@ -897,7 +897,7 @@ class ManageAttachments_Controller
 				)
 			);
 			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -933,7 +933,7 @@ class ManageAttachments_Controller
 				}
 				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'missing_thumbnail_parent';
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				// Do we need to delete what we have?
 				if ($fix_errors && !empty($to_remove) && in_array('missing_thumbnail_parent', $to_fix))
@@ -983,7 +983,7 @@ class ManageAttachments_Controller
 				}
 				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'parent_missing_thumbnail';
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				// Do we need to delete what we have?
 				if ($fix_errors && !empty($to_update) && in_array('parent_missing_thumbnail', $to_fix))
@@ -1015,7 +1015,7 @@ class ManageAttachments_Controller
 				)
 			);
 			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
 			{
@@ -1100,7 +1100,7 @@ class ManageAttachments_Controller
 					$to_fix[] = 'file_wrong_size';
 				if (in_array('wrong_folder', $errors_found))
 					$to_fix[] = 'wrong_folder';
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				// Do we need to delete what we have?
 				if ($fix_errors && !empty($to_remove))
@@ -1124,7 +1124,7 @@ class ManageAttachments_Controller
 				)
 			);
 			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -1161,7 +1161,7 @@ class ManageAttachments_Controller
 				}
 				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'avatar_no_member';
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				// Do we need to delete what we have?
 				if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
@@ -1195,7 +1195,7 @@ class ManageAttachments_Controller
 				)
 			);
 			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -1229,7 +1229,7 @@ class ManageAttachments_Controller
 				}
 				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'attachment_no_msg';
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				// Do we need to delete what we have?
 				if ($fix_errors && !empty($to_remove) && in_array('attachment_no_msg', $to_fix))
@@ -1309,7 +1309,7 @@ class ManageAttachments_Controller
 											$to_fix[] = 'files_without_attachment';
 										}
 									}
-									$smcFunc['db_free_result']($request);
+									$db->free_result($request);
 								}
 							}
 							elseif ($file != 'index.php')
@@ -1458,7 +1458,7 @@ class ManageAttachments_Controller
 						);
 
 						list ($num_attach) = $smcFunc['db_fetch_row']($request);
-						$smcFunc['db_free_result']($request);
+						$db->free_result($request);
 
 						// A check to see if it's a used base dir.
 						if (!empty($modSettings['attachment_basedirectories']))
@@ -1921,7 +1921,7 @@ class ManageAttachments_Controller
 				)
 			);
 			list ($total_progress) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
@@ -1968,7 +1968,7 @@ class ManageAttachments_Controller
 						)
 					);
 					list ($dir_files, $dir_size) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 				}
 
 				// Find some attachments to move
@@ -2048,7 +2048,7 @@ class ManageAttachments_Controller
 					else
 						$total_not_moved++;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				if (!empty($moved))
 				{

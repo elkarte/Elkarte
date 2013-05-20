@@ -106,7 +106,7 @@ function list_getLanguages()
 		elseif (isset($languages[$row['lngfile']]))
 			$languages[$row['lngfile']]['count'] += $row['num_users'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Restore the current users language.
 	$txt = $old_txt;

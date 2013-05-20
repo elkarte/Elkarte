@@ -113,7 +113,7 @@ class ModerationCenter_Controller
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_access', false);
 		list ($context['notice_body'], $context['notice_subject']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['notice_body'] = parse_bbc($context['notice_body'], false);
 	}
@@ -216,7 +216,7 @@ class ModerationCenter_Controller
 			)
 		);
 		list ($context['total_reports']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// So, that means we can page index, yes?
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);
@@ -263,7 +263,7 @@ class ModerationCenter_Controller
 				'ignore' => $row['ignore_all']
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Now get all the people who reported it.
 		if (!empty($report_ids))
@@ -292,7 +292,7 @@ class ModerationCenter_Controller
 					),
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 	}
 
@@ -602,7 +602,7 @@ class ModerationCenter_Controller
 				),
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Hang about old chap, any comments from moderators on this one?
 		$request = $db->query('', '
@@ -631,7 +631,7 @@ class ModerationCenter_Controller
 				),
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
@@ -1253,7 +1253,7 @@ function ModBlockWatchedUsers()
 		$watched_users = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$watched_users[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		cache_put_data('recent_user_watches', $watched_users, 240);
 	}
@@ -1350,7 +1350,7 @@ function ModBlockNotes()
 			)
 		);
 		list ($moderator_notes_total) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
 	}
@@ -1375,7 +1375,7 @@ function ModBlockNotes()
 		$moderator_notes = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$moderator_notes[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if ($offset == 0)
 			cache_put_data('moderator_notes', $moderator_notes, 240);
@@ -1439,7 +1439,7 @@ function ModBlockReportedPosts()
 		$reported_posts = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$reported_posts[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Cache it.
 		cache_put_data('reported_posts_' . $cachekey, $reported_posts, 90);
@@ -1514,7 +1514,7 @@ function ModBlockGroupRequests()
 			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return 'group_requests_block';
 }
@@ -1538,7 +1538,7 @@ function list_getWatchedUserCount($approve_query)
 		)
 	);
 	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalMembers;
 }
@@ -1583,7 +1583,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 		);
 		$members[] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($members))
 	{
@@ -1621,7 +1621,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 				$watched_users[$row['id_member']]['last_post_id'] = $latest_posts[$row['id_member']];
 			}
 
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		$request = $db->query('', '
@@ -1641,7 +1641,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 			$watched_users[$row['id_member']]['last_post'] = standardTime($row['last_post']);
 			$watched_users[$row['id_member']]['last_post_id'] = $row['last_post_id'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $watched_users;
@@ -1671,7 +1671,7 @@ function list_getWatchedUserPostsCount($approve_query)
 		)
 	);
 	list ($totalMemberPosts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalMemberPosts;
 }
@@ -1723,7 +1723,7 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
 			'can_delete' => $delete_boards == array(0) || in_array($row['id_board'], $delete_boards),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $member_posts;
 }

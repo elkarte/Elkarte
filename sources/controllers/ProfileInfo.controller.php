@@ -189,7 +189,7 @@ function action_summary()
 				'explanation' => $ban_explanation,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Load up the most recent attachments for this user for use in profile views etc.
@@ -373,7 +373,7 @@ function action_showPosts()
 			)
 		);
 	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$request = $db->query('', '
 		SELECT MIN(id_msg), MAX(id_msg)
@@ -388,7 +388,7 @@ function action_showPosts()
 		)
 	);
 	list ($min_msg_member, $max_msg_member) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$reverse = false;
 	$range_limit = '';
@@ -525,7 +525,7 @@ function action_showPosts()
 			$board_ids['own'][$row['id_board']][] = $counter;
 		$board_ids['any'][$row['id_board']][] = $counter;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// All posts were retrieved in reverse order, get them right again.
 	if ($reverse)
@@ -768,7 +768,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'approved' => $row['approved'],
 		);
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $attachments;
 }
@@ -808,7 +808,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
 		)
 	);
 	list ($attachCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $attachCount;
 }
@@ -975,7 +975,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 	$topics = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$topics[] = $row['id_topic'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Any topics found?
 	$topicsInfo = array();
@@ -995,7 +995,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$topicsInfo[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $topicsInfo;
@@ -1026,7 +1026,7 @@ function list_getNumDisregarded($memID)
 		)
 	);
 	list ($disregardedCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $disregardedCount;
 }
@@ -1073,7 +1073,7 @@ function action_statPanel()
 		)
 	);
 	list ($context['num_topics']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Number polls started.
 	$result = $db->query('', '
@@ -1089,7 +1089,7 @@ function action_statPanel()
 		)
 	);
 	list ($context['num_polls']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Number polls voted in.
 	$result = $db->query('distinct_poll_votes', '
@@ -1101,7 +1101,7 @@ function action_statPanel()
 		)
 	);
 	list ($context['num_votes']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Format the numbers...
 	$context['num_topics'] = comma_format($context['num_topics']);
@@ -1138,7 +1138,7 @@ function action_statPanel()
 			'total_posts_member' => $user_profile[$memID]['posts'],
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Now get the 10 boards this user has most often participated in.
 	$result = $db->query('profile_board_stats', '
@@ -1169,7 +1169,7 @@ function action_statPanel()
 			'total_posts' => $row['num_posts'],
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Posting activity by time.
 	$result = $db->query('user_activity_by_time', '
@@ -1204,7 +1204,7 @@ function action_statPanel()
 			'is_last' => $row['hour'] == 23,
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	if ($maxPosts > 0)
 		for ($hour = 0; $hour < 24; $hour++)
@@ -1300,7 +1300,7 @@ function action_showPermissions()
 				'profile_name' => $context['profiles'][$row['id_profile']]['name'],
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($context['no_access_boards']))
 		$context['no_access_boards'][count($context['no_access_boards']) - 1]['is_last'] = true;
@@ -1363,7 +1363,7 @@ function action_showPermissions()
 		// Once denied is always denied.
 		$context['member']['permissions']['general'][$row['permission']]['is_denied'] |= empty($row['add_deny']);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	$request = $db->query('', '
 		SELECT
@@ -1414,7 +1414,7 @@ function action_showPermissions()
 
 		$context['member']['permissions']['board'][$row['permission']]['is_denied'] |= empty($row['add_deny']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**

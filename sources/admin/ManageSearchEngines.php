@@ -271,7 +271,7 @@ class ManageSearchEngines_Controller
 		$context['spider_last_seen'] = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$context['spider_last_seen'][$row['id_spider']] = $row['last_seen_time'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		createToken('admin-ser');
 		$listOptions = array(
@@ -472,7 +472,7 @@ class ManageSearchEngines_Controller
 					'agent' => $row['user_agent'],
 					'ip_info' => $row['ip_info'],
 				);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		createToken('admin-ses');
@@ -653,7 +653,7 @@ class ManageSearchEngines_Controller
 		);
 
 		list ($min_date, $max_date) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$min_year = (int) substr($min_date, 0, 4);
 		$max_year = (int) substr($max_date, 0, 4);
@@ -710,7 +710,7 @@ class ManageSearchEngines_Controller
 				)
 			);
 			list ($_REQUEST['start']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		$listOptions = array(
@@ -809,7 +809,7 @@ function list_getSpiders($start, $items_per_page, $sort)
 	$spiders = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$spiders[$row['id_spider']] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $spiders;
 }
@@ -831,7 +831,7 @@ function list_getNumSpiders()
 		)
 	);
 	list ($numSpiders) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numSpiders;
 }
@@ -862,7 +862,7 @@ function list_getSpiderLogs($start, $items_per_page, $sort)
 	$spider_logs = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$spider_logs[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $spider_logs;
 }
@@ -884,7 +884,7 @@ function list_getNumSpiderLogs()
 		)
 	);
 	list ($numLogs) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numLogs;
 }
@@ -916,7 +916,7 @@ function list_getSpiderStats($start, $items_per_page, $sort)
 	$spider_stats = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$spider_stats[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $spider_stats;
 }
@@ -940,7 +940,7 @@ function list_getNumSpiderStats()
 		)
 	);
 	list ($numStats) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numStats;
 }

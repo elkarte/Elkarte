@@ -112,7 +112,7 @@ function updateChildPermissions($parents, $profile = null)
 		$child_groups[] = $row['id_group'];
 		$parents[] = $row['id_parent'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$parents = array_unique($parents);
 
@@ -136,7 +136,7 @@ function updateChildPermissions($parents, $profile = null)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$db->query('', '
 			DELETE FROM {db_prefix}permissions
@@ -178,7 +178,7 @@ function updateChildPermissions($parents, $profile = null)
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$db->query('', '
 			DELETE FROM {db_prefix}board_permissions
@@ -324,7 +324,7 @@ class InlinePermissions_Form
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$request = $db->query('', '
 			SELECT mg.id_group, mg.group_name, mg.min_posts, IFNULL(p.add_deny, -1) AS status, p.permission
@@ -355,7 +355,7 @@ class InlinePermissions_Form
 
 			$context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Some permissions cannot be given to certain groups. Remove the groups.
 		foreach ($excluded_groups as $group)

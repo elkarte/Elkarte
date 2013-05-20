@@ -278,7 +278,7 @@ function loadCustomFields($memID, $area = 'summary')
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
 }
@@ -1107,7 +1107,7 @@ function profileValidateEmail($email, $memID = 0)
 
 	if ($db->num_rows($request) > 0)
 		return 'email_taken';
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return true;
 }
@@ -1250,7 +1250,7 @@ function makeThemeChanges($memID, $id_theme)
 	$custom_fields = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$custom_fields[] = $row['col_name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// These are the theme changes...
 	$themeSetArray = array();
@@ -1361,7 +1361,7 @@ function makeNotificationChanges($memID)
 		$notification_current = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$notification_current[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// And remove what they no longer want
 		$notification_deletes = array_diff($notification_current, $notification_wanted);
@@ -1502,7 +1502,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			$user_profile[$memID]['options'][$row['col_name']] = $value;
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	call_integration_hook('integrate_save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
 
@@ -1760,7 +1760,7 @@ function profileLoadGroups()
 			'can_be_primary' => $row['hidden'] != 2,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['member']['group_id'] = $user_settings['id_group'];
 
@@ -2268,7 +2268,7 @@ function profileSaveGroups(&$value)
 		$protected_groups = array(1);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$protected_groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$protected_groups = array_unique($protected_groups);
 	}
@@ -2326,7 +2326,7 @@ function profileSaveGroups(&$value)
 				)
 			);
 			list ($another) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($another))
 				fatal_lang_error('at_least_one_admin', 'critical');
@@ -2388,7 +2388,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $previous_warnings;
 }
@@ -2416,7 +2416,7 @@ function list_getUserWarningCount($memID)
 		)
 	);
 	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $total_warnings;
 }

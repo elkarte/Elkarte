@@ -101,7 +101,7 @@ class Stats_Controller
 			)
 		);
 		$row = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
@@ -127,7 +127,7 @@ class Stats_Controller
 			)
 		);
 		list ($context['num_boards']) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		$result = $db->query('', '
 			SELECT COUNT(*)
@@ -136,7 +136,7 @@ class Stats_Controller
 			)
 		);
 		list ($context['num_categories']) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// Format the numbers nicely.
 		$context['users_online'] = comma_format($context['users_online']);
@@ -169,7 +169,7 @@ class Stats_Controller
 				if (!empty($row['gender']))
 					$context['gender'][$row['gender'] == 2 ? 'females' : 'males'] = $row['total_members'];
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			// Set these two zero if the didn't get set at all.
 			if (empty($context['gender']['males']))
@@ -205,7 +205,7 @@ class Stats_Controller
 			)
 		);
 		list ($context['online_today']) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		$context['online_today'] = comma_format((int) $context['online_today']);
 
@@ -235,7 +235,7 @@ class Stats_Controller
 			if ($max_num_posts < $row_members['posts'])
 				$max_num_posts = $row_members['posts'];
 		}
-		$smcFunc['db_free_result']($members_result);
+		$db->free_result($members_result);
 
 		foreach ($context['top_posters'] as $i => $poster)
 		{
@@ -272,7 +272,7 @@ class Stats_Controller
 			if ($max_num_posts < $row_board['num_posts'])
 				$max_num_posts = $row_board['num_posts'];
 		}
-		$smcFunc['db_free_result']($boards_result);
+		$db->free_result($boards_result);
 
 		foreach ($context['top_boards'] as $i => $board)
 		{
@@ -298,7 +298,7 @@ class Stats_Controller
 			$topic_ids = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$topic_ids[] = $row['id_topic'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 		else
 			$topic_ids = array();
@@ -344,7 +344,7 @@ class Stats_Controller
 			if ($max_num_replies < $row_topic_reply['num_replies'])
 				$max_num_replies = $row_topic_reply['num_replies'];
 		}
-		$smcFunc['db_free_result']($topic_reply_result);
+		$db->free_result($topic_reply_result);
 
 		foreach ($context['top_topics_replies'] as $i => $topic)
 		{
@@ -368,7 +368,7 @@ class Stats_Controller
 			$topic_ids = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$topic_ids[] = $row['id_topic'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 		else
 			$topic_ids = array();
@@ -414,7 +414,7 @@ class Stats_Controller
 			if ($max_num_views < $row_topic_views['num_views'])
 				$max_num_views = $row_topic_views['num_views'];
 		}
-		$smcFunc['db_free_result']($topic_view_result);
+		$db->free_result($topic_view_result);
 
 		foreach ($context['top_topics_views'] as $i => $topic)
 		{
@@ -439,7 +439,7 @@ class Stats_Controller
 			$members = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$members[$row['id_member_started']] = $row['hits'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			cache_put_data('stats_top_starters', $members, 360);
 		}
@@ -474,7 +474,7 @@ class Stats_Controller
 			if ($max_num_topics < $members[$row_members['id_member']])
 				$max_num_topics = $members[$row_members['id_member']];
 		}
-		$smcFunc['db_free_result']($members_result);
+		$db->free_result($members_result);
 
 		foreach ($context['top_starters'] as $i => $topic)
 		{
@@ -527,7 +527,7 @@ class Stats_Controller
 			if ($max_time_online < $row_members['total_time_logged_in'])
 				$max_time_online = $row_members['total_time_logged_in'];
 		}
-		$smcFunc['db_free_result']($members_result);
+		$db->free_result($members_result);
 
 		foreach ($context['top_time_online'] as $i => $member)
 			$context['top_time_online'][$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
@@ -668,5 +668,5 @@ function getDailyStats($condition_string, $condition_parameters = array())
 			'most_members_online' => comma_format($row_days['most_on']),
 			'hits' => comma_format($row_days['hits'])
 		);
-	$smcFunc['db_free_result']($days_result);
+	$db->free_result($days_result);
 }

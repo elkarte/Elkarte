@@ -446,7 +446,7 @@ class Register_Controller
 			if (trim($value) == '' && $row['show_reg'] > 1)
 				$custom_field_errors[] = array('custom_field_empty', array($row['field_name']));
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Process any errors.
 		if (!empty($custom_field_errors))
@@ -583,7 +583,7 @@ class Register_Controller
 		}
 
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && sha1(strtolower($row['member_name']) . $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
@@ -611,7 +611,7 @@ class Register_Controller
 			// @todo Separate the sprintf?
 			if ($db->num_rows($request) != 0)
 				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];

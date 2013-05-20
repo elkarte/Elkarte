@@ -114,7 +114,7 @@ function AutoTask()
 				}
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get the next timestamp right.
 		$request = $db->query('', '
@@ -132,7 +132,7 @@ function AutoTask()
 			$nextEvent = time() + 86400;
 		else
 			list ($nextEvent) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		updateSettings(array('next_task_time' => $nextEvent));
 	}
@@ -194,7 +194,7 @@ function scheduled_approval_notification()
 		// Store the profile for a bit later.
 		$profiles[$row['id_board']] = $row['id_profile'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Delete it all!
 	$db->query('', '
@@ -234,7 +234,7 @@ function scheduled_approval_notification()
 		if ($row['add_deny'])
 			$addGroups[] = $row['id_group'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Grab the moderators if they have permission!
 	$mods = array();
@@ -253,7 +253,7 @@ function scheduled_approval_notification()
 			// Make sure they get included in the big loop.
 			$members[] = $row['id_member'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Come along one and all... until we reject you ;)
@@ -289,7 +289,7 @@ function scheduled_approval_notification()
 			'name' => $row['real_name'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get the mailing stuff.
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -404,7 +404,7 @@ function scheduled_daily_maintenance()
 		$members = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$members[$row['id_member']] = $row['warning'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Have some members to check?
 		if (!empty($members))
@@ -431,7 +431,7 @@ function scheduled_daily_maintenance()
 						'warning' => $members[$row['id_recipient']] >= $modSettings['warning_decrement'] ? $members[$row['id_recipient']] - $modSettings['warning_decrement'] : 0,
 					);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Have some members to change?
 			if (!empty($member_changes))
@@ -525,7 +525,7 @@ function scheduled_auto_optimize()
 			)
 		);
 		list ($dont_do_it) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if ($dont_do_it > $modSettings['autoOptMaxOnline'])
 			$delay = true;
@@ -606,7 +606,7 @@ function scheduled_daily_digest()
 		else
 			$notify['boards'][$row['id_board']][] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($boards))
 		return true;
@@ -711,7 +711,7 @@ function scheduled_daily_digest()
 		if (!empty($notify['boards'][$row['id_board']]))
 			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['boards'][$row['id_board']]);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($types))
 		return true;
@@ -1054,7 +1054,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			'message_id' => $row['message_id'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Delete, delete, delete!!!
 	if (!empty($ids))
@@ -1266,7 +1266,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		if ($next_time < $nextTaskTime)
 			$nextTaskTime = $next_time;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Now make the changes!
 	foreach ($tasks as $id => $time)
@@ -1383,7 +1383,7 @@ function scheduled_fetchFiles()
 			'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
 	require_once(SUBSDIR . '/Package.subs.php');
@@ -1474,7 +1474,7 @@ function scheduled_birthdayemails()
 			'email' => $row['email_address']
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Send out the greetings!
 	foreach ($birthdays as $lang => $recps)
@@ -1635,7 +1635,7 @@ function scheduled_weekly_maintenance()
 			while ($row = $smcFunc['db_fetch_row']($result))
 				$reports[] = $row[0];
 
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			if (!empty($reports))
 			{
@@ -1741,7 +1741,7 @@ function scheduled_paid_subscriptions()
 		require_once(ADMINDIR . '/ManagePaid.php');
 		removeSubscription($row['id_subscribe'], $row['id_member']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get all those about to expire that have not had a reminder sent.
 	$request = $db->query('', '
@@ -1785,7 +1785,7 @@ function scheduled_paid_subscriptions()
 		// Send the actual email.
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Mark the reminder as sent.
 	if (!empty($subs_reminded))
@@ -1862,7 +1862,7 @@ function scheduled_remove_topic_redirect()
 
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$topics[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Zap, you're gone
 	if (count($topics) > 0)
@@ -1904,7 +1904,7 @@ function scheduled_remove_old_drafts()
 
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$drafts[] = (int) $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If we have old one, remove them
 	if (count($drafts) > 0)
@@ -1951,7 +1951,7 @@ function scheduled_remove_old_followups()
 	$remove = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$remove[] = $row['derived_from'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($remove))
 		return true;

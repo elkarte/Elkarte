@@ -258,7 +258,7 @@ class Groups_Controller
 			if ($user_info['id'] == $row['id_member'] && $context['group']['group_type'] != 1)
 				$context['group']['can_moderate'] = true;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// If this group is hidden then it can only "exists" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
@@ -340,7 +340,7 @@ class Groups_Controller
 				);
 				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$members[] = $row['id_member'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// @todo Add $_POST['additional'] to templates!
@@ -393,7 +393,7 @@ class Groups_Controller
 			)
 		);
 		list ($context['total_members']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
@@ -434,7 +434,7 @@ class Groups_Controller
 				'is_activated' => $row['is_activated'] % 10 == 1,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Select the template.
 		$context['sub_template'] = 'group_members';
@@ -555,7 +555,7 @@ class Groups_Controller
 							'language' => $row['lngfile'],
 						);
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				// Remove the evidence...
 				$db->query('', '
@@ -777,7 +777,7 @@ function list_getGroupRequestCount($where, $where_parameters)
 		))
 	);
 	list ($totalRequests) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalRequests;
 }
@@ -828,7 +828,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $group_requests;
 }

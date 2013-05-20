@@ -903,7 +903,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 		$mails[] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $mails;
 }
@@ -926,7 +926,7 @@ function list_getMailQueueSize()
 		)
 	);
 	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $mailQueueSize;
 }
@@ -970,7 +970,7 @@ function list_MailQueueStatus()
 		)
 	);
 	list ($items['mailQueueSize'], $items['mailOldest']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $items;
 }

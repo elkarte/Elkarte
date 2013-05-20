@@ -173,7 +173,7 @@ function action_plushsearch1()
 			fatal_lang_error('topic_gone', false);
 
 		list ($context['search_topic']['subject']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['search_topic']['link'] = '<a href="' . $context['search_topic']['href'] . '">' . $context['search_topic']['subject'] . '</a>';
 	}
@@ -372,7 +372,7 @@ function action_plushsearch2()
 		list ($minMsgID, $maxMsgID) = $smcFunc['db_fetch_row']($request);
 		if ($minMsgID < 0 || $maxMsgID < 0)
 			$context['search_errors']['no_messages_in_time_frame'] = true;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Default the user name to a wildcard matching every user (*).
@@ -445,7 +445,7 @@ function action_plushsearch2()
 				)
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Ensure that boards are an array of integers (or nothing).
@@ -482,7 +482,7 @@ function action_plushsearch2()
 
 		$search_params['brd'] = array();
 		list ($search_params['brd'][0]) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	// Select all boards you've selected AND are allowed to see.
 	elseif ($user_info['is_admin'] && (!empty($search_params['advanced']) || !empty($query_boards)))
@@ -512,7 +512,7 @@ function action_plushsearch2()
 			)
 		);
 		list ($num_boards) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (count($search_params['brd']) == $num_boards)
 			$boardQuery = '';
@@ -1086,7 +1086,7 @@ function action_plushsearch2()
 							foreach ($row as $key => $value)
 								$inserts[$row[1]][] = (int) $row[$key];
 						}
-						$smcFunc['db_free_result']($ignoreRequest);
+						$db->free_result($ignoreRequest);
 						$numSubjectResults = count($inserts);
 					}
 					else
@@ -1314,7 +1314,7 @@ function action_plushsearch2()
 
 								$inserts[$row[$ind]] = $row;
 							}
-							$smcFunc['db_free_result']($ignoreRequest);
+							$db->free_result($ignoreRequest);
 							$numSubjectResults = count($inserts);
 						}
 						else
@@ -1415,7 +1415,7 @@ function action_plushsearch2()
 
 									$inserts[$row[0]] = $row;
 								}
-								$smcFunc['db_free_result']($ignoreRequest);
+								$db->free_result($ignoreRequest);
 								$indexedResults = count($inserts);
 							}
 							else
@@ -1548,7 +1548,7 @@ function action_plushsearch2()
 							foreach ($row as $key => $value)
 								$inserts[$row[2]][] = (int) $row[$key];
 						}
-						$smcFunc['db_free_result']($ignoreRequest);
+						$db->free_result($ignoreRequest);
 
 						// Now put them in!
 						if (!empty($inserts))
@@ -1619,7 +1619,7 @@ function action_plushsearch2()
 							$usedIDs[$row[1]] = true;
 							$inserts[] = $row;
 						}
-						$smcFunc['db_free_result']($ignoreRequest);
+						$db->free_result($ignoreRequest);
 
 						// Now put them in!
 						if (!empty($inserts))
@@ -1664,7 +1664,7 @@ function action_plushsearch2()
 			// By default they didn't participate in the topic!
 			$participants[$row['id_topic']] = false;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$num_results = $_SESSION['search_cache']['num_results'];
 	}
@@ -1704,7 +1704,7 @@ function action_plushsearch2()
 		$posters = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$posters[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		call_integration_hook('integrate_search_message_list', array(&$msg_list, &$posters));
 
@@ -1763,7 +1763,7 @@ function action_plushsearch2()
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($result))
 				$participants[$row['id_topic']] = true;
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 		}
 	}
 
@@ -1994,7 +1994,7 @@ function MessageSearch2()
 			$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
 			$searchq_parameters['member_list'] = $memberlist;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Setup the sorting variables...
@@ -2197,7 +2197,7 @@ function MessageSearch2()
 		))
 	);
 	list ($numResults) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get all the matching messages... using standard search only (No caching and the like!)
 	$request = $db->query('', '
@@ -2227,7 +2227,7 @@ function MessageSearch2()
 		$posters[] = $row['id_member_from'];
 		$head_pms[$row['id_pm']] = $row['id_pm_head'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Find the real head pms!
 	if ($context['display_mode'] == 2 && !empty($head_pms))
@@ -2251,7 +2251,7 @@ function MessageSearch2()
 		$real_pm_ids = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$real_pm_ids[$row['id_pm_head']] = $row['id_pm'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Load the users...
@@ -2368,7 +2368,7 @@ function MessageSearch2()
 				'counter' => ++$counter,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Finish off the context.

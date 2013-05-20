@@ -1487,7 +1487,7 @@ function findForumErrors($do_fix = false)
 			list ($step_max) = $smcFunc['db_fetch_row']($request);
 
 			$total_queries++;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// We in theory keep doing this... the substeps.
@@ -1608,7 +1608,7 @@ function findForumErrors($do_fix = false)
 			}
 
 			// Free the result.
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			// Keep memory down.
 			$db_cache = '';
 
@@ -1688,7 +1688,7 @@ function createSalvageArea()
 	);
 	if ($db->num_rows($result) != 0)
 		list ($salvageCatID) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	if (empty($salvageCatID))
 	{
@@ -1722,7 +1722,7 @@ function createSalvageArea()
 	);
 	if ($db->num_rows($result) != 0)
 		list ($salvageBoardID) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	if (empty($salvageBoardID))
 	{

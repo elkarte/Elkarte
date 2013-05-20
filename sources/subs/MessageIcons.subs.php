@@ -56,7 +56,7 @@ function getMessageIcons()
 		);
 		$last_icon = $row['id_icon'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $icons;
 }
@@ -163,7 +163,7 @@ function list_getMessageIcons($start, $items_per_page, $sort)
 	$message_icons = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$message_icons[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $message_icons;
 }

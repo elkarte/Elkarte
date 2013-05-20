@@ -97,7 +97,7 @@ class Members_Controller
 
 			echo $row['real_name'], "\n";
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		obExit(false);
 	}

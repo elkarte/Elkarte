@@ -91,7 +91,7 @@ class MergeTopics_Controller
 			)
 		);
 		list ($topiccount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Make the page list.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=mergetopics;from=' . $_GET['from'] . ';targetboard=' . $_REQUEST['targetboard'] . ';board=' . $board . '.%1$d', $_REQUEST['start'], $topiccount, $modSettings['defaultMaxTopics'], true);
@@ -169,7 +169,7 @@ class MergeTopics_Controller
 				'js_subject' => addcslashes(addslashes($row['subject']), '/')
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
 			fatal_lang_error('merge_need_more_topics');
@@ -302,7 +302,7 @@ class MergeTopics_Controller
 
 			$is_sticky = max($is_sticky, $row['is_sticky']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if (empty($topic_data))
@@ -361,7 +361,7 @@ class MergeTopics_Controller
 						'question' => $row['question'],
 						'selected' => $row['id_topic'] == $firstTopic
 					);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			if (count($boards) > 1)
 			{
@@ -456,7 +456,7 @@ class MergeTopics_Controller
 				$num_unapproved = $row['message_count'];
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Ensure we have a board stat for the target board.
 		if (!isset($boardTotals[$target_board]))
@@ -496,7 +496,7 @@ class MergeTopics_Controller
 		if ($member_updated === NULL)
 			$member_updated = $member_started;
 
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Obtain all the message ids we are going to affect.
 		$affected_msgs = array();
@@ -509,7 +509,7 @@ class MergeTopics_Controller
 		));
 		while ($row = $smcFunc['db_fetch_row']($request))
 			$affected_msgs[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($topics);
@@ -662,7 +662,7 @@ class MergeTopics_Controller
 				)
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Merge topic notifications.
 		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
@@ -699,7 +699,7 @@ class MergeTopics_Controller
 					)
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Get rid of the redundant polls.

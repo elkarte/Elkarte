@@ -215,7 +215,7 @@ class Themes_Controller
 			$themes = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$themes[$row['id_theme']][$row['variable']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$setValues = array();
 			foreach ($themes as $id => $theme)
@@ -274,7 +274,7 @@ class Themes_Controller
 				);
 			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		foreach ($context['themes'] as $i => $theme)
 		{
@@ -340,7 +340,7 @@ class Themes_Controller
 					);
 				$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$request = $db->query('', '
 				SELECT id_theme, COUNT(*) AS value
@@ -353,7 +353,7 @@ class Themes_Controller
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Need to make sure we don't do custom fields.
 			$request = $db->query('', '
@@ -365,7 +365,7 @@ class Themes_Controller
 			$customFields = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$customFields[] = $row['col_name'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 			$request = $db->query('themes_count', '
@@ -381,7 +381,7 @@ class Themes_Controller
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// There has to be a Settings template!
 			foreach ($context['themes'] as $k => $v)
@@ -585,7 +585,7 @@ class Themes_Controller
 				$customFields = array();
 				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$customFields[] = $row['col_name'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
@@ -638,7 +638,7 @@ class Themes_Controller
 			$context['theme_options'] = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$context['theme_options'][$row['variable']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -1133,7 +1133,7 @@ class Themes_Controller
 					);
 				$context['available_themes'][$row['id_theme']][$row['variable']] = $row['value'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
@@ -1168,7 +1168,7 @@ class Themes_Controller
 			else
 				$context['available_themes'][$guest_theme]['num_users'] += $row['the_count'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get any member variant preferences.
 		$variant_preferences = array();
@@ -1187,7 +1187,7 @@ class Themes_Controller
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$variant_preferences[$row['id_theme']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Save the setting first.
@@ -1309,7 +1309,7 @@ class Themes_Controller
 				)
 			);
 			list ($theme_name) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
@@ -1386,7 +1386,7 @@ class Themes_Controller
 				else
 					continue;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Lets add a theme_info.xml to this theme.
 			$xml_info = '<' . '?xml version="1.0"?' . '>
@@ -1535,7 +1535,7 @@ class Themes_Controller
 						)
 					);
 					$temp = $smcFunc['db_fetch_assoc']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					// @todo An error otherwise?
 					if (is_array($temp))
@@ -1558,7 +1558,7 @@ class Themes_Controller
 				)
 			);
 			list ($id_theme) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			// This will be theme number...
 			$id_theme++;
@@ -2115,7 +2115,7 @@ class Themes_Controller
 			)
 		);
 		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (isset($_REQUEST['template']) && preg_match('~[\./\\\\:\0]~', $_REQUEST['template']) == 0)
 		{

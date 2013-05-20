@@ -400,7 +400,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Return all the results.
 	return $results;
@@ -589,7 +589,7 @@ function rebuildModCache()
 		$groups = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($groups))
 			$group_query = '0=1';
@@ -624,7 +624,7 @@ function rebuildModCache()
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$boards_mod[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
@@ -776,7 +776,7 @@ function findUser($where, $whereparams)
 	// Maybe email?
 	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']))
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$request = $db->query('', '
 			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
@@ -791,7 +791,7 @@ function findUser($where, $whereparams)
 	}
 
 	$member = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $member;
 }
@@ -814,7 +814,7 @@ function generateValidationCode()
 	);
 
 	list ($dbRand) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
 }
@@ -847,7 +847,7 @@ function loadExistingMember($name)
 	// Didn't work. Try it as an email address.
 	if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
@@ -866,7 +866,7 @@ function loadExistingMember($name)
 		return false;
 
 	$user_settings = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $user_settings;
 }

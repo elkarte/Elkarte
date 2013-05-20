@@ -371,7 +371,7 @@ class News_Controller
 					'link' => $scripturl . '?action=profile;u=' . $row['id_member']
 				);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}
@@ -431,7 +431,7 @@ class News_Controller
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
 			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 				if (empty($_REQUEST['boards']) && empty($board))
 					unset($context['optimize_msg']['lowest']);
 				else
@@ -520,7 +520,7 @@ class News_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}
@@ -566,7 +566,7 @@ class News_Controller
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
 			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 				if (empty($_REQUEST['boards']) && empty($board))
 					unset($context['optimize_msg']['lowest']);
 				else
@@ -579,7 +579,7 @@ class News_Controller
 		$messages = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$messages[] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($messages))
 			return array();
@@ -695,7 +695,7 @@ class News_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}

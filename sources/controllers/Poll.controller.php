@@ -64,7 +64,7 @@ class Poll_Controller
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('poll_error', false);
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// If this is a guest can they vote?
 		if ($user_info['is_guest'])
@@ -126,7 +126,7 @@ class Poll_Controller
 			);
 			while ($choice = $smcFunc['db_fetch_row']($request))
 				$pollOptions[] = $choice[0];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Just skip it if they had voted for nothing before.
 			if (!empty($pollOptions))
@@ -405,7 +405,7 @@ class Poll_Controller
 						'is_last' => false
 					);
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Work out how many options we have, so we get the 'is_last' field right...
@@ -518,7 +518,7 @@ class Poll_Controller
 						'is_last' => false
 					);
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				$last_id = max(array_keys($context['choices'])) + 1;
 
@@ -630,7 +630,7 @@ class Poll_Controller
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board');
 		$bcinfo = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
@@ -774,7 +774,7 @@ class Poll_Controller
 		$choices = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$choices[] = $row['id_choice'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$delete_options = array();
 		foreach ($_POST['options'] as $k => $option)
@@ -892,7 +892,7 @@ class Poll_Controller
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
 			list ($topicStarter, $pollStarter) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			isAllowedTo('poll_remove_' . ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $user_info['id'] == $pollStarter) ? 'own' : 'any'));
 		}

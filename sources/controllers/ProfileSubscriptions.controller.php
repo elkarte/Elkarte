@@ -115,7 +115,7 @@ function action_subscriptions()
 		if ($row['status'] == 1)
 			$context['subscriptions'][$row['id_subscribe']]['subscribed'] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Simple "done"?
 	if (isset($_GET['done']))

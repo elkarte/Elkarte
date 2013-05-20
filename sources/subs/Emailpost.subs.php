@@ -401,7 +401,7 @@ function pbe_parse_email_message(&$body)
 		else
 			$expressions[] = array('type' => 'string', 'parser' => $row['filter_from']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	$match = false;
@@ -468,7 +468,7 @@ function pbe_filter_email_message($text)
 		else
 			$text = str_replace($row['filter_from'], $row['filter_to'], $text);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $text;
 }
@@ -1036,7 +1036,7 @@ function query_load_user_info($email)
 		)
 	);
 	list($id_member) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// No user found ... back we go
 	if (empty($id_member))
@@ -1122,7 +1122,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 		else
 			$pbe['user_info']['permissions'][] = $row['permission'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Remove all the permissions they shouldn't have ;)
 	if (!empty($modSettings['permission_enable_deny']))
@@ -1162,7 +1162,7 @@ function query_sender_wrapper($from)
 	if (!empty($result['signature']))
 		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -1193,7 +1193,7 @@ function query_user_keys($email)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$keys[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $keys;
 }
@@ -1223,7 +1223,7 @@ function query_key_owner($key)
 		)
 	);
 	list($email_to) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $email_to;
 }
@@ -1290,7 +1290,7 @@ function query_load_subject($message_id, $message_type, $email)
 		if ($db->num_rows($request) !== 0)
 		{
 			list($id_member) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Now find this PM ID and make sure it was sent to this member
 			$request = $db->query('', '
@@ -1313,7 +1313,7 @@ function query_load_subject($message_id, $message_type, $email)
 		list($subject) = $smcFunc['db_fetch_row']($request);
 		$subject = pbe_clean_email_subject($subject);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $subject;
 }
@@ -1389,7 +1389,7 @@ function query_load_message($message_type, $message_id, $pbe)
 	// Found the information, load the topic_info array with the data for this topic and board
 	if ($db->num_rows($request) !== 0)
 		$topic_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Return the results or false
 	return !empty($topic_info) ? $topic_info : false;
@@ -1416,7 +1416,7 @@ function query_load_board($message_id)
 	);
 
 	list($board_id) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $board_id === '' ? 0 : $board_id;
 }
@@ -1445,7 +1445,7 @@ function query_load_board_details($board_id, $pbe)
 		)
 	);
 	$board_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $board_info;
 }
@@ -1496,7 +1496,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 	while ($row = $smcFunc['db_fetch_assoc']($result))
 		$theme_settings[$row['variable']] = $row['value'];
 
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $theme_settings;
 }
@@ -1530,7 +1530,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 	);
 	if ($smcFunc['db_fetch_row']($request))
 		$board_notify = true;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If they have topic notification on and not board notification then
 	// add this post to the notification log
@@ -1602,7 +1602,7 @@ function query_mark_pms($email_message, $pbe)
 		$total_unread = 0;
 		while ($row = $smcFunc['db_fetch_assoc']($result))
 			$total_unread += $row['num'];
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// Update things for when they come to the site
 		updateMemberData($pbe['profile']['id_member'], array('unread_messages' => $total_unread));

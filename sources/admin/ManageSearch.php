@@ -440,7 +440,7 @@ class ManageSearch_Controller
 				$context['table_info']['data_length'] = $row['Data_length'];
 				$context['table_info']['index_length'] = $row['Index_length'];
 				$context['table_info']['fulltext_length'] = $row['Index_length'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Now check the custom index table, if it exists at all.
@@ -468,7 +468,7 @@ class ManageSearch_Controller
 				$row = $smcFunc['db_fetch_assoc']($request);
 				$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
 				$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 		}
 		elseif ($db_type == 'postgresql')
@@ -508,7 +508,7 @@ class ManageSearch_Controller
 						$context['table_info']['custom_index_length'] = (int) $row['KB'];
 					}
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			else
 				// Didn't work for some reason...
@@ -709,7 +709,7 @@ class ManageSearch_Controller
 					}
 					$num_messages['done'] += $number_processed;
 					$num_messages['todo'] -= $number_processed;
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
 
@@ -763,7 +763,7 @@ class ManageSearch_Controller
 					);
 					while ($row = $smcFunc['db_fetch_assoc']($request))
 						$stop_words[] = $row['id_word'];
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
@@ -979,7 +979,7 @@ function detectFulltextIndex()
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 				$context['fulltext_index'][] = $row['Key_name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (is_array($context['fulltext_index']))
 			$context['fulltext_index'] = array_unique($context['fulltext_index']);
@@ -1009,7 +1009,7 @@ function detectFulltextIndex()
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 }
 

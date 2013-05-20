@@ -94,7 +94,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 
 		$i++;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $postemail;
 }
@@ -136,7 +136,7 @@ function list_maillist_count_unapproved()
 		)
 	);
 	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $total;
 }
@@ -215,7 +215,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		);
 		$i++;
 	};
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $email_filters;
 }
@@ -250,7 +250,7 @@ function list_count_filter_parser($id, $style)
 		)
 	);
 	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $total;
 }
@@ -284,7 +284,7 @@ function maillist_load_filter_parser($id, $style)
 		)
 	);
 	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Check that the filter does exist
 	if (empty($row))
@@ -342,7 +342,7 @@ function maillist_board_list()
 	$result[0] = '';
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$result[$row[0]] = $row[1];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -402,7 +402,7 @@ function maillist_templates()
 			'subject' => $txt['ml_bounce_template_subject_default'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_templates;
 }

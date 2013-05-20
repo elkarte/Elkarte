@@ -98,7 +98,7 @@ function deleteMembers($users, $check_not_admin = false)
 			$admins[] = $row['id_member'];
 		$user_log_details[$row['id_member']] = array($row['id_member'], $row['member_name']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($user_log_details))
 		return;
@@ -404,7 +404,7 @@ function deleteMembers($users, $check_not_admin = false)
 				'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users)),
 			)
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Make sure no member's birthday is still sticking in the calendar...
 	updateSettings(array(
@@ -547,7 +547,7 @@ function registerMember(&$regOptions, $return_errors = false)
 	// @todo Separate the sprintf?
 	if ($db->num_rows($request) != 0)
 		$reg_errors[] = array('lang', 'email_in_use', false, array(htmlspecialchars($regOptions['email'])));
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If we found any errors we need to do something about it right away!
 	foreach ($reg_errors as $key => $error)
@@ -670,7 +670,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$unassignableGroups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (in_array($regOptions['register_vars']['id_group'], $unassignableGroups))
 			$regOptions['register_vars']['id_group'] = 0;
@@ -933,7 +933,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	);
 	if ($db->num_rows($request) > 0)
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		return true;
 	}
 
@@ -949,7 +949,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	);
 	if ($db->num_rows($request) > 0)
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		return true;
 	}
 
@@ -994,7 +994,7 @@ function groupsAllowedTo($permission, $board_id = null)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Otherwise it's time to look at the board.
@@ -1027,7 +1027,7 @@ function groupsAllowedTo($permission, $board_id = null)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Denied is never allowed.
@@ -1078,7 +1078,7 @@ function membersAllowedTo($permission, $board_id = null)
 	$members = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$members[] = $row['id_member'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $members;
 }
@@ -1132,7 +1132,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 			)
 		);
 		list ($messageCount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
 	}
@@ -1206,7 +1206,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 	$members = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$members[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If we want duplicates pass the members array off.
 	if ($get_duplicates)
@@ -1242,7 +1242,7 @@ function list_getNumMembers($where, $where_params = array())
 			))
 		);
 		list ($num_members) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $num_members;
@@ -1309,7 +1309,7 @@ function populateDuplicateMembers(&$members)
 		if ($row['member_ip'] != $row['member_ip2'] && in_array($row['member_ip2'], $ips))
 			$duplicate_members[$row['member_ip2']][] = $member_context;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Also try to get a list of messages using these ips.
 	$request = $db->query('', '
@@ -1343,7 +1343,7 @@ function populateDuplicateMembers(&$members)
 			'ip2' => $row['poster_ip'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Now we have all the duplicate members, stick them with their respective member in the list.
 	if (!empty($duplicate_members))
@@ -1392,7 +1392,7 @@ function isAnotherAdmin($memberID)
 		)
 	);
 	list ($another) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $another;
 }
@@ -1426,7 +1426,7 @@ function admins($id_admin = 0)
 	$admins = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$admins[$row['id_member']] = array($row['real_name'], $row['lngfile']);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $admins;
 }
@@ -1448,7 +1448,7 @@ function maxMemberID()
 		)
 	);
 	list ($max_id) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $max_id;
 }
@@ -1521,7 +1521,7 @@ function getBasicMemberData($member_ids, $options = array())
 		else
 			$members[$row['id_member']] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $members;
 }
@@ -1550,7 +1550,7 @@ function countInactiveMembers()
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$inactive_members[$row['is_activated']] = $row['total_members'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $inactive_members;
 }
@@ -1581,7 +1581,7 @@ function getMemberByName($name)
 		fatal_lang_error('error_member_not_found');
 
 	list ($member['id_member'], $member['id_group']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $member;
 }
@@ -1622,7 +1622,7 @@ function getMember($search, $buddies = array())
 			'value' => $row['real_name'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $xml_data;
 }
@@ -1704,7 +1704,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 			'code' => $row['validation_code']
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $data;
 }
@@ -1792,7 +1792,7 @@ function countMembersInGroup($id_group = 0)
 		)
 	);
 	list ($num_members) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $num_members;
 }

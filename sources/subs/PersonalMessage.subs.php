@@ -43,7 +43,7 @@ function loadMessageLimit()
 			)
 		);
 		list ($maxMessage, $minMessage) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
 
@@ -80,7 +80,7 @@ function loadPMLabels()
 				$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
 		}
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Store it please!
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
@@ -126,7 +126,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 	}
 
 	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $count;
 }
@@ -211,7 +211,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 					$user_info['unread_messages'] -= $row['num_deleted_messages'];
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Do the actual deletion.
 		$db->query('', '
@@ -246,7 +246,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	$remove_pms = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$remove_pms[] = $row['sender'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($remove_pms))
 	{
@@ -334,7 +334,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 			foreach ($this_labels as $this_label)
 				$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// Need to store all this.
 		cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
@@ -376,12 +376,12 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 
 	if ($db->num_rows($request) === 0)
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		return false;
 	}
 
 	$validationResult = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	switch ($validFor)
 	{
@@ -488,7 +488,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			if (isset($usernames[$smcFunc['strtolower']($row['member_name'])]))
 				$usernames[$smcFunc['strtolower']($row['member_name'])] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.
 		foreach ($recipients as $rec_type => $rec)
@@ -553,7 +553,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		if ($delete)
 			$deletes[$row['id_member']] = 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Load the membergrounp message limits.
 	static $message_limit_cache = array();
@@ -567,7 +567,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$message_limit_cache[$row['id_group']] = $row['max_messages'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Load the groups that are allowed to read PMs.
@@ -591,7 +591,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			$allowed_groups[] = $row['id_group'];
 	}
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($modSettings['permission_enable_deny']))
 		$disallowed_groups = array();
@@ -679,7 +679,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Only 'send' the message if there are any recipients left.
 	if (empty($all_to))
@@ -906,7 +906,7 @@ function loadPMs($pm_options, $id_member)
 			while ($row = $smcFunc['db_fetch_assoc']($sub_request))
 				$sub_pms[$row['id_pm_head']] = $row['sort_param'];
 
-			$smcFunc['db_free_result']($sub_request);
+			$db->free_result($sub_request);
 
 			$request = $db->query('', '
 				SELECT pm.id_pm AS id_pm, pm.id_pm_head
@@ -1009,7 +1009,7 @@ function loadPMs($pm_options, $id_member)
 				'head' => $row['id_pm_head'],
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return array($pms, $posters, $recipients, $lastData);
 }
@@ -1038,7 +1038,7 @@ function pmCount($id_member, $time)
 		)
 	);
 	list ($pmCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $pmCount;
 }

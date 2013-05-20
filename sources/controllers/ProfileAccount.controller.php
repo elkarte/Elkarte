@@ -80,7 +80,7 @@ function action_issuewarning()
 			)
 		);
 		list ($current_applied) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 		$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
@@ -362,7 +362,7 @@ function action_issuewarning()
 			'body' => $row['body'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Setup the "default" templates.
 	foreach (array('spamming', 'offence', 'insulting') as $type)
@@ -486,7 +486,7 @@ function action_deleteaccount2()
 
 				removeMessage($row['id_msg']);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Only delete this poor member's account if they are actually being booted out of camp.

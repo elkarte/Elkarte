@@ -154,7 +154,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		}
 	}
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $return_value;
 }

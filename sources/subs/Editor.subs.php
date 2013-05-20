@@ -121,7 +121,7 @@ function getMessageIcons($board_id)
 			$icon_data = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$icon_data[] = $row;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$icons = array();
 			foreach ($icon_data as $icon)
@@ -614,7 +614,7 @@ function create_control_richedit($editorOptions)
 
 					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{
@@ -1245,7 +1245,7 @@ class Control_Verification_Questions implements Control_Verifications
 			$modSettings['question_id_cache'] = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($modSettings['cache_enable']))
 				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
@@ -1288,7 +1288,7 @@ class Control_Verification_Questions implements Control_Verifications
 				'language' => $row['language'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $question_answers;
 	}
@@ -1521,7 +1521,7 @@ function html_to_bbc($text)
 				$mappings = array();
 				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$mappings[$row['filename']] = htmlspecialchars($row['code']);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($matches[1] as $k => $file)
 					if (isset($mappings[$file]))

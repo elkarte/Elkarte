@@ -134,7 +134,7 @@ function action_who()
 		)
 	);
 	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Prepare some page index variables.
 	$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
@@ -185,7 +185,7 @@ function action_who()
 		$url_data[$row['session']] = array($row['url'], $row['id_member']);
 		$member_ids[] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Load the user data for these members.
 	loadMemberData($member_ids);
@@ -403,7 +403,7 @@ function determineActions($urls, $preferred_prefix = false)
 				);
 				list ($id_topic, $subject) = $smcFunc['db_fetch_row']($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
@@ -467,7 +467,7 @@ function determineActions($urls, $preferred_prefix = false)
 			foreach ($topic_ids[$row['id_topic']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_topic'], censorText($row['subject']));
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 	}
 
 	// Load board names.

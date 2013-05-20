@@ -229,7 +229,7 @@ class RemoveTopic_Controller
 				if ($row['id_member'])
 					$actioned_messages[$row['id_previous_topic']]['members'][] = $row['id_member'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Check for topics we are going to fully restore.
 			foreach ($actioned_messages as $topic => $data)
@@ -254,7 +254,7 @@ class RemoveTopic_Controller
 						'board' => $row['id_board'],
 						'subject' => $row['subject'],
 					);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Restore each topic.
@@ -362,13 +362,13 @@ class RemoveTopic_Controller
 
 					while ($member = $smcFunc['db_fetch_assoc']($request2))
 						updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
-					$smcFunc['db_free_result']($request2);
+					$db->free_result($request2);
 				}
 
 				// Log it.
 				logAction('restore_topic', array('topic' => $row['id_topic'], 'board' => $row['id_board'], 'board_to' => $row['id_previous_board']));
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Didn't find some things?
@@ -414,7 +414,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		)
 	);
 	list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get some target topic and board stats.
 	$request = $db->query('', '
@@ -427,7 +427,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		)
 	);
 	list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Lets see if the board that we are returning to has post count enabled.
 	if (empty($count_posts))
@@ -491,7 +491,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		else
 			$target_topic_data['num_replies'] = max(0, $row['message_count'] - 1);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// We have a new post count for the board.
 	$db->query('', '
@@ -525,7 +525,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Recycled topic.
 	if ($topic_exists == true)
@@ -557,7 +557,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			else
 				$source_topic_data['num_replies'] = max(0, $row['message_count'] - 1);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Update the topic details for the source topic.
 		$db->query('', '
@@ -636,7 +636,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			updateStats('subject', $row['id_topic'], $row['subject']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	updateLastMessages(array($from_board, $target_board));

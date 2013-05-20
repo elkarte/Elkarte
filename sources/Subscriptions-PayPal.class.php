@@ -387,7 +387,7 @@ class paypal_payment
 			// Can we identify them by email?
 			if (!empty($_POST['payer_email']))
 			{
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 				$request = $db->query('', '
 					SELECT ls.id_member, ls.id_subscribe
 					FROM {db_prefix}log_subscribed AS ls
@@ -406,6 +406,6 @@ class paypal_payment
 		}
 		list ($member_id, $subscription_id) = $smcFunc['db_fetch_row']($request);
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 }

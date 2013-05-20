@@ -191,7 +191,7 @@ class Email_Parse
 			)
 		);
 		list($message) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $message;
 	}

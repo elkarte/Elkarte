@@ -149,7 +149,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 				'color' => $row['online_color']
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If there are spiders only and we're showing the detail, add them to the online list - at the bottom.
 	if (!empty($spider_finds) && $modSettings['show_spider_online'] > 1)
@@ -253,7 +253,7 @@ function trackStatsUsersOnline($total_users_online)
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$settingsToUpdate['mostOnlineUpdated'] = $date;
 		$settingsToUpdate['mostOnlineToday'] = $total_users_online;

@@ -70,7 +70,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 	$attachment_stuff = array($row);
 	while ($row2 = $smcFunc['db_fetch_assoc']($request))
 		$attachment_stuff[] = $row2;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$temp = array();
 	foreach ($attachment_stuff as $attachment)
@@ -114,7 +114,7 @@ function getMessageInfo($id_msg, $override_permissions = false)
 	);
 
 	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return empty($row) ? false : $row;
 }
@@ -228,7 +228,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if ($db->num_rows($request) == 0)
 		return false;
 	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($board) || $row['id_board'] != $board)
 	{
@@ -373,7 +373,7 @@ function removeMessage($message, $decreasePostCount = true)
 			)
 		);
 		$row2 = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$db->query('', '
 			UPDATE {db_prefix}topics
@@ -428,7 +428,7 @@ function removeMessage($message, $decreasePostCount = true)
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('recycle_no_valid_board');
 		list ($isRead, $last_board_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Is there an existing topic in the recycle board to group this post with?
 		$request = $db->query('', '
@@ -442,7 +442,7 @@ function removeMessage($message, $decreasePostCount = true)
 			)
 		);
 		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Insert a new topic in the recycle board if $id_recycle_topic is empty.
 		if (empty($id_recycle_topic))
@@ -681,7 +681,7 @@ function associatedTopic($msg_id, $topicID = null)
 			$topic = false;
 		else
 			list ($topic) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $topic;
 	}

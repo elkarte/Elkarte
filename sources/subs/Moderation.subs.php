@@ -46,7 +46,7 @@ function recountOpenReports($flush = true)
 		)
 	);
 	list ($open_reports) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$_SESSION['rc'] = array(
 		'id' => $user_info['id'],
@@ -92,7 +92,7 @@ function recountUnapprovedPosts($approve_query = null)
 		)
 	);
 	list ($unapproved_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// What about topics?
 	$request = $db->query('', '
@@ -107,7 +107,7 @@ function recountUnapprovedPosts($approve_query = null)
 		)
 	);
 	list ($unapproved_topics) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['total_unapproved_topics'] = $unapproved_topics;
 	$context['total_unapproved_posts'] = $unapproved_posts;
@@ -139,7 +139,7 @@ function recountFailedEmails($approve_query = null)
 		)
 	);
 	list ($failed_emails) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['failed_emails'] = $failed_emails;
 	return $failed_emails;
@@ -321,7 +321,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		logAction('delete_warn_template', array('template' => $row['recipient_name']));
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Do the deletes.
 	$db->query('', '
@@ -379,7 +379,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 			'body' => $smcFunc['htmlspecialchars']($row['body']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $templates;
 }
@@ -409,7 +409,7 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 		)
 	);
 	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalWarns;
 }
@@ -453,7 +453,7 @@ function list_getWarnings($start, $items_per_page, $sort)
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $warnings;
 }
@@ -476,7 +476,7 @@ function list_getWarningCount()
 		)
 	);
 	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalWarns;
 }
@@ -514,7 +514,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -601,7 +601,7 @@ function modReportDetails($id_report)
 	else
 		$row = $smcFunc['db_fetch_assoc']($request);
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $row;
 }

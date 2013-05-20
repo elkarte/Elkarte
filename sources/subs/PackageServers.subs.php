@@ -44,7 +44,7 @@ function fetchPackageServers($server = null)
 			'id' => $row['id_server'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $servers;
 }

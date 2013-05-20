@@ -73,7 +73,7 @@ function numErrors()
 	);
 	list ($num_errors) = $smcFunc['db_fetch_row']($result);
 
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $num_errors;
 }
@@ -154,7 +154,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 		// Make a list of members to load later.
 		$log['members'][$row['id_member']] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return($log);
 }
@@ -198,7 +198,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $types;
 }

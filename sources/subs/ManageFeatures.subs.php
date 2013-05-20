@@ -127,7 +127,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$list[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $list;
@@ -150,7 +150,7 @@ function list_getProfileFieldSize()
 	);
 
 	list ($numProfileFields) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numProfileFields;
 }
@@ -216,7 +216,7 @@ function getProfileField($id_field)
 			'placement' => $row['placement'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return($field);
 }
@@ -250,7 +250,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 			$unique = true;
 		else
 			$colname = $initial_colname . $i;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 	}
 
 	return $unique;
@@ -485,6 +485,6 @@ function updateDisplayCache()
 			'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	updateSettings(array('displayFields' => serialize($fields)));
 }

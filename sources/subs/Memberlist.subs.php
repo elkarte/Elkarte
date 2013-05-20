@@ -81,7 +81,7 @@ function ml_CustomProfile()
 			$context['custom_profile_fields']['parameters']['t' . $curField] = $row['col_name'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($context['custom_profile_fields']);
 }
@@ -151,7 +151,7 @@ function ml_memberCount()
 		)
 	);
 	list ($num_members) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $num_members;
 }
@@ -178,7 +178,7 @@ function ml_alphaStart($start)
 		)
 	);
 	list ($start) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $start;
 }
@@ -213,7 +213,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	);
 
 	printMemberListRows($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -244,7 +244,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 		$query_parameters
 	);
 	list ($numResults) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Select the members from the database.
 	$request = $db->query('', '
@@ -263,7 +263,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 
 	// Place everything context so the template can use it
 	printMemberListRows($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numResults;
 }
@@ -299,7 +299,7 @@ function ml_findSearchableCustomFields()
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -322,7 +322,7 @@ function printMemberListRows($request)
 		)
 	);
 	list ($most_posts) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Avoid division by zero...
 	if ($most_posts == 0)

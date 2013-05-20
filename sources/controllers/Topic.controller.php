@@ -129,7 +129,7 @@ class Topic_Controller
 			)
 		);
 		list ($is_sticky) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Toggle the sticky value.
 		setTopicAttribute($topic, array('sticky' => $is_sticky));
@@ -190,7 +190,7 @@ class Topic_Controller
 		if ($db->num_rows($request) == 0)
 			redirectexit();
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (!empty($row['id_poll']))
 		{
@@ -209,7 +209,7 @@ class Topic_Controller
 				)
 			);
 			$pollinfo = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
@@ -222,7 +222,7 @@ class Topic_Controller
 				)
 			);
 			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Total voters needs to include guest voters
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
@@ -249,7 +249,7 @@ class Topic_Controller
 				$realtotal += $row['votes'];
 				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -398,7 +398,7 @@ class Topic_Controller
 			if (!isset($context['topic_subject']))
 				$context['topic_subject'] = $row['subject'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
@@ -427,7 +427,7 @@ class Topic_Controller
 				if (!isset($context['printattach'][$row['id_msg']]))
 					$context['printattach'][$row['id_msg']] = array();
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			ksort($temp);
 
 			// load them into $context so the template can use them

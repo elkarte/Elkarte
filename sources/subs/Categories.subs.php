@@ -67,7 +67,7 @@ function modifyCategory($category_id, $catOptions)
 				$cats[] = $category_id;
 			$cat_order[$row['id_cat']] = $row['cat_order'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Set the new order for the categories.
 		foreach ($cats as $index => $cat)
@@ -326,7 +326,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			elseif (!empty($row['is_collapsed']))
 				$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))
@@ -371,7 +371,7 @@ function categoryName($id_cat)
 		)
 	);
 	list ($name) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $name;
 }

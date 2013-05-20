@@ -365,7 +365,7 @@ class PersonalMessage_Controller
 				while ($row = $smcFunc['db_fetch_assoc']($sub_request))
 					$sub_pms[$row['id_pm_head']] = $row['sort_param'];
 
-				$smcFunc['db_free_result']($sub_request);
+				$db->free_result($sub_request);
 
 				$request = $db->query('', '
 					SELECT pm.id_pm AS id_pm, pm.id_pm_head
@@ -468,7 +468,7 @@ class PersonalMessage_Controller
 					'head' => $row['id_pm_head'],
 				);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Make sure that we have been given a correct head pm id!
 		if ($context['display_mode'] === 2 && !empty($pmID) && $pmID != $lastData['id'])
@@ -519,7 +519,7 @@ class PersonalMessage_Controller
 					$display_pms[] = $row['id_pm'];
 					$posters[$row['id_pm']] = $row['id_member_from'];
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// This is pretty much EVERY pm!
@@ -557,7 +557,7 @@ class PersonalMessage_Controller
 					}
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Make sure we don't load unnecessary data.
 			if ($context['display_mode'] == 1)
@@ -708,7 +708,7 @@ class PersonalMessage_Controller
 				)
 			);
 			$isReceived = $db->num_rows($request) != 0;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Get the quoted message (and make sure you're allowed to see this quote!).
 			$request = $db->query('', '
@@ -732,7 +732,7 @@ class PersonalMessage_Controller
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('pm_not_yours', false);
 			$row_quoted = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Censor the message.
 			censorText($row_quoted['subject']);
@@ -833,7 +833,7 @@ class PersonalMessage_Controller
 						'id' => $row['id_member'],
 						'name' => $row['real_name'],
 					);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			else
 			{
@@ -1261,7 +1261,7 @@ class PersonalMessage_Controller
 			$pm_heads = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$pm_heads[$row['id_pm_head']] = $row['id_pm'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$request = $db->query('', '
 				SELECT id_pm, id_pm_head
@@ -1277,7 +1277,7 @@ class PersonalMessage_Controller
 				if (isset($pm_heads[$row['id_pm_head']]) && isset($_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]]))
 					$_REQUEST['pm_actions'][$row['id_pm']] = $_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		$to_delete = array();
@@ -1367,7 +1367,7 @@ class PersonalMessage_Controller
 					);
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Any errors?
 			// @todo Separate the sprintf?
@@ -1451,7 +1451,7 @@ class PersonalMessage_Controller
 			);
 			while ($row = $smcFunc['db_fetch_row']($request))
 				$toDelete[] = $row[0];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Select all messages in their inbox older than $deleteTime.
 			$request = $db->query('', '
@@ -1469,7 +1469,7 @@ class PersonalMessage_Controller
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$toDelete[] = $row['id_pm'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Delete the actual messages.
 			deleteMessages($toDelete);
@@ -1636,7 +1636,7 @@ class PersonalMessage_Controller
 						)
 					);
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				// Now do the same the rules - check through each rule.
 				foreach ($context['rules'] as $k => $rule)
@@ -1827,7 +1827,7 @@ class PersonalMessage_Controller
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
 			list ($subject, $body, $time, $memberFromID, $memberFromName) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Remove the line breaks...
 			$body = preg_replace('~<br ?/?' . '>~i', "\n", $body);
@@ -1854,7 +1854,7 @@ class PersonalMessage_Controller
 				else
 					$recipients[] = '[url=' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . ']' . $row['to_name'] . '[/url]';
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if ($hidden_recipients)
 				$recipients[] = sprintf($txt['pm_report_pm_hidden'], $hidden_recipients);
@@ -1961,7 +1961,7 @@ class PersonalMessage_Controller
 
 			$context['groups'][$row['id_group']] = $row['group_name'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Applying all rules?
 		if (isset($_GET['apply']))
@@ -2045,7 +2045,7 @@ class PersonalMessage_Controller
 					if ($db->num_rows($request) == 0)
 						continue;
 					list ($memID) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					$criteria[] = array('t' => 'mid', 'v' => $memID);
 				}
@@ -2216,7 +2216,7 @@ function applyRules($all_messages = false)
 			}
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Deletes are easy!
 	if (!empty($actions['deletes']))
@@ -2287,7 +2287,7 @@ function loadRules($reload = false)
 		if ($row['delete_pm'])
 			$context['rules'][$row['id_rule']]['actions'][] = array('t' => 'del', 'v' => 1);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -2478,7 +2478,7 @@ function preparePMContext($type = 'subject', $reset = false)
 		$subject = $smcFunc['db_fetch_assoc']($subjects_request);
 		if (!$subject)
 		{
-			$smcFunc['db_free_result']($subjects_request);
+			$db->free_result($subjects_request);
 			return false;
 		}
 
@@ -2520,7 +2520,7 @@ function preparePMContext($type = 'subject', $reset = false)
 	if (!$message)
 	{
 		if ($type != 'subject')
-			$smcFunc['db_free_result']($messages_request);
+			$db->free_result($messages_request);
 
 		return false;
 	}
@@ -2665,7 +2665,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 				$error_types->addError('pm_not_yours');
 		}
 		$row_quoted = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		censorText($row_quoted['subject']);
 		censorText($row_quoted['body']);

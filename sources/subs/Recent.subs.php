@@ -93,7 +93,7 @@ function getLastPosts($latestPostOptions)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $posts;
 }
@@ -203,7 +203,7 @@ function getRecentPosts($messages, $start)
 			$board_ids['own'][$row['id_board']][] = $row['id_msg'];
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return array($posts, $board_ids);
 

@@ -49,7 +49,7 @@ function installedThemes()
 			);
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -77,7 +77,7 @@ function themeDirectory($id_theme)
 		)
 	);
 	list($themeDirectory) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themeDirectory;
 }
@@ -106,7 +106,7 @@ function themeUrl($id_theme)
 		);
 
 	list ($theme_url) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $theme_url;
 }
@@ -144,7 +144,7 @@ function validateThemeName($indexes, $value_data)
 			if (strpos($row['value'], $index) !== false)
 				$themes[$row['id_theme']] = $index;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -178,7 +178,7 @@ function getBasicThemeInfos($themes)
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$themelist[$themes[$row['id_theme']]] = $row['value'];
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themelist;
 }
@@ -216,7 +216,7 @@ function getCustomThemes()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -255,7 +255,7 @@ function getThemesPathbyID($theme_list = array())
 	$theme_paths = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $theme_paths;
 }
@@ -291,7 +291,7 @@ function loadThemes($knownThemes)
 			'name' => $row['name'],
 			'known' => in_array($row['id_theme'], $knownThemes),
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }

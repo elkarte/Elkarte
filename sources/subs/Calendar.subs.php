@@ -79,7 +79,7 @@ function getBirthdayRange($low_date, $high_date)
 			'is_last' => false
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Set is_last, so the themes know when to stop placing separators.
 	foreach ($bday as $mday => $array)
@@ -189,7 +189,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 				);
 		}
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// If we're doing normal contextual data, go through and make things clear to the templates ;).
 	if ($use_permissions)
@@ -246,7 +246,7 @@ function getHolidayRange($low_date, $high_date)
 
 		$holidays[$event_year . substr($row['event_date'], 4)][] = $row['title'];
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $holidays;
 }
@@ -295,7 +295,7 @@ function canLinkEvent()
 		// Topic/Board doesn't exist.....
 		else
 			fatal_lang_error('calendar_no_topic', 'general');
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 	}
 }
 
@@ -832,7 +832,7 @@ function getEventPoster($event_id)
 
 	// Grab the results and return.
 	list ($poster) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	return (int) $poster;
 }
 
@@ -1023,7 +1023,7 @@ function getEventProperties($event_id)
 		return false;
 
 	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$return_value = array(
 		'boards' => array(),
@@ -1076,7 +1076,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 	$holidays = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$holidays[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $holidays;
 }
@@ -1099,7 +1099,7 @@ function list_getNumHolidays()
 		)
 	);
 	list($num_items) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return (int) $num_items;
 }
@@ -1214,7 +1214,7 @@ function getHoliday($id_holiday)
 			'year' => $row['year'] <= 4 ? 0 : $row['year'],
 			'title' => $row['title']
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $holiday;
 }

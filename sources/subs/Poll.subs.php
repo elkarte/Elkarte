@@ -41,7 +41,7 @@ function associatedPoll($topicID, $pollID = null)
 			)
 		);
 		list ($pollID) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $pollID;
 	}
@@ -169,7 +169,7 @@ function getPollInfo($topicID)
 
 	// Get the poll information.
 	$pollinfo = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $pollinfo;
 }

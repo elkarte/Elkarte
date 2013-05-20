@@ -76,7 +76,7 @@ function excludeBannedMembers()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$excludes[] = $row['id_member'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$request = $db->query('', '
 		SELECT DISTINCT bi.email_address
@@ -100,7 +100,7 @@ function excludeBannedMembers()
 		$condition_array[] = '{string:email_' . $count . '}';
 		$condition_array_params['email_' . $count++] = $row['email_address'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($condition_array))
 	{
@@ -112,7 +112,7 @@ function excludeBannedMembers()
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$excludes['exclude_members'][] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $excludes;
@@ -142,7 +142,7 @@ function getModerators()
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$mods[] = $row['identifier'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $mods;
 }
@@ -186,7 +186,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 
 	while ($row = $smcFunc['db_fetch_assoc']($result))
 		$recipients[] = $row;
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $recipients;
 }

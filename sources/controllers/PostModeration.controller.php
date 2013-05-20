@@ -170,7 +170,7 @@ class PostModeration_Controller
 				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
 				$details[$anItem]["board"] = $row['id_board'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If we have anything left we can actually do the approving (etc).
 			if (!empty($toAction))
@@ -281,7 +281,7 @@ class PostModeration_Controller
 				'can_delete' => $can_delete,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['sub_template'] = 'unapproved_posts';
 	}
@@ -587,7 +587,7 @@ function approveAllData()
 	$msgs = array();
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$msgs[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($msgs))
 	{
@@ -608,7 +608,7 @@ function approveAllData()
 	$attaches = array();
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$attaches[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($attaches))
 	{

@@ -434,7 +434,7 @@ function loadInstalledPackages()
 			'version' => $row['version'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $installed;
 }
@@ -2934,7 +2934,7 @@ function package_create_backup($id = 'backup')
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	while (!empty($dirs))
 	{
@@ -3263,7 +3263,7 @@ function isPackageInstalled($id)
 			'install_state' => $row['install_state'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -3323,7 +3323,7 @@ function checkPackageDependency()
 	);
 	while ($row = $smcFunc['db_fetch_row']($request));
 		list($version) = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $version;
 }

@@ -596,7 +596,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			)
 		);
 		list($num_attachments) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Using the maillist function or the standard style
 		if ($maillist)
@@ -629,7 +629,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'attachments' => $num_attachments,
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -771,7 +771,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				}
 			}
 		}
-		$smcFunc['db_free_result']($members);
+		$db->free_result($members);
 	}
 
 	// Find the members with notification on for this topic.
@@ -866,7 +866,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			$sent++;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_language)
 		loadLanguage('Post');
@@ -965,7 +965,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
 				);
 				while ($row_perm = $smcFunc['db_fetch_assoc']($request))
 					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Get the email permission for this board / posting group
@@ -1021,7 +1021,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// If nothing was filled in as name/e-mail address, try the member table.
@@ -1356,7 +1356,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$message = getExistingMessage($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -1458,7 +1458,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 		if ($db->num_rows($request) == 1)
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -1581,7 +1581,7 @@ function approvePosts($msgs, $approve = true)
 		if ($row['id_member'] && empty($row['count_posts']))
 			$member_post_changes[$row['id_member']] = isset($member_post_changes[$row['id_member']]) ? $member_post_changes[$row['id_member']] + 1 : 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($msgs))
 		return;
@@ -1613,7 +1613,7 @@ function approvePosts($msgs, $approve = true)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// ... next the topics...
@@ -1727,7 +1727,7 @@ function approveTopics($topics, $approve = true)
 	$msgs = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$msgs[] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return approvePosts($msgs, $approve);
 }
@@ -1864,7 +1864,7 @@ function sendApprovalNotifications(&$topicData)
 			$sent_this_time = true;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Post');
@@ -1926,7 +1926,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 		$lastMsg = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	else
 	{
@@ -2074,7 +2074,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add administrators too...
 	$groups[] = 1;
@@ -2115,7 +2115,7 @@ function adminNotify($type, $memberID, $member_name = null)
 		// And do the actual sending...
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
@@ -2192,7 +2192,7 @@ function notifyMembersBoard(&$topicData)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$board_names[$row['id_board']] = $row['name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
@@ -2296,7 +2296,7 @@ function notifyMembersBoard(&$topicData)
 			$sentOnceAlready = 1;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	loadLanguage('index', $user_info['language']);
 
@@ -2345,7 +2345,7 @@ function lastPost()
 	if ($db->num_rows($request) == 0)
 		return array();
 	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Censor the subject and post...
 	censorText($row['subject']);
@@ -2414,7 +2414,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.
 			if (trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)

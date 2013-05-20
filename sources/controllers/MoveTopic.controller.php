@@ -299,7 +299,7 @@ class MoveTopic_Controller
 
 				$posters[$row['id_member']]++;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			foreach ($posters as $id_member => $posts)
 			{

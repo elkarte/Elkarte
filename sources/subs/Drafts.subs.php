@@ -222,7 +222,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 
 	// load up the data
 	$draft_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// a little cleaning
 	$draft_info['body'] = !empty($draft_info['body']) ? str_replace('<br />', "\n", un_htmlspecialchars(stripslashes($draft_info['body']))) : '';
@@ -271,7 +271,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 	// place them in the draft array
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$user_drafts[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $user_drafts;
 }
@@ -337,7 +337,7 @@ function draftsCount($member_id, $draft_type)
 		)
 	);
 	list ($msgCount) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $msgCount;
 }
@@ -400,7 +400,7 @@ function getOldDrafts($days)
 
 	while ($row = $smcFunc['db_fetch_row']($request))
 		$drafts[] = (int) $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $drafts;
 }

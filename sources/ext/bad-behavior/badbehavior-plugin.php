@@ -126,7 +126,7 @@ function bb2_db_rows($result)
 	$temp = array();
 	while($row = $smcFunc['db_fetch_assoc']($result))
 		$temp[] = $row;
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $temp;
 }

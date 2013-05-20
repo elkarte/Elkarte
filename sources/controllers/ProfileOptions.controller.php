@@ -138,7 +138,7 @@ function action_editBuddies($memID)
 			// Add the new member to the buddies array.
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$buddiesArray[] = (int) $row['id_member'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
@@ -248,7 +248,7 @@ function action_editIgnoreList($memID)
 			// Add the new member to the buddies array.
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$ignoreArray[] = (int) $row['id_member'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
@@ -731,7 +731,7 @@ function list_getTopicNotificationCount($memID)
 		)
 	);
 	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// @todo make this an integer before it gets returned
 	return $totalNotifications;
@@ -800,7 +800,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_topics;
 }
@@ -825,7 +825,7 @@ function getBoardNotificationsCount($memID)
 		)
 	);
 	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $totalNotifications;
 }
@@ -870,7 +870,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'new' => $row['board_read'] < $row['id_msg_updated'],
 			'checked' => 'checked="checked"',
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// and all the boards that you can see but don't have notify turned on for
 	$request = $db->query('', '
@@ -897,7 +897,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'new' => $row['board_read'] < $row['id_msg_updated'],
 			'checked' => '',
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_boards;
 }
@@ -948,7 +948,7 @@ function loadThemeOptions($memID)
 				$row['value'] = $_POST['options'][$row['variable']];
 			$context['member']['options'][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Load up the default theme options for any missing.
 		foreach ($temp as $k => $v)
@@ -1064,7 +1064,7 @@ function action_groupMembership()
 			'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add registered members on the end.
 	$context['groups']['member'][0] = array(
@@ -1193,7 +1193,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 			)
 		);
 		list ($disallow) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if ($disallow)
 			isAllowedTo('admin_forum');
@@ -1214,7 +1214,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		);
 		if ($db->num_rows($request) != 0)
 			fatal_lang_error('profile_error_already_requested_group');
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Log the request.
 		$smcFunc['db_insert']('',
@@ -1243,7 +1243,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		$moderators = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$moderators[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Otherwise this is the backup!
 		if (empty($moderators))

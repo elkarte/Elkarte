@@ -322,7 +322,7 @@ class SplitTopics_Controller
 				$_REQUEST['move'] = '';
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$original_msgs['not_selected'][] = $row['id_msg'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
 				$request = $db->query('', '
@@ -343,7 +343,7 @@ class SplitTopics_Controller
 				);
 				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$original_msgs['selected'][] = $row['id_msg'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 		}
 
@@ -378,7 +378,7 @@ class SplitTopics_Controller
 			$_SESSION['split_selection'][$topic] = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$_SESSION['split_selection'][$topic][] = $row['id_msg'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Get the number of messages (not) selected to be split.
@@ -396,7 +396,7 @@ class SplitTopics_Controller
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fix an oversized starting page (to make sure both pageindexes are properly set).
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
@@ -530,7 +530,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		)
 	);
 	list ($id_board, $split1_approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Find the new first and last not in the list. (old topic)
 	$request = $db->query('', '
@@ -580,7 +580,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split1_unapprovedposts = $row['message_count'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	$split1_firstMem = getMsgMemberID($split1_first_msg);
 	$split1_lastMem = getMsgMemberID($split1_last_msg);
 
@@ -628,7 +628,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split2_unapprovedposts = $row['message_count'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	$split2_firstMem = getMsgMemberID($split2_first_msg);
 	$split2_lastMem = getMsgMemberID($split2_last_msg);
 
@@ -790,7 +790,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Housekeeping.
 	updateStats('topic');
@@ -862,7 +862,7 @@ function splitAttemptMove($boards, $totopic)
 
 					$posters[$row['id_member']]++;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($posters as $id_member => $posts)
 				{

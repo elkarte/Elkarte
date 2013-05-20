@@ -57,7 +57,7 @@ class ModerateAttachments_Controller
 			);
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$attachments[] = $row['id_attach'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 		elseif (!empty($_GET['aid']))
 			$attachments[] = (int) $_GET['aid'];
@@ -95,7 +95,7 @@ class ModerateAttachments_Controller
 				$redirect = 'topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'];
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($attachments))
 			fatal_lang_error('no_access', false);

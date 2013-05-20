@@ -188,7 +188,7 @@ class MarkRead_Controller
 					)
 				);
 				list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 			}
 		}
 		// Marking read from first page?  That's the whole topic.
@@ -208,7 +208,7 @@ class MarkRead_Controller
 				)
 			);
 			list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 
 			$earlyMsg--;
 		}
@@ -296,7 +296,7 @@ class MarkRead_Controller
 					array('id_member', 'id_board')
 				);
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 			if (empty($board))
 				return '';
 			else

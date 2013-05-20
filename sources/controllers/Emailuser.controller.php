@@ -182,7 +182,7 @@ class Emailuser_Controller
 				)
 			);
 			$row = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
@@ -444,7 +444,7 @@ class Emailuser_Controller
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
 		$message = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
@@ -480,7 +480,7 @@ class Emailuser_Controller
 			);
 			if ($db->num_rows($request2) != 0)
 				list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request2);
-			$smcFunc['db_free_result']($request2);
+			$db->free_result($request2);
 
 			// If we're just going to ignore these, then who gives a monkeys...
 			if (!empty($ignore))
@@ -549,7 +549,7 @@ class Emailuser_Controller
 		$real_mods = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request2))
 			$real_mods[] = $row['id_member'];
-		$smcFunc['db_free_result']($request2);
+		$db->free_result($request2);
 
 		// Send every moderator an email.
 		foreach ($mod_to_notify as $row)
@@ -576,7 +576,7 @@ class Emailuser_Controller
 			// Send it to the moderator.
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $user_info['email'], null, false, 2);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.
 		updateSettings(array('last_mod_report_action' => time()));

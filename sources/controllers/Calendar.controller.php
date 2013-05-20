@@ -240,7 +240,7 @@ class Calendar_Controller
 							'id_event' => $_REQUEST['eventid'],
 					));
 					list ($id_board, $id_topic) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 				}
 
 				$eventOptions = array(

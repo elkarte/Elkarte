@@ -330,7 +330,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	$groups = array(1);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, lngfile, email_address
@@ -361,7 +361,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		// Track who we emailed so we don't do it twice.
 		$emails_sent[] = $row['email_address'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Any additional users we must email this to?
 	if (!empty($additional_recipients))

@@ -41,7 +41,7 @@ function loadTasks($tasks)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$task[$row['id_task']] = $row['task'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $task;
 }
@@ -158,7 +158,7 @@ function loadTaskDetails($id_task)
 			'unit' => $row['time_unit'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $task;
 }
@@ -200,7 +200,7 @@ function list_getScheduledTasks()
 			'regularity' => $offset . ', ' . $repeating,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $known_tasks;
 }
@@ -235,7 +235,7 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 			'time_run' => $row['time_run'],
 			'time_taken' => $row['time_taken'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $log_entries;
 }
@@ -256,7 +256,7 @@ function list_getNumaction_logEntries()
 		)
 	);
 	list ($num_entries) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $num_entries;
 }

@@ -162,7 +162,7 @@ class Reports_Controller
 		$moderators = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$moderators[$row['id_board']][] = $row['real_name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get all the possible membergroups!
 		$request = $db->query('', '
@@ -174,7 +174,7 @@ class Reports_Controller
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// All the fields we'll show.
 		$boardSettings = array(
@@ -259,7 +259,7 @@ class Reports_Controller
 			// Next add the main data.
 			addData($boardData);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	/**
@@ -330,7 +330,7 @@ class Reports_Controller
 			$member_groups = array('col' => '');
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$member_groups[$row['id_group']] = $row['group_name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Make sure that every group is represented - plus in rows!
 		setKeys('rows', $member_groups);
@@ -366,7 +366,7 @@ class Reports_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Now cycle through the board permissions array... lots to do ;)
 		foreach ($board_permissions as $board => $groups)
@@ -470,7 +470,7 @@ class Reports_Controller
 				'deny_groups' => $denyGroups,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Standard settings.
 		$mgSettings = array(
@@ -532,7 +532,7 @@ class Reports_Controller
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$rows[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		foreach ($rows as $row)
 		{
@@ -603,7 +603,7 @@ class Reports_Controller
 			$groups = array('col' => '');
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$groups[$row['id_group']] = $row['group_name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Make sure that every group is represented!
 		setKeys('rows', $groups);
@@ -653,7 +653,7 @@ class Reports_Controller
 			else
 				$curData[$row['id_group']] = '<span style="color: red;">' . $txt['board_perms_deny'] . '</span>';
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Flush the last data!
 		addData($curData);
@@ -685,7 +685,7 @@ class Reports_Controller
 		$boards = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$boards[$row['id_board']] = $row['name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get every moderator.
 		$request = $db->query('', '
@@ -701,7 +701,7 @@ class Reports_Controller
 			$moderators[$row['id_member']][] = $row['id_board'];
 			$local_mods[$row['id_member']] = $row['id_member'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get a list of global moderators (i.e. members with moderation powers).
 		$global_mods = array_intersect(membersAllowedTo('moderate_board', 0), membersAllowedTo('approve_posts', 0), membersAllowedTo('remove_any', 0), membersAllowedTo('modify_any', 0));
@@ -726,7 +726,7 @@ class Reports_Controller
 		$groups = array(0 => $txt['full_member']);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// All the fields we'll show.
 		$staffSettings = array(
@@ -778,7 +778,7 @@ class Reports_Controller
 			// Next add the main data.
 			addData($staffData);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 }
 

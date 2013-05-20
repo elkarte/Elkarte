@@ -585,7 +585,7 @@ function fix_serialized_columns()
 				)
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Refresh some cached data.
 	updateSettings(array(

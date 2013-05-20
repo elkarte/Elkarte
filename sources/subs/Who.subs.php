@@ -45,7 +45,7 @@ function viewers($id, $session, $type = 'topic')
 	{
 		$viewers[] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $viewers;
 }

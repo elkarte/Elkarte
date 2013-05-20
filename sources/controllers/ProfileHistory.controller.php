@@ -179,7 +179,7 @@ function action_trackactivity($memID)
 			)
 		);
 		list ($max_msg_member) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
 		$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
@@ -212,7 +212,7 @@ function action_trackactivity($memID)
 		$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
 		$ips[] = $row['poster_ip'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Now also get the IP addresses from the error messages.
 	$request = $db->query('', '
@@ -230,7 +230,7 @@ function action_trackactivity($memID)
 		$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
 		$ips[] = $row['ip'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Find other users that might use the same IP.
 	$ips = array_unique($ips);
@@ -253,7 +253,7 @@ function action_trackactivity($memID)
 		$message_members = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$message_members[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fetch their names, cause of the GROUP BY doesn't like giving us that normally.
 		if (!empty($message_members))
@@ -277,7 +277,7 @@ function action_trackactivity($memID)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 			$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	$context['sub_template'] = 'trackActivity';
 }
@@ -303,7 +303,7 @@ function list_getUserErrorCount($where, $where_vars = array())
 		$where_vars
 	);
 	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// @todo cast this to an integer
 	return $count;
@@ -349,7 +349,7 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
 			'time' => relativeTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $error_messages;
 }
@@ -375,7 +375,7 @@ function list_getIPMessageCount($where, $where_vars = array())
 		$where_vars
 	);
 	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// @todo cast to integer
 	return $count;
@@ -427,7 +427,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time'])
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $messages;
 }
@@ -488,7 +488,7 @@ function action_trackip($memID = 0)
 	$context['ips'] = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$context['ips'][$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	ksort($context['ips']);
 
@@ -826,7 +826,7 @@ function list_getLoginCount($where, $where_vars = array())
 		)
 	);
 	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// @todo cast to integer
 	return $count;
@@ -864,7 +864,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 			'ip' => $row['ip'],
 			'ip2' => $row['ip2'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $logins;
 }
@@ -895,7 +895,7 @@ function action_trackedits($memID)
 			'title' => $row['field_name'],
 			'parse_bbc' => $row['bbc'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Set the options for the error lists.
 	$listOptions = array(
@@ -995,7 +995,7 @@ function list_getProfileEditCount($memID)
 		)
 	);
 	list ($edit_count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// @todo cast to integer
 	return $edit_count;
@@ -1064,7 +1064,7 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 			'time' => standardTime($row['log_time']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get any member names.
 	if (!empty($members))
