@@ -21,8 +21,10 @@ interface Database
 	 *
 	 * @param string &db_prefix
 	 * @param string $db_name
+	 * 
+	 * @return string
 	 */
-	function fix_prefix(&$db_prefix, $db_name);
+	function fix_prefix($db_prefix, $db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.

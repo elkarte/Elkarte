@@ -15,19 +15,6 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Fix up the prefix so it doesn't require the database to be selected.
- *
- * @param string &db_prefix
- * @param string $db_name
- */
-function db_fix_prefix(&$db_prefix, $db_name)
-{
-	$db = database();
-
-	$db->fix_prefix(&$db_prefix, $db_name);
-}
-
-/**
  * Callback for preg_replace_callback on the query.
  * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
  * their current values from $user_info.
