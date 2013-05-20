@@ -35,7 +35,7 @@ class Topic_Controller
 	*/
 	function action_lock()
 	{
-		global $topic, $user_info, $board, ;
+		global $topic, $user_info, $board;
 
 		$db = database();
 
@@ -97,7 +97,7 @@ class Topic_Controller
 	 */
 	function action_sticky()
 	{
-		global $modSettings, $topic, $board, ;
+		global $modSettings, $topic, $board;
 
 		$db = database();
 

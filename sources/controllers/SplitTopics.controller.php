@@ -249,7 +249,7 @@ class SplitTopics_Controller
 	function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -820,7 +820,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context, ;
+	global $board, $user_info, $context;
 
 	$db = database();
 

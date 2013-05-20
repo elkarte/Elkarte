@@ -363,7 +363,7 @@ class paypal_payment
 	 */
 	private function _findSubscription()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

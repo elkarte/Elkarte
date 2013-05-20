@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -132,7 +132,7 @@ function modifyCategory($category_id, $catOptions)
  */
 function createCategory($catOptions)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -264,7 +264,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -357,7 +357,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  */
 function categoryName($id_cat)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

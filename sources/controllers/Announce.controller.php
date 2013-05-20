@@ -63,7 +63,7 @@ class Announce_Controller
 	 */
 	function action_selectgroup()
 	{
-		global $txt, $context, $topic, $board, $board_info, ;
+		global $txt, $context, $topic, $board, $board_info;
 
 		$db = database();
 
@@ -105,7 +105,7 @@ class Announce_Controller
 	function action_send()
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
-		global $language, $scripturl, $txt, $user_info, ;
+		global $language, $scripturl, $txt, $user_info;
 
 		$db = database();
 

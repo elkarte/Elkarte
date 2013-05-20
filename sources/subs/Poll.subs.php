@@ -24,7 +24,7 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -66,7 +66,7 @@ function associatedPoll($topicID, $pollID = null)
  */
 function removePoll($pollID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -105,7 +105,7 @@ function removePoll($pollID)
  */
 function resetVotes($pollID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -144,7 +144,7 @@ function resetVotes($pollID)
  */
 function getPollInfo($topicID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  */
 function deleteBadBehavior($type ,$filter)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -71,7 +71,7 @@ function deleteBadBehavior($type ,$filter)
  */
 function getBadBehaviorLogEntryCount($filter)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -99,7 +99,7 @@ function getBadBehaviorLogEntryCount($filter)
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
-	global $scripturl, ;
+	global $scripturl;
 
 	$db = database();
 

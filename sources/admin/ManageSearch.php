@@ -103,7 +103,7 @@ class ManageSearch_Controller
 	 */
 	function action_searchSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings, ;
+		global $txt, $context, $scripturl, $modSettings;
 
 		$db = database();
 

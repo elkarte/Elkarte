@@ -24,7 +24,7 @@ class ManageBadBehavior_Controller
 	 */
 	public function action_badbehaviorlog()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, ;
+		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 
 		$db = database();
 

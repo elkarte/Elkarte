@@ -517,7 +517,7 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, ;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -877,7 +877,7 @@ function createAttachment(&$attachmentOptions)
 */
 function getAvatar($id_attach)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -919,7 +919,7 @@ function getAvatar($id_attach)
 */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -954,7 +954,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 */
 function increaseDownloadCounter($id_attach)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -975,7 +975,7 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1070,7 +1070,7 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1236,7 +1236,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1556,7 +1556,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
  */
 function getAttachmentCount()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1584,7 +1584,7 @@ function getAttachmentCount()
  */
 function getAvatarCount()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1629,7 +1629,7 @@ function getAttachmentDirs()
  */
 function getAvatarsDefault()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1745,7 +1745,7 @@ function getServerStoredAvatars($directory, $level)
  */
 function removeOrphanAttachments($attach_ids)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1775,7 +1775,7 @@ function removeOrphanAttachments($attach_ids)
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1819,7 +1819,7 @@ function attachment_filesize($attach_id, $filesize = null)
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1860,7 +1860,7 @@ function attachment_folder($attach_id, $folder_id = null)
  */
 function maxThumbnails()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1886,7 +1886,7 @@ function maxThumbnails()
  */
 function validateAttachments($attachments, $approve_query)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -2006,7 +2006,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -2208,7 +2208,7 @@ function list_getBaseDirs()
  */
 function list_getNumFiles($browse_type)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -2315,7 +2315,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
  */
 function overallAttachmentsSize()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -2415,7 +2415,7 @@ function moveAvatars()
  */
 function setRemovalNotice($messages, $notice)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

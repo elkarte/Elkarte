@@ -733,7 +733,7 @@ class Packages_Controller
 	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
-		global $user_info, ;
+		global $user_info;
 
 		$db = database();
 
@@ -941,7 +941,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'code' && !empty($action['filename']))
 				{
 					// This is just here as reference for what is available.
-					global $txt, $modSettings, $context, $settings, $forum_version, ;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					$db = database();
 
@@ -970,7 +970,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
 				{
 					// These can also be there for database changes.
-					global $txt, $modSettings, $context, $settings, $forum_version, ;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					$db = database();
 
@@ -1438,7 +1438,7 @@ class Packages_Controller
 	 */
 	public function action_options()
 	{
-		global $txt, $context, $modSettings, ;
+		global $txt, $context, $modSettings;
 
 		$db = database();
 

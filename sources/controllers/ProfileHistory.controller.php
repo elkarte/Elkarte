@@ -73,7 +73,7 @@ function action_history()
 function action_trackactivity($memID)
 {
 	global $scripturl, $txt, $modSettings;
-	global $user_profile, $context, ;
+	global $user_profile, $context;
 
 	$db = database();
 
@@ -292,7 +292,7 @@ function action_trackactivity($memID)
  */
 function list_getUserErrorCount($where, $where_vars = array())
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -363,7 +363,7 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
  */
 function list_getIPMessageCount($where, $where_vars = array())
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -442,7 +442,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 function action_trackip($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, ;
+	global $context;
 
 	$db = database();
 
@@ -730,7 +730,7 @@ function action_trackip($memID = 0)
 function action_tracklogin($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, ;
+	global $context;
 
 	$db = database();
 
@@ -813,7 +813,7 @@ function action_tracklogin($memID = 0)
  */
 function list_getLoginCount($where, $where_vars = array())
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -876,7 +876,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $context, ;
+	global $scripturl, $txt, $modSettings, $context;
 
 	$db = database();
 
@@ -980,7 +980,7 @@ function action_trackedits($memID)
  */
 function list_getProfileEditCount($memID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

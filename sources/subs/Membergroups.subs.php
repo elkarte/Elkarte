@@ -555,7 +555,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl, $txt, ;
+	global $scripturl, $txt;
 
 	$db = database();
 
@@ -592,7 +592,7 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
  */
 function cache_getMembergroupList()
 {
-	global $scripturl, ;
+	global $scripturl;
 
 	$db = database();
 
@@ -636,7 +636,7 @@ function cache_getMembergroupList()
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
 {
-	global $scripturl, ;
+	global $scripturl;
 
 	$db = database();
 
@@ -738,7 +738,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -835,7 +835,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  */
 function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1025,7 +1025,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1071,7 +1071,7 @@ function getGroups($groupList)
  */
 function getMaxGroupID()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1096,7 +1096,7 @@ function getMaxGroupID()
  */
 function addMembergroup($id_group, $groupname, $minposts, $type)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1123,7 +1123,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1163,7 +1163,7 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  */
 function copyBoardPermissions($id_group, $copy_from)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1199,7 +1199,7 @@ function copyBoardPermissions($id_group, $copy_from)
  */
 function updateCopiedGroup($id_group, $copy_from)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1231,7 +1231,7 @@ function updateCopiedGroup($id_group, $copy_from)
  */
 function updateInheritedGroup($id_group, $copy_id)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1252,7 +1252,7 @@ function updateInheritedGroup($id_group, $copy_id)
  */
 function updateMembergroupProperties($properties)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1286,7 +1286,7 @@ function updateMembergroupProperties($properties)
  */
 function detachGroupFromBoards($id_group, $boards, $access_list)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1318,7 +1318,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1345,7 +1345,7 @@ function assignGroupToBoards($id_group, $boards, $access_list)
  */
 function detachDeletedGroupFromMembers($id_group)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1385,7 +1385,7 @@ function detachDeletedGroupFromMembers($id_group)
  */
 function setGroupToHidden($id_group)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1450,7 +1450,7 @@ function validateShowGroupMembership()
  */
 function detachGroupModerators($id_group)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1471,7 +1471,7 @@ function detachGroupModerators($id_group)
  */
 function getIDMemberFromGroupModerators($moderators)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1502,7 +1502,7 @@ function getIDMemberFromGroupModerators($moderators)
  */
 function assignGroupModerators($id_group, $group_moderators)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1526,7 +1526,7 @@ function assignGroupModerators($id_group, $group_moderators)
  */
 function getGroupModerators($id_group)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

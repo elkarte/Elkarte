@@ -145,7 +145,7 @@ class Email_Format
 	 */
 	private function _prep_data($data)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

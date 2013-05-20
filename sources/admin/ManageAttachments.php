@@ -830,7 +830,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_repair()
 	{
-		global $modSettings, $context, $txt, ;
+		global $modSettings, $context, $txt;
 
 		$db = database();
 
@@ -1356,7 +1356,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_attachpaths()
 	{
-		global $modSettings, $scripturl, $context, $txt, ;
+		global $modSettings, $scripturl, $context, $txt;
 
 		$db = database();
 

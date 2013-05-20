@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function AutoTask()
 {
-	global $time_start, $modSettings, ;
+	global $time_start, $modSettings;
 
 	$db = database();
 
@@ -154,7 +154,7 @@ function AutoTask()
  */
 function scheduled_approval_notification()
 {
-	global $scripturl, $modSettings, $mbname, $txt, ;
+	global $scripturl, $modSettings, $mbname, $txt;
 
 	$db = database();
 
@@ -1222,7 +1222,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1360,7 +1360,7 @@ function next_time($regularity, $unit, $offset)
  */
 function scheduled_fetchFiles()
 {
-	global $txt, $language, $settings, $forum_version, $modSettings, ;
+	global $txt, $language, $settings, $forum_version, $modSettings;
 
 	$db = database();
 
@@ -1517,7 +1517,7 @@ function scheduled_birthdayemails()
  */
 function scheduled_weekly_maintenance()
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1839,7 +1839,7 @@ function scheduled_remove_temp_attachments()
  */
 function scheduled_remove_topic_redirect()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1933,7 +1933,7 @@ function scheduled_maillist_fetch_IMAP()
  */
 function scheduled_remove_old_followups()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

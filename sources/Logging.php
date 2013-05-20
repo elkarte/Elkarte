@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, ;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board;
 
 	$db = database();
 
@@ -337,7 +337,7 @@ function displayDebug()
  */
 function trackStats($stats = array())
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 	static $cache_stats = array();
@@ -418,7 +418,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, ;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -546,7 +546,7 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

@@ -32,7 +32,7 @@ class Stats_Controller
 	 */
 	function action_stats()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $context, ;
+		global $txt, $scripturl, $modSettings, $user_info, $context;
 
 		$db = database();
 
@@ -645,7 +645,7 @@ class Stats_Controller
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 

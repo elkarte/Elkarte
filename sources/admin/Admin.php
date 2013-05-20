@@ -834,7 +834,7 @@ class Admin_Controller
 	 */
 	public function action_search()
 	{
-		global $txt, $context, ;
+		global $txt, $context;
 
 		$db = database();
 

@@ -343,7 +343,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => create_function('$topics', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -492,7 +492,7 @@ function loadForumTests()
 				GROUP BY t.id_topic, t.id_first_msg, t.id_last_msg, t.approved, mf.approved
 				ORDER BY t.id_topic',
 			'fix_processing' => create_function('$row', '
-				global , ;
+				global ;
 
 				$db = database();
 				$row[\'firstmsg_approved\'] = (int) $row[\'firstmsg_approved\'];
@@ -558,7 +558,7 @@ function loadForumTests()
 				GROUP BY t.id_topic, t.num_replies, mf.approved
 				ORDER BY t.id_topic',
 			'fix_processing' => create_function('$row', '
-				global , ;
+				global ;
 
 				$db = database();
 				$row[\'my_num_replies\'] = (int) $row[\'my_num_replies\'];
@@ -608,7 +608,7 @@ function loadForumTests()
 				HAVING unapproved_posts != COUNT(mu.id_msg)
 				ORDER BY t.id_topic',
 			'fix_processing' => create_function('$row', '
-				global , ;
+				global ;
 
 				$db = database();
 				$row[\'my_unapproved_posts\'] = (int) $row[\'my_unapproved_posts\'];
@@ -734,7 +734,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_msg',
 				'process' => create_function('$msgs', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -797,7 +797,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_poll',
 				'process' => create_function('$polls', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -830,7 +830,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => create_function('$events', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -861,7 +861,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => create_function('$topics', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -892,7 +892,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -923,7 +923,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => create_function('$boards', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -954,7 +954,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -985,7 +985,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => create_function('$boards', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1016,7 +1016,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1047,7 +1047,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_pm',
 				'process' => create_function('$pms', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1079,7 +1079,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1110,7 +1110,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_pm',
 				'process' => create_function('$guestMessages', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1141,7 +1141,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1170,7 +1170,7 @@ function loadForumTests()
 				WHERE t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
 					AND lss.id_topic IS NULL',
 			'fix_full_processing' => create_function('$result', '
-				global , ;
+				global ;
 
 				$db = database();
 
@@ -1228,7 +1228,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => create_function('$deleteTopics', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1259,7 +1259,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1289,7 +1289,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_poll',
 				'process' => create_function('$polls', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1319,7 +1319,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_report',
 				'process' => create_function('$reports', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1349,7 +1349,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_report',
 				'process' => create_function('$reports', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1380,7 +1380,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1411,7 +1411,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_group',
 				'process' => create_function('$groups', '
-					global , ;
+					global ;
 
 					$db = database();
 					$smcFunc[\'db_query\'](\'\', \'
@@ -1662,7 +1662,7 @@ function findForumErrors($do_fix = false)
  */
 function createSalvageArea()
 {
-	global $txt, $language, $salvageBoardID, $salvageCatID, ;
+	global $txt, $language, $salvageBoardID, $salvageCatID;
 
 	$db = database();
 	static $createOnce = false;

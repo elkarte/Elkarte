@@ -53,7 +53,7 @@ class DbSearch_MySQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

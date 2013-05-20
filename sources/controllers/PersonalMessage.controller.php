@@ -943,7 +943,7 @@ class PersonalMessage_Controller
 	function action_sendmessage2()
 	{
 		global $txt, $context;
-		global $user_info, $modSettings, $scripturl, ;
+		global $user_info, $modSettings, $scripturl;
 
 		$db = database();
 
@@ -1225,7 +1225,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messageactions()
 	{
-		global $txt, $context, $user_info, $options, ;
+		global $txt, $context, $user_info, $options;
 
 		$db = database();
 
@@ -1421,7 +1421,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messageprune()
 	{
-		global $txt, $context, $user_info, $scripturl, ;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -1493,7 +1493,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagelabels()
 	{
-		global $txt, $context, $user_info, $scripturl, ;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -1709,7 +1709,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagesettings()
 	{
-		global $txt, $user_settings, $user_info, $context, ;
+		global $txt, $user_settings, $user_info, $context;
 
 		$db = database();
 		global $scripturl, $profile_vars, $cur_profile, $user_profile;
@@ -1771,7 +1771,7 @@ class PersonalMessage_Controller
 	function action_reportmessage()
 	{
 		global $txt, $context, $scripturl;
-		global $user_info, $language, $modSettings, ;
+		global $user_info, $language, $modSettings;
 
 		$db = database();
 
@@ -1920,7 +1920,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagerules()
 	{
-		global $txt, $context, $user_info, $scripturl, ;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -2255,7 +2255,7 @@ function applyRules($all_messages = false)
  */
 function loadRules($reload = false)
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -2452,7 +2452,7 @@ function messageIndexBar($area)
  */
 function preparePMContext($type = 'subject', $reset = false)
 {
-	global $txt, $scripturl, $modSettings, $settings, $context, $messages_request, $memberContext, $recipients, ;
+	global $txt, $scripturl, $modSettings, $settings, $context, $messages_request, $memberContext, $recipients;
 
 	$db = database();
 	global $user_info, $subjects_request;

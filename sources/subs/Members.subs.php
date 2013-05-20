@@ -39,7 +39,7 @@ if (!defined('ELKARTE'))
  */
 function deleteMembers($users, $check_not_admin = false)
 {
-	global $modSettings, $user_info, ;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -437,7 +437,7 @@ function deleteMembers($users, $check_not_admin = false)
 function registerMember(&$regOptions, $return_errors = false)
 {
 	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings, ;
+	global $user_info, $options, $settings;
 
 	$db = database();
 
@@ -971,7 +971,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  */
 function groupsAllowedTo($permission, $board_id = null)
 {
-	global $modSettings, $board_info, ;
+	global $modSettings, $board_info;
 
 	$db = database();
 
@@ -1049,7 +1049,7 @@ function groupsAllowedTo($permission, $board_id = null)
  */
 function membersAllowedTo($permission, $board_id = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1097,7 +1097,7 @@ function membersAllowedTo($permission, $board_id = null)
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1183,7 +1183,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1255,7 +1255,7 @@ function list_getNumMembers($where, $where_params = array())
  */
 function populateDuplicateMembers(&$members)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1376,7 +1376,7 @@ function populateDuplicateMembers(&$members)
  */
 function isAnotherAdmin($memberID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1406,7 +1406,7 @@ function isAnotherAdmin($memberID)
  */
 function admins($id_admin = 0)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1437,7 +1437,7 @@ function admins($id_admin = 0)
  */
 function maxMemberID()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1532,7 +1532,7 @@ function getBasicMemberData($member_ids, $options = array())
  */
 function countInactiveMembers()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1562,7 +1562,7 @@ function countInactiveMembers()
  */
 function getMemberByName($name)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1588,7 +1588,7 @@ function getMemberByName($name)
 
 function getMember($search, $buddies = array())
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1719,7 +1719,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
  */
 function approveMembers($members, $condition, $timeBefore, $current_filter)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1750,7 +1750,7 @@ function approveMembers($members, $condition, $timeBefore, $current_filter)
  */
 function enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1778,7 +1778,7 @@ function enforceReactivation($member, $condition, $current_filter, $members, $ti
  */
 function countMembersInGroup($id_group = 0)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

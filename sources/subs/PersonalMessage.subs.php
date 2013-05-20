@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
 
 function loadMessageLimit()
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -54,7 +54,7 @@ function loadMessageLimit()
 
 function loadPMLabels()
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -88,7 +88,7 @@ function loadPMLabels()
 
 function getPMCount($descending = false, $pmID = null, $labelQuery)
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -140,7 +140,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
-	global $user_info, ;
+	global $user_info;
 
 	$db = database();
 
@@ -280,7 +280,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -355,7 +355,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
-	global $user_info, ;
+	global $user_info;
 
 	$db = database();
 
@@ -835,7 +835,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
  */
 function markPMsRead($memberID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1022,7 +1022,7 @@ function loadPMs($pm_options, $id_member)
  */
 function pmCount($id_member, $time)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

@@ -176,7 +176,7 @@ class Memberlist_Controller
 	 */
 	function action_mlall()
 	{
-		global $txt, $scripturl, $modSettings, $context, ;
+		global $txt, $scripturl, $modSettings, $context;
 
 		$db = database();
 
@@ -322,7 +322,7 @@ class Memberlist_Controller
 	 */
 	function action_mlsearch()
 	{
-		global $txt, $scripturl, $context, $modSettings, ;
+		global $txt, $scripturl, $context, $modSettings;
 
 		$db = database();
 

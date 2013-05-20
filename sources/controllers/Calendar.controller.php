@@ -172,7 +172,7 @@ class Calendar_Controller
 	function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
-		global $modSettings, $topic, ;
+		global $modSettings, $topic;
 
 		$db = database();
 

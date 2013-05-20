@@ -350,7 +350,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
  */
 function loadPermissionProfiles()
 {
-	global $context, $txt, ;
+	global $context, $txt;
 
 	$db = database();
 

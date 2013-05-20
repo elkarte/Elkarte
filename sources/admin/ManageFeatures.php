@@ -964,7 +964,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_profileedit()
 	{
-		global $txt, $scripturl, $context, ;
+		global $txt, $scripturl, $context;
 
 		$db = database();
 

@@ -363,7 +363,7 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, ;
+	global $db_connection, $webmaster_email, $db_last_error, $db_error_send;
 
 	$db = database();
 

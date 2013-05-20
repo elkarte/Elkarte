@@ -48,7 +48,7 @@ class Modlog_Controller
 	 */
 	public function action_modlog()
 	{
-		global $txt, $context, $scripturl, ;
+		global $txt, $context, $scripturl;
 
 		$db = database();
 

@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function recountOpenReports($flush = true)
 {
-	global $user_info, $context, ;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -71,7 +71,7 @@ function recountOpenReports($flush = true)
  */
 function recountUnapprovedPosts($approve_query = null)
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 
@@ -121,7 +121,7 @@ function recountUnapprovedPosts($approve_query = null)
  */
 function recountFailedEmails($approve_query = null)
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 	
@@ -245,7 +245,7 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -463,7 +463,7 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function list_getWarningCount()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

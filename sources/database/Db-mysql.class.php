@@ -530,7 +530,7 @@ class Database_MySQL implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1077,7 +1077,7 @@ class Database_MySQL implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global $db_name, ;
+		global $db_name;
 
 		$db = database();
 
@@ -1294,7 +1294,7 @@ class Database_MySQL implements Database
 	 */
 	function db_server_version()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1367,7 +1367,7 @@ class Database_MySQL implements Database
 	 */
 	function db_client_version()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

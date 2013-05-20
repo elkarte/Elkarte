@@ -538,7 +538,7 @@ function resizeBBCImages(&$message)
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
 	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -988,7 +988,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, ;
+	global $user_info, $txt, $modSettings;
 
 	$db = database();
 
@@ -1328,7 +1328,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, ;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -1476,7 +1476,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1701,7 +1701,7 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1739,7 +1739,7 @@ function approveTopics($topics, $approve = true)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, ;
+	global $scripturl, $language, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1897,7 +1897,7 @@ function sendApprovalNotifications(&$topicData)
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
-	global $board_info, $board, ;
+	global $board_info, $board;
 
 	$db = database();
 
@@ -2037,7 +2037,7 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info, ;
+	global $modSettings, $language, $scripturl, $user_info;
 
 	$db = database();
 
@@ -2322,7 +2322,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, ;
+	global $user_info, $scripturl, $modSettings;
 
 	$db = database();
 

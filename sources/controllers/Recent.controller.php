@@ -28,7 +28,7 @@ class Recent_Controller
 	 */
 	function action_recent()
 	{
-		global $txt, $scripturl, $user_info, $context, $modSettings, $board, ;
+		global $txt, $scripturl, $user_info, $context, $modSettings, $board;
 
 		$db = database();
 

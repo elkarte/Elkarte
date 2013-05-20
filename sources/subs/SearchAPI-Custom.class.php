@@ -157,7 +157,7 @@ class Custom_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 
@@ -192,7 +192,7 @@ class Custom_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 
@@ -289,7 +289,7 @@ class Custom_Search
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 
@@ -317,7 +317,7 @@ class Custom_Search
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 

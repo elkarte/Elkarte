@@ -227,7 +227,7 @@ class Register_Controller
 	function action_register2($verifiedOpenID = false)
 	{
 		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings, ;
+		global $user_info, $options, $settings;
 
 		$db = database();
 
@@ -695,7 +695,7 @@ class Register_Controller
 	 */
 	function action_coppa()
 	{
-		global $context, $modSettings, $txt, ;
+		global $context, $modSettings, $txt;
 
 		$db = database();
 

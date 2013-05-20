@@ -89,7 +89,7 @@ function updateSignature($id_member, $signature)
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
-	global $txt, $modSettings, ;
+	global $txt, $modSettings;
 
 	$db = database();
 

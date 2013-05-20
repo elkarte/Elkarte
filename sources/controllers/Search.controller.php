@@ -39,7 +39,7 @@ $GLOBALS['search_versions'] = array(
  */
 function action_plushsearch1()
 {
-	global $txt, $scripturl, $modSettings, $user_info, $context, ;
+	global $txt, $scripturl, $modSettings, $user_info, $context;
 
 	$db = database();
 
@@ -199,7 +199,7 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants, ;
+	global $excludedWords, $participants;
 
 	$db = database();
 
@@ -1803,7 +1803,7 @@ function action_plushsearch2()
  */
 function MessageSearch()
 {
-	global $context, $txt, $scripturl, $modSettings, ;
+	global $context, $txt, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -1883,7 +1883,7 @@ function MessageSearch()
 function MessageSearch2()
 {
 	global $scripturl, $modSettings, $user_info, $context, $txt;
-	global $memberContext, ;
+	global $memberContext;
 
 	$db = database();
 
@@ -2399,7 +2399,7 @@ function prepareSearchContext($reset = false)
 {
 	global $txt, $modSettings, $scripturl, $user_info;
 	global $memberContext, $context, $settings, $options, $messages_request;
-	global $boards_can, $participants, ;
+	global $boards_can, $participants;
 
 	$db = database();
 

@@ -183,7 +183,7 @@ class PackageServers_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $forum_version, $context, ;
+		global $txt, $context, $scripturl, $forum_version, $context;
 
 		$db = database();
 
@@ -700,7 +700,7 @@ class PackageServers_Controller
 	 */
 	public function action_add()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

@@ -339,7 +339,7 @@ class ManageScheduledTasks_Controller
 	 */
 	function action_log()
 	{
-		global $scripturl, $context, $txt, ;
+		global $scripturl, $context, $txt;
 
 		$db = database();
 

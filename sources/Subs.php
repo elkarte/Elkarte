@@ -47,7 +47,7 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -266,7 +266,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, ;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -420,7 +420,7 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -644,7 +644,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings, ;
+	global $context, $user_info, $txt, $modSettings;
 
 	$db = database();
 	static $non_twelve_hour;
@@ -819,7 +819,7 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -846,7 +846,7 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -940,7 +940,7 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, ;
+	global $txt, $scripturl, $context, $modSettings, $user_info;
 
 	$db = database();
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
@@ -2481,7 +2481,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, ;
+	global $modSettings, $txt, $user_info, $context;
 
 	$db = database();
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
@@ -2642,7 +2642,7 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, ;
+	global $context, $settings, $modSettings, $txt;
 
 	$db = database();
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
@@ -2782,7 +2782,7 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings, ;
+	global $user_settings;
 
 	$db = database();
 	static $loaded = false;
@@ -3339,7 +3339,7 @@ function template_css()
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 

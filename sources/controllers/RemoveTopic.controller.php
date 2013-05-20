@@ -84,7 +84,7 @@ class RemoveTopic_Controller
 	 */
 	function action_deletemsg()
 	{
-		global $user_info, $topic, $board, $modSettings, ;
+		global $user_info, $topic, $board, $modSettings;
 
 		$db = database();
 

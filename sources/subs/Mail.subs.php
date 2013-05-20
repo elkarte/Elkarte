@@ -291,7 +291,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
-	global $context, $modSettings, ;
+	global $context, $modSettings;
 
 	$db = database();
 
@@ -914,7 +914,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -937,7 +937,7 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -956,7 +956,7 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

@@ -1802,7 +1802,7 @@ class Post_Controller
 	function action_quotefast()
 	{
 		global $modSettings, $user_info, $txt, $settings, $context;
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -2168,7 +2168,7 @@ class Post_Controller
 	 */
 	function action_spellcheck()
 	{
-		global $txt, $context, ;
+		global $txt, $context;
 
 		$db = database();
 

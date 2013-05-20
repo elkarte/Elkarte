@@ -115,7 +115,7 @@ class ManageNews_Controller
 	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -347,7 +347,7 @@ class ManageNews_Controller
 	 */
 	public function action_mailingcompose()
 	{
-		global $txt, $context, ;
+		global $txt, $context;
 
 		$db = database();
 

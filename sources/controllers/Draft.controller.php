@@ -81,7 +81,7 @@ class Draft_Controller
 	 */
 	function action_showProfileDrafts($draft_type = 0)
 	{
-		global $txt, $scripturl, $modSettings, $context, ;
+		global $txt, $scripturl, $modSettings, $context;
 
 		$db = database();
 
@@ -194,7 +194,7 @@ class Draft_Controller
 	 */
 	function action_showPMDrafts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context, ;
+		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		$db = database();
 

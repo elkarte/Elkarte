@@ -407,7 +407,7 @@ class ManagePaid_Controller
 	 */
 	public function action_modify()
 	{
-		global $context, $txt, ;
+		global $context, $txt;
 
 		$db = database();
 

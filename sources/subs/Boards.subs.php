@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function markBoardsRead($boards, $unread = false)
 {
-	global $user_info, $modSettings, ;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -163,7 +163,7 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards, ;
+	global $cat_tree, $boards;
 
 	$db = database();
 
@@ -456,7 +456,7 @@ function modifyBoard($board_id, &$boardOptions)
  */
 function createBoard($boardOptions)
 {
-	global $boards, ;
+	global $boards;
 
 	$db = database();
 
@@ -550,7 +550,7 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $boards, ;
+	global $boards;
 
 	$db = database();
 
@@ -689,7 +689,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
  */
 function reorderBoards()
 {
-	global $cat_tree, $boardList, $boards, ;
+	global $cat_tree, $boardList, $boards;
 
 	$db = database();
 
@@ -732,7 +732,7 @@ function reorderBoards()
  */
 function fixChildren($parent, $newLevel, $newParent)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -776,7 +776,7 @@ function fixChildren($parent, $newLevel, $newParent)
  */
 function getBoardTree()
 {
-	global $cat_tree, $boards, $boardList, ;
+	global $cat_tree, $boards, $boardList;
 
 	$db = database();
 
@@ -935,7 +935,7 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -966,7 +966,7 @@ function hasBoardNotification($id_member, $id_board)
  */
 function setBoardNotification($id_member, $id_board, $on = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1000,7 +1000,7 @@ function setBoardNotification($id_member, $id_board, $on = false)
  */
 function accessibleBoards()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1030,7 +1030,7 @@ function accessibleBoards()
  */
 function boardInfo($board_id, $topic_id = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1082,7 +1082,7 @@ function boardInfo($board_id, $topic_id = null)
  */
 function getOtherGroups($curBoard)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1124,7 +1124,7 @@ function getOtherGroups($curBoard)
  */
 function getBoardModerators($idboard)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1153,7 +1153,7 @@ function getBoardModerators($idboard)
  */
 function getAllThemes()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1183,7 +1183,7 @@ function getAllThemes()
  */
 function getBoardProperties($idboard)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1211,7 +1211,7 @@ function getBoardProperties($idboard)
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1362,7 +1362,7 @@ function fetchBoardsInfo($conditions, $params = array())
  */
 function addChildBoards(&$boards)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

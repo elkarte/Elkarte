@@ -372,7 +372,7 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -436,7 +436,7 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -647,7 +647,7 @@ function pbe_check_moderation(&$pbe)
  */
 function pbe_emailError($error, $email_message)
 {
-	global $txt, ;
+	global $txt;
 
 	$db = database();
 
@@ -1096,7 +1096,7 @@ function query_load_user_info($email)
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1138,7 +1138,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  */
 function query_sender_wrapper($from)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1175,7 +1175,7 @@ function query_sender_wrapper($from)
  */
 function query_user_keys($email)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1206,7 +1206,7 @@ function query_user_keys($email)
  */
 function query_key_owner($key)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1238,7 +1238,7 @@ function query_key_owner($key)
  */
 function query_load_subject($message_id, $message_type, $email)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1328,7 +1328,7 @@ function query_load_subject($message_id, $message_type, $email)
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1402,7 +1402,7 @@ function query_load_message($message_type, $message_id, $pbe)
  */
 function query_load_board($message_id)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1428,7 +1428,7 @@ function query_load_board($message_id)
  */
 function query_load_board_details($board_id, $pbe)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1511,7 +1511,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1568,7 +1568,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
  */
 function query_mark_pms($email_message, $pbe)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1629,7 +1629,7 @@ function query_mark_pms($email_message, $pbe)
  */
 function query_key_maintenance($email_message)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1673,7 +1673,7 @@ function query_key_maintenance($email_message)
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
-	global , ;
+	global ;
 
 	$db = database();
 

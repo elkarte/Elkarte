@@ -242,7 +242,7 @@ class Poll_Controller
 	 */
 	function action_lockvoting()
 	{
-		global $topic, $user_info, ;
+		global $topic, $user_info;
 
 		$db = database();
 
@@ -590,7 +590,7 @@ class Poll_Controller
 	function action_editpoll2()
 	{
 		global $txt, $topic, $board, $context;
-		global $modSettings, $user_info, ;
+		global $modSettings, $user_info;
 
 		$db = database();
 
@@ -865,7 +865,7 @@ class Poll_Controller
 	 */
 	function action_removepoll()
 	{
-		global $topic, $user_info, ;
+		global $topic, $user_info;
 
 		$db = database();
 

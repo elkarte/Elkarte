@@ -491,7 +491,7 @@ class Database_SQLite implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1062,7 +1062,7 @@ class Database_SQLite implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

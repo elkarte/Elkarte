@@ -116,7 +116,7 @@ function openID_revalidate()
  */
 function openID_getAssociation($server, $handle = null, $no_delete = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -242,7 +242,7 @@ function openID_makeAssociation($server)
  */
 function openID_removeAssociation($handle)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -434,7 +434,7 @@ function openID_canonize($uri)
  */
 function openid_member_exists($url)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

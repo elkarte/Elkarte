@@ -408,7 +408,7 @@ function pbe_create_pm($pbe, $email_message)
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
-	global $txt, $modSettings, ;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -576,7 +576,7 @@ function action_pbe_preview($data = null)
  */
 function pbe_load_text($html, $email_message, $pbe)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

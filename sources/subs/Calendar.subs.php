@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -210,7 +210,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
  */
 function getHolidayRange($low_date, $high_date)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -260,7 +260,7 @@ function getHolidayRange($low_date, $high_date)
  */
 function canLinkEvent()
 {
-	global $user_info, $topic, $board, ;
+	global $user_info, $topic, $board;
 
 	$db = database();
 
@@ -748,7 +748,7 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -811,7 +811,7 @@ function validateEventPost()
  */
 function getEventPoster($event_id)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -846,7 +846,7 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -906,7 +906,7 @@ function insertEvent(&$eventOptions)
  */
 function modifyEvent($event_id, &$eventOptions)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -970,7 +970,7 @@ function modifyEvent($event_id, &$eventOptions)
  */
 function removeEvent($event_id)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -997,7 +997,7 @@ function removeEvent($event_id)
  */
 function getEventProperties($event_id)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1060,7 +1060,7 @@ function getEventProperties($event_id)
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1088,7 +1088,7 @@ function list_getHolidays($start, $items_per_page, $sort)
  */
 function list_getNumHolidays()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1111,7 +1111,7 @@ function list_getNumHolidays()
  */
 function removeHolidays($holiday_ids)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1137,7 +1137,7 @@ function removeHolidays($holiday_ids)
  */
 function editHoliday($holiday, $date, $title)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1165,7 +1165,7 @@ function editHoliday($holiday, $date, $title)
  */
 function insert_holiday($date, $title)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1193,7 +1193,7 @@ function insert_holiday($date, $title)
  */
 function getHoliday($id_holiday)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

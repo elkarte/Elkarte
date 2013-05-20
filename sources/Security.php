@@ -179,7 +179,7 @@ function is_not_guest($message = '', $is_fatal = true)
 function is_not_banned($forceCheck = false)
 {
 	global $txt, $modSettings, $context, $user_info;
-	global $cookiename, $user_settings, ;
+	global $cookiename, $user_settings;
 
 	$db = database();
 
@@ -507,7 +507,7 @@ function banPermissions()
  */
 function log_ban($ban_ids = array(), $email = null)
 {
-	global $user_info, ;
+	global $user_info;
 
 	$db = database();
 
@@ -545,7 +545,7 @@ function log_ban($ban_ids = array(), $email = null)
  */
 function isBannedEmail($email, $restriction, $error)
 {
-	global $txt, ;
+	global $txt;
 
 	$db = database();
 
@@ -911,7 +911,7 @@ function checkSubmitOnce($action, $is_fatal = true)
  */
 function allowedTo($permission, $boards = null)
 {
-	global $user_info, $modSettings, ;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -1048,7 +1048,7 @@ function isAllowedTo($permission, $boards = null)
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
-	global $user_info, $modSettings, ;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -1187,7 +1187,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  */
 function spamProtection($error_type)
 {
-	global $modSettings, $txt, $user_info, ;
+	global $modSettings, $txt, $user_info;
 
 	$db = database();
 

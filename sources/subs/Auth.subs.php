@@ -260,7 +260,7 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -330,7 +330,7 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $modSettings, ;
+	global $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -533,7 +533,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -569,7 +569,7 @@ function validatePassword($password, $username, $restrict_in = array())
  */
 function rebuildModCache()
 {
-	global $user_info, ;
+	global $user_info;
 
 	$db = database();
 
@@ -697,7 +697,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function logOnline($ids, $on = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -724,7 +724,7 @@ function logOnline($ids, $on = false)
  */
 function deleteOnline($session)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -744,7 +744,7 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -759,7 +759,7 @@ function isFirstLogin($id_member)
 
 function findUser($where, $whereparams)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -829,7 +829,7 @@ function generateValidationCode()
  */
 function loadExistingMember($name)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

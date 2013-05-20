@@ -138,7 +138,7 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -163,7 +163,7 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -194,7 +194,7 @@ function ml_alphaStart($start)
  */
 function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = '')
 {
-	global $context, $modSettings, ;
+	global $context, $modSettings;
 
 	$db = database();
 
@@ -228,7 +228,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  */
 function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limit = 0)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -310,7 +310,7 @@ function ml_findSearchableCustomFields()
  */
 function printMemberListRows($request)
 {
-	global $txt, $context, $scripturl, $memberContext, $settings, ;
+	global $txt, $context, $scripturl, $memberContext, $settings;
 
 	$db = database();
 

@@ -597,7 +597,7 @@ function action_showPosts()
 function action_showAttachments()
 {
 	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile, ;
+	global $context, $user_profile;
 
 	$db = database();
 
@@ -819,7 +819,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function action_showDisregarded()
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context, ;
+	global $txt, $user_info, $scripturl, $modSettings, $board, $context;
 
 	$db = database();
 
@@ -948,7 +948,7 @@ function action_showDisregarded()
  */
 function list_getDisregarded($start, $items_per_page, $sort, $memID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1037,7 +1037,7 @@ function list_getNumDisregarded($memID)
  */
 function action_statPanel()
 {
-	global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings, ;
+	global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1239,7 +1239,7 @@ function action_statPanel()
 function action_showPermissions()
 {
 	global $scripturl, $txt, $board, $modSettings;
-	global $user_profile, $context, $user_info, ;
+	global $user_profile, $context, $user_info;
 
 	$db = database();
 

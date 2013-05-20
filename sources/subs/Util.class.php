@@ -23,7 +23,7 @@ class Util
  	*/
 	static function compat_init()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

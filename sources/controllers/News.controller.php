@@ -320,7 +320,7 @@ class News_Controller
 	 */
 	function action_xmlmembers($xml_format)
 	{
-		global $scripturl, ;
+		global $scripturl;
 
 		$db = database();
 

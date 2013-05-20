@@ -279,7 +279,7 @@ class Emailuser_Controller
 	 */
 	function action_reporttm()
 	{
-		global $txt, $topic, $modSettings, $user_info, $context, ;
+		global $txt, $topic, $modSettings, $user_info, $context;
 
 		$db = database();
 
@@ -367,7 +367,7 @@ class Emailuser_Controller
 	 */
 	function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, ;
+		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
 
 		$db = database();
 

@@ -195,7 +195,7 @@ function reapplySubscriptions($users)
  */
 function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTime = 0, $forceEndTime = 0)
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 
@@ -439,7 +439,7 @@ function loadPaymentGateways()
  */
 function loadSubscriptions()
 {
-	global $context, $txt, $modSettings, ;
+	global $context, $txt, $modSettings;
 
 	$db = database();
 
@@ -988,7 +988,7 @@ function updatePendingSubscription($log_id, $details)
  */
 function removeSubscription($id_subscribe, $id_member, $delete = false)
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 

@@ -196,7 +196,7 @@ class ManageCalendar_Controller
 	 */
 	public function action_editholiday()
 	{
-		global $txt, $context, ;
+		global $txt, $context;
 
 		$db = database();
 

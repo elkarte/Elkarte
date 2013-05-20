@@ -350,7 +350,7 @@ class Sphinxql_Search
 	 */
 	private function _cleanString($string)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

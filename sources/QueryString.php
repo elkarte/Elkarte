@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  */
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl, ;
+	global $board, $topic, $boardurl, $scripturl;
 
 	$db = database();
 
@@ -403,7 +403,7 @@ function expandIPv6($addr, $strict_check = true)
  */
 function escapestring__recursive($var)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -433,7 +433,7 @@ function escapestring__recursive($var)
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -484,7 +484,7 @@ function urldecode__recursive($var, $level = 0)
  */
 function unescapestring__recursive($var)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -540,7 +540,7 @@ function stripslashes__recursive($var, $level = 0)
  */
 function htmltrim__recursive($var, $level = 0)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

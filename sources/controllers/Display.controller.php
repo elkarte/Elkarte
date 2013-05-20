@@ -34,7 +34,7 @@ class Display_Controller
 	 */
 	function action_index()
 	{
-		global $scripturl, $txt, $modSettings, $context, $settings, ;
+		global $scripturl, $txt, $modSettings, $context, $settings;
 
 		$db = database();
 		global $options, $user_info, $board_info, $topic, $board;
@@ -1038,7 +1038,7 @@ class Display_Controller
  */
 function prepareDisplayContext($reset = false)
 {
-	global $settings, $txt, $modSettings, $scripturl, $options, $user_info, ;
+	global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
 
 	$db = database();
 	global $memberContext, $context, $messages_request, $topic, $attachments, $topicinfo;
@@ -1181,7 +1181,7 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, ;
+	global $attachments, $modSettings, $txt, $scripturl, $topic;
 
 	$db = database();
 

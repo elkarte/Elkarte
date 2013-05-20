@@ -80,7 +80,7 @@ class Auth_Controller
 	 */
 	function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, ;
+		global $txt, $scripturl, $user_info, $user_settings;
 
 		$db = database();
 		global $cookiename, $maintenance, $modSettings, $context, $sc;
@@ -404,7 +404,7 @@ class Auth_Controller
  	*/
 	function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context, $modSettings, ;
+		global $user_info, $user_settings, $context, $modSettings;
 
 		$db = database();
 
@@ -514,7 +514,7 @@ function checkActivation()
  */
 function DoLogin()
 {
-	global $txt, $scripturl, $user_info, $user_settings, ;
+	global $txt, $scripturl, $user_info, $user_settings;
 
 	$db = database();
 	global $cookiename, $maintenance, $modSettings, $context;

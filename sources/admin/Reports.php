@@ -272,7 +272,7 @@ class Reports_Controller
 	 */
 	function action_board_perms()
 	{
-		global $context, $txt, $modSettings, ;
+		global $context, $txt, $modSettings;
 
 		$db = database();
 
@@ -439,7 +439,7 @@ class Reports_Controller
 	 */
 	function action_member_groups()
 	{
-		global $context, $txt, $settings, $modSettings, ;
+		global $context, $txt, $settings, $modSettings;
 
 		$db = database();
 
@@ -564,7 +564,7 @@ class Reports_Controller
 	 */
 	function action_group_perms()
 	{
-		global $context, $txt, $modSettings, ;
+		global $context, $txt, $modSettings;
 
 		$db = database();
 
@@ -669,7 +669,7 @@ class Reports_Controller
 	 */
 	function action_staff()
 	{
-		global $context, $txt, ;
+		global $context, $txt;
 
 		$db = database();
 

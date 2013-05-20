@@ -40,7 +40,7 @@ class DbSearch_SQLite implements DbSearch
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -78,7 +78,7 @@ class DbSearch_SQLite implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 

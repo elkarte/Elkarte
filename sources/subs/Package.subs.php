@@ -386,7 +386,7 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -451,7 +451,7 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -2902,7 +2902,7 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -3303,7 +3303,7 @@ function setPackageState($id)
  */
 function checkPackageDependency()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -3366,7 +3366,7 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
  */
 function setPackagesAsUninstalled()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

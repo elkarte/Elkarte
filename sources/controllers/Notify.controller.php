@@ -120,7 +120,7 @@ class Notify_Controller
 	 */
 	public function action_notifyboard()
 	{
-		global $scripturl, $txt, $board, $user_info, $context, ;
+		global $scripturl, $txt, $board, $user_info, $context;
 
 		$db = database();
 
@@ -171,7 +171,7 @@ class Notify_Controller
 	 */
 	public function action_notifyboard_api()
 	{
-		global $scripturl, $txt, $board, $user_info, $context, ;
+		global $scripturl, $txt, $board, $user_info, $context;
 
 		$db = database();
 

@@ -125,7 +125,7 @@ class MarkRead_Controller
 	*/
 	public function action_markreplies()
 	{
-		global $user_info, $modSettings, ;
+		global $user_info, $modSettings;
 
 		$db = database();
 
@@ -153,7 +153,7 @@ class MarkRead_Controller
 	*/
 	public function action_marktopic()
 	{
-		global $board, $topic, $user_info, ;
+		global $board, $topic, $user_info;
 
 		$db = database();
 
@@ -226,7 +226,7 @@ class MarkRead_Controller
 	*/
 	public function action_markasread()
 	{
-		global $board, $user_info, $board_info, $modSettings, ;
+		global $board, $user_info, $board_info, $modSettings;
 
 		$db = database();
 

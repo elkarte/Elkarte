@@ -38,7 +38,7 @@ class Attachment_Controller
 	 */
 	function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $scripturl, $context, $topic, ;
+		global $txt, $modSettings, $user_info, $scripturl, $context, $topic;
 
 		$db = database();
 

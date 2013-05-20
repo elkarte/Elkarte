@@ -180,7 +180,7 @@ class Reminder_Controller
 	 */
 	function action_setpassword2()
 	{
-		global $context, $txt, $modSettings, ;
+		global $context, $txt, $modSettings;
 
 		$db = database();
 
@@ -251,7 +251,7 @@ class Reminder_Controller
 	 */
 	function action_secret2()
 	{
-		global $txt, $context, $modSettings, ;
+		global $txt, $context, $modSettings;
 
 		$db = database();
 
@@ -326,7 +326,7 @@ class Reminder_Controller
  */
 function secretAnswerInput()
 {
-	global $txt, $context, ;
+	global $txt, $context;
 
 	$db = database();
 

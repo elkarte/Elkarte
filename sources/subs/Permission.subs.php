@@ -84,7 +84,7 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -212,7 +212,7 @@ class InlinePermissions_Form
 	 */
 	static function save_inline_permissions($permissions)
 	{
-		global $context, ;
+		global $context;
 
 		$db = database();
 
@@ -281,7 +281,7 @@ class InlinePermissions_Form
 	 */
 	static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
-		global $context, $txt, $modSettings, ;
+		global $context, $txt, $modSettings;
 
 		$db = database();
 

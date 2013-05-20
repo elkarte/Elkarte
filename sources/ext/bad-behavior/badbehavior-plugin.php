@@ -38,7 +38,7 @@ function bb2_db_date()
  */
 function bb2_db_affected_rows()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -53,7 +53,7 @@ function bb2_db_affected_rows()
  */
 function bb2_db_escape($string)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -68,7 +68,7 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -85,7 +85,7 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -119,7 +119,7 @@ function bb2_db_query($query)
  */
 function bb2_db_rows($result)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

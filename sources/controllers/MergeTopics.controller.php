@@ -58,7 +58,7 @@ class MergeTopics_Controller
 	 */
 	function action_mergeIndex()
 	{
-		global $txt, $board, $context, ;
+		global $txt, $board, $context;
 
 		$db = database();
 		global $scripturl, $topic, $user_info, $modSettings;

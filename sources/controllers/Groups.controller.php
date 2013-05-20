@@ -203,7 +203,7 @@ class Groups_Controller
 	 */
 	function action_groupmembers()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, ;
+		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
 		$db = database();
 
@@ -765,7 +765,7 @@ class Groups_Controller
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

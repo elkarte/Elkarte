@@ -51,7 +51,7 @@ class PostModeration_Controller
 	 */
 	function action_unapproved()
 	{
-		global $txt, $scripturl, $context, $user_info, ;
+		global $txt, $scripturl, $context, $user_info;
 
 		$db = database();
 
@@ -499,7 +499,7 @@ class PostModeration_Controller
  	 */
 	function action_approve()
 	{
-		global $user_info, $topic, $board, ;
+		global $user_info, $topic, $board;
 
 		$db = database();
 
@@ -571,7 +571,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

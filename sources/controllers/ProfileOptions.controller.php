@@ -70,7 +70,7 @@ function action_editBuddyIgnoreLists()
 function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, ;
+	global $context, $user_profile, $memberContext;
 
 	$db = database();
 
@@ -185,7 +185,7 @@ function action_editBuddies($memID)
 function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, ;
+	global $context, $user_profile, $memberContext;
 
 	$db = database();
 
@@ -370,7 +370,7 @@ function action_pmprefs()
  */
 function action_themepick()
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, ;
+	global $txt, $context, $user_profile, $modSettings, $settings, $user_info;
 
 	$db = database();
 
@@ -909,7 +909,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
  */
 function loadThemeOptions($memID)
 {
-	global $context, $options, $cur_profile, ;
+	global $context, $options, $cur_profile;
 
 	$db = database();
 
@@ -991,7 +991,7 @@ function action_ignoreboards()
  */
 function action_groupMembership()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, ;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings;
 
 	$db = database();
 

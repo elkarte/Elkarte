@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  */
 function action_who()
 {
-	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext, ;
+	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext;
 
 	$db = database();
 

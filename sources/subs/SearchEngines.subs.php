@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function spiderCheck()
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -170,7 +170,7 @@ function logSpider()
  */
 function consolidateSpiderStats()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -239,7 +239,7 @@ function consolidateSpiderStats()
  */
 function recacheSpiderNames()
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -262,7 +262,7 @@ function recacheSpiderNames()
  */
 function sortSpiderTable()
 {
-	global , ;
+	global ;
 
 	$db = database();
 

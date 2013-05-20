@@ -117,7 +117,7 @@ class Themes_Controller
 	 */
 	function action_admin()
 	{
-		global $context, $modSettings, ;
+		global $context, $modSettings;
 
 		$db = database();
 
@@ -182,7 +182,7 @@ class Themes_Controller
 	 */
 	function action_list()
 	{
-		global $context, $boardurl, ;
+		global $context, $boardurl;
 
 		$db = database();
 
@@ -308,7 +308,7 @@ class Themes_Controller
 	 */
 	function action_options()
 	{
-		global $txt, $context, $settings, $modSettings, ;
+		global $txt, $context, $settings, $modSettings;
 
 		$db = database();
 
@@ -693,7 +693,7 @@ class Themes_Controller
 	 */
 	function action_setthemesettings()
 	{
-		global $txt, $context, $settings, $modSettings, ;
+		global $txt, $context, $settings, $modSettings;
 
 		$db = database();
 
@@ -872,7 +872,7 @@ class Themes_Controller
 	 */
 	function action_remove()
 	{
-		global $modSettings, $context, ;
+		global $modSettings, $context;
 
 		$db = database();
 
@@ -1280,7 +1280,7 @@ class Themes_Controller
 	 */
 	function action_install()
 	{
-		global $boardurl, $txt, $context, $settings, $modSettings, ;
+		global $boardurl, $txt, $context, $settings, $modSettings;
 
 		$db = database();
 
@@ -1695,7 +1695,7 @@ class Themes_Controller
 	 */
 	function action_edit()
 	{
-		global $context, $settings, $scripturl, ;
+		global $context, $settings, $scripturl;
 
 		$db = database();
 
@@ -2090,7 +2090,7 @@ class Themes_Controller
 	 */
 	function action_copy()
 	{
-		global $context, $settings, ;
+		global $context, $settings;
 
 		$db = database();
 

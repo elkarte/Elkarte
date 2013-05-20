@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, ;
+	global $context, $cur_profile, $memberContext;
 
 	$db = database();
 
@@ -382,7 +382,7 @@ function action_issuewarning()
  */
 function action_deleteaccount()
 {
-	global $txt, $context, $user_info, $modSettings, $cur_profile, ;
+	global $txt, $context, $user_info, $modSettings, $cur_profile;
 
 	$db = database();
 
@@ -408,7 +408,7 @@ function action_deleteaccount()
  */
 function action_deleteaccount2()
 {
-	global $user_info, $context, $cur_profile, $modSettings, ;
+	global $user_info, $context, $cur_profile, $modSettings;
 
 	$db = database();
 

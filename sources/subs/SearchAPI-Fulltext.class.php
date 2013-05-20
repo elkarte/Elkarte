@@ -114,7 +114,7 @@ class Fulltext_Search
 	 */
 	protected function _getMinWordLength()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -152,7 +152,7 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords, ;
+		global $excludedWords;
 
 		$db = database();
 
@@ -175,7 +175,7 @@ class Fulltext_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 
@@ -219,7 +219,7 @@ class Fulltext_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 

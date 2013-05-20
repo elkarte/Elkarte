@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -376,7 +376,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopics($topics, $toBoard)
 {
-	global $user_info, $modSettings, ;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -728,7 +728,7 @@ function moveTopicConcurrence()
  */
 function increaseViewCounter($id_topic)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -750,7 +750,7 @@ function increaseViewCounter($id_topic)
  */
 function markTopicsRead($mark_topics, $was_set = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -864,7 +864,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
  */
 function hasTopicNotification($id_member, $id_topic)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -895,7 +895,7 @@ function hasTopicNotification($id_member, $id_topic)
  */
 function setTopicNotification($id_member, $id_topic, $on = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -967,7 +967,7 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1135,7 +1135,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 
@@ -1211,7 +1211,7 @@ function removeOldTopics()
  */
 function topicsStartedBy($memberID)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1239,7 +1239,7 @@ function topicsStartedBy($memberID)
  */
 function messagesAfter($topic, $message)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1311,7 +1311,7 @@ function messageInfo($topic, $message, $topic_approved = false)
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1372,7 +1372,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
  */
 function unapprovedPosts($id_topic, $id_member)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1405,7 +1405,7 @@ function unapprovedPosts($id_topic, $id_member)
  */
 function updateSplitTopics($options, $id_board)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1486,7 +1486,7 @@ function updateSplitTopics($options, $id_board)
 
 function topicStarter($topic)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1517,7 +1517,7 @@ function topicStarter($topic)
  */
 function setTopicAttribute($topic, $attributes)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1552,7 +1552,7 @@ function setTopicAttribute($topic, $attributes)
  */
 function toggleTopicSticky($topics)
 {
-	global , ;
+	global ;
 
 	$db = database();
 
@@ -1581,7 +1581,7 @@ function toggleTopicSticky($topics)
  */
 function getLoggedTopics($member, $topics)
 {
-	global , ;
+	global ;
 
 	$db = database();
 

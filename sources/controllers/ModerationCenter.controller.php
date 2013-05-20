@@ -124,7 +124,7 @@ class ModerationCenter_Controller
 	 */
 	function action_reportedPosts()
 	{
-		global $txt, $context, $scripturl, $user_info, ;
+		global $txt, $context, $scripturl, $user_info;
 
 		$db = database();
 
@@ -504,7 +504,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modReport()
 	{
-		global $user_info, $context, $scripturl, $txt, ;
+		global $user_info, $context, $scripturl, $txt;
 
 		$db = database();
 
@@ -1407,7 +1407,7 @@ function ModBlockNotes()
  */
 function ModBlockReportedPosts()
 {
-	global $context, $user_info, $scripturl, ;
+	global $context, $user_info, $scripturl;
 
 	$db = database();
 
@@ -1474,7 +1474,7 @@ function ModBlockReportedPosts()
  */
 function ModBlockGroupRequests()
 {
-	global $context, $user_info, $scripturl, ;
+	global $context, $user_info, $scripturl;
 
 	$db = database();
 
@@ -1735,7 +1735,7 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
  */
 function action_modcenter($dont_call = false)
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options, ;
+	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options;
 
 	$db = database();
 

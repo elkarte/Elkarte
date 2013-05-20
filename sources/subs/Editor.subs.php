@@ -75,7 +75,7 @@ function action_loadlocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $context, $txt, $settings, ;
+	global $modSettings, $context, $txt, $settings;
 
 	$db = database();
 
@@ -149,7 +149,7 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, ;
+	global $txt, $modSettings, $options;
 
 	$db = database();
 	global $context, $settings, $user_info, $scripturl;
@@ -1069,7 +1069,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function prepareContext()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1205,7 +1205,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _verifyAnswers()
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1231,7 +1231,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _refreshQuestionsCache()
 	{
-		global $modSettings, ;
+		global $modSettings;
 
 		$db = database();
 
@@ -1260,7 +1260,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _loadAntispamQuestions($filter = null)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1295,7 +1295,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _delete($id)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1310,7 +1310,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _update($id, $question, $answers, $language)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1333,7 +1333,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _insert($questions)
 	{
-		global , ;
+		global ;
 
 		$db = database();
 
@@ -1372,7 +1372,7 @@ function theme_postbox($msg)
  */
 function bbc_to_html($text, $compat_mode = false)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 

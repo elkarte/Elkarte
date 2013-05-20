@@ -148,7 +148,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, ;
+	global $modSettings, $user_settings;
 
 	$db = database();
 	global $cookiename, $user_info, $language, $context;
@@ -410,7 +410,7 @@ function loadUserSettings()
 function loadBoard()
 {
 	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic, $user_info, ;
+	global $board_info, $board, $topic, $user_info;
 
 	$db = database();
 
@@ -670,7 +670,7 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, ;
+	global $user_info, $board, $board_info, $modSettings;
 
 	$db = database();
 
@@ -947,7 +947,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
 	global $context, $modSettings, $board_info, $settings;
-	global , ;
+	global ;
 
 	$db = database();
 	static $dataLoaded = array();
@@ -1152,7 +1152,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $ssi_theme, ;
+	global $context, $settings, $options, $ssi_theme;
 
 	$db = database();
 
@@ -2117,7 +2117,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
  */
 function getBoardParents($id_parent)
 {
-	global $scripturl, ;
+	global $scripturl;
 
 	$db = database();
 

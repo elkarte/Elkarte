@@ -205,7 +205,7 @@ function getMembersOnlineStats($membersOnlineOptions)
  */
 function trackStatsUsersOnline($total_users_online)
 {
-	global $modSettings, ;
+	global $modSettings;
 
 	$db = database();
 

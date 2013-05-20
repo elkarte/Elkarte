@@ -246,7 +246,7 @@ function action_previews()
  */
 function action_newspreview()
 {
-	global $context, ;
+	global $context;
 
 	$db = database();
 
