@@ -2592,7 +2592,7 @@ function preparePMContext($type = 'subject', $reset = false)
 function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 

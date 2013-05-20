@@ -27,7 +27,7 @@ class ModerateAttachments_Controller
 	 */
 	function action_attachapprove()
 	{
-		global , $user_info;
+		global $user_info;
 
 		$db = database();
 

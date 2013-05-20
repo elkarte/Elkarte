@@ -115,7 +115,7 @@ class ManageNews_Controller
 	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
-		global ;
+
 
 		$db = database();
 

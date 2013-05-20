@@ -43,7 +43,7 @@ class Database_PostgreSQL implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global , $mysql_set_mode;
+		global $mysql_set_mode;
 
 		$db = database();
 
@@ -600,7 +600,7 @@ class Database_PostgreSQL implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global ;
+
 
 		$db = database();
 
@@ -939,7 +939,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_sql($tableName, $new_table = false)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 		static $start = 0, $num_rows, $fields, $limit;
@@ -1018,7 +1018,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_table_sql($tableName)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 
@@ -1126,7 +1126,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1158,7 +1158,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 
@@ -1191,7 +1191,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_backup_table($table, $backup_table)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 

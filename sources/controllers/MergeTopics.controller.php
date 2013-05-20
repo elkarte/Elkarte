@@ -196,7 +196,7 @@ class MergeTopics_Controller
 	function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
-		global , $language, $modSettings;
+		global $language, $modSettings;
 
 		$db = database();
 

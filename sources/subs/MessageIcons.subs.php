@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function getMessageIcons()
 {
-	global , $settings, $txt;
+	global $settings, $txt;
 
 	$db = database();
 

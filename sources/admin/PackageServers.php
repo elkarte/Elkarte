@@ -700,7 +700,7 @@ class PackageServers_Controller
 	 */
 	public function action_add()
 	{
-		global ;
+
 
 		$db = database();
 

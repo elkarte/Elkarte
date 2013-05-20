@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
 
 function viewers($id, $session, $type = 'topic')
 {
-	global ;
+
 
 	$db = database();
 

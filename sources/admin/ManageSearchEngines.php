@@ -794,7 +794,7 @@ class ManageSearchEngines_Controller
  */
 function list_getSpiders($start, $items_per_page, $sort)
 {
-	global ;
+
 
 	$db = database();
 
@@ -820,7 +820,7 @@ function list_getSpiders($start, $items_per_page, $sort)
  */
 function list_getNumSpiders()
 {
-	global ;
+
 
 	$db = database();
 
@@ -846,7 +846,7 @@ function list_getNumSpiders()
  */
 function list_getSpiderLogs($start, $items_per_page, $sort)
 {
-	global ;
+
 
 	$db = database();
 
@@ -873,7 +873,7 @@ function list_getSpiderLogs($start, $items_per_page, $sort)
  */
 function list_getNumSpiderLogs()
 {
-	global ;
+
 
 	$db = database();
 
@@ -900,7 +900,7 @@ function list_getNumSpiderLogs()
  */
 function list_getSpiderStats($start, $items_per_page, $sort)
 {
-	global ;
+
 
 	$db = database();
 
@@ -929,7 +929,7 @@ function list_getSpiderStats($start, $items_per_page, $sort)
  */
 function list_getNumSpiderStats()
 {
-	global ;
+
 
 	$db = database();
 

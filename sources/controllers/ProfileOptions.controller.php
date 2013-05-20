@@ -713,7 +713,7 @@ function action_notification()
  */
 function list_getTopicNotificationCount($memID)
 {
-	global , $user_info, $context, $modSettings;
+	global $user_info, $context, $modSettings;
 
 	$db = database();
 
@@ -748,7 +748,7 @@ function list_getTopicNotificationCount($memID)
  */
 function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global , $txt, $scripturl, $user_info, $context, $modSettings;
+	global $txt, $scripturl, $user_info, $context, $modSettings;
 
 	$db = database();
 
@@ -807,7 +807,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 
 function getBoardNotificationsCount($memID)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -841,7 +841,7 @@ function getBoardNotificationsCount($memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global , $txt, $scripturl, $user_info, $modSettings;
+	global $txt, $scripturl, $user_info, $modSettings;
 
 	$db = database();
 

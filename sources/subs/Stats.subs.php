@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  */
 function onlineCount()
 {
-	global ;
+
 
 	$db = database();
 

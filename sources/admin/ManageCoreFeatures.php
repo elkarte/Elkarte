@@ -171,7 +171,7 @@ class ManageCoreFeatures_Controller
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => create_function('$value', '
-					global ;
+
 
 					$db = database();
 					if (!$value)
@@ -203,7 +203,7 @@ class ManageCoreFeatures_Controller
 					'drafts_show_saved_enabled' => 2,
 				),
 				'setting_callback' => create_function('$value', '
-					global ;
+
 
 					$db = database();
 
@@ -273,7 +273,7 @@ class ManageCoreFeatures_Controller
 					'paid_enabled' => 1,
 				),
 				'setting_callback' => create_function('$value', '
-					global ;
+
 
 					$db = database();
 

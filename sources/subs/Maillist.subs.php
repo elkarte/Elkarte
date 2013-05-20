@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 {
-	global , $txt, $boardurl, $user_info;
+	global $txt, $boardurl, $user_info;
 
 	$db = database();
 
@@ -107,7 +107,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
  */
 function list_maillist_count_unapproved()
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -148,7 +148,7 @@ function list_maillist_count_unapproved()
  */
 function maillist_delete_entry($id)
 {
-	global ;
+
 
 	$db = database();
 
@@ -176,7 +176,7 @@ function maillist_delete_entry($id)
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
-	global ;
+
 
 	$db = database();
 
@@ -231,7 +231,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
  */
 function list_count_filter_parser($id, $style)
 {
-	global ;
+
 
 	$db = database();
 
@@ -265,7 +265,7 @@ function list_count_filter_parser($id, $style)
  */
 function maillist_load_filter_parser($id, $style)
 {
-	global ;
+
 
 	$db = database();
 
@@ -300,7 +300,7 @@ function maillist_load_filter_parser($id, $style)
  */
 function maillist_delete_filter_parser($id)
 {
-	global ;
+
 
 	$db = database();
 
@@ -325,7 +325,7 @@ function maillist_delete_filter_parser($id)
  */
 function maillist_board_list()
 {
-	global ;
+
 
 	$db = database();
 
@@ -355,7 +355,7 @@ function maillist_board_list()
  */
 function enable_maillist_imap_cron($switch)
 {
-	global ;
+
 
 	$db = database();
 
@@ -377,7 +377,7 @@ function enable_maillist_imap_cron($switch)
  */
 function maillist_templates()
 {
-	global , $user_info, $txt;
+	global $user_info, $txt;
 
 	$db = database();
 

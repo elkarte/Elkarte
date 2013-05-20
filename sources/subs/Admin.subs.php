@@ -307,7 +307,7 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global , $language, $modSettings;
+	global $language, $modSettings;
 
 	$db = database();
 

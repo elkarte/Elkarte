@@ -576,7 +576,7 @@ function action_pbe_preview($data = null)
  */
 function pbe_load_text($html, $email_message, $pbe)
 {
-	global ;
+
 
 	$db = database();
 

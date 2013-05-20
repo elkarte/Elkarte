@@ -924,7 +924,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function validateAccess($row, $maillist, &$email_perm = true)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 	static $board_profile = array();
@@ -1476,7 +1476,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1701,7 +1701,7 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global ;
+
 
 	$db = database();
 
@@ -2370,7 +2370,7 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global , $modSettings, $context;
+	global $modSettings, $context;
 
 	$db = database();
 

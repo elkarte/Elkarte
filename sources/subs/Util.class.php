@@ -23,9 +23,7 @@ class Util
  	*/
 	static function compat_init()
 	{
-		global ;
-
-		$db = database();
+		global $smcFunc;
 
 		$smcFunc += array(
 			'entity_fix' => create_function('$string', 'return Util::entity_fix($string);'),

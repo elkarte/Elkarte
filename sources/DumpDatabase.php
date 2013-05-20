@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
 function DumpDatabase2()
 {
 	global $db_name, $scripturl, $context, $modSettings, $crlf;
-	global , $db_prefix, $db_show_debug;
+	global $db_prefix, $db_show_debug;
 
 	$db = database();
 

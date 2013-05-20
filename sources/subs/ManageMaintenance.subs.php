@@ -153,7 +153,7 @@ function detectExceedingMessages($start, $increment)
  */
 function getExceedingMessages($msg)
 {
-	global , $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -182,7 +182,7 @@ function getExceedingMessages($msg)
  */
 function getElkTables()
 {
-	global , $db_prefix;
+	global $db_prefix;
 
 	$db = database();
 
@@ -726,7 +726,7 @@ function countContributors()
  */
 function updateMembersPostCount($start, $increment)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -773,7 +773,7 @@ function updateMembersPostCount($start, $increment)
  */
 function updateZeroPostMembers()
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 

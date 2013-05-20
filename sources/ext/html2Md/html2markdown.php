@@ -471,7 +471,7 @@ class Convert_Md
 	 */
 	private function _convert_header($level, $content)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -549,7 +549,7 @@ class Convert_Md
 	 */
 	function _convert_table($node)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -827,7 +827,7 @@ class Convert_Md
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
-		global ;
+
 
 		$db = database();
 

@@ -35,7 +35,7 @@ if (!defined('ELKARTE'))
  */
 function getBoardIndex($boardIndexOptions)
 {
-	global , $scripturl, $user_info, $modSettings, $txt;
+	global $scripturl, $user_info, $modSettings, $txt;
 
 	$db = database();
 	global $settings, $context;

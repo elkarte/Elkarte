@@ -20,7 +20,7 @@ if (!defined('ELKARTE'))
  */
 function followupTopics($messages, $include_approved = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -50,7 +50,7 @@ function followupTopics($messages, $include_approved = false)
  */
 function topicStartedHere($topic, $include_approved = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -80,7 +80,7 @@ function topicStartedHere($topic, $include_approved = false)
  */
 function linkMessages($msg, $topic)
 {
-	global ;
+
 
 	$db = database();
 
@@ -99,7 +99,7 @@ function linkMessages($msg, $topic)
  */
 function unlinkMessages($msg, $topic)
 {
-	global ;
+
 
 	$db = database();
 
@@ -120,7 +120,7 @@ function unlinkMessages($msg, $topic)
  */
 function removeFollowUpsByTopic($topics)
 {
-	global ;
+
 
 	$db = database();
 
@@ -138,7 +138,7 @@ function removeFollowUpsByTopic($topics)
  */
 function removeFollowUpsByMessage($msgs)
 {
-	global ;
+
 
 	$db = database();
 

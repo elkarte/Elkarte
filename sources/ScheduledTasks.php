@@ -378,7 +378,7 @@ function scheduled_approval_notification()
  */
 function scheduled_daily_maintenance()
 {
-	global , $modSettings, $db_type;
+	global $modSettings, $db_type;
 
 	$db = database();
 
@@ -1839,7 +1839,7 @@ function scheduled_remove_temp_attachments()
  */
 function scheduled_remove_topic_redirect()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1879,7 +1879,7 @@ function scheduled_remove_topic_redirect()
  */
 function scheduled_remove_old_drafts()
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1933,7 +1933,7 @@ function scheduled_maillist_fetch_IMAP()
  */
 function scheduled_remove_old_followups()
 {
-	global ;
+
 
 	$db = database();
 

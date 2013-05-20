@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 
@@ -1346,7 +1346,7 @@ function deletePermissionProfiles($profiles)
  */
 function permProfilesInUse($profiles)
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 

@@ -42,9 +42,7 @@ class Database_MySQL implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global , $mysql_set_mode;
-
-		$db = database();
+		global $mysql_set_mode, $smcFunc;
 
 		// Map some database specific functions, only do this once.
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'mysql_fetch_assoc')
@@ -530,7 +528,7 @@ class Database_MySQL implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global ;
+
 
 		$db = database();
 
@@ -728,7 +726,7 @@ class Database_MySQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global , $db_connection, $db_prefix;
+		global $db_connection, $db_prefix;
 
 		$db = database();
 
@@ -885,7 +883,7 @@ class Database_MySQL implements Database
 	 */
 	function insert_sql($tableName, $new_table = false)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 		static $start = 0, $num_rows, $fields, $limit;
@@ -962,7 +960,7 @@ class Database_MySQL implements Database
 	 */
 	function db_table_sql($tableName)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 
@@ -1110,7 +1108,7 @@ class Database_MySQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global , $db_name, $db_prefix;
+		global $db_name, $db_prefix;
 
 		$db = database();
 
@@ -1160,7 +1158,7 @@ class Database_MySQL implements Database
 	 */
 	function db_backup_table($table, $backup_table)
 	{
-		global , $db_prefix;
+		global $db_prefix;
 
 		$db = database();
 
@@ -1294,7 +1292,7 @@ class Database_MySQL implements Database
 	 */
 	function db_server_version()
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1367,7 +1365,7 @@ class Database_MySQL implements Database
 	 */
 	function db_client_version()
 	{
-		global ;
+
 
 		$db = database();
 

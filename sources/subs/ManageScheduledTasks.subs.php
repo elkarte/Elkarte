@@ -124,7 +124,7 @@ function updateTask($id_task, $disabled, $offset, $interval, $unit)
  */
 function loadTaskDetails($id_task)
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 
@@ -172,7 +172,7 @@ function loadTaskDetails($id_task)
  */
 function list_getScheduledTasks()
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 
@@ -214,7 +214,7 @@ function list_getScheduledTasks()
  */
 function list_getTaskLogEntries($start, $items_per_page, $sort)
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 

@@ -732,7 +732,7 @@ function reorderBoards()
  */
 function fixChildren($parent, $newLevel, $newParent)
 {
-	global ;
+
 
 	$db = database();
 
@@ -935,7 +935,7 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
-	global ;
+
 
 	$db = database();
 
@@ -966,7 +966,7 @@ function hasBoardNotification($id_member, $id_board)
  */
 function setBoardNotification($id_member, $id_board, $on = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1000,7 +1000,7 @@ function setBoardNotification($id_member, $id_board, $on = false)
  */
 function accessibleBoards()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1030,7 +1030,7 @@ function accessibleBoards()
  */
 function boardInfo($board_id, $topic_id = null)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1082,7 +1082,7 @@ function boardInfo($board_id, $topic_id = null)
  */
 function getOtherGroups($curBoard)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1124,7 +1124,7 @@ function getOtherGroups($curBoard)
  */
 function getBoardModerators($idboard)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1153,7 +1153,7 @@ function getBoardModerators($idboard)
  */
 function getAllThemes()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1183,7 +1183,7 @@ function getAllThemes()
  */
 function getBoardProperties($idboard)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1211,7 +1211,7 @@ function getBoardProperties($idboard)
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1269,7 +1269,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  */
 function fetchBoardsInfo($conditions, $params = array())
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1362,7 +1362,7 @@ function fetchBoardsInfo($conditions, $params = array())
  */
 function addChildBoards(&$boards)
 {
-	global ;
+
 
 	$db = database();
 

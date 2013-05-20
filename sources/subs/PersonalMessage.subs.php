@@ -835,7 +835,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
  */
 function markPMsRead($memberID)
 {
-	global ;
+
 
 	$db = database();
 
@@ -868,7 +868,7 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
-	global , $context, $modSettings;
+	global $context, $modSettings;
 
 	$db = database();
 
@@ -1022,7 +1022,7 @@ function loadPMs($pm_options, $id_member)
  */
 function pmCount($id_member, $time)
 {
-	global ;
+
 
 	$db = database();
 

@@ -571,7 +571,7 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global ;
+
 
 	$db = database();
 

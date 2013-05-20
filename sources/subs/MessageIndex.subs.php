@@ -31,7 +31,7 @@ if (!defined('ELKARTE'))
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 

@@ -334,7 +334,7 @@ class paypal_payment
 	 */
 	public function close()
 	{
-		global , $subscription_id;
+		global $subscription_id;
 
 		$db = database();
 
@@ -363,7 +363,7 @@ class paypal_payment
 	 */
 	private function _findSubscription()
 	{
-		global ;
+
 
 		$db = database();
 

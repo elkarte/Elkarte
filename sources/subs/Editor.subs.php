@@ -1069,7 +1069,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function prepareContext()
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1205,7 +1205,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _verifyAnswers()
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1260,7 +1260,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _loadAntispamQuestions($filter = null)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1295,7 +1295,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _delete($id)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1310,7 +1310,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _update($id, $question, $answers, $language)
 	{
-		global ;
+
 
 		$db = database();
 
@@ -1333,7 +1333,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _insert($questions)
 	{
-		global ;
+
 
 		$db = database();
 

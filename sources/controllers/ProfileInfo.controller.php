@@ -715,7 +715,7 @@ function action_showAttachments()
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
-	global , $board, $modSettings, $context;
+	global $board, $modSettings, $context;
 
 	$db = database();
 
@@ -948,7 +948,7 @@ function action_showDisregarded()
  */
 function list_getDisregarded($start, $items_per_page, $sort, $memID)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1008,7 +1008,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
  */
 function list_getNumDisregarded($memID)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 

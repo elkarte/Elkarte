@@ -245,7 +245,7 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	global ;
+
 
 	$db = database();
 
@@ -276,7 +276,7 @@ function logWarningNotice($subject, $body)
  */
 function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -301,7 +301,7 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -348,7 +348,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global , $scripturl, $user_info;
+	global $scripturl, $user_info;
 
 	$db = database();
 
@@ -393,7 +393,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
  */
 function list_getWarningTemplateCount($template_type = 'warntpl')
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -423,7 +423,7 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
  */
 function list_getWarnings($start, $items_per_page, $sort)
 {
-	global , $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -463,7 +463,7 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function list_getWarningCount()
 {
-	global ;
+
 
 	$db = database();
 
@@ -488,7 +488,7 @@ function list_getWarningCount()
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global , $user_info, $context;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -528,7 +528,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -577,7 +577,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  */
 function modReportDetails($id_report)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 

@@ -546,7 +546,7 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	global ;
+
 
 	$db = database();
 

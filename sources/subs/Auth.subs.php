@@ -260,7 +260,7 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	global ;
+
 
 	$db = database();
 
@@ -697,7 +697,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function logOnline($ids, $on = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -724,7 +724,7 @@ function logOnline($ids, $on = false)
  */
 function deleteOnline($session)
 {
-	global ;
+
 
 	$db = database();
 
@@ -744,7 +744,7 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-	global ;
+
 
 	$db = database();
 
@@ -759,7 +759,7 @@ function isFirstLogin($id_member)
 
 function findUser($where, $whereparams)
 {
-	global ;
+
 
 	$db = database();
 
@@ -803,7 +803,7 @@ function findUser($where, $whereparams)
  */
 function generateValidationCode()
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -829,7 +829,7 @@ function generateValidationCode()
  */
 function loadExistingMember($name)
 {
-	global ;
+
 
 	$db = database();
 

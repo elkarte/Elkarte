@@ -105,7 +105,7 @@ function spiderCheck()
  */
 function logSpider()
 {
-	global , $modSettings, $context;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -170,7 +170,7 @@ function logSpider()
  */
 function consolidateSpiderStats()
 {
-	global ;
+
 
 	$db = database();
 
@@ -239,7 +239,7 @@ function consolidateSpiderStats()
  */
 function recacheSpiderNames()
 {
-	global ;
+
 
 	$db = database();
 
@@ -262,7 +262,7 @@ function recacheSpiderNames()
  */
 function sortSpiderTable()
 {
-	global ;
+
 
 	$db = database();
 

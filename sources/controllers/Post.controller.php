@@ -1802,7 +1802,7 @@ class Post_Controller
 	function action_quotefast()
 	{
 		global $modSettings, $user_info, $txt, $settings, $context;
-		global ;
+
 
 		$db = database();
 

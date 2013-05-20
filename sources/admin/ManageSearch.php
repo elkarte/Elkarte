@@ -963,7 +963,7 @@ function loadSearchAPIs()
  */
 function detectFulltextIndex()
 {
-	global , $context, $db_prefix;
+	global $context, $db_prefix;
 
 	$db = database();
 

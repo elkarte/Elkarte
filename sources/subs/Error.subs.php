@@ -88,7 +88,7 @@ function numErrors()
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
-	global , $modSettings, $scripturl, $txt;
+	global $modSettings, $scripturl, $txt;
 
 	$db = database();
 
@@ -168,7 +168,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {
-	global , $txt, $scripturl;
+	global $txt, $scripturl;
 
 	$db = database();
 

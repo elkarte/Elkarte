@@ -947,7 +947,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
 	global $context, $modSettings, $board_info, $settings;
-	global ;
+
 
 	$db = database();
 	static $dataLoaded = array();
@@ -1152,7 +1152,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $ssi_theme;
+	global $context, $settings, $options, $ssi_theme, $smcFunc;
 
 	$db = database();
 
@@ -2187,7 +2187,7 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global , $settings, $modSettings;
+	global $settings, $modSettings;
 
 	$db = database();
 

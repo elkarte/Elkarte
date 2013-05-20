@@ -386,7 +386,7 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global ;
+
 
 	$db = database();
 
@@ -451,7 +451,7 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global ;
+
 
 	$db = database();
 
@@ -2902,7 +2902,7 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global ;
+
 
 	$db = database();
 
@@ -3223,7 +3223,7 @@ if (!function_exists('crc32_compat'))
  */
 function isPackageInstalled($id)
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 
@@ -3275,7 +3275,7 @@ function isPackageInstalled($id)
  */
 function setPackageState($id)
 {
-	global , $context, $user_info;
+	global $context, $user_info;
 
 	$db = database();
 
@@ -3303,7 +3303,7 @@ function setPackageState($id)
  */
 function checkPackageDependency()
 {
-	global ;
+
 
 	$db = database();
 
@@ -3340,7 +3340,7 @@ function checkPackageDependency()
  */
 function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -3366,7 +3366,7 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
  */
 function setPackagesAsUninstalled()
 {
-	global ;
+
 
 	$db = database();
 

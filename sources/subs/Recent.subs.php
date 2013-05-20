@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $context;
+	global $scripturl, $txt, $user_info, $modSettings, $context, $smcFunc;
 
 	$db = database();
 
@@ -119,7 +119,7 @@ function cache_getLastPosts($latestPostOptions)
 
 function getRecentPosts($messages, $start)
 {
-	global , $user_info, $scripturl;
+	global $user_info, $scripturl;
 
 	$db = database();
 

@@ -25,9 +25,7 @@
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
-	global , $mysql_set_mode;
-
-	$db = database();
+	global $mysql_set_mode;
 
 	require_once(SOURCEDIR . '/database/Db.php');
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');

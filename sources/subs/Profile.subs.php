@@ -487,7 +487,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'enabled' => $modSettings['theme_allow'] || allowedTo('admin_forum'),
 			'preload' => create_function('', '
-				global , $context, $cur_profile, $txt;
+				global $context, $cur_profile, $txt;
 
 				$db = database();
 
@@ -661,7 +661,7 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-				global ;
+
 
 				$db = database();
 
@@ -875,7 +875,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-				global ;
+
 
 				$db = database();
 
@@ -1080,7 +1080,7 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 
@@ -1123,7 +1123,7 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 {
 	global $user_info, $txt, $modSettings, $user_profile;
 	global $context, $settings;
-	global ;
+
 
 	$db = database();
 
@@ -1331,7 +1331,7 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-	global ;
+
 
 	$db = database();
 
@@ -2356,7 +2356,7 @@ function profileSaveGroups(&$value)
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
-	global , $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -2401,7 +2401,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  */
 function list_getUserWarningCount($memID)
 {
-	global ;
+
 
 	$db = database();
 

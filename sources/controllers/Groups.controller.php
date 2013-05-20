@@ -765,7 +765,7 @@ class Groups_Controller
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	global ;
+
 
 	$db = database();
 
@@ -800,7 +800,7 @@ function list_getGroupRequestCount($where, $where_parameters)
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
-	global , $txt, $scripturl;
+	global $txt, $scripturl;
 
 	$db = database();
 

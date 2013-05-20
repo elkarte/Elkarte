@@ -29,7 +29,7 @@ if (!defined('ELKARTE'))
  */
 function ml_CustomProfile()
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 
@@ -138,7 +138,7 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-	global ;
+
 
 	$db = database();
 
@@ -163,7 +163,7 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-	global ;
+
 
 	$db = database();
 
@@ -273,7 +273,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
  */
 function ml_findSearchableCustomFields()
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 

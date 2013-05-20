@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
-	global , $user_info;
+	global $user_info;
 
 	$db = database();
 

@@ -1438,7 +1438,7 @@ class ManageMaillist_Controller
 	 */
 	public function action_modify_bounce_templates()
 	{
-		global , $context, $txt, $user_info;
+		global $context, $txt, $user_info;
 
 		$db = database();
 

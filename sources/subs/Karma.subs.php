@@ -13,7 +13,7 @@
 
 function clearKarma($karmaWaitTime)
 {
-	global ;
+
 
 	$db = database();
 
@@ -36,7 +36,7 @@ function clearKarma($karmaWaitTime)
  */
 function lastActionOn($id_executor, $id_target)
 {
-	global ;
+
 
 	$db = database();
 
@@ -68,7 +68,7 @@ function lastActionOn($id_executor, $id_target)
  */
 function addKarma($id_executor, $id_target, $direction)
 {
-	global ;
+
 
 	$db = database();
 
@@ -93,7 +93,7 @@ function addKarma($id_executor, $id_target, $direction)
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
-	global ;
+
 
 	$db = database();
 

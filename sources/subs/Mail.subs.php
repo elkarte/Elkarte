@@ -42,7 +42,7 @@ if (!defined('ELKARTE'))
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global , $boardurl;
+	global $boardurl;
 
 	$db = database();
 
@@ -878,7 +878,7 @@ function user_info_callback($matches)
  */
 function list_getMailQueue($start, $items_per_page, $sort)
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 
@@ -914,7 +914,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	global ;
+
 
 	$db = database();
 
@@ -937,7 +937,7 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-	global ;
+
 
 	$db = database();
 
@@ -956,7 +956,7 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-	global ;
+
 
 	$db = database();
 

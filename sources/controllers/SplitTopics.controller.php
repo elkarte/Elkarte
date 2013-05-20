@@ -249,7 +249,7 @@ class SplitTopics_Controller
 	function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-		global ;
+
 
 		$db = database();
 

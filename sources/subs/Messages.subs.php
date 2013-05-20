@@ -35,7 +35,7 @@ if (!defined('ELKARTE'))
  */
 function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -91,7 +91,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -664,7 +664,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function associatedTopic($msg_id, $topicID = null)
 {
-	global ;
+
 
 	$db = database();
 

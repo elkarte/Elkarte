@@ -90,7 +90,7 @@ class ModerationCenter_Controller
 	 */
 	function action_showNotice()
 	{
-		global , $txt, $context;
+		global $txt, $context;
 
 		$db = database();
 
@@ -401,7 +401,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modifyWarningTemplate()
 	{
-		global , $context, $txt, $user_info;
+		global $context, $txt, $user_info;
 
 		$db = database();
 
@@ -1525,7 +1525,7 @@ function ModBlockGroupRequests()
  */
 function list_getWatchedUserCount($approve_query)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1554,7 +1554,7 @@ function list_getWatchedUserCount($approve_query)
  */
 function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 {
-	global , $txt, $modSettings, $user_info;
+	global $txt, $modSettings, $user_info;
 
 	$db = database();
 	$request = $db->query('', '
@@ -1654,7 +1654,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
  */
 function list_getWatchedUserPostsCount($approve_query)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1687,7 +1687,7 @@ function list_getWatchedUserPostsCount($approve_query)
  */
 function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
-	global , $scripturl, $modSettings;
+	global $scripturl, $modSettings;
 
 	$db = database();
 

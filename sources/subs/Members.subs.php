@@ -1049,7 +1049,7 @@ function groupsAllowedTo($permission, $board_id = null)
  */
 function membersAllowedTo($permission, $board_id = null)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1097,7 +1097,7 @@ function membersAllowedTo($permission, $board_id = null)
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1183,7 +1183,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1223,7 +1223,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
  */
 function list_getNumMembers($where, $where_params = array())
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1255,7 +1255,7 @@ function list_getNumMembers($where, $where_params = array())
  */
 function populateDuplicateMembers(&$members)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1376,7 +1376,7 @@ function populateDuplicateMembers(&$members)
  */
 function isAnotherAdmin($memberID)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1406,7 +1406,7 @@ function isAnotherAdmin($memberID)
  */
 function admins($id_admin = 0)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1437,7 +1437,7 @@ function admins($id_admin = 0)
  */
 function maxMemberID()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1469,7 +1469,7 @@ function maxMemberID()
  */
 function getBasicMemberData($member_ids, $options = array())
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 
@@ -1532,7 +1532,7 @@ function getBasicMemberData($member_ids, $options = array())
  */
 function countInactiveMembers()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1562,7 +1562,7 @@ function countInactiveMembers()
  */
 function getMemberByName($name)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1588,7 +1588,7 @@ function getMemberByName($name)
 
 function getMember($search, $buddies = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -1667,7 +1667,7 @@ function jeffsdatediff($old)
  */
 function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 {
-	global , $modSettings, $language;
+	global $modSettings, $language;
 
 	$db = database();
 
@@ -1719,7 +1719,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
  */
 function approveMembers($members, $condition, $timeBefore, $current_filter)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1750,7 +1750,7 @@ function approveMembers($members, $condition, $timeBefore, $current_filter)
  */
 function enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1778,7 +1778,7 @@ function enforceReactivation($member, $condition, $current_filter, $members, $ti
  */
 function countMembersInGroup($id_group = 0)
 {
-	global ;
+
 
 	$db = database();
 

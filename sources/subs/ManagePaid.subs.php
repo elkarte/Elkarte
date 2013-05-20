@@ -67,7 +67,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  */
 function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars = array())
 {
-	global , $txt;
+	global $txt;
 
 	$db = database();
 

@@ -345,7 +345,7 @@ class Calendar_Controller
 	 */
 	function action_ical()
 	{
-		global , $forum_version, $context, $modSettings, $webmaster_email, $mbname;
+		global $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 		$db = database();
 

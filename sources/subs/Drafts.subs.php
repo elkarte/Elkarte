@@ -16,7 +16,7 @@
  */
 function create_pm_draft($draft, $recipientList)
 {
-	global ;
+
 
 	$db = database();
 
@@ -63,7 +63,7 @@ function create_pm_draft($draft, $recipientList)
  */
 function modify_pm_draft($draft, $recipientList)
 {
-	global ;
+
 
 	$db = database();
 
@@ -98,7 +98,7 @@ function modify_pm_draft($draft, $recipientList)
  */
 function create_post_draft($draft)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -150,7 +150,7 @@ function create_post_draft($draft)
  */
 function modify_post_draft($draft)
 {
-	global ;
+
 
 	$db = database();
 
@@ -195,7 +195,7 @@ function modify_post_draft($draft)
  */
 function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = true)
 {
-	global ;
+
 
 	$db = database();
 
@@ -243,7 +243,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  */
 function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
 {
-	global ;
+
 
 	$db = database();
 
@@ -287,7 +287,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
  */
 function deleteDrafts($id_draft, $member_id = -1, $check = true)
 {
-	global ;
+
 
 	$db = database();
 
@@ -352,7 +352,7 @@ function draftsCount($member_id, $draft_type)
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
-	global ;
+
 
 	$db = database();
 
@@ -382,7 +382,7 @@ function draftsRecipients($allRecipients, $recipient_ids)
  */
 function getOldDrafts($days)
 {
-	global ;
+
 
 	$db = database();
 

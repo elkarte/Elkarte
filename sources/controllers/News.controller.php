@@ -854,7 +854,7 @@ function fix_possible_url($val)
  */
 function cdata_parse($data, $ns = '')
 {
-	global , $cdata_override;
+	global $cdata_override;
 
 	$db = database();
 

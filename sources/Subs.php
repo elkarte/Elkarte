@@ -644,9 +644,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings;
-
-	$db = database();
+	global $context, $user_info, $txt, $modSettings, $smcFunc;
 	static $non_twelve_hour;
 
 	// Offset the time.
@@ -819,9 +817,7 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global ;
-
-	$db = database();
+	global $smcFunc;
 
 	// It was already short enough!
 	if ($smcFunc['strlen']($subject) <= $len)
@@ -846,7 +842,7 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-	global ;
+
 
 	$db = database();
 
@@ -2642,9 +2638,8 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt;
+	global $context, $settings, $modSettings, $txt, $smcFunc;
 
-	$db = database();
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
 	// Attempt to prevent a recursive loop.
@@ -2782,9 +2777,8 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings;
+	global $user_settings, $smcFunc;
 
-	$db = database();
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
@@ -4046,7 +4040,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -4102,7 +4096,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global , $modSettings;
+	global $modSettings;
 
 	$db = database();
 

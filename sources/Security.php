@@ -1400,7 +1400,7 @@ function loadBadBehavior()
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
-	global , $cookiename;
+	global $cookiename;
 
 	$db = database();
 

@@ -173,7 +173,7 @@ class Email_Parse
 	 */
 	private function _query_load_email($id)
 	{
-		global ;
+
 
 		$db = database();
 

@@ -84,7 +84,7 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	global ;
+
 
 	$db = database();
 

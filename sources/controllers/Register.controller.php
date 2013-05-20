@@ -930,7 +930,7 @@ class Register_Controller
  */
 function registerCheckUsername()
 {
-	global , $context, $txt;
+	global $context, $txt;
 
 	$db = database();
 

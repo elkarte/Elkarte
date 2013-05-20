@@ -78,7 +78,7 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
 {
-	global ;
+
 
 	$db = database();
 
@@ -126,7 +126,7 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  */
 function removeBanGroups($group_ids)
 {
-	global ;
+
 
 	$db = database();
 
@@ -158,7 +158,7 @@ function removeBanGroups($group_ids)
  */
 function removeBanLogs($ids = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -198,7 +198,7 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-	global ;
+
 
 	$db = database();
 
@@ -373,7 +373,7 @@ function validateTriggers(&$triggers)
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -469,7 +469,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -573,7 +573,7 @@ function logTriggersUpdates($logs, $new = true)
  */
 function updateBanGroup($ban_info = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -639,7 +639,7 @@ function updateBanGroup($ban_info = array())
  */
 function insertBanGroup($ban_info = array())
 {
-	global ;
+
 
 	$db = database();
 
@@ -759,7 +759,7 @@ function range2ip($low, $high)
  */
 function checkExistingTriggerIP($ip_array, $fullip = '')
 {
-	global , $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -820,7 +820,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
  */
 function updateBanMembers()
 {
-	global ;
+
 
 	$db = database();
 
@@ -948,7 +948,7 @@ function updateBanMembers()
 
 function getMemberData($id)
 {
-	global ;
+
 
 	$db = database();
 
@@ -979,7 +979,7 @@ function getMemberData($id)
  */
 function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1020,7 +1020,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  */
 function list_getNumBanTriggers($trigger_type)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1055,7 +1055,7 @@ function list_getNumBanTriggers($trigger_type)
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1083,7 +1083,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumBanLogEntries()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1106,7 +1106,7 @@ function list_getNumBanLogEntries()
  */
 function list_getNumBans()
 {
-	global ;
+
 
 	$db = database();
 
@@ -1238,7 +1238,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  */
 function list_getBans($start, $items_per_page, $sort)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1271,7 +1271,7 @@ function list_getBans($start, $items_per_page, $sort)
  */
 function list_getNumBanItems()
 {
-	global , $context;
+	global $context;
 
 	$db = database();
 
@@ -1300,7 +1300,7 @@ function list_getNumBanItems()
  */
 function banLoadAdditionalIPsMember($member_id)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1331,7 +1331,7 @@ function banLoadAdditionalIPsMember($member_id)
  */
 function banLoadAdditionalIPsError($member_id)
 {
-	global ;
+
 
 	$db = database();
 
@@ -1386,7 +1386,7 @@ function banLoadAdditionalIPs($member_id)
  */
 function banDetails($ban_id, $ban_group)
 {
-	global ;
+
 
 	$db = database();
 
