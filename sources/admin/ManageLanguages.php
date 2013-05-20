@@ -1046,8 +1046,7 @@ class ManageLanguages_Controller
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-
+		
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
@@ -1067,7 +1066,10 @@ class ManageLanguages_Controller
 	public function settings()
 	{
 		global $txt;
-
+		
+		// Warn the user if the backup of Settings.php failed.
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+		
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
