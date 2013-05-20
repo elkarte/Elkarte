@@ -652,7 +652,7 @@ class ManageSearchEngines_Controller
 			)
 		);
 
-		list ($min_date, $max_date) = $smcFunc['db_fetch_row']($request);
+		list ($min_date, $max_date) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$min_year = (int) substr($min_date, 0, 4);
@@ -709,7 +709,7 @@ class ManageSearchEngines_Controller
 					'date_being_viewed' => $date_query,
 				)
 			);
-			list ($_REQUEST['start']) = $smcFunc['db_fetch_row']($request);
+			list ($_REQUEST['start']) = $db->fetch_row($request);
 			$db->free_result($request);
 		}
 
@@ -830,7 +830,7 @@ function list_getNumSpiders()
 		array(
 		)
 	);
-	list ($numSpiders) = $smcFunc['db_fetch_row']($request);
+	list ($numSpiders) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numSpiders;
@@ -883,7 +883,7 @@ function list_getNumSpiderLogs()
 		array(
 		)
 	);
-	list ($numLogs) = $smcFunc['db_fetch_row']($request);
+	list ($numLogs) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numLogs;
@@ -939,7 +939,7 @@ function list_getNumSpiderStats()
 		array(
 		)
 	);
-	list ($numStats) = $smcFunc['db_fetch_row']($request);
+	list ($numStats) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numStats;

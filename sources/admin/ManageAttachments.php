@@ -896,7 +896,7 @@ class ManageAttachments_Controller
 					'thumbnail' => 3,
 				)
 			);
-			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+			list ($thumbnails) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
@@ -1014,7 +1014,7 @@ class ManageAttachments_Controller
 				array(
 				)
 			);
-			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+			list ($thumbnails) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
@@ -1123,7 +1123,7 @@ class ManageAttachments_Controller
 				array(
 				)
 			);
-			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+			list ($thumbnails) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
@@ -1194,7 +1194,7 @@ class ManageAttachments_Controller
 				array(
 				)
 			);
-			list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+			list ($thumbnails) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
@@ -1457,7 +1457,7 @@ class ManageAttachments_Controller
 							)
 						);
 
-						list ($num_attach) = $smcFunc['db_fetch_row']($request);
+						list ($num_attach) = $db->fetch_row($request);
 						$db->free_result($request);
 
 						// A check to see if it's a used base dir.
@@ -1920,7 +1920,7 @@ class ManageAttachments_Controller
 					'attachment_type' => 1,
 				)
 			);
-			list ($total_progress) = $smcFunc['db_fetch_row']($request);
+			list ($total_progress) = $db->fetch_row($request);
 			$db->free_result($request);
 			$total_progress -= $start;
 
@@ -1967,7 +1967,7 @@ class ManageAttachments_Controller
 							'attachment_type' => 1,
 						)
 					);
-					list ($dir_files, $dir_size) = $smcFunc['db_fetch_row']($request);
+					list ($dir_files, $dir_size) = $db->fetch_row($request);
 					$db->free_result($request);
 				}
 

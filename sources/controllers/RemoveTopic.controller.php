@@ -413,7 +413,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			'from_topic' => $from_topic,
 		)
 	);
-	list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $smcFunc['db_fetch_row']($request);
+	list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Get some target topic and board stats.
@@ -426,7 +426,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			'target_topic' => $target_topic,
 		)
 	);
-	list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $smcFunc['db_fetch_row']($request);
+	list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Lets see if the board that we are returning to has post count enabled.

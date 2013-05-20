@@ -1308,7 +1308,7 @@ class Themes_Controller
 					'name' => 'name',
 				)
 			);
-			list ($theme_name) = $smcFunc['db_fetch_row']($result);
+			list ($theme_name) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			$context['sub_template'] = 'installed';
@@ -1557,7 +1557,7 @@ class Themes_Controller
 				array(
 				)
 			);
-			list ($id_theme) = $smcFunc['db_fetch_row']($result);
+			list ($id_theme) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			// This will be theme number...
@@ -2114,7 +2114,7 @@ class Themes_Controller
 				'theme_dir' => 'theme_dir',
 			)
 		);
-		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $smcFunc['db_fetch_row']($request);
+		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if (isset($_REQUEST['template']) && preg_match('~[\./\\\\:\0]~', $_REQUEST['template']) == 0)

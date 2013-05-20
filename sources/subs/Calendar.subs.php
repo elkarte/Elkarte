@@ -831,7 +831,7 @@ function getEventPoster($event_id)
 		return false;
 
 	// Grab the results and return.
-	list ($poster) = $smcFunc['db_fetch_row']($request);
+	list ($poster) = $db->fetch_row($request);
 	$db->free_result($request);
 	return (int) $poster;
 }
@@ -1098,7 +1098,7 @@ function list_getNumHolidays()
 		array(
 		)
 	);
-	list($num_items) = $smcFunc['db_fetch_row']($request);
+	list($num_items) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return (int) $num_items;

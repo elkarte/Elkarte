@@ -585,7 +585,7 @@ function approveAllData()
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$msgs[] = $row[0];
 	$db->free_result($request);
 
@@ -606,7 +606,7 @@ function approveAllData()
 		)
 	);
 	$attaches = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$attaches[] = $row[0];
 	$db->free_result($request);
 

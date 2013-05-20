@@ -76,7 +76,7 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list($themeDirectory) = $smcFunc['db_fetch_row']($request);
+	list($themeDirectory) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $themeDirectory;
@@ -105,7 +105,7 @@ function themeUrl($id_theme)
 			)
 		);
 
-	list ($theme_url) = $smcFunc['db_fetch_row']($request);
+	list ($theme_url) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $theme_url;

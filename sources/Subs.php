@@ -79,7 +79,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'is_activated' => 1,
 				)
 			);
-			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
+			list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -99,7 +99,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'activation_status' => array(3, 4),
 					)
 				);
-				list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
+				list ($changes['unapprovedMembers']) = $db->fetch_row($result);
 				$db->free_result($result);
 			}
 		}
@@ -3362,7 +3362,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		if ($db->num_rows($request) === 0)
 			return false;
 
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
+		list ($file_hash) = $db->fetch_row($request);
 		$db->free_result($request);
 	}
 
@@ -4063,7 +4063,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 				'variable' => $hook,
 			)
 		);
-		list($current_functions) = $smcFunc['db_fetch_row']($request);
+		list($current_functions) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if (!empty($current_functions))
@@ -4117,7 +4117,7 @@ function remove_integration_function($hook, $function, $file = '')
 			'variable' => $hook,
 		)
 	);
-	list($current_functions) = $smcFunc['db_fetch_row']($request);
+	list($current_functions) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($current_functions))

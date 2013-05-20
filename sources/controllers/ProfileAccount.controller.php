@@ -79,7 +79,7 @@ function action_issuewarning()
 				'warning' => 'warning',
 			)
 		);
-		list ($current_applied) = $smcFunc['db_fetch_row']($request);
+		list ($current_applied) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);

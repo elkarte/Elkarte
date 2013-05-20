@@ -172,7 +172,7 @@ function action_plushsearch1()
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('topic_gone', false);
 
-		list ($context['search_topic']['subject']) = $smcFunc['db_fetch_row']($request);
+		list ($context['search_topic']['subject']) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$context['search_topic']['link'] = '<a href="' . $context['search_topic']['href'] . '">' . $context['search_topic']['subject'] . '</a>';
@@ -369,7 +369,7 @@ function action_plushsearch2()
 				'is_approved_true' => 1,
 			)
 		);
-		list ($minMsgID, $maxMsgID) = $smcFunc['db_fetch_row']($request);
+		list ($minMsgID, $maxMsgID) = $db->fetch_row($request);
 		if ($minMsgID < 0 || $maxMsgID < 0)
 			$context['search_errors']['no_messages_in_time_frame'] = true;
 		$db->free_result($request);
@@ -481,7 +481,7 @@ function action_plushsearch2()
 			fatal_lang_error('topic_gone', false);
 
 		$search_params['brd'] = array();
-		list ($search_params['brd'][0]) = $smcFunc['db_fetch_row']($request);
+		list ($search_params['brd'][0]) = $db->fetch_row($request);
 		$db->free_result($request);
 	}
 	// Select all boards you've selected AND are allowed to see.
@@ -511,7 +511,7 @@ function action_plushsearch2()
 				'empty_string' => '',
 			)
 		);
-		list ($num_boards) = $smcFunc['db_fetch_row']($request);
+		list ($num_boards) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if (count($search_params['brd']) == $num_boards)
@@ -1077,7 +1077,7 @@ function action_plushsearch2()
 					// If the database doesn't support IGNORE to make this fast we need to do some tracking.
 					if (!$db->support_ignore())
 					{
-						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
+						while ($row = $db->fetch_row($ignoreRequest))
 						{
 							// No duplicates!
 							if (isset($inserts[$row[1]]))
@@ -1305,7 +1305,7 @@ function action_plushsearch2()
 						// Don't do INSERT IGNORE? Manually fix this up!
 						if (!$db->support_ignore())
 						{
-							while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
+							while ($row = $db->fetch_row($ignoreRequest))
 							{
 								$ind = $createTemporary ? 0 : 1;
 								// No duplicates!
@@ -1407,7 +1407,7 @@ function action_plushsearch2()
 
 							if (!$db->support_ignore())
 							{
-								while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
+								while ($row = $db->fetch_row($ignoreRequest))
 								{
 									// No duplicates!
 									if (isset($inserts[$row[0]]))
@@ -1539,7 +1539,7 @@ function action_plushsearch2()
 					if (!$db->support_ignore())
 					{
 						$inserts = array();
-						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
+						while ($row = $db->fetch_row($ignoreRequest))
 						{
 							// No duplicates!
 							if (isset($inserts[$row[2]]))
@@ -1610,7 +1610,7 @@ function action_plushsearch2()
 					if (!$db->support_ignore())
 					{
 						$inserts = array();
-						while ($row = $smcFunc['db_fetch_row']($ignoreRequest))
+						while ($row = $db->fetch_row($ignoreRequest))
 						{
 							// No duplicates!
 							if (isset($usedIDs[$row[1]]))
@@ -2196,7 +2196,7 @@ function MessageSearch2()
 			'not_deleted' => 0,
 		))
 	);
-	list ($numResults) = $smcFunc['db_fetch_row']($request);
+	list ($numResults) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Get all the matching messages... using standard search only (No caching and the like!)

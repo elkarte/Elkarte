@@ -1131,7 +1131,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 				'recycled_icon' => 'recycled',
 			)
 		);
-		list ($messageCount) = $smcFunc['db_fetch_row']($request);
+		list ($messageCount) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
@@ -1241,7 +1241,7 @@ function list_getNumMembers($where, $where_params = array())
 			array_merge($where_params, array(
 			))
 		);
-		list ($num_members) = $smcFunc['db_fetch_row']($request);
+		list ($num_members) = $db->fetch_row($request);
 		$db->free_result($request);
 	}
 
@@ -1391,7 +1391,7 @@ function isAnotherAdmin($memberID)
 			'selected_member' => $memberID,
 		)
 	);
-	list ($another) = $smcFunc['db_fetch_row']($request);
+	list ($another) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $another;
@@ -1447,7 +1447,7 @@ function maxMemberID()
 		array(
 		)
 	);
-	list ($max_id) = $smcFunc['db_fetch_row']($request);
+	list ($max_id) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $max_id;
@@ -1580,7 +1580,7 @@ function getMemberByName($name)
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('error_member_not_found');
 
-	list ($member['id_member'], $member['id_group']) = $smcFunc['db_fetch_row']($request);
+	list ($member['id_member'], $member['id_group']) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $member;
@@ -1791,7 +1791,7 @@ function countMembersInGroup($id_group = 0)
 			'group' => $id_group,
 		)
 	);
-	list ($num_members) = $smcFunc['db_fetch_row']($request);
+	list ($num_members) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_members;

@@ -730,7 +730,7 @@ function list_getTopicNotificationCount($memID)
 			'is_approved' => 1,
 		)
 	);
-	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
+	list ($totalNotifications) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// @todo make this an integer before it gets returned
@@ -824,7 +824,7 @@ function getBoardNotificationsCount($memID)
 			'selected_member' => $memID,
 		)
 	);
-	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
+	list ($totalNotifications) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $totalNotifications;
@@ -1192,7 +1192,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 				'admin_forum' => 'admin_forum',
 			)
 		);
-		list ($disallow) = $smcFunc['db_fetch_row']($request);
+		list ($disallow) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if ($disallow)

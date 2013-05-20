@@ -311,7 +311,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 				'newbie_group' => 4,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_row']($query))
+		while ($row = $db->fetch_row($query))
 		{
 			$group = $row[0];
 

@@ -479,7 +479,7 @@ class Emailuser_Controller
 				)
 			);
 			if ($db->num_rows($request2) != 0)
-				list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request2);
+				list ($id_report, $ignore) = $db->fetch_row($request2);
 			$db->free_result($request2);
 
 			// If we're just going to ignore these, then who gives a monkeys...

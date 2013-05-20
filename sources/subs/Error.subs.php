@@ -71,7 +71,7 @@ function numErrors()
 			'filter' => isset($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($num_errors) = $smcFunc['db_fetch_row']($result);
+	list ($num_errors) = $db->fetch_row($result);
 
 	$db->free_result($result);
 

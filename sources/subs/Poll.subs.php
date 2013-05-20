@@ -40,7 +40,7 @@ function associatedPoll($topicID, $pollID = null)
 				'current_topic' => $topicID,
 			)
 		);
-		list ($pollID) = $smcFunc['db_fetch_row']($request);
+		list ($pollID) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		return $pollID;

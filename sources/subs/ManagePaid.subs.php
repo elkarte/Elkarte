@@ -48,7 +48,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
 			'no_pending_payments' => 0,
 		))
 	);
-	list ($memberCount) = $smcFunc['db_fetch_row']($request);
+	list ($memberCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $memberCount;
@@ -248,7 +248,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	);
 	if ($db->num_rows($request) != 0)
 	{
-		list ($id_sublog, $endtime, $starttime) = $smcFunc['db_fetch_row']($request);
+		list ($id_sublog, $endtime, $starttime) = $db->fetch_row($request);
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
@@ -333,7 +333,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	// @todo Don't really need to do this twice...
 	if ($db->num_rows($request) != 0)
 	{
-		list ($id_sublog, $endtime, $starttime) = $smcFunc['db_fetch_row']($request);
+		list ($id_sublog, $endtime, $starttime) = $db->fetch_row($request);
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
@@ -614,7 +614,7 @@ function countActiveSubscriptions($sub_id)
 			'is_active' => 1,
 		)
 	);
-	list ($isActive) = $smcFunc['db_fetch_row']($request);
+	list ($isActive) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $isActive;
@@ -781,7 +781,7 @@ function validateSubscriptionID($id)
 	);
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
-	list ($sub_id) = $smcFunc['db_fetch_row']($request);
+	list ($sub_id) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $sub_id;
@@ -844,7 +844,7 @@ function getSubscriptionStatus($log_id)
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 
-	list ($status['id_member'], $status['old_status']) = $smcFunc['db_fetch_row']($request);
+	list ($status['id_member'], $status['old_status']) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $status;

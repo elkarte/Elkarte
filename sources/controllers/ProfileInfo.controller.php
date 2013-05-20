@@ -372,7 +372,7 @@ function action_showPosts()
 				'board' => $board,
 			)
 		);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
+	list ($msgCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$request = $db->query('', '
@@ -387,7 +387,7 @@ function action_showPosts()
 			'board' => $board,
 		)
 	);
-	list ($min_msg_member, $max_msg_member) = $smcFunc['db_fetch_row']($request);
+	list ($min_msg_member, $max_msg_member) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$reverse = false;
@@ -807,7 +807,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
 			'board' => $board,
 		)
 	);
-	list ($attachCount) = $smcFunc['db_fetch_row']($request);
+	list ($attachCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $attachCount;
@@ -1025,7 +1025,7 @@ function list_getNumDisregarded($memID)
 			'current_member' => $memID,
 		)
 	);
-	list ($disregardedCount) = $smcFunc['db_fetch_row']($request);
+	list ($disregardedCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $disregardedCount;
@@ -1072,7 +1072,7 @@ function action_statPanel()
 			'recycle_board' => $modSettings['recycle_board'],
 		)
 	);
-	list ($context['num_topics']) = $smcFunc['db_fetch_row']($result);
+	list ($context['num_topics']) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	// Number polls started.
@@ -1088,7 +1088,7 @@ function action_statPanel()
 			'no_poll' => 0,
 		)
 	);
-	list ($context['num_polls']) = $smcFunc['db_fetch_row']($result);
+	list ($context['num_polls']) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	// Number polls voted in.
@@ -1100,7 +1100,7 @@ function action_statPanel()
 			'current_member' => $memID,
 		)
 	);
-	list ($context['num_votes']) = $smcFunc['db_fetch_row']($result);
+	list ($context['num_votes']) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	// Format the numbers...

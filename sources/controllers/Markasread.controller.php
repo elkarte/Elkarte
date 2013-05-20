@@ -187,7 +187,7 @@ class MarkRead_Controller
 						'id_first_msg' => $topicinfo['id_first_msg'],
 					)
 				);
-				list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
+				list ($earlyMsg) = $db->fetch_row($result);
 				$db->free_result($result);
 			}
 		}
@@ -207,7 +207,7 @@ class MarkRead_Controller
 					'start' => (int) $_REQUEST['start'],
 				)
 			);
-			list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
+			list ($earlyMsg) = $db->fetch_row($result);
 			$db->free_result($result);
 
 			$earlyMsg--;

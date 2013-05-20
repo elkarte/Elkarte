@@ -255,7 +255,7 @@ function list_getNumaction_logEntries()
 		array(
 		)
 	);
-	list ($num_entries) = $smcFunc['db_fetch_row']($request);
+	list ($num_entries) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_entries;

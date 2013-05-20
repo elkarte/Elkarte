@@ -45,7 +45,7 @@ function recountOpenReports($flush = true)
 			'not_ignored' => 0,
 		)
 	);
-	list ($open_reports) = $smcFunc['db_fetch_row']($request);
+	list ($open_reports) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$_SESSION['rc'] = array(
@@ -91,7 +91,7 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_posts) = $smcFunc['db_fetch_row']($request);
+	list ($unapproved_posts) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// What about topics?
@@ -106,7 +106,7 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_topics) = $smcFunc['db_fetch_row']($request);
+	list ($unapproved_topics) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['total_unapproved_topics'] = $unapproved_topics;
@@ -138,7 +138,7 @@ function recountFailedEmails($approve_query = null)
 		array(
 		)
 	);
-	list ($failed_emails) = $smcFunc['db_fetch_row']($request);
+	list ($failed_emails) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['failed_emails'] = $failed_emails;
@@ -408,7 +408,7 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
+	list ($totalWarns) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $totalWarns;
@@ -475,7 +475,7 @@ function list_getWarningCount()
 			'warning' => 'warning',
 		)
 	);
-	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
+	list ($totalWarns) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $totalWarns;

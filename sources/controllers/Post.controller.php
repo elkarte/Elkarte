@@ -100,7 +100,7 @@ class Post_Controller
 					'current_topic' => $topic,
 				)
 			);
-			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $smcFunc['db_fetch_row']($request);
+			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// If this topic already has a poll, they sure can't add another.
@@ -338,7 +338,7 @@ class Post_Controller
 						'approved' => 1,
 					)
 				);
-				list ($context['new_replies']) = $smcFunc['db_fetch_row']($request);
+				list ($context['new_replies']) = $db->fetch_row($request);
 				$db->free_result($request);
 
 				if (!empty($context['new_replies']))

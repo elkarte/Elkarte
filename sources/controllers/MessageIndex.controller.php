@@ -182,7 +182,7 @@ class MessageIndex_Controller
 			$context['is_marked_notify'] = $db->num_rows($request) != 0;
 			if ($context['is_marked_notify'])
 			{
-				list ($sent) = $smcFunc['db_fetch_row']($request);
+				list ($sent) = $db->fetch_row($request);
 				if (!empty($sent))
 				{
 					$db->query('', '

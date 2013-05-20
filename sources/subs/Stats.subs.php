@@ -36,7 +36,7 @@ function onlineCount()
 		array(
 		)
 	);
-	list ($users_online) = $smcFunc['db_fetch_row']($result);
+	list ($users_online) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	return $users_online;

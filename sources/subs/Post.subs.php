@@ -595,7 +595,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				'id_msg' => $row['id_last_msg'],
 			)
 		);
-		list($num_attachments) = $smcFunc['db_fetch_row']($request);
+		list($num_attachments) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Using the maillist function or the standard style
@@ -1020,7 +1020,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_topic' => $topicOptions['id'],
 			)
 		);
-		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
+		list ($topicOptions['is_approved']) = $db->fetch_row($request);
 		$db->free_result($request);
 	}
 
@@ -2413,7 +2413,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			);
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('quoted_post_deleted', false);
-			list ($form_subject, $mname, $mdate, $form_message) = $smcFunc['db_fetch_row']($request);
+			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.

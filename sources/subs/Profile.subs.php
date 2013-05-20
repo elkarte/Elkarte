@@ -2325,7 +2325,7 @@ function profileSaveGroups(&$value)
 					'selected_member' => $context['id_member'],
 				)
 			);
-			list ($another) = $smcFunc['db_fetch_row']($request);
+			list ($another) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			if (empty($another))
@@ -2415,7 +2415,7 @@ function list_getUserWarningCount($memID)
 			'warning' => 'warning',
 		)
 	);
-	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
+	list ($total_warnings) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_warnings;

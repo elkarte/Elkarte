@@ -492,7 +492,7 @@ class Recent_Controller
 						'current_member' => $user_info['id'],
 					)
 				);
-				list ($earliest_msg) = $smcFunc['db_fetch_row']($request);
+				list ($earliest_msg) = $db->fetch_row($request);
 				$db->free_result($request);
 			}
 			else
@@ -506,7 +506,7 @@ class Recent_Controller
 						'current_member' => $user_info['id'],
 					)
 				);
-				list ($earliest_msg) = $smcFunc['db_fetch_row']($request);
+				list ($earliest_msg) = $db->fetch_row($request);
 				$db->free_result($request);
 			}
 
@@ -529,7 +529,7 @@ class Recent_Controller
 							'current_member' => $user_info['id'],
 						)
 					);
-					list ($earliest_msg2) = $smcFunc['db_fetch_row']($request);
+					list ($earliest_msg2) = $db->fetch_row($request);
 					$db->free_result($request);
 
 					// In theory this could be zero, if the first ever post is unread, so fudge it ;)
@@ -595,7 +595,7 @@ class Recent_Controller
 					'is_approved' => 1,
 				))
 			);
-			list ($num_topics, $min_message) = $smcFunc['db_fetch_row']($request);
+			list ($num_topics, $min_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Make sure the starting place makes sense and construct the page index.
@@ -678,7 +678,7 @@ class Recent_Controller
 					'is_approved' => 1,
 				))
 			);
-			list ($num_topics, $min_message) = $smcFunc['db_fetch_row']($request);
+			list ($num_topics, $min_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Make sure the starting place makes sense and construct the page index.
@@ -824,7 +824,7 @@ class Recent_Controller
 					array_merge($query_parameters, array(
 					))
 				);
-				list ($num_topics) = $smcFunc['db_fetch_row']($request);
+				list ($num_topics) = $db->fetch_row($request);
 				$db->free_result($request);
 			}
 			else
@@ -845,7 +845,7 @@ class Recent_Controller
 						'is_approved' => 1,
 					))
 				);
-				list ($num_topics, $min_message) = $smcFunc['db_fetch_row']($request);
+				list ($num_topics, $min_message) = $db->fetch_row($request);
 				$db->free_result($request);
 			}
 

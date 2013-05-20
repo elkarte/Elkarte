@@ -367,7 +367,7 @@ function processAttachments()
 					'attachment_type' => 0,
 				)
 			);
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $smcFunc['db_fetch_row']($request);
+			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $db->fetch_row($request);
 			$db->free_result($request);
 		}
 		else
@@ -597,7 +597,7 @@ function attachmentChecks($attachID)
 					'type' => 1,
 				)
 			);
-			list ($context['dir_files'], $context['dir_size']) = $smcFunc['db_fetch_row']($request);
+			list ($context['dir_files'], $context['dir_size']) = $db->fetch_row($request);
 			$db->free_result($request);
 		}
 		$context['dir_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
@@ -900,7 +900,7 @@ function getAvatar($id_attach)
 
 		$avatarData = array();
 		if ($db->num_rows($request) != 0)
-			$avatarData = $smcFunc['db_fetch_row']($request);
+			$avatarData = $db->fetch_row($request);
 		$db->free_result($request);
 
 		cache_put_data('getAvatar_id-' . $id_attach, $avatarData, 900);
@@ -940,7 +940,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 
 	$attachmentData = array();
 	if ($db->num_rows($request) != 0)
-		$attachmentData = $smcFunc['db_fetch_row']($request);
+		$attachmentData = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $attachmentData;
@@ -1571,7 +1571,7 @@ function getAttachmentCount()
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_attachments) = $smcFunc['db_fetch_row']($request);
+	list ($num_attachments) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_attachments;
@@ -1597,7 +1597,7 @@ function getAvatarCount()
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_avatars) = $smcFunc['db_fetch_row']($request);
+	list ($num_avatars) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_avatars;
@@ -1791,7 +1791,7 @@ function attachment_filesize($attach_id, $filesize = null)
 		);
 		if (!empty($result))
 		{
-			list($filesize) = $smcFunc['db_fetch_row']($result);
+			list($filesize) = $db->fetch_row($result);
 			$db->free_result($result);
 			return $filesize;
 		}
@@ -1835,7 +1835,7 @@ function attachment_folder($attach_id, $folder_id = null)
 		);
 		if (!empty($result))
 		{
-			list($folder_id) = $smcFunc['db_fetch_row']($result);
+			list($folder_id) = $db->fetch_row($result);
 			$db->free_result($result);
 			return $folder_id;
 		}
@@ -1872,7 +1872,7 @@ function maxThumbnails()
 			'no_thumb' => 0,
 		)
 	);
-	list ($thumbnails) = $smcFunc['db_fetch_row']($result);
+	list ($thumbnails) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	return $thumbnails;
@@ -2025,7 +2025,7 @@ function list_getNumUnapprovedAttachments($approve_query)
 			'attachment_type' => 0,
 		)
 	);
-	list ($total_unapproved_attachments) = $smcFunc['db_fetch_row']($request);
+	list ($total_unapproved_attachments) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_unapproved_attachments;
@@ -2237,7 +2237,7 @@ function list_getNumFiles($browse_type)
 			)
 		);
 
-	list ($num_files) = $smcFunc['db_fetch_row']($request);
+	list ($num_files) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_files;
@@ -2328,7 +2328,7 @@ function overallAttachmentsSize()
 			'type' => 1,
 		)
 	);
-	list ($attachmentDirSize) = $smcFunc['db_fetch_row']($request);
+	list ($attachmentDirSize) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Divide it into kilobytes.
@@ -2359,7 +2359,7 @@ function currentAttachDirProperties()
 			'type' => 1,
 		)
 	);
-	list ($current_dir['files'], $current_dir['size']) = $smcFunc['db_fetch_row']($request);
+	list ($current_dir['files'], $current_dir['size']) = $db->fetch_row($request);
 	$db->free_result($request);
 	$current_dir['size'] /= 1024;
 

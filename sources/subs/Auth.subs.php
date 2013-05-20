@@ -813,7 +813,7 @@ function generateValidationCode()
 		)
 	);
 
-	list ($dbRand) = $smcFunc['db_fetch_row']($request);
+	list ($dbRand) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);

@@ -150,7 +150,7 @@ function ml_memberCount()
 			'is_activated' => 1,
 		)
 	);
-	list ($num_members) = $smcFunc['db_fetch_row']($request);
+	list ($num_members) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_members;
@@ -177,7 +177,7 @@ function ml_alphaStart($start)
 			'first_letter' => $start,
 		)
 	);
-	list ($start) = $smcFunc['db_fetch_row']($request);
+	list ($start) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $start;
@@ -243,7 +243,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 			AND mem.is_activated = {int:is_activated}',
 		$query_parameters
 	);
-	list ($numResults) = $smcFunc['db_fetch_row']($request);
+	list ($numResults) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Select the members from the database.
@@ -321,7 +321,7 @@ function printMemberListRows($request)
 		array(
 		)
 	);
-	list ($most_posts) = $smcFunc['db_fetch_row']($result);
+	list ($most_posts) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	// Avoid division by zero...

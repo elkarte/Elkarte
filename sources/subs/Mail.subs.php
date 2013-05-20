@@ -925,7 +925,7 @@ function list_getMailQueueSize()
 		array(
 		)
 	);
-	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
+	list ($mailQueueSize) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $mailQueueSize;
@@ -969,7 +969,7 @@ function list_MailQueueStatus()
 		array(
 		)
 	);
-	list ($items['mailQueueSize'], $items['mailOldest']) = $smcFunc['db_fetch_row']($request);
+	list ($items['mailQueueSize'], $items['mailOldest']) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $items;

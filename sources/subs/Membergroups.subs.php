@@ -815,7 +815,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 			array(
 			)
 		);
-		list ($groups[3]) = $smcFunc['db_fetch_row']($request);
+		list ($groups[3]) = $db->fetch_row($request);
 		$db->free_result($request);
 	}
 
@@ -1081,7 +1081,7 @@ function getMaxGroupID()
 		array(
 		)
 	);
-	list ($id_group) = $smcFunc['db_fetch_row']($request);
+	list ($id_group) = $db->fetch_row($request);
 
 	return $id_group;
 }
@@ -1436,7 +1436,7 @@ function validateShowGroupMembership()
 			'non_joinable' => 1,
 		)
 	);
-	list ($have_joinable) = $smcFunc['db_fetch_row']($request);
+	list ($have_joinable) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Do we need to update the setting?

@@ -1449,7 +1449,7 @@ class PersonalMessage_Controller
 					'msgtime' => $deleteTime,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_row']($request))
+			while ($row = $db->fetch_row($request))
 				$toDelete[] = $row[0];
 			$db->free_result($request);
 
@@ -1826,7 +1826,7 @@ class PersonalMessage_Controller
 			// Can only be a hacker here!
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
-			list ($subject, $body, $time, $memberFromID, $memberFromName) = $smcFunc['db_fetch_row']($request);
+			list ($subject, $body, $time, $memberFromID, $memberFromName) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Remove the line breaks...
@@ -2044,7 +2044,7 @@ class PersonalMessage_Controller
 					);
 					if ($db->num_rows($request) == 0)
 						continue;
-					list ($memID) = $smcFunc['db_fetch_row']($request);
+					list ($memID) = $db->fetch_row($request);
 					$db->free_result($request);
 
 					$criteria[] = array('t' => 'mid', 'v' => $memID);

@@ -126,7 +126,7 @@ class Stats_Controller
 				'blank_redirect' => '',
 			)
 		);
-		list ($context['num_boards']) = $smcFunc['db_fetch_row']($result);
+		list ($context['num_boards']) = $db->fetch_row($result);
 		$db->free_result($result);
 
 		$result = $db->query('', '
@@ -135,7 +135,7 @@ class Stats_Controller
 			array(
 			)
 		);
-		list ($context['num_categories']) = $smcFunc['db_fetch_row']($result);
+		list ($context['num_categories']) = $db->fetch_row($result);
 		$db->free_result($result);
 
 		// Format the numbers nicely.
@@ -204,7 +204,7 @@ class Stats_Controller
 				'today_date' => $date,
 			)
 		);
-		list ($context['online_today']) = $smcFunc['db_fetch_row']($result);
+		list ($context['online_today']) = $db->fetch_row($result);
 		$db->free_result($result);
 
 		$context['online_today'] = comma_format((int) $context['online_today']);

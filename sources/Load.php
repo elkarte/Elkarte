@@ -51,7 +51,7 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 			display_db_error();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
 
@@ -569,7 +569,7 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $smcFunc['db_fetch_row']($request);
+				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
 			}
 
 			if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))

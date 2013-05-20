@@ -195,7 +195,7 @@ class Display_Controller
 							'timestamp' => $timestamp,
 						)
 					);
-					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
+					list ($context['start_from']) = $db->fetch_row($request);
 					$db->free_result($request);
 
 					// Handle view_newest_first options, and get the correct start value.
@@ -228,7 +228,7 @@ class Display_Controller
 							'no_member' => 0,
 						)
 					);
-					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
+					list ($context['start_from']) = $db->fetch_row($request);
 					$db->free_result($request);
 				}
 
@@ -462,7 +462,7 @@ class Display_Controller
 					'not_guest' => 0,
 				)
 			);
-			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
+			list ($pollinfo['total']) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Total voters needs to include guest voters

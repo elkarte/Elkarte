@@ -131,7 +131,7 @@ class Fulltext_Search
 		);
 		if ($request !== false && $db->num_rows($request) == 1)
 		{
-			list (, $min_word_length) = $smcFunc['db_fetch_row']($request);
+			list (, $min_word_length) = $db->fetch_row($request);
 			$db->free_result($request);
 		}
 		// 4 is the MySQL default...

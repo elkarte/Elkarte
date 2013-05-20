@@ -133,7 +133,7 @@ function action_who()
 		array(
 		)
 	);
-	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
+	list ($totalMembers) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Prepare some page index variables.
@@ -401,7 +401,7 @@ function determineActions($urls, $preferred_prefix = false)
 						'id_msg' => $msgid,
 					)
 				);
-				list ($id_topic, $subject) = $smcFunc['db_fetch_row']($result);
+				list ($id_topic, $subject) = $db->fetch_row($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
 				$db->free_result($result);
 

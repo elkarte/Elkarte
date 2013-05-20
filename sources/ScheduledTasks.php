@@ -131,7 +131,7 @@ function AutoTask()
 		if ($db->num_rows($request) === 0)
 			$nextEvent = time() + 86400;
 		else
-			list ($nextEvent) = $smcFunc['db_fetch_row']($request);
+			list ($nextEvent) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		updateSettings(array('next_task_time' => $nextEvent));
@@ -524,7 +524,7 @@ function scheduled_auto_optimize()
 			array(
 			)
 		);
-		list ($dont_do_it) = $smcFunc['db_fetch_row']($request);
+		list ($dont_do_it) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if ($dont_do_it > $modSettings['autoOptMaxOnline'])
@@ -1632,7 +1632,7 @@ function scheduled_weekly_maintenance()
 				)
 			);
 
-			while ($row = $smcFunc['db_fetch_row']($result))
+			while ($row = $db->fetch_row($result))
 				$reports[] = $row[0];
 
 			$db->free_result($result);
@@ -1860,7 +1860,7 @@ function scheduled_remove_topic_redirect()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$topics[] = $row[0];
 	$db->free_result($request);
 
@@ -1902,7 +1902,7 @@ function scheduled_remove_old_drafts()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$drafts[] = (int) $row[0];
 	$db->free_result($request);
 

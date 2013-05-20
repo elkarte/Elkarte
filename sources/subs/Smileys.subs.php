@@ -101,7 +101,7 @@ function nextSmileyLocation($location)
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $smcFunc['db_fetch_row']($request);
+	list ($smiley_order) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $smiley_order;
@@ -253,7 +253,7 @@ function getSmileyPosition($location, $id)
 			'id_smiley' => $id,
 		)
 	);
-	list ($smiley['row'], $smiley['order'], $smiley['location']) = $smcFunc['db_fetch_row']($request);
+	list ($smiley['row'], $smiley['order'], $smiley['location']) = $db->fetch_row($request);
 
 	$db->free_result($request);
 
@@ -477,7 +477,7 @@ function getMaxSmileyOrder()
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $smcFunc['db_fetch_row']($request);
+	list ($smiley_order) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $smiley_order;
@@ -621,7 +621,7 @@ function list_getNumSmileys()
 		array(
 		)
 	);
-	list($numSmileys) = $smcFunc['db_fetch_row'];
+	list($numSmileys) = $db->fetch_row;
 	$db->free_result($request);
 
 	return $numSmileys;

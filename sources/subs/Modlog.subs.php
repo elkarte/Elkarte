@@ -53,7 +53,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 			'modlog_query' => $modlog_query,
 		))
 	);
-	list ($entry_count) = $smcFunc['db_fetch_row']($result);
+	list ($entry_count) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	return $entry_count;

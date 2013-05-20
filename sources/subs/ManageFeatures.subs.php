@@ -149,7 +149,7 @@ function list_getProfileFieldSize()
 		)
 	);
 
-	list ($numProfileFields) = $smcFunc['db_fetch_row']($request);
+	list ($numProfileFields) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numProfileFields;

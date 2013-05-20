@@ -336,7 +336,7 @@ function draftsCount($member_id, $draft_type)
 			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
 		)
 	);
-	list ($msgCount) = $smcFunc['db_fetch_row']($request);
+	list ($msgCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $msgCount;
@@ -398,7 +398,7 @@ function getOldDrafts($days)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$drafts[] = (int) $row[0];
 	$db->free_result($request);
 

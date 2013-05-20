@@ -124,7 +124,7 @@ class Poll_Controller
 					'id_poll' => $row['id_poll'],
 				)
 			);
-			while ($choice = $smcFunc['db_fetch_row']($request))
+			while ($choice = $db->fetch_row($request))
 				$pollOptions[] = $choice[0];
 			$db->free_result($request);
 
@@ -259,7 +259,7 @@ class Poll_Controller
 				'current_topic' => $topic,
 			)
 		);
-		list ($memberID, $pollID, $voting_locked) = $smcFunc['db_fetch_row']($request);
+		list ($memberID, $pollID, $voting_locked) = $db->fetch_row($request);
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
@@ -891,7 +891,7 @@ class Poll_Controller
 			);
 			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
-			list ($topicStarter, $pollStarter) = $smcFunc['db_fetch_row']($request);
+			list ($topicStarter, $pollStarter) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			isAllowedTo('poll_remove_' . ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $user_info['id'] == $pollStarter) ? 'own' : 'any'));

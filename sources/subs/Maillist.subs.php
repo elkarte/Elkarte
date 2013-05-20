@@ -135,7 +135,7 @@ function list_maillist_count_unapproved()
 		array(
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
+	list ($total) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total;
@@ -249,7 +249,7 @@ function list_count_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
+	list ($total) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total;
@@ -340,7 +340,7 @@ function maillist_board_list()
 	);
 	$result = array();
 	$result[0] = '';
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$result[$row[0]] = $row[1];
 	$db->free_result($request);
 

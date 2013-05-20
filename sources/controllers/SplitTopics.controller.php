@@ -529,7 +529,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => $split1_ID_TOPIC,
 		)
 	);
-	list ($id_board, $split1_approved) = $smcFunc['db_fetch_row']($request);
+	list ($id_board, $split1_approved) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Find the new first and last not in the list. (old topic)

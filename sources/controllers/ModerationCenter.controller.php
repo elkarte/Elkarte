@@ -112,7 +112,7 @@ class ModerationCenter_Controller
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_access', false);
-		list ($context['notice_body'], $context['notice_subject']) = $smcFunc['db_fetch_row']($request);
+		list ($context['notice_body'], $context['notice_subject']) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$context['notice_body'] = parse_bbc($context['notice_body'], false);
@@ -215,7 +215,7 @@ class ModerationCenter_Controller
 				'view_closed' => $context['view_closed'],
 			)
 		);
-		list ($context['total_reports']) = $smcFunc['db_fetch_row']($request);
+		list ($context['total_reports']) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// So, that means we can page index, yes?
@@ -1349,7 +1349,7 @@ function ModBlockNotes()
 				'modnote' => 'modnote',
 			)
 		);
-		list ($moderator_notes_total) = $smcFunc['db_fetch_row']($request);
+		list ($moderator_notes_total) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
@@ -1537,7 +1537,7 @@ function list_getWatchedUserCount($approve_query)
 			'warning_watch' => $modSettings['warning_watch'],
 		)
 	);
-	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
+	list ($totalMembers) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $totalMembers;
@@ -1670,7 +1670,7 @@ function list_getWatchedUserPostsCount($approve_query)
 			'warning_watch' => $modSettings['warning_watch'],
 		)
 	);
-	list ($totalMemberPosts) = $smcFunc['db_fetch_row']($request);
+	list ($totalMemberPosts) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $totalMemberPosts;

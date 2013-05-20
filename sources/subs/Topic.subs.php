@@ -649,7 +649,7 @@ function moveTopics($topics, $toBoard)
 			'id_board' => $toBoard,
 		)
 	);
-	list ($isSeen) = $smcFunc['db_fetch_row']($request);
+	list ($isSeen) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
@@ -712,7 +712,7 @@ function moveTopicConcurrence()
 				'topic_id' => $topic,
 			)
 		);
-		list($topic_subject, $board_name) = $smcFunc['db_fetch_row']($request);
+		list($topic_subject, $board_name) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $board_name . '</a>';
@@ -849,7 +849,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 			'id_msg_last_visit' => (int) $id_msg_last_visit,
 		)
 	);
-	list ($unread) = $smcFunc['db_fetch_row']($request);
+	list ($unread) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $unread;
@@ -1029,7 +1029,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		);
 	}
 	// Now you can be sure $topic is the id_topic to view.
-	list ($topic) = $smcFunc['db_fetch_row']($request);
+	list ($topic) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $topic;
@@ -1391,7 +1391,7 @@ function unapprovedPosts($id_topic, $id_member)
 				'current_member' => $id_member,
 			)
 		);
-	list ($myUnapprovedPosts) = $smcFunc['db_fetch_row']($request);
+	list ($myUnapprovedPosts) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $myUnapprovedPosts;
@@ -1500,7 +1500,7 @@ function topicStarter($topic)
 			'current_topic' => $topic,
 		)
 	);
-	$starter = $smcFunc['db_fetch_row']($request);
+	$starter = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $starter;

@@ -239,7 +239,7 @@ class Calendar_Controller
 						array(
 							'id_event' => $_REQUEST['eventid'],
 					));
-					list ($id_board, $id_topic) = $smcFunc['db_fetch_row']($request);
+					list ($id_board, $id_topic) = $db->fetch_row($request);
 					$db->free_result($request);
 				}
 

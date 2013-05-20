@@ -83,7 +83,7 @@ function getBadBehaviorLogEntryCount($filter)
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($entry_count) = $smcFunc['db_fetch_row']($result);
+	list ($entry_count) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	return $entry_count;

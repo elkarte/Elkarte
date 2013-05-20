@@ -427,7 +427,7 @@ function removeMessage($message, $decreasePostCount = true)
 		);
 		if ($db->num_rows($request) == 0)
 			fatal_lang_error('recycle_no_valid_board');
-		list ($isRead, $last_board_msg) = $smcFunc['db_fetch_row']($request);
+		list ($isRead, $last_board_msg) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Is there an existing topic in the recycle board to group this post with?
@@ -441,7 +441,7 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $smcFunc['db_fetch_row']($request);
+		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Insert a new topic in the recycle board if $id_recycle_topic is empty.
@@ -680,7 +680,7 @@ function associatedTopic($msg_id, $topicID = null)
 		if ($db->num_rows($request) != 1)
 			$topic = false;
 		else
-			list ($topic) = $smcFunc['db_fetch_row']($request);
+			list ($topic) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		return $topic;

@@ -42,7 +42,7 @@ function loadMessageLimit()
 				'users_groups' => $user_info['groups'],
 			)
 		);
-		list ($maxMessage, $minMessage) = $smcFunc['db_fetch_row']($request);
+		list ($maxMessage, $minMessage) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
@@ -125,7 +125,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 		);
 	}
 
-	list ($count) = $smcFunc['db_fetch_row']($request);
+	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $count;
@@ -1037,7 +1037,7 @@ function pmCount($id_member, $time)
 			'msgtime' => time() - $time,
 		)
 	);
-	list ($pmCount) = $smcFunc['db_fetch_row']($request);
+	list ($pmCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $pmCount;

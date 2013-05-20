@@ -35,7 +35,7 @@ function countMessages()
 		FROM {db_prefix}messages',
 		array()
 	);
-	list($messages) = $smcFunc['db_fetch_row']($request);
+	list($messages) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $messages;
@@ -233,7 +233,7 @@ function getMaxTopicID()
 		array(
 		)
 	);
-	list ($id_topic) = $smcFunc['db_fetch_row']($request);
+	list ($id_topic) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $id_topic;
@@ -650,7 +650,7 @@ function countTopicsFromBoard($id_board)
 			'id_board' => $id_board,
 		)
 	);
-	list ($total_topics) = $smcFunc['db_fetch_row']($request);
+	list ($total_topics) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_topics;
@@ -711,7 +711,7 @@ function countContributors()
 	);
 
 	// save it so we don't do this again for this task
-	list ($total_members) = $smcFunc['db_fetch_row']($request);
+	list ($total_members) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_members;

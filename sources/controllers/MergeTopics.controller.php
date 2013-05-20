@@ -90,7 +90,7 @@ class MergeTopics_Controller
 				'is_approved' => 1,
 			)
 		);
-		list ($topiccount) = $smcFunc['db_fetch_row']($request);
+		list ($topiccount) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Make the page list.
@@ -490,8 +490,8 @@ class MergeTopics_Controller
 				'last_msg' => $last_msg,
 			)
 		);
-		list ($member_started) = $smcFunc['db_fetch_row']($request);
-		list ($member_updated) = $smcFunc['db_fetch_row']($request);
+		list ($member_started) = $db->fetch_row($request);
+		list ($member_updated) = $db->fetch_row($request);
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === NULL)
 			$member_updated = $member_started;
@@ -507,7 +507,7 @@ class MergeTopics_Controller
 			array(
 				'topic_list' => $topics,
 		));
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $db->fetch_row($request))
 			$affected_msgs[] = $row[0];
 		$db->free_result($request);
 

@@ -297,7 +297,7 @@ function validateTriggers(&$triggers)
 				);
 				if ($db->num_rows($request) == 0)
 					$ban_errors->addError('invalid_username');
-				list ($value, $isAdmin) = $smcFunc['db_fetch_row']($request);
+				list ($value, $isAdmin) = $db->fetch_row($request);
 				$db->free_result($request);
 
 				if ($isAdmin && strtolower($isAdmin) != 'f')
@@ -666,7 +666,7 @@ function insertBanGroup($ban_info = array())
 
 	if ($db->num_rows($request) == 1)
 	{
-		list($id_ban) = $smcFunc['db_fetch_row']($request);
+		list($id_ban) = $db->fetch_row($request);
 		$db->free_result($request);
 		return $id_ban;
 	}
@@ -803,7 +803,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 	);
 	if ($db->num_rows($request) != 0)
 	{
-		list ($error_id_ban, $error_ban_name) = $smcFunc['db_fetch_row']($request);
+		list ($error_id_ban, $error_ban_name) = $db->fetch_row($request);
 		fatal_lang_error('ban_trigger_already_exists', false, array(
 			$fullip,
 			'<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $error_id_ban . '">' . $error_ban_name . '</a>',
@@ -1039,7 +1039,7 @@ function list_getNumBanTriggers($trigger_type)
 			'blank_string' => '',
 		)
 	);
-	list ($num_triggers) = $smcFunc['db_fetch_row']($request);
+	list ($num_triggers) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_triggers;
@@ -1093,7 +1093,7 @@ function list_getNumBanLogEntries()
 		array(
 		)
 	);
-	list ($num_entries) = $smcFunc['db_fetch_row']($request);
+	list ($num_entries) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $num_entries;
@@ -1116,7 +1116,7 @@ function list_getNumBans()
 		array(
 		)
 	);
-	list ($numBans) = $smcFunc['db_fetch_row']($request);
+	list ($numBans) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numBans;
@@ -1287,7 +1287,7 @@ function list_getNumBanItems()
 			'current_ban' => $ban_group_id,
 		)
 	);
-	list($banNumber) = $smcFunc['db_fetch_row']($request);
+	list($banNumber) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $banNumber;

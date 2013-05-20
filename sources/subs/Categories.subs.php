@@ -370,7 +370,7 @@ function categoryName($id_cat)
 			'id_cat' => $id_cat,
 		)
 	);
-	list ($name) = $smcFunc['db_fetch_row']($request);
+	list ($name) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $name;

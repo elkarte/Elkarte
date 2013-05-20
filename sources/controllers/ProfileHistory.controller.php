@@ -178,7 +178,7 @@ function action_trackactivity($memID)
 				'current_member' => $memID,
 			)
 		);
-		list ($max_msg_member) = $smcFunc['db_fetch_row']($request);
+		list ($max_msg_member) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
@@ -302,7 +302,7 @@ function list_getUserErrorCount($where, $where_vars = array())
 		WHERE ' . $where,
 		$where_vars
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
+	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// @todo cast this to an integer
@@ -374,7 +374,7 @@ function list_getIPMessageCount($where, $where_vars = array())
 		WHERE {query_see_board} AND ' . $where,
 		$where_vars
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
+	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// @todo cast to integer
@@ -825,7 +825,7 @@ function list_getLoginCount($where, $where_vars = array())
 			'id_member' => $where_vars['current_member'],
 		)
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
+	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// @todo cast to integer
@@ -994,7 +994,7 @@ function list_getProfileEditCount($memID)
 			'owner' => $memID,
 		)
 	);
-	list ($edit_count) = $smcFunc['db_fetch_row']($request);
+	list ($edit_count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// @todo cast to integer

@@ -102,7 +102,7 @@ function markBoardsRead($boards, $unread = false)
 			'current_member' => $user_info['id'],
 		)
 	);
-	list ($lowest_topic) = $smcFunc['db_fetch_row']($result);
+	list ($lowest_topic) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	if (empty($lowest_topic))
@@ -1197,7 +1197,7 @@ function getBoardProperties($idboard)
 			'current_board' => $idboard,
 		)
 	);
-	list ($properties['oldRedirect'], $properties['numPosts']) = $smcFunc['db_fetch_row']($request);
+	list ($properties['oldRedirect'], $properties['numPosts']) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $properties;
@@ -1341,7 +1341,7 @@ function fetchBoardsInfo($conditions, $params = array())
 
 	if (!empty($params['count']))
 	{
-		list($return) = $smcFunc['db_fetch_row']($request);
+		list($return) = $db->fetch_row($request);
 	}
 	else
 	{

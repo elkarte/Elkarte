@@ -128,7 +128,7 @@ class Topic_Controller
 				'current_topic' => $topic,
 			)
 		);
-		list ($is_sticky) = $smcFunc['db_fetch_row']($request);
+		list ($is_sticky) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Toggle the sticky value.
@@ -221,7 +221,7 @@ class Topic_Controller
 					'not_guest' => 0,
 				)
 			);
-			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
+			list ($pollinfo['total']) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Total voters needs to include guest voters
