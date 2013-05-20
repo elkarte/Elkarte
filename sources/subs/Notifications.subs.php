@@ -73,6 +73,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		GROUP BY t.id_topic',
 		array(
 			'topic_list' => $topics,
+			'attachment_type' => 0,
+			'id_msg' => $row['id_last_msg'],
 		)
 	);
 	$topicData = array();
