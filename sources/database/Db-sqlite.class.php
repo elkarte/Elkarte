@@ -108,9 +108,9 @@ class Database_SQLite implements Database
 	 * @param type $db_prefix
 	 * @param type $db_name
 	 */
-	function fix_prefix(&$db_prefix, $db_name)
+	function fix_prefix($db_prefix, $db_name)
 	{
-		return false;
+		return $db_prefix;
 	}
 
 	/**

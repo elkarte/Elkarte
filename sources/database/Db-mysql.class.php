@@ -84,7 +84,7 @@ class Database_MySQL implements Database
 		if (empty($db_options['dont_select_db']) && !@mysql_select_db($db_name, $connection) && empty($db_options['non_fatal']))
 			display_db_error();
 
-		// This makes it possible to have ELKARTE automatically change the sql_mode and autocommit if needed.
+		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
 			$smcFunc['db_query']('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
@@ -100,9 +100,10 @@ class Database_MySQL implements Database
 	 * @param string &db_prefix
 	 * @param string $db_name
 	 */
-	function fix_prefix(&$db_prefix, $db_name)
+	function fix_prefix($db_prefix, $db_name)
 	{
 		$db_prefix = is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
+		return $db_prefix;
 	}
 
 	/**

@@ -2498,8 +2498,9 @@ function loadDatabase()
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
+	$db = database();
 	if (ELKARTE == 'SSI')
-		db_fix_prefix($db_prefix, $db_name);
+		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 }
 
 /**
