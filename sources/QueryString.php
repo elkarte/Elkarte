@@ -40,8 +40,11 @@ function cleanRequest()
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
 
-	// What function to use to reverse magic quotes - if sybase is on we assume that the database sensibly has the right unescape function!
-	$removeMagicQuoteFunction = ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on' ? 'unescapestring__recursive' : 'stripslashes__recursive';
+	// Reject magic_quotes_sybase='on'.
+	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
+		die('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
+		die('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
 
 	// Save some memory.. (since we don't use these anyway.)
 	unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS']);
@@ -87,16 +90,9 @@ function cleanRequest()
 
 		// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
-
-		// Magic quotes still applies with parse_str - so clean it up.
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
-			$_GET = $removeMagicQuoteFunction($_GET);
 	}
 	elseif (strpos(ini_get('arg_separator.input'), ';') !== false)
 	{
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
-			$_GET = $removeMagicQuoteFunction($_GET);
-
 		// Search engines will send action=profile%3Bu=1, which confuses PHP.
 		foreach ($_GET as $k => $v)
 		{
@@ -136,21 +132,8 @@ function cleanRequest()
 		if (strpos($request, basename($scripturl) . '/') !== false)
 		{
 			parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($scripturl)) + strlen(basename($scripturl)))), '/', '&')), 1), $temp);
-			if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
-				$temp = $removeMagicQuoteFunction($temp);
 			$_GET += $temp;
 		}
-	}
-
-	// If magic quotes is on we have some work...
-	if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
-	{
-		$_ENV = $removeMagicQuoteFunction($_ENV);
-		$_POST = $removeMagicQuoteFunction($_POST);
-		$_COOKIE = $removeMagicQuoteFunction($_COOKIE);
-		foreach ($_FILES as $k => $dummy)
-			if (isset($_FILES[$k]['name']))
-				$_FILES[$k]['name'] = $removeMagicQuoteFunction($_FILES[$k]['name']);
 	}
 
 	// Add entities to GET.  This is kinda like the slashes on everything else.
@@ -463,32 +446,6 @@ function urldecode__recursive($var, $level = 0)
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
 		$new_var[urldecode($k)] = $level > 25 ? null : urldecode__recursive($v, $level + 1);
-
-	return $new_var;
-}
-/**
- * Unescapes any array or variable.  Uses two underscores to guard against overloading.
- * What it does:
- * - unescapes, recursively, from the array or string var.
- * - effects both keys and values of arrays.
- * - calls itself recursively to handle arrays of arrays.
- *
- * @param array|string $var
- * @return array|string
- */
-function unescapestring__recursive($var)
-{
-	$db = database();
-
-	if (!is_array($var))
-		return $db->unescape_string($var);
-
-	// Reindex the array without slashes, this time.
-	$new_var = array();
-
-	// Strip the slashes from every element.
-	foreach ($var as $k => $v)
-		$new_var[$db->unescape_string($k)] = unescapestring__recursive($v);
 
 	return $new_var;
 }
