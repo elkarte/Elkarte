@@ -1567,7 +1567,7 @@ function toggleTopicSticky($topics)
 		)
 	);
 
-	return $smcFunc['db_affected_rows']();
+	return $db->affected_rows();
 }
 
 /**

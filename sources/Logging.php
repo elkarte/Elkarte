@@ -108,7 +108,7 @@ function writeLog($force = false)
 		);
 
 		// Guess it got deleted.
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 			$_SESSION['log_time'] = 0;
 	}
 	else
@@ -373,7 +373,7 @@ function trackStats($stats = array())
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
-	if ($smcFunc['db_affected_rows']() == 0)
+	if ($db->affected_rows() == 0)
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_activity',

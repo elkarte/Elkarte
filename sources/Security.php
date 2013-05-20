@@ -1229,7 +1229,7 @@ function spamProtection($error_type)
 	);
 
 	// If affected is 0 or 2, it was there already.
-	if ($smcFunc['db_affected_rows']() != 1)
+	if ($db->affected_rows() != 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
 		fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));

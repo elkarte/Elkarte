@@ -87,7 +87,7 @@ function AutoTask()
 					'current_next_time' => $row['next_time'],
 				)
 			);
-			$affected_rows = $smcFunc['db_affected_rows']();
+			$affected_rows = $db->affected_rows();
 
 			// The function must exist or we are wasting our time, plus do some timestamp checking, and database check!
 			if (function_exists('scheduled_' . $row['task']) && (!isset($_GET['ts']) || $_GET['ts'] == $row['next_time']) && $affected_rows)
@@ -998,7 +998,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 				'last_send' => $modSettings['mail_next_send'],
 			)
 		);
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 			return false;
 		$modSettings['mail_next_send'] = time() + $delay;
 	}

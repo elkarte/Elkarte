@@ -1699,7 +1699,7 @@ function createSalvageArea()
 			array('id_cat')
 		);
 
-		if ($smcFunc['db_affected_rows']() <= 0)
+		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
 			fatal_lang_error('salvaged_category_error', false);
@@ -1733,7 +1733,7 @@ function createSalvageArea()
 			array('id_board')
 		);
 
-		if ($smcFunc['db_affected_rows']() <= 0)
+		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
 			fatal_lang_error('salvaged_board_error', false);

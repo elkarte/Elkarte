@@ -1273,7 +1273,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				)
 			);
 
-			$flag = $smcFunc['db_affected_rows']() != 0;
+			$flag = $db->affected_rows() != 0;
 		}
 
 		if (empty($flag))
@@ -1429,7 +1429,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 
-		$flag = $smcFunc['db_affected_rows']() != 0;
+		$flag = $db->affected_rows() != 0;
 
 		if (empty($flag))
 		{

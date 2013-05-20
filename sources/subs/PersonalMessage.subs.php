@@ -302,7 +302,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 	);
 
 	// If something wasn't marked as read, get the number of unread messages remaining.
-	if ($smcFunc['db_affected_rows']() > 0)
+	if ($db->affected_rows() > 0)
 	{
 		if ($owner == $user_info['id'])
 		{

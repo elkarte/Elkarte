@@ -42,7 +42,7 @@ function bb2_db_affected_rows()
 
 	$db = database();
 
-	return $smcFunc['db_affected_rows']();
+	return $db->affected_rows();
 }
 
 /**

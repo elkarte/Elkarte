@@ -129,7 +129,7 @@ function logSpider()
 		);
 
 		// Nothing updated?
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
@@ -209,7 +209,7 @@ function consolidateSpiderStats()
 				'current_spider' => $stat['id_spider'],
 			)
 		);
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 			$stat_inserts[] = array($date, $stat['id_spider'], $stat['num_hits'], $stat['last_seen']);
 	}
 
