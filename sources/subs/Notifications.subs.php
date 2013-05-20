@@ -63,13 +63,14 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Get the subject, body and basic poster details
 	$result = $smcFunc['db_query']('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name
+			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})
-		LIMIT 1',
+		GROUP BY t.id_topic',
 		array(
 			'topic_list' => $topics,
 		)
@@ -78,22 +79,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$boards_index = array();
 	while ($row = $smcFunc['db_fetch_assoc']($result))
 	{
-		// Any attachments, we just want the number of them for display
-		$num_attachments = 0;
-		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(id_attach)
-			FROM {db_prefix}attachments
-			WHERE attachment_type = {int:attachment_type}
-				AND id_msg = {int:id_msg}
-			LIMIT 1',
-			array(
-				'attachment_type' => 0,
-				'id_msg' => $row['id_last_msg'],
-			)
-		);
-		list($num_attachments) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
 		// Using the maillist function or the standard style
 		if ($maillist)
 		{
@@ -122,7 +107,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'name' => $row['poster_name'],
 			'exclude' => '',
 			'signature' => $row['signature'],
-			'attachments' => $num_attachments,
+			'attachments' => $row['num_attach'],
 		);
 	}
 	$smcFunc['db_free_result']($result);
