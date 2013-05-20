@@ -1234,7 +1234,7 @@ class Post_Controller
 			}
 		}
 
-		// Incase we want to override
+		// In case we want to override
 		if (allowedTo('approve_posts'))
 		{
 			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
@@ -1430,7 +1430,23 @@ class Post_Controller
 			$_POST['question'] = $smcFunc['truncate']($_POST['question'], 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
+
+			// Finally, make the poll.
+			require_once(SUBSDIR . '/Poll.subs.php');
+			$id_poll = createPoll(
+				$_POST['question'],
+				$user_info['id'],
+				$_POST['guestname'],
+				$_POST['poll_max_votes'],
+				$_POST['poll_hide'],
+				$_POST['poll_expire'],
+				$_POST['poll_change_vote'],
+				$_POST['poll_guest_vote'],
+				$_POST['options']
+			);
 		}
+		else
+			$id_poll = 0;
 
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
@@ -1503,25 +1519,6 @@ class Post_Controller
 			}
 			unset($_SESSION['temp_attachments']);
 		}
-
-		// Make the poll...
-		if (isset($_REQUEST['poll']))
-		{
-			require_once(SUBSDIR . '/Poll.subs.php');
-			$id_poll = createPoll(
-					$_POST['question'],
-					$user_info['id'],
-					$_POST['guestname'],
-					$_POST['poll_max_votes'],
-					$_POST['poll_hide'],
-					$_POST['poll_expire'],
-					$_POST['poll_change_vote'],
-					$_POST['poll_guest_vote'],
-					$_POST['options']
-			);
-		}
-		else
-			$id_poll = 0;
 
 		// Creating a new topic?
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
@@ -1665,7 +1662,7 @@ class Post_Controller
 		// Mark all the parents read.  (since you just posted and they will be unread.)
 		if (!$user_info['is_guest'])
 		{
-			$board_list = !empty($board_info['parent_boards']) ? $board_info['parent_boards'] : array();
+			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
 
 			// Returning to the topic?
 			if (!empty($_REQUEST['goback']))
@@ -1680,7 +1677,7 @@ class Post_Controller
 						AND id_board IN ({array_int:board_list})',
 					array(
 						'current_member' => $user_info['id'],
-						'board_list' => array_keys($board_info['parent_boards']),
+						'board_list' => $board_list,
 						'id_msg' => $modSettings['maxMsgID'],
 					)
 				);
