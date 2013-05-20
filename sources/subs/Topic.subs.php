@@ -1415,7 +1415,7 @@ function updateSplitTopics($options, $id_board)
 
 	// If the new topic isn't approved ensure the first message flags
 	// this just in case.
-	if (!$options['split2_approved'])
+	if (!$split2_approved)
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}messages
 			SET approved = {int:approved}
