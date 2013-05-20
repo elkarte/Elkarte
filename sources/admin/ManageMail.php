@@ -117,9 +117,8 @@ class ManageMail_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
+							global $smcFunc;
 
-
-							$db = database();
 							return $smcFunc[\'strlen\']($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars($smcFunc[\'substr\']($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
 						'),
 						'class' => 'smalltext',
@@ -337,7 +336,7 @@ class ManageMail_Controller
 	 */
 	public function settings()
 	{
-		global $txt, $modSettings, $txtBirthdayEmails;;
+		global $txt, $modSettings, $txtBirthdayEmails;
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];

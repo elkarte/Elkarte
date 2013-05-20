@@ -152,9 +152,7 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords;
-
-		$db = database();
+		global $excludedWords, $smcFunc;
 
 		$x = $smcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = $smcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);
@@ -175,9 +173,7 @@ class Fulltext_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings;
-
-		$db = database();
+		global $modSettings, $smcFunc;
 
 		$subwords = text2words($word, null, false);
 

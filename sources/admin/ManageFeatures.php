@@ -385,9 +385,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $scripturl;
-
-		$db = database();
+		global $context, $txt, $modSettings, $sig_start, $scripturl, $smcFunc;
 
 		// initialize the form
 		$this->_initSignatureSettingsForm();
@@ -964,9 +962,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_profileedit()
 	{
-		global $txt, $scripturl, $context;
-
-		$db = database();
+		global $txt, $scripturl, $context, $smcFunc;
 
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');

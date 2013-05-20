@@ -1438,9 +1438,7 @@ class ManageMaillist_Controller
 	 */
 	public function action_modify_bounce_templates()
 	{
-		global $context, $txt, $user_info;
-
-		$db = database();
+		global $context, $txt, $user_info, $smcFunc;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 

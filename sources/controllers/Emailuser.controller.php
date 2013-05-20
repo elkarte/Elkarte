@@ -367,7 +367,7 @@ class Emailuser_Controller
 	 */
 	function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
+		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, $smcFunc;
 
 		$db = database();
 

@@ -1356,7 +1356,7 @@ class ManageAttachments_Controller
 	 */
 	public function action_attachpaths()
 	{
-		global $modSettings, $scripturl, $context, $txt;
+		global $modSettings, $scripturl, $context, $txt, $smcFunc;
 
 		$db = database();
 

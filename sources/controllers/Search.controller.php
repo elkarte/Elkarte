@@ -39,7 +39,7 @@ $GLOBALS['search_versions'] = array(
  */
 function action_plushsearch1()
 {
-	global $txt, $scripturl, $modSettings, $user_info, $context;
+	global $txt, $scripturl, $modSettings, $user_info, $context, $smcFunc;
 
 	$db = database();
 
@@ -199,9 +199,7 @@ function action_plushsearch2()
 {
 	global $scripturl, $modSettings, $txt;
 	global $user_info, $context, $options, $messages_request, $boards_can;
-	global $excludedWords, $participants;
-
-	$db = database();
+	global $excludedWords, $participants, $smcFunc;
 
 	// We shouldn't be working with the db, but we do :P
 	$db = database();
@@ -1883,7 +1881,7 @@ function MessageSearch()
 function MessageSearch2()
 {
 	global $scripturl, $modSettings, $user_info, $context, $txt;
-	global $memberContext;
+	global $memberContext, $smcFunc;
 
 	$db = database();
 
@@ -2399,9 +2397,7 @@ function prepareSearchContext($reset = false)
 {
 	global $txt, $modSettings, $scripturl, $user_info;
 	global $memberContext, $context, $settings, $options, $messages_request;
-	global $boards_can, $participants;
-
-	$db = database();
+	global $boards_can, $participants, $smcFunc;
 
 	// Remember which message this is.  (ie. reply #83)
 	static $counter = null;

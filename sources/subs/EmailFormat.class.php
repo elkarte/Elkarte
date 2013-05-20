@@ -145,9 +145,7 @@ class Email_Format
 	 */
 	private function _prep_data($data)
 	{
-
-
-		$db = database();
+		global $smcFunc;
 
 		// Un-wordwrap the email, create a line by line array broken on the newlines
 		$temp = explode("\n", $data);

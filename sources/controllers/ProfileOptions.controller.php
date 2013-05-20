@@ -70,7 +70,7 @@ function action_editBuddyIgnoreLists()
 function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext;
+	global $context, $user_profile, $memberContext, $smcFunc;
 
 	$db = database();
 
@@ -185,7 +185,7 @@ function action_editBuddies($memID)
 function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext;
+	global $context, $user_profile, $memberContext, $smcFunc;
 
 	$db = database();
 

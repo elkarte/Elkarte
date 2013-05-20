@@ -37,8 +37,6 @@ class Topic_Controller
 	{
 		global $topic, $user_info, $board;
 
-		$db = database();
-
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
 			fatal_lang_error('not_a_topic', false);

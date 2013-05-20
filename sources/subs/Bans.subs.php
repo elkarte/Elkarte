@@ -198,7 +198,7 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-
+	global $smcFunc;
 
 	$db = database();
 

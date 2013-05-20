@@ -131,9 +131,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitExecute()
 	{
-		global $txt, $context, $user_info, $modSettings;
-
-		$db = database();
+		global $txt, $context, $user_info, $modSettings, $smcFunc;
 		global $board, $topic, $language, $scripturl;
 
 		// Check the session to make sure they meant to do this.
@@ -203,7 +201,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitSelection()
 	{
-		global $txt, $board, $topic, $context, $user_info;
+		global $txt, $board, $topic, $context, $user_info, $smcFunc;
 
 		// Make sure the session id was passed with post.
 		checkSession();
@@ -248,10 +246,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitSelectTopics()
 	{
-		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-
-
-		$db = database();
+		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options, $smcFunc;
 
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
@@ -461,9 +456,7 @@ class SplitTopics_Controller
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $user_info, $topic, $board;
-
-	$db = database();
+	global $scripturl, $user_info, $language, $txt, $user_info, $topic, $board, $smcFunc;
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
@@ -511,7 +504,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $txt, $context;
+	global $user_info, $topic, $board, $modSettings, $txt, $context, $smcFunc;
 
 	$db = database();
 

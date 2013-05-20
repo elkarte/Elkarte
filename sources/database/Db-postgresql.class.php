@@ -43,9 +43,7 @@ class Database_PostgreSQL implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global $mysql_set_mode;
-
-		$db = database();
+		global $smcFunc;
 
 		// Map some database specific functions, only do this once.
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'postg_fetch_assoc')

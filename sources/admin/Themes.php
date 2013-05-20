@@ -1280,7 +1280,7 @@ class Themes_Controller
 	 */
 	function action_install()
 	{
-		global $boardurl, $txt, $context, $settings, $modSettings;
+		global $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
 
 		$db = database();
 

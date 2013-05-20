@@ -31,8 +31,6 @@ if (!defined('ELKARTE'))
  */
 function getSignatureFromMembers($start_member)
 {
-
-
 	$db = database();
 
 	$members = array();
@@ -64,8 +62,6 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -138,8 +134,6 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
  */
 function list_getProfileFieldSize()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -163,8 +157,6 @@ function list_getProfileFieldSize()
  */
 function getProfileField($id_field)
 {
-
-
 	$db = database();
 
 	$field = array();
@@ -231,8 +223,6 @@ function getProfileField($id_field)
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
-
-
 	$db = database();
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
@@ -266,8 +256,6 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -292,8 +280,6 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  */
 function updateProfileField($field_data)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -339,8 +325,6 @@ function updateProfileField($field_data)
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -363,8 +347,6 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  */
 function addProfileField($field)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -393,8 +375,6 @@ function addProfileField($field)
 
 function reOrderProfileFields()
 {
-
-
 	$db = database();
 
 	$db->query('alter_table_boards', '
@@ -413,8 +393,6 @@ function reOrderProfileFields()
  */
 function deleteProfileFieldUserData($name)
 {
-
-
 	$db = database();
 
 	// Delete the user data first.
@@ -436,8 +414,6 @@ function deleteProfileFieldUserData($name)
  */
 function deleteProfileField($id)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -454,8 +430,6 @@ function deleteProfileField($id)
  */
 function updateDisplayCache()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

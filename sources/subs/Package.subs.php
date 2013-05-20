@@ -451,9 +451,7 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-
-
-	$db = database();
+	global $smcFunc;
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false)

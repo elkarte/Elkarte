@@ -437,7 +437,7 @@ function deleteMembers($users, $check_not_admin = false)
 function registerMember(&$regOptions, $return_errors = false)
 {
 	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings;
+	global $user_info, $options, $settings, $smcFunc;
 
 	$db = database();
 
@@ -865,7 +865,7 @@ function registerMember(&$regOptions, $return_errors = false)
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
-	global $user_info, $modSettings, $context;
+	global $user_info, $modSettings, $context, $smcFunc;
 
 	$db = database();
 
@@ -1588,7 +1588,7 @@ function getMemberByName($name)
 
 function getMember($search, $buddies = array())
 {
-
+	global $smcFunc;
 
 	$db = database();
 

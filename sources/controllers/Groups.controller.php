@@ -203,7 +203,7 @@ class Groups_Controller
 	 */
 	function action_groupmembers()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
+		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, $smcFunc;
 
 		$db = database();
 

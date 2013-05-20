@@ -515,7 +515,7 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function action_credits($in_admin = false)
 {
-	global $context, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info;
+	global $context, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info, $smcFunc;
 
 	$db = database();
 

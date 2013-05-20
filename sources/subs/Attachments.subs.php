@@ -975,7 +975,7 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-
+	global $smcFunc;
 
 	$db = database();
 
@@ -1070,7 +1070,7 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings;
+	global $modSettings, $smcFunc;
 
 	$db = database();
 

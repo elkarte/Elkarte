@@ -32,9 +32,7 @@ if (!defined('ELKARTE'))
 function DumpDatabase2()
 {
 	global $db_name, $scripturl, $context, $modSettings, $crlf;
-	global $db_prefix, $db_show_debug;
-
-	$db = database();
+	global $db_prefix, $db_show_debug, $smcFunc;
 
 	// Administrators only!
 	if (!allowedTo('admin_forum'))
@@ -131,15 +129,9 @@ function DumpDatabase2()
 
 	// Get all tables in the database....
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0)
-	{
-		$db = strtr($match[1], array('`' => ''));
 		$dbp = str_replace('_', '\_', $match[2]);
-	}
 	else
-	{
-		$db = false;
 		$dbp = $db_prefix;
-	}
 
 	// Dump each table.
 	$tables = $database->db_list_tables(false, $db_prefix . '%');

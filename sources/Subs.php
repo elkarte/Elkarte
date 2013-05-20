@@ -842,9 +842,7 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-
-
-	$db = database();
+	global $smcFunc;
 
 	$current = $smcFunc['strlen']($text);
 

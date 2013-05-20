@@ -408,9 +408,7 @@ function pbe_create_pm($pbe, $email_message)
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
-	global $txt, $modSettings;
-
-	$db = database();
+	global $txt, $modSettings, $smcFunc;
 
 	// It does not work like that
 	if (empty($pbe) || empty($email_message))
@@ -576,9 +574,7 @@ function action_pbe_preview($data = null)
  */
 function pbe_load_text($html, $email_message, $pbe)
 {
-
-
-	$db = database();
+	global $smcFunc;
 
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{

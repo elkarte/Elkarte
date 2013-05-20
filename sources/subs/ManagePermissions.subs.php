@@ -1237,7 +1237,7 @@ function clearPostgroupPermissions()
  */
 function copyPermissionProfile($profile_name, $copy_from)
 {
-
+	global $smcFunc;
 
 	$db = database();
 
@@ -1286,7 +1286,7 @@ function copyPermissionProfile($profile_name, $copy_from)
  */
 function renamePermissionProfile($id_profile, $name)
 {
-
+	global $smcFunc;
 
 	$db = database();
 

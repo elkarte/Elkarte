@@ -33,7 +33,7 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $cur_profile;
+		global $language, $scripturl, $cur_profile, $smcFunc;
 
 		$db = database();
 
@@ -227,7 +227,7 @@ class Register_Controller
 	function action_register2($verifiedOpenID = false)
 	{
 		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings;
+		global $user_info, $options, $settings, $smcFunc;
 
 		$db = database();
 
@@ -841,9 +841,7 @@ class Register_Controller
 	 */
 	function action_contact()
 	{
-		global $context, $txt, $user_info, $modSettings;
-
-		$db = database();
+		global $context, $txt, $user_info, $modSettings, $smcFunc;
 
 		// Already inside, no need to use this, just send a PM
 		// Disabled, you cannot enter.
@@ -930,9 +928,7 @@ class Register_Controller
  */
 function registerCheckUsername()
 {
-	global $context, $txt;
-
-	$db = database();
+	global $context;
 
 	// This is XML!
 	loadTemplate('Xml');

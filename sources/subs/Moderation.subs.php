@@ -245,7 +245,7 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-
+	global $smcFunc;
 
 	$db = database();
 
@@ -348,7 +348,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global $scripturl, $user_info;
+	global $scripturl, $user_info, $smcFunc;
 
 	$db = database();
 
@@ -488,7 +488,7 @@ function list_getWarningCount()
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global $user_info, $context;
+	global $user_info, $context, $smcFunc;
 
 	$db = database();
 

@@ -29,7 +29,7 @@ class MessageIndex_Controller
 	function action_messageindex()
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
-		global $options, $settings, $board_info, $user_info;
+		global $options, $settings, $board_info, $user_info, $smcFunc;
 
 		$db = database();
 

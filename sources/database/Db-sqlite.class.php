@@ -41,9 +41,7 @@ class Database_SQLite implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global $mysql_set_mode, $db_in_transact, $sqlite_error;
-
-		$db = database();
+		global $db_in_transact, $sqlite_error, $smcFunc;
 
 		// Map some database specific functions, only do this once.
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'sqlite_fetch_array')

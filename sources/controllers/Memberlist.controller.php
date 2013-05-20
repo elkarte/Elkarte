@@ -176,9 +176,7 @@ class Memberlist_Controller
 	 */
 	function action_mlall()
 	{
-		global $txt, $scripturl, $modSettings, $context;
-
-		$db = database();
+		global $txt, $scripturl, $modSettings, $context, $smcFunc;
 
 		// The chunk size for the cached index.
 		$cache_step_size = 500;
@@ -322,7 +320,7 @@ class Memberlist_Controller
 	 */
 	function action_mlsearch()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $scripturl, $context, $modSettings, $smcFunc;
 
 		$db = database();
 

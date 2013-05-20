@@ -171,12 +171,11 @@ class ManageCoreFeatures_Controller
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => create_function('$value', '
-
-
 					$db = database();
+
 					if (!$value)
 					{
-						$smcFunc[\'db_query\'](\'\', \'
+						$db->query(\'\', \'
 							UPDATE {db_prefix}custom_fields
 							SET active = 0\');
 					}
@@ -203,12 +202,10 @@ class ManageCoreFeatures_Controller
 					'drafts_show_saved_enabled' => 2,
 				),
 				'setting_callback' => create_function('$value', '
-
-
 					$db = database();
 
 					// Set the correct disabled value for the scheduled task.
-					$smcFunc[\'db_query\'](\'\', \'
+					$db->query(\'\', \'
 						UPDATE {db_prefix}scheduled_tasks
 						SET disabled = {int:disabled}
 						WHERE task = {string:task}\',
@@ -273,12 +270,10 @@ class ManageCoreFeatures_Controller
 					'paid_enabled' => 1,
 				),
 				'setting_callback' => create_function('$value', '
-
-
 					$db = database();
 
 					// Set the correct disabled value for scheduled task.
-					$smcFunc[\'db_query\'](\'\', \'
+					$db->query(\'\', \'
 						UPDATE {db_prefix}scheduled_tasks
 						SET disabled = {int:disabled}
 						WHERE task = {string:task}\',

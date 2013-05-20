@@ -388,7 +388,7 @@ class News_Controller
 	function action_xmlnews($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $settings, $context;
+		global $query_this_board, $settings, $context, $smcFunc;
 
 		$db = database();
 
@@ -536,7 +536,7 @@ class News_Controller
 	function action_xmlrecent($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $settings, $context;
+		global $query_this_board, $settings, $context, $smcFunc;
 
 		$db = database();
 
@@ -854,9 +854,7 @@ function fix_possible_url($val)
  */
 function cdata_parse($data, $ns = '')
 {
-	global $cdata_override;
-
-	$db = database();
+	global $cdata_override, $smcFunc;
 
 	// Are we not doing it?
 	if (!empty($cdata_override))

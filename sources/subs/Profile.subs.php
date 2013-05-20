@@ -157,7 +157,7 @@ function setupProfileContext($fields)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
+	global $context, $txt, $user_profile, $user_info, $settings, $scripturl, $smcFunc;
 
 	$db = database();
 
@@ -491,7 +491,7 @@ function loadProfileFields($force_reload = false)
 
 				$db = database();
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $db->query(\'\', \'
 					SELECT value
 					FROM {db_prefix}themes
 					WHERE id_theme = {int:id_theme}
@@ -501,8 +501,8 @@ function loadProfileFields($force_reload = false)
 						\'variable\' => \'name\',
 					)
 				);
-				list ($name) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list ($name) = $db->fetch_row($request);
+				$db->free_result($request);
 
 				$context[\'member\'][\'theme\'] = array(
 					\'id\' => $cur_profile[\'id_theme\'],
@@ -661,9 +661,7 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-
-
-				$db = database();
+				global $smcFunc;
 
 				if ($smcFunc[\'strlen\']($value) > 50)
 					return \'personal_text_too_long\';
@@ -720,9 +718,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $cur_profile;
-
-				$db = database();
+				global $context, $cur_profile, $smcFunc;
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
@@ -875,9 +871,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-
-
-				$db = database();
+				global $smcFunc;
 
 				if ($smcFunc[\'strlen\'] > 50)
 					return \'user_title_too_long\';
@@ -1420,7 +1414,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $user_profile, $user_info, $modSettings;
+	global $context, $user_profile, $user_info, $modSettings, $smcFunc;
 
 	$db = database();
 
@@ -1820,9 +1814,7 @@ function profileReloadUser()
  */
 function profileValidateSignature(&$value)
 {
-	global $modSettings, $txt;
-
-	$db = database();
+	global $modSettings, $txt, $smcFunc;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 

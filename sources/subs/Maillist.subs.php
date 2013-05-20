@@ -176,7 +176,7 @@ function maillist_delete_entry($id)
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
-
+	global $smcFunc;
 
 	$db = database();
 
@@ -325,8 +325,6 @@ function maillist_delete_filter_parser($id)
  */
 function maillist_board_list()
 {
-
-
 	$db = database();
 
 	// Get the board and the id's, we need these for the templates
@@ -355,8 +353,6 @@ function maillist_board_list()
  */
 function enable_maillist_imap_cron($switch)
 {
-
-
 	$db = database();
 
 	// Enable or disable the fake cron

@@ -32,8 +32,6 @@ class RemoveTopic_Controller
 	{
 		global $user_info, $topic, $board, $context, $modSettings;
 
-		$db = database();
-
 		// Make sure they aren't being lead around by someone. (:@)
 		checkSession('get');
 
@@ -85,8 +83,6 @@ class RemoveTopic_Controller
 	function action_deletemsg()
 	{
 		global $user_info, $topic, $board, $modSettings;
-
-		$db = database();
 
 		checkSession('get');
 
@@ -648,8 +644,6 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 function removeDeleteConcurrence()
 {
 	global $modSettings, $board, $topic, $scripturl, $context;
-
-	$db = database();
 
 	// No recycle no need to go further
 	if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))

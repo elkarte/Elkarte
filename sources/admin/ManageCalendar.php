@@ -196,9 +196,7 @@ class ManageCalendar_Controller
 	 */
 	public function action_editholiday()
 	{
-		global $txt, $context;
-
-		$db = database();
+		global $txt, $context, $smcFunc;
 
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');

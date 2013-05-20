@@ -946,10 +946,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
-	global $context, $modSettings, $board_info, $settings;
-
-
-	$db = database();
+	global $context, $modSettings, $board_info, $settings, $smcFunc;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -2187,9 +2184,7 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $settings, $modSettings;
-
-	$db = database();
+	global $settings, $modSettings, $smcFunc;
 
 	// Either we don't use the cache, or its expired.
 	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)

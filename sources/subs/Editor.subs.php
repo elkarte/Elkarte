@@ -893,9 +893,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $modSettings;
-
-		$db = database();
+		global $context, $modSettings, $smcFunc;
 
 		if (!$this->_show_captcha)
 			return;
@@ -1069,9 +1067,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function prepareContext()
 	{
-
-
-		$db = database();
+		global $smcFunc;
 
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
@@ -1109,9 +1105,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $language;
-
-		$db = database();
+		global $txt, $context, $language, $smcFunc;
 
 		// Load any question and answers!
 		$filter = null;
@@ -1205,9 +1199,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _verifyAnswers()
 	{
-
-
-		$db = database();
+		global $smcFunc;
 
 		// Get the answers and see if they are all right!
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
@@ -1260,8 +1252,6 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _loadAntispamQuestions($filter = null)
 	{
-
-
 		$db = database();
 
 		$available_filters = array(
@@ -1295,8 +1285,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _delete($id)
 	{
-
-
 		$db = database();
 
 		$db->query('', '
@@ -1310,8 +1298,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _update($id, $question, $answers, $language)
 	{
-
-
 		$db = database();
 
 		$request = $db->query('', '
@@ -1333,8 +1319,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _insert($questions)
 	{
-
-
 		$db = database();
 
 		$db->insert('',
@@ -1373,8 +1357,6 @@ function theme_postbox($msg)
 function bbc_to_html($text, $compat_mode = false)
 {
 	global $modSettings;
-
-	$db = database();
 
 	if (!$compat_mode)
 		return $text;

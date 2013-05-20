@@ -113,7 +113,7 @@ class MoveTopic_Controller
 	function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
-		global $board, $language, $user_info;
+		global $board, $language, $user_info, $smcFunc;
 
 		$db = database();
 
