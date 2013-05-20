@@ -64,8 +64,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	// Get the subject, body and basic poster details
 	$result = $db->query('', '
-		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach, t.id_member_started,
+		SELECT mf.subject, ml.body, ml.id_member, IFNULL(mem.real_name, ml.poster_name) AS poster_name, mem.signature,
+			 t.id_last_msg, t.id_topic, t.id_board, t.id_member_started, COUNT(a.id_attach) as num_attach,
 			b.member_groups as board_groups, b.name as board_name, b.id_profile
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -160,7 +160,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$members = $db->query('', '
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-				mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_board, ln.sent
+				mem.id_group, mem.additional_groups, mem.id_post_group, mem.warning, ln.id_board, ln.sent
 			FROM {db_prefix}log_notify AS ln
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			WHERE ln.id_board IN ({array_int:board_list})
@@ -275,7 +275,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_topic, ln.sent
+			mem.id_group, mem.additional_groups, mem.id_post_group, mem.warning, ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 		WHERE ln.id_topic IN ({array_int:topic_list})
@@ -487,7 +487,7 @@ function notifyMembersBoard(&$topicData)
 	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
-			ln.sent, ln.id_board, mem.id_group, mem.additional_groups
+			mem.id_group, mem.additional_groups, ln.sent, ln.id_board
 			mem.id_post_group
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -656,8 +656,8 @@ function sendApprovalNotifications(&$topicData)
 	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
-			ln.id_topic
+			mem.id_group, mem.additional_groups, mem.warning, b.member_groups, mem.id_post_group, t.id_member_started,
+			ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
