@@ -392,7 +392,7 @@ class DbTable_MySQL extends DbTable
 			$index_info['name'] = $index_info['name'];
 
 		// Log that we are going to want to remove this!
-		$this->$_db_package_log[] = array('remove_index', $table_name, $index_info['name']);
+		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
 		$indexes = $this->db_list_indexes($table_name, true);
