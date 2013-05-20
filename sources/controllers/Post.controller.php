@@ -1738,6 +1738,7 @@ class Post_Controller
 					'topic' => $topic,
 					'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
 				);
+				require_once(SUBSDIR . '/Notifications.subs.php');
 				notifyMembersBoard($notifyData);
 			}
 			elseif (empty($_REQUEST['msg']))
