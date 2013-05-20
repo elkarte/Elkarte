@@ -206,7 +206,7 @@ else
 	setupThemeContext();
 
 // Make sure they didn't muss around with the settings... but only if it's not cli.
-if (isset($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['is_cli']) && session_id() == '')
+if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')
 	trigger_error($txt['ssi_session_broken'], E_USER_NOTICE);
 
 // Without visiting the forum this session variable might not be set on submit.

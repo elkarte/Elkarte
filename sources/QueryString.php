@@ -201,9 +201,8 @@ function cleanRequest()
 	// Make sure we have a valid REMOTE_ADDR.
 	if (!isset($_SERVER['REMOTE_ADDR']))
 	{
+		// Command line, or else.
 		$_SERVER['REMOTE_ADDR'] = '';
-		// A new magic variable to indicate we think this is command line.
-		$_SERVER['is_cli'] = true;
 	}
 	// Perhaps we have a IPv6 address.
 	elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~::ffff:\d+\.\d+\.\d+\.\d+~', $_SERVER['REMOTE_ADDR']) !== 0)
