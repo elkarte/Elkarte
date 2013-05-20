@@ -38,7 +38,9 @@ class Attachment_Controller
 	 */
 	function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $scripturl, $context, $topic, $smcFunc;
+		global $txt, $modSettings, $user_info, $scripturl, $context, $topic;
+
+		$db = database();
 
 		// Some defaults that we need.
 		$context['character_set'] = 'UTF-8';

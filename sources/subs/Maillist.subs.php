@@ -25,7 +25,9 @@ if (!defined('ELKARTE'))
  */
 function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 {
-	global $smcFunc, $txt, $boardurl, $user_info;
+	global $txt, $boardurl, $user_info;
+
+	$db = database();
 
 	// Init
 	$i = 0;
@@ -45,7 +47,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		$approve_query = ' AND 0';
 
 	// Load them errors
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
@@ -62,7 +64,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 			'id' => $id,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
@@ -92,7 +94,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 
 		$i++;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $postemail;
 }
@@ -105,7 +107,9 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
  */
 function list_maillist_count_unapproved()
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	$total= 0;
 
@@ -121,7 +125,7 @@ function list_maillist_count_unapproved()
 		$approve_query = ' AND 0';
 
 	// Get the total count of failed emails, needed for pages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			COUNT(*) as total
 		FROM {db_prefix}postby_emails_error AS e
@@ -131,8 +135,8 @@ function list_maillist_count_unapproved()
 		array(
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total;
 }
@@ -144,10 +148,12 @@ function list_maillist_count_unapproved()
  */
 function maillist_delete_entry($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// bye bye error log entry
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_error
 		WHERE id_email = {int:id}',
 		array(
@@ -172,6 +178,8 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 {
 	global $smcFunc;
 
+	$db = database();
+
 	// Init
 	$i = 0;
 	if (empty($sort))
@@ -181,7 +189,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 	$email_filters = array();
 
 	// Load all the email_filters, we need lots of these :0
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT *
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
@@ -196,7 +204,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 			'style' => $style
 		)
 	);
-	while($row = $smcFunc['db_fetch_assoc']($request))
+	while($row = $db->fetch_assoc($request))
 	{
 		$email_filters[$i] = array(
 			'id_filter' => $row['id_filter'],
@@ -207,7 +215,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		);
 		$i++;
 	};
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $email_filters;
 }
@@ -223,12 +231,14 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
  */
 function list_count_filter_parser($id, $style)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$total = 0;
 
 	// Get the total filter count, needed for pages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			COUNT(*) as total
 		FROM {db_prefix}postby_emails_filters
@@ -239,8 +249,8 @@ function list_count_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total;
 }
@@ -255,12 +265,14 @@ function list_count_filter_parser($id, $style)
  */
 function maillist_load_filter_parser($id, $style)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$row = array();
 
 	// Load filter/parser details for editing
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT *
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter = {int:id}
@@ -271,8 +283,8 @@ function maillist_load_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	// Check that the filter does exist
 	if (empty($row))
@@ -288,10 +300,12 @@ function maillist_load_filter_parser($id, $style)
  */
 function maillist_delete_filter_parser($id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Delete the rows from the database for the filter selected
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_filters
 		WHERE id_filter = {int:id}',
 		array(
@@ -311,10 +325,10 @@ function maillist_delete_filter_parser($id)
  */
 function maillist_board_list()
 {
-	global $smcFunc;
+	$db = database();
 
 	// Get the board and the id's, we need these for the templates
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board > {int:zero}',
@@ -324,9 +338,9 @@ function maillist_board_list()
 	);
 	$result = array();
 	$result[0] = '';
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$result[$row[0]] = $row[1];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -339,10 +353,10 @@ function maillist_board_list()
  */
 function enable_maillist_imap_cron($switch)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Enable or disable the fake cron
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
 		SET disabled = {int:onoff}, next_time = {int:time}
 		WHERE task = {string:name}',
@@ -359,11 +373,13 @@ function enable_maillist_imap_cron($switch)
  */
 function maillist_templates()
 {
-	global $smcFunc, $user_info, $txt;
+	global $user_info, $txt;
+
+	$db = database();
 
 	$notification_templates = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -374,7 +390,7 @@ function maillist_templates()
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$notification_templates[] = array(
 			'title' => $row['template_title'],
@@ -382,7 +398,7 @@ function maillist_templates()
 			'subject' => $txt['ml_bounce_template_subject_default'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_templates;
 }

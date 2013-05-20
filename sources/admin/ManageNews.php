@@ -114,8 +114,7 @@ class ManageNews_Controller
 	 */
 	public function action_editnews()
 	{
-		global $txt, $modSettings, $context, $scripturl;
-		global $smcFunc;
+		global $txt, $modSettings, $context, $scripturl, $smcFunc;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 

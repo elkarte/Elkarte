@@ -21,9 +21,11 @@ if (!defined('ELKARTE'))
  */
 function installedThemes()
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
@@ -37,7 +39,7 @@ function installedThemes()
 		)
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($themes[$row['id_theme']]))
 			$themes[$row['id_theme']] = array(
@@ -47,7 +49,7 @@ function installedThemes()
 			);
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -59,9 +61,11 @@ function installedThemes()
  */
 function themeDirectory($id_theme)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_dir}
@@ -72,8 +76,8 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list($themeDirectory) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($themeDirectory) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $themeDirectory;
 }
@@ -85,9 +89,11 @@ function themeDirectory($id_theme)
  */
 function themeUrl($id_theme)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_url}
@@ -99,8 +105,8 @@ function themeUrl($id_theme)
 			)
 		);
 
-	list ($theme_url) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($theme_url) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $theme_url;
 }
@@ -114,9 +120,11 @@ function themeUrl($id_theme)
  */
 function validateThemeName($indexes, $value_data)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -129,14 +137,14 @@ function validateThemeName($indexes, $value_data)
 		))
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Find the right one.
 		foreach ($indexes as $index)
 			if (strpos($row['value'], $index) !== false)
 				$themes[$row['id_theme']] = $index;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -149,11 +157,13 @@ function validateThemeName($indexes, $value_data)
  */
 function getBasicThemeInfos($themes)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$themelist = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -165,10 +175,10 @@ function getBasicThemeInfos($themes)
 			'name' => 'name',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themelist[$themes[$row['id_theme']]] = $row['value'];
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themelist;
 }
@@ -179,9 +189,11 @@ function getBasicThemeInfos($themes)
  */
 function getCustomThemes()
 {
-	global $smcFunc, $settings, $txt;
+	global $settings, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
@@ -202,9 +214,9 @@ function getCustomThemes()
 			'theme_dir' => $settings['default_theme_dir'],
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }
@@ -216,7 +228,9 @@ function getCustomThemes()
  */
 function getThemesPathbyID($theme_list = array())
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	// Nothing passed then we use the defaults
 	if (empty($theme_list))
@@ -226,7 +240,7 @@ function getThemesPathbyID($theme_list = array())
 		$theme_list = array($theme_list);
 
 	// Load up any themes we need the paths for
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
@@ -239,9 +253,9 @@ function getThemesPathbyID($theme_list = array())
 		)
 	);
 	$theme_paths = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $theme_paths;
 }
@@ -254,10 +268,12 @@ function getThemesPathbyID($theme_list = array())
  */
 function loadThemes($knownThemes)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Load up all the themes.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
@@ -269,13 +285,13 @@ function loadThemes($knownThemes)
 		)
 	);
 	$themes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$themes[] = array(
 			'id' => $row['id_theme'],
 			'name' => $row['name'],
 			'known' => in_array($row['id_theme'], $knownThemes),
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $themes;
 }

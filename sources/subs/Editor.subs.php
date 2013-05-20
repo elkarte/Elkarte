@@ -75,7 +75,9 @@ function action_loadlocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $context, $txt, $settings, $smcFunc;
+	global $modSettings, $context, $txt, $settings;
+
+	$db = database();
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -108,7 +110,7 @@ function getMessageIcons($board_id)
 	{
 		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
 		{
-			$request = $smcFunc['db_query']('select_message_icons', '
+			$request = $db->query('select_message_icons', '
 				SELECT title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})',
@@ -117,9 +119,9 @@ function getMessageIcons($board_id)
 				)
 			);
 			$icon_data = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$icon_data[] = $row;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$icons = array();
 			foreach ($icon_data as $icon)
@@ -147,7 +149,9 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $smcFunc;
+	global $txt, $modSettings, $options;
+
+	$db = database();
 	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
@@ -595,7 +599,7 @@ function create_control_richedit($editorOptions)
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
@@ -603,14 +607,14 @@ function create_control_richedit($editorOptions)
 					array(
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					$row['filename'] = htmlspecialchars($row['filename']);
 					$row['description'] = htmlspecialchars($row['description']);
 
 					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{
@@ -697,7 +701,9 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $txt, $modSettings, $options, $smcFunc, $language;
+	global $txt, $modSettings, $options, $language;
+
+	$db = database();
 	global $context, $settings, $user_info, $scripturl;
 	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
 	static $all_instances;
@@ -887,7 +893,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $smcFunc, $modSettings;
+		global $context, $modSettings, $smcFunc;
 
 		if (!$this->_show_captcha)
 			return;
@@ -1099,7 +1105,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $smcFunc, $language;
+		global $txt, $context, $language, $smcFunc;
 
 		// Load any question and answers!
 		$filter = null;
@@ -1217,19 +1223,21 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _refreshQuestionsCache()
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
+
+		$db = database();
 
 		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_question, language
 				FROM {db_prefix}antispam_questions',
 				array()
 			);
 			$modSettings['question_id_cache'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($modSettings['cache_enable']))
 				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
@@ -1244,7 +1252,7 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _loadAntispamQuestions($filter = null)
 	{
-		global $smcFunc;
+		$db = database();
 
 		$available_filters = array(
 			'language' => 'language = {string:current_filter}',
@@ -1253,7 +1261,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		// Load any question and answers!
 		$question_answers = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
 			WHERE ' . $available_filters[$filter['type']]),
@@ -1261,7 +1269,7 @@ class Control_Verification_Questions implements Control_Verifications
 				'current_filter' => $filter['value'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
@@ -1270,16 +1278,16 @@ class Control_Verification_Questions implements Control_Verifications
 				'language' => $row['language'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $question_answers;
 	}
 
 	private function _delete($id)
 	{
-		global $smcFunc;
+		$db = database();
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}antispam_questions
 			WHERE id_question = {int:id}',
 			array(
@@ -1290,9 +1298,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _update($id, $question, $answers, $language)
 	{
-		global $smcFunc;
+		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			UPDATE {db_prefix}antispam_questions
 			SET
 				question = {string:question},
@@ -1311,9 +1319,9 @@ class Control_Verification_Questions implements Control_Verifications
 
 	private function _insert($questions)
 	{
-		global $smcFunc;
+		$db = database();
 
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}antispam_questions',
 			array('question' => 'string-65535', 'answer' => 'string-65535', 'language' => 'string-50'),
 			$questions,
@@ -1348,7 +1356,7 @@ function theme_postbox($msg)
  */
 function bbc_to_html($text, $compat_mode = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	if (!$compat_mode)
 		return $text;
@@ -1413,7 +1421,9 @@ function bbc_to_html($text, $compat_mode = false)
  */
 function html_to_bbc($text)
 {
-	global $modSettings, $smcFunc, $scripturl, $context;
+	global $modSettings, $scripturl, $context;
+
+	$db = database();
 
 	// Replace newlines with spaces, as that's how browsers usually interpret them.
 	$text = preg_replace("~\s*[\r\n]+\s*~", ' ', $text);
@@ -1482,7 +1492,7 @@ function html_to_bbc($text)
 
 			if (!empty($names))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT code, filename
 					FROM {db_prefix}smileys
 					WHERE filename IN ({array_string:smiley_filenames})',
@@ -1491,9 +1501,9 @@ function html_to_bbc($text)
 					)
 				);
 				$mappings = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$mappings[$row['filename']] = htmlspecialchars($row['code']);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($matches[1] as $k => $file)
 					if (isset($mappings[$file]))

@@ -26,16 +26,18 @@ if (!defined('ELKARTE'))
  */
 function onlineCount()
 {
-	global $smcFunc;
 
-	$result = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online',
 		array(
 		)
 	);
-	list ($users_online) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($users_online) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	return $users_online;
 }

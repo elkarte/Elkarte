@@ -31,7 +31,9 @@ class MaillistSettingsClass extends Settings_Form
 {
 	static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
 	{
-		global $smcFunc;
+
+
+		$db = database();
 
 		// Init
 		$insert_type = array();
@@ -99,7 +101,7 @@ class MaillistSettingsClass extends Settings_Form
 		}
 
 		// Do it !!
-		$smcFunc['db_insert']($update ? 'replace' : 'insert',
+		$db->insert($update ? 'replace' : 'insert',
 			'{db_prefix}' . $tablename,
 			$insert_type,
 			$insert_value,

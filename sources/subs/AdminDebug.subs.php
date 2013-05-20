@@ -20,10 +20,12 @@ if (!defined('ELKARTE'))
  */
 function list_getAdminInfoFile($filename)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$file = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT data, filetype
 		FROM {db_prefix}admin_info_files
 		WHERE filename = {string:current_filename}
@@ -33,11 +35,11 @@ function list_getAdminInfoFile($filename)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('admin_file_not_found', true, array($filename));
 
-	list ($file['file_data'], $file['filetype']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($file['file_data'], $file['filetype']) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $file;
 }

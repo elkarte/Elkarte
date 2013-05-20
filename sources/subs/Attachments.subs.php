@@ -330,7 +330,9 @@ function attachments_init_dir (&$tree, &$count)
  */
 function processAttachments()
 {
-	global $context, $modSettings, $smcFunc, $txt, $user_info;
+	global $context, $modSettings, $txt, $user_info;
+
+	$db = database();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -355,7 +357,7 @@ function processAttachments()
 		// If this isn't a new post, check the current attachments.
 		if (isset($_REQUEST['msg']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(*), SUM(size)
 				FROM {db_prefix}attachments
 				WHERE id_msg = {int:id_msg}
@@ -365,8 +367,8 @@ function processAttachments()
 					'attachment_type' => 0,
 				)
 			);
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $db->fetch_row($request);
+			$db->free_result($request);
 		}
 		else
 			$context['attachments'] = array(
@@ -515,7 +517,9 @@ function processAttachments()
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context;
+
+	$db = database();
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if ( empty($_SESSION['temp_attachments'][$attachID]))
@@ -583,7 +587,7 @@ function attachmentChecks($attachID)
 		// Check the folder size and count. If it hasn't been done already.
 		if (empty($context['dir_size']) || empty($context['dir_files']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(*), SUM(size)
 				FROM {db_prefix}attachments
 				WHERE id_folder = {int:folder_id}
@@ -593,8 +597,8 @@ function attachmentChecks($attachID)
 					'type' => 1,
 				)
 			);
-			list ($context['dir_files'], $context['dir_size']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($context['dir_files'], $context['dir_size']) = $db->fetch_row($request);
+			$db->free_result($request);
 		}
 		$context['dir_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
 		$context['dir_files']++;
@@ -695,7 +699,9 @@ function attachmentChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $smcFunc, $context;
+	global $modSettings, $context;
+
+	$db = database();
 	global $txt;
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
@@ -740,7 +746,7 @@ function createAttachment(&$attachmentOptions)
 			$attachmentOptions['fileext'] = '';
 	}
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -754,7 +760,7 @@ function createAttachment(&$attachmentOptions)
 		),
 		array('id_attach')
 	);
-	$attachmentOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 	// @todo Add an error here maybe?
 	if (empty($attachmentOptions['id']))
@@ -766,7 +772,7 @@ function createAttachment(&$attachmentOptions)
 
 	// If it's not approved then add to the approval queue.
 	if (!$attachmentOptions['approved'])
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_attach' => 'int', 'id_msg' => 'int',
@@ -828,7 +834,7 @@ function createAttachment(&$attachmentOptions)
 			}
 
 			// To the database we go!
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}attachments',
 				array(
 					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -840,11 +846,11 @@ function createAttachment(&$attachmentOptions)
 				),
 				array('id_attach')
 			);
-			$attachmentOptions['thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 			if (!empty($attachmentOptions['thumb']))
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}attachments
 					SET id_thumb = {int:id_thumb}
 					WHERE id_attach = {int:id_attach}',
@@ -871,14 +877,16 @@ function createAttachment(&$attachmentOptions)
 */
 function getAvatar($id_attach)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Use our cache when possible
 	if (($cache = cache_get_data('getAvatar_id-' . $id_attach)) !== null)
 		$avatarData = $cache;
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}
@@ -891,9 +899,9 @@ function getAvatar($id_attach)
 		);
 
 		$avatarData = array();
-		if ($smcFunc['db_num_rows']($request) != 0)
-			$avatarData = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		if ($db->num_rows($request) != 0)
+			$avatarData = $db->fetch_row($request);
+		$db->free_result($request);
 
 		cache_put_data('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
@@ -911,11 +919,13 @@ function getAvatar($id_attach)
 */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Make sure this attachment is on this board.
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.attachment_type, a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
@@ -929,9 +939,9 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	);
 
 	$attachmentData = array();
-	if ($smcFunc['db_num_rows']($request) != 0)
-		$attachmentData = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	if ($db->num_rows($request) != 0)
+		$attachmentData = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $attachmentData;
 }
@@ -944,9 +954,11 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 */
 function increaseDownloadCounter($id_attach)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('attach_download_increase', '
+
+	$db = database();
+
+	$db->query('attach_download_increase', '
 		UPDATE LOW_PRIORITY {db_prefix}attachments
 		SET downloads = downloads + 1
 		WHERE id_attach = {int:id_attach}',
@@ -965,11 +977,13 @@ function approveAttachments($attachments)
 {
 	global $smcFunc;
 
+	$db = database();
+
 	if (empty($attachments))
 		return 0;
 
 	// For safety, check for thumbnails...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			a.id_attach, a.id_member, IFNULL(thumb.id_attach, 0) AS id_thumb
 		FROM {db_prefix}attachments AS a
@@ -982,7 +996,7 @@ function approveAttachments($attachments)
 		)
 	);
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Update the thumbnail too...
 		if (!empty($row['id_thumb']))
@@ -990,13 +1004,13 @@ function approveAttachments($attachments)
 
 		$attachments[] = $row['id_attach'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($attachments))
 		return 0;
 
 	// Approving an attachment is not hard - it's easy.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}attachments
 		SET approved = {int:is_approved}
 		WHERE id_attach IN ({array_int:attachments})',
@@ -1007,7 +1021,7 @@ function approveAttachments($attachments)
 	);
 
 	// In order to log the attachments, we really need their message and filename
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_msg, a.filename
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -1019,7 +1033,7 @@ function approveAttachments($attachments)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		logAction(
 			'approve_attach',
 			array(
@@ -1027,10 +1041,10 @@ function approveAttachments($attachments)
 				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
 			)
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Remove from the approval queue.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}approval_queue
 		WHERE id_attach IN ({array_int:attachments})',
 		array(
@@ -1057,6 +1071,8 @@ function approveAttachments($attachments)
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
 	global $modSettings, $smcFunc;
+
+	$db = database();
 
 	// @todo This might need more work!
 	$new_condition = array();
@@ -1101,7 +1117,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	$parents = array();
 
 	// Get all the attachment names and id_msg's.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			a.id_folder, a.filename, a.file_hash, a.attachment_type, a.id_attach, a.id_member' . ($query_type == 'messages' ? ', m.id_msg' : ', a.id_msg') . ',
 			thumb.id_folder AS thumb_folder, IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.filename AS thumb_filename, thumb.file_hash AS thumb_file_hash, thumb_parent.id_attach AS id_parent
@@ -1113,7 +1129,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		WHERE ' . $condition,
 		$query_parameter
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Figure out the "encrypted" filename and unlink it ;).
 		if ($row['attachment_type'] == 1)
@@ -1146,12 +1162,12 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			$msgs[] = $row['id_msg'];
 		$attach[] = $row['id_attach'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Removed attachments don't have to be updated anymore.
 	$parents = array_diff($parents, $attach);
 	if (!empty($parents))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET id_thumb = {int:no_thumb}
 			WHERE id_attach IN ({array_int:parent_attachments})',
@@ -1164,7 +1180,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	if (!empty($do_logging))
 	{
 		// In order to log the attachments, we really need their message and filename
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT m.id_msg, a.filename
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -1176,7 +1192,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			logAction(
 				'remove_attach',
 				array(
@@ -1184,11 +1200,11 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
 				)
 			);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($attach))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}attachments
 			WHERE id_attach IN ({array_int:attachment_list})',
 			array(
@@ -1220,7 +1236,9 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1233,7 +1251,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	$id_folder = getAttachmentPathID();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int',
@@ -1245,7 +1263,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		),
 		array('id_attach')
 	);
-	$attachID = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
 	// First, the temporary file will have the .tmp extension.
 	$tempName = getAvatarPath() . '/' . $destName . '.tmp';
@@ -1271,7 +1289,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 			$mime_type = 'image/' . $ext;
 
 			// Write filesize in the database.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}attachments
 				SET size = {int:filesize}, width = {int:width}, height = {int:height},
 					mime_type = {string:mime_type}
@@ -1298,7 +1316,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	}
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}attachments
 			WHERE id_attach = {int:current_attachment}',
 			array(
@@ -1490,10 +1508,12 @@ function getAvatarPathID()
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$attachments = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
 			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
@@ -1508,7 +1528,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
 		)
 	);
 	$temp = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row)))
 			continue;
@@ -1518,7 +1538,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
 		if (!isset($attachments[$row['id_msg']]))
 			$attachments[$row['id_msg']] = array();
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// This is better than sorting it with the query...
 	ksort($temp);
@@ -1536,10 +1556,12 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
  */
 function getAttachmentCount()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Get the number of attachments....
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}attachments
 		WHERE attachment_type = {int:attachment_type}
@@ -1549,8 +1571,8 @@ function getAttachmentCount()
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_attachments) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_attachments) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $num_attachments;
 }
@@ -1562,10 +1584,12 @@ function getAttachmentCount()
  */
 function getAvatarCount()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Get the avatar amount....
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}attachments
 		WHERE id_member != {int:guest_id_member}',
@@ -1573,8 +1597,8 @@ function getAvatarCount()
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_avatars) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_avatars) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $num_avatars;
 }
@@ -1605,9 +1629,11 @@ function getAttachmentDirs()
  */
 function getAvatarsDefault()
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
 		WHERE attachment_type = {int:attachment_type}
@@ -1619,9 +1645,9 @@ function getAvatarsDefault()
 	);
 
 	$avatars = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$avatars[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $avatars;
 }
@@ -1719,16 +1745,18 @@ function getServerStoredAvatars($directory, $level)
  */
 function removeOrphanAttachments($attach_ids)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}attachments
 		WHERE id_attach IN ({array_int:to_remove})',
 		array(
 			'to_remove' => $attach_ids,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}attachments
 			SET id_thumb = {int:no_thumb}
 			WHERE id_thumb IN ({array_int:to_remove})',
@@ -1747,11 +1775,13 @@ function removeOrphanAttachments($attach_ids)
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if ($filesize === null)
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT size
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -1761,15 +1791,15 @@ function attachment_filesize($attach_id, $filesize = null)
 		);
 		if (!empty($result))
 		{
-			list($filesize) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list($filesize) = $db->fetch_row($result);
+			$db->free_result($result);
 			return $filesize;
 		}
 		return false;
 	}
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET size = {int:filesize}
 			WHERE id_attach = {int:id_attach}',
@@ -1789,11 +1819,13 @@ function attachment_filesize($attach_id, $filesize = null)
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if ($folder_id === null)
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT id_folder
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -1803,15 +1835,15 @@ function attachment_folder($attach_id, $folder_id = null)
 		);
 		if (!empty($result))
 		{
-			list($folder_id) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list($folder_id) = $db->fetch_row($result);
+			$db->free_result($result);
 			return $folder_id;
 		}
 		return false;
 	}
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET id_folder = {int:new_folder}
 			WHERE id_attach = {int:id_attach}',
@@ -1828,9 +1860,11 @@ function attachment_folder($attach_id, $folder_id = null)
  */
 function maxThumbnails()
 {
-	global $smcFunc;
 
-	$result = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$result = $db->query('', '
 		SELECT MAX(id_attach)
 		FROM {db_prefix}attachments
 		WHERE id_thumb != {int:no_thumb}',
@@ -1838,8 +1872,8 @@ function maxThumbnails()
 			'no_thumb' => 0,
 		)
 	);
-	list ($thumbnails) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($thumbnails) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	return $thumbnails;
 }
@@ -1852,10 +1886,12 @@ function maxThumbnails()
  */
 function validateAttachments($attachments, $approve_query)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// double check the attachments array, pick only what is returned from the database
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT a.id_attach
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -1872,9 +1908,9 @@ function validateAttachments($attachments, $approve_query)
 		)
 	);
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$attachments[] = $row['id_attach'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $attachments;
 }
@@ -1891,10 +1927,12 @@ function validateAttachments($attachments, $approve_query)
  */
 function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
+
+	$db = database();
 
 	// Get all unapproved attachments.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT a.id_attach, a.filename, a.size, m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
@@ -1921,7 +1959,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 	);
 
 	$unapproved_items = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$unapproved_items[] = array(
 			'id' => $row['id_attach'],
@@ -1954,7 +1992,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $unapproved_items;
 }
@@ -1968,10 +2006,12 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// How many unapproved attachments in total?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -1985,8 +2025,8 @@ function list_getNumUnapprovedAttachments($approve_query)
 			'attachment_type' => 0,
 		)
 	);
-	list ($total_unapproved_attachments) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_unapproved_attachments) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total_unapproved_attachments;
 }
@@ -1997,9 +2037,11 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function list_getAttachDirs()
 {
-	global $smcFunc, $modSettings, $context, $txt;
+	global $modSettings, $context, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_folder, COUNT(id_attach) AS num_attach, SUM(size) AS size_attach
 		FROM {db_prefix}attachments
 		WHERE attachment_type != {int:type}
@@ -2011,12 +2053,12 @@ function list_getAttachDirs()
 
 	$expected_files = array();
 	$expected_size = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$expected_files[$row['id_folder']] = $row['num_attach'];
 		$expected_size[$row['id_folder']] = $row['size_attach'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$attachdirs = array();
 	foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -2166,11 +2208,13 @@ function list_getBaseDirs()
  */
 function list_getNumFiles($browse_type)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Depending on the type of file, different queries are used.
 	if ($browse_type === 'avatars')
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}attachments
 		WHERE id_member != {int:guest_id_member}',
@@ -2179,7 +2223,7 @@ function list_getNumFiles($browse_type)
 		)
 	);
 	else
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*) AS num_attach
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -2193,8 +2237,8 @@ function list_getNumFiles($browse_type)
 			)
 		);
 
-	list ($num_files) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_files) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $num_files;
 }
@@ -2211,11 +2255,13 @@ function list_getNumFiles($browse_type)
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
 {
-	global $smcFunc, $txt;
+	global $txt;
+
+	$db = database();
 
 	// Choose a query depending on what we are viewing.
 	if ($browse_type === 'avatars')
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				{string:blank_text} AS id_msg, IFNULL(mem.real_name, {string:not_applicable_text}) AS poster_name,
 				mem.last_login AS poster_time, 0 AS id_topic, a.id_member, a.id_attach, a.filename, a.file_hash, a.attachment_type,
@@ -2235,7 +2281,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 			)
 		);
 	else
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.id_msg, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.id_topic, m.id_member,
 				a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board
@@ -2255,9 +2301,9 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 			)
 		);
 	$files = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$files[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $files;
 }
@@ -2269,10 +2315,12 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
  */
 function overallAttachmentsSize()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Check the size of all the directories.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT SUM(size)
 		FROM {db_prefix}attachments
 		WHERE attachment_type != {int:type}',
@@ -2280,8 +2328,8 @@ function overallAttachmentsSize()
 			'type' => 1,
 		)
 	);
-	list ($attachmentDirSize) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($attachmentDirSize) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Divide it into kilobytes.
 	$attachmentDirSize /= 1024;
@@ -2295,11 +2343,13 @@ function overallAttachmentsSize()
  */
 function currentAttachDirProperties()
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$current_dir = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*), SUM(size)
 		FROM {db_prefix}attachments
 		WHERE id_folder = {int:folder_id}
@@ -2309,8 +2359,8 @@ function currentAttachDirProperties()
 			'type' => 1,
 		)
 	);
-	list ($current_dir['files'], $current_dir['size']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($current_dir['files'], $current_dir['size']) = $db->fetch_row($request);
+	$db->free_result($request);
 	$current_dir['size'] /= 1024;
 
 	return $current_dir;
@@ -2321,9 +2371,11 @@ function currentAttachDirProperties()
  */
 function moveAvatars()
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
 		WHERE attachment_type = {int:attachment_type}
@@ -2334,17 +2386,17 @@ function moveAvatars()
 		)
 	);
 	$updatedAvatars = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 
 		if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
 			$updatedAvatars[] = $row['id_attach'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($updatedAvatars))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET attachment_type = {int:attachment_type}
 			WHERE id_attach IN ({array_int:updated_avatars})',
@@ -2363,9 +2415,11 @@ function moveAvatars()
  */
 function setRemovalNotice($messages, $notice)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET body = CONCAT(body, {string:notice})
 		WHERE id_msg IN ({array_int:messages})',

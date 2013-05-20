@@ -35,7 +35,7 @@ class Topic_Controller
 	*/
 	function action_lock()
 	{
-		global $topic, $user_info, $board, $smcFunc;
+		global $topic, $user_info, $board;
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
@@ -95,7 +95,9 @@ class Topic_Controller
 	 */
 	function action_sticky()
 	{
-		global $modSettings, $topic, $board, $smcFunc;
+		global $modSettings, $topic, $board;
+
+		$db = database();
 
 		// Make sure the user can sticky it, and they are stickying *something*.
 		isAllowedTo('make_sticky');
@@ -115,7 +117,7 @@ class Topic_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT is_sticky
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
@@ -124,8 +126,8 @@ class Topic_Controller
 				'current_topic' => $topic,
 			)
 		);
-		list ($is_sticky) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($is_sticky) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Toggle the sticky value.
 		setTopicAttribute($topic, array('sticky' => $is_sticky));
@@ -151,7 +153,9 @@ class Topic_Controller
 	function action_printpage()
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
-		global $board_info, $smcFunc, $modSettings, $settings;
+		global $board_info, $modSettings, $settings;
+
+		$db = database();
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
@@ -168,7 +172,7 @@ class Topic_Controller
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -181,16 +185,16 @@ class Topic_Controller
 			)
 		);
 		// Redirect to the boardindex if no valid topic id is provided.
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			redirectexit();
-		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		if (!empty($row['id_poll']))
 		{
 			loadLanguage('Post');
 			// Get the question and if it's locked.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
@@ -202,10 +206,10 @@ class Topic_Controller
 					'id_poll' => $row['id_poll'],
 				)
 			);
-			$pollinfo = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$pollinfo = $db->fetch_assoc($request);
+			$db->free_result($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
 				FROM {db_prefix}log_polls
 				WHERE id_poll = {int:id_poll}
@@ -215,14 +219,14 @@ class Topic_Controller
 					'not_guest' => 0,
 				)
 			);
-			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($pollinfo['total']) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			// Total voters needs to include guest voters
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
 
 			// Get all the options, and calculate the total votes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
 				FROM {db_prefix}poll_choices AS pc
 					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
@@ -236,14 +240,14 @@ class Topic_Controller
 			$pollOptions = array();
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				censorText($row['label']);
 				$pollOptions[$row['id_choice']] = $row;
 				$realtotal += $row['votes'];
 				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -360,7 +364,7 @@ class Topic_Controller
 			$context['parent_boards'][] = $parent['name'];
 
 		// Split the topics up so we can print them.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -374,7 +378,7 @@ class Topic_Controller
 			)
 		);
 		$context['posts'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Censor the subject and message.
 			censorText($row['subject']);
@@ -392,7 +396,7 @@ class Topic_Controller
 			if (!isset($context['topic_subject']))
 				$context['topic_subject'] = $row['subject'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
@@ -402,7 +406,7 @@ class Topic_Controller
 				$messages[] = $temp['id_msg'];
 
 			// build the request
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					a.id_attach, a.id_msg, a.approved, a.width, a.height, a.file_hash, a.filename, a.id_folder, a.mime_type
 				FROM {db_prefix}attachments AS a
@@ -415,13 +419,13 @@ class Topic_Controller
 				)
 			);
 			$temp = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$temp[$row['id_attach']] = $row;
 				if (!isset($context['printattach'][$row['id_msg']]))
 					$context['printattach'][$row['id_msg']] = array();
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			ksort($temp);
 
 			// load them into $context so the template can use them

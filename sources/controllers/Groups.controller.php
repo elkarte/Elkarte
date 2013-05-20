@@ -205,6 +205,8 @@ class Groups_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, $smcFunc;
 
+		$db = database();
+
 		$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
 		// No browsing of guests, membergroup 0 or moderators.
@@ -236,7 +238,7 @@ class Groups_Controller
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Load all the group moderators, for fun.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, mem.real_name
 			FROM {db_prefix}group_moderators AS mods
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -246,7 +248,7 @@ class Groups_Controller
 			)
 		);
 		$context['group']['moderators'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$context['group']['moderators'][] = array(
 				'id' => $row['id_member'],
@@ -256,7 +258,7 @@ class Groups_Controller
 			if ($user_info['id'] == $row['id_member'] && $context['group']['group_type'] != 1)
 				$context['group']['can_moderate'] = true;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// If this group is hidden then it can only "exists" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
@@ -326,7 +328,7 @@ class Groups_Controller
 			$members = array();
 			if (!empty($member_query))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_member
 					FROM {db_prefix}members
 					WHERE (' . implode(' OR ', $member_query) . ')
@@ -336,9 +338,9 @@ class Groups_Controller
 						'id_group' => $_REQUEST['group'],
 					))
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$members[] = $row['id_member'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// @todo Add $_POST['additional'] to templates!
@@ -382,7 +384,7 @@ class Groups_Controller
 			$where = $context['group']['is_post_group'] ? 'id_post_group = {int:group}' : 'id_group = {int:group}';
 
 		// Count members of the group.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}members
 			WHERE ' . $where,
@@ -390,8 +392,8 @@ class Groups_Controller
 				'group' => $_REQUEST['group'],
 			)
 		);
-		list ($context['total_members']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($context['total_members']) = $db->fetch_row($request);
+		$db->free_result($request);
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
@@ -400,7 +402,7 @@ class Groups_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// Load up all members of this group.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, member_name, real_name, email_address, member_ip, date_registered, last_login,
 				hide_email, posts, is_activated, real_name
 			FROM {db_prefix}members
@@ -412,7 +414,7 @@ class Groups_Controller
 			)
 		);
 		$context['members'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
 
@@ -432,7 +434,7 @@ class Groups_Controller
 				'is_activated' => $row['is_activated'] % 10 == 1,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Select the template.
 		$context['sub_template'] = 'group_members';
@@ -445,7 +447,9 @@ class Groups_Controller
 	 */
 	function action_grouprequests()
 	{
-		global $txt, $context, $scripturl, $user_info, $smcFunc, $modSettings, $language;
+		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
+
+		$db = database();
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -490,7 +494,7 @@ class Groups_Controller
 			else
 			{
 				// Get the details of all the members concerned...
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
 						mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
 						mg.hidden, mg.group_name
@@ -506,7 +510,7 @@ class Groups_Controller
 				);
 				$email_details = array();
 				$group_changes = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -551,10 +555,10 @@ class Groups_Controller
 							'language' => $row['lngfile'],
 						);
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				// Remove the evidence...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_group_requests
 					WHERE id_request IN ({array_int:request_list})',
 					array(
@@ -580,7 +584,7 @@ class Groups_Controller
 								if ($value == 0 || trim($value) == '')
 									unset($groups['add'][$key]);
 
-							$smcFunc['db_query']('', '
+							$db->query('', '
 								UPDATE {db_prefix}members
 								SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
 								WHERE id_member = {int:selected_member}',
@@ -761,17 +765,19 @@ class Groups_Controller
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_group_requests AS lgr
 		WHERE ' . $where,
 		array_merge($where_parameters, array(
 		))
 	);
-	list ($totalRequests) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalRequests) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $totalRequests;
 }
@@ -794,9 +800,11 @@ function list_getGroupRequestCount($where, $where_parameters)
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
-	global $smcFunc, $txt, $scripturl;
+	global $txt, $scripturl;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			mem.member_name, mg.group_name, mg.online_color, mem.real_name
 		FROM {db_prefix}log_group_requests AS lgr
@@ -810,7 +818,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		))
 	);
 	$group_requests = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$group_requests[] = array(
 			'id' => $row['id_request'],
@@ -820,7 +828,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $group_requests;
 }

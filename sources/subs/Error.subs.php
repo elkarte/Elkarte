@@ -20,18 +20,20 @@ if (!defined('ELKARTE'))
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Delete all or just some?
 	if ($type == 'delall' && !isset($filter))
-		$smcFunc['db_query']('truncate_table', '
+		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
 			array(
 			)
 		);
 	// Deleting all with a filter?
 	elseif ($type == 'delall' && isset($filter))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
@@ -40,7 +42,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 		);
 	// Just specific errors?
 	elseif ($type == 'delete')
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE id_error IN ({array_int:error_list})',
 			array(
@@ -56,10 +58,12 @@ function deleteErrors($type, $filter = null, $error_list = null)
  */
 function numErrors()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Just how many errors are there?
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
@@ -67,9 +71,9 @@ function numErrors()
 			'filter' => isset($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($num_errors) = $smcFunc['db_fetch_row']($result);
+	list ($num_errors) = $db->fetch_row($result);
 
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $num_errors;
 }
@@ -84,11 +88,13 @@ function numErrors()
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
-	global $smcFunc, $modSettings, $scripturl, $txt;
+	global $modSettings, $scripturl, $txt;
+
+	$db = database();
 
 	$db = database();
 	// Find and sort out the errors.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
@@ -101,7 +107,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$log = array();
 
-	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
+	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
 	{
 		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->escape_wildcard_string($row['message']));
 		if ($search_message == $filter['value']['sql'])
@@ -148,7 +154,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 		// Make a list of members to load later.
 		$log['members'][$row['id_member']] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return($log);
 }
@@ -162,14 +168,16 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {
-	global $smcFunc, $txt, $scripturl;
+	global $txt, $scripturl;
+
+	$db = database();
 
 	$sum = 0;
 	$types = array();
 
 	$db = database();
 	// What type of errors do we have and how many do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT error_type, COUNT(*) AS num_errors
 		FROM {db_prefix}log_errors
 		GROUP BY error_type
@@ -178,7 +186,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'critical_type' => 'critical',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Total errors so far?
 		$sum += $row['num_errors'];
@@ -190,7 +198,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $types;
 }

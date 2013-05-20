@@ -38,9 +38,11 @@ function bb2_db_date()
  */
 function bb2_db_affected_rows()
 {
-	global $smcFunc;
 
-	return $smcFunc['db_affected_rows']();
+
+	$db = database();
+
+	return $db->affected_rows();
 }
 
 /**
@@ -51,9 +53,11 @@ function bb2_db_affected_rows()
  */
 function bb2_db_escape($string)
 {
-	global $smcFunc;
 
-	return $smcFunc['db_escape_string']($string);
+
+	$db = database();
+
+	return $db->escape_string($string);
 }
 
 /**
@@ -64,9 +68,11 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-	global $smcFunc;
 
-	return $smcFunc['db_num_rows']($result);
+
+	$db = database();
+
+	return $db->num_rows($result);
 }
 
 /**
@@ -79,7 +85,9 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
@@ -89,7 +97,7 @@ function bb2_db_query($query)
 		return true;
 
 	// Run the query, return success, failure or the actual results
-	$result = $smcFunc['db_query']('', $query, array());
+	$result = $db->query('', $query, array());
 
 	if (!$result)
 		return false;
@@ -111,12 +119,14 @@ function bb2_db_query($query)
  */
 function bb2_db_rows($result)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$temp = array();
-	while($row = $smcFunc['db_fetch_assoc']($result))
+	while($row = $db->fetch_assoc($result))
 		$temp[] = $row;
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $temp;
 }

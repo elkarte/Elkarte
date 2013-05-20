@@ -36,7 +36,9 @@ if (!defined('ELKARTE'))
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
-	global $txt, $modSettings, $sc, $user_info, $smcFunc, $scripturl, $last_error;
+	global $txt, $modSettings, $sc, $user_info, $scripturl, $last_error;
+
+	$db = database();
 	static $tried_hook = false;
 
 	// Check if error logging is actually on.
@@ -103,7 +105,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	if (empty($last_error) || $last_error != $error_info)
 	{
 		// Insert the error into the database.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_errors',
 			array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 			$error_info,
@@ -361,7 +363,9 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $smcFunc;
+	global $db_connection, $webmaster_email, $db_last_error, $db_error_send;
+
+	$db = database();
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)

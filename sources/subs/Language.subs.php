@@ -18,9 +18,9 @@ if (!defined('ELKARTE'))
  */
 function removeLanguageFromMember($lang_id)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET lngfile = {string:empty_string}
 		WHERE lngfile = {string:current_language}',
@@ -48,7 +48,9 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $smcFunc, $language, $context, $txt;
+	global $settings, $language, $context, $txt, $smcFunc;
+
+	$db = database();
 
 	$languages = array();
 	// Keep our old entries.
@@ -84,14 +86,14 @@ function list_getLanguages()
 	}
 
 	// Work out how many people are using each language.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Default?
 		if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
@@ -102,7 +104,7 @@ function list_getLanguages()
 		elseif (isset($languages[$row['lngfile']]))
 			$languages[$row['lngfile']]['count'] += $row['num_users'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Restore the current users language.
 	$txt = $old_txt;
@@ -325,7 +327,7 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $txt, $scripturl, $smcFunc;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again

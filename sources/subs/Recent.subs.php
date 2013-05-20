@@ -28,11 +28,13 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $smcFunc, $context;
+	global $scripturl, $txt, $user_info, $modSettings, $context, $smcFunc;
+
+	$db = database();
 
 	// Find all the posts.  Newer ones will have higher IDs.  (assuming the last 20 * number are accessable...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_board, b.name AS board_name,
@@ -56,7 +58,7 @@ function getLastPosts($latestPostOptions)
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and post for the preview ;).
 		censorText($row['subject']);
@@ -91,7 +93,7 @@ function getLastPosts($latestPostOptions)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $posts;
 }
@@ -117,10 +119,12 @@ function cache_getLastPosts($latestPostOptions)
 
 function getRecentPosts($messages, $start)
 {
-	global $smcFunc, $user_info, $scripturl;
+	global $user_info, $scripturl;
+
+	$db = database();
 
 	// Get all the most recent posts.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
 			b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS id_first_member,
@@ -143,7 +147,7 @@ function getRecentPosts($messages, $start)
 	$counter = $_REQUEST['start'] + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor everything.
 		censorText($row['body']);
@@ -199,7 +203,7 @@ function getRecentPosts($messages, $start)
 			$board_ids['own'][$row['id_board']][] = $row['id_msg'];
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return array($posts, $board_ids);
 

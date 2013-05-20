@@ -51,7 +51,9 @@ class PostModeration_Controller
 	 */
 	function action_unapproved()
 	{
-		global $txt, $scripturl, $context, $user_info, $smcFunc;
+		global $txt, $scripturl, $context, $user_info;
+
+		$db = database();
 
 		$context['current_view'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
@@ -116,7 +118,7 @@ class PostModeration_Controller
 			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg, m.id_member, m.id_board, m.subject, t.id_topic, t.id_first_msg, t.id_member_started
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -131,7 +133,7 @@ class PostModeration_Controller
 			);
 			$toAction = array();
 			$details = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// If it's not within what our view is ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] != 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] != 'replies'))
@@ -168,7 +170,7 @@ class PostModeration_Controller
 				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
 				$details[$anItem]["board"] = $row['id_board'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If we have anything left we can actually do the approving (etc).
 			if (!empty($toAction))
@@ -215,7 +217,7 @@ class PostModeration_Controller
 		}
 
 		// Get all unapproved posts.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
 				IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.smileys_enabled,
 				t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
@@ -234,7 +236,7 @@ class PostModeration_Controller
 			)
 		);
 		$context['unapproved_items'] = array();
-		for ($i = 1; $row = $smcFunc['db_fetch_assoc']($request); $i++)
+		for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 		{
 			// Can delete is complicated, let's solve it first... is it their own post?
 			if ($row['id_member'] == $user_info['id'] && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
@@ -279,7 +281,7 @@ class PostModeration_Controller
 				'can_delete' => $can_delete,
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$context['sub_template'] = 'unapproved_posts';
 	}
@@ -289,7 +291,9 @@ class PostModeration_Controller
 	 */
 	function action_unapproved_attachments()
 	{
-		global $txt, $scripturl, $context, $user_info, $smcFunc, $modSettings;
+		global $txt, $scripturl, $context, $user_info, $modSettings;
+
+		$db = database();
 
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -495,7 +499,9 @@ class PostModeration_Controller
  	 */
 	function action_approve()
 	{
-		global $user_info, $topic, $board, $smcFunc;
+		global $user_info, $topic, $board;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -565,10 +571,12 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Start with messages and topics.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE approved = {int:not_approved}',
@@ -577,9 +585,9 @@ function approveAllData()
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$msgs[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($msgs))
 	{
@@ -589,7 +597,7 @@ function approveAllData()
 	}
 
 	// Now do attachments
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_attach
 		FROM {db_prefix}attachments
 		WHERE approved = {int:not_approved}',
@@ -598,9 +606,9 @@ function approveAllData()
 		)
 	);
 	$attaches = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 		$attaches[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($attaches))
 	{

@@ -30,11 +30,13 @@ if (!defined('ELKARTE'))
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	$modlog_query = allowedTo('admin_forum') || $user_info['mod_cache']['bq'] == '1=1' ? '1=1' : ($user_info['mod_cache']['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr($user_info['mod_cache']['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr($user_info['mod_cache']['bq'], array('id_board' => 't.id_board'))));
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_actions AS lm
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lm.id_member)
@@ -51,8 +53,8 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 			'modlog_query' => $modlog_query,
 		))
 	);
-	list ($entry_count) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($entry_count) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	return $entry_count;
 }
@@ -70,7 +72,9 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
 {
-	global $context, $scripturl, $txt, $smcFunc, $user_info;
+	global $context, $scripturl, $txt, $user_info;
+
+	$db = database();
 
 	$modlog_query = allowedTo('admin_forum') || $user_info['mod_cache']['bq'] == '1=1' ? '1=1' : ($user_info['mod_cache']['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr($user_info['mod_cache']['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr($user_info['mod_cache']['bq'], array('id_board' => 't.id_board'))));
 
@@ -82,7 +86,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$seeIP = allowedTo('moderate_forum');
 
 	// Here we have the query getting the log details.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT
 			lm.id_action, lm.id_member, lm.ip, lm.log_time, lm.action, lm.id_board, lm.id_topic, lm.id_msg, lm.extra,
 			mem.real_name, mg.group_name
@@ -110,7 +114,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$members = array();
 	$messages = array();
 	$entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$row['extra'] = @unserialize($row['extra']);
 
@@ -196,7 +200,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			'action_text' => isset($row['action_text']) ? $row['action_text'] : '',
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	if (!empty($boards))
 	{
@@ -220,7 +224,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($topics))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT ms.subject, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
@@ -230,7 +234,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'topic_list' => array_keys($topics),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			foreach ($topics[$row['id_topic']] as $action)
 			{
@@ -251,12 +255,12 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['new_topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($messages))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, subject
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:message_list})
@@ -265,7 +269,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'message_list' => array_keys($messages),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			foreach ($messages[$row['id_msg']] as $action)
 			{
@@ -284,7 +288,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($members))
@@ -339,9 +343,11 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:moderate_log}
 			' . isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '' . '

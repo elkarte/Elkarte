@@ -34,7 +34,9 @@ class Display_Controller
 	 */
 	function action_index()
 	{
-		global $scripturl, $txt, $modSettings, $context, $settings, $smcFunc;
+		global $scripturl, $txt, $modSettings, $context, $settings;
+
+		$db = database();
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request, $topicinfo, $language, $all_posters;
 
@@ -180,7 +182,7 @@ class Display_Controller
 				else
 				{
 					// Find the number of messages posted before said time...
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}messages
 						WHERE poster_time < {int:timestamp}
@@ -193,8 +195,8 @@ class Display_Controller
 							'timestamp' => $timestamp,
 						)
 					);
-					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					list ($context['start_from']) = $db->fetch_row($request);
+					$db->free_result($request);
 
 					// Handle view_newest_first options, and get the correct start value.
 					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
@@ -212,7 +214,7 @@ class Display_Controller
 				else
 				{
 					// Find the start value for that message......
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}messages
 						WHERE id_msg < {int:virtual_msg}
@@ -226,8 +228,8 @@ class Display_Controller
 							'no_member' => 0,
 						)
 					);
-					list ($context['start_from']) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					list ($context['start_from']) = $db->fetch_row($request);
+					$db->free_result($request);
 				}
 
 				// We need to reverse the start as well in this case.
@@ -392,7 +394,7 @@ class Display_Controller
 				$date_string = $matches[0];
 
 			// Any calendar information for this topic?
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 				FROM {db_prefix}calendar AS cal
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
@@ -403,7 +405,7 @@ class Display_Controller
 				)
 			);
 			$context['linked_calendar_events'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// Prepare the dates for being formatted.
 				$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
@@ -425,7 +427,7 @@ class Display_Controller
 					'is_last' => false
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($context['linked_calendar_events']))
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
@@ -435,7 +437,7 @@ class Display_Controller
 		if ($context['is_poll'])
 		{
 			// Get the question and if it's locked.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
@@ -447,10 +449,10 @@ class Display_Controller
 					'id_poll' => $topicinfo['id_poll'],
 				)
 			);
-			$pollinfo = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$pollinfo = $db->fetch_assoc($request);
+			$db->free_result($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
 				FROM {db_prefix}log_polls
 				WHERE id_poll = {int:id_poll}
@@ -460,14 +462,14 @@ class Display_Controller
 					'not_guest' => 0,
 				)
 			);
-			list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($pollinfo['total']) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			// Total voters needs to include guest voters
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
 
 			// Get all the options, and calculate the total votes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
 				FROM {db_prefix}poll_choices AS pc
 					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
@@ -481,14 +483,14 @@ class Display_Controller
 			$pollOptions = array();
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				censorText($row['label']);
 				$pollOptions[$row['id_choice']] = $row;
 				$realtotal += $row['votes'];
 				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -643,7 +645,7 @@ class Display_Controller
 		}
 
 		// Get each post and poster in this topic.
-		$request = $smcFunc['db_query']('display_get_post_poster', '
+		$request = $db->query('display_get_post_poster', '
 			SELECT id_msg, id_member, approved
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
@@ -661,13 +663,13 @@ class Display_Controller
 
 		$messages = array();
 		$all_posters = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!empty($row['id_member']))
 				$all_posters[$row['id_msg']] = $row['id_member'];
 			$messages[] = $row['id_msg'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		$posters = array_unique($all_posters);
 
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
@@ -705,7 +707,7 @@ class Display_Controller
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if (isset($_REQUEST['boardseen']))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}log_boards',
 					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 					array($modSettings['maxMsgID'], $user_info['id'], $board),
@@ -737,7 +739,7 @@ class Display_Controller
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 				loadMemberData($posters);
-			$messages_request = $smcFunc['db_query']('', '
+			$messages_request = $db->query('', '
 				SELECT
 					id_msg, icon, subject, poster_time, poster_ip, id_member, modified_time, modified_name, body,
 					smileys_enabled, poster_name, poster_email, approved,
@@ -932,7 +934,9 @@ class Display_Controller
 	 */
 	function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $smcFunc, $modSettings, $context;
+		global $topic, $board, $user_info, $modSettings, $context;
+
+		$db = database();
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -976,7 +980,7 @@ class Display_Controller
 			isAllowedTo('delete_own');
 
 		// Allowed to remove which messages?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, subject, id_member, poster_time
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:message_list})
@@ -990,14 +994,14 @@ class Display_Controller
 			)
 		);
 		$messages = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 				continue;
 
 			$messages[$row['id_msg']] = array($row['subject'], $row['id_member']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
@@ -1034,7 +1038,9 @@ class Display_Controller
  */
 function prepareDisplayContext($reset = false)
 {
-	global $settings, $txt, $modSettings, $scripturl, $options, $user_info, $smcFunc;
+	global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
+
+	$db = database();
 	global $memberContext, $context, $messages_request, $topic, $attachments, $topicinfo;
 
 	static $counter = null;
@@ -1055,10 +1061,10 @@ function prepareDisplayContext($reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// Attempt to get the next message.
-	$message = $smcFunc['db_fetch_assoc']($messages_request);
+	$message = $db->fetch_assoc($messages_request);
 	if (!$message)
 	{
-		$smcFunc['db_free_result']($messages_request);
+		$db->free_result($messages_request);
 		return false;
 	}
 
@@ -1175,7 +1181,9 @@ function prepareDisplayContext($reset = false)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic, $smcFunc;
+	global $attachments, $modSettings, $txt, $scripturl, $topic;
+
+	$db = database();
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
@@ -1244,17 +1252,17 @@ function loadAttachmentContext($id_msg)
 						$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
 
 						// Add this beauty to the database.
-						$smcFunc['db_insert']('',
+						$db->insert('',
 							'{db_prefix}attachments',
 							array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
 							array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
 							array('id_attach')
 						);
 						$old_id_thumb = $attachment['id_thumb'];
-						$attachment['id_thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+						$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 						if (!empty($attachment['id_thumb']))
 						{
-							$smcFunc['db_query']('', '
+							$db->query('', '
 								UPDATE {db_prefix}attachments
 								SET id_thumb = {int:id_thumb}
 								WHERE id_attach = {int:id_attach}',

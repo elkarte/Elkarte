@@ -33,7 +33,9 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $smcFunc, $cur_profile;
+		global $language, $scripturl, $cur_profile, $smcFunc;
+
+		$db = database();
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
@@ -227,6 +229,8 @@ class Register_Controller
 		global $scripturl, $txt, $modSettings, $context;
 		global $user_info, $options, $settings, $smcFunc;
 
+		$db = database();
+
 		checkSession();
 		validateToken('register');
 
@@ -396,7 +400,7 @@ class Register_Controller
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT col_name, field_name, field_type, field_length, mask, show_reg
 			FROM {db_prefix}custom_fields
 			WHERE active = {int:is_active}',
@@ -405,7 +409,7 @@ class Register_Controller
 			)
 		);
 		$custom_field_errors = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Don't allow overriding of the theme variables.
 			if (isset($regOptions['theme_vars'][$row['col_name']]))
@@ -442,7 +446,7 @@ class Register_Controller
 			if (trim($value) == '' && $row['show_reg'] > 1)
 				$custom_field_errors[] = array('custom_field_empty', array($row['field_name']));
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Process any errors.
 		if (!empty($custom_field_errors))
@@ -530,7 +534,9 @@ class Register_Controller
 	 */
 	function action_activate()
 	{
-		global $context, $txt, $modSettings, $scripturl, $smcFunc, $language, $user_info;
+		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
+
+		$db = database();
 
 		// Logged in users should not bother to activate their accounts
 		if (!empty($user_info['id']))
@@ -554,7 +560,7 @@ class Register_Controller
 		}
 
 		// Get the code from the database...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, validation_code, member_name, real_name, email_address, is_activated, passwd, lngfile
 			FROM {db_prefix}members' . (empty($_REQUEST['u']) ? '
 			WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
@@ -567,7 +573,7 @@ class Register_Controller
 		);
 
 		// Does this user exist at all?
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -576,8 +582,8 @@ class Register_Controller
 			return;
 		}
 
-		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && sha1(strtolower($row['member_name']) . $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
@@ -593,7 +599,7 @@ class Register_Controller
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 			// Ummm... don't even dare try to take someone else's email!!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE email_address = {string:email_address}
@@ -603,9 +609,9 @@ class Register_Controller
 				)
 			);
 			// @todo Separate the sprintf?
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($db->num_rows($request) != 0)
 				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
@@ -689,7 +695,9 @@ class Register_Controller
 	 */
 	function action_coppa()
 	{
-		global $context, $modSettings, $txt, $smcFunc;
+		global $context, $modSettings, $txt;
+
+		$db = database();
 
 		loadLanguage('Login');
 		loadTemplate('Register');
@@ -833,7 +841,7 @@ class Register_Controller
 	 */
 	function action_contact()
 	{
-		global $context, $txt, $smcFunc, $user_info, $modSettings;
+		global $context, $txt, $user_info, $modSettings, $smcFunc;
 
 		// Already inside, no need to use this, just send a PM
 		// Disabled, you cannot enter.
@@ -920,7 +928,7 @@ class Register_Controller
  */
 function registerCheckUsername()
 {
-	global $smcFunc, $context, $txt;
+	global $context;
 
 	// This is XML!
 	loadTemplate('Xml');

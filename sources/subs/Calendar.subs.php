@@ -31,14 +31,16 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// We need to search for any birthday in this range, and whatever year that birthday is on.
 	$year_low = (int) substr($low_date, 0, 4);
 	$year_high = (int) substr($high_date, 0, 4);
 
 	// Collect all of the birthdays for this month.  I know, it's a painful query.
-	$result = $smcFunc['db_query']('birthday_array', '
+	$result = $db->query('birthday_array', '
 		SELECT id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
 		FROM {db_prefix}members
 		WHERE YEAR(birthdate) != {string:year_one}
@@ -63,7 +65,7 @@ function getBirthdayRange($low_date, $high_date)
 		)
 	);
 	$bday = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		if ($year_low != $year_high)
 			$age_year = substr($row['birthdate'], 5) < substr($high_date, 5) ? $year_high : $year_low;
@@ -77,7 +79,7 @@ function getBirthdayRange($low_date, $high_date)
 			'is_last' => false
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Set is_last, so the themes know when to stop placing separators.
 	foreach ($bday as $mday => $array)
@@ -101,7 +103,9 @@ function getBirthdayRange($low_date, $high_date)
  */
 function getEventRange($low_date, $high_date, $use_permissions = true)
 {
-	global $scripturl, $modSettings, $user_info, $smcFunc, $context;
+	global $scripturl, $modSettings, $user_info, $context;
+
+	$db = database();
 
 	$low_date_time = sscanf($low_date, '%04d-%02d-%02d');
 	$low_date_time = mktime(0, 0, 0, $low_date_time[1], $low_date_time[2], $low_date_time[0]);
@@ -109,7 +113,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 	$high_date_time = mktime(0, 0, 0, $high_date_time[1], $high_date_time[2], $high_date_time[0]);
 
 	// Find all the calendar info...
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT
 			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
 			cal.id_board, b.member_groups, t.id_first_msg, t.approved, b.id_board
@@ -126,7 +130,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 		)
 	);
 	$events = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// If the attached topic is not approved then for the moment pretend it doesn't exist
 		if (!empty($row['id_first_msg']) && $modSettings['postmod_active'] && !$row['approved'])
@@ -185,7 +189,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 				);
 		}
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// If we're doing normal contextual data, go through and make things clear to the templates ;).
 	if ($use_permissions)
@@ -206,7 +210,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
  */
 function getHolidayRange($low_date, $high_date)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Get the lowest and highest dates for "all years".
 	if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
@@ -216,7 +222,7 @@ function getHolidayRange($low_date, $high_date)
 		$allyear_part = 'event_date BETWEEN {date:all_year_low} AND {date:all_year_high}';
 
 	// Find some holidays... ;).
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT event_date, YEAR(event_date) AS year, title
 		FROM {db_prefix}calendar_holidays
 		WHERE event_date BETWEEN {date:low_date} AND {date:high_date}
@@ -231,7 +237,7 @@ function getHolidayRange($low_date, $high_date)
 		)
 	);
 	$holidays = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
 			$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
@@ -240,7 +246,7 @@ function getHolidayRange($low_date, $high_date)
 
 		$holidays[$event_year . substr($row['event_date'], 4)][] = $row['title'];
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $holidays;
 }
@@ -254,7 +260,9 @@ function getHolidayRange($low_date, $high_date)
  */
 function canLinkEvent()
 {
-	global $user_info, $topic, $board, $smcFunc;
+	global $user_info, $topic, $board;
+
+	$db = database();
 
 	// If you can't post, you can't link.
 	isAllowedTo('calendar_post');
@@ -269,7 +277,7 @@ function canLinkEvent()
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
 	{
 		// Not admin or a moderator of this board. You better be the owner - or else.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT id_member_started
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
@@ -278,7 +286,7 @@ function canLinkEvent()
 				'current_topic' => $topic,
 			)
 		);
-		if ($row = $smcFunc['db_fetch_assoc']($result))
+		if ($row = $db->fetch_assoc($result))
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
@@ -287,7 +295,7 @@ function canLinkEvent()
 		// Topic/Board doesn't exist.....
 		else
 			fatal_lang_error('calendar_no_topic', 'general');
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 	}
 }
 
@@ -801,10 +809,12 @@ function validateEventPost()
  */
 function getEventPoster($event_id)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// A simple database query, how hard can that be?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}calendar
 		WHERE id_event = {int:id_event}
@@ -815,12 +825,12 @@ function getEventPoster($event_id)
 	);
 
 	// No results, return false.
-	if ($smcFunc['db_num_rows'] === 0)
+	if ($db->num_rows === 0)
 		return false;
 
 	// Grab the results and return.
-	list ($poster) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($poster) = $db->fetch_row($request);
+	$db->free_result($request);
 	return (int) $poster;
 }
 
@@ -835,6 +845,8 @@ function getEventPoster($event_id)
 function insertEvent(&$eventOptions)
 {
 	global $smcFunc;
+
+	$db = database();
 
 	// Add special chars to the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
@@ -866,7 +878,7 @@ function insertEvent(&$eventOptions)
 	call_integration_hook('integrate_create_event', array(&$eventOptions, &$event_columns, &$event_parameters));
 
 	// Insert the event!
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}calendar',
 		$event_columns,
 		$event_parameters,
@@ -874,7 +886,7 @@ function insertEvent(&$eventOptions)
 	);
 
 	// Store the just inserted id_event for future reference.
-	$eventOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}calendar', 'id_event');
+	$eventOptions['id'] = $db->insert_id('{db_prefix}calendar', 'id_event');
 
 	// Update the settings to show something calendarish was updated.
 	updateSettings(array(
@@ -893,6 +905,8 @@ function insertEvent(&$eventOptions)
 function modifyEvent($event_id, &$eventOptions)
 {
 	global $smcFunc;
+
+	$db = database();
 
 	// Properly sanitize the title.
 	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
@@ -927,7 +941,7 @@ function modifyEvent($event_id, &$eventOptions)
 	$real_event_id = $event_id;
 	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns, &$event_parameters));
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}calendar
 		SET
 			' . implode(', ', $event_columns) . '
@@ -954,9 +968,11 @@ function modifyEvent($event_id, &$eventOptions)
  */
 function removeEvent($event_id)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}calendar
 		WHERE id_event = {int:id_event}',
 		array(
@@ -979,9 +995,11 @@ function removeEvent($event_id)
  */
 function getEventProperties($event_id)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT
 			c.id_event, c.id_board, c.id_topic, MONTH(c.start_date) AS month,
 			DAYOFMONTH(c.start_date) AS day, YEAR(c.start_date) AS year,
@@ -999,11 +1017,11 @@ function getEventProperties($event_id)
 	);
 
 	// If nothing returned, we are in poo, poo.
-	if ($smcFunc['db_num_rows']($request) === 0)
+	if ($db->num_rows($request) === 0)
 		return false;
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	$return_value = array(
 		'boards' => array(),
@@ -1040,9 +1058,11 @@ function getEventProperties($event_id)
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
@@ -1052,9 +1072,9 @@ function list_getHolidays($start, $items_per_page, $sort)
 		)
 	);
 	$holidays = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$holidays[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $holidays;
 }
@@ -1066,16 +1086,18 @@ function list_getHolidays($start, $items_per_page, $sort)
  */
 function list_getNumHolidays()
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}calendar_holidays',
 		array(
 		)
 	);
-	list($num_items) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($num_items) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return (int) $num_items;
 }
@@ -1087,9 +1109,11 @@ function list_getNumHolidays()
  */
 function removeHolidays($holiday_ids)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
 		WHERE id_holiday IN ({array_int:id_holiday})',
 		array(
@@ -1111,9 +1135,11 @@ function removeHolidays($holiday_ids)
  */
 function editHoliday($holiday, $date, $title)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		UPDATE {db_prefix}calendar_holidays
 		SET event_date = {date:holiday_date}, title = {string:holiday_title}
 		WHERE id_holiday = {int:selected_holiday}',
@@ -1137,9 +1163,11 @@ function editHoliday($holiday, $date, $title)
  */
 function insert_holiday($date, $title)
 {
-	global $smcFunc;
 
-	$smcFunc['db_insert']('',
+
+	$db = database();
+
+	$db->insert('',
 		'{db_prefix}calendar_holidays',
 		array(
 			'event_date' => 'date', 'title' => 'string-60',
@@ -1163,9 +1191,11 @@ function insert_holiday($date, $title)
  */
 function getHoliday($id_holiday)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		WHERE id_holiday = {int:selected_holiday}
@@ -1174,7 +1204,7 @@ function getHoliday($id_holiday)
 				'selected_holiday' => $id_holiday,
 			)
 		);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$holiday = array(
 			'id' => $row['id_holiday'],
 			'day' => $row['day'],
@@ -1182,7 +1212,7 @@ function getHoliday($id_holiday)
 			'year' => $row['year'] <= 4 ? 0 : $row['year'],
 			'title' => $row['title']
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $holiday;
 }

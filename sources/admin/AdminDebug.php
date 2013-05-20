@@ -161,7 +161,7 @@ class AdminDebug_Controller
 				echo '
 		<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">';
 
-				$row = $smcFunc['db_fetch_assoc']($result);
+				$row = $db->fetch_assoc($result);
 
 				echo '
 			<tr>

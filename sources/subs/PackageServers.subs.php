@@ -20,12 +20,14 @@ if (!defined('ELKARTE'))
  */
 function fetchPackageServers($server = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 	
 	$servers = array();
 
 	// Load the list of servers.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_server, name, url
 		FROM {db_prefix}package_servers' .
 		(!empty($server) ? 'WHERE id_server = {int:current_server}' : ''),
@@ -34,7 +36,7 @@ function fetchPackageServers($server = null)
 		)
 	);
 	
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$servers[] = array(
 			'name' => $row['name'],
@@ -42,7 +44,7 @@ function fetchPackageServers($server = null)
 			'id' => $row['id_server'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $servers;
 }
@@ -54,9 +56,11 @@ function fetchPackageServers($server = null)
  */
 function deletePackageServer($id)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}package_servers
 		WHERE id_server = {int:current_server}',
 		array(
@@ -73,9 +77,11 @@ function deletePackageServer($id)
  */
 function addPackageServer($name, $url)
 {
-	global $smcFunc;
 
-	$smcFunc['db_insert']('',
+
+	$db = database();
+
+	$db->insert('',
 		'{db_prefix}package_servers',
 		array(
 			'name' => 'string-255', 'url' => 'string-255',

@@ -372,10 +372,12 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Load up the parsers from the database
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT filter_from, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}',
@@ -386,7 +388,7 @@ function pbe_parse_email_message(&$body)
 
 	// Build an array of valid expressions
 	$expressions = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -399,7 +401,7 @@ function pbe_parse_email_message(&$body)
 		else
 			$expressions[] = array('type' => 'string', 'parser' => $row['filter_from']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	$match = false;
@@ -434,10 +436,12 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// load up the text filters from the database, regex first and ordered by id number
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT filter_from, filter_to, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
@@ -448,7 +452,7 @@ function pbe_filter_email_message($text)
 	);
 
 	// Remove all the excess things as defined, i.e. sent from my iPhone, I hate those >:D
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -464,7 +468,7 @@ function pbe_filter_email_message($text)
 		else
 			$text = str_replace($row['filter_from'], $row['filter_to'], $text);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $text;
 }
@@ -643,7 +647,9 @@ function pbe_check_moderation(&$pbe)
  */
 function pbe_emailError($error, $email_message)
 {
-	global $txt, $smcFunc;
+	global $txt;
+
+	$db = database();
 
 	loadLanguage('EmailTemplates');
 
@@ -737,7 +743,7 @@ function pbe_emailError($error, $email_message)
 
 	// Log the error so the moderators can take a look, helps keep them sharp
 	$id = isset($_POST['item']) ? (int) $_POST['item'] : 0;
-	$smcFunc['db_insert'](isset($_POST['item']) ? 'replace' : 'ignore',
+	$db->insert(isset($_POST['item']) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
 		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
 		array($id, $error, $message_key, $email_message->subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
@@ -1010,13 +1016,15 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  */
 function query_load_user_info($email)
 {
-	global $smcFunc, $user_profile, $modSettings, $language;
+	global $user_profile, $modSettings, $language;
+
+	$db = database();
 
 	if (empty($email))
 		return false;
 
 	// Find the user who owns this email address
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE email_address = {string:email}
@@ -1027,8 +1035,8 @@ function query_load_user_info($email)
 			'act' => 1,
 		)
 	);
-	list($id_member) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($id_member) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// No user found ... back we go
 	if (empty($id_member))
@@ -1088,12 +1096,14 @@ function query_load_user_info($email)
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	$where_query = ($type === 'board' ? '({array_int:member_groups}) AND id_profile = {int:id_profile}' : '({array_int:member_groups})');
 
 	// Load up the users board or general site permissions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT permission, add_deny
 		FROM {db_prefix}' . ($type === 'board' ? 'board_permissions' : 'permissions') . '
 		WHERE id_group IN ' . $where_query,
@@ -1105,14 +1115,14 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 	$removals = array();
 	$pbe['user_info']['permissions'] = array();
 	// While we have results, put them in our yeah or nay arrays
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['add_deny']))
 			$removals[] = $row['permission'];
 		else
 			$pbe['user_info']['permissions'][] = $row['permission'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Remove all the permissions they shouldn't have ;)
 	if (!empty($modSettings['permission_enable_deny']))
@@ -1128,12 +1138,14 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  */
 function query_sender_wrapper($from)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$result = array();
 
 	// The signature and email visibility details
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 	SELECT hide_email, email_address, signature
 		FROM {db_prefix}members
 		WHERE id_member  = {int:uid}
@@ -1144,13 +1156,13 @@ function query_sender_wrapper($from)
 			'act' => 1,
 		)
 	);
-	$result = $smcFunc['db_fetch_assoc']($request);
+	$result = $db->fetch_assoc($request);
 
 	// Clean up the signature line
 	if (!empty($result['signature']))
 		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -1163,12 +1175,14 @@ function query_sender_wrapper($from)
  */
 function query_user_keys($email)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$keys = array();
 
 	// Find all keys sent to this email, sorted by date
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_email
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
@@ -1177,9 +1191,9 @@ function query_user_keys($email)
 			'email' => $email,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$keys[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $keys;
 }
@@ -1192,12 +1206,14 @@ function query_user_keys($email)
  */
 function query_key_owner($key)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$email_to = false;
 
 	// Check that this is a reply to an "actual" message by finding the key in the sent email table
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT email_to
 		FROM {db_prefix}postby_emails
 		WHERE id_email = {string:database_id}
@@ -1206,8 +1222,8 @@ function query_key_owner($key)
 			'database_id' => $key
 		)
 	);
-	list($email_to) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($email_to) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $email_to;
 }
@@ -1222,14 +1238,16 @@ function query_key_owner($key)
  */
 function query_load_subject($message_id, $message_type, $email)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$subject = '';
 
 	// Load up the core topic details,
 	if ($message_type === 't')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.id_topic, m.subject
 			FROM {db_prefix}topics AS t
@@ -1242,7 +1260,7 @@ function query_load_subject($message_id, $message_type, $email)
 	}
 	elseif ($message_type === 'm')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.id_topic, m.subject
 			FROM {db_prefix}messages AS m
@@ -1256,7 +1274,7 @@ function query_load_subject($message_id, $message_type, $email)
 	elseif ($message_type === 'p')
 	{
 		// With PM's ... first get the member id based on the email
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE email_address = {string:email}
@@ -1269,13 +1287,13 @@ function query_load_subject($message_id, $message_type, $email)
 		);
 
 		// Found them, now we find the PM to them with this ID
-		if ($smcFunc['db_num_rows']($request) !== 0)
+		if ($db->num_rows($request) !== 0)
 		{
-			list($id_member) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list($id_member) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			// Now find this PM ID and make sure it was sent to this member
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT p.subject
 				FROM {db_prefix}pm_recipients AS pmr, {db_prefix}personal_messages AS p
 				WHERE pmr.id_pm = {int:id_pm}
@@ -1290,12 +1308,12 @@ function query_load_subject($message_id, $message_type, $email)
 	}
 
 	// if we found the message, topic or PM, return the subject
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 	{
-		list($subject) = $smcFunc['db_fetch_row']($request);
+		list($subject) = $db->fetch_row($request);
 		$subject = pbe_clean_email_subject($subject);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $subject;
 }
@@ -1310,12 +1328,14 @@ function query_load_subject($message_id, $message_type, $email)
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Load up the topic details
 	if ($message_type === 't')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.id_topic, t.id_board, t.locked, t.id_member_started, t.id_last_msg,
 				m.subject,
@@ -1333,7 +1353,7 @@ function query_load_message($message_type, $message_id, $pbe)
 	}
 	elseif ($message_type === 'm')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.id_topic, m.id_board, m.subject,
 				t.locked, t.id_member_started, t.approved, t.id_last_msg,
@@ -1352,7 +1372,7 @@ function query_load_message($message_type, $message_id, $pbe)
 	elseif ($message_type === 'p')
 	{
 		// Load up the personal message...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT p.id_pm, p.subject, p.id_member_from, p.id_pm_head
 			FROM {db_prefix}pm_recipients AS pm, {db_prefix}personal_messages AS p, {db_prefix}members AS mem
 			WHERE pm.id_pm = {int:mess_id}
@@ -1367,9 +1387,9 @@ function query_load_message($message_type, $message_id, $pbe)
 	}
 	$topic_info = array();
 	// Found the information, load the topic_info array with the data for this topic and board
-	if ($smcFunc['db_num_rows']($request) !== 0)
-		$topic_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	if ($db->num_rows($request) !== 0)
+		$topic_info = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	// Return the results or false
 	return !empty($topic_info) ? $topic_info : false;
@@ -1382,9 +1402,11 @@ function query_load_message($message_type, $message_id, $pbe)
  */
 function query_load_board($message_id)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_board
 		FROM {db_prefix}messages
 		WHERE id_msg = {int:message_id}',
@@ -1393,8 +1415,8 @@ function query_load_board($message_id)
 		)
 	);
 
-	list($board_id) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($board_id) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $board_id === '' ? 0 : $board_id;
 }
@@ -1406,12 +1428,14 @@ function query_load_board($message_id)
  */
 function query_load_board_details($board_id, $pbe)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$board_info = array();
 
 	// To post a NEW Topic, we need certain board details
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
 		FROM {db_prefix}boards as b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
@@ -1420,8 +1444,8 @@ function query_load_board_details($board_id, $pbe)
 			'query_see_board' => $pbe['user_info']['query_see_board'],
 		)
 	);
-	$board_info = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$board_info = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $board_info;
 }
@@ -1436,7 +1460,9 @@ function query_load_board_details($board_id, $pbe)
  */
 function query_get_theme($id_member, $id_theme, $board_info)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	// Verify the id_theme...
 	// Allow the board specific theme, if they are overriding.
@@ -1454,7 +1480,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 		$id_theme = (int) $id_theme;
 
 	// With the theme and member, load the auto_notify variables
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:id_member}
@@ -1467,10 +1493,10 @@ function query_get_theme($id_member, $id_theme, $board_info)
 
 	// Put everything about this member/theme into a theme setting array
 	$theme_settings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$theme_settings[$row['variable']] = $row['value'];
 
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $theme_settings;
 }
@@ -1485,12 +1511,14 @@ function query_get_theme($id_member, $id_theme, $board_info)
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// First see if they have a board notification on for this board
 	// so we don't set both board and individual topic notifications
 	$board_notify = false;
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}log_notify
 		WHERE id_board = {int:board_list}
@@ -1500,15 +1528,15 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 			'board_list' => $id_board,
 		)
 	);
-	if ($smcFunc['db_fetch_row']($request))
+	if ($db->fetch_row($request))
 		$board_notify = true;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If they have topic notification on and not board notification then
 	// add this post to the notification log
 	if (!empty($auto_notify) && (in_array('mark_any_notify', $pbe['user_info']['permissions'])) && !$board_notify)
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_notify',
 			array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
 			array($id_member, $id_topic, 0),
@@ -1518,7 +1546,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 	else
 	{
 		// Make sure they don't get notified
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_member = {int:current_member}
 				AND id_topic = {int:current_topic}',
@@ -1540,9 +1568,11 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
  */
 function query_mark_pms($email_message, $pbe)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_read = is_read | 1
 		WHERE id_member = {int:id_member}
@@ -1555,9 +1585,9 @@ function query_mark_pms($email_message, $pbe)
 	);
 
 	// If something was marked as read, get the number of unread messages remaining.
-	if ($smcFunc['db_affected_rows']() > 0)
+	if ($db->affected_rows() > 0)
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT labels, COUNT(*) AS num
 			FROM {db_prefix}pm_recipients
 			WHERE id_member = {int:id_member}
@@ -1570,16 +1600,16 @@ function query_mark_pms($email_message, $pbe)
 			)
 		);
 		$total_unread = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 			$total_unread += $row['num'];
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// Update things for when they come to the site
 		updateMemberData($pbe['profile']['id_member'], array('unread_messages' => $total_unread));
 	}
 
 	// Now mark the message as "replied to" since they just did
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_read = is_read | 2
 		WHERE id_pm = {int:replied_to}
@@ -1599,7 +1629,9 @@ function query_mark_pms($email_message, $pbe)
  */
 function query_key_maintenance($email_message)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
 	$delete_old = time() - ($days * 24 * 60 * 60);
@@ -1608,7 +1640,7 @@ function query_key_maintenance($email_message)
 	// but we let PM's slide, they often seem to be re re re replied to
 	if ($email_message->message_type !== 'p')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			DELETE FROM {db_prefix}postby_emails
 			WHERE id_email = {string:message_key_id}',
 			array(
@@ -1619,7 +1651,7 @@ function query_key_maintenance($email_message)
 
 	// Since we are here lets delete any items older than delete_old days,
 	// if they have not responded in that time tuff
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		DELETE FROM {db_prefix}postby_emails
 		WHERE time_sent < {int:delete_old}',
 		array(
@@ -1641,7 +1673,9 @@ function query_key_maintenance($email_message)
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$last_login = time();
 	$do_delete = false;
@@ -1656,7 +1690,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	}
 
 	// Update the members total time logged in data
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET total_time_logged_in = {int:total_time_logged_in},
 			last_login = {int:last_login}
@@ -1692,7 +1726,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	// Place the entry in to the online log so the who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
-	$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
+	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
 		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
 		array($session_id, $pbe['profile']['id_member'], 0, $last_login, 'IFNULL(INET_ATON(\'' . $pbe['profile']['member_ip'] . '\'), 0)', $serialized),

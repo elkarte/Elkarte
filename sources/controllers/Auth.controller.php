@@ -80,7 +80,9 @@ class Auth_Controller
 	 */
 	function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
+		global $txt, $scripturl, $user_info, $user_settings;
+
+		$db = database();
 		global $cookiename, $maintenance, $modSettings, $context, $sc;
 
 		// Load cookie authentication stuff.
@@ -402,7 +404,9 @@ class Auth_Controller
  	*/
 	function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context, $modSettings, $smcFunc;
+		global $user_info, $user_settings, $context, $modSettings;
+
+		$db = database();
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -510,7 +514,9 @@ function checkActivation()
  */
 function DoLogin()
 {
-	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
+	global $txt, $scripturl, $user_info, $user_settings;
+
+	$db = database();
 	global $cookiename, $maintenance, $modSettings, $context;
 
 	// Load cookie authentication stuff.

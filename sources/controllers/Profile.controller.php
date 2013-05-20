@@ -28,7 +28,9 @@ if (!defined('ELKARTE'))
 function action_modifyprofile()
 {
 	global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
-	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
+	global $modSettings, $memberContext, $profile_vars, $post_errors, $options, $user_settings;
+
+	$db = database();
 
 	// Don't reload this as we may have processed error strings.
 	if (empty($post_errors))

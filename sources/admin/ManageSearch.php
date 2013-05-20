@@ -300,7 +300,9 @@ class ManageSearch_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
+		global $txt, $context, $modSettings, $db_type, $db_prefix;
+
+		$db = database();
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
@@ -324,7 +326,7 @@ class ManageSearch_Controller
 			validateToken('admin-msm', 'get');
 
 			// Make sure it's gone before creating it.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				DROP INDEX body',
 				array(
@@ -332,7 +334,7 @@ class ManageSearch_Controller
 				)
 			);
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				ADD FULLTEXT body (body)',
 				array(
@@ -346,7 +348,7 @@ class ManageSearch_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				DROP INDEX ' . implode(',
 				DROP INDEX ', $context['fulltext_index']),
@@ -412,7 +414,7 @@ class ManageSearch_Controller
 		if ($db_type == 'mysql')
 		{
 			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					FROM {string:database_name}
 					LIKE {string:table_name}',
@@ -422,26 +424,26 @@ class ManageSearch_Controller
 					)
 				);
 			else
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					LIKE {string:table_name}',
 					array(
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 					)
 				);
-			if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $db->fetch_assoc($request);
 				$context['table_info']['data_length'] = $row['Data_length'];
 				$context['table_info']['index_length'] = $row['Index_length'];
 				$context['table_info']['fulltext_length'] = $row['Index_length'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Now check the custom index table, if it exists at all.
 			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					FROM {string:database_name}
 					LIKE {string:table_name}',
@@ -451,20 +453,20 @@ class ManageSearch_Controller
 					)
 				);
 			else
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					LIKE {string:table_name}',
 					array(
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
 					)
 				);
-			if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $db->fetch_assoc($request);
 				$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
 				$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 		}
 		elseif ($db_type == 'postgresql')
@@ -476,7 +478,7 @@ class ManageSearch_Controller
 					$db->db_optimize_table($table);
 
 			// PostGreSql has some hidden sizes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
 				WHERE relname = {string:messages} OR relname = {string:log_search_words}
 				ORDER BY relpages DESC',
@@ -486,9 +488,9 @@ class ManageSearch_Controller
 				)
 			);
 
-			if ($request !== false && $smcFunc['db_num_rows']($request) > 0)
+			if ($request !== false && $db->num_rows($request) > 0)
 			{
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					if ($row['relname'] == $db_prefix . 'messages')
 					{
@@ -504,7 +506,7 @@ class ManageSearch_Controller
 						$context['table_info']['custom_index_length'] = (int) $row['KB'];
 					}
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			else
 				// Didn't work for some reason...
@@ -554,7 +556,9 @@ class ManageSearch_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+		global $modSettings, $context, $db_prefix, $txt;
+
+		$db = database();
 
 		// Get hang of db_search
 		$db_search = db_search();
@@ -649,7 +653,7 @@ class ManageSearch_Controller
 				'todo' => 0,
 			);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
 				FROM {db_prefix}messages
 				GROUP BY todo',
@@ -657,7 +661,7 @@ class ManageSearch_Controller
 					'starting_id' => $context['start'],
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
 
 			if (empty($num_messages['todo']))
@@ -673,7 +677,7 @@ class ManageSearch_Controller
 				while (time() < $stop)
 				{
 					$inserts = array();
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_msg, body
 						FROM {db_prefix}messages
 						WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
@@ -686,7 +690,7 @@ class ManageSearch_Controller
 					);
 					$forced_break = false;
 					$number_processed = 0;
-					while ($row = $smcFunc['db_fetch_assoc']($request))
+					while ($row = $db->fetch_assoc($request))
 					{
 						// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 						if ($stop < time())
@@ -703,12 +707,12 @@ class ManageSearch_Controller
 					}
 					$num_messages['done'] += $number_processed;
 					$num_messages['todo'] -= $number_processed;
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
 
 					if (!empty($inserts))
-						$smcFunc['db_insert']('ignore',
+						$db->insert('ignore',
 							'{db_prefix}log_search_words',
 							array('id_word' => 'int', 'id_msg' => 'int'),
 							$inserts,
@@ -743,7 +747,7 @@ class ManageSearch_Controller
 
 				while (time() < $stop)
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_word, COUNT(id_word) AS num_words
 						FROM {db_prefix}log_search_words
 						WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
@@ -755,14 +759,14 @@ class ManageSearch_Controller
 							'minimum_messages' => $max_messages,
 						)
 					);
-					while ($row = $smcFunc['db_fetch_assoc']($request))
+					while ($row = $db->fetch_assoc($request))
 						$stop_words[] = $row['id_word'];
-					$smcFunc['db_free_result']($request);
+					$db->free_result($request);
 
 					updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
 					if (!empty($stop_words))
-						$smcFunc['db_query']('', '
+						$db->query('', '
 							DELETE FROM {db_prefix}log_search_words
 							WHERE id_word in ({array_int:stop_words})',
 							array(
@@ -787,7 +791,7 @@ class ManageSearch_Controller
 			$context['sub_template'] = 'create_index_done';
 
 			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}settings
 				WHERE variable = {string:search_custom_index_resume}',
 				array(
@@ -957,28 +961,30 @@ function loadSearchAPIs()
  */
 function detectFulltextIndex()
 {
-	global $smcFunc, $context, $db_prefix;
+	global $context, $db_prefix;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SHOW INDEX
 		FROM {db_prefix}messages',
 		array(
 		)
 	);
 	$context['fulltext_index'] = '';
-	if ($request !== false || $smcFunc['db_num_rows']($request) != 0)
+	if ($request !== false || $db->num_rows($request) != 0)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 				$context['fulltext_index'][] = $row['Key_name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (is_array($context['fulltext_index']))
 			$context['fulltext_index'] = array_unique($context['fulltext_index']);
 	}
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SHOW TABLE STATUS
 			FROM {string:database_name}
 			LIKE {string:table_name}',
@@ -988,7 +994,7 @@ function detectFulltextIndex()
 			)
 		);
 	else
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			array(
@@ -998,10 +1004,10 @@ function detectFulltextIndex()
 
 	if ($request !== false)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 }
 

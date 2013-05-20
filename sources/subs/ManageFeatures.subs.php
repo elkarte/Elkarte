@@ -31,11 +31,11 @@ if (!defined('ELKARTE'))
  */
 function getSignatureFromMembers($start_member)
 {
-	global $smcFunc;
+	$db = database();
 
 	$members = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, signature
 		FROM {db_prefix}members
 		WHERE id_member BETWEEN ' . $start_member . ' AND ' . $start_member . ' + 49
@@ -45,7 +45,7 @@ function getSignatureFromMembers($start_member)
 			'admin_group' => 1,
 		)
 	);
-	while ($result = $smcFunc['db_fetch_assoc']($request))
+	while ($result = $db->fetch_assoc($request))
 	{
 		$members[$result['id_member']]['id_member'] = $result['id_member'];
 		$members[$result['id_member']]['signature'] = $result['signature'];
@@ -62,9 +62,9 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET signature = {string:signature}
 		WHERE id_member = {int:id_member}',
@@ -85,7 +85,9 @@ function updateSignature($id_member, $signature)
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
-	global $txt, $modSettings, $smcFunc;
+	global $txt, $modSettings;
+
+	$db = database();
 
 	$list = array();
 
@@ -108,7 +110,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	else
 	{
 		// Load all the fields.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}
@@ -119,9 +121,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'items_per_page' => $items_per_page,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$list[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $list;
@@ -132,17 +134,17 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
  */
 function list_getProfileFieldSize()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}custom_fields',
 		array(
 		)
 	);
 
-	list ($numProfileFields) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($numProfileFields) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $numProfileFields;
 }
@@ -155,11 +157,11 @@ function list_getProfileFieldSize()
  */
 function getProfileField($id_field)
 {
-	global $smcFunc;
+	$db = database();
 
 	$field = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
@@ -171,7 +173,7 @@ function getProfileField($id_field)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['field_type'] == 'textarea')
 			@list ($rows, $cols) = explode(',', $row['default_value']);
@@ -206,7 +208,7 @@ function getProfileField($id_field)
 			'placement' => $row['placement'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return($field);
 }
@@ -221,12 +223,12 @@ function getProfileField($id_field)
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
-	global $smcFunc;
+	$db = database();
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
 	for ($i = 0; !$unique && $i < 9; $i ++)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_field
 			FROM {db_prefix}custom_fields
 			WHERE col_name = {string:current_column}',
@@ -234,11 +236,11 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 				'current_column' => $colname,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			$unique = true;
 		else
 			$colname = $initial_colname . $i;
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 	}
 
 	return $unique;
@@ -254,9 +256,9 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}themes
 		SET value = {string:new_value}
 		WHERE variable = {string:current_column}
@@ -278,9 +280,9 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  */
 function updateProfileField($field_data)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET
 			field_name = {string:field_name}, field_desc = {string:field_desc},
@@ -323,9 +325,9 @@ function updateProfileField($field_data)
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
@@ -345,9 +347,9 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  */
 function addProfileField($field)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}custom_fields',
 		array(
 			'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',
@@ -373,9 +375,9 @@ function addProfileField($field)
 
 function reOrderProfileFields()
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('alter_table_boards', '
+	$db->query('alter_table_boards', '
 		ALTER TABLE {db_prefix}custom_fields
 		ORDER BY field_name',
 		array(
@@ -391,10 +393,10 @@ function reOrderProfileFields()
  */
 function deleteProfileFieldUserData($name)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Delete the user data first.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
@@ -412,9 +414,9 @@ function deleteProfileFieldUserData($name)
  */
 function deleteProfileField($id)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
@@ -428,9 +430,9 @@ function deleteProfileField($id)
  */
 function updateDisplayCache()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_type, bbc, enclose, placement
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
@@ -446,7 +448,7 @@ function updateDisplayCache()
 	);
 
 	$fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$fields[] = array(
 			'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
@@ -457,6 +459,6 @@ function updateDisplayCache()
 			'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	updateSettings(array('displayFields' => serialize($fields)));
 }
