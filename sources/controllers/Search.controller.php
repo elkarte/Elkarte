@@ -1742,24 +1742,11 @@ function action_plushsearch2()
 		if ($smcFunc['db_num_rows']($messages_request) == 0)
 			$context['topics'] = array();
 
+		// @todo this is broken - no where is $participants used after this in this scope (or anything similar in the template)
 		// If we want to know who participated in what then load this now.
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
 		{
-			$result = $smcFunc['db_query']('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_topic IN ({array_int:topic_list})
-					AND id_member = {int:current_member}
-				GROUP BY id_topic
-				LIMIT ' . count($participants),
-				array(
-					'current_member' => $user_info['id'],
-					'topic_list' => array_keys($participants),
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($result))
-				$participants[$row['id_topic']] = true;
-			$smcFunc['db_free_result']($result);
+			$participants = getTopicsParticipation(array_keys($participants));
 		}
 	}
 
