@@ -242,7 +242,7 @@ class ManageSecurity_Controller
 			$save_vars[] = array('text', 'warning_settings');
 			unset($save_vars['rem1'], $save_vars['rem2']);
 
-			call_integration_hook('integrate_save_karma_settings', array(&$save_vars));
+			call_integration_hook('integrate_save_moderation_settings', array(&$save_vars));
 
 			Settings_Form::save_db($save_vars);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
