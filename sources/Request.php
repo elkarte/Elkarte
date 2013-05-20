@@ -182,7 +182,7 @@ class Request
 		$_SERVER['REMOTE_ADDR'] = $this->_client_ip;
 
 		// set the scheme, for later use
-		$this->_scheme = 'http';
+		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
 
 		// make sure we know everything about you... HTTP_USER_AGENT!
 		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES) : '';
