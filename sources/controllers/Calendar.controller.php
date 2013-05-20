@@ -252,10 +252,6 @@ class Calendar_Controller
 				modifyEvent($_REQUEST['eventid'], $eventOptions);
 			}
 
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
-
 			// No point hanging around here now...
 			redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
 		}
