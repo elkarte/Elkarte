@@ -1323,7 +1323,7 @@ function action_adminAccount()
 				return false;
 			}
 
-			$incontext['member_id'] = $smcFunc['db_insert_id']("{$db_prefix}members", 'id_member');
+			$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
 		}
 
 		// If we're here we're good.
