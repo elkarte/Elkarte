@@ -77,6 +77,7 @@ class Topic_Controller
 		if (!$user_lock)
 			logAction($locked ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
 		// Notify people that this topic has been locked?
+		require_once(SUBSDIR . '/Notifications.subs.php');
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
 
 		// Back to the topic!
@@ -134,7 +135,10 @@ class Topic_Controller
 		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));
 		// Notify people that this topic has been stickied?
 		if (empty($is_sticky))
+		{
+			require_once(SUBSDIR . '/Notifications.subs.php');
 			sendNotifications($topic, 'sticky');
+		}
 
 		// Take them back to the now stickied topic.
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);

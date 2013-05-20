@@ -963,6 +963,8 @@ class MessageIndex_Controller
 			// Maybe *none* were their own topics.
 			if (!empty($removeCache))
 			{
+				require_once(SUBSDIR . '/Notifications.subs.php');
+
 				// Gotta send the notifications *first*!
 				foreach ($removeCache as $topic)
 				{
@@ -1102,6 +1104,7 @@ class MessageIndex_Controller
 			markTopicsRead($markArray, true);
 		}
 
+		require_once(SUBSDIR . '/Notifications.subs.php');
 		foreach ($moveCache as $topic)
 		{
 			// Didn't actually move anything!

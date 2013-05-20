@@ -1742,6 +1742,8 @@ class Post_Controller
 			}
 			elseif (empty($_REQUEST['msg']))
 			{
+				require_once(SUBSDIR . '/Notifications.subs.php');
+
 				// Only send it to everyone if the topic is approved, otherwise just to the topic starter if they want it.
 				if ($topic_info['approved'])
 					sendNotifications($topic, 'reply');
@@ -2280,7 +2282,7 @@ class Post_Controller
  */
 function getTopic()
 {
-	global $topic, $modSettings, $context, $smcFunc, $counter, $options;
+	global $topic, $modSettings, $context, $smcFunc, $counter, $options, $user_settings;
 
 	if (isset($_REQUEST['xml']))
 		$limit = '
