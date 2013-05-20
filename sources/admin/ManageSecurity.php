@@ -242,7 +242,7 @@ class ManageSecurity_Controller
 			$save_vars[] = array('text', 'warning_settings');
 			unset($save_vars['rem1'], $save_vars['rem2']);
 
-			call_integration_hook('integrate_save_karma_settings', array(&$save_vars));
+			call_integration_hook('integrate_save_moderation_settings', array(&$save_vars));
 
 			Settings_Form::save_db($save_vars);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
@@ -412,9 +412,6 @@ class ManageSecurity_Controller
 		// Our callback templates are here
 		loadTemplate('BadBehavior');
 
-		// See if they supplied a valid looking http:BL API Key
-		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
-
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])
 		{
@@ -495,13 +492,16 @@ class ManageSecurity_Controller
 	 */
 	private function _initBBSettingsForm()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
+		
+		// See if they supplied a valid looking http:BL API Key
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Build up our options array
 		$config_vars = array(
@@ -682,7 +682,10 @@ class ManageSecurity_Controller
 	 */
 	public function bbSettings()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
+		
+		// See if they supplied a valid looking http:BL API Key
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Build up our options array
 		$config_vars = array(
