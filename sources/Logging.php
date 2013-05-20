@@ -429,6 +429,9 @@ function logActions($logs)
 	if (empty($modSettings['modlog_enabled']))
 		return false;
 
+	// we'll work with one of these
+	$db = database();
+
 	foreach ($logs as $log)
 	{
 		if (!isset($log_types[$log['log_type']]))
@@ -462,7 +465,7 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_report
 				FROM {db_prefix}log_reported
 				WHERE {raw:column_name} = {int:reported}
@@ -473,13 +476,13 @@ function logActions($logs)
 			));
 
 			// Alright, if we get any result back, update open reports.
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($db->num_rows($request) > 0)
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
@@ -517,7 +520,7 @@ function logActions($logs)
 		);
 	}
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
@@ -527,7 +530,7 @@ function logActions($logs)
 		array('id_action')
 	);
 
-	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
+	return $db->insert_id('{db_prefix}log_actions', 'id_action');
 }
 
 /**
@@ -540,9 +543,9 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('insert',
+	$db->insert('insert',
 		'{db_prefix}member_logins',
 		array(
 			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',

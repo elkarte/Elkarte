@@ -55,7 +55,6 @@ class Database_MySQL implements Database
 				'db_insert' => 'elk_db_insert', //
 				'db_insert_id' => 'elk_db_insert_id', //
 				'db_num_rows' => 'mysql_num_rows', //
-				'db_num_fields' => 'mysql_num_fields', //
 				'db_escape_string' => 'addslashes', //
 				'db_unescape_string' => 'stripslashes', //
 				'db_affected_rows' => 'elk_db_affected_rows', //
@@ -99,7 +98,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string &db_prefix
 	 * @param string $db_name
-	 * 
+	 *
 	 * @return string
 	 */
 	function fix_prefix($db_prefix, $db_name)

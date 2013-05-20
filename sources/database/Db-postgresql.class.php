@@ -56,7 +56,6 @@ class Database_PostgreSQL implements Database
 				'db_fetch_row' => 'elk_db_fetch_row',
 				'db_free_result' => 'pg_free_result',
 				'db_num_rows' => 'pg_num_rows',
-				'db_num_fields' => 'pg_num_fields',
 				'db_escape_string' => 'pg_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
 				'db_affected_rows' => 'elk_db_affected_rows',
@@ -94,7 +93,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param type $db_prefix
 	 * @param type $db_name
-	 * 
+	 *
 	 * @return string
 	 */
 	function fix_prefix($db_prefix, $db_name)

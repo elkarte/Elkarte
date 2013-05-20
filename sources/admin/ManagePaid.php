@@ -522,7 +522,8 @@ class ManagePaid_Controller
 
 				updateSubscription($update, $ignore_active);
 			}
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $smcFunc['db_insert_id']('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+			$db = database();
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $db->insert_id('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
@@ -586,7 +587,7 @@ class ManagePaid_Controller
 		$context['sub_id'] = (int) $_REQUEST['sid'];
 		// Load the subscription information.
 		$context['subscription'] = getSubscription($context['sub_id']);
-	
+
 		// Are we searching for people?
 		$search_string = isset($_POST['ssearch']) && !empty($_POST['sub_search']) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
 		$search_vars = empty($_POST['sub_search']) ? array() : array('search' => '%' . $_POST['sub_search'] . '%', 'guest' => $txt['guest']);
@@ -797,7 +798,7 @@ class ManagePaid_Controller
 				// Find the user...
 				require_once(SUBSDIR . '/Members.subs.php');
 				$member = getMemberByName($_POST['name']);
-		
+
 				if(alreadySubscribed($context['sub_id'], $member['id_member']))
 					fatal_lang_error('member_already_subscribed');
 
@@ -814,7 +815,7 @@ class ManagePaid_Controller
 						'end_time' => $endtime,
 						'status' => $status,
 					);
-					
+
 					logSubscription($details);
 				}
 			}
@@ -822,7 +823,7 @@ class ManagePaid_Controller
 			else
 			{
 				$subscription_status = getSubscriptionStatus($context['log_id']);
-				
+
 				// Pick the right permission stuff depending on what the status is changing from/to.
 				if ($subscription_status['old_status'] == 1 && $status != 1)
 					removeSubscription($context['sub_id'], $subscription_status['id_member']);
@@ -837,7 +838,7 @@ class ManagePaid_Controller
 						'end_time' => $endtime,
 						'status' => $status,
 						'current_log_item' => $context['log_id']
-					);		
+					);
 					updateSubscriptionItem($item);
 				}
 			}
