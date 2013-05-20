@@ -329,6 +329,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		if (!empty($row['notify_regularity']) && $type == 'reply')
 			$message_type .= '_once';
 
+		call_integration_hook('integrate_notification_replacements', array(&$replacements, $row, $type, $current_language));
+
 		// Send only if once is off or it's on and it hasn't been sent.
 		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
 		{
