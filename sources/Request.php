@@ -36,6 +36,12 @@ class Request
 	private $_user_agent;
 
 	/**
+	 * Whether the request is an XmlHttpRequest
+	 * @var bool
+	 */
+	private $_xml;
+
+	/**
 	 * Sole private Request instance
 	 * @var Request
 	 */
@@ -64,6 +70,14 @@ class Request
 	public function scheme()
 	{
 		return $this->_scheme;
+	}
+
+	/**
+	 * Returns whether the request is XML
+	 */
+	public function is_xml()
+	{
+		return $this->_xml;
 	}
 
 	/**
@@ -153,6 +167,83 @@ class Request
 
 		// keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;
+
+	}
+
+	/**
+	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
+	 * Also figures out if this is an xml request.
+	 */
+	public function parseRequest()
+	{
+		global $board, $topic;
+
+		// parse the request for our dear globals, I know
+		// they're in there somewhere...
+
+		// look for $board first
+		if (isset($_REQUEST['board']))
+		{
+			// Make sure it's a string (not an array, say)
+			$_REQUEST['board'] = (string) $_REQUEST['board'];
+
+			// if we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
+			if (strpos($_REQUEST['board'], '/') !== false)
+				list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
+			// or perhaps we have... ?board=1.0...
+			elseif (strpos($_REQUEST['board'], '.') !== false)
+				list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
+
+			// $board and $_REQUEST['start'] are always numbers.
+			$board = (int) $_REQUEST['board'];
+			$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+
+			// This is for "Who's Online" because it might come via POST - and it should be an int here.
+			$_GET['board'] = $board;
+		}
+		// None? We still need *something*, and it'd better be a number
+		else
+			$board = 0;
+
+		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
+		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
+			$_REQUEST['topic'] = $_REQUEST['threadid'];
+
+		// look for $topic
+		if (isset($_REQUEST['topic']))
+		{
+			// Make sure it's a string (not an array, say)
+			$_REQUEST['topic'] = (string) $_REQUEST['topic'];
+
+			// it might come as ?topic=1/15, from an old, SMF beta style link
+			if (strpos($_REQUEST['topic'], '/') !== false)
+				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
+			// or it might come as ?topic=1.15.
+			elseif (strpos($_REQUEST['topic'], '.') !== false)
+				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
+
+			// $topic and $_REQUEST['start'] are numbers, numbers I say.
+			$topic = (int) $_REQUEST['topic'];
+			$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+
+			// Now make sure the online log gets the right number.
+			$_GET['topic'] = $topic;
+		}
+		// No topic? Well, set something, and that something is 0.
+		else
+			$topic = 0;
+
+		// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
+		if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
+			$_REQUEST['start'] = 0;
+
+		// The action needs to be a string, too.
+		if (isset($_REQUEST['action']))
+			$_REQUEST['action'] = (string) $_REQUEST['action'];
+		if (isset($_GET['action']))
+			$_GET['action'] = (string) $_GET['action'];
+
+		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
 
 	}
 

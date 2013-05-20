@@ -28,12 +28,12 @@ if (!defined('ELKARTE'))
  *	 makes sure the query string was parsed correctly.
  * - handles the URLs passed by the queryless URLs option.
  * - makes sure, regardless of php.ini, everything has slashes.
- * - sets up $board, $topic, and $scripturl and $_REQUEST['start'].
- * - determines, or rather tries to determine, the client's IP.
+ * - uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
+ * - uses Request to try to determine client IPs for the current request.
  */
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl;
+	global $boardurl, $scripturl;
 
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
@@ -143,66 +143,11 @@ function cleanRequest()
 	// Let's not depend on the ini settings... why even have COOKIE in there, anyway?
 	$_REQUEST = $_POST + $_GET;
 
-	// Make sure $board and $topic are numbers.
-	if (isset($_REQUEST['board']))
-	{
-		// Make sure its a string and not something else like an array
-		$_REQUEST['board'] = (string) $_REQUEST['board'];
-
-		// If there's a slash in it, we've got a start value! (old, compatible links.)
-		if (strpos($_REQUEST['board'], '/') !== false)
-			list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
-		// Same idea, but dots.  This is the currently used format - ?board=1.0...
-		elseif (strpos($_REQUEST['board'], '.') !== false)
-			list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
-		// Now make absolutely sure it's a number.
-		$board = (int) $_REQUEST['board'];
-		$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-
-		// This is for "Who's Online" because it might come via POST - and it should be an int here.
-		$_GET['board'] = $board;
-	}
-	// Well, $board is going to be a number no matter what.
-	else
-		$board = 0;
-
-	// If there's a threadid, it's probably an old YaBB SE link.  Flow with it.
-	if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
-		$_REQUEST['topic'] = $_REQUEST['threadid'];
-
-	// We've got topic!
-	if (isset($_REQUEST['topic']))
-	{
-		// Make sure its a string and not something else like an array
-		$_REQUEST['topic'] = (string) $_REQUEST['topic'];
-
-		// Slash means old, beta style, formatting.  That's okay though, the link should still work.
-		if (strpos($_REQUEST['topic'], '/') !== false)
-			list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
-		// Dots are useful and fun ;).  This is ?topic=1.15.
-		elseif (strpos($_REQUEST['topic'], '.') !== false)
-			list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
-
-		$topic = (int) $_REQUEST['topic'];
-
-		// Now make sure the online log gets the right number.
-		$_GET['topic'] = $topic;
-	}
-	else
-		$topic = 0;
-
-	// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
-	if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
-		$_REQUEST['start'] = 0;
-
-	// The action needs to be a string and not an array or anything else
-	if (isset($_REQUEST['action']))
-		$_REQUEST['action'] = (string) $_REQUEST['action'];
-	if (isset($_GET['action']))
-		$_GET['action'] = (string) $_GET['action'];
-
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
 	$req = request();
+
+	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
+	$req->parseRequest();
 
 	// Make sure we know the URL of the current request.
 	if (empty($_SERVER['REQUEST_URI']))
