@@ -52,7 +52,7 @@ function loadLikes($messages, $prepare = true)
 
 	// Load up them likes from the db
 	$db = database();
-	$db->query('', '
+	$request = $db->query('', '
 		SELECT l.id_member, l.id_msg, m.real_name
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
@@ -159,7 +159,7 @@ function lastLikeOn($id_liker)
 
 	// Find out if, and how many, this user has done recently...
 	$db = database();
-	$db->query('', '
+	$request = $db->query('', '
 		SELECT action
 		FROM {db_prefix}log_likes
 		WHERE id_executor = {int:current_member}',
@@ -184,7 +184,7 @@ function addLike($id_liker, $liked_message, $direction)
 {
 	// See if they already likeyed this message
 	$db = database();
-	$db->query('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}message_likes
 		WHERE id_member = {int:id_member}
