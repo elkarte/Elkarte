@@ -2646,7 +2646,10 @@ function redirectexit($setLocation = '', $refresh = false)
 }
 
 /**
- * Ends execution.  Takes care of template loading and remembering the previous URL.
+ * Ends execution.
+ * Takes care of template loading and remembering the previous URL.
+ * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
+ *
  * @param bool $header = null
  * @param bool $do_footer = null
  * @param bool $from_index = false
