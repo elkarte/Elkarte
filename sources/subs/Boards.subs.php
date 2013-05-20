@@ -1351,3 +1351,35 @@ function addChildBoards(&$boards)
 			$boards[] = $row['id_board'];
 	$smcFunc['db_free_result']($request);
 }
+
+/**
+ * Get some basic info about the boards from the database
+ * 
+ * @param array $boards
+ * @return array
+ */
+function getBoards(array $boards)
+{
+	$db = database();
+
+	// Load the actual board names
+	$boards = array();
+	$request = $db->query('', '
+		SELECT id_board, name, member_groups, id_profile
+		FROM {db_prefix}boards
+		WHERE id_board IN ({array_int:board_list})',
+		array(
+			'board_list' => $boards,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$boards[$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'name' => $row['name'],
+			'groups' => explode(',', $row['member_groups']),
+			'profile' => $row['id_profile'],
+		);
+	$db->free_result($request);
+
+	return $boards;
+}

@@ -35,7 +35,7 @@ if (!defined('ELKARTE'))
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
-	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
+	global $txt, $language, $user_info, $webmaster_email, $mbname;
 	global $modSettings;
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
@@ -101,12 +101,13 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		}
 
 		// all the boards for these topics, used to find all the members to be notified
-		$boards_index[$row['id_board']] = array(
-			'id' => $row['id_board'],
-			'name' => $row['board_name'],
-			'groups' => $row['board_groups'],
-			'profile' => $row['id_profile'],
-		);
+		if (!isset($boards_index[$row['id_board']]))
+			$boards_index[$row['id_board']] = array(
+				'id' => $row['id_board'],
+				'name' => $row['board_name'],
+				'groups' => explode(',', $row['board_groups']),
+				'profile' => $row['id_profile'],
+			);
 
 		$topicData[$row['id_topic']] = array(
 			'subject' => $row['subject'],
@@ -199,7 +200,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				$email_perm = true;
-				if (validateAccess($row, $maillist, $email_perm) === false)
+				if (validateAccess($row, $boards_index[$row['id_board']], $maillist, $email_perm) === false)
 					continue;
 
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -310,7 +311,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			continue;
 
 		$email_perm = true;
-		if (validateAccess($row, $maillist, $email_perm) === false)
+		if (validateAccess($row, $boards_index[$row['id_board']], $maillist, $email_perm) === false)
 			continue;
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -416,7 +417,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function notifyMembersBoard(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
+	global $language, $user_info, $modSettings, $webmaster_email;
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -463,21 +464,10 @@ function notifyMembersBoard(&$topicData)
 	if (empty($board_index))
 		return;
 
+	require_once(SUBSDIR . '/Boards.subs.php');
 	$db = database();
 
-	// Load the actual board names
-	$board_names = array();
-	$request = $db->query('', '
-		SELECT id_board, name
-		FROM {db_prefix}boards
-		WHERE id_board IN ({array_int:board_list})',
-		array(
-			'board_list' => $board_index,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-		$board_names[$row['id_board']] = $row['name'];
-	$db->free_result($request);
+	$boards_info = getBoards($board_index);
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
@@ -497,10 +487,9 @@ function notifyMembersBoard(&$topicData)
 	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
-			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
+			ln.sent, ln.id_board, mem.id_group, mem.additional_groups
 			mem.id_post_group
 		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 		WHERE ln.id_board IN ({array_int:board_list})
 			AND mem.id_member != {int:current_member}
@@ -510,7 +499,6 @@ function notifyMembersBoard(&$topicData)
 		ORDER BY mem.lngfile',
 		array(
 			'current_member' => $user_info['id'],
-			'board_list' => $board_index,
 			'is_activated' => 1,
 			'notify_types' => 4,
 			'notify_regularity' => 2,
@@ -520,7 +508,7 @@ function notifyMembersBoard(&$topicData)
 	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
-		if (validateAccess($rowmember, $maillist, $email_perm) === false)
+		if (validateAccess($rowmember, $boards_info[$rowmember['id_board']], $maillist, $email_perm) === false)
 			continue;
 
 		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
@@ -551,7 +539,7 @@ function notifyMembersBoard(&$topicData)
 				),
 				'board' => array(
 					'id' => $topicData[$key]['board'],
-					'name' => $board_names[$topicData[$key]['board']],
+					'name' => $boards_info[$topicData[$key]['board']]['name'],
 				),
 				'member' => array(
 					'signature' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
@@ -773,10 +761,11 @@ function sendApprovalNotifications(&$topicData)
  * Sets email_perm to false if they should not get a reply-able message
  *
  * @param array $row
+ * @param array $board array(profile => b.id_profile, groups => b.member_groups)
  * @param boolean $maillist
  * @param boolean $email_perm
  */
-function validateAccess($row, $maillist, &$email_perm = true)
+function validateAccess($row, $board, $maillist, &$email_perm = true)
 {
 	global $modSettings;
 	static $board_profile = array();
@@ -785,7 +774,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
 	if ($row['id_group'] == 1)
 		return;
 
-	$allowed = explode(',', $row['member_groups']);
+	$allowed = $board['groups'];
 	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
 	$row['additional_groups'][] = $row['id_group'];
 	$row['additional_groups'][] = $row['id_post_group'];
@@ -812,17 +801,17 @@ function validateAccess($row, $maillist, &$email_perm = true)
 					WHERE id_profile = {int:id_profile}
 						AND permission = {string:permission}',
 					array(
-						'id_profile' => $row['id_profile'],
+						'id_profile' => $board['profile'],
 						'permission' => 'postby_email',
 					)
 				);
 				while ($row_perm = $db->fetch_assoc($request))
-					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
+					$board_profile[$board['profile']][] = $row_perm['id_group'];
 				$db->free_result($request);
 			}
 
 			// Get the email permission for this board / posting group
-			if (count(array_intersect($board_profile[$row['id_profile']], $row['additional_groups'])) === 0)
+			if (count(array_intersect($board_profile[$board['profile']], $row['additional_groups'])) === 0)
 				$email_perm = false;
 		}
 	}
