@@ -180,6 +180,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$sent = 0;
 		while ($row = $smcFunc['db_fetch_assoc']($members))
 		{
+			// If they are not the poster do they want to know?
+			// @todo maybe if they posted via email?  
+			if ($type !== 'reply' && $row['notify_types'] == 2)
+				continue;
+
 			// for this member/board, loop through the topics and see if we should send it
 			foreach ($topicData as $id => &$data) 
 			{
@@ -189,11 +194,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 				// Don't do the excluded...
 				if ($data['exclude'] === $row['id_member'])
-					continue;
-
-				// If they are not the poster do they want to know?
-				// @todo maybe if they posted via email?  
-				if ($type !== 'reply' && $row['notify_types'] == 2)
 					continue;
 
 				$email_perm = true;
