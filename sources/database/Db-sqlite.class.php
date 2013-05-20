@@ -54,7 +54,6 @@ class Database_SQLite implements Database
 				'db_insert' => 'elk_db_insert',
 				'db_insert_id' => 'elk_db_insert_id',
 				'db_num_rows' => 'sqlite_num_rows',
-				'db_num_fields' => 'sqlite_num_fields',
 				'db_escape_string' => 'sqlite_escape_string',
 				'db_unescape_string' => 'elk_db_unescape_string',
 				'db_affected_rows' => 'elk_db_affected_rows',
@@ -107,7 +106,7 @@ class Database_SQLite implements Database
 	 *
 	 * @param type $db_prefix
 	 * @param type $db_name
-	 * 
+	 *
 	 * @return string
 	 */
 	function fix_prefix($db_prefix, $db_name)
