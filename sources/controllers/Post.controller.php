@@ -1508,7 +1508,7 @@ class Post_Controller
 		if (isset($_REQUEST['poll']))
 		{
 			require_once(SUBSDIR . '/Poll.subs.php');
-			createPoll(
+			$id_poll = createPoll(
 					$_POST['question'],
 					$user_info['id'],
 					$_POST['guestname'],
