@@ -79,6 +79,14 @@ class Request
 	}
 
 	/**
+	 * Return the user agent
+	 */
+	public function user_agent()
+	{
+		return $this->_user_agent;
+	}
+
+	/**
 	 * Returns whether the request is XML
 	 */
 	public function is_xml()

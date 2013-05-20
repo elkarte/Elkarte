@@ -623,6 +623,9 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
 	global $sc, $modSettings, $boardurl;
 
+	// We'll work out user agent checks
+	$req = request();
+
 	// Is it in as $_POST['sc']?
 	if ($type == 'post')
 	{
@@ -649,7 +652,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	}
 
 	// Verify that they aren't changing user agents on us - that could be bad.
-	if ((!isset($_SESSION['USER_AGENT']) || $_SESSION['USER_AGENT'] != $_SERVER['HTTP_USER_AGENT']) && empty($modSettings['disableCheckUA']))
+	if ((!isset($_SESSION['USER_AGENT']) || $_SESSION['USER_AGENT'] != $req->user_agent()) && empty($modSettings['disableCheckUA']))
 		$error = 'session_verify_fail';
 
 	// Make sure a page with session check requirement is not being prefetched.
@@ -703,7 +706,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$log_error = true;
 	}
 
-	if (strtolower($_SERVER['HTTP_USER_AGENT']) == 'hacker')
+	if (strtolower($req->user_agent()) == 'hacker')
 		fatal_error('Sound the alarm!  It\'s a hacker!  Close the castle gates!!', false);
 
 	// Everything is ok, return an empty string.
@@ -738,12 +741,14 @@ function checkConfirm($action)
 {
 	global $modSettings;
 
-	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $_SERVER['HTTP_USER_AGENT']) === $_SESSION['confirm_' . $action])
+	$req = request();
+
+	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $req->user_agent()) === $_SESSION['confirm_' . $action])
 		return true;
 	else
 	{
 		$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
-		$_SESSION['confirm_' . $action] = md5($token . $_SERVER['HTTP_USER_AGENT']);
+		$_SESSION['confirm_' . $action] = md5($token . $req->user_agent());
 
 		return $token;
 	}
@@ -760,10 +765,13 @@ function createToken($action, $type = 'post')
 {
 	global $modSettings, $context;
 
+	// we need user agent
+	$req = request();
+
 	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed'] . $type);
 	$token_var = substr(preg_replace('~^\d+~', '', md5(mt_rand() . (string) microtime() . mt_rand())), 0, rand(7, 12));
 
-	$_SESSION['token'][$type . '-' . $action] = array($token_var, md5($token . $_SERVER['HTTP_USER_AGENT']), time(), $token);
+	$_SESSION['token'][$type . '-' . $action] = array($token_var, md5($token . $req->user_agent()), time(), $token);
 
 	$context[$action . '_token'] = $token;
 	$context[$action . '_token_var'] = $token_var;
@@ -797,14 +805,15 @@ function validateToken($action, $type = 'post', $reset = true)
 	}
 
 	// This nasty piece of code validates a token.
-	/*
-		1. The token exists in session.
-		2. The {$type} variable should exist.
-		3. We concat the variable we received with the user agent
-		4. Match that result against what is in the session.
-		5. If it matchs, success, otherwise we fallout.
-	*/
-	if (isset($_SESSION['token'][$type . '-' . $action], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]] . $_SERVER['HTTP_USER_AGENT']) === $_SESSION['token'][$type . '-' . $action][1])
+	// 1. The token exists in session.
+	// 2. The {$type} variable should exist.
+	// 3. We concat the variable we received with the user agent
+	// 4. Match that result against what is in the session.
+	// 5. If it matchs, success, otherwise we fallout.
+
+	// we use user agent
+	$req = request();
+	if (isset($_SESSION['token'][$type . '-' . $action], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]] . $req->user_agent()) === $_SESSION['token'][$type . '-' . $action][1])
 	{
 		// Invalidate this token now.
 		unset($_SESSION['token'][$type . '-' . $action]);

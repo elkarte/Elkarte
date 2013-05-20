@@ -97,6 +97,9 @@ require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 
+// Clean the request variables.
+cleanRequest();
+
 // Create a variable to store some specific functions in.
 $smcFunc = array();
 
@@ -108,9 +111,6 @@ reloadSettings();
 
 // Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
 Util::compat_init();
-
-// Clean the request variables.
-cleanRequest();
 
 // Seed the random generator?
 if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
@@ -205,13 +205,16 @@ if (isset($ssi_layers))
 else
 	setupThemeContext();
 
+// We need to set up user agent, and make more checks on the request
+$req = request();
+
 // Make sure they didn't muss around with the settings... but only if it's not cli.
 if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')
 	trigger_error($txt['ssi_session_broken'], E_USER_NOTICE);
 
 // Without visiting the forum this session variable might not be set on submit.
 if (!isset($_SESSION['USER_AGENT']) && (!isset($_GET['ssi_function']) || $_GET['ssi_function'] !== 'pollVote'))
-	$_SESSION['USER_AGENT'] = $_SERVER['HTTP_USER_AGENT'];
+	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 // Have the ability to easily add functions to SSI.
 call_integration_hook('integrate_SSI');
