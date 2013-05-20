@@ -476,7 +476,7 @@ function action_showPosts()
 		}
 
 		// Make sure we quit this loop.
-		if ($smcFunc['db_num_rows']($request) === $maxIndex || $looped)
+		if ($db->num_rows($request) === $maxIndex || $looped)
 			break;
 		$looped = true;
 		$range_limit = '';

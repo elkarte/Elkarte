@@ -234,7 +234,7 @@ function trackStatsUsersOnline($total_users_online)
 		);
 
 		// The log_activity hasn't got an entry for today?
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 		{
 			$smcFunc['db_insert']('ignore',
 				'{db_prefix}log_activity',

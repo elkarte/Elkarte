@@ -318,7 +318,7 @@ class SplitTopics_Controller
 				)
 			);
 			// You can't split the last message off.
-			if (empty($context['not_selected']['start']) && $smcFunc['db_num_rows']($request) <= 1 && $_REQUEST['move'] == 'down')
+			if (empty($context['not_selected']['start']) && $db->num_rows($request) <= 1 && $_REQUEST['move'] == 'down')
 				$_REQUEST['move'] = '';
 			while ($row = $smcFunc['db_fetch_assoc']($request))
 				$original_msgs['not_selected'][] = $row['id_msg'];
@@ -549,7 +549,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		)
 	);
 	// You can't select ALL the messages!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('selected_all_posts', false);
 
 	$split1_first_msg = null;
@@ -780,7 +780,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => (int) $split1_ID_TOPIC,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 	{
 		$replaceEntries = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))

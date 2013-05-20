@@ -164,7 +164,7 @@ function getPollInfo($topicID)
 	);
 
 	// The topic must exist
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 
 	// Get the poll information.

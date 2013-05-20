@@ -746,7 +746,7 @@ function updateMembersPostCount($start, $increment)
 			'zero' => 0,
 		)
 	);
-	$total_rows = $smcFunc['db_num_rows']($request);
+	$total_rows = $db->num_rows($request);
 
 	// Update the post count for this group
 	while ($row = $smcFunc['db_fetch_assoc']($request))

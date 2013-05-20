@@ -187,7 +187,7 @@ class Topic_Controller
 			)
 		);
 		// Redirect to the boardindex if no valid topic id is provided.
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			redirectexit();
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);

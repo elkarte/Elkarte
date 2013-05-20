@@ -1324,7 +1324,7 @@ function deletePermissionProfiles($profiles)
 			'profile_list' => $profiles,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 		fatal_lang_error('no_access', false);
 	$smcFunc['db_free_result']($request);
 

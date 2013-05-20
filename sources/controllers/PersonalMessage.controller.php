@@ -707,7 +707,7 @@ class PersonalMessage_Controller
 					'id_pm' => $pmsg,
 				)
 			);
-			$isReceived = $smcFunc['db_num_rows']($request) != 0;
+			$isReceived = $db->num_rows($request) != 0;
 			$smcFunc['db_free_result']($request);
 
 			// Get the quoted message (and make sure you're allowed to see this quote!).
@@ -729,7 +729,7 @@ class PersonalMessage_Controller
 					'id_pm' => $pmsg,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($db->num_rows($request) == 0)
 				fatal_lang_error('pm_not_yours', false);
 			$row_quoted = $smcFunc['db_fetch_assoc']($request);
 			$smcFunc['db_free_result']($request);
@@ -1824,7 +1824,7 @@ class PersonalMessage_Controller
 				)
 			);
 			// Can only be a hacker here!
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
 			list ($subject, $body, $time, $memberFromID, $memberFromName) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);
@@ -2042,7 +2042,7 @@ class PersonalMessage_Controller
 							'member_name' => $name,
 						)
 					);
-					if ($smcFunc['db_num_rows']($request) == 0)
+					if ($db->num_rows($request) == 0)
 						continue;
 					list ($memID) = $smcFunc['db_fetch_row']($request);
 					$smcFunc['db_free_result']($request);
@@ -2657,7 +2657,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 				'replied_to' => $_REQUEST['replied_to'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 		{
 			if (!isset($_REQUEST['xml']))
 				fatal_lang_error('pm_not_yours', false);

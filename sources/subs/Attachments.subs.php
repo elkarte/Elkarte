@@ -899,7 +899,7 @@ function getAvatar($id_attach)
 		);
 
 		$avatarData = array();
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($db->num_rows($request) != 0)
 			$avatarData = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
 
@@ -939,7 +939,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	);
 
 	$attachmentData = array();
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 		$attachmentData = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 

@@ -187,7 +187,7 @@ class Emailuser_Controller
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
 
-		if (empty($request) || $smcFunc['db_num_rows']($request) == 0)
+		if (empty($request) || $db->num_rows($request) == 0)
 			fatal_lang_error('cant_find_user_email');
 
 		// Are you sure you got the address?
@@ -441,7 +441,7 @@ class Emailuser_Controller
 				'id_msg' => $_POST['msg'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
 		$message = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
@@ -478,7 +478,7 @@ class Emailuser_Controller
 					'ignored' => 1,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request2) != 0)
+			if ($db->num_rows($request2) != 0)
 				list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request2);
 			$smcFunc['db_free_result']($request2);
 

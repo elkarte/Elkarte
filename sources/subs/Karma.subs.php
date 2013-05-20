@@ -52,7 +52,7 @@ function lastActionOn($id_executor, $id_target)
 			'id_target' => $id_target,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 		list ($action) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 

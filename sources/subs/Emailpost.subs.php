@@ -1287,7 +1287,7 @@ function query_load_subject($message_id, $message_type, $email)
 		);
 
 		// Found them, now we find the PM to them with this ID
-		if ($smcFunc['db_num_rows']($request) !== 0)
+		if ($db->num_rows($request) !== 0)
 		{
 			list($id_member) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);
@@ -1308,7 +1308,7 @@ function query_load_subject($message_id, $message_type, $email)
 	}
 
 	// if we found the message, topic or PM, return the subject
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 	{
 		list($subject) = $smcFunc['db_fetch_row']($request);
 		$subject = pbe_clean_email_subject($subject);
@@ -1387,7 +1387,7 @@ function query_load_message($message_type, $message_id, $pbe)
 	}
 	$topic_info = array();
 	// Found the information, load the topic_info array with the data for this topic and board
-	if ($smcFunc['db_num_rows']($request) !== 0)
+	if ($db->num_rows($request) !== 0)
 		$topic_info = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 

@@ -545,7 +545,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		)
 	);
 	// @todo Separate the sprintf?
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 		$reg_errors[] = array('lang', 'email_in_use', false, array(htmlspecialchars($regOptions['email'])));
 	$smcFunc['db_free_result']($request);
 
@@ -931,7 +931,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'check_name' => $checkName,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 	{
 		$smcFunc['db_free_result']($request);
 		return true;
@@ -947,7 +947,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'check_name' => $checkName,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 	{
 		$smcFunc['db_free_result']($request);
 		return true;
@@ -1577,7 +1577,7 @@ function getMemberByName($name)
 			'name' => $name,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('error_member_not_found');
 
 	list ($member['id_member'], $member['id_group']) = $smcFunc['db_fetch_row']($request);
@@ -1686,7 +1686,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 		)
 	);
 
-	$data['member_count'] = $smcFunc['db_num_rows']($request);
+	$data['member_count'] = $db->num_rows($request);
 
 	if ($data['member_count'] == 0)
 		return $data;

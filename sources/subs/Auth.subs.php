@@ -774,7 +774,7 @@ function findUser($where, $whereparams)
 	);
 
 	// Maybe email?
-	if ($smcFunc['db_num_rows']($request) == 0 && empty($_REQUEST['uid']))
+	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']))
 	{
 		$smcFunc['db_free_result']($request);
 
@@ -786,7 +786,7 @@ function findUser($where, $whereparams)
 			array_merge($where_params, array(
 			))
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_user_with_email', false);
 	}
 
@@ -845,7 +845,7 @@ function loadExistingMember($name)
 		)
 	);
 	// Didn't work. Try it as an email address.
-	if ($smcFunc['db_num_rows']($request) == 0 && strpos($name, '@') !== false)
+	if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
 	{
 		$smcFunc['db_free_result']($request);
 
@@ -862,7 +862,7 @@ function loadExistingMember($name)
 	}
 
 	// Nothing? Ah the horror...
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 
 	$user_settings = $smcFunc['db_fetch_assoc']($request);

@@ -374,7 +374,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) === 0)
+	if ($db->num_rows($request) === 0)
 	{
 		$smcFunc['db_free_result']($request);
 		return false;

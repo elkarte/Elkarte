@@ -246,7 +246,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 			'is_active' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 	{
 		list ($id_sublog, $endtime, $starttime) = $smcFunc['db_fetch_row']($request);
 
@@ -331,7 +331,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 		)
 	);
 	// @todo Don't really need to do this twice...
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 	{
 		list ($id_sublog, $endtime, $starttime) = $smcFunc['db_fetch_row']($request);
 
@@ -743,7 +743,7 @@ function getSubscription($id_sub)
 		)
 	);
 	// Something wrong?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 
 	// Do the subscription context.
@@ -779,7 +779,7 @@ function validateSubscriptionID($id)
 			'current_log_item' => $id,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 	list ($sub_id) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
@@ -811,7 +811,7 @@ function alreadySubscribed($id_sub, $id_member)
 			'current_member' => $id_member,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 		return true;
 
 	$smcFunc['db_free_result']($request);
@@ -841,7 +841,7 @@ function getSubscriptionStatus($log_id)
 			'current_log_item' => $log_id,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 
 	list ($status['id_member'], $status['old_status']) = $smcFunc['db_fetch_row']($request);

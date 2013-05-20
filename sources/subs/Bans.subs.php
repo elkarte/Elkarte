@@ -273,7 +273,7 @@ function validateTriggers(&$triggers)
 						'email' => $value,
 					)
 				);
-				if ($smcFunc['db_num_rows']($request) != 0)
+				if ($db->num_rows($request) != 0)
 					$ban_errors->addError('no_ban_admin');
 				$smcFunc['db_free_result']($request);
 
@@ -295,7 +295,7 @@ function validateTriggers(&$triggers)
 						'username' => $user,
 					)
 				);
-				if ($smcFunc['db_num_rows']($request) == 0)
+				if ($db->num_rows($request) == 0)
 					$ban_errors->addError('invalid_username');
 				list ($value, $isAdmin) = $smcFunc['db_fetch_row']($request);
 				$smcFunc['db_free_result']($request);
@@ -598,7 +598,7 @@ function updateBanGroup($ban_info = array())
 			'new_ban_name' => $ban_info['name'],
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return insertBanGroup($ban_info);
 	$smcFunc['db_free_result']($request);
 
@@ -664,7 +664,7 @@ function insertBanGroup($ban_info = array())
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 1)
+	if ($db->num_rows($request) == 1)
 	{
 		list($id_ban) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
@@ -801,7 +801,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 		LIMIT 1',
 		$values
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($db->num_rows($request) != 0)
 	{
 		list ($error_id_ban, $error_ban_name) = $smcFunc['db_fetch_row']($request);
 		fatal_lang_error('ban_trigger_already_exists', false, array(
@@ -1156,7 +1156,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 			'items_per_page' => $items_per_page,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('ban_not_found', false);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))

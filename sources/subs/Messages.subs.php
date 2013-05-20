@@ -63,7 +63,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 		)
 	);
 	// The message they were trying to edit was most likely deleted.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 	$row = $smcFunc['db_fetch_assoc']($request);
 
@@ -225,7 +225,7 @@ function removeMessage($message, $decreasePostCount = true)
 			'id_msg' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 	$row = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
@@ -425,7 +425,7 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('recycle_no_valid_board');
 		list ($isRead, $last_board_msg) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);
@@ -677,7 +677,7 @@ function associatedTopic($msg_id, $topicID = null)
 			array(
 				'msg' => $msg_id,
 		));
-		if ($smcFunc['db_num_rows']($request) != 1)
+		if ($db->num_rows($request) != 1)
 			$topic = false;
 		else
 			list ($topic) = $smcFunc['db_fetch_row']($request);

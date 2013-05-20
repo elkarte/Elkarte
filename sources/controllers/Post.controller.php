@@ -1837,7 +1837,7 @@ class Post_Controller
 				'not_locked' => 0,
 			)
 		);
-		$context['close_window'] = $smcFunc['db_num_rows']($request) == 0;
+		$context['close_window'] = $db->num_rows($request) == 0;
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
 
@@ -1941,7 +1941,7 @@ class Post_Controller
 				'guest_id' => 0,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);

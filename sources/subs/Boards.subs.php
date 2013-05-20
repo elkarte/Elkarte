@@ -951,7 +951,7 @@ function hasBoardNotification($id_member, $id_board)
 			'current_member' => $id_member,
 		)
 	);
-	$hasNotification = $smcFunc['db_num_rows']($request) != 0;
+	$hasNotification = $db->num_rows($request) != 0;
 	$smcFunc['db_free_result']($request);
 
 	return $hasNotification;

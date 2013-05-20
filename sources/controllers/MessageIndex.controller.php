@@ -179,7 +179,7 @@ class MessageIndex_Controller
 					'current_member' => $user_info['id'],
 				)
 			);
-			$context['is_marked_notify'] = $smcFunc['db_num_rows']($request) != 0;
+			$context['is_marked_notify'] = $db->num_rows($request) != 0;
 			if ($context['is_marked_notify'])
 			{
 				list ($sent) = $smcFunc['db_fetch_row']($request);

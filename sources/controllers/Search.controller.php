@@ -169,7 +169,7 @@ function action_plushsearch1()
 			)
 		);
 
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('topic_gone', false);
 
 		list ($context['search_topic']['subject']) = $smcFunc['db_fetch_row']($request);
@@ -419,9 +419,9 @@ function action_plushsearch2()
 		);
 
 		// Simply do nothing if there're too many members matching the criteria.
-		if ($smcFunc['db_num_rows']($request) > $maxMembersToSearch)
+		if ($db->num_rows($request) > $maxMembersToSearch)
 			$userQuery = '';
-		elseif ($smcFunc['db_num_rows']($request) == 0)
+		elseif ($db->num_rows($request) == 0)
 		{
 			$userQuery = $smcFunc['db_quote'](
 				'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
@@ -477,7 +477,7 @@ function action_plushsearch2()
 			)
 		);
 
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('topic_gone', false);
 
 		$search_params['brd'] = array();
@@ -1743,7 +1743,7 @@ function action_plushsearch2()
 		);
 
 		// If there are no results that means the things in the cache got deleted, so pretend we have no topics anymore.
-		if ($smcFunc['db_num_rows']($messages_request) == 0)
+		if ($db->num_rows($messages_request) == 0)
 			$context['topics'] = array();
 
 		// If we want to know who participated in what then load this now.
@@ -1968,9 +1968,9 @@ function MessageSearch2()
 			)
 		);
 		// Simply do nothing if there're too many members matching the criteria.
-		if ($smcFunc['db_num_rows']($request) > $maxMembersToSearch)
+		if ($db->num_rows($request) > $maxMembersToSearch)
 			$userQuery = '';
-		elseif ($smcFunc['db_num_rows']($request) == 0)
+		elseif ($db->num_rows($request) == 0)
 		{
 			if ($context['folder'] === 'inbox')
 				$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';

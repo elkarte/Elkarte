@@ -864,7 +864,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return $groups;
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))

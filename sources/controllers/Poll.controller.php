@@ -61,7 +61,7 @@ class Poll_Controller
 				'not_guest' => 0,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('poll_error', false);
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
@@ -627,7 +627,7 @@ class Poll_Controller
 				'current_topic' => $topic,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board');
 		$bcinfo = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
@@ -889,7 +889,7 @@ class Poll_Controller
 					'current_topic' => $topic,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($db->num_rows($request) == 0)
 				fatal_lang_error('no_access', false);
 			list ($topicStarter, $pollStarter) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);

@@ -110,7 +110,7 @@ class ModerationCenter_Controller
 				'id_notice' => $id_notice,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_access', false);
 		list ($context['notice_body'], $context['notice_subject']) = $smcFunc['db_fetch_row']($request);
 		$smcFunc['db_free_result']($request);

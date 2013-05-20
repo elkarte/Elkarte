@@ -241,7 +241,7 @@ class MergeTopics_Controller
 				'topic_list' => $topics,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) < 2)
+		if ($db->num_rows($request) < 2)
 			fatal_lang_error('no_topic_id');
 		$num_views = 0;
 		$is_sticky = 0;
@@ -643,7 +643,7 @@ class MergeTopics_Controller
 				'topics' => $topics,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($db->num_rows($request) > 0)
 		{
 			$replaceEntries = array();
 			while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -677,7 +677,7 @@ class MergeTopics_Controller
 					'topics_list' => $notifications,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($db->num_rows($request) > 0)
 			{
 				$replaceEntries = array();
 				while ($row = $smcFunc['db_fetch_assoc']($request))

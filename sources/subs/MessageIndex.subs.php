@@ -111,7 +111,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	else
 	{
 		$return_value = array(
-			'num_boards' => $smcFunc['db_num_rows']($request),
+			'num_boards' => $db->num_rows($request),
 			'boards_check_all' => true,
 			'boards_current_disabled' => true,
 			'categories' => array(),

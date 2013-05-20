@@ -72,7 +72,7 @@ function bb2_db_num_rows($result)
 
 	$db = database();
 
-	return $smcFunc['db_num_rows']($result);
+	return $db->num_rows($result);
 }
 
 /**

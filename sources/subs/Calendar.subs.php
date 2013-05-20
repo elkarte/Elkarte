@@ -827,7 +827,7 @@ function getEventPoster($event_id)
 	);
 
 	// No results, return false.
-	if ($smcFunc['db_num_rows'] === 0)
+	if ($db->num_rows === 0)
 		return false;
 
 	// Grab the results and return.
@@ -1019,7 +1019,7 @@ function getEventProperties($event_id)
 	);
 
 	// If nothing returned, we are in poo, poo.
-	if ($smcFunc['db_num_rows']($request) === 0)
+	if ($db->num_rows($request) === 0)
 		return false;
 
 	$row = $smcFunc['db_fetch_assoc']($request);

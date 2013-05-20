@@ -145,7 +145,7 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return null;
 
 	$return = $smcFunc['db_fetch_assoc']($request);
@@ -330,7 +330,7 @@ function action_openidreturn()
 		)
 	);
 
-	$member_found = $smcFunc['db_num_rows']($result);
+	$member_found = $db->num_rows($result);
 
 	if (!$member_found && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $openid_uri)
 	{

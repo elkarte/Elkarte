@@ -35,7 +35,7 @@ function list_getAdminInfoFile($filename)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('admin_file_not_found', true, array($filename));
 
 	list ($file['file_data'], $file['filetype']) = $smcFunc['db_fetch_row']($request);

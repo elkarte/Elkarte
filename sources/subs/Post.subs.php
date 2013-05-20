@@ -1456,7 +1456,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 1)
+		if ($db->num_rows($request) == 1)
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
 		$smcFunc['db_free_result']($request);
 	}
@@ -2342,7 +2342,7 @@ function lastPost()
 			'is_approved' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return array();
 	$row = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
@@ -2411,7 +2411,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 					'is_approved' => 1,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($db->num_rows($request) == 0)
 				fatal_lang_error('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);

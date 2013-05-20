@@ -519,7 +519,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 
 	// Remove the topic if it doesn't have any messages.
 	$topic_exists = true;
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 	{
 		require_once(SUBSDIR . '/Topic.subs.php');
 		removeTopics($from_topic, false, true);

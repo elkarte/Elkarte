@@ -1105,7 +1105,7 @@ function profileValidateEmail($email, $memID = 0)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 		return 'email_taken';
 	$smcFunc['db_free_result']($request);
 

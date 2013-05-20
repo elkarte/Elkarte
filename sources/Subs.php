@@ -3359,7 +3359,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 				'id_attach' => $attachment_id,
 		));
 
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 			return false;
 
 		list ($file_hash) = $smcFunc['db_fetch_row']($request);

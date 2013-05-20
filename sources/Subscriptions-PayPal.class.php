@@ -382,7 +382,7 @@ class paypal_payment
 			)
 		);
 		// No joy?
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 		{
 			// Can we identify them by email?
 			if (!empty($_POST['payer_email']))
@@ -398,7 +398,7 @@ class paypal_payment
 						'payer_email' => $_POST['payer_email'],
 					)
 				);
-				if ($smcFunc['db_num_rows']($request) === 0)
+				if ($db->num_rows($request) === 0)
 					return false;
 			}
 			else

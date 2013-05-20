@@ -429,7 +429,7 @@ class News_Controller
 				)
 			);
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $smcFunc['db_num_rows']($request) < $_GET['limit'])
+			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
 				$smcFunc['db_free_result']($request);
 				if (empty($_REQUEST['boards']) && empty($board))
@@ -564,7 +564,7 @@ class News_Controller
 				)
 			);
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $smcFunc['db_num_rows']($request) < $_GET['limit'])
+			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
 				$smcFunc['db_free_result']($request);
 				if (empty($_REQUEST['boards']) && empty($board))

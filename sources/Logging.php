@@ -479,7 +479,7 @@ function logActions($logs)
 			));
 
 			// Alright, if we get any result back, update open reports.
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($db->num_rows($request) > 0)
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));

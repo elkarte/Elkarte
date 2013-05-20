@@ -72,7 +72,7 @@ function validateDuplicateSmiley($code, $current = null)
 			'smiley_code' => $code,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 		return true;
 	$smcFunc['db_free_result']($request);
 
@@ -220,7 +220,7 @@ function getSmiley($id)
 			'current_smiley' => $id,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 1)
+	if ($db->num_rows($request) != 1)
 		fatal_lang_error('smiley_not_found');
 	$current_smiley = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
@@ -421,7 +421,7 @@ function isSmileySetInstalled($set)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 		return false;
 
 	return true;

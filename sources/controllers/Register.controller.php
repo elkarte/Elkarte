@@ -573,7 +573,7 @@ class Register_Controller
 		);
 
 		// Does this user exist at all?
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -609,7 +609,7 @@ class Register_Controller
 				)
 			);
 			// @todo Separate the sprintf?
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($db->num_rows($request) != 0)
 				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
 			$smcFunc['db_free_result']($request);
 

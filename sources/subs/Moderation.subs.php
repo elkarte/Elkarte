@@ -596,7 +596,7 @@ function modReportDetails($id_report)
 	);
 
 	// So did we find anything?
-	if (!$smcFunc['db_num_rows']($request))
+	if (!$db->num_rows($request))
 		$row = false;
 	else
 		$row = $smcFunc['db_fetch_assoc']($request);

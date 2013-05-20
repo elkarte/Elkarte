@@ -63,7 +63,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'is_approved' => 1,
 			)
 		);
-		if ($smcFunc['db_num_rows']($requestMembers) > 0)
+		if ($db->num_rows($requestMembers) > 0)
 		{
 			while ($rowMembers = $smcFunc['db_fetch_assoc']($requestMembers))
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
@@ -85,7 +85,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($db->num_rows($request) > 0)
 		{
 			// Get topics that will be recycled.
 			$recycleTopics = array();
@@ -409,7 +409,7 @@ function moveTopics($topics, $toBoard)
 		)
 	);
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return;
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -880,7 +880,7 @@ function hasTopicNotification($id_member, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	$hasNotification = $smcFunc['db_num_rows']($request) != 0;
+	$hasNotification = $db->num_rows($request) != 0;
 	$smcFunc['db_free_result']($request);
 
 	return $hasNotification;
@@ -1003,7 +1003,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 	);
 
 	// Was there any?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 	{
 		$smcFunc['db_free_result']($request);
 

@@ -931,7 +931,7 @@ class ManageAttachments_Controller
 						}
 					}
 				}
-				if ($smcFunc['db_num_rows']($result) != 0)
+				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'missing_thumbnail_parent';
 				$smcFunc['db_free_result']($result);
 
@@ -981,7 +981,7 @@ class ManageAttachments_Controller
 					$to_update[] = $row['id_attach'];
 					$context['repair_errors']['parent_missing_thumbnail']++;
 				}
-				if ($smcFunc['db_num_rows']($result) != 0)
+				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'parent_missing_thumbnail';
 				$smcFunc['db_free_result']($result);
 
@@ -1159,7 +1159,7 @@ class ManageAttachments_Controller
 						@unlink($filename);
 					}
 				}
-				if ($smcFunc['db_num_rows']($result) != 0)
+				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'avatar_no_member';
 				$smcFunc['db_free_result']($result);
 
@@ -1227,7 +1227,7 @@ class ManageAttachments_Controller
 						@unlink($filename);
 					}
 				}
-				if ($smcFunc['db_num_rows']($result) != 0)
+				if ($db->num_rows($result) != 0)
 					$to_fix[] = 'attachment_no_msg';
 				$smcFunc['db_free_result']($result);
 
@@ -1297,7 +1297,7 @@ class ManageAttachments_Controller
 											'attachment_id' => $attachID,
 										)
 									);
-									if ($smcFunc['db_num_rows']($request) == 0)
+									if ($db->num_rows($request) == 0)
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
 										{
@@ -1986,14 +1986,14 @@ class ManageAttachments_Controller
 					)
 				);
 
-				if ($smcFunc['db_num_rows']($request) === 0)
+				if ($db->num_rows($request) === 0)
 				{
 					if (empty($current_progress))
 						$results[] = $txt['attachment_transfer_no_find'];
 					break;
 				}
 
-				if ($smcFunc['db_num_rows']($request) < $limit)
+				if ($db->num_rows($request) < $limit)
 					$break = true;
 
 				// Move them

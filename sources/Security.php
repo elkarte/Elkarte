@@ -963,7 +963,7 @@ function allowedTo($permission, $boards = null)
 	);
 
 	// Make sure they can do it on all of the boards.
-	if ($smcFunc['db_num_rows']($request) != count($boards))
+	if ($db->num_rows($request) != count($boards))
 		return false;
 
 	$result = true;

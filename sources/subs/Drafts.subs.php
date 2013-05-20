@@ -217,7 +217,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 	);
 
 	// no results?
-	if (!$smcFunc['db_num_rows']($request))
+	if (!$db->num_rows($request))
 		return false;
 
 	// load up the data

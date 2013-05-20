@@ -52,7 +52,7 @@ function AutoTask()
 				'current_time' => time(),
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($db->num_rows($request) != 0)
 		{
 			// The two important things really...
 			$row = $smcFunc['db_fetch_assoc']($request);
@@ -128,7 +128,7 @@ function AutoTask()
 			)
 		);
 		// No new task scheduled yet?
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 			$nextEvent = time() + 86400;
 		else
 			list ($nextEvent) = $smcFunc['db_fetch_row']($request);

@@ -284,7 +284,7 @@ class MarkRead_Controller
 					'parent_list' => $boards,
 				)
 			);
-			if ($smcFunc['db_num_rows']($result) > 0)
+			if ($db->num_rows($result) > 0)
 			{
 				$logBoardInserts = '';
 				while ($row = $smcFunc['db_fetch_assoc']($result))

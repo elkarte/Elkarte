@@ -1212,7 +1212,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 				'selected_group' => $group_id,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($db->num_rows($request) != 0)
 			fatal_lang_error('profile_error_already_requested_group');
 		$smcFunc['db_free_result']($request);
 

@@ -944,7 +944,7 @@ class Database_SQLite implements Database
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $smcFunc['db_num_rows']($result);
+		$num_rows = $db->num_rows($result);
 
 		if ($num_rows == 0)
 			return '';

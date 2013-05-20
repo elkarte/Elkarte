@@ -129,7 +129,7 @@ class Fulltext_Search
 				'fulltext_minimum_word_length' => 'ft_min_word_len',
 			)
 		);
-		if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+		if ($request !== false && $db->num_rows($request) == 1)
 		{
 			list (, $min_word_length) = $smcFunc['db_fetch_row']($request);
 			$smcFunc['db_free_result']($request);

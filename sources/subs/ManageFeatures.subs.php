@@ -246,7 +246,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 				'current_column' => $colname,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			$unique = true;
 		else
 			$colname = $initial_colname . $i;

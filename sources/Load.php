@@ -497,7 +497,7 @@ function loadBoard()
 			)
 		);
 		// If there aren't any, skip.
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($db->num_rows($request) > 0)
 		{
 			$row = $smcFunc['db_fetch_assoc']($request);
 
@@ -2143,7 +2143,7 @@ function getBoardParents($id_parent)
 				)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
-			if ($smcFunc['db_num_rows']($result) == 0)
+			if ($db->num_rows($result) == 0)
 				fatal_lang_error('parent_not_found', 'critical');
 			while ($row = $smcFunc['db_fetch_assoc']($result))
 			{
