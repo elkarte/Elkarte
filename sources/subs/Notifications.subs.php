@@ -63,10 +63,12 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Get the subject, body and basic poster details
 	$result = $smcFunc['db_query']('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
+			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach, t.id_member_started,
+			b.member_groups as board_groups, b.name as board_name, b.id_profile
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			INNER JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})
@@ -97,18 +99,24 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		}
 
 		// all the boards for these topics, used to find all the members to be notified
-		$boards_index[] = $row['id_board'];
+		$boards_index[$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'name' => $row['board_name'],
+			'groups' => $row['board_groups'],
+			'profile' => $row['id_profile'],
+		);
 
 		$topicData[$row['id_topic']] = array(
 			'subject' => $row['subject'],
 			'body' => $row['body'],
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
-			'board' => $row['id_board'],
+			'board' => $boards_index[$row['id_board']],
 			'name' => $row['poster_name'],
 			'exclude' => '',
 			'signature' => $row['signature'],
 			'attachments' => $row['num_attach'],
+			'started_by' => $row['id_member_started'],
 		);
 	}
 	$smcFunc['db_free_result']($result);
@@ -149,10 +157,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$members = $smcFunc['db_query']('', '
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
-				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
-				ln.id_board
+				mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_board, ln.sent
 			FROM {db_prefix}log_notify AS ln
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			WHERE ln.id_board IN ({array_int:board_list})
 				AND mem.notify_types != {int:notify_types}
@@ -175,13 +181,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		while ($row = $smcFunc['db_fetch_assoc']($members))
 		{
 			// for this member/board, loop through the topics and see if we should send it
-			foreach ($topicData as $id => $data) 
+			foreach ($topicData as $id => &$data) 
 			{
 				// Don't send it if its not from the right board
-				if ($data['board'] !== $row['id_board'])
+				if ($data['board']['id'] !== $row['id_board'])
 					continue;
-				else
-					$data['board_name'] = $row['name'];
 
 				// Don't do the excluded...
 				if ($data['exclude'] === $row['id_member'])
@@ -206,7 +210,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					'POSTERNAME' => un_htmlspecialchars($data['name']),
 					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
 					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $data['board'] . '.0',
+					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $boards_index[$data['id_board']]['name'] . '.0',
 					'SIGNATURE' => $data['signature'],
 					'BOARDNAME' => $data['board_name'],
 				);
@@ -260,12 +264,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$members = $smcFunc['db_query']('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
-			ln.id_topic
+			mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE ln.id_topic IN ({array_int:topic_list})
 			AND mem.notify_types < {int:notify_types}
 			AND mem.notify_regularity < {int:notify_regularity}
@@ -295,7 +296,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 		// Easier to check this here... if they aren't the topic poster do they really want to know?
 		// @todo prehaps just if they posted by email?
-		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
+		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $topicData[$row['id_topic']]['started_by'])
 			continue;
 
 		$email_perm = true;
@@ -314,7 +315,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
 			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
 			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
-			'BOARDNAME' => $row['name'],
+			'BOARDNAME' => $topicData[$row['id_topic']]['board']['name'],
 		);
 
 		if ($type == 'remove')
@@ -329,7 +330,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		if (!empty($row['notify_regularity']) && $type == 'reply')
 			$message_type .= '_once';
 
-		call_integration_hook('integrate_notification_replacements', array(&$replacements, $row, $type, $current_language));
+		call_integration_hook('integrate_notification_replacements', array(&$replacements, $row, $type, $current_language, $boards_index, $topicData));
 
 		// Send only if once is off or it's on and it hasn't been sent.
 		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
