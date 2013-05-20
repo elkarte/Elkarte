@@ -42,6 +42,12 @@ class Request
 	private $_xml;
 
 	/**
+	 * Web server software
+	 * @var string
+	 */
+	private $_server_software;
+
+	/**
 	 * Sole private Request instance
 	 * @var Request
 	 */
@@ -78,6 +84,14 @@ class Request
 	public function is_xml()
 	{
 		return $this->_xml;
+	}
+
+	/**
+	 * Returns server software (or empty string if it wasn't set for PHP)
+	 */
+	public function server_software()
+	{
+		return $this->_server_software;
 	}
 
 	/**
@@ -167,6 +181,9 @@ class Request
 
 		// keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;
+
+		// we want to know who we are, too :P
+		$this->_server_software = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
 
 	}
 
