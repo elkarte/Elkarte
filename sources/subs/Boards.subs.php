@@ -611,13 +611,9 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 			'boards_to_remove' => $boards_to_remove,
 		)
 	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
+
+	require_once(SUBSDIR . '/Notifications.subs.php');
+	removeNotifications(array('boards' => $boards_to_remove));
 
 	// Delete this board's moderators.
 	$smcFunc['db_query']('', '
@@ -965,15 +961,8 @@ function setBoardNotification($id_member, $id_board, $on = false)
 	else
 	{
 		// Turn notification off for this board.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_board = {int:current_board}',
-			array(
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-			)
-		);
+		require_once(SUBSDIR . '/Notifications.subs.php');
+		removeNotifications(array('boards' => $id_board, 'members' => $id_member));
 	}
 }
 
@@ -1350,4 +1339,36 @@ function addChildBoards(&$boards)
 		if (in_array($row['id_parent'], $boards))
 			$boards[] = $row['id_board'];
 	$smcFunc['db_free_result']($request);
+}
+
+/**
+ * Get some basic info about the boards from the database
+ * 
+ * @param array $boards
+ * @return array
+ */
+function getBoards(array $boards)
+{
+	$db = database();
+
+	// Load the actual board names
+	$boards = array();
+	$request = $db->query('', '
+		SELECT id_board, name, member_groups, id_profile
+		FROM {db_prefix}boards
+		WHERE id_board IN ({array_int:board_list})',
+		array(
+			'board_list' => $boards,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$boards[$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'name' => $row['name'],
+			'groups' => explode(',', $row['member_groups']),
+			'profile' => $row['id_profile'],
+		);
+	$db->free_result($request);
+
+	return $boards;
 }

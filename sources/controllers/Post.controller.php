@@ -1703,15 +1703,10 @@ class Post_Controller
 			);
 		}
 		elseif (!$newTopic)
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}log_notify
-				WHERE id_member = {int:current_member}
-					AND id_topic = {int:current_topic}',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
+		{
+			require_once(SUBSDIR . '/Notifications.subs.php');
+			removeNotifications(array('members' => $user_info['id'], 'topics' => $topic));
+		}
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
@@ -1738,10 +1733,13 @@ class Post_Controller
 					'topic' => $topic,
 					'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
 				);
+				require_once(SUBSDIR . '/Notifications.subs.php');
 				notifyMembersBoard($notifyData);
 			}
 			elseif (empty($_REQUEST['msg']))
 			{
+				require_once(SUBSDIR . '/Notifications.subs.php');
+
 				// Only send it to everyone if the topic is approved, otherwise just to the topic starter if they want it.
 				if ($topic_info['approved'])
 					sendNotifications($topic, 'reply');
@@ -2280,7 +2278,7 @@ class Post_Controller
  */
 function getTopic()
 {
-	global $topic, $modSettings, $context, $smcFunc, $counter, $options;
+	global $topic, $modSettings, $context, $smcFunc, $counter, $options, $user_settings;
 
 	if (isset($_REQUEST['xml']))
 		$limit = '

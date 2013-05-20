@@ -1340,15 +1340,10 @@ function makeNotificationChanges($memID)
 		// And remove what they no longer want
 		$notification_deletes = array_diff($notification_current, $notification_wanted);
 		if (!empty($notification_deletes))
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}log_notify
-				WHERE id_board IN ({array_int:board_list})
-					AND id_member = {int:selected_member}',
-				array(
-					'board_list' =>$notification_deletes,
-					'selected_member' => $memID,
-				)
-			);
+		{
+			require_once(SUBSDIR . '/Notifications.subs.php');
+			removeNotifications(array('boards' => $notification_deletes, 'members' => $memID));
+		}
 
 		// Now add in what they do want
 		$notification_inserts = array();
@@ -1373,15 +1368,8 @@ function makeNotificationChanges($memID)
 		// Make sure there are no zeros left.
 		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_topic IN ({array_int:topic_list})
-				AND id_member = {int:selected_member}',
-			array(
-				'topic_list' => $_POST['notify_topics'],
-				'selected_member' => $memID,
-			)
-		);
+		require_once(SUBSDIR . '/Notifications.subs.php');
+		removeNotifications(array('topics' => $_POST['notify_topics'], 'members' => $memID));
 	}
 }
 

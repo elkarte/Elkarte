@@ -316,6 +316,7 @@ class MoveTopic_Controller
 			logAction('move', array('topic' => $topic, 'board_from' => $board, 'board_to' => $toboard));
 
 		// Notify people that this topic has been moved?
+		require_once(SUBSDIR . '/Notifications.subs.php');
 		sendNotifications($topic, 'move');
 
 		// Why not go back to the original board in case they want to keep moving?

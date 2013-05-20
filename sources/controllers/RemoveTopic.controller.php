@@ -58,6 +58,8 @@ class RemoveTopic_Controller
 		if ($modSettings['postmod_active'] && !$topic_info['approved'] && $topic_info['id_member_started'] != $user_info['id'])
 			isAllowedTo('approve_posts');
 
+		require_once(SUBSDIR . '/Notifications.subs.php');
+
 		// Notify people that this topic has been removed.
 		sendNotifications($topic, 'remove');
 

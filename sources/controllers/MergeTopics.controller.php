@@ -760,6 +760,7 @@ class MergeTopics_Controller
 		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
 
 		// Notify people that these topics have been merged?
+		require_once(SUBSDIR . '/Notifications.subs.php');
 		sendNotifications($id_topic, 'merge');
 
 		// If there's a search index that needs updating, update it...
