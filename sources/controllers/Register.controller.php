@@ -668,7 +668,7 @@ class Register_Controller
 
 		if (!isset($_POST['new_email']))
 		{
-			require_once(SUBSDIR . '/Post.subs.php');
+			require_once(SUBSDIR . '/Notifications.subs.php');
 
 			adminNotify('activation', $row['id_member'], $row['member_name']);
 		}
