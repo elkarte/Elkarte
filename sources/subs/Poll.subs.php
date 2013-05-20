@@ -168,7 +168,7 @@ function getPollInfo($topicID)
 
 /**
  * Create a poll
- * 
+ *
  * @param string $question The title/question of the poll
  * @param int $id_member = false The id of the creator
  * @param string $poster_name The name of the poll creator
@@ -210,7 +210,7 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
 
 /**
  * Add options to an already created poll
- * 
+ *
  * @param int $id_poll The id of the poll you're adding the options to
  * @param array $options The options to choose from
  */
