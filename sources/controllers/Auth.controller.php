@@ -622,8 +622,11 @@ function doLogin()
 	else
 		unset($_SESSION['first_login']);
 
+	// You're one of us: need to know all about you now, IP, stuff.
+	$req = request();
+
 	// You've logged in, haven't you?
-	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']));
+	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
 	deleteOnline('ip' . $user_info['ip']);

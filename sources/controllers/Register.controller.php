@@ -491,6 +491,11 @@ class Register_Controller
 			$regOptions['openid'] = !empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : $_SESSION['openid']['openid_uri'];
 		}
 
+		// Registration needs to know your IP
+		$req = request();
+
+		$regOptions['ip'] = $user_info['ip'];
+		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, true);
 
 		// Was there actually an error of some kind dear boy?
