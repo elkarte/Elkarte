@@ -1800,7 +1800,6 @@ function updateMemberStats($id_member = null, $real_name = null)
 		list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
 		$smcFunc['db_free_result']($result);
 
-		require_once(SUBSDIR . '/Members.subs.php');
 		// Get the latest activated member's display name.
 		$result = getBasicMemberData((int) $changes['latestMember']);
 		$changes['latestRealName'] = $result['real_name'];
