@@ -2375,3 +2375,78 @@ function setRemovalNotice($messages, $notice)
 		)
 	);
 }
+
+/**
+ * Update an attachment's thumbnail
+ * 
+ * @param string $filename
+ * @param int $id_msg
+ * @param int $old_id_thumb = 0
+ * @return array The updated information
+ */
+function updateAttachmentThumbnail($filename, $id_msg, $old_id_thumb = 0)
+{
+	global $modSettings, $smcFunc;
+
+	$attachment = array();
+
+	require_once(SUBSDIR . '/Graphics.subs.php');
+	if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
+	{
+		// So what folder are we putting this image in?
+		$id_folder_thumb = getAttachmentPathID();
+
+		// Calculate the size of the created thumbnail.
+		$size = @getimagesize($filename . '_thumb');
+		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
+		$thumb_size = filesize($filename . '_thumb');
+
+		// These are the only valid image types.
+		$validImageTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 5 => 'psd', 6 => 'bmp', 7 => 'tiff', 8 => 'tiff', 9 => 'jpeg', 14 => 'iff');
+
+		// What about the extension?
+		$thumb_ext = isset($validImageTypes[$size[2]]) ? $validImageTypes[$size[2]] : '';
+
+		// Figure out the mime type.
+		if (!empty($size['mime']))
+			$thumb_mime = $size['mime'];
+		else
+			$thumb_mime = 'image/' . $thumb_ext;
+
+		$thumb_filename = $filename . '_thumb';
+		$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
+
+		// Add this beauty to the database.
+		$smcFunc['db_insert']('',
+			'{db_prefix}attachments',
+			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
+			array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
+			array('id_attach')
+		);
+
+		$attachment['id_thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+		if (!empty($attachment['id_thumb']))
+		{
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}attachments
+				SET id_thumb = {int:id_thumb}
+				WHERE id_attach = {int:id_attach}',
+				array(
+					'id_thumb' => $attachment['id_thumb'],
+					'id_attach' => $attachment['id_attach'],
+				)
+			);
+
+			$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
+			rename($filename . '_thumb', $thumb_realname);
+
+			// Do we need to remove an old thumbnail?
+			if (!empty($old_id_thumb))
+			{
+				removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
+			}
+		}
+	}
+
+	return $attachment;
+}
