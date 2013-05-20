@@ -238,7 +238,7 @@ class Groups_Controller
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Load all the group moderators, for fun.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, mem.real_name
 			FROM {db_prefix}group_moderators AS mods
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -328,7 +328,7 @@ class Groups_Controller
 			$members = array();
 			if (!empty($member_query))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_member
 					FROM {db_prefix}members
 					WHERE (' . implode(' OR ', $member_query) . ')
@@ -384,7 +384,7 @@ class Groups_Controller
 			$where = $context['group']['is_post_group'] ? 'id_post_group = {int:group}' : 'id_group = {int:group}';
 
 		// Count members of the group.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}members
 			WHERE ' . $where,
@@ -402,7 +402,7 @@ class Groups_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// Load up all members of this group.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, member_name, real_name, email_address, member_ip, date_registered, last_login,
 				hide_email, posts, is_activated, real_name
 			FROM {db_prefix}members
@@ -494,7 +494,7 @@ class Groups_Controller
 			else
 			{
 				// Get the details of all the members concerned...
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
 						mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
 						mg.hidden, mg.group_name
@@ -558,7 +558,7 @@ class Groups_Controller
 				$smcFunc['db_free_result']($request);
 
 				// Remove the evidence...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_group_requests
 					WHERE id_request IN ({array_int:request_list})',
 					array(
@@ -584,7 +584,7 @@ class Groups_Controller
 								if ($value == 0 || trim($value) == '')
 									unset($groups['add'][$key]);
 
-							$smcFunc['db_query']('', '
+							$db->query('', '
 								UPDATE {db_prefix}members
 								SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
 								WHERE id_member = {int:selected_member}',
@@ -769,7 +769,7 @@ function list_getGroupRequestCount($where, $where_parameters)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_group_requests AS lgr
 		WHERE ' . $where,
@@ -804,7 +804,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			mem.member_name, mg.group_name, mg.online_color, mem.real_name
 		FROM {db_prefix}log_group_requests AS lgr

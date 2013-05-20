@@ -26,14 +26,14 @@ function deleteErrors($type, $filter = null, $error_list = null)
 
 	// Delete all or just some?
 	if ($type == 'delall' && !isset($filter))
-		$smcFunc['db_query']('truncate_table', '
+		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
 			array(
 			)
 		);
 	// Deleting all with a filter?
 	elseif ($type == 'delall' && isset($filter))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
@@ -42,7 +42,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 		);
 	// Just specific errors?
 	elseif ($type == 'delete')
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE id_error IN ({array_int:error_list})',
 			array(
@@ -63,7 +63,7 @@ function numErrors()
 	$db = database();
 
 	// Just how many errors are there?
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
@@ -94,7 +94,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$db = database();
 	// Find and sort out the errors.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
@@ -177,7 +177,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 
 	$db = database();
 	// What type of errors do we have and how many do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT error_type, COUNT(*) AS num_errors
 		FROM {db_prefix}log_errors
 		GROUP BY error_type

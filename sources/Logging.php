@@ -81,7 +81,7 @@ function writeLog($force = false)
 	{
 		if ($do_delete)
 		{
-			$smcFunc['db_query']('delete_log_online_interval', '
+			$db->query('delete_log_online_interval', '
 				DELETE FROM {db_prefix}log_online
 				WHERE log_time < {int:log_time}
 					AND session != {string:session}',
@@ -95,7 +95,7 @@ function writeLog($force = false)
 			cache_put_data('log_online-update', time(), 30);
 		}
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_online
 			SET log_time = {int:log_time}, ip = IFNULL(INET_ATON({string:ip}), 0), url = {string:url}
 			WHERE session = {string:session}',
@@ -118,7 +118,7 @@ function writeLog($force = false)
 	if (empty($_SESSION['log_time']))
 	{
 		if ($do_delete || !empty($user_info['id']))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_online
 				WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
 				array(
@@ -367,7 +367,7 @@ function trackStats($stats = array())
 		$insert_keys[$field] = 'int';
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_activity
 		SET' . substr($setStringUpdate, 0, -1) . '
 		WHERE date = {date:current_date}',
@@ -468,7 +468,7 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_report
 				FROM {db_prefix}log_reported
 				WHERE {raw:column_name} = {int:reported}

@@ -40,7 +40,7 @@ function AutoTask()
 		call_integration_hook('integrate_autotask_include');
 
 		// Select the next task to do.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_task, task, next_time, time_offset, time_regularity, time_unit
 			FROM {db_prefix}scheduled_tasks
 			WHERE disabled = {int:not_disabled}
@@ -76,7 +76,7 @@ function AutoTask()
 				$next_time += $duration;
 
 			// Update it now, so no others run this!
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}scheduled_tasks
 				SET next_time = {int:next_time}
 				WHERE id_task = {int:id_task}
@@ -117,7 +117,7 @@ function AutoTask()
 		$smcFunc['db_free_result']($request);
 
 		// Get the next timestamp right.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT next_time
 			FROM {db_prefix}scheduled_tasks
 			WHERE disabled = {int:not_disabled}
@@ -159,7 +159,7 @@ function scheduled_approval_notification()
 	$db = database();
 
 	// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT aq.id_msg, aq.id_attach, aq.id_event, m.id_topic, m.id_board, m.subject, t.id_first_msg,
 			b.id_profile
 		FROM {db_prefix}approval_queue AS aq
@@ -197,7 +197,7 @@ function scheduled_approval_notification()
 	$smcFunc['db_free_result']($request);
 
 	// Delete it all!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}approval_queue',
 		array(
 		)
@@ -210,7 +210,7 @@ function scheduled_approval_notification()
 	// Now we need to think about finding out *who* can approve - this is hard!
 
 	// First off, get all the groups with this permission and sort by board.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group, id_profile, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE permission = {string:approve_posts}
@@ -241,7 +241,7 @@ function scheduled_approval_notification()
 	$members = array();
 	if (in_array(2, $addGroups))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, id_board
 			FROM {db_prefix}moderators',
 			array(
@@ -257,7 +257,7 @@ function scheduled_approval_notification()
 	}
 
 	// Come along one and all... until we reject you ;)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name, email_address, lngfile, id_group, additional_groups, mod_prefs
 		FROM {db_prefix}members
 		WHERE id_group IN ({array_int:additional_group_list})
@@ -393,7 +393,7 @@ function scheduled_daily_maintenance()
 	if ($modSettings['warning_decrement'])
 	{
 		// Find every member who has a warning level...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, warning
 			FROM {db_prefix}members
 			WHERE warning > {int:no_warning}',
@@ -410,7 +410,7 @@ function scheduled_daily_maintenance()
 		if (!empty($members))
 		{
 			// Find out when they were last warned.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_recipient, MAX(log_time) AS last_warning
 				FROM {db_prefix}log_comments
 				WHERE id_recipient IN ({array_int:member_list})
@@ -436,7 +436,7 @@ function scheduled_daily_maintenance()
 			// Have some members to change?
 			if (!empty($member_changes))
 				foreach ($member_changes as $change)
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}members
 						SET warning = {int:warning}
 						WHERE id_member = {int:id_member}',
@@ -461,7 +461,7 @@ function scheduled_daily_maintenance()
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 	elseif (!empty($modSettings['db_mysql_group_by_fix']))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable = {string:mysql_fix}',
 			array(
@@ -476,7 +476,7 @@ function scheduled_daily_maintenance()
 		openID_setup_DH(true);
 	}
 	elseif (!empty($modSettings['dh_keys']))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable = {string:dh_keys}',
 			array(
@@ -485,7 +485,7 @@ function scheduled_daily_maintenance()
 		);
 
 	// Clean up some old login history information.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}member_logins
 		WHERE time > {int:oldLogins}',
 		array(
@@ -518,7 +518,7 @@ function scheduled_auto_optimize()
 	// Otherwise are we restricting the number of people online for this?
 	if (!empty($modSettings['autoOptMaxOnline']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}log_online',
 			array(
@@ -568,7 +568,7 @@ function scheduled_daily_digest()
 	$is_weekly = !empty($is_weekly) ? 1 : 0;
 
 	// Right - get all the notification data FIRST.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, mem.email_address, mem.member_name, mem.real_name, mem.notify_types,
 			mem.lngfile, mem.id_member
 		FROM {db_prefix}log_notify AS ln
@@ -620,7 +620,7 @@ function scheduled_daily_digest()
 		return true;
 
 	// Get the actual topics...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT ld.note_type, t.id_topic, t.id_board, t.id_member_started, m.id_msg, m.subject, m.body, ld.id_msg AS last_reply,
 			b.name AS board_name, ml.body as last_body
 		FROM {db_prefix}log_digest AS ld
@@ -886,14 +886,14 @@ function scheduled_daily_digest()
 	// Clean up...
 	if ($is_weekly)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_digest
 			WHERE daily != {int:not_daily}',
 			array(
 				'not_daily' => 0,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_digest
 			SET daily = {int:daily_value}
 			WHERE daily = {int:not_daily}',
@@ -906,14 +906,14 @@ function scheduled_daily_digest()
 	else
 	{
 		// Clear any only weekly ones, and stop us from sending daily again.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_digest
 			WHERE daily = {int:daily_value}',
 			array(
 				'daily_value' => 2,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_digest
 			SET daily = {int:both_value}
 			WHERE daily = {int:no_value}',
@@ -926,7 +926,7 @@ function scheduled_daily_digest()
 
 	// Just in case the member changes their settings mark this as sent.
 	$members = array_keys($members);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_notify
 		SET sent = {int:is_sent}
 		WHERE id_member IN ({array_int:member_list})',
@@ -987,7 +987,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 		// Set our delay based on our per min limit (mail_limit)
 		$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_limit']) && $modSettings['mail_limit'] < 5 ? 10 : 5);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:next_mail_send}
 			WHERE variable = {string:mail_next_send}
@@ -1029,7 +1029,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	}
 
 	// Now we know how many we're sending, let's send them.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
@@ -1058,7 +1058,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 	// Delete, delete, delete!!!
 	if (!empty($ids))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}mail_queue
 			WHERE id_mail IN ({array_int:mail_list})',
 			array(
@@ -1070,7 +1070,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (count($ids) < $number)
 	{
 		// Only update the setting if no-one else has beaten us to it.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:no_send}
 			WHERE variable = {string:mail_next_send}
@@ -1176,7 +1176,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 		// If we have failed to many times, tell mail to wait a bit and try again.
 		if ($modSettings['mail_failed_attempts'] > 5)
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}settings
 				SET value = {string:next_mail_send}
 				WHERE variable = {string:mail_next_send}
@@ -1200,7 +1200,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	}
 	// We where unable to send the email, clear our failed attempts.
 	elseif (!empty($modSettings['mail_failed_attempts']))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:zero}
 			WHERE variable = {string:mail_failed_attempts}',
@@ -1241,7 +1241,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$nextTaskTime = empty($tasks) ? time() + 86400 : $modSettings['next_task_time'];
 
 	// Get the critical info for the tasks.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:no_disabled}
@@ -1270,7 +1270,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 
 	// Now make the changes!
 	foreach ($tasks as $id => $time)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}scheduled_tasks
 			SET next_time = {int:next_time}
 			WHERE id_task = {int:id_task}',
@@ -1365,7 +1365,7 @@ function scheduled_fetchFiles()
 	$db = database();
 
 	// What files do we want to get
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_file, filename, path, parameters
 		FROM {db_prefix}admin_info_files',
 		array(
@@ -1410,7 +1410,7 @@ function scheduled_fetchFiles()
 		elseif ($file_data !== false)
 		{
 			// Save the update to the database
-			$smcFunc['db_query']('substring', '
+			$db->query('substring', '
 				UPDATE {db_prefix}admin_info_files
 				SET data = SUBSTRING({string:file_data}, 1, 65534)
 				WHERE id_file = {int:id_file}',
@@ -1447,7 +1447,7 @@ function scheduled_birthdayemails()
 	$day = date('j'); // Day without leading zeros.
 
 	// So who are the lucky ones?  Don't include those who are banned and those who don't want them.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT id_member, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE is_activated < 10
@@ -1528,7 +1528,7 @@ function scheduled_weekly_maintenance()
 		'search_enable_captcha', 'search_floodcontrol_time', 'show_spider_online',
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_list})
 			AND (value = {string:zero_value} OR value = {string:blank_value})',
@@ -1544,7 +1544,7 @@ function scheduled_weekly_maintenance()
 		'attachment_full_notified',
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_list})',
 		array(
@@ -1563,7 +1563,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneErrorLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_errors
 				WHERE log_time < {int:log_time}',
 				array(
@@ -1577,7 +1577,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneModLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_actions
 				WHERE log_time < {int:log_time}
 					AND id_log = {int:moderation_log}',
@@ -1593,7 +1593,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneBanLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_banned
 				WHERE log_time < {int:log_time}',
 				array(
@@ -1607,7 +1607,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneBadbehaviorLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_badbehavior
 				WHERE log_time < {int:log_time}',
 				array(
@@ -1623,7 +1623,7 @@ function scheduled_weekly_maintenance()
 
 			// This one is more complex then the other logs.  First we need to figure out which reports are too old.
 			$reports = array();
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT id_report
 				FROM {db_prefix}log_reported
 				WHERE time_started < {int:time_started}',
@@ -1640,7 +1640,7 @@ function scheduled_weekly_maintenance()
 			if (!empty($reports))
 			{
 				// Now delete the reports...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_reported
 					WHERE id_report IN ({array_int:report_list})',
 					array(
@@ -1648,7 +1648,7 @@ function scheduled_weekly_maintenance()
 					)
 				);
 				// And delete the comments for those reports...
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_reported_comments
 					WHERE id_report IN ({array_int:report_list})',
 					array(
@@ -1663,7 +1663,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneScheduledTaskLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_scheduled_tasks
 				WHERE time_run < {int:time_run}',
 				array(
@@ -1677,7 +1677,7 @@ function scheduled_weekly_maintenance()
 			// Figure out when our cutoff time is.  1 day = 86400 seconds.
 			$t = time() - $modSettings['pruneSpiderHitLog'] * 86400;
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_spider_hits
 				WHERE log_time < {int:log_time}',
 				array(
@@ -1688,7 +1688,7 @@ function scheduled_weekly_maintenance()
 	}
 
 	// Get rid of any paid subscriptions that were never actioned.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_subscribed
 		WHERE end_time = {int:no_end_time}
 			AND status = {int:not_active}
@@ -1703,7 +1703,7 @@ function scheduled_weekly_maintenance()
 	);
 
 	// Some OS's don't seem to clean out their sessions.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 		array(
@@ -1726,7 +1726,7 @@ function scheduled_paid_subscriptions()
 	$db = database();
 
 	// Start off by checking for removed subscriptions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_subscribe, id_member
 		FROM {db_prefix}log_subscribed
 		WHERE status = {int:is_active}
@@ -1744,7 +1744,7 @@ function scheduled_paid_subscriptions()
 	$smcFunc['db_free_result']($request);
 
 	// Get all those about to expire that have not had a reminder sent.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT ls.id_sublog, m.id_member, m.member_name, m.email_address, m.lngfile, s.name, ls.end_time
 		FROM {db_prefix}log_subscribed AS ls
 			INNER JOIN {db_prefix}subscriptions AS s ON (s.id_subscribe = ls.id_subscribe)
@@ -1789,7 +1789,7 @@ function scheduled_paid_subscriptions()
 
 	// Mark the reminder as sent.
 	if (!empty($subs_reminded))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
 			SET reminder_sent = {int:reminder_sent}
 			WHERE id_sublog IN ({array_int:subscription_list})',
@@ -1850,7 +1850,7 @@ function scheduled_remove_topic_redirect()
 	loadEssentialThemeData();
 
 	// Find all of the old MOVE topic notices that were set to expire
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE redirect_expires <= {int:redirect_expires}
@@ -1893,7 +1893,7 @@ function scheduled_remove_old_drafts()
 	loadEssentialThemeData();
 
 	// Find all of the old drafts
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
@@ -1937,7 +1937,7 @@ function scheduled_remove_old_followups()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT fu.derived_from
 		FROM {db_prefix}follow_ups as fu
 			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)

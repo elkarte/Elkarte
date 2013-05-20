@@ -208,7 +208,7 @@ class MoveTopic_Controller
 						cache_put_data('response_prefix', $context['response_prefix'], 600);
 					}
 
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}messages
 						SET subject = {string:subject}
 						WHERE id_topic = {int:current_topic}',
@@ -219,7 +219,7 @@ class MoveTopic_Controller
 					);
 				}
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET subject = {string:custom_subject}
 					WHERE id_msg = {int:id_first_msg}',
@@ -281,7 +281,7 @@ class MoveTopic_Controller
 
 		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}

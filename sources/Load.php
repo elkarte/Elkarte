@@ -33,7 +33,7 @@ function reloadSettings()
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
-		$smcFunc['db_query']('set_character_set', '
+		$db->query('set_character_set', '
 			SET NAMES ' . $db_character_set,
 			array(
 			)
@@ -42,7 +42,7 @@ function reloadSettings()
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array(
@@ -195,7 +195,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = cache_get_data('user_settings-' . $id_member, 60)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -478,7 +478,7 @@ function loadBoard()
 
 	if (empty($temp))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, IFNULL(mem.id_member, 0) AS id_moderator,
@@ -556,7 +556,7 @@ function loadBoard()
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT COUNT(id_topic)
 					FROM {db_prefix}topics
 					WHERE id_member_started={int:id_member}
@@ -706,7 +706,7 @@ function loadPermissions()
 	if (empty($user_info['permissions']))
 	{
 		// Get the general permissions.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -737,7 +737,7 @@ function loadPermissions()
 		if (!isset($board_info['profile']))
 			fatal_lang_error('no_board');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -867,7 +867,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($users))
 	{
 		// Load the member's data.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
@@ -889,7 +889,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 
 	if (!empty($new_loaded_ids) && $set !== 'minimal')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT *
 			FROM {db_prefix}themes
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
@@ -1211,7 +1211,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (empty($flag))
 	{
 		// Load variables from the current or default theme, global or this user's.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT variable, value, id_member, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
@@ -1624,7 +1624,7 @@ function loadEssentialThemeData()
 	$db = database();
 
 	// Get all the default theme variables.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -2130,7 +2130,7 @@ function getBoardParents($id_parent)
 		// Loop while the parent is non-zero.
 		while ($id_parent != 0)
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT
 					b.id_parent, b.name, {int:board_parent} AS id_board, IFNULL(mem.id_member, 0) AS id_moderator,
 					mem.real_name, b.child_level

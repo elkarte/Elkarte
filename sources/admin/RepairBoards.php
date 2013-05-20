@@ -1479,7 +1479,7 @@ function findForumErrors($do_fix = false)
 		if (isset($test['substeps']))
 		{
 			$step_size = isset($test['substeps']['step_size']) ? $test['substeps']['step_size'] : 100;
-			$request = $smcFunc['db_query']('',
+			$request = $db->query('',
 				$test['substeps']['step_max'],
 				array(
 				)
@@ -1505,7 +1505,7 @@ function findForumErrors($do_fix = false)
 				$test_query = isset($test['fix_query']) ? 'fix_query' : 'check_query';
 
 			// Do the test...
-			$request = $smcFunc['db_query']('',
+			$request = $db->query('',
 				isset($test['substeps']) ? strtr($test[$test_query], array('{STEP_LOW}' => $_GET['substep'], '{STEP_HIGH}' => $_GET['substep'] + $step_size - 1)) : $test[$test_query],
 				array(
 				)
@@ -1580,7 +1580,7 @@ function findForumErrors($do_fix = false)
 
 					// Simply executing a fix it query?
 					elseif (isset($test['fix_it_query']))
-						$smcFunc['db_query']('',
+						$db->query('',
 							$test['fix_it_query'],
 							array(
 							)
@@ -1677,7 +1677,7 @@ function createSalvageArea()
 	loadLanguage('Admin', $language);
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT id_cat
 		FROM {db_prefix}categories
 		WHERE name = {string:cat_name}
@@ -1709,7 +1709,7 @@ function createSalvageArea()
 	}
 
 	// Check to see if a 'Salvage Board' exists, if not => insert one.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT id_board
 		FROM {db_prefix}boards
 		WHERE id_cat = {int:id_cat}
@@ -1742,7 +1742,7 @@ function createSalvageArea()
 		$salvageBoardID = $smcFunc['db_insert_id']('{db_prefix}boards', 'id_board');
 	}
 
-	$smcFunc['db_query']('alter_table_boards', '
+	$db->query('alter_table_boards', '
 		ALTER TABLE {db_prefix}boards
 		ORDER BY board_order',
 		array(

@@ -27,7 +27,7 @@ function viewers($id, $session, $type = 'topic')
 	}
 
 	$viewers = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.id_member, lo.log_time, mem.real_name, mem.member_name, mem.show_online,
 			mg.online_color, mg.id_group, mg.group_name

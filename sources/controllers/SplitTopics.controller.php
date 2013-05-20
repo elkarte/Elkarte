@@ -301,7 +301,7 @@ class SplitTopics_Controller
 				'not_selected' => array(),
 				'selected' => array(),
 			);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
@@ -325,7 +325,7 @@ class SplitTopics_Controller
 			$smcFunc['db_free_result']($request);
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_msg
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -363,7 +363,7 @@ class SplitTopics_Controller
 		// Make sure the selection is still accurate.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -382,7 +382,7 @@ class SplitTopics_Controller
 		}
 
 		// Get the number of messages (not) selected to be split.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
 			FROM {db_prefix}messages AS m
 			WHERE m.id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
@@ -520,7 +520,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		fatal_lang_error('no_posts_selected', false);
 
 	// Get some board info.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, approved
 		FROM {db_prefix}topics
 		WHERE id_topic = {int:id_topic}
@@ -533,7 +533,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	$smcFunc['db_free_result']($request);
 
 	// Find the new first and last not in the list. (old topic)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			MIN(m.id_msg) AS myid_first_msg, MAX(m.id_msg) AS myid_last_msg, COUNT(*) AS message_count, m.approved
 		FROM {db_prefix}messages AS m
@@ -585,7 +585,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	$split1_lastMem = getMsgMemberID($split1_last_msg);
 
 	// Find the first and last in the list. (new topic)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MIN(id_msg) AS myid_first_msg, MAX(id_msg) AS myid_last_msg, COUNT(*) AS message_count, approved
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:msg_list})
@@ -672,7 +672,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	// Valid subject?
 	if ($new_subject != '')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
@@ -693,7 +693,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// @fixme refactor this section, Topic.subs has the function.
 	// Any associated reported posts better follow...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_topic = {int:id_topic}
 		WHERE id_msg IN ({array_int:split_msgs})',
@@ -704,7 +704,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 
 	// Mess with the old topic's first, last, and number of messages.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			num_replies = {int:num_replies},
@@ -726,7 +726,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 
 	// Now, put the first/last message back to what they should be.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			id_first_msg = {int:id_first_msg},
@@ -741,7 +741,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// If the new topic isn't approved ensure the first message flags this just in case.
 	if (!$split2_approved)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET approved = {int:approved}
 			WHERE id_msg = {int:id_msg}
@@ -754,7 +754,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 	// The board has more topics now (Or more unapproved ones!).
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($split2_approved ? '
 			num_topics = num_topics + 1' : '
@@ -772,7 +772,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Copy log topic entries.
 	// @todo This should really be chunked.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, id_msg, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic = {int:id_topic}',
@@ -844,7 +844,7 @@ function splitAttemptMove($boards, $totopic)
 			// @todo this should probably go into a function...
 			if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_member
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}

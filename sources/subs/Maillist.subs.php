@@ -47,7 +47,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		$approve_query = ' AND 0';
 
 	// Load them errors
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
@@ -125,7 +125,7 @@ function list_maillist_count_unapproved()
 		$approve_query = ' AND 0';
 
 	// Get the total count of failed emails, needed for pages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			COUNT(*) as total
 		FROM {db_prefix}postby_emails_error AS e
@@ -153,7 +153,7 @@ function maillist_delete_entry($id)
 	$db = database();
 
 	// bye bye error log entry
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_error
 		WHERE id_email = {int:id}',
 		array(
@@ -189,7 +189,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 	$email_filters = array();
 
 	// Load all the email_filters, we need lots of these :0
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT *
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
@@ -238,7 +238,7 @@ function list_count_filter_parser($id, $style)
 	$total = 0;
 
 	// Get the total filter count, needed for pages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			COUNT(*) as total
 		FROM {db_prefix}postby_emails_filters
@@ -272,7 +272,7 @@ function maillist_load_filter_parser($id, $style)
 	$row = array();
 
 	// Load filter/parser details for editing
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT *
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter = {int:id}
@@ -305,7 +305,7 @@ function maillist_delete_filter_parser($id)
 	$db = database();
 
 	// Delete the rows from the database for the filter selected
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_filters
 		WHERE id_filter = {int:id}',
 		array(
@@ -330,7 +330,7 @@ function maillist_board_list()
 	$db = database();
 
 	// Get the board and the id's, we need these for the templates
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board > {int:zero}',
@@ -360,7 +360,7 @@ function enable_maillist_imap_cron($switch)
 	$db = database();
 
 	// Enable or disable the fake cron
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
 		SET disabled = {int:onoff}, next_time = {int:time}
 		WHERE task = {string:name}',
@@ -383,7 +383,7 @@ function maillist_templates()
 
 	$notification_templates = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}

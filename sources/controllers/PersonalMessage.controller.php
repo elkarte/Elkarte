@@ -94,7 +94,7 @@ class PersonalMessage_Controller
 
 			applyRules();
 			updateMemberData($user_info['id'], array('new_pm' => 0));
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}pm_recipients
 				SET is_new = {int:not_new}
 				WHERE id_member = {int:current_member}',
@@ -338,7 +338,7 @@ class PersonalMessage_Controller
 			// On a non-default sort due to PostgreSQL we have to do a harder sort.
 			if ($db->db_title() == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
 			{
-				$sub_request = $smcFunc['db_query']('', '
+				$sub_request = $db->query('', '
 					SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
 					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
 						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -367,7 +367,7 @@ class PersonalMessage_Controller
 
 				$smcFunc['db_free_result']($sub_request);
 
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT pm.id_pm AS id_pm, pm.id_pm_head
 					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
 						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -390,7 +390,7 @@ class PersonalMessage_Controller
 			}
 			else
 			{
-				$request = $smcFunc['db_query']('pm_conversation_list', '
+				$request = $db->query('pm_conversation_list', '
 					SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
 						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -419,7 +419,7 @@ class PersonalMessage_Controller
 		else
 		{
 			// @todo SLOW This query uses a filesort. (inbox only.)
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
 				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? '' . ($sort_by == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -489,7 +489,7 @@ class PersonalMessage_Controller
 			// At this point we know the main id_pm's. But - if we are looking at conversations we need the others!
 			if ($context['display_mode'] == 2)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT pm.id_pm, pm.id_member_from, pm.deleted_by_sender, pmr.id_member, pmr.deleted
 					FROM {db_prefix}personal_messages AS pm
 						INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
@@ -527,7 +527,7 @@ class PersonalMessage_Controller
 			$all_pms = array_unique($all_pms);
 
 			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pmr.id_pm, mem_to.id_member AS id_member_to, mem_to.real_name AS to_name, pmr.bcc, pmr.labels, pmr.is_read
 				FROM {db_prefix}pm_recipients AS pmr
 					LEFT JOIN {db_prefix}members AS mem_to ON (mem_to.id_member = pmr.id_member)
@@ -581,7 +581,7 @@ class PersonalMessage_Controller
 					$orderBy[] = 'pm.id_pm = ' . $pm;
 
 				// Seperate query for these bits!
-				$subjects_request = $smcFunc['db_query']('', '
+				$subjects_request = $db->query('', '
 					SELECT pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, IFNULL(mem.real_name, pm.from_name) AS from_name,
 						IFNULL(mem.id_member, 0) AS not_guest
 					FROM {db_prefix}personal_messages AS pm
@@ -596,7 +596,7 @@ class PersonalMessage_Controller
 			}
 
 			// Execute the query!
-			$messages_request = $smcFunc['db_query']('', '
+			$messages_request = $db->query('', '
 				SELECT pm.id_pm, pm.subject, pm.id_member_from, pm.body, pm.msgtime, pm.from_name
 				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') . ($sort_by == 'name' ? '
@@ -695,7 +695,7 @@ class PersonalMessage_Controller
 				fatal_lang_error('no_access', false);
 
 			// Work out whether this is one you've received?
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					id_pm
 				FROM {db_prefix}pm_recipients
@@ -711,7 +711,7 @@ class PersonalMessage_Controller
 			$smcFunc['db_free_result']($request);
 
 			// Get the quoted message (and make sure you're allowed to see this quote!).
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					pm.id_pm, CASE WHEN pm.id_pm_head = {int:id_pm_head_empty} THEN pm.id_pm ELSE pm.id_pm_head END AS pm_head,
 					pm.body, pm.subject, pm.msgtime, mem.member_name, IFNULL(mem.id_member, 0) AS id_member,
@@ -815,7 +815,7 @@ class PersonalMessage_Controller
 					);
 
 				// Now to get the others.
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT mem.id_member, mem.real_name
 					FROM {db_prefix}pm_recipients AS pmr
 						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = pmr.id_member)
@@ -1187,7 +1187,7 @@ class PersonalMessage_Controller
 		// Mark the message as "replied to".
 		if (!empty($context['send_log']['sent']) && !empty($_REQUEST['replied_to']) && isset($_REQUEST['f']) && $_REQUEST['f'] == 'inbox')
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}pm_recipients
 				SET is_read = is_read | 2
 				WHERE id_pm = {int:replied_to}
@@ -1250,7 +1250,7 @@ class PersonalMessage_Controller
 			foreach ($_REQUEST['pm_actions'] as $pm => $dummy)
 				$id_pms[] = (int) $pm;
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_pm_head, id_pm
 				FROM {db_prefix}personal_messages
 				WHERE id_pm IN ({array_int:id_pms})',
@@ -1263,7 +1263,7 @@ class PersonalMessage_Controller
 				$pm_heads[$row['id_pm_head']] = $row['id_pm'];
 			$smcFunc['db_free_result']($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_pm, id_pm_head
 				FROM {db_prefix}personal_messages
 				WHERE id_pm_head IN ({array_int:pm_heads})',
@@ -1320,7 +1320,7 @@ class PersonalMessage_Controller
 			$updateErrors = 0;
 
 			// Get information about each message...
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_pm, labels
 				FROM {db_prefix}pm_recipients
 				WHERE id_member = {int:current_member}
@@ -1354,7 +1354,7 @@ class PersonalMessage_Controller
 					$updateErrors++;
 				else
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}pm_recipients
 						SET labels = {string:labels}
 						WHERE id_pm = {int:id_pm}
@@ -1437,7 +1437,7 @@ class PersonalMessage_Controller
 			$toDelete = array();
 
 			// Select all the messages they have sent older than $deleteTime.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_pm
 				FROM {db_prefix}personal_messages
 				WHERE deleted_by_sender = {int:not_deleted}
@@ -1454,7 +1454,7 @@ class PersonalMessage_Controller
 			$smcFunc['db_free_result']($request);
 
 			// Select all messages in their inbox older than $deleteTime.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pmr.id_pm
 				FROM {db_prefix}pm_recipients AS pmr
 					INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
@@ -1596,7 +1596,7 @@ class PersonalMessage_Controller
 				}
 
 				// Now find the messages to change.
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_pm, labels
 					FROM {db_prefix}pm_recipients
 					WHERE FIND_IN_SET({raw:find_label_implode}, labels) != 0
@@ -1624,7 +1624,7 @@ class PersonalMessage_Controller
 						$toChange[] = '-1';
 
 					// Update the message.
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}pm_recipients
 						SET labels = {string:new_labels}
 						WHERE id_pm = {int:id_pm}
@@ -1665,7 +1665,7 @@ class PersonalMessage_Controller
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						$smcFunc['db_query']('', '
+						$db->query('', '
 							UPDATE {db_prefix}pm_rules
 							SET actions = {string:actions}
 							WHERE id_rule = {int:id_rule}
@@ -1681,7 +1681,7 @@ class PersonalMessage_Controller
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}pm_rules
 						WHERE id_rule IN ({array_int:rule_list})
 								AND id_member = {int:current_member}',
@@ -1808,7 +1808,7 @@ class PersonalMessage_Controller
 			checkSession('post');
 
 			// First, pull out the message contents, and verify it actually went to them!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pm.subject, pm.body, pm.msgtime, pm.id_member_from, IFNULL(m.real_name, pm.from_name) AS sender_name
 				FROM {db_prefix}personal_messages AS pm
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
@@ -1833,7 +1833,7 @@ class PersonalMessage_Controller
 			$body = preg_replace('~<br ?/?' . '>~i', "\n", $body);
 
 			// Get any other recipients of the email.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT mem_to.id_member AS id_member_to, mem_to.real_name AS to_name, pmr.bcc
 				FROM {db_prefix}pm_recipients AS pmr
 					LEFT JOIN {db_prefix}members AS mem_to ON (mem_to.id_member = pmr.id_member)
@@ -1937,7 +1937,7 @@ class PersonalMessage_Controller
 		loadRules();
 
 		// Likely to need all the groups!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
 			FROM {db_prefix}membergroups AS mg
 				LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
@@ -2033,7 +2033,7 @@ class PersonalMessage_Controller
 				if ($type == 'mid')
 				{
 					$name = trim($_POST['ruledef'][$ind]);
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_member
 						FROM {db_prefix}members
 						WHERE real_name = {string:member_name}
@@ -2095,7 +2095,7 @@ class PersonalMessage_Controller
 					array('id_rule')
 				);
 			else
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}pm_rules
 					SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
 						delete_pm = {int:delete_pm}, is_or = {int:is_or}
@@ -2123,7 +2123,7 @@ class PersonalMessage_Controller
 				$toDelete[] = (int) $k;
 
 			if (!empty($toDelete))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}pm_rules
 					WHERE id_rule IN ({array_int:delete_list})
 						AND id_member = {int:current_member}',
@@ -2162,7 +2162,7 @@ function applyRules($all_messages = false)
 
 	// @todo Apply all should have timeout protection!
 	// Get all the messages that match this.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			pmr.id_pm, pm.id_member_from, pm.subject, pm.body, mem.id_group, pmr.labels
 		FROM {db_prefix}pm_recipients AS pmr
@@ -2233,7 +2233,7 @@ function applyRules($all_messages = false)
 				if (in_array($label['id'], $labels) && ($label['id'] != -1 || empty($options['pm_remove_inbox_label'])))
 					$realLabels[] = $label['id'];
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}pm_recipients
 				SET labels = {string:new_labels}
 				WHERE id_pm = {int:id_pm}
@@ -2262,7 +2262,7 @@ function loadRules($reload = false)
 	if (isset($context['rules']) && !$reload)
 		return;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_rule, rule_name, criteria, actions, delete_pm, is_or
 		FROM {db_prefix}pm_rules
@@ -2639,7 +2639,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	{
 		$_REQUEST['replied_to'] = (int) $_REQUEST['replied_to'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				pm.id_pm, CASE WHEN pm.id_pm_head = {int:no_id_pm_head} THEN pm.id_pm ELSE pm.id_pm_head END AS pm_head,
 				pm.body, pm.subject, pm.msgtime, mem.member_name, IFNULL(mem.id_member, 0) AS id_member,

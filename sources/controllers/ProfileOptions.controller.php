@@ -124,7 +124,7 @@ function action_editBuddies($memID)
 		if (!empty($new_buddies))
 		{
 			// Now find out the id_member of the buddy.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_buddies}) OR real_name IN ({array_string:new_buddies})
@@ -234,7 +234,7 @@ function action_editIgnoreList($memID)
 		if (!empty($new_entries))
 		{
 			// Now find out the id_member for the members in question.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_entries}) OR real_name IN ({array_string:new_entries})
@@ -717,7 +717,7 @@ function list_getTopicNotificationCount($memID)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
@@ -753,7 +753,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// All the topics with notification on...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
 			t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
@@ -812,7 +812,7 @@ function getBoardNotificationsCount($memID)
 	$db = database();
 
 	// All the boards that you have notification enabled
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -846,7 +846,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// All the boards that you have notification enabled
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -873,7 +873,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	$smcFunc['db_free_result']($request);
 
 	// and all the boards that you can see but don't have notify turned on for
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
@@ -925,7 +925,7 @@ function loadThemeOptions($memID)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, variable, value
 			FROM {db_prefix}themes
 			WHERE id_theme IN (1, {int:member_theme})
@@ -1018,7 +1018,7 @@ function action_groupMembership()
 		$groups[$k] = (int) $v;
 
 	// Get all the membergroups they can join.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
 			IFNULL(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
@@ -1180,7 +1180,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// Final security check, don't allow users to promote themselves to admin.
 	if ($context['can_manage_membergroups'] && !allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(permission)
 			FROM {db_prefix}permissions
 			WHERE id_group = {int:selected_group}
@@ -1202,7 +1202,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// If we're requesting, add the note then return.
 	if ($changeType == 'request')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}log_group_requests
 			WHERE id_member = {int:selected_member}
@@ -1232,7 +1232,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Do we have any group moderators?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}group_moderators
 			WHERE id_group = {int:selected_group}',

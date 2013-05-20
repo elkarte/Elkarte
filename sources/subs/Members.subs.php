@@ -80,7 +80,7 @@ function deleteMembers($users, $check_not_admin = false)
 	}
 
 	// Get their names for logging purposes.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, CASE WHEN id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0 THEN 1 ELSE 0 END AS is_admin
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:user_list})
@@ -135,7 +135,7 @@ function deleteMembers($users, $check_not_admin = false)
 	}
 
 	// Make these peoples' posts guest posts.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_member = {int:guest_id}' . (!empty($modSettings['deleteMembersRemovesEmail']) ? ',
 		poster_email = {string:blank_email}' : '') . '
@@ -146,7 +146,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}polls
 		SET id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
@@ -157,7 +157,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Make these peoples' posts guest first posts and last posts.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET id_member_started = {int:guest_id}
 		WHERE id_member_started IN ({array_int:users})',
@@ -166,7 +166,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET id_member_updated = {int:guest_id}
 		WHERE id_member_updated IN ({array_int:users})',
@@ -176,7 +176,7 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_actions
 		SET id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
@@ -186,7 +186,7 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_banned
 		SET id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
@@ -196,7 +196,7 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_errors
 		SET id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
@@ -207,7 +207,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete the member.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}members
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -216,7 +216,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete any drafts...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}user_drafts
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -225,7 +225,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete the logs...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
 			AND id_member IN ({array_int:users})',
@@ -234,14 +234,14 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_boards
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_recipient IN ({array_int:users})
 			AND comment_type = {string:warntpl}',
@@ -250,14 +250,14 @@ function deleteMembers($users, $check_not_admin = false)
 			'warntpl' => 'warntpl',
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_group_requests
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_karma
 		WHERE id_target IN ({array_int:users})
 			OR id_executor IN ({array_int:users})',
@@ -265,42 +265,42 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_mark_read
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_notify
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_subscribed
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_topics
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}collapsed_categories
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -310,7 +310,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 	// Make their votes appear as guest votes - at least it keeps the totals right.
 	// @todo Consider adding back in cookie protection.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_polls
 		SET id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
@@ -324,7 +324,7 @@ function deleteMembers($users, $check_not_admin = false)
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
 	deleteMessages(null, null, $users);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}personal_messages
 		SET id_member_from = {int:guest_id}
 		WHERE id_member_from IN ({array_int:users})',
@@ -335,7 +335,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// They no longer exist, so we don't know who it was sent to.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}pm_recipients
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -348,14 +348,14 @@ function deleteMembers($users, $check_not_admin = false)
 	removeAttachments(array('id_member' => $users));
 
 	// It's over, no more moderation for you.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}moderators
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}group_moderators
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -364,7 +364,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// If you don't exist we can't ban you.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}ban_items
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -373,7 +373,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Remove individual theme settings.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -382,7 +382,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// These users are nobody's buddy nomore.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, pm_ignore_list, buddy_list
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
@@ -392,7 +392,7 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
 				pm_ignore_list = {string:pm_ignore_list},
@@ -533,7 +533,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		isBannedEmail($regOptions['email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 	// Check if the email address is in use.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE email_address = {string:email_address}
@@ -658,7 +658,7 @@ function registerMember(&$regOptions, $return_errors = false)
 
 		// Check if this group is assignable.
 		$unassignableGroups = array(-1, 3);
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group
 			FROM {db_prefix}membergroups
 			WHERE min_posts != {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
@@ -920,7 +920,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
 
 	// Make sure they don't want someone else's name.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
@@ -938,7 +938,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	}
 
 	// Does name case insensitive match a member group name?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE group_name LIKE {string:check_name}
@@ -984,7 +984,7 @@ function groupsAllowedTo($permission, $board_id = null)
 	// Assume we're dealing with regular permissions (like profile_view_own).
 	if ($board_id === null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, add_deny
 			FROM {db_prefix}permissions
 			WHERE permission = {string:permission}',
@@ -1015,7 +1015,7 @@ function groupsAllowedTo($permission, $board_id = null)
 		else
 			$profile_id = 1;
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT bp.id_group, bp.add_deny
 			FROM {db_prefix}board_permissions AS bp
 			WHERE bp.permission = {string:permission}
@@ -1061,7 +1061,7 @@ function membersAllowedTo($permission, $board_id = null)
 	$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
 	$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($include_moderators || $exclude_moderators ? '
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
@@ -1113,7 +1113,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	// If they want the post count restored then we need to do some research.
 	if ($post_count)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND b.count_posts = {int:count_posts})
@@ -1145,7 +1145,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	$query = implode(' AND ', $query_parts);
 
 	// Finally, update the posts themselves!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_member = {int:memID}
 		WHERE ' . $query,
@@ -1157,7 +1157,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	);
 
 	// ...and the topics too!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics as t, {db_prefix}messages as m
 		SET t.id_member_started = {int:memID}
 		WHERE m.id_member = {int:memID}
@@ -1187,7 +1187,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.member_ip, mem.member_ip2, mem.last_login,
 			mem.posts, mem.is_activated, mem.date_registered, mem.id_group, mem.additional_groups, mg.group_name
@@ -1234,7 +1234,7 @@ function list_getNumMembers($where, $where_params = array())
 	// The database knows the amount when there are extra conditions.
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}members AS mem
 			WHERE ' . $where,
@@ -1279,7 +1279,7 @@ function populateDuplicateMembers(&$members)
 		return false;
 
 	// Fetch all members with this IP address, we'll filter out the current ones in a sec.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_member, member_name, email_address, member_ip, member_ip2, is_activated
 		FROM {db_prefix}members
@@ -1312,7 +1312,7 @@ function populateDuplicateMembers(&$members)
 	$smcFunc['db_free_result']($request);
 
 	// Also try to get a list of messages using these ips.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.poster_ip, mem.id_member, mem.member_name, mem.email_address, mem.is_activated
 		FROM {db_prefix}messages AS m
@@ -1380,7 +1380,7 @@ function isAnotherAdmin($memberID)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -1411,7 +1411,7 @@ function admins($id_admin = 0)
 	$db = database();
 
 	// Now let's get out and loop through the admins.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name, lngfile
 		FROM {db_prefix}members
 		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -1441,7 +1441,7 @@ function maxMemberID()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MAX(id_member)
 		FROM {db_prefix}members',
 		array(
@@ -1497,7 +1497,7 @@ function getBasicMemberData($member_ids, $options = array())
 	}
 
 	// Get some additional member info...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (isset($options['moderation']) ? ',
 		member_ip, id_group, additional_groups, last_login' : '') . (isset($options['authentication']) ? ',
 		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (isset($options['preferences']) ? ',
@@ -1538,7 +1538,7 @@ function countInactiveMembers()
 
 	$inactive_members = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS total_members, is_activated
 		FROM {db_prefix}members
 		WHERE is_activated != {int:is_activated}
@@ -1568,7 +1568,7 @@ function getMemberByName($name)
 
 	$member = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, id_group
 		FROM {db_prefix}members
 		WHERE real_name = {string:name}
@@ -1593,7 +1593,7 @@ function getMember($search, $buddies = array())
 	$db = database();
 
 	// Find the member.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE real_name LIKE {string:search}' . (!empty($buddies) ? '
@@ -1674,7 +1674,7 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 	$data = array();
 
 	// Get information on each of the members, things that are important to us, like email address...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
 		FROM {db_prefix}members
 		WHERE is_activated = {int:activated_status}' . $condition . '
@@ -1724,7 +1724,7 @@ function approveMembers($members, $condition, $timeBefore, $current_filter)
 	$db = database();
 
 	// Approve/activate this member.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
 		WHERE is_activated = {int:activated_status}' . $condition,
@@ -1754,7 +1754,7 @@ function enforceReactivation($member, $condition, $current_filter, $members, $ti
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
 		WHERE is_activated = {int:activated_status}
@@ -1783,7 +1783,7 @@ function countMembersInGroup($id_group = 0)
 	$db = database();
 
 	// Determine the number of ungrouped members.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE id_group = {int:group}',

@@ -618,7 +618,7 @@ class Database_SQLite implements Database
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
-				$smcFunc['db_query']('',
+				$db->query('',
 					(($method === 'replace') ? 'REPLACE' : (' INSERT' . ($method === 'ignore' ? ' OR IGNORE' : ''))) . ' INTO ' . $table . '(' . implode(', ', $indexed_columns) . ')
 					VALUES
 						' . $entry,
@@ -934,7 +934,7 @@ class Database_SQLite implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $start . ', ' . $limit,
@@ -1016,7 +1016,7 @@ class Database_SQLite implements Database
 		$index_create = '';
 
 		// Let's get the create statement directly from SQLite.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1030,7 +1030,7 @@ class Database_SQLite implements Database
 		$this->free_result($result);
 
 		// Now the indexes.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1068,7 +1068,7 @@ class Database_SQLite implements Database
 
 		$filter = $filter == false ? '' : ' AND name LIKE \'' . str_replace("\_", "_", $filter) . '\'';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT name
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1101,7 +1101,7 @@ class Database_SQLite implements Database
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			VACUUM {raw:table}',
 			array(
 				'table' => $table,
@@ -1132,7 +1132,7 @@ class Database_SQLite implements Database
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:txttable}
@@ -1179,7 +1179,7 @@ class Database_SQLite implements Database
 		if (substr($create, -2) == '))')
 			$create = substr($create, 0, -1);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DROP TABLE {raw:backup_table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1194,14 +1194,14 @@ class Database_SQLite implements Database
 				'create' => $create,
 		));
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}',
 			array(
 				'backup_table' => $backup_table,
 				'create' => $create,
 		));
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT *
 			FROM {raw:table}',

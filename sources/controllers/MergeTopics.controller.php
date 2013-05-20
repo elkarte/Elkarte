@@ -80,7 +80,7 @@ class MergeTopics_Controller
 			$onlyApproved = false;
 
 		// How many topics are on this board?  (used for paging.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}topics AS t
 			WHERE t.id_board = {int:id_board}' . ($onlyApproved ? '
@@ -133,7 +133,7 @@ class MergeTopics_Controller
 			);
 
 		// Get some topics to merge it with.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_topic, m.subject, m.id_member, IFNULL(mem.real_name, m.poster_name) AS poster_name
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -224,7 +224,7 @@ class MergeTopics_Controller
 			$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 		// Get info about the topics and polls that will be merged.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
 				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
@@ -340,7 +340,7 @@ class MergeTopics_Controller
 		{
 			if (count($polls) > 1)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT t.id_topic, t.id_poll, m.subject, p.question
 					FROM {db_prefix}polls AS p
 						INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
@@ -413,7 +413,7 @@ class MergeTopics_Controller
 			$target_subject = $topic_data[$firstTopic]['subject'];
 
 		// Get the first and last message and the number of messages....
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
@@ -479,7 +479,7 @@ class MergeTopics_Controller
 		$boardTotals[$target_board]['posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
 
 		// Get the member ID of the first and last message.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
@@ -500,7 +500,7 @@ class MergeTopics_Controller
 
 		// Obtain all the message ids we are going to affect.
 		$affected_msgs = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})',
@@ -516,14 +516,14 @@ class MergeTopics_Controller
 
 		// Delete the remaining topics.
 		$deleted_topics = array_diff($topics, array($id_topic));
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}topics
 			WHERE id_topic IN ({array_int:deleted_topics})',
 			array(
 				'deleted_topics' => $deleted_topics,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic IN ({array_int:deleted_topics})',
 			array(
@@ -532,7 +532,7 @@ class MergeTopics_Controller
 		);
 
 		// Asssign the properties of the newly merged topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_board = {int:id_board},
@@ -578,7 +578,7 @@ class MergeTopics_Controller
 		}
 
 		// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
@@ -594,7 +594,7 @@ class MergeTopics_Controller
 		);
 
 		// Any reported posts should reflect the new board.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_reported
 			SET
 				id_topic = {int:id_topic},
@@ -608,7 +608,7 @@ class MergeTopics_Controller
 		);
 
 		// Change the subject of the first message...
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET subject = {string:target_subject}
 			WHERE id_msg = {int:first_msg}',
@@ -619,7 +619,7 @@ class MergeTopics_Controller
 		);
 
 		// Adjust all calendar events to point to the new topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}calendar
 			SET
 				id_topic = {int:id_topic},
@@ -634,7 +634,7 @@ class MergeTopics_Controller
 
 		// Merge log topic entries.
 		// The disregard setting comes from the oldest topic
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
 			FROM {db_prefix}log_topics
 			WHERE id_topic IN ({array_int:topics})
@@ -654,7 +654,7 @@ class MergeTopics_Controller
 			unset($replaceEntries);
 
 			// Get rid of the old log entries.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_topics
 				WHERE id_topic IN ({array_int:deleted_topics})',
 				array(
@@ -668,7 +668,7 @@ class MergeTopics_Controller
 		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
 		if (!empty($notifications))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member, MAX(sent) AS sent
 				FROM {db_prefix}log_notify
 				WHERE id_topic IN ({array_int:topics_list})
@@ -691,7 +691,7 @@ class MergeTopics_Controller
 					);
 				unset($replaceEntries);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_topics
 					WHERE id_topic IN ({array_int:deleted_topics})',
 					array(
@@ -705,21 +705,21 @@ class MergeTopics_Controller
 		// Get rid of the redundant polls.
 		if (!empty($deleted_polls))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}polls
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
 					'deleted_polls' => $deleted_polls,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}poll_choices
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
 					'deleted_polls' => $deleted_polls,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_polls
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
@@ -731,7 +731,7 @@ class MergeTopics_Controller
 		// Cycle through each board...
 		foreach ($boardTotals as $id_board => $stats)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_topics = CASE WHEN {int:topics} > num_topics THEN 0 ELSE num_topics - {int:topics} END,

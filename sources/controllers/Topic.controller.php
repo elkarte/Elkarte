@@ -119,7 +119,7 @@ class Topic_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT is_sticky
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
@@ -174,7 +174,7 @@ class Topic_Controller
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -196,7 +196,7 @@ class Topic_Controller
 		{
 			loadLanguage('Post');
 			// Get the question and if it's locked.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
@@ -211,7 +211,7 @@ class Topic_Controller
 			$pollinfo = $smcFunc['db_fetch_assoc']($request);
 			$smcFunc['db_free_result']($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
 				FROM {db_prefix}log_polls
 				WHERE id_poll = {int:id_poll}
@@ -228,7 +228,7 @@ class Topic_Controller
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
 
 			// Get all the options, and calculate the total votes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
 				FROM {db_prefix}poll_choices AS pc
 					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
@@ -366,7 +366,7 @@ class Topic_Controller
 			$context['parent_boards'][] = $parent['name'];
 
 		// Split the topics up so we can print them.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -408,7 +408,7 @@ class Topic_Controller
 				$messages[] = $temp['id_msg'];
 
 			// build the request
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					a.id_attach, a.id_msg, a.approved, a.width, a.height, a.file_hash, a.filename, a.id_folder, a.mime_type
 				FROM {db_prefix}attachments AS a

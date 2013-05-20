@@ -34,7 +34,7 @@ function loadMessageLimit()
 		$context['message_limit'] = 0;
 	elseif (($context['message_limit'] = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT MAX(max_messages) AS top_limit, MIN(max_messages) AS bottom_limit
 			FROM {db_prefix}membergroups
 			WHERE id_group IN ({array_int:users_groups})',
@@ -59,7 +59,7 @@ function loadPMLabels()
 	$db = database();
 
 	// Looks like we need to reseek!
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT labels, is_read, COUNT(*) AS num
 		FROM {db_prefix}pm_recipients
 		WHERE id_member = {int:current_member}
@@ -95,7 +95,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 	// Figure out how many messages there are.
 	if ($context['folder'] == 'sent')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(' . ($context['display_mode'] == 2 ? 'DISTINCT id_pm_head' : '*') . ')
 			FROM {db_prefix}personal_messages
 			WHERE id_member_from = {int:current_member}
@@ -110,7 +110,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(' . ($context['display_mode'] == 2 ? 'DISTINCT pm.id_pm_head' : '*') . ')
 			FROM {db_prefix}pm_recipients AS pmr' . ($context['display_mode'] == 2 ? '
 				INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)' : '') . '
@@ -167,7 +167,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 
 	if ($folder == 'sent' || $folder === null)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}personal_messages
 			SET deleted_by_sender = {int:is_deleted}
 			WHERE id_member_from IN ({array_int:member_list})
@@ -183,7 +183,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	if ($folder != 'sent' || $folder === null)
 	{
 		// Calculate the number of messages each member's gonna lose...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, COUNT(*) AS num_deleted_messages, CASE WHEN is_read & 1 >= 1 THEN 1 ELSE 0 END AS is_read
 			FROM {db_prefix}pm_recipients
 			WHERE id_member IN ({array_int:member_list})
@@ -214,7 +214,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		$smcFunc['db_free_result']($request);
 
 		// Do the actual deletion.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}pm_recipients
 			SET deleted = {int:is_deleted}
 			WHERE id_member IN ({array_int:member_list})
@@ -229,7 +229,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// If sender and recipients all have deleted their message, it can be removed.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT pm.id_pm AS sender, pmr.id_pm
 		FROM {db_prefix}personal_messages AS pm
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm AND pmr.deleted = {int:not_deleted})
@@ -250,7 +250,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 
 	if (!empty($remove_pms))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}personal_messages
 			WHERE id_pm IN ({array_int:pm_list})',
 			array(
@@ -258,7 +258,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}pm_recipients
 			WHERE id_pm IN ({array_int:pm_list})',
 			array(
@@ -287,7 +287,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 	if ($owner === null)
 		$owner = $user_info['id'];
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_read = is_read | 1
 		WHERE id_member = {int:id_member}
@@ -310,7 +310,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 				$context['labels'][(int) $label['id']]['unread_messages'] = 0;
 		}
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT labels, COUNT(*) AS num
 			FROM {db_prefix}pm_recipients
 			WHERE id_member = {int:id_member}
@@ -359,7 +359,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			pm.id_member_from = {int:id_current_member} AND pm.deleted_by_sender = {int:not_deleted} AS valid_for_outbox,
 			pmr.id_pm IS NOT NULL AS valid_for_inbox
@@ -477,7 +477,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 	if (!empty($usernames))
 	{
-		$request = $smcFunc['db_query']('pm_find_username', '
+		$request = $db->query('pm_find_username', '
 			SELECT id_member, member_name
 			FROM {db_prefix}members
 			WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
@@ -519,7 +519,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	$all_to = array_merge($recipients['to'], $recipients['bcc']);
 
 	// Check no-one will want it deleted right away!
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_member, criteria, is_or
 		FROM {db_prefix}pm_rules
@@ -559,7 +559,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	static $message_limit_cache = array();
 	if (!allowedTo('moderate_forum') && empty($message_limit_cache))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, max_messages
 			FROM {db_prefix}membergroups',
 			array(
@@ -574,7 +574,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	// @todo move into a separate function on $permission.
 	$allowed_groups = array();
 	$disallowed_groups = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group, add_deny
 		FROM {db_prefix}permissions
 		WHERE permission = {string:read_permission}',
@@ -596,7 +596,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	if (empty($modSettings['permission_enable_deny']))
 		$disallowed_groups = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			member_name, real_name, id_member, email_address, lngfile,
 			pm_email_notify, instant_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
@@ -709,7 +709,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	{
 		// If this is new we need to set it part of it's own conversation.
 		if (empty($pm_head))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}personal_messages
 				SET id_pm_head = {int:id_pm_head}
 				WHERE id_pm = {int:id_pm_head}',
@@ -719,7 +719,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			);
 
 		// Some people think manually deleting personal_messages is fun... it's not. We protect against it though :)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}pm_recipients
 			WHERE id_pm = {int:id_pm}',
 			array(
@@ -839,7 +839,7 @@ function markPMsRead($memberID)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_new = {int:not_new}
 		WHERE id_member = {int:current_member}',
@@ -879,7 +879,7 @@ function loadPMs($pm_options, $id_member)
 		// On a non-default sort due to PostgreSQL we have to do a harder sort.
 		if ($pm_options['is_postgres'] && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
-			$sub_request = $smcFunc['db_query']('', '
+			$sub_request = $db->query('', '
 				SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
 				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -908,7 +908,7 @@ function loadPMs($pm_options, $id_member)
 
 			$smcFunc['db_free_result']($sub_request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pm.id_pm AS id_pm, pm.id_pm_head
 				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -931,7 +931,7 @@ function loadPMs($pm_options, $id_member)
 		}
 		else
 		{
-			$request = $smcFunc['db_query']('pm_conversation_list', '
+			$request = $db->query('pm_conversation_list', '
 				SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -960,7 +960,7 @@ function loadPMs($pm_options, $id_member)
 	else
 	{
 		// @todo SLOW This query uses a filesort. (inbox only.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
 			FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? '' . ($pm_options['sort_by'] == 'name' ? '
 				LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
@@ -1026,7 +1026,7 @@ function pmCount($id_member, $time)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(pr.id_pm) AS post_count
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pr ON (pr.id_pm = pm.id_pm)

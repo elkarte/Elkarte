@@ -172,7 +172,7 @@ class Emailuser_Controller
 		}
 		elseif (isset($_REQUEST['msg']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
 				FROM {db_prefix}messages AS m
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -429,7 +429,7 @@ class Emailuser_Controller
 		// Get the basic topic information, and make sure they can see it.
 		$_POST['msg'] = (int) $_POST['msg'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
@@ -466,7 +466,7 @@ class Emailuser_Controller
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))
 		{
-			$request2 = $smcFunc['db_query']('', '
+			$request2 = $db->query('', '
 				SELECT id_report, ignore_all
 				FROM {db_prefix}log_reported
 				WHERE id_msg = {int:id_msg}
@@ -488,7 +488,7 @@ class Emailuser_Controller
 
 			// Already reported? My god, we could be dealing with a real rogue here...
 			if (!empty($id_report))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_reported
 					SET num_reports = num_reports + 1, time_updated = {int:current_time}
 					WHERE id_report = {int:id_report}',
@@ -538,7 +538,7 @@ class Emailuser_Controller
 		}
 
 		// Find out who the real moderators are - for mod preferences.
-		$request2 = $smcFunc['db_query']('', '
+		$request2 = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',

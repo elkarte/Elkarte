@@ -47,7 +47,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Decrease the post counts.
 	if ($decreasePostCount)
 	{
-		$requestMembers = $smcFunc['db_query']('', '
+		$requestMembers = $db->query('', '
 			SELECT m.id_member, COUNT(*) AS posts
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -74,7 +74,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Recycle topics that aren't in the recycle board...
 	if (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 && !$ignoreRecycling)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, id_board, unapproved_posts, approved
 			FROM {db_prefix}topics
 			WHERE id_topic IN ({array_int:topics})
@@ -97,7 +97,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				$recycleTopics[] = $row['id_topic'];
 
 				// Set the id_previous_board for this topic - and make it not sticky.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}topics
 					SET id_previous_board = {int:id_previous_board}, is_sticky = {int:not_sticky}
 					WHERE id_topic = {int:id_topic}',
@@ -111,7 +111,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			$smcFunc['db_free_result']($request);
 
 			// Mark recycled topics as recycled.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}messages
 				SET icon = {string:recycled}
 				WHERE id_topic IN ({array_int:recycle_topics})',
@@ -128,7 +128,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			// Close reports that are being recycled.
 			require_once(SUBSDIR . '/Moderation.subs.php');
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_reported
 				SET closed = {int:is_closed}
 				WHERE id_topic IN ({array_int:recycle_topics})',
@@ -155,7 +155,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$adjustBoards = array();
 
 	// Find out how many posts we are deleting.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
 			SUM(num_replies) AS num_replies
 		FROM {db_prefix}topics
@@ -195,7 +195,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		if (function_exists('apache_reset_timeout'))
 			@apache_reset_timeout();
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
 				num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
@@ -214,7 +214,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Remove Polls.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_poll
 		FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})
@@ -232,21 +232,21 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	if (!empty($polls))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}polls
 			WHERE id_poll IN ({array_int:polls})',
 			array(
 				'polls' => $polls,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}poll_choices
 			WHERE id_poll IN ({array_int:polls})',
 			array(
 				'polls' => $polls,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_polls
 			WHERE id_poll IN ({array_int:polls})',
 			array(
@@ -270,7 +270,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 		$words = array();
 		$messages = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, body
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})',
@@ -290,7 +290,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$words = array_unique($words);
 
 		if (!empty($words) && !empty($messages))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_search_words
 				WHERE id_word IN ({array_int:word_list})
 					AND id_msg IN ({array_int:message_list})',
@@ -302,42 +302,42 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Delete anything related to the topic.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}calendar
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_notify
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_search_subjects
 		WHERE id_topic IN ({array_int:topics})',
 		array(
@@ -398,7 +398,7 @@ function moveTopics($topics, $toBoard)
 	$isRecycleDest = !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $toBoard;
 
 	// Determine the source boards...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
 			SUM(num_replies) AS num_replies
 		FROM {db_prefix}topics
@@ -437,7 +437,7 @@ function moveTopics($topics, $toBoard)
 
 	// Move over the mark_read data. (because it may be read and now not by some!)
 	$SaveAServer = max(0, $modSettings['maxMsgID'] - 50000);
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lmr.id_member, lmr.id_msg, t.id_topic, IFNULL(lt.disregarded, 0) as disregarded
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board
@@ -478,7 +478,7 @@ function moveTopics($topics, $toBoard)
 	$totalUnapprovedPosts = 0;
 	foreach ($fromBoards as $stats)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
 				num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
@@ -499,7 +499,7 @@ function moveTopics($topics, $toBoard)
 		$totalUnapprovedTopics += $stats['unapproved_topics'];
 		$totalUnapprovedPosts += $stats['unapproved_posts'];
 	}
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
 			num_topics = num_topics + {int:total_topics},
@@ -519,7 +519,7 @@ function moveTopics($topics, $toBoard)
 	);
 
 	// Move the topic.  Done.  :P
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET id_board = {int:id_board}' . ($isRecycleDest ? ',
 			unapproved_posts = {int:no_unapproved}, approved = {int:is_approved}' : '') . '
@@ -535,7 +535,7 @@ function moveTopics($topics, $toBoard)
 	// If this was going to the recycle bin, check what messages are being recycled, and remove them from the queue.
 	if ($isRecycleDest && ($totalUnapprovedTopics || $totalUnapprovedPosts))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
@@ -552,7 +552,7 @@ function moveTopics($topics, $toBoard)
 
 		// Empty the approval queue for these, as we're going to approve them next.
 		if (!empty($approval_msgs))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}approval_queue
 				WHERE id_msg IN ({array_int:message_list})
 					AND id_attach = {int:id_attach}',
@@ -563,7 +563,7 @@ function moveTopics($topics, $toBoard)
 			);
 
 		// Get all the current max and mins.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, id_first_msg, id_last_msg
 			FROM {db_prefix}topics
 			WHERE id_topic IN ({array_int:topics})',
@@ -582,7 +582,7 @@ function moveTopics($topics, $toBoard)
 		$smcFunc['db_free_result']($request);
 
 		// Check the MAX and MIN are correct.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
@@ -595,7 +595,7 @@ function moveTopics($topics, $toBoard)
 		{
 			// If not, update.
 			if ($row['first_msg'] != $topicMaxMin[$row['id_topic']]['min'] || $row['last_msg'] != $topicMaxMin[$row['id_topic']]['max'])
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}topics
 					SET id_first_msg = {int:first_msg}, id_last_msg = {int:last_msg}
 					WHERE id_topic = {int:selected_topic}',
@@ -609,7 +609,7 @@ function moveTopics($topics, $toBoard)
 		$smcFunc['db_free_result']($request);
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_board = {int:id_board}' . ($isRecycleDest ? ',approved = {int:is_approved}' : '') . '
 		WHERE id_topic IN ({array_int:topics})',
@@ -619,7 +619,7 @@ function moveTopics($topics, $toBoard)
 			'is_approved' => 1,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_board = {int:id_board}
 		WHERE id_topic IN ({array_int:topics})',
@@ -628,7 +628,7 @@ function moveTopics($topics, $toBoard)
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}calendar
 		SET id_board = {int:id_board}
 		WHERE id_topic IN ({array_int:topics})',
@@ -639,7 +639,7 @@ function moveTopics($topics, $toBoard)
 	);
 
 	// Mark target board as seen, if it was already marked as seen before.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT (IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS isSeen
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -701,7 +701,7 @@ function moveTopicConcurrence()
 		return true;
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT m.subject, b.name
 			FROM {db_prefix}topics as t
 				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
@@ -732,7 +732,7 @@ function increaseViewCounter($id_topic)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET num_views = num_views + 1
 		WHERE id_topic = {int:current_topic}',
@@ -781,7 +781,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 	$db = database();
 
 	// Check for notifications on this topic OR board.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT sent, id_topic
 		FROM {db_prefix}log_notify
 		WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
@@ -803,7 +803,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 		// Only do this once, but mark the notifications as "not sent yet" for next time.
 		if (!empty($row['sent']))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_notify
 				SET sent = {int:is_not_sent}
 				WHERE (id_topic = {int:current_topic} OR id_board = {int:current_board})
@@ -833,7 +833,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = {int:current_board} AND lb.id_member = {int:current_member})
@@ -869,7 +869,7 @@ function hasTopicNotification($id_member, $id_topic)
 	$db = database();
 
 	// Find out if they have notification set for this topic already.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}log_notify
 		WHERE id_member = {int:current_member}
@@ -912,7 +912,7 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 	else
 	{
 		// Just turn notifications off.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_member = {int:current_member}
 				AND id_topic = {int:current_topic}',
@@ -971,7 +971,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t2.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}topics AS t2 ON (' .
@@ -1008,7 +1008,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		$smcFunc['db_free_result']($request);
 
 		// Roll over - if we're going prev, get the last - otherwise the first.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE id_board = {int:current_board}' .
@@ -1097,7 +1097,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	$logs_table = !empty($full) && $full === 'all';
 
 	// Create the query, taking full and integration in to account
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
 			t.id_member_started, t.id_member_updated, t.id_poll,
@@ -1182,7 +1182,7 @@ function removeOldTopics()
 	}
 
 	// All we're gonna do here is grab the id_topic's and send them to removeTopics().
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_last_msg)
@@ -1216,7 +1216,7 @@ function topicsStartedBy($memberID)
 	$db = database();
 
 	// Fetch all topics started by this user.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_topic
 		FROM {db_prefix}topics AS t
 		WHERE t.id_member_started = {int:selected_member}',
@@ -1244,7 +1244,7 @@ function messagesAfter($topic, $message)
 	$db = database();
 
 	// Fetch the message IDs of the topic that are at or after the message.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}
@@ -1279,7 +1279,7 @@ function messageInfo($topic, $message, $topic_approved = false)
 	// @todo isn't this a duplicate?
 
 	// Retrieve a few info on the specific message.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_member, m.subject,' . ($topic_approved ? ' t.approved,' : 'm.approved,') . '
 			t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started
 		FROM {db_prefix}messages AS m
@@ -1316,8 +1316,13 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 	$db = database();
 
 	// Get the messages and stick them into an array.
+<<<<<<< HEAD
 	$request = $smcFunc['db_query']('', '
 		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled, m.id_member
+=======
+	$request = $db->query('', '
+		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled
+>>>>>>> $smcFunc['db_query'] => $db->query
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
@@ -1380,7 +1385,7 @@ function unapprovedPosts($id_topic, $id_member)
 	if (empty($id_member))
 		return array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 			SELECT COUNT(id_member) AS my_unapproved_posts
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:current_topic}
@@ -1410,7 +1415,7 @@ function updateSplitTopics($options, $id_board)
 	$db = database();
 
 	// Any associated reported posts better follow...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_topic = {int:id_topic}
 		WHERE id_msg IN ({array_int:split_msgs})',
@@ -1421,7 +1426,7 @@ function updateSplitTopics($options, $id_board)
 	);
 
 	// Mess with the old topic's first, last, and number of messages.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			num_replies = {int:num_replies},
@@ -1443,7 +1448,7 @@ function updateSplitTopics($options, $id_board)
 	);
 
 	// Now, put the first/last message back to what they should be.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			id_first_msg = {int:id_first_msg},
@@ -1459,7 +1464,7 @@ function updateSplitTopics($options, $id_board)
 	// If the new topic isn't approved ensure the first message flags
 	// this just in case.
 	if (!$split2_approved)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET approved = {int:approved}
 			WHERE id_msg = {int:id_msg}
@@ -1472,7 +1477,7 @@ function updateSplitTopics($options, $id_board)
 		);
 
 	// The board has more topics now (Or more unapproved ones!).
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($options['split2_approved'] ? '
 			num_topics = num_topics + 1' : '
@@ -1491,7 +1496,7 @@ function topicStarter($topic)
 	$db = database();
 
 	// Find out who started the topic - in case User Topic Locking is enabled.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member_started, locked
 		FROM {db_prefix}topics
 		WHERE id_topic = {int:current_topic}
@@ -1523,7 +1528,7 @@ function setTopicAttribute($topic, $attributes)
 
 	if (isset($attributes['locked']))
 		// Lock the topic in the database with the new value.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET locked = {int:locked}
 			WHERE id_topic = {int:current_topic}',
@@ -1534,7 +1539,7 @@ function setTopicAttribute($topic, $attributes)
 		);
 	if (isset($attributes['sticky']))
 		// Toggle the sticky value... pretty simple ;).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET is_sticky = {int:is_sticky}
 			WHERE id_topic = {int:current_topic}',
@@ -1558,7 +1563,7 @@ function toggleTopicSticky($topics)
 
 	$topics = is_array($topics) ? $topics : array($topics);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET is_sticky = CASE WHEN is_sticky = 1 THEN 0 ELSE 1 END
 		WHERE id_topic IN ({array_int:sticky_topic_ids})',
@@ -1585,7 +1590,7 @@ function getLoggedTopics($member, $topics)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_topic, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})

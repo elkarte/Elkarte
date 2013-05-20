@@ -154,7 +154,7 @@ function action_plushsearch1()
 			'href' => $scripturl . '?topic=' . $context['search_params']['topic'] . '.0',
 		);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT ms.subject
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -356,7 +356,7 @@ function action_plushsearch2()
 
 	if (!empty($search_params['minage']) || !empty($search_params['maxage']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT ' . (empty($search_params['maxage']) ? '0, ' : 'IFNULL(MIN(id_msg), -1), ') . (empty($search_params['minage']) ? '0' : 'IFNULL(MAX(id_msg), -1)') . '
 			FROM {db_prefix}messages
 			WHERE 1=1' . ($modSettings['postmod_active'] ? '
@@ -409,7 +409,7 @@ function action_plushsearch2()
 			);
 
 		// Retrieve a list of possible members.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE {raw:match_possible_users}',
@@ -463,7 +463,7 @@ function action_plushsearch2()
 	// Special case for boards: searching just one topic?
 	if (!empty($search_params['topic']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT b.id_board
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -503,7 +503,7 @@ function action_plushsearch2()
 			$search_params['brd'][$k] = (int) $v;
 
 		// If we've selected all boards, this parameter can be left empty.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}boards
 			WHERE redirect = {string:empty_string}',
@@ -1690,7 +1690,7 @@ function action_plushsearch2()
 		$msg_list = array_keys($context['topics']);
 
 		// Load the posters...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_member != {int:no_member}
@@ -1712,7 +1712,7 @@ function action_plushsearch2()
 			loadMemberData(array_unique($posters));
 
 		// Get the messages out for the callback - select enough that it can be made to look just like Display.
-		$messages_request = $smcFunc['db_query']('', '
+		$messages_request = $db->query('', '
 			SELECT
 				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time, m.id_member,
 				m.icon, m.poster_ip, m.body, m.smileys_enabled, m.modified_time, m.modified_name,
@@ -1749,7 +1749,7 @@ function action_plushsearch2()
 		// If we want to know who participated in what then load this now.
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT id_topic
 				FROM {db_prefix}messages
 				WHERE id_topic IN ({array_int:topic_list})
@@ -1959,7 +1959,7 @@ function MessageSearch2()
 		}
 
 		// Who matches those criteria?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE real_name LIKE {raw:real_name_implode}',
@@ -2180,7 +2180,7 @@ function MessageSearch2()
 	}
 
 	// Get the amount of results.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}pm_recipients AS pmr
 			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
@@ -2200,7 +2200,7 @@ function MessageSearch2()
 	$smcFunc['db_free_result']($request);
 
 	// Get all the matching messages... using standard search only (No caching and the like!)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
 		FROM {db_prefix}pm_recipients AS pmr
 			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
@@ -2232,7 +2232,7 @@ function MessageSearch2()
 	// Find the real head pms!
 	if ($context['display_mode'] == 2 && !empty($head_pms))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 			FROM {db_prefix}personal_messages AS pm
 				INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
@@ -2269,7 +2269,7 @@ function MessageSearch2()
 	if (!empty($foundMessages))
 	{
 		// Now get recipients (but don't include bcc-recipients for your inbox, you're not supposed to know :P!)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				pmr.id_pm, mem_to.id_member AS id_member_to, mem_to.real_name AS to_name,
 				pmr.bcc, pmr.labels, pmr.is_read
@@ -2304,7 +2304,7 @@ function MessageSearch2()
 		}
 
 		// Prepare the query for the callback!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT pm.id_pm, pm.subject, pm.id_member_from, pm.body, pm.msgtime, pm.from_name
 			FROM {db_prefix}personal_messages AS pm
 			WHERE pm.id_pm IN ({array_int:message_list})

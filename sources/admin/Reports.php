@@ -152,7 +152,7 @@ class Reports_Controller
 		loadPermissionProfiles();
 
 		// Get every moderator.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mods.id_board, mods.id_member, mem.real_name
 			FROM {db_prefix}moderators AS mods
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)',
@@ -165,7 +165,7 @@ class Reports_Controller
 		$smcFunc['db_free_result']($request);
 
 		// Get all the possible membergroups!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, group_name, online_color
 			FROM {db_prefix}membergroups',
 			array(
@@ -196,7 +196,7 @@ class Reports_Controller
 		setKeys('cols');
 
 		// Go through each board!
-		$request = $smcFunc['db_query']('order_by_board_order', '
+		$request = $db->query('order_by_board_order', '
 			SELECT b.id_board, b.name, b.num_posts, b.num_topics, b.count_posts, b.member_groups, b.override_theme, b.id_profile, b.deny_member_groups,
 				c.name AS cat_name, IFNULL(par.name, {string:text_none}) AS parent_name, IFNULL(th.value, {string:text_none}) AS theme_name
 			FROM {db_prefix}boards AS b
@@ -310,7 +310,7 @@ class Reports_Controller
 			$profiles[] = $row['id_profile'];
 
 		// Get all the possible membergroups, except admin!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, group_name
 			FROM {db_prefix}membergroups
 			WHERE ' . $group_clause . '
@@ -338,7 +338,7 @@ class Reports_Controller
 		// Cache every permission setting, to make sure we don't miss any allows.
 		$permissions = array();
 		$board_permissions = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_profile, id_group, add_deny, permission
 			FROM {db_prefix}board_permissions
 			WHERE id_profile IN ({array_int:profile_list})
@@ -444,7 +444,7 @@ class Reports_Controller
 		$db = database();
 
 		// Fetch all the board names.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board, name, member_groups, id_profile, deny_member_groups
 			FROM {db_prefix}boards',
 			array(
@@ -497,7 +497,7 @@ class Reports_Controller
 		addData($mgSettings);
 
 		// Now start cycling the membergroups!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mg.id_group, mg.group_name, mg.online_color, mg.min_posts, mg.max_messages, mg.icons,
 				CASE WHEN bp.permission IS NOT NULL OR mg.id_group = {int:admin_group} THEN 1 ELSE 0 END AS can_moderate
 			FROM {db_prefix}membergroups AS mg
@@ -582,7 +582,7 @@ class Reports_Controller
 			$clause = 'id_group != {int:moderator_group}';
 
 		// Get all the possible membergroups, except admin!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, group_name
 			FROM {db_prefix}membergroups
 			WHERE ' . $clause . '
@@ -618,7 +618,7 @@ class Reports_Controller
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, add_deny, permission
 			FROM {db_prefix}permissions
 			WHERE ' . $clause . (empty($modSettings['permission_enable_deny']) ? '
@@ -676,7 +676,7 @@ class Reports_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Fetch all the board names.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board, name
 			FROM {db_prefix}boards',
 			array(
@@ -688,7 +688,7 @@ class Reports_Controller
 		$smcFunc['db_free_result']($request);
 
 		// Get every moderator.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mods.id_board, mods.id_member
 			FROM {db_prefix}moderators AS mods',
 			array(
@@ -717,7 +717,7 @@ class Reports_Controller
 			fatal_lang_error('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, group_name, online_color
 			FROM {db_prefix}membergroups',
 			array(

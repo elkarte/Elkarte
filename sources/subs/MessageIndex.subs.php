@@ -85,7 +85,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['blank_redirect'] = '';
 	}
 
-	$request = $smcFunc['db_query']('messageindex_fetch_boards', '
+	$request = $db->query('messageindex_fetch_boards', '
 		SELECT c.name AS cat_name, c.id_cat, b.id_board, b.name AS board_name, b.child_level' . $select . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($where) ? '' : '

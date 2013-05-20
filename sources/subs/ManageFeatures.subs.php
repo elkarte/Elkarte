@@ -37,7 +37,7 @@ function getSignatureFromMembers($start_member)
 
 	$members = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, signature
 		FROM {db_prefix}members
 		WHERE id_member BETWEEN ' . $start_member . ' AND ' . $start_member . ' + 49
@@ -68,7 +68,7 @@ function updateSignature($id_member, $signature)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET signature = {string:signature}
 		WHERE id_member = {int:id_member}',
@@ -114,7 +114,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	else
 	{
 		// Load all the fields.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}
@@ -142,7 +142,7 @@ function list_getProfileFieldSize()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}custom_fields',
 		array(
@@ -169,7 +169,7 @@ function getProfileField($id_field)
 
 	$field = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
@@ -238,7 +238,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 	// @todo This may not be the most efficient way to do this.
 	for ($i = 0; !$unique && $i < 9; $i ++)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_field
 			FROM {db_prefix}custom_fields
 			WHERE col_name = {string:current_column}',
@@ -270,7 +270,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}themes
 		SET value = {string:new_value}
 		WHERE variable = {string:current_column}
@@ -296,7 +296,7 @@ function updateProfileField($field_data)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET
 			field_name = {string:field_name}, field_desc = {string:field_desc},
@@ -343,7 +343,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
@@ -397,7 +397,7 @@ function reOrderProfileFields()
 
 	$db = database();
 
-	$smcFunc['db_query']('alter_table_boards', '
+	$db->query('alter_table_boards', '
 		ALTER TABLE {db_prefix}custom_fields
 		ORDER BY field_name',
 		array(
@@ -418,7 +418,7 @@ function deleteProfileFieldUserData($name)
 	$db = database();
 
 	// Delete the user data first.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
@@ -440,7 +440,7 @@ function deleteProfileField($id)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
@@ -458,7 +458,7 @@ function updateDisplayCache()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_type, bbc, enclose, placement
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}

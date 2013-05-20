@@ -25,7 +25,7 @@ function installedThemes()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
@@ -65,7 +65,7 @@ function themeDirectory($id_theme)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_dir}
@@ -93,7 +93,7 @@ function themeUrl($id_theme)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_url}
@@ -124,7 +124,7 @@ function validateThemeName($indexes, $value_data)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -163,7 +163,7 @@ function getBasicThemeInfos($themes)
 
 	$themelist = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -193,7 +193,7 @@ function getCustomThemes()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
@@ -240,7 +240,7 @@ function getThemesPathbyID($theme_list = array())
 		$theme_list = array($theme_list);
 
 	// Load up any themes we need the paths for
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
@@ -273,7 +273,7 @@ function loadThemes($knownThemes)
 	$db = database();
 
 	// Load up all the themes.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}

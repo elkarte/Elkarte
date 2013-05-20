@@ -155,7 +155,7 @@ function action_summary()
 		}
 
 		// So... are they banned?  Dying to know!
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT bg.id_ban_group, bg.name, bg.cannot_access, bg.cannot_post, bg.cannot_register,
 				bg.cannot_login, bg.reason
 			FROM {db_prefix}ban_items AS bi
@@ -345,7 +345,7 @@ function action_showPosts()
 		$_REQUEST['viewscount'] = '10';
 
 	if ($context['is_topics'])
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}topics AS t' . ($user_info['query_see_board'] == '1=1' ? '' : '
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
@@ -359,7 +359,7 @@ function action_showPosts()
 			)
 		);
 	else
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
@@ -375,7 +375,7 @@ function action_showPosts()
 	list ($msgCount) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MIN(id_msg), MAX(id_msg)
 		FROM {db_prefix}messages AS m
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
@@ -427,7 +427,7 @@ function action_showPosts()
 	{
 		if ($context['is_topics'])
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					b.id_board, b.name AS bname, c.id_cat, c.name AS cname, t.id_member_started, t.id_first_msg, t.id_last_msg,
 					t.approved, m.body, m.smileys_enabled, m.subject, m.poster_time, m.id_topic, m.id_msg
@@ -451,7 +451,7 @@ function action_showPosts()
 		}
 		else
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					b.id_board, b.name AS bname, c.id_cat, c.name AS cname, m.id_topic, m.id_msg,
 					t.id_member_started, t.id_first_msg, t.id_last_msg, m.body, m.smileys_enabled,
@@ -720,7 +720,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 	$db = database();
 
 	// Retrieve some attachments.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
 			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
 			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
@@ -787,7 +787,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
 	$db = database();
 
 	// Get the total number of attachments they have posted.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -953,7 +953,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// Get the list of topics we can see
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lt.id_topic
 		FROM {db_prefix}log_topics as lt
 			LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
@@ -981,7 +981,7 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
 	$topicsInfo = array();
 	if (!empty($topics))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
@@ -1013,7 +1013,7 @@ function list_getNumDisregarded($memID)
 	$db = database();
 
 	// Get the total number of attachments they have posted.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_topics as lt
 		LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
@@ -1062,7 +1062,7 @@ function action_statPanel()
 	);
 
 	// Number of topics started.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -1076,7 +1076,7 @@ function action_statPanel()
 	$smcFunc['db_free_result']($result);
 
 	// Number polls started.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -1092,7 +1092,7 @@ function action_statPanel()
 	$smcFunc['db_free_result']($result);
 
 	// Number polls voted in.
-	$result = $smcFunc['db_query']('distinct_poll_votes', '
+	$result = $db->query('distinct_poll_votes', '
 		SELECT COUNT(DISTINCT id_poll)
 		FROM {db_prefix}log_polls
 		WHERE id_member = {int:current_member}',
@@ -1109,7 +1109,7 @@ function action_statPanel()
 	$context['num_votes'] = comma_format($context['num_votes']);
 
 	// Grab the board this member posted in most often.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT
 			b.id_board, MAX(b.name) AS name, MAX(b.num_posts) AS num_posts, COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
@@ -1141,7 +1141,7 @@ function action_statPanel()
 	$smcFunc['db_free_result']($result);
 
 	// Now get the 10 boards this user has most often participated in.
-	$result = $smcFunc['db_query']('profile_board_stats', '
+	$result = $db->query('profile_board_stats', '
 		SELECT
 			b.id_board, MAX(b.name) AS name, b.num_posts, COUNT(*) AS message_count,
 			CASE WHEN COUNT(*) > MAX(b.num_posts) THEN 1 ELSE COUNT(*) / MAX(b.num_posts) END * 100 AS percentage
@@ -1172,7 +1172,7 @@ function action_statPanel()
 	$smcFunc['db_free_result']($result);
 
 	// Posting activity by time.
-	$result = $smcFunc['db_query']('user_activity_by_time', '
+	$result = $db->query('user_activity_by_time', '
 		SELECT
 			HOUR(FROM_UNIXTIME(poster_time + {int:time_offset})) AS hour,
 			COUNT(*) AS post_count
@@ -1272,7 +1272,7 @@ function action_showPermissions()
 	$curGroups[] = $user_profile[$memID]['id_post_group'];
 
 	// Load a list of boards for the jump box - except the defaults.
-	$request = $smcFunc['db_query']('order_by_board_order', '
+	$request = $db->query('order_by_board_order', '
 		SELECT b.id_board, b.name, b.id_profile, b.member_groups, IFNULL(mods.id_member, 0) AS is_mod
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
@@ -1318,7 +1318,7 @@ function action_showPermissions()
 	$denied = array();
 
 	// Get all general permissions.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT p.permission, p.add_deny, mg.group_name, p.id_group
 		FROM {db_prefix}permissions AS p
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = p.id_group)
@@ -1365,7 +1365,7 @@ function action_showPermissions()
 	}
 	$smcFunc['db_free_result']($result);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			bp.add_deny, bp.permission, bp.id_group, mg.group_name' . (empty($board) ? '' : ',
 			b.id_profile, CASE WHEN mods.id_member IS NULL THEN 0 ELSE 1 END AS is_moderator') . '

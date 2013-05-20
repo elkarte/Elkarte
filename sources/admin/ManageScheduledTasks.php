@@ -353,7 +353,7 @@ class ManageScheduledTasks_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$smcFunc['db_query']('truncate_table', '
+			$db->query('truncate_table', '
 				TRUNCATE {db_prefix}log_scheduled_tasks',
 				array(
 				)

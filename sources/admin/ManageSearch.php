@@ -328,7 +328,7 @@ class ManageSearch_Controller
 			validateToken('admin-msm', 'get');
 
 			// Make sure it's gone before creating it.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				DROP INDEX body',
 				array(
@@ -336,7 +336,7 @@ class ManageSearch_Controller
 				)
 			);
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				ADD FULLTEXT body (body)',
 				array(
@@ -350,7 +350,7 @@ class ManageSearch_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {db_prefix}messages
 				DROP INDEX ' . implode(',
 				DROP INDEX ', $context['fulltext_index']),
@@ -416,7 +416,7 @@ class ManageSearch_Controller
 		if ($db_type == 'mysql')
 		{
 			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					FROM {string:database_name}
 					LIKE {string:table_name}',
@@ -426,7 +426,7 @@ class ManageSearch_Controller
 					)
 				);
 			else
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					LIKE {string:table_name}',
 					array(
@@ -445,7 +445,7 @@ class ManageSearch_Controller
 
 			// Now check the custom index table, if it exists at all.
 			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					FROM {string:database_name}
 					LIKE {string:table_name}',
@@ -455,7 +455,7 @@ class ManageSearch_Controller
 					)
 				);
 			else
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SHOW TABLE STATUS
 					LIKE {string:table_name}',
 					array(
@@ -480,7 +480,7 @@ class ManageSearch_Controller
 					$db->db_optimize_table($table);
 
 			// PostGreSql has some hidden sizes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
 				WHERE relname = {string:messages} OR relname = {string:log_search_words}
 				ORDER BY relpages DESC',
@@ -655,7 +655,7 @@ class ManageSearch_Controller
 				'todo' => 0,
 			);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
 				FROM {db_prefix}messages
 				GROUP BY todo',
@@ -679,7 +679,7 @@ class ManageSearch_Controller
 				while (time() < $stop)
 				{
 					$inserts = array();
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_msg, body
 						FROM {db_prefix}messages
 						WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
@@ -749,7 +749,7 @@ class ManageSearch_Controller
 
 				while (time() < $stop)
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_word, COUNT(id_word) AS num_words
 						FROM {db_prefix}log_search_words
 						WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
@@ -768,7 +768,7 @@ class ManageSearch_Controller
 					updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
 					if (!empty($stop_words))
-						$smcFunc['db_query']('', '
+						$db->query('', '
 							DELETE FROM {db_prefix}log_search_words
 							WHERE id_word in ({array_int:stop_words})',
 							array(
@@ -793,7 +793,7 @@ class ManageSearch_Controller
 			$context['sub_template'] = 'create_index_done';
 
 			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}settings
 				WHERE variable = {string:search_custom_index_resume}',
 				array(
@@ -967,7 +967,7 @@ function detectFulltextIndex()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SHOW INDEX
 		FROM {db_prefix}messages',
 		array(
@@ -986,7 +986,7 @@ function detectFulltextIndex()
 	}
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SHOW TABLE STATUS
 			FROM {string:database_name}
 			LIKE {string:table_name}',
@@ -996,7 +996,7 @@ function detectFulltextIndex()
 			)
 		);
 	else
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			array(

@@ -67,7 +67,7 @@ function modify_pm_draft($draft, $recipientList)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}user_drafts
 		SET id_reply = {int:id_reply},
 			type = {int:type},
@@ -154,7 +154,7 @@ function modify_post_draft($draft)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}user_drafts
 		SET
 			id_topic = {int:id_topic},
@@ -200,7 +200,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 	$db = database();
 
 	// load in a draft from the DB
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT *
 		FROM {db_prefix}user_drafts
 		WHERE id_draft = {int:id_draft}' . ($check ? '
@@ -249,7 +249,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 
 	// load the drafts that the user has available for the given type & action
 	$user_drafts = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
 		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
@@ -299,7 +299,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 	if (empty($id_draft))
 		return false;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 			DELETE FROM {db_prefix}user_drafts
 			WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
 				AND  id_member = {int:id_member}' : ''),
@@ -324,7 +324,7 @@ function draftsCount($member_id, $draft_type)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(id_draft)
 		FROM {db_prefix}user_drafts
 		WHERE id_member = {int:id_member}
@@ -389,7 +389,7 @@ function getOldDrafts($days)
 	$drafts = array();
 
 	// Find all of the old drafts
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',

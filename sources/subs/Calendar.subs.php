@@ -40,7 +40,7 @@ function getBirthdayRange($low_date, $high_date)
 	$year_high = (int) substr($high_date, 0, 4);
 
 	// Collect all of the birthdays for this month.  I know, it's a painful query.
-	$result = $smcFunc['db_query']('birthday_array', '
+	$result = $db->query('birthday_array', '
 		SELECT id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
 		FROM {db_prefix}members
 		WHERE YEAR(birthdate) != {string:year_one}
@@ -113,7 +113,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 	$high_date_time = mktime(0, 0, 0, $high_date_time[1], $high_date_time[2], $high_date_time[0]);
 
 	// Find all the calendar info...
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT
 			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
 			cal.id_board, b.member_groups, t.id_first_msg, t.approved, b.id_board
@@ -222,7 +222,7 @@ function getHolidayRange($low_date, $high_date)
 		$allyear_part = 'event_date BETWEEN {date:all_year_low} AND {date:all_year_high}';
 
 	// Find some holidays... ;).
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT event_date, YEAR(event_date) AS year, title
 		FROM {db_prefix}calendar_holidays
 		WHERE event_date BETWEEN {date:low_date} AND {date:high_date}
@@ -277,7 +277,7 @@ function canLinkEvent()
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
 	{
 		// Not admin or a moderator of this board. You better be the owner - or else.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT id_member_started
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
@@ -816,7 +816,7 @@ function getEventPoster($event_id)
 	$db = database();
 
 	// A simple database query, how hard can that be?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}calendar
 		WHERE id_event = {int:id_event}
@@ -943,7 +943,7 @@ function modifyEvent($event_id, &$eventOptions)
 	$real_event_id = $event_id;
 	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns, &$event_parameters));
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}calendar
 		SET
 			' . implode(', ', $event_columns) . '
@@ -974,7 +974,7 @@ function removeEvent($event_id)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}calendar
 		WHERE id_event = {int:id_event}',
 		array(
@@ -1001,7 +1001,7 @@ function getEventProperties($event_id)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			c.id_event, c.id_board, c.id_topic, MONTH(c.start_date) AS month,
 			DAYOFMONTH(c.start_date) AS day, YEAR(c.start_date) AS year,
@@ -1064,7 +1064,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
@@ -1092,7 +1092,7 @@ function list_getNumHolidays()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}calendar_holidays',
 		array(
@@ -1115,7 +1115,7 @@ function removeHolidays($holiday_ids)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
 		WHERE id_holiday IN ({array_int:id_holiday})',
 		array(
@@ -1141,7 +1141,7 @@ function editHoliday($holiday, $date, $title)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}calendar_holidays
 		SET event_date = {date:holiday_date}, title = {string:holiday_title}
 		WHERE id_holiday = {int:selected_holiday}',
@@ -1197,7 +1197,7 @@ function getHoliday($id_holiday)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		WHERE id_holiday = {int:selected_holiday}

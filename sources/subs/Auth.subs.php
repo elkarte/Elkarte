@@ -373,7 +373,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	$real_name = $smcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name';
 
 	// Search by username, display name, and email address.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, hide_email
 		FROM {db_prefix}members
 		WHERE ({raw:member_name_search}
@@ -578,7 +578,7 @@ function rebuildModCache()
 
 	if ($group_query == '0=1')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
@@ -614,7 +614,7 @@ function rebuildModCache()
 	$boards_mod = array();
 	if (!$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}moderators
 			WHERE id_member = {int:current_member}',
@@ -707,7 +707,7 @@ function logOnline($ids, $on = false)
 	if (empty($on))
 	{
 		// set the user(s) out of log_online
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE id_member IN ({array_int:members})',
 			array(
@@ -728,7 +728,7 @@ function deleteOnline($session)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE session = {string:session}',
 		array(
@@ -764,7 +764,7 @@ function findUser($where, $whereparams)
 	$db = database();
 
 	// Find the user!
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 		FROM {db_prefix}members
 		WHERE ' . $where . '
@@ -778,7 +778,7 @@ function findUser($where, $whereparams)
 	{
 		$smcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
@@ -807,7 +807,7 @@ function generateValidationCode()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('get_random_number', '
+	$request = $db->query('get_random_number', '
 		SELECT RAND()',
 		array(
 		)
@@ -834,7 +834,7 @@ function loadExistingMember($name)
 	$db = database();
 
 	// Try to find the user, assuming a member_name was passed...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			openid_uri, passwd_flood
 		FROM {db_prefix}members
@@ -849,7 +849,7 @@ function loadExistingMember($name)
 	{
 		$smcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
 			passwd_flood
 			FROM {db_prefix}members

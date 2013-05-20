@@ -27,7 +27,7 @@ function fetchPackageServers($server = null)
 	$servers = array();
 
 	// Load the list of servers.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_server, name, url
 		FROM {db_prefix}package_servers' .
 		(!empty($server) ? 'WHERE id_server = {int:current_server}' : ''),
@@ -60,7 +60,7 @@ function deletePackageServer($id)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}package_servers
 		WHERE id_server = {int:current_server}',
 		array(

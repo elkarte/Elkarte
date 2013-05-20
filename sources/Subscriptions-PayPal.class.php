@@ -342,7 +342,7 @@ class paypal_payment
 		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
 		{
 			$_POST['subscr_id'] = $_POST['subscr_id'];
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_subscribed
 				SET vendor_ref = {string:vendor_ref}
 				WHERE id_sublog = {int:current_subscription}',
@@ -372,7 +372,7 @@ class paypal_payment
 			return false;
 
 		// Do we have this in the database?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, id_subscribe
 			FROM {db_prefix}log_subscribed
 			WHERE vendor_ref = {string:vendor_ref}
@@ -388,7 +388,7 @@ class paypal_payment
 			if (!empty($_POST['payer_email']))
 			{
 				$smcFunc['db_free_result']($request);
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT ls.id_member, ls.id_subscribe
 					FROM {db_prefix}log_subscribed AS ls
 						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)

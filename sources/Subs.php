@@ -71,7 +71,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// Update the latest activated member (highest id_member) and count.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT COUNT(*), MAX(id_member)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:is_activated}',
@@ -91,7 +91,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
 			{
 				// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}members
 					WHERE is_activated IN ({array_int:activation_status})',
@@ -113,7 +113,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// SUM and MAX on a smaller table is better for InnoDB tables.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
 				FROM {db_prefix}boards
 				WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -135,7 +135,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 	case 'subject':
 		// Remove the previous subject (if any).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic = {int:id_topic}',
 			array(
@@ -170,7 +170,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		{
 			// Get the number of topics - a SUM is better for InnoDB tables.
 			// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_topics + unapproved_topics) AS total_topics
 				FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				WHERE id_board != {int:recycle_board}' : ''),
@@ -194,7 +194,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		if ($postgroups === null || $parameter1 === null)
 		{
 			// Fetch the postgroups!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_group, min_posts
 				FROM {db_prefix}membergroups
 				WHERE min_posts != {int:min_posts}',
@@ -228,7 +228,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		}
 
 		// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET id_post_group = CASE ' . $conditions . '
 					ELSE 0
@@ -325,7 +325,7 @@ function updateMemberData($members, $data)
 			else
 			{
 				$member_names = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
@@ -375,7 +375,7 @@ function updateMemberData($members, $data)
 		$parameters['p_' . $var] = $val;
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET' . substr($setString, 0, -1) . '
 		WHERE ' . $condition,
@@ -432,7 +432,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	{
 		foreach ($changeArray as $variable => $value)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
@@ -2505,7 +2505,7 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT code, filename, description
 					FROM {db_prefix}smileys',
 					array(
@@ -3351,7 +3351,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// @todo: Locate all places that don't call a hash and fix that.
 	if ($file_hash === '')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT file_hash
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -4055,7 +4055,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 	// Is it going to be permanent?
 	if ($permanent)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
@@ -4109,7 +4109,7 @@ function remove_integration_function($hook, $function, $file = '')
 	$integration_call = (!empty($file)) ? $function . ':' . $file : $function;
 
 	// Get the permanent functions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {string:variable}',

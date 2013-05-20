@@ -170,7 +170,7 @@ function action_trackactivity($memID)
 	// If this is a big forum, or a large posting user, let's limit the search.
 	if ($modSettings['totalMessages'] > 50000 && $user_profile[$memID]['posts'] > 500)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT MAX(id_msg)
 			FROM {db_prefix}messages AS m
 			WHERE m.id_member = {int:current_member}',
@@ -193,7 +193,7 @@ function action_trackactivity($memID)
 
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}
@@ -215,7 +215,7 @@ function action_trackactivity($memID)
 	$smcFunc['db_free_result']($request);
 
 	// Now also get the IP addresses from the error messages.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS error_count, ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_member}
@@ -238,7 +238,7 @@ function action_trackactivity($memID)
 	if (!empty($ips))
 	{
 		// Get member ID's which are in messages...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -265,7 +265,7 @@ function action_trackactivity($memID)
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		}
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE id_member != {int:current_member}
@@ -296,7 +296,7 @@ function list_getUserErrorCount($where, $where_vars = array())
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS error_count
 		FROM {db_prefix}log_errors
 		WHERE ' . $where,
@@ -326,7 +326,7 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
 	$db = database();
 
 	// Get a list of error messages from this ip (range).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			le.log_time, le.ip, le.url, le.message, IFNULL(mem.id_member, 0) AS id_member,
 			IFNULL(mem.real_name, {string:guest_title}) AS display_name, mem.member_name
@@ -367,7 +367,7 @@ function list_getIPMessageCount($where, $where_vars = array())
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -399,7 +399,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 
 	// Get all the messages fitting this where clause.
 	// @todo SLOW This query is using a filesort.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_msg, m.poster_ip, IFNULL(mem.real_name, m.poster_name) AS display_name, mem.id_member,
 			m.subject, m.poster_time, m.id_topic, m.id_board
@@ -477,7 +477,7 @@ function action_trackip($memID = 0)
 	if (empty($context['history_area']))
 		$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name AS display_name, member_ip
 		FROM {db_prefix}members
 		WHERE member_ip ' . $ip_string,
@@ -817,7 +817,7 @@ function list_getLoginCount($where, $where_vars = array())
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
 		WHERE id_member = {int:id_member}',
@@ -848,7 +848,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT time, ip, ip2
 		FROM {db_prefix}member_logins
 		WHERE {int:id_member}
@@ -883,7 +883,7 @@ function action_trackedits($memID)
 	require_once(SUBSDIR . '/List.subs.php');
 
 	// Get the names of any custom fields.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, bbc
 		FROM {db_prefix}custom_fields',
 		array(
@@ -984,7 +984,7 @@ function list_getProfileEditCount($memID)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS edit_count
 		FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
@@ -1017,7 +1017,7 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// Get a list of error messages from this ip (range).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_action, id_member, ip, log_time, action, extra
 		FROM {db_prefix}log_actions

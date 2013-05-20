@@ -48,7 +48,7 @@ function getBoardIndex($boardIndexOptions)
 		);
 
 	// Find all boards and categories, as well as related information.  This will be sorted by the natural order of boards and categories, which we control.
-	$result_boards = $smcFunc['db_query']('boardindex_fetch_boards', '
+	$result_boards = $db->query('boardindex_fetch_boards', '
 		SELECT' . ($boardIndexOptions['include_categories'] ? '
 			c.id_cat, c.name AS cat_name,' : '') . '
 			b.id_board, b.name AS board_name, b.description,

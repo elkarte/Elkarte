@@ -42,7 +42,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 	if (empty($id_msg))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
@@ -98,7 +98,7 @@ function getMessageInfo($id_msg, $override_permissions = false)
 	if (empty($id_msg))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_member, m.id_topic, m.id_board,
 			m.body, m.subject,
@@ -210,7 +210,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (empty($message) || !is_numeric($message))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_member, m.icon, m.poster_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
 			m.approved, t.id_topic, t.id_first_msg, t.id_last_msg, t.num_replies, t.id_board,
@@ -298,7 +298,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 
 	// Close any moderation reports for this message.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET closed = {int:is_closed}
 		WHERE id_msg = {int:id_msg}',
@@ -360,7 +360,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if ($row['id_last_msg'] == $message)
 	{
 		// Find the last message, set it, and decrease the post count.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, id_member
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:id_topic}
@@ -375,7 +375,7 @@ function removeMessage($message, $decreasePostCount = true)
 		$row2 = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_last_msg = {int:id_last_msg},
@@ -394,7 +394,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 	// Only decrease post counts.
 	else
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET ' . ($row['approved'] ? '
 				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : '
@@ -415,7 +415,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (!empty($modSettings['recycle_enable']) && $row['id_board'] != $modSettings['recycle_board'] && $row['icon'] != 'recycled')
 	{
 		// Check if the recycle board exists and if so get the read status.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT (IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS is_seen, id_last_msg
 			FROM {db_prefix}boards AS b
 				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -431,7 +431,7 @@ function removeMessage($message, $decreasePostCount = true)
 		$smcFunc['db_free_result']($request);
 
 		// Is there an existing topic in the recycle board to group this post with?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, id_first_msg, id_last_msg
 			FROM {db_prefix}topics
 			WHERE id_previous_topic = {int:id_previous_topic}
@@ -465,7 +465,7 @@ function removeMessage($message, $decreasePostCount = true)
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}messages
 				SET
 					id_topic = {int:id_topic},
@@ -483,7 +483,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 			// Take any reported posts with us...
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_reported
 				SET
 					id_topic = {int:id_topic},
@@ -513,7 +513,7 @@ function removeMessage($message, $decreasePostCount = true)
 				);
 
 			// Add one topic and post to the recycle bin board.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_topics = num_topics + {int:num_topics_inc},
@@ -529,7 +529,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Lets increase the num_replies, and the first/last message ID as appropriate.
 			if (!empty($id_recycle_topic))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}topics
 					SET num_replies = num_replies + 1' .
 						($message > $last_topic_msg ? ', id_last_msg = {int:id_merged_msg}' : '') .
@@ -550,7 +550,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 		// If it wasn't approved don't keep it in the queue.
 		if (!$row['approved'])
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}approval_queue
 				WHERE id_msg = {int:id_msg}
 					AND id_attach = {int:id_attach}',
@@ -561,7 +561,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($row['approved'] ? '
 			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
@@ -583,7 +583,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (!$recycle)
 	{
 		// Remove the message!
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}messages
 			WHERE id_msg = {int:id_msg}',
 			array(
@@ -596,7 +596,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
 			$words = text2words($row['body'], $customIndexSettings['bytes_per_word'], true);
 			if (!empty($words))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_word IN ({array_int:word_list})
 						AND id_msg = {int:id_msg}',
@@ -620,7 +620,7 @@ function removeMessage($message, $decreasePostCount = true)
 		// If it is an entire topic
 		if ($row['id_first_msg'] == $message)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}follow_ups
 				WHERE follow_ups IN ({array_int:topics})',
 				array(
@@ -670,7 +670,7 @@ function associatedTopic($msg_id, $topicID = null)
 
 	if ($topicID === null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic
 			FROM {db_prefix}messages
 			WHERE id_msg = {int:msg}',
@@ -687,7 +687,7 @@ function associatedTopic($msg_id, $topicID = null)
 	}
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_topic = {int:topic}
 			WHERE id_msg = {int:msg}',

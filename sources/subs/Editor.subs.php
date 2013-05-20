@@ -110,7 +110,7 @@ function getMessageIcons($board_id)
 	{
 		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
 		{
-			$request = $smcFunc['db_query']('select_message_icons', '
+			$request = $db->query('select_message_icons', '
 				SELECT title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})',
@@ -599,7 +599,7 @@ function create_control_richedit($editorOptions)
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
@@ -1237,7 +1237,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_question, language
 				FROM {db_prefix}antispam_questions',
 				array()
@@ -1271,7 +1271,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		// Load any question and answers!
 		$question_answers = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
 			WHERE ' . $available_filters[$filter['type']]),
@@ -1299,7 +1299,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		$db = database();
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}antispam_questions
 			WHERE id_question = {int:id}',
 			array(
@@ -1314,7 +1314,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			UPDATE {db_prefix}antispam_questions
 			SET
 				question = {string:question},
@@ -1510,7 +1510,7 @@ function html_to_bbc($text)
 
 			if (!empty($names))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT code, filename
 					FROM {db_prefix}smileys
 					WHERE filename IN ({array_string:smiley_filenames})',

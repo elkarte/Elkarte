@@ -513,7 +513,7 @@ class Database_PostgreSQL implements Database
 			$connection = $db_connection;
 
 		// Try get the last ID for the auto increment field.
-		$request = $smcFunc['db_query']('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
+		$request = $db->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array(
 			)
 		);
@@ -768,7 +768,7 @@ class Database_PostgreSQL implements Database
 			{
 				foreach ($data as $k => $entry)
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM ' . $table .
 						' WHERE ' . $where,
 						$entry, $connection
@@ -801,7 +801,7 @@ class Database_PostgreSQL implements Database
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
 					VALUES
 						' . $entry,
@@ -956,7 +956,7 @@ class Database_PostgreSQL implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $start . ', ' . $limit,
@@ -1033,7 +1033,7 @@ class Database_PostgreSQL implements Database
 		$seq_create = '';
 
 		// Find all the fields.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = {string:table}
@@ -1063,7 +1063,7 @@ class Database_PostgreSQL implements Database
 				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)
 				{
 					// Get to find the next variable first!
-					$count_req = $smcFunc['db_query']('', '
+					$count_req = $db->query('', '
 						SELECT MAX("{raw:column}")
 						FROM {raw:table}',
 						array(
@@ -1085,7 +1085,7 @@ class Database_PostgreSQL implements Database
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
 			FROM pg_class AS c
 				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
@@ -1130,7 +1130,7 @@ class Database_PostgreSQL implements Database
 
 		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT tablename
 			FROM pg_tables
 			WHERE schemaname = {string:schema_public}' . ($filter == false ? '' : '
@@ -1164,7 +1164,7 @@ class Database_PostgreSQL implements Database
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 				VACUUM ANALYZE {raw:table}',
 				array(
 					'table' => $table,
@@ -1200,7 +1200,7 @@ class Database_PostgreSQL implements Database
 		// Do we need to drop it first?
 		$tables = $this->db_list_tables(false, $backup_table);
 		if (!empty($tables))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DROP TABLE {raw:backup_table}',
 				array(
 					'backup_table' => $backup_table,
@@ -1208,7 +1208,7 @@ class Database_PostgreSQL implements Database
 			);
 
 		// @todo Should we create backups of sequences as well?
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			CREATE TABLE {raw:backup_table}
 			(
 				LIKE {raw:table}
@@ -1219,7 +1219,7 @@ class Database_PostgreSQL implements Database
 				'table' => $table,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT * FROM {raw:table}',
 			array(

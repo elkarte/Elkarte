@@ -77,7 +77,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		$spiders = unserialize($modSettings['spider_name_cache']);
 
 	// Load the users online right now.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.id_member, lo.log_time, lo.id_spider, mem.real_name, mem.member_name, mem.show_online,
 			mg.online_color, mg.id_group, mg.group_name
@@ -223,7 +223,7 @@ function trackStatsUsersOnline($total_users_online)
 	// No entry exists for today yet?
 	if (!isset($modSettings['mostOnlineUpdated']) || $modSettings['mostOnlineUpdated'] != $date)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT most_on
 			FROM {db_prefix}log_activity
 			WHERE date = {date:date}

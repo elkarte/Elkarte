@@ -175,7 +175,7 @@ class MarkRead_Controller
 			// Otherwise, get the latest message before the named one.
 			else
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT MAX(id_msg)
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -196,7 +196,7 @@ class MarkRead_Controller
 			$earlyMsg = 0;
 		else
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -275,7 +275,7 @@ class MarkRead_Controller
 		if (!isset($_REQUEST['unread']))
 		{
 			// Find all the boards this user can see.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT b.id_board
 				FROM {db_prefix}boards AS b
 				WHERE b.id_parent IN ({array_int:parent_list})

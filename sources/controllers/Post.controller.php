@@ -84,7 +84,7 @@ class Post_Controller
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
 					t.id_first_msg, mf.subject,
@@ -249,7 +249,7 @@ class Post_Controller
 				}
 
 				// Get the current event information.
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT
 						id_member, title, MONTH(start_date) AS month, DAYOFMONTH(start_date) AS day,
 						YEAR(start_date) AS year, (TO_DAYS(end_date) - TO_DAYS(start_date)) AS span
@@ -325,7 +325,7 @@ class Post_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -1671,7 +1671,7 @@ class Post_Controller
 
 			if (!empty($board_list))
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_boards
 					SET id_msg = {int:id_msg}
 					WHERE id_member = {int:current_member}
@@ -1696,7 +1696,7 @@ class Post_Controller
 			);
 		}
 		elseif (!$newTopic)
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_member = {int:current_member}
 					AND id_topic = {int:current_topic}',
@@ -1820,7 +1820,7 @@ class Post_Controller
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
 				m.id_board, m.id_member, m.approved
 			FROM {db_prefix}messages AS m
@@ -1922,7 +1922,7 @@ class Post_Controller
 
 		// Assume the first message if no message ID was given.
 		// @todo: candidate for messageInfo
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.locked, t.num_replies, t.id_member_started, t.id_first_msg,
 				m.id_msg, m.id_member, m.poster_time, m.subject, m.smileys_enabled, m.body, m.icon,
@@ -2090,7 +2090,7 @@ class Post_Controller
 					cache_put_data('response_prefix', $context['response_prefix'], 600);
 				}
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET subject = {string:subject}
 					WHERE id_topic = {int:current_topic}

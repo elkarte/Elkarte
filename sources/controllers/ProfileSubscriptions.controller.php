@@ -85,7 +85,7 @@ function action_subscriptions()
 		fatal_error($txt['paid_admin_not_setup_gateway']);
 
 	// Get the current subscriptions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
 		FROM {db_prefix}log_subscribed
 		WHERE id_member = {int:selected_member}',
@@ -143,7 +143,7 @@ function action_subscriptions()
 				// Save the details back.
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_id}
@@ -239,7 +239,7 @@ function action_subscriptions()
 				$current_pending[] = $new_data;
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_item}

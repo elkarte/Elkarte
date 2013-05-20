@@ -178,7 +178,7 @@ function loadCustomFields($memID, $area = 'summary')
 		$where .= ' AND show_profile = {string:area}';
 
 	// Load all the relevant fields - and data.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
 			default_value, bbc, enclose, placement
@@ -1093,7 +1093,7 @@ function profileValidateEmail($email, $memID = 0)
 		return 'bad_email';
 
 	// Email addresses should be and stay unique.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
@@ -1239,7 +1239,7 @@ function makeThemeChanges($memID, $id_theme)
 		fatal_lang_error('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
@@ -1305,7 +1305,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		if (!empty($erase_options))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_theme != {int:id_theme}
 					AND variable IN ({array_string:erase_variables})
@@ -1350,7 +1350,7 @@ function makeNotificationChanges($memID)
 		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
 
 		// Gather up any any existing board notifications.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}log_notify
 			WHERE id_member = {int:selected_member}',
@@ -1366,7 +1366,7 @@ function makeNotificationChanges($memID)
 		// And remove what they no longer want
 		$notification_deletes = array_diff($notification_current, $notification_wanted);
 		if (!empty($notification_deletes))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_board IN ({array_int:board_list})
 					AND id_member = {int:selected_member}',
@@ -1399,7 +1399,7 @@ function makeNotificationChanges($memID)
 		// Make sure there are no zeros left.
 		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
@@ -1430,7 +1430,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	$where = $area == 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
@@ -1731,7 +1731,7 @@ function profileLoadGroups()
 	$curGroups = explode(',', $cur_profile['additional_groups']);
 
 	// Load membergroups, but only those groups the user can assign.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT group_name, id_group, hidden
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
@@ -2257,7 +2257,7 @@ function profileSaveGroups(&$value)
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
@@ -2314,7 +2314,7 @@ function profileSaveGroups(&$value)
 		// If they would no longer be an admin, look for any other...
 		if (!$stillAdmin)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -2360,7 +2360,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
@@ -2405,7 +2405,7 @@ function list_getUserWarningCount($memID)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}

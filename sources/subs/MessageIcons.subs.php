@@ -31,7 +31,7 @@ function getMessageIcons()
 
 	$icons = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 		FROM {db_prefix}message_icons AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -73,7 +73,7 @@ function deleteMessageIcon($icons)
 	$db = database();
 
 	// Do the actual delete!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}message_icons
 		WHERE id_icon IN ({array_int:icon_list})',
 		array(
@@ -129,7 +129,7 @@ function sortMessageIconTable()
 
 	$db = database();
 
-	$smcFunc['db_query']('alter_table_icons', '
+	$db->query('alter_table_icons', '
 		ALTER TABLE {db_prefix}message_icons
 		ORDER BY icon_order',
 		array(
@@ -151,7 +151,7 @@ function list_getMessageIcons($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 		FROM {db_prefix}message_icons AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)

@@ -43,7 +43,7 @@ class ModerateAttachments_Controller
 		{
 			$id_msg = (int) $_GET['mid'];
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_attach
 				FROM {db_prefix}attachments
 				WHERE id_msg = {int:id_msg}
@@ -70,7 +70,7 @@ class ModerateAttachments_Controller
 		$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 		// Validate the attachments exist and are the right approval state.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)

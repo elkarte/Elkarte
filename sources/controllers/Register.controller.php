@@ -400,7 +400,7 @@ class Register_Controller
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT col_name, field_name, field_type, field_length, mask, show_reg
 			FROM {db_prefix}custom_fields
 			WHERE active = {int:is_active}',
@@ -560,7 +560,7 @@ class Register_Controller
 		}
 
 		// Get the code from the database...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, validation_code, member_name, real_name, email_address, is_activated, passwd, lngfile
 			FROM {db_prefix}members' . (empty($_REQUEST['u']) ? '
 			WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
@@ -599,7 +599,7 @@ class Register_Controller
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 			// Ummm... don't even dare try to take someone else's email!!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE email_address = {string:email_address}

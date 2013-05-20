@@ -34,7 +34,7 @@ function recountOpenReports($flush = true)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
 		WHERE ' . $user_info['mod_cache']['bq'] . '
@@ -79,7 +79,7 @@ function recountUnapprovedPosts($approve_query = null)
 		return array('posts' => 0, 'topics' => 0);
 
 	// Any unapproved posts?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_first_msg != m.id_msg)
@@ -95,7 +95,7 @@ function recountUnapprovedPosts($approve_query = null)
 	$smcFunc['db_free_result']($request);
 
 	// What about topics?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(m.id_topic)
 		FROM {db_prefix}topics AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -128,7 +128,7 @@ function recountFailedEmails($approve_query = null)
 	if ($approve_query === null)
 		return 0;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}postby_emails_error as m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -306,7 +306,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 	$db = database();
 
 	// Log the actions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name
 		FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
@@ -324,7 +324,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 	$smcFunc['db_free_result']($request);
 
 	// Do the deletes.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
 			AND comment_type = {string:tpltype}
@@ -352,7 +352,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
 			IFNULL(mem.real_name, lc.member_name) AS creator_name, recipient_name AS template_title,
 			lc.log_time, lc.body
@@ -397,7 +397,7 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -427,7 +427,7 @@ function list_getWarnings($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
 			IFNULL(mem2.id_member, 0) AS id_recipient, IFNULL(mem2.real_name, lc.recipient_name) AS recipient_name,
 			lc.log_time, lc.body, lc.id_notice, lc.counter
@@ -467,7 +467,7 @@ function list_getWarningCount()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:warning}',
@@ -492,7 +492,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, id_recipient, recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE id_comment = {int:id}
@@ -535,7 +535,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 	if ($edit)
 	{
 		// Simple update...
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_comments
 			SET id_recipient = {int:personal}, recipient_name = {string:title}, body = {string:body}
 			WHERE id_comment = {int:id}
@@ -581,7 +581,7 @@ function modReportDetails($id_report)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 			lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author

@@ -394,7 +394,7 @@ function loadInstalledPackages()
 	$install_file = implode('', file(BOARDDIR . '/packages/installed.list'));
 	if (trim($install_file) == '')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_packages
 			SET install_state = {int:not_installed}',
 			array(
@@ -407,7 +407,7 @@ function loadInstalledPackages()
 	}
 
 	// Load the packages from the database - note this is ordered by install time to ensure latest package uninstalled first.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_install, package_id, filename, name, version
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
@@ -2922,7 +2922,7 @@ function package_create_backup($id = 'backup')
 		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -3239,7 +3239,7 @@ function isPackageInstalled($id)
 		return $result;
 
 	// See if it is installed?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT version, themes_installed, db_changes, package_id, install_state
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
@@ -3279,7 +3279,7 @@ function setPackageState($id)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_packages
 		SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
 			time_removed = {int:current_time}
@@ -3309,7 +3309,7 @@ function checkPackageDependency()
 
 	$version = false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT version
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
@@ -3371,7 +3371,7 @@ function setPackagesAsUninstalled()
 	$db = database();
 
 	// Set everything as uninstalled, just like that
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_packages
 		SET install_state = {int:not_installed}',
 		array(

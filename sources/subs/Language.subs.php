@@ -22,7 +22,7 @@ function removeLanguageFromMember($lang_id)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET lngfile = {string:empty_string}
 		WHERE lngfile = {string:current_language}',
@@ -88,7 +88,7 @@ function list_getLanguages()
 	}
 
 	// Work out how many people are using each language.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',

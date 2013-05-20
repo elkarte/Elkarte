@@ -125,7 +125,7 @@ function action_who()
 		$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
 
 	// Get the total amount of members online.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online AS lo
 			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
@@ -141,7 +141,7 @@ function action_who()
 	$context['start'] = $_REQUEST['start'];
 
 	// Look for people online, provided they don't mind if you see they are.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
 			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
@@ -387,7 +387,7 @@ function determineActions($urls, $preferred_prefix = false)
 				// Find out what message they are accessing.
 				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
 
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT m.id_topic, m.subject
 					FROM {db_prefix}messages AS m
 						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -446,7 +446,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load topic names.
 	if (!empty($topic_ids))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT t.id_topic, m.subject
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -575,7 +575,7 @@ function action_credits($in_admin = false)
 	if (($mods = cache_get_data('mods_credits', 86400)) === null)
 	{
 		$mods = array();
-		$request = $smcFunc['db_query']('substring', '
+		$request = $db->query('substring', '
 			SELECT version, name, credits
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_mods}

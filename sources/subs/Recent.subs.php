@@ -34,7 +34,7 @@ function getLastPosts($latestPostOptions)
 
 	// Find all the posts.  Newer ones will have higher IDs.  (assuming the last 20 * number are accessable...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_board, b.name AS board_name,
@@ -124,7 +124,7 @@ function getRecentPosts($messages, $start)
 	$db = database();
 
 	// Get all the most recent posts.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
 			b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS id_first_member,

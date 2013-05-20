@@ -123,7 +123,7 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 	if (!$no_delete)
 	{
 		// Delete the already expired associations.
-		$smcFunc['db_query']('openid_delete_assoc_old', '
+		$db->query('openid_delete_assoc_old', '
 			DELETE FROM {db_prefix}openid_assoc
 			WHERE expires <= {int:current_time}',
 			array(
@@ -133,7 +133,7 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 	}
 
 	// Get the association that has the longest lifetime from now.
-	$request = $smcFunc['db_query']('openid_select_assoc', '
+	$request = $db->query('openid_select_assoc', '
 		SELECT server_url, handle, secret, issued, expires, assoc_type
 		FROM {db_prefix}openid_assoc
 		WHERE server_url = {string:server_url}' . ($handle === null ? '' : '
@@ -246,7 +246,7 @@ function openID_removeAssociation($handle)
 
 	$db = database();
 
-	$smcFunc['db_query']('openid_remove_association', '
+	$db->query('openid_remove_association', '
 		DELETE FROM {db_prefix}openid_assoc
 		WHERE handle = {string:handle}',
 		array(
@@ -320,7 +320,7 @@ function action_openidreturn()
 	$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
 
 	// Is there a user with this OpenID_uri?
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			openid_uri
 		FROM {db_prefix}members
@@ -438,7 +438,7 @@ function openid_member_exists($url)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('openid_member_exists', '
+	$request = $db->query('openid_member_exists', '
 		SELECT mem.id_member, mem.member_name
 		FROM {db_prefix}members AS mem
 		WHERE mem.openid_uri = {string:openid_uri}',

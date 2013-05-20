@@ -327,7 +327,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	{
 		$nextSendTime = time() + 10;
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:nextSendTime}
 			WHERE variable = {string:mail_next_send}
@@ -882,7 +882,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -919,7 +919,7 @@ function list_getMailQueueSize()
 	$db = database();
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS queue_size
 		FROM {db_prefix}mail_queue',
 		array(
@@ -941,7 +941,7 @@ function deleteMailQueueItems($items)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}mail_queue
 		WHERE id_mail IN ({array_int:mail_ids})',
 		array(
@@ -963,7 +963,7 @@ function list_MailQueueStatus()
 	$items = array();
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS queue_size, MIN(time_sent) AS oldest
 		FROM {db_prefix}mail_queue',
 		array(

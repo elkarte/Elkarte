@@ -273,7 +273,7 @@ function updateAdminPreferences()
 	$options['admin_preferences'] = serialize($context['admin_preferences']);
 
 	// Just check we haven't ended up with something theme exclusive somehow.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
 		AND variable = {string:admin_preferences}',
@@ -315,7 +315,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:admin_forum}
@@ -332,7 +332,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		$groups[] = $row['id_group'];
 	$smcFunc['db_free_result']($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)

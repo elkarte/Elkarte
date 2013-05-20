@@ -76,7 +76,7 @@ class Members_Controller
 		if (function_exists('iconv'))
 			header('Content-Type: text/plain; charset=UTF-8');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT real_name
 			FROM {db_prefix}members
 			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '

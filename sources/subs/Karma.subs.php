@@ -18,7 +18,7 @@ function clearKarma($karmaWaitTime)
 	$db = database();
 
 	// Delete any older items from the log. (karmaWaitTime is by hour.)
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_karma
 		WHERE {int:current_time} - log_time > {int:wait_time}',
 		array(
@@ -41,7 +41,7 @@ function lastActionOn($id_executor, $id_target)
 	$db = database();
 
 	// Find out if this user has done this recently...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT action
 		FROM {db_prefix}log_karma
 		WHERE id_target = {int:id_target}
@@ -98,7 +98,7 @@ function updateKarma($id_executor, $id_target, $direction)
 	$db = database();
 
 	// You decided to go back on your previous choice?
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_karma
 		SET action = {int:action}, log_time = {int:current_time}
 		WHERE id_target = {int:id_target}

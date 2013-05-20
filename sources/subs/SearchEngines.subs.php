@@ -38,7 +38,7 @@ function spiderCheck()
 	// We cache the spider data for five minutes if we can.
 	if (($spider_data = cache_get_data('spider_search', 300)) === null)
 	{
-		$request = $smcFunc['db_query']('spider_check', '
+		$request = $db->query('spider_check', '
 			SELECT id_spider, user_agent, ip_info
 			FROM {db_prefix}spiders',
 			array(
@@ -116,7 +116,7 @@ function logSpider()
 	if ($modSettings['spider_mode'] == 1)
 	{
 		$date = strftime('%Y-%m-%d', forum_time(false));
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET last_seen = {int:current_time}, page_hits = page_hits + 1
 			WHERE id_spider = {int:current_spider}
@@ -174,7 +174,7 @@ function consolidateSpiderStats()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('consolidate_spider_stats', '
+	$request = $db->query('consolidate_spider_stats', '
 		SELECT id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
 		FROM {db_prefix}log_spider_hits
 		WHERE processed = {int:not_processed}
@@ -197,7 +197,7 @@ function consolidateSpiderStats()
 	{
 		// We assume the max date is within the right day.
 		$date = strftime('%Y-%m-%d', $stat['last_seen']);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET page_hits = page_hits + ' . $stat['num_hits'] . ',
 				last_seen = CASE WHEN last_seen > {int:last_seen} THEN last_seen ELSE {int:last_seen} END
@@ -223,7 +223,7 @@ function consolidateSpiderStats()
 		);
 
 	// All processed.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_spider_hits
 		SET processed = {int:is_processed}
 		WHERE processed = {int:not_processed}',
@@ -243,7 +243,7 @@ function recacheSpiderNames()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_spider, spider_name
 		FROM {db_prefix}spiders',
 		array(
@@ -272,7 +272,7 @@ function sortSpiderTable()
 	$table->db_add_column('{db_prefix}spiders', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
 
 	// Set the contents of this column.
-	$smcFunc['db_query']('set_spider_order', '
+	$db->query('set_spider_order', '
 		UPDATE {db_prefix}spiders
 		SET temp_order = LENGTH(user_agent)',
 		array(
@@ -280,7 +280,7 @@ function sortSpiderTable()
 	);
 
 	// Order the table by this column.
-	$smcFunc['db_query']('alter_table_spiders', '
+	$db->query('alter_table_spiders', '
 		ALTER TABLE {db_prefix}spiders
 		ORDER BY temp_order DESC',
 		array(

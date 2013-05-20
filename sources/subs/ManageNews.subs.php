@@ -61,7 +61,7 @@ function excludeBannedMembers()
 
 	$excludes = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}ban_groups AS bg
 			INNER JOIN {db_prefix}ban_items AS bi ON (bg.id_ban_group = bi.id_ban_group)
@@ -78,7 +78,7 @@ function excludeBannedMembers()
 		$excludes[] = $row['id_member'];
 	$smcFunc['db_free_result']($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -104,7 +104,7 @@ function excludeBannedMembers()
 
 	if (!empty($condition_array))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE email_address IN(' . implode(', ', $condition_array) .')',
@@ -131,7 +131,7 @@ function getModerators()
 
 	$mods = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT mem.id_member AS identifier
 		FROM {db_prefix}members AS mem
 			INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
@@ -165,7 +165,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 
 	$recipients = array();
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
 		FROM {db_prefix}members AS mem
 		WHERE mem.id_member > {int:min_id_member}

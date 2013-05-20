@@ -118,7 +118,7 @@ class PostModeration_Controller
 			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg, m.id_member, m.id_board, m.subject, t.id_topic, t.id_first_msg, t.id_member_started
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -217,7 +217,7 @@ class PostModeration_Controller
 		}
 
 		// Get all unapproved posts.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
 				IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.smileys_enabled,
 				t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
@@ -576,7 +576,7 @@ function approveAllData()
 	$db = database();
 
 	// Start with messages and topics.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE approved = {int:not_approved}',
@@ -597,7 +597,7 @@ function approveAllData()
 	}
 
 	// Now do attachments
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_attach
 		FROM {db_prefix}attachments
 		WHERE approved = {int:not_approved}',

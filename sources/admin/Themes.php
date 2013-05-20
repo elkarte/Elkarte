@@ -197,7 +197,7 @@ class Themes_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:theme_dir}, {string:theme_url}, {string:images_url}, {string:base_theme_dir}, {string:base_theme_url}, {string:base_images_url})
@@ -252,7 +252,7 @@ class Themes_Controller
 
 		loadTemplate('Themes');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url})
@@ -318,7 +318,7 @@ class Themes_Controller
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:name}, {string:theme_dir})
@@ -342,7 +342,7 @@ class Themes_Controller
 			}
 			$smcFunc['db_free_result']($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, COUNT(*) AS value
 				FROM {db_prefix}themes
 				WHERE id_member = {int:guest_member}
@@ -356,7 +356,7 @@ class Themes_Controller
 			$smcFunc['db_free_result']($request);
 
 			// Need to make sure we don't do custom fields.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT col_name
 				FROM {db_prefix}custom_fields',
 				array(
@@ -368,7 +368,7 @@ class Themes_Controller
 			$smcFunc['db_free_result']($request);
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-			$request = $smcFunc['db_query']('themes_count', '
+			$request = $db->query('themes_count', '
 				SELECT COUNT(DISTINCT id_member) AS value, id_theme
 				FROM {db_prefix}themes
 				WHERE id_member > {int:no_member}
@@ -425,7 +425,7 @@ class Themes_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme != {int:default_theme}
 							AND id_member = {int:guest_member}
@@ -468,7 +468,7 @@ class Themes_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:default_theme}
 							AND id_member != {int:no_member}
@@ -479,7 +479,7 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						INSERT INTO {db_prefix}themes
 							(id_member, id_theme, variable, value)
 						SELECT id_member, 1, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -494,7 +494,7 @@ class Themes_Controller
 				}
 				elseif ($_POST['default_options_master'][$opt] == 2)
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE variable = {string:option_name}
 							AND id_member > {int:no_member}',
@@ -508,7 +508,7 @@ class Themes_Controller
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme != {int:default_theme}
 						AND id_member > {int:no_member}
@@ -527,7 +527,7 @@ class Themes_Controller
 				elseif ($_POST['options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility - again!
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:current_theme}
 							AND id_member != {int:no_member}
@@ -538,7 +538,7 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						INSERT INTO {db_prefix}themes
 							(id_member, id_theme, variable, value)
 						SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -552,7 +552,7 @@ class Themes_Controller
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE variable = {string:option}
 							AND id_member > {int:no_member}
@@ -576,7 +576,7 @@ class Themes_Controller
 			// Don't delete custom fields!!
 			if ($_GET['th'] == 1)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT col_name
 					FROM {db_prefix}custom_fields',
 					array(
@@ -589,7 +589,7 @@ class Themes_Controller
 			}
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_member > {int:no_member}
 					AND id_theme = {int:current_theme}
@@ -625,7 +625,7 @@ class Themes_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT variable, value
 				FROM {db_prefix}themes
 				WHERE id_theme IN (1, {int:current_theme})
@@ -895,7 +895,7 @@ class Themes_Controller
 				unset($known[$i]);
 		}
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}themes
 			WHERE id_theme = {int:current_theme}',
 			array(
@@ -903,7 +903,7 @@ class Themes_Controller
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET id_theme = {int:default_theme}
 			WHERE id_theme = {int:current_theme}',
@@ -913,7 +913,7 @@ class Themes_Controller
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_theme = {int:default_theme}
 			WHERE id_theme = {int:current_theme}',
@@ -1025,7 +1025,7 @@ class Themes_Controller
 				// Remove any custom variants.
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:current_theme}
 							AND variable = {string:theme_variant}',
@@ -1105,7 +1105,7 @@ class Themes_Controller
 		$context['available_themes'] = array();
 		if (!empty($modSettings['knownThemes']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
@@ -1147,7 +1147,7 @@ class Themes_Controller
 		else
 			$guest_theme = $modSettings['theme_guests'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_theme, COUNT(*) AS the_count
 			FROM {db_prefix}members
 			GROUP BY id_theme
@@ -1174,7 +1174,7 @@ class Themes_Controller
 		$variant_preferences = array();
 		if ($context['current_member'] > 0)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, value
 				FROM {db_prefix}themes
 				WHERE variable = {string:theme_variant}
@@ -1295,7 +1295,7 @@ class Themes_Controller
 
 		if (isset($_GET['theme_id']))
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT value
 				FROM {db_prefix}themes
 				WHERE id_theme = {int:current_theme}
@@ -1364,7 +1364,7 @@ class Themes_Controller
 			$theme_dir = realpath($theme_dir);
 
 			// Lets get some data for the new theme.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:theme_templates}, {string:theme_layers})
@@ -1512,7 +1512,7 @@ class Themes_Controller
 				{
 					$install_info['based_on'] = preg_replace('~[^A-Za-z0-9\-_ ]~', '', $install_info['based_on']);
 
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
 						FROM {db_prefix}themes AS th
 							INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
@@ -1551,7 +1551,7 @@ class Themes_Controller
 			}
 
 			// Find the newest id_theme.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT MAX(id_theme)
 				FROM {db_prefix}themes',
 				array(
@@ -2101,7 +2101,7 @@ class Themes_Controller
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT th1.value, th1.id_theme, th2.value
 			FROM {db_prefix}themes AS th1
 				LEFT JOIN {db_prefix}themes AS th2 ON (th2.variable = {string:base_theme_dir} AND th2.id_theme = {int:current_theme})

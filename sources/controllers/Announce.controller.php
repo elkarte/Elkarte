@@ -140,7 +140,7 @@ class Announce_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Select the email addresses for this batch.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, mem.email_address, mem.lngfile
 			FROM {db_prefix}members AS mem
 			WHERE (mem.id_group IN ({array_int:group_list}) OR mem.id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, mem.additional_groups) != 0)' . (!empty($modSettings['allow_disableAnnounce']) ? '

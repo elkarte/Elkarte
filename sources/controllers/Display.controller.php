@@ -182,7 +182,7 @@ class Display_Controller
 				else
 				{
 					// Find the number of messages posted before said time...
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}messages
 						WHERE poster_time < {int:timestamp}
@@ -214,7 +214,7 @@ class Display_Controller
 				else
 				{
 					// Find the start value for that message......
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}messages
 						WHERE id_msg < {int:virtual_msg}
@@ -394,7 +394,7 @@ class Display_Controller
 				$date_string = $matches[0];
 
 			// Any calendar information for this topic?
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 				FROM {db_prefix}calendar AS cal
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
@@ -437,7 +437,7 @@ class Display_Controller
 		if ($context['is_poll'])
 		{
 			// Get the question and if it's locked.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
@@ -452,7 +452,7 @@ class Display_Controller
 			$pollinfo = $smcFunc['db_fetch_assoc']($request);
 			$smcFunc['db_free_result']($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT COUNT(DISTINCT id_member) AS total
 				FROM {db_prefix}log_polls
 				WHERE id_poll = {int:id_poll}
@@ -469,7 +469,7 @@ class Display_Controller
 			$pollinfo['total'] += $pollinfo['num_guest_voters'];
 
 			// Get all the options, and calculate the total votes.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
 				FROM {db_prefix}poll_choices AS pc
 					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
@@ -645,7 +645,7 @@ class Display_Controller
 		}
 
 		// Get each post and poster in this topic.
-		$request = $smcFunc['db_query']('display_get_post_poster', '
+		$request = $db->query('display_get_post_poster', '
 			SELECT id_msg, id_member, approved
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
@@ -739,7 +739,7 @@ class Display_Controller
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 				loadMemberData($posters);
-			$messages_request = $smcFunc['db_query']('', '
+			$messages_request = $db->query('', '
 				SELECT
 					id_msg, icon, subject, poster_time, poster_ip, id_member, modified_time, modified_name, body,
 					smileys_enabled, poster_name, poster_email, approved,
@@ -980,7 +980,7 @@ class Display_Controller
 			isAllowedTo('delete_own');
 
 		// Allowed to remove which messages?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, subject, id_member, poster_time
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:message_list})
@@ -1262,7 +1262,7 @@ function loadAttachmentContext($id_msg)
 						$attachment['id_thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
 						if (!empty($attachment['id_thumb']))
 						{
-							$smcFunc['db_query']('', '
+							$db->query('', '
 								UPDATE {db_prefix}attachments
 								SET id_thumb = {int:id_thumb}
 								WHERE id_attach = {int:id_attach}',

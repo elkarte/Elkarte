@@ -24,7 +24,7 @@ function followupTopics($messages, $include_approved = false)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT fu.derived_from, fu.follow_up, m.subject
 		FROM {db_prefix}follow_ups as fu
 			LEFT JOIN {db_prefix}topics as t ON (t.id_topic = fu.follow_up)
@@ -54,7 +54,7 @@ function topicStartedHere($topic, $include_approved = false)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT fu.derived_from, m.subject
 		FROM {db_prefix}follow_ups as fu
 			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
@@ -103,7 +103,7 @@ function unlinkMessages($msg, $topic)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from = {int:id_msg}
 			AND follow_up = {int:id_topic}
@@ -124,7 +124,7 @@ function removeFollowUpsByTopic($topics)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE follow_up IN ({array_int:id_topics})',
 		array(
@@ -142,7 +142,7 @@ function removeFollowUpsByMessage($msgs)
 
 	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from IN ({array_int:id_msgs})',
 		array(

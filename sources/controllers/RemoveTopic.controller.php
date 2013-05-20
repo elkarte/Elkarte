@@ -182,7 +182,7 @@ class RemoveTopic_Controller
 				$msgs[$k] = (int) $msg;
 
 			// Get the id_previous_board and id_previous_topic.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_topic, m.id_msg, m.id_board, m.subject, m.id_member, t.id_previous_board, t.id_previous_topic,
 					t.id_first_msg, b.count_posts, IFNULL(pt.id_board, 0) AS possible_prev_board
 				FROM {db_prefix}messages AS m
@@ -239,7 +239,7 @@ class RemoveTopic_Controller
 			// Load any previous topics to check they exist.
 			if (!empty($previous_topics))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT t.id_topic, t.id_board, m.subject
 					FROM {db_prefix}topics AS t
 						INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -285,7 +285,7 @@ class RemoveTopic_Controller
 
 			// Put the icons back.
 			if (!empty($messages))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET icon = {string:icon}
 					WHERE id_msg IN ({array_int:messages})',
@@ -309,7 +309,7 @@ class RemoveTopic_Controller
 			require_once(SUBSDIR . 'Boards.subs.php');
 
 			// Lets get the data for these topics.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT t.id_topic, t.id_previous_board, t.id_board, t.id_first_msg, m.subject
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -332,7 +332,7 @@ class RemoveTopic_Controller
 				moveTopics($row['id_topic'], $row['id_previous_board']);
 
 				// Lets remove the recycled icon.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET icon = {string:icon}
 					WHERE id_topic = {int:id_topic}',
@@ -348,7 +348,7 @@ class RemoveTopic_Controller
 				if (empty($board_data['count_posts']))
 				{
 					// Lets get the members that need their post count restored.
-					$request2 = $smcFunc['db_query']('', '
+					$request2 = $db->query('', '
 						SELECT id_member, COUNT(id_msg) AS post_count
 						FROM {db_prefix}messages
 						WHERE id_topic = {int:topic}
@@ -404,7 +404,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		$msgs[$key] = (int) $msg;
 
 	// Get the source information.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_board, t.id_first_msg, t.num_replies, t.unapproved_posts
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -417,7 +417,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$smcFunc['db_free_result']($request);
 
 	// Get some target topic and board stats.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_board, t.id_first_msg, t.num_replies, t.unapproved_posts, b.count_posts
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -433,7 +433,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	if (empty($count_posts))
 	{
 		// Lets get the members that need their post count restored.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:messages})
@@ -449,7 +449,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	}
 
 	// Time to move the messages.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET
 			id_topic = {int:target_topic},
@@ -470,7 +470,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		'unapproved_posts' => 0,
 		'id_first_msg' => 9999999999,
 	);
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MIN(id_msg) AS id_first_msg, MAX(id_msg) AS id_last_msg, COUNT(*) AS message_count, approved
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:target_topic}
@@ -494,7 +494,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$smcFunc['db_free_result']($request);
 
 	// We have a new post count for the board.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
 			num_posts = num_posts + {int:diff_replies},
@@ -508,7 +508,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	);
 
 	// In some cases we merged the only post in a topic so the topic data is left behind in the topic table.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_topic
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:from_topic}',
@@ -536,7 +536,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 			'unapproved_posts' => 0,
 			'id_first_msg' => 9999999999,
 		);
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT MIN(id_msg) AS id_first_msg, MAX(id_msg) AS id_last_msg, COUNT(*) AS message_count, approved, subject
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:from_topic}
@@ -560,7 +560,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		$smcFunc['db_free_result']($request);
 
 		// Update the topic details for the source topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_first_msg = {int:id_first_msg},
@@ -578,7 +578,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		);
 
 		// We have a new post count for the source board.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
 				num_posts = num_posts + {int:diff_replies},
@@ -593,7 +593,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	}
 
 	// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			id_first_msg = {int:id_first_msg},
@@ -626,7 +626,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 
 	if (!empty($cache_updates))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, subject
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:first_messages})',

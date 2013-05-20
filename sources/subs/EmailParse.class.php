@@ -181,7 +181,7 @@ class Email_Parse
 		if (empty($id))
 			return '';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT message
 			FROM {db_prefix}postby_emails_error
 			WHERE id_email = {int:id}

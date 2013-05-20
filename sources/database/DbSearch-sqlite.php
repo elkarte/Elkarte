@@ -64,7 +64,7 @@ class DbSearch_SQLite implements DbSearch
 			$db_values['db_error_skip'] = true;
 		}
 
-		$return = $smcFunc['db_query']('', $db_string,
+		$return = $db->query('', $db_string,
 			$db_values, $connection
 		);
 
@@ -84,7 +84,7 @@ class DbSearch_SQLite implements DbSearch
 
 		$size = 'int';
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			CREATE TABLE {db_prefix}log_search_words (
 				id_word {raw:size} NOT NULL default {string:string_zero},
 				id_msg int(10) NOT NULL default {string:string_zero},

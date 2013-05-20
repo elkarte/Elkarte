@@ -328,7 +328,7 @@ class News_Controller
 			return array();
 
 		// Find the most recent members.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, member_name, real_name, date_registered, last_login
 			FROM {db_prefix}members
 			ORDER BY id_member DESC
@@ -403,7 +403,7 @@ class News_Controller
 		while (!$done)
 		{
 			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.modified_time,
 					m.icon, t.id_topic, t.id_board, t.num_replies,
@@ -545,7 +545,7 @@ class News_Controller
 		while (!$done)
 		{
 			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -585,7 +585,7 @@ class News_Controller
 			return array();
 
 		// Find the most recent posts this user can see.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
 				b.name AS bname, t.num_replies, m.id_member, m.icon, mf.id_member AS id_first_member,

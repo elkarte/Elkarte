@@ -25,7 +25,7 @@ function list_getAdminInfoFile($filename)
 	$db = database();
 
 	$file = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT data, filetype
 		FROM {db_prefix}admin_info_files
 		WHERE filename = {string:current_filename}

@@ -47,7 +47,7 @@ class Poll_Controller
 		loadLanguage('Post');
 
 		// Check if they have already voted, or voting is locked.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
 				p.guest_vote, p.reset_poll, p.num_guest_voters
 			FROM {db_prefix}topics AS t
@@ -114,7 +114,7 @@ class Poll_Controller
 			$pollOptions = array();
 
 			// Find out what they voted for before.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_choice
 				FROM {db_prefix}log_polls
 				WHERE id_member = {int:current_member}
@@ -132,7 +132,7 @@ class Poll_Controller
 			if (!empty($pollOptions))
 			{
 				// Update the poll totals.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}poll_choices
 					SET votes = votes - 1
 					WHERE id_poll = {int:id_poll}
@@ -146,7 +146,7 @@ class Poll_Controller
 				);
 
 				// Delete off the log.
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_polls
 					WHERE id_member = {int:current_member}
 						AND id_poll = {int:id_poll}',
@@ -190,7 +190,7 @@ class Poll_Controller
 			array('id_poll', 'id_member', 'id_choice')
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}poll_choices
 			SET votes = votes + 1
 			WHERE id_poll = {int:id_poll}
@@ -210,7 +210,7 @@ class Poll_Controller
 			$_COOKIE['guest_poll_vote'] .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? explode(',' . $pollOptions) : $pollOptions[0]);
 
 			// Increase num guest voters count by 1
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}polls
 				SET num_guest_voters = num_guest_voters + 1
 				WHERE id_poll = {int:id_poll}',
@@ -249,7 +249,7 @@ class Poll_Controller
 		checkSession('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_member_started, t.id_poll, p.voting_locked
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
@@ -282,7 +282,7 @@ class Poll_Controller
 			$voting_locked = '1';
 
 		// Lock!  *Poof* - no one can vote.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}polls
 			SET voting_locked = {int:voting_locked}
 			WHERE id_poll = {int:id_poll}',
@@ -375,7 +375,7 @@ class Poll_Controller
 			// Get all the choices - if this is an edit.
 			if ($context['is_edit'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT label, votes, id_choice
 					FROM {db_prefix}poll_choices
 					WHERE id_poll = {int:id_poll}',
@@ -496,7 +496,7 @@ class Poll_Controller
 			// Get all the choices - if this is an edit.
 			if ($context['is_edit'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT label, votes, id_choice
 					FROM {db_prefix}poll_choices
 					WHERE id_poll = {int:id_poll}',
@@ -617,7 +617,7 @@ class Poll_Controller
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		// Get the starter and the poll's ID - if it's an edit.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
 			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
@@ -711,7 +711,7 @@ class Poll_Controller
 		// If we're editing, let's commit the changes.
 		if ($isEdit)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}polls
 				SET question = {string:question}, change_vote = {int:change_vote},' . (allowedTo('moderate_board') ? '
 					hide_results = {int:hide_results}, expire_time = {int:expire_time}, max_votes = {int:max_votes},
@@ -751,7 +751,7 @@ class Poll_Controller
 			$bcinfo['id_poll'] = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
 
 			// Link the poll to the topic
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}topics
 				SET id_poll = {int:id_poll}
 				WHERE id_topic = {int:current_topic}',
@@ -763,7 +763,7 @@ class Poll_Controller
 		}
 
 		// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_choice
 			FROM {db_prefix}poll_choices
 			WHERE id_poll = {int:id_poll}',
@@ -798,7 +798,7 @@ class Poll_Controller
 
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}poll_choices
 					SET label = {string:option_name}
 					WHERE id_poll = {int:id_poll}
@@ -825,7 +825,7 @@ class Poll_Controller
 		// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
 		if (!empty($delete_options))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_polls
 				WHERE id_poll = {int:id_poll}
 					AND id_choice IN ({array_int:delete_options})',
@@ -834,7 +834,7 @@ class Poll_Controller
 					'id_poll' => $bcinfo['id_poll'],
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}poll_choices
 				WHERE id_poll = {int:id_poll}
 					AND id_choice IN ({array_int:delete_options})',
@@ -879,7 +879,7 @@ class Poll_Controller
 		// Check permissions.
 		if (!allowedTo('poll_remove_any'))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT t.id_member_started, p.id_member AS poll_starter
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)

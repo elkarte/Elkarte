@@ -97,7 +97,7 @@ function bb2_db_query($query)
 		return true;
 
 	// Run the query, return success, failure or the actual results
-	$result = $smcFunc['db_query']('', $query, array());
+	$result = $db->query('', $query, array());
 
 	if (!$result)
 		return false;

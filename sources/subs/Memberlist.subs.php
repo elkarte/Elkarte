@@ -36,7 +36,7 @@ function ml_CustomProfile()
 	$context['custom_profile_fields'] = array();
 
 	// Find any custom profile fields that are to be shown for the memberlist?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc, field_type, bbc, enclose
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
@@ -142,7 +142,7 @@ function ml_memberCount()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}',
@@ -167,7 +167,7 @@ function ml_alphaStart($start)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE LOWER(SUBSTRING(real_name, 1, 1)) < {string:first_letter}
@@ -199,7 +199,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	$db = database();
 
 	// Select the members from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($sort === 'is_online' ? '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : ($sort === 'id_group' ? '
@@ -233,7 +233,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 	$db = database();
 
 	// Get the number of results
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
@@ -247,7 +247,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 	$smcFunc['db_free_result']($request);
 
 	// Select the members from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
@@ -277,7 +277,7 @@ function ml_findSearchableCustomFields()
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc
 			FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
@@ -315,7 +315,7 @@ function printMemberListRows($request)
 	$db = database();
 
 	// Get the max post number for the bar graph
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT MAX(posts)
 		FROM {db_prefix}members',
 		array(

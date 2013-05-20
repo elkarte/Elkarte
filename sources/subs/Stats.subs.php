@@ -30,7 +30,7 @@ function onlineCount()
 
 	$db = database();
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online',
 		array(

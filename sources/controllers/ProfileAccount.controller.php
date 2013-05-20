@@ -65,7 +65,7 @@ function action_issuewarning()
 	if ($context['warning_limit'] > 0)
 	{
 		// Make sure we cannot go outside of our limit for the day.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT SUM(counter)
 			FROM {db_prefix}log_comments
 			WHERE id_recipient = {int:selected_member}
@@ -340,7 +340,7 @@ function action_issuewarning()
 	// Any custom templates?
 	$context['notification_templates'] = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:warntpl}
@@ -468,7 +468,7 @@ function action_deleteaccount2()
 			}
 
 			// Now delete the remaining messages.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic

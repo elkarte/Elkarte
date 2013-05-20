@@ -52,7 +52,7 @@ function modifyCategory($category_id, $catOptions)
 			$cats[] = $category_id;
 
 		// Grab the categories sorted by cat_order.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_cat, cat_order
 			FROM {db_prefix}categories
 			ORDER BY cat_order',
@@ -72,7 +72,7 @@ function modifyCategory($category_id, $catOptions)
 		// Set the new order for the categories.
 		foreach ($cats as $index => $cat)
 			if ($index != $cat_order[$cat])
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}categories
 					SET cat_order = {int:new_order}
 					WHERE id_cat = {int:current_category}',
@@ -106,7 +106,7 @@ function modifyCategory($category_id, $catOptions)
 	// Do the updates (if any).
 	if (!empty($catUpdates))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}categories
 			SET
 				' . implode(',
@@ -215,7 +215,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	// Move the boards inside the categories to a safe category.
 	else
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_cat = {int:new_parent_cat}
 			WHERE id_cat IN ({array_int:category_list})',
@@ -226,7 +226,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 		);
 
 	// No one will ever be able to collapse these categories anymore.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}collapsed_categories
 		WHERE id_cat IN ({array_int:category_list})',
 		array(
@@ -235,7 +235,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	);
 
 	// Do the deletion of the category itself
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}categories
 		WHERE id_cat IN ({array_int:category_list})',
 		array(
@@ -271,7 +271,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 	// Collapse or expand the categories.
 	if ($new_status === 'collapse' || $new_status === 'expand')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}collapsed_categories
 			WHERE id_cat IN ({array_int:category_list})' . ($members === null ? '' : '
 				AND id_member IN ({array_int:member_list})'),
@@ -282,7 +282,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 		);
 
 		if ($new_status === 'collapse')
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				INSERT INTO {db_prefix}collapsed_categories
 					(id_cat, id_member)
 				SELECT c.id_cat, mem.id_member
@@ -307,7 +307,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'insert' => array(),
 			'remove' => array(),
 		);
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, c.id_cat, IFNULL(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
@@ -341,7 +341,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 
 		// And expand the ones that were originally collapsed.
 		if (!empty($updates['remove']))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}collapsed_categories
 				WHERE ' . implode(' OR ', $updates['remove']),
 				array(
@@ -361,7 +361,7 @@ function categoryName($id_cat)
 
 	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT name
 		FROM {db_prefix}categories
 		WHERE id_cat = {int:id_cat}

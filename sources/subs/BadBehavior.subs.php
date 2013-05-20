@@ -29,7 +29,7 @@ function deleteBadBehavior($type ,$filter)
 	// Delete all or just some?
 	if ($type === 'delall' && empty($filter))
 	{
-		$smcFunc['db_query']('truncate_table', '
+		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_badbehavior',
 			array(
 			)
@@ -38,7 +38,7 @@ function deleteBadBehavior($type ,$filter)
 	// Deleting all with a filter?
 	elseif ($type === 'delall'  && !empty($filter))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
@@ -49,7 +49,7 @@ function deleteBadBehavior($type ,$filter)
 	// Just specific entries?
 	elseif ($type == 'delete')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
 			WHERE id IN ({array_int:log_list})',
 			array(
@@ -75,7 +75,7 @@ function getBadBehaviorLogEntryCount($filter)
 
 	$db = database();
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
@@ -108,7 +108,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 	$bb_entries = array();
 
 	$db = database();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '

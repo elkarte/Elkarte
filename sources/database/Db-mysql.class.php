@@ -88,7 +88,7 @@ class Database_MySQL implements Database
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
-			$smcFunc['db_query']('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
+			$db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
 			false
 		);
@@ -617,7 +617,7 @@ class Database_MySQL implements Database
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
-					$smcFunc['db_query']('', "
+					$db->query('', "
 						REPAIR TABLE $table", false, false);
 
 				// And send off an email!
@@ -626,7 +626,7 @@ class Database_MySQL implements Database
 				$modSettings['cache_enable'] = $old_cache;
 
 				// Try the query again...?
-				$ret = $smcFunc['db_query']('', $db_string, false, false);
+				$ret = $db->query('', $db_string, false, false);
 				if ($ret !== false)
 					return $ret;
 			}
@@ -664,7 +664,7 @@ class Database_MySQL implements Database
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
-						$ret = $smcFunc['db_query']('', $db_string, false, false);
+						$ret = $db->query('', $db_string, false, false);
 
 						$new_errno = mysql_errno($db_connection);
 						if ($ret !== false || in_array($new_errno, array(1205, 1213)))
@@ -769,7 +769,7 @@ class Database_MySQL implements Database
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
 		// Do the insert.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
 			VALUES
 				' . implode(',
@@ -902,7 +902,7 @@ class Database_MySQL implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ *
 			FROM `' . $tableName . '`
 			LIMIT ' . $start . ', ' . $limit,
@@ -978,7 +978,7 @@ class Database_MySQL implements Database
 		$schema_create .= 'CREATE TABLE `' . $tableName . '` (' . $crlf;
 
 		// Find all the fields.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW FIELDS
 			FROM `{raw:table}`',
 			array(
@@ -1016,7 +1016,7 @@ class Database_MySQL implements Database
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
 		// Find the keys.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW KEYS
 			FROM `{raw:table}`',
 			array(
@@ -1051,7 +1051,7 @@ class Database_MySQL implements Database
 		}
 
 		// Now just get the comment and type... (MyISAM, etc.)
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table}',
 			array(
@@ -1085,7 +1085,7 @@ class Database_MySQL implements Database
 		$db_name_str = trim($db_name_str);
 		$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SHOW TABLES
 			FROM `{raw:db_name_str}`
 			{raw:filter}',
@@ -1117,7 +1117,7 @@ class Database_MySQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Get how much overhead there is.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 				SHOW TABLE STATUS LIKE {string:table_name}',
 				array(
 					'table_name' => str_replace('_', '\_', $table),
@@ -1127,7 +1127,7 @@ class Database_MySQL implements Database
 		$this->free_result($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 				OPTIMIZE TABLE `{raw:table}`',
 				array(
 					'table' => $table,
@@ -1137,7 +1137,7 @@ class Database_MySQL implements Database
 			return -1;
 
 		// How much left?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 				SHOW TABLE STATUS LIKE {string:table}',
 				array(
 					'table' => str_replace('_', '\_', $table),
@@ -1167,7 +1167,7 @@ class Database_MySQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// First, get rid of the old table.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DROP TABLE IF EXISTS {raw:backup_table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1175,7 +1175,7 @@ class Database_MySQL implements Database
 		);
 
 		// Can we do this the quick way?
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			CREATE TABLE {raw:backup_table} LIKE {raw:table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1184,7 +1184,7 @@ class Database_MySQL implements Database
 		// If this failed, we go old school.
 		if ($result)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				INSERT INTO {raw:backup_table}
 				SELECT *
 				FROM {raw:table}',
@@ -1199,7 +1199,7 @@ class Database_MySQL implements Database
 		}
 
 		// At this point, the quick method failed.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SHOW CREATE TABLE {raw:table}',
 			array(
 				'table' => $table,
@@ -1253,7 +1253,7 @@ class Database_MySQL implements Database
 		else
 			$create = '';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}
 			ENGINE={raw:engine}' . (empty($charset) ? '' : ' CHARACTER SET {raw:charset}' . (empty($collate) ? '' : ' COLLATE {raw:collate}')) . '
 			SELECT *
@@ -1273,7 +1273,7 @@ class Database_MySQL implements Database
 			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) == ',')
 				$auto_inc = substr($auto_inc, 0, -1);
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				ALTER TABLE {raw:backup_table}
 				CHANGE COLUMN {raw:column_detail} {raw:auto_inc}',
 				array(
@@ -1298,7 +1298,7 @@ class Database_MySQL implements Database
 
 		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT VERSION()',
 			array(
 			)
@@ -1371,7 +1371,7 @@ class Database_MySQL implements Database
 
 		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT VERSION()',
 			array(
 			)
