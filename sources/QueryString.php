@@ -33,7 +33,9 @@ if (!defined('ELKARTE'))
  */
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl, $smcFunc;
+	global $board, $topic, $boardurl, $scripturl;
+
+	$db = database();
 
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
@@ -287,7 +289,7 @@ function cleanRequest()
 		$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
 
 	// And make sure HTTP_USER_AGENT is set.
-	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($smcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : '';
+	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($db->unescape_string($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : '';
 
 	// Some final checking.
 	if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $_SERVER['BAN_CHECK_IP']) === 0 || !isValidIPv6($_SERVER['BAN_CHECK_IP']))
@@ -401,17 +403,19 @@ function expandIPv6($addr, $strict_check = true)
  */
 function escapestring__recursive($var)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if (!is_array($var))
-		return $smcFunc['db_escape_string']($var);
+		return $db->escape_string($var);
 
 	// Reindex the array with slashes.
 	$new_var = array();
 
 	// Add slashes to every element, even the indexes!
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_escape_string']($k)] = escapestring__recursive($v);
+		$new_var[$db->escape_string($k)] = escapestring__recursive($v);
 
 	return $new_var;
 }
@@ -478,17 +482,19 @@ function urldecode__recursive($var, $level = 0)
  */
 function unescapestring__recursive($var)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if (!is_array($var))
-		return $smcFunc['db_unescape_string']($var);
+		return $db->unescape_string($var);
 
 	// Reindex the array without slashes, this time.
 	$new_var = array();
 
 	// Strip the slashes from every element.
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_unescape_string']($k)] = unescapestring__recursive($v);
+		$new_var[$db->unescape_string($k)] = unescapestring__recursive($v);
 
 	return $new_var;
 }

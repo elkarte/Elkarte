@@ -636,7 +636,7 @@ class ManageBans_Controller
 	 */
 	public function action_edit2()
 	{
-		global $smcFunc, $context;
+		global $context, $smcFunc;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -997,6 +997,7 @@ class ManageBans_Controller
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => create_function('$rowData', '
 					global $smcFunc;
+
 					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'hostname\']), array(\'%\' => \'*\'));
 				'),
 			);
@@ -1010,6 +1011,7 @@ class ManageBans_Controller
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => create_function('$rowData', '
 					global $smcFunc;
+
 					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'email_address\']), array(\'%\' => \'*\'));
 				'),
 			);

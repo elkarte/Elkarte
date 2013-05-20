@@ -26,7 +26,9 @@ if (!defined('ELKARTE'))
  */
 function action_subscriptions()
 {
-	global $context, $txt, $modSettings, $smcFunc, $scripturl;
+	global $context, $txt, $modSettings, $scripturl;
+
+	$db = database();
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');
@@ -83,7 +85,7 @@ function action_subscriptions()
 		fatal_error($txt['paid_admin_not_setup_gateway']);
 
 	// Get the current subscriptions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
 		FROM {db_prefix}log_subscribed
 		WHERE id_member = {int:selected_member}',
@@ -92,7 +94,7 @@ function action_subscriptions()
 		)
 	);
 	$context['current'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// The subscription must exist!
 		if (!isset($context['subscriptions'][$row['id_subscribe']]))
@@ -113,7 +115,7 @@ function action_subscriptions()
 		if ($row['status'] == 1)
 			$context['subscriptions'][$row['id_subscribe']]['subscribed'] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Simple "done"?
 	if (isset($_GET['done']))
@@ -141,7 +143,7 @@ function action_subscriptions()
 				// Save the details back.
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_id}
@@ -237,7 +239,7 @@ function action_subscriptions()
 				$current_pending[] = $new_data;
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_item}
@@ -256,7 +258,7 @@ function action_subscriptions()
 		else
 		{
 			$pending_details = serialize(array($new_data));
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}log_subscribed',
 				array(
 					'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int', 'pending_details' => 'string-65534',

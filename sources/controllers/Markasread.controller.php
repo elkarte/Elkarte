@@ -125,7 +125,9 @@ class MarkRead_Controller
 	*/
 	public function action_markreplies()
 	{
-		global $user_info, $modSettings, $smcFunc;
+		global $user_info, $modSettings;
+
+		$db = database();
 
 		// Make sure all the topics are integers!
 		$topics = array_map('intval', explode('-', $_REQUEST['topics']));
@@ -151,7 +153,9 @@ class MarkRead_Controller
 	*/
 	public function action_marktopic()
 	{
-		global $board, $topic, $user_info, $smcFunc;
+		global $board, $topic, $user_info;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -171,7 +175,7 @@ class MarkRead_Controller
 			// Otherwise, get the latest message before the named one.
 			else
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT MAX(id_msg)
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -183,8 +187,8 @@ class MarkRead_Controller
 						'id_first_msg' => $topicinfo['id_first_msg'],
 					)
 				);
-				list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				list ($earlyMsg) = $db->fetch_row($result);
+				$db->free_result($result);
 			}
 		}
 		// Marking read from first page?  That's the whole topic.
@@ -192,7 +196,7 @@ class MarkRead_Controller
 			$earlyMsg = 0;
 		else
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -203,8 +207,8 @@ class MarkRead_Controller
 					'start' => (int) $_REQUEST['start'],
 				)
 			);
-			list ($earlyMsg) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($earlyMsg) = $db->fetch_row($result);
+			$db->free_result($result);
 
 			$earlyMsg--;
 		}
@@ -222,7 +226,9 @@ class MarkRead_Controller
 	*/
 	public function action_markasread()
 	{
-		global $board, $user_info, $board_info, $modSettings, $smcFunc;
+		global $board, $user_info, $board_info, $modSettings;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -269,7 +275,7 @@ class MarkRead_Controller
 		if (!isset($_REQUEST['unread']))
 		{
 			// Find all the boards this user can see.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT b.id_board
 				FROM {db_prefix}boards AS b
 				WHERE b.id_parent IN ({array_int:parent_list})
@@ -278,19 +284,19 @@ class MarkRead_Controller
 					'parent_list' => $boards,
 				)
 			);
-			if ($smcFunc['db_num_rows']($result) > 0)
+			if ($db->num_rows($result) > 0)
 			{
 				$logBoardInserts = '';
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $row['id_board']);
-					$smcFunc['db_insert']('replace',
+					$db->insert('replace',
 					'{db_prefix}log_boards',
 					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 					$logBoardInserts,
 					array('id_member', 'id_board')
 				);
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 			if (empty($board))
 				return '';
 			else

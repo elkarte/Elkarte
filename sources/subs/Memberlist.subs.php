@@ -29,12 +29,14 @@ if (!defined('ELKARTE'))
  */
 function ml_CustomProfile()
 {
-	global $smcFunc, $context;
+	global $context;
+
+	$db = database();
 
 	$context['custom_profile_fields'] = array();
 
 	// Find any custom profile fields that are to be shown for the memberlist?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc, field_type, bbc, enclose
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
@@ -46,7 +48,7 @@ function ml_CustomProfile()
 			'private_level' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Avoid collisions
 		$curField = 'cust_' . $row['col_name'];
@@ -79,7 +81,7 @@ function ml_CustomProfile()
 			$context['custom_profile_fields']['parameters']['t' . $curField] = $row['col_name'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($context['custom_profile_fields']);
 }
@@ -136,9 +138,11 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}',
@@ -146,8 +150,8 @@ function ml_memberCount()
 			'is_activated' => 1,
 		)
 	);
-	list ($num_members) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_members) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $num_members;
 }
@@ -159,9 +163,11 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-	global $smcFunc;
 
-	$request = $smcFunc['db_query']('substring', '
+
+	$db = database();
+
+	$request = $db->query('substring', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE LOWER(SUBSTRING(real_name, 1, 1)) < {string:first_letter}
@@ -171,8 +177,8 @@ function ml_alphaStart($start)
 			'first_letter' => $start,
 		)
 	);
-	list ($start) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($start) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $start;
 }
@@ -188,10 +194,12 @@ function ml_alphaStart($start)
  */
 function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = '')
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings;
+
+	$db = database();
 
 	// Select the members from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($sort === 'is_online' ? '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : ($sort === 'id_group' ? '
@@ -205,7 +213,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	);
 
 	printMemberListRows($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -220,10 +228,12 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  */
 function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limit = 0)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	// Get the number of results
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
@@ -233,11 +243,11 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 			AND mem.is_activated = {int:is_activated}',
 		$query_parameters
 	);
-	list ($numResults) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($numResults) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Select the members from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
@@ -253,7 +263,7 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
 
 	// Place everything context so the template can use it
 	printMemberListRows($request);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $numResults;
 }
@@ -263,9 +273,11 @@ function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limi
  */
 function ml_findSearchableCustomFields()
 {
-	global $smcFunc, $context;
+	global $context;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc
 			FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
@@ -281,13 +293,13 @@ function ml_findSearchableCustomFields()
 		)
 	);
 	$context['custom_search_fields'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['custom_search_fields'][$row['col_name']] = array(
 			'colname' => $row['col_name'],
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -298,24 +310,26 @@ function ml_findSearchableCustomFields()
  */
 function printMemberListRows($request)
 {
-	global $txt, $context, $scripturl, $memberContext, $settings, $smcFunc;
+	global $txt, $context, $scripturl, $memberContext, $settings;
+
+	$db = database();
 
 	// Get the max post number for the bar graph
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT MAX(posts)
 		FROM {db_prefix}members',
 		array(
 		)
 	);
-	list ($most_posts) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($most_posts) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	// Avoid division by zero...
 	if ($most_posts == 0)
 		$most_posts = 1;
 
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.

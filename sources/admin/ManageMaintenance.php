@@ -119,7 +119,9 @@ class ManageMaintenance_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $smcFunc, $maintenance;
+		global $context, $db_type, $modSettings, $maintenance;
+
+		$db = database();
 
 		// We need this, really..
 		require_once(SUBSDIR . '/ManageMaintenance.subs.php');

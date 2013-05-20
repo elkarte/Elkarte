@@ -31,7 +31,9 @@ if (!defined('ELKARTE'))
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	if ((isset($boardListOptions['excluded_boards']) || isset($boardListOptions['allowed_to'])) && isset($boardListOptions['included_boards']))
 		trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);
@@ -83,7 +85,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['blank_redirect'] = '';
 	}
 
-	$request = $smcFunc['db_query']('messageindex_fetch_boards', '
+	$request = $db->query('messageindex_fetch_boards', '
 		SELECT c.name AS cat_name, c.id_cat, b.id_board, b.name AS board_name, b.child_level' . $select . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($where) ? '' : '
@@ -95,7 +97,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	if ($simple)
 	{
 		$return_value = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$return_value[$row['id_board']] = array(
 				'id_cat' => $row['id_cat'],
@@ -109,12 +111,12 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	else
 	{
 		$return_value = array(
-			'num_boards' => $smcFunc['db_num_rows']($request),
+			'num_boards' => $db->num_rows($request),
 			'boards_check_all' => true,
 			'boards_current_disabled' => true,
 			'categories' => array(),
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// This category hasn't been set up yet..
 			if (!isset($return_value['categories'][$row['id_cat']]))
@@ -152,7 +154,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		}
 	}
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $return_value;
 }

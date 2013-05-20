@@ -33,7 +33,9 @@ if (!defined('ELKARTE'))
  */
 function action_who()
 {
-	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext, $smcFunc;
+	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext;
+
+	$db = database();
 
 	// Permissions, permissions, permissions.
 	isAllowedTo('who_view');
@@ -123,7 +125,7 @@ function action_who()
 		$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
 
 	// Get the total amount of members online.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online AS lo
 			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
@@ -131,15 +133,15 @@ function action_who()
 		array(
 		)
 	);
-	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalMembers) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Prepare some page index variables.
 	$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
 	$context['start'] = $_REQUEST['start'];
 
 	// Look for people online, provided they don't mind if you see they are.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
 			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
@@ -161,7 +163,7 @@ function action_who()
 	$context['members'] = array();
 	$member_ids = array();
 	$url_data = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$actions = @unserialize($row['url']);
 		if ($actions === false)
@@ -183,7 +185,7 @@ function action_who()
 		$url_data[$row['session']] = array($row['url'], $row['id_member']);
 		$member_ids[] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Load the user data for these members.
 	loadMemberData($member_ids);
@@ -269,7 +271,9 @@ function action_who()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings, $smcFunc, $context;
+	global $txt, $user_info, $modSettings, $context;
+
+	$db = database();
 
 	if (!allowedTo('who_view'))
 		return array();
@@ -383,7 +387,7 @@ function determineActions($urls, $preferred_prefix = false)
 				// Find out what message they are accessing.
 				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
 
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT m.id_topic, m.subject
 					FROM {db_prefix}messages AS m
 						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -397,9 +401,9 @@ function determineActions($urls, $preferred_prefix = false)
 						'id_msg' => $msgid,
 					)
 				);
-				list ($id_topic, $subject) = $smcFunc['db_fetch_row']($result);
+				list ($id_topic, $subject) = $db->fetch_row($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
@@ -442,7 +446,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load topic names.
 	if (!empty($topic_ids))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT t.id_topic, m.subject
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -457,13 +461,13 @@ function determineActions($urls, $preferred_prefix = false)
 				'limit' => count($topic_ids),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			// Show the topic's subject for each of the actions.
 			foreach ($topic_ids[$row['id_topic']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_topic'], censorText($row['subject']));
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 	}
 
 	// Load board names.
@@ -511,7 +515,9 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function action_credits($in_admin = false)
 {
-	global $context, $smcFunc, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info;
+	global $context, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info, $smcFunc;
+
+	$db = database();
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	loadLanguage('Who');
@@ -569,7 +575,7 @@ function action_credits($in_admin = false)
 	if (($mods = cache_get_data('mods_credits', 86400)) === null)
 	{
 		$mods = array();
-		$request = $smcFunc['db_query']('substring', '
+		$request = $db->query('substring', '
 			SELECT version, name, credits
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_mods}
@@ -584,7 +590,7 @@ function action_credits($in_admin = false)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$credit_info = unserialize($row['credits']);
 

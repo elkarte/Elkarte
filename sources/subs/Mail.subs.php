@@ -42,7 +42,9 @@ if (!defined('ELKARTE'))
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global $smcFunc, $boardurl;
+	global $boardurl;
+
+	$db = database();
 
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
@@ -253,7 +255,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		// Log each email that we sent so they can be replied to
 		if (!empty($sent))
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}postby_emails',
 				array(
 					'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
@@ -289,7 +291,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings;
+
+	$db = database();
 
 	static $cur_insert = array();
 	static $cur_insert_len = 0;
@@ -304,7 +308,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		$cur_insert_len = 0;
 
 		// Dump the data...
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}mail_queue',
 			array(
 				'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -323,7 +327,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	{
 		$nextSendTime = time() + 10;
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:nextSendTime}
 			WHERE variable = {string:mail_next_send}
@@ -350,7 +354,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		if ($this_insert_len + $cur_insert_len > 1000000)
 		{
 			// Flush out what we have so far.
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}mail_queue',
 				array(
 					'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -622,7 +626,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 	// Log each email
 	if (!empty($sent))
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}postby_emails',
 			array(
 				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
@@ -874,9 +878,11 @@ function user_info_callback($matches)
  */
 function list_getMailQueue($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -889,7 +895,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 		)
 	);
 	$mails = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
 		if (!empty($row['private']))
@@ -897,7 +903,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 		$mails[] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $mails;
 }
@@ -908,17 +914,19 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS queue_size
 		FROM {db_prefix}mail_queue',
 		array(
 		)
 	);
-	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($mailQueueSize) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $mailQueueSize;
 }
@@ -929,9 +937,11 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		DELETE FROM {db_prefix}mail_queue
 		WHERE id_mail IN ({array_int:mail_ids})',
 		array(
@@ -946,19 +956,21 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	$items = array();
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS queue_size, MIN(time_sent) AS oldest
 		FROM {db_prefix}mail_queue',
 		array(
 		)
 	);
-	list ($items['mailQueueSize'], $items['mailOldest']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($items['mailQueueSize'], $items['mailOldest']) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $items;
 }

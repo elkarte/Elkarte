@@ -385,7 +385,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $smcFunc, $scripturl;
+		global $context, $txt, $modSettings, $sig_start, $scripturl, $smcFunc;
 
 		// initialize the form
 		$this->_initSignatureSettingsForm();

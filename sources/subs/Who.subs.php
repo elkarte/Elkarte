@@ -16,7 +16,9 @@ if (!defined('ELKARTE'))
 
 function viewers($id, $session, $type = 'topic')
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if (!in_array($type, array('topic', 'board')))
 	{
@@ -25,7 +27,7 @@ function viewers($id, $session, $type = 'topic')
 	}
 
 	$viewers = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.id_member, lo.log_time, mem.real_name, mem.member_name, mem.show_online,
 			mg.online_color, mg.id_group, mg.group_name
@@ -39,11 +41,11 @@ function viewers($id, $session, $type = 'topic')
 			'session' => $session
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$viewers[] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $viewers;
 }

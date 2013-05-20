@@ -39,8 +39,10 @@ class Post_Controller
 	function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $settings;
-		global $options, $smcFunc, $language;
+		global $user_info, $context, $settings, $smcFunc;
+		global $options, $language;
+
+		$db = database();
 
 		loadLanguage('Post');
 
@@ -82,7 +84,7 @@ class Post_Controller
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
 					t.id_first_msg, mf.subject,
@@ -98,8 +100,8 @@ class Post_Controller
 					'current_topic' => $topic,
 				)
 			);
-			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			// If this topic already has a poll, they sure can't add another.
 			if (isset($_REQUEST['poll']) && $pollID > 0)
@@ -247,7 +249,7 @@ class Post_Controller
 				}
 
 				// Get the current event information.
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT
 						id_member, title, MONTH(start_date) AS month, DAYOFMONTH(start_date) AS day,
 						YEAR(start_date) AS year, (TO_DAYS(end_date) - TO_DAYS(start_date)) AS span
@@ -258,8 +260,8 @@ class Post_Controller
 						'id_event' => $context['event']['id'],
 					)
 				);
-				$row = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
+				$row = $db->fetch_assoc($request);
+				$db->free_result($request);
 
 				// Make sure the user is allowed to edit this event.
 				if ($row['id_member'] != $user_info['id'])
@@ -323,7 +325,7 @@ class Post_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -336,8 +338,8 @@ class Post_Controller
 						'approved' => 1,
 					)
 				);
-				list ($context['new_replies']) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				list ($context['new_replies']) = $db->fetch_row($request);
+				$db->free_result($request);
 
 				if (!empty($context['new_replies']))
 				{
@@ -930,8 +932,10 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
+		global $board, $topic, $txt, $modSettings, $context;
+		global $user_info, $board_info, $options, $scripturl, $settings, $smcFunc;
+
+		$db = database();
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -1667,7 +1671,7 @@ class Post_Controller
 
 			if (!empty($board_list))
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_boards
 					SET id_msg = {int:id_msg}
 					WHERE id_member = {int:current_member}
@@ -1684,7 +1688,7 @@ class Post_Controller
 		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
 				array($user_info['id'], $topic, 0),
@@ -1692,7 +1696,7 @@ class Post_Controller
 			);
 		}
 		elseif (!$newTopic)
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_member = {int:current_member}
 					AND id_topic = {int:current_topic}',
@@ -1797,8 +1801,9 @@ class Post_Controller
 	 */
 	function action_quotefast()
 	{
-		global $modSettings, $user_info, $txt, $settings, $context;
-		global $smcFunc;
+		global $modSettings, $user_info, $txt, $settings, $context, $smcFunc;
+
+		$db = database();
 
 		loadLanguage('Post');
 		if (!isset($_REQUEST['xml']))
@@ -1814,7 +1819,7 @@ class Post_Controller
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
 				m.id_board, m.id_member, m.approved
 			FROM {db_prefix}messages AS m
@@ -1831,9 +1836,9 @@ class Post_Controller
 				'not_locked' => 0,
 			)
 		);
-		$context['close_window'] = $smcFunc['db_num_rows']($request) == 0;
-		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$context['close_window'] = $db->num_rows($request) == 0;
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
@@ -1903,7 +1908,9 @@ class Post_Controller
 	function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
-		global $user_info, $context, $smcFunc, $language;
+		global $user_info, $context, $language, $smcFunc;
+
+		$db = database();
 
 		// We have to have a topic!
 		if (empty($topic))
@@ -1914,7 +1921,7 @@ class Post_Controller
 
 		// Assume the first message if no message ID was given.
 		// @todo: candidate for messageInfo
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.locked, t.num_replies, t.id_member_started, t.id_first_msg,
 				m.id_msg, m.id_member, m.poster_time, m.subject, m.smileys_enabled, m.body, m.icon,
@@ -1933,10 +1940,10 @@ class Post_Controller
 				'guest_id' => 0,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_board', false);
-		$row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		// Change either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
@@ -2082,7 +2089,7 @@ class Post_Controller
 					cache_put_data('response_prefix', $context['response_prefix'], 600);
 				}
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET subject = {string:subject}
 					WHERE id_topic = {int:current_topic}
@@ -2161,6 +2168,8 @@ class Post_Controller
 	function action_spellcheck()
 	{
 		global $txt, $context, $smcFunc;
+
+		$db = database();
 
 		// A list of "words" we know about but pspell doesn't.
 		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');

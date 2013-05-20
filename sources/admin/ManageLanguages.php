@@ -623,7 +623,7 @@ class ManageLanguages_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
+		global $settings, $context, $txt, $modSettings, $language, $smcFunc;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');

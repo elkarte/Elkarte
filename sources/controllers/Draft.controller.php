@@ -324,7 +324,7 @@ class Draft_Controller
  */
 function saveDraft()
 {
-	global $context, $user_info, $smcFunc, $modSettings, $board;
+	global $context, $user_info, $modSettings, $board, $smcFunc;
 
 	// ajax calling
 	if (!isset($context['drafts_save']))
@@ -424,7 +424,7 @@ function saveDraft()
  */
 function savePMDraft($recipientList)
 {
-	global $context, $user_info, $smcFunc, $modSettings;
+	global $context, $user_info, $modSettings, $smcFunc;
 
 	// ajax calling
 	if (!isset($context['drafts_pm_save']))

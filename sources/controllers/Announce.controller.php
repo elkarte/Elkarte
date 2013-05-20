@@ -63,7 +63,9 @@ class Announce_Controller
 	 */
 	function action_selectgroup()
 	{
-		global $txt, $context, $topic, $board, $board_info, $smcFunc;
+		global $txt, $context, $topic, $board, $board_info;
+
+		$db = database();
 
 		$groups = array_merge($board_info['groups'], array(1));
 		foreach ($groups as $id => $group)
@@ -103,7 +105,9 @@ class Announce_Controller
 	function action_send()
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
-		global $language, $scripturl, $txt, $user_info, $smcFunc;
+		global $language, $scripturl, $txt, $user_info;
+
+		$db = database();
 
 		checkSession();
 
@@ -136,7 +140,7 @@ class Announce_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Select the email addresses for this batch.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member, mem.email_address, mem.lngfile
 			FROM {db_prefix}members AS mem
 			WHERE (mem.id_group IN ({array_int:group_list}) OR mem.id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, mem.additional_groups) != 0)' . (!empty($modSettings['allow_disableAnnounce']) ? '
@@ -157,7 +161,7 @@ class Announce_Controller
 		);
 
 		// All members have received a mail. Go to the next screen.
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 		{
 			logAction('announce_topic', array('topic' => $topic), 'user');
 			if (!empty($_REQUEST['move']) && allowedTo('move_any'))
@@ -170,7 +174,7 @@ class Announce_Controller
 
 		$announcements = array();
 		// Loop through all members that'll receive an announcement in this batch.
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -195,7 +199,7 @@ class Announce_Controller
 			$announcements[$cur_language]['recipients'][$row['id_member']] = $row['email_address'];
 			$context['start'] = $row['id_member'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// For each language send a different mail - low priority...
 		foreach ($announcements as $lang => $mail)

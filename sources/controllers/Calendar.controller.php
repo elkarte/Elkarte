@@ -174,6 +174,8 @@ class Calendar_Controller
 		global $context, $txt, $user_info, $scripturl;
 		global $modSettings, $topic, $smcFunc;
 
+		$db = database();
+
 		// Well - can they?
 		isAllowedTo('calendar_post');
 
@@ -229,7 +231,7 @@ class Calendar_Controller
 				// There could be already a topic you are not allowed to modify
 				if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_board, id_topic
 						FROM {db_prefix}calendar
 						WHERE id_event = {int:id_event}
@@ -237,8 +239,8 @@ class Calendar_Controller
 						array(
 							'id_event' => $_REQUEST['eventid'],
 					));
-					list ($id_board, $id_topic) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					list ($id_board, $id_topic) = $db->fetch_row($request);
+					$db->free_result($request);
 				}
 
 				$eventOptions = array(
@@ -343,7 +345,7 @@ class Calendar_Controller
 	 */
 	function action_ical()
 	{
-		global $smcFunc, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
+		global $forum_version, $context, $modSettings, $webmaster_email, $mbname, $smcFunc;
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))

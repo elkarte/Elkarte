@@ -58,7 +58,9 @@ class MergeTopics_Controller
 	 */
 	function action_mergeIndex()
 	{
-		global $txt, $board, $context, $smcFunc;
+		global $txt, $board, $context;
+
+		$db = database();
 		global $scripturl, $topic, $user_info, $modSettings;
 
 		if (!isset($_GET['from']))
@@ -78,7 +80,7 @@ class MergeTopics_Controller
 			$onlyApproved = false;
 
 		// How many topics are on this board?  (used for paging.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}topics AS t
 			WHERE t.id_board = {int:id_board}' . ($onlyApproved ? '
@@ -88,8 +90,8 @@ class MergeTopics_Controller
 				'is_approved' => 1,
 			)
 		);
-		list ($topiccount) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($topiccount) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Make the page list.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=mergetopics;from=' . $_GET['from'] . ';targetboard=' . $_REQUEST['targetboard'] . ';board=' . $board . '.%1$d', $_REQUEST['start'], $topiccount, $modSettings['defaultMaxTopics'], true);
@@ -131,7 +133,7 @@ class MergeTopics_Controller
 			);
 
 		// Get some topics to merge it with.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_topic, m.subject, m.id_member, IFNULL(mem.real_name, m.poster_name) AS poster_name
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -151,7 +153,7 @@ class MergeTopics_Controller
 			)
 		);
 		$context['topics'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			censorText($row['subject']);
 
@@ -167,7 +169,7 @@ class MergeTopics_Controller
 				'js_subject' => addcslashes(addslashes($row['subject']), '/')
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
 			fatal_lang_error('merge_need_more_topics');
@@ -194,7 +196,9 @@ class MergeTopics_Controller
 	function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
-		global $smcFunc, $language, $modSettings;
+		global $language, $modSettings, $smcFunc;
+
+		$db = database();
 
 		// Check the session.
 		checkSession('request');
@@ -220,7 +224,7 @@ class MergeTopics_Controller
 			$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 		// Get info about the topics and polls that will be merged.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
 				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
@@ -237,7 +241,7 @@ class MergeTopics_Controller
 				'topic_list' => $topics,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) < 2)
+		if ($db->num_rows($request) < 2)
 			fatal_lang_error('no_topic_id');
 		$num_views = 0;
 		$is_sticky = 0;
@@ -245,7 +249,7 @@ class MergeTopics_Controller
 		$boards = array();
 		$polls = array();
 		$firstTopic = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Make a note for the board counts...
 			if (!isset($boardTotals[$row['id_board']]))
@@ -298,7 +302,7 @@ class MergeTopics_Controller
 
 			$is_sticky = max($is_sticky, $row['is_sticky']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if (empty($topic_data))
@@ -336,7 +340,7 @@ class MergeTopics_Controller
 		{
 			if (count($polls) > 1)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT t.id_topic, t.id_poll, m.subject, p.question
 					FROM {db_prefix}polls AS p
 						INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
@@ -347,7 +351,7 @@ class MergeTopics_Controller
 						'polls' => $polls,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$context['polls'][] = array(
 						'id' => $row['id_poll'],
 						'topic' => array(
@@ -357,7 +361,7 @@ class MergeTopics_Controller
 						'question' => $row['question'],
 						'selected' => $row['id_topic'] == $firstTopic
 					);
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			if (count($boards) > 1)
 			{
@@ -409,7 +413,7 @@ class MergeTopics_Controller
 			$target_subject = $topic_data[$firstTopic]['subject'];
 
 		// Get the first and last message and the number of messages....
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
@@ -421,7 +425,7 @@ class MergeTopics_Controller
 		);
 		$topic_approved = 1;
 		$first_msg = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// If this is approved, or is fully unapproved.
 			if ($row['approved'] || !isset($first_msg))
@@ -452,7 +456,7 @@ class MergeTopics_Controller
 				$num_unapproved = $row['message_count'];
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Ensure we have a board stat for the target board.
 		if (!isset($boardTotals[$target_board]))
@@ -475,7 +479,7 @@ class MergeTopics_Controller
 		$boardTotals[$target_board]['posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
 
 		// Get the member ID of the first and last message.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
@@ -486,40 +490,40 @@ class MergeTopics_Controller
 				'last_msg' => $last_msg,
 			)
 		);
-		list ($member_started) = $smcFunc['db_fetch_row']($request);
-		list ($member_updated) = $smcFunc['db_fetch_row']($request);
+		list ($member_started) = $db->fetch_row($request);
+		list ($member_updated) = $db->fetch_row($request);
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === NULL)
 			$member_updated = $member_started;
 
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Obtain all the message ids we are going to affect.
 		$affected_msgs = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})',
 			array(
 				'topic_list' => $topics,
 		));
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $db->fetch_row($request))
 			$affected_msgs[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($topics);
 
 		// Delete the remaining topics.
 		$deleted_topics = array_diff($topics, array($id_topic));
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}topics
 			WHERE id_topic IN ({array_int:deleted_topics})',
 			array(
 				'deleted_topics' => $deleted_topics,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic IN ({array_int:deleted_topics})',
 			array(
@@ -528,7 +532,7 @@ class MergeTopics_Controller
 		);
 
 		// Asssign the properties of the newly merged topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_board = {int:id_board},
@@ -574,7 +578,7 @@ class MergeTopics_Controller
 		}
 
 		// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
@@ -590,7 +594,7 @@ class MergeTopics_Controller
 		);
 
 		// Any reported posts should reflect the new board.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_reported
 			SET
 				id_topic = {int:id_topic},
@@ -604,7 +608,7 @@ class MergeTopics_Controller
 		);
 
 		// Change the subject of the first message...
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET subject = {string:target_subject}
 			WHERE id_msg = {int:first_msg}',
@@ -615,7 +619,7 @@ class MergeTopics_Controller
 		);
 
 		// Adjust all calendar events to point to the new topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}calendar
 			SET
 				id_topic = {int:id_topic},
@@ -630,7 +634,7 @@ class MergeTopics_Controller
 
 		// Merge log topic entries.
 		// The disregard setting comes from the oldest topic
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
 			FROM {db_prefix}log_topics
 			WHERE id_topic IN ({array_int:topics})
@@ -639,10 +643,10 @@ class MergeTopics_Controller
 				'topics' => $topics,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($db->num_rows($request) > 0)
 		{
 			$replaceEntries = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
 
 			require_once(SUBSDIR . '/Topic.subs.php');
@@ -650,7 +654,7 @@ class MergeTopics_Controller
 			unset($replaceEntries);
 
 			// Get rid of the old log entries.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_topics
 				WHERE id_topic IN ({array_int:deleted_topics})',
 				array(
@@ -658,13 +662,13 @@ class MergeTopics_Controller
 				)
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Merge topic notifications.
 		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
 		if (!empty($notifications))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member, MAX(sent) AS sent
 				FROM {db_prefix}log_notify
 				WHERE id_topic IN ({array_int:topics_list})
@@ -673,13 +677,13 @@ class MergeTopics_Controller
 					'topics_list' => $notifications,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($db->num_rows($request) > 0)
 			{
 				$replaceEntries = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
 
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 						'{db_prefix}log_notify',
 						array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
 						$replaceEntries,
@@ -687,7 +691,7 @@ class MergeTopics_Controller
 					);
 				unset($replaceEntries);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_topics
 					WHERE id_topic IN ({array_int:deleted_topics})',
 					array(
@@ -695,27 +699,27 @@ class MergeTopics_Controller
 					)
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Get rid of the redundant polls.
 		if (!empty($deleted_polls))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}polls
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
 					'deleted_polls' => $deleted_polls,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}poll_choices
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
 					'deleted_polls' => $deleted_polls,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_polls
 				WHERE id_poll IN ({array_int:deleted_polls})',
 				array(
@@ -727,7 +731,7 @@ class MergeTopics_Controller
 		// Cycle through each board...
 		foreach ($boardTotals as $id_board => $stats)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_topics = CASE WHEN {int:topics} > num_topics THEN 0 ELSE num_topics - {int:topics} END,

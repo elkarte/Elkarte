@@ -41,7 +41,9 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $smcFunc;
+
+
+		$db = database();
 
 		$replacements = array(
 			'create_tmp_log_search_topics' => array(
@@ -79,7 +81,7 @@ class DbSearch_PostgreSQL implements DbSearch
 			$db_values['db_error_skip'] = true;
 		}
 
-		$return = $smcFunc['db_query']('', $db_string,
+		$return = $db->query('', $db_string,
 			$db_values, $connection
 		);
 
@@ -93,11 +95,13 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global $smcFunc;
+
+
+		$db = database();
 
 		$size = 'int';
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			CREATE TABLE {db_prefix}log_search_words (
 				id_word {raw:size} NOT NULL default {string:string_zero},
 				id_msg int NOT NULL default {string:string_zero},

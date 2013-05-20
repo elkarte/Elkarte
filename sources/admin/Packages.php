@@ -112,7 +112,7 @@ class Packages_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $smcFunc, $settings;
+		global $txt, $context, $scripturl, $settings, $smcFunc;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -731,7 +731,9 @@ class Packages_Controller
 	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
-		global $user_info, $smcFunc;
+		global $user_info;
+
+		$db = database();
 
 		// Make sure we don't install this mod twice.
 		checkSubmitOnce('check');

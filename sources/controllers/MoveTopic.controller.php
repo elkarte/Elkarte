@@ -33,7 +33,9 @@ class MoveTopic_Controller
 	 */
 	function action_movetopic()
 	{
-		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $modSettings;
+		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $modSettings;
+
+		$db = database();
 		global $cat_tree, $boards, $boardList;
 
 		if (empty($topic))
@@ -112,6 +114,8 @@ class MoveTopic_Controller
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
 		global $board, $language, $user_info, $smcFunc;
+
+		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -204,7 +208,7 @@ class MoveTopic_Controller
 						cache_put_data('response_prefix', $context['response_prefix'], 600);
 					}
 
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}messages
 						SET subject = {string:subject}
 						WHERE id_topic = {int:current_topic}',
@@ -215,7 +219,7 @@ class MoveTopic_Controller
 					);
 				}
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET subject = {string:custom_subject}
 					WHERE id_msg = {int:id_first_msg}',
@@ -277,7 +281,7 @@ class MoveTopic_Controller
 
 		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -288,14 +292,14 @@ class MoveTopic_Controller
 				)
 			);
 			$posters = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($posters[$row['id_member']]))
 					$posters[$row['id_member']] = 0;
 
 				$posters[$row['id_member']]++;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			foreach ($posters as $id_member => $posts)
 			{

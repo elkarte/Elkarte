@@ -27,7 +27,9 @@ class ModerateAttachments_Controller
 	 */
 	function action_attachapprove()
 	{
-		global $smcFunc, $user_info;
+		global $user_info;
+
+		$db = database();
 
 		// Security is our primary concern...
 		checkSession('get');
@@ -41,7 +43,7 @@ class ModerateAttachments_Controller
 		{
 			$id_msg = (int) $_GET['mid'];
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_attach
 				FROM {db_prefix}attachments
 				WHERE id_msg = {int:id_msg}
@@ -53,9 +55,9 @@ class ModerateAttachments_Controller
 					'attachment_type' => 0,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$attachments[] = $row['id_attach'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 		elseif (!empty($_GET['aid']))
 			$attachments[] = (int) $_GET['aid'];
@@ -68,7 +70,7 @@ class ModerateAttachments_Controller
 		$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 		// Validate the attachments exist and are the right approval state.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -82,7 +84,7 @@ class ModerateAttachments_Controller
 			)
 		);
 		$attachments = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// We can only add it if we can approve in this board!
 			if ($allowed_boards == array(0) || in_array($row['id_board'], $allowed_boards))
@@ -93,7 +95,7 @@ class ModerateAttachments_Controller
 				$redirect = 'topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'];
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($attachments))
 			fatal_lang_error('no_access', false);

@@ -65,6 +65,8 @@ class Members_Controller
 	{
 		global $user_info, $txt, $smcFunc;
 
+		$db = database();
+
 		checkSession('get');
 
 		$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
@@ -74,7 +76,7 @@ class Members_Controller
 		if (function_exists('iconv'))
 			header('Content-Type: text/plain; charset=UTF-8');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT real_name
 			FROM {db_prefix}members
 			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
@@ -86,7 +88,7 @@ class Members_Controller
 				'search' => $_REQUEST['search'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -95,7 +97,7 @@ class Members_Controller
 
 			echo $row['real_name'], "\n";
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		obExit(false);
 	}

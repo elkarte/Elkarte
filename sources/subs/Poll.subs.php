@@ -24,12 +24,14 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	if ($pollID === null)
 	{
 		// Retrieve the poll ID.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_poll
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
@@ -38,14 +40,14 @@ function associatedPoll($topicID, $pollID = null)
 				'current_topic' => $topicID,
 			)
 		);
-		list ($pollID) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($pollID) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		return $pollID;
 	}
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET id_poll = {int:poll}
 			WHERE id_topic = {int:current_topic}',
@@ -64,10 +66,12 @@ function associatedPoll($topicID, $pollID = null)
  */
 function removePoll($pollID)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Remove votes.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}',
 		array(
@@ -76,7 +80,7 @@ function removePoll($pollID)
 	);
 
 	// Remove the choices associated with this poll.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:id_poll}',
 		array(
@@ -85,7 +89,7 @@ function removePoll($pollID)
 	);
 
 	// Remove the poll.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}polls
 		WHERE id_poll = {int:id_poll}',
 		array(
@@ -101,9 +105,11 @@ function removePoll($pollID)
  */
 function resetVotes($pollID)
 {
-	global $smcFunc;
 
-	$smcFunc['db_query']('', '
+
+	$db = database();
+
+	$db->query('', '
 		UPDATE {db_prefix}polls
 		SET num_guest_voters = {int:no_votes}, reset_poll = {int:time}
 		WHERE id_poll = {int:id_poll}',
@@ -113,7 +119,7 @@ function resetVotes($pollID)
 			'time' => time(),
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}poll_choices
 		SET votes = {int:no_votes}
 		WHERE id_poll = {int:id_poll}',
@@ -122,7 +128,7 @@ function resetVotes($pollID)
 			'id_poll' => $pollID,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}',
 		array(
@@ -138,10 +144,12 @@ function resetVotes($pollID)
  */
 function getPollInfo($topicID)
 {
-	global $smcFunc;
+
+
+	$db = database();
 
 	// Check if a poll currently exists on this topic, and get the id, question and starter.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			t.id_member_started, p.id_poll, p.question, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 			m.subject, p.guest_vote, p.id_member AS poll_starter
@@ -156,12 +164,12 @@ function getPollInfo($topicID)
 	);
 
 	// The topic must exist
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 
 	// Get the poll information.
-	$pollinfo = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$pollinfo = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $pollinfo;
 }

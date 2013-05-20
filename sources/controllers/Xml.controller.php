@@ -307,7 +307,9 @@ function action_newsletterpreview()
  */
 function action_sig_preview()
 {
-	global $context, $smcFunc, $txt, $user_info;
+	global $context, $txt, $user_info;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Profile.subs.php');
 	loadLanguage('Profile');
@@ -389,7 +391,7 @@ function action_sig_preview()
  */
 function action_warning_preview()
 {
-	global $context, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $txt, $user_info, $scripturl, $mbname, $smcFunc;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
@@ -456,7 +458,7 @@ function action_warning_preview()
  */
 function action_bounce_preview()
 {
-	global $context, $smcFunc, $txt, $scripturl, $mbname, $modSettings;
+	global $context, $txt, $scripturl, $mbname, $modSettings, $smcFunc;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
