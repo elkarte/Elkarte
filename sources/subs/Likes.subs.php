@@ -211,6 +211,10 @@ function addLike($id_liker, $liked_message, $direction)
 		// If we are liking the first message in a topic, we are de facto liking the topic
 		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
 			increaseTopicLikes($topic, $direction);
+
+		// And update the stats
+		updateMemberData($id_liker, array('likes_given' => '+'));
+		updateMemberData($liked_message['id_member'], array('likes_received' => '+'));
 	}
 	// Or you are just being fickle?
 	elseif ($count !==0 && $direction === '-')
@@ -228,6 +232,10 @@ function addLike($id_liker, $liked_message, $direction)
 		// If we are unliking the first message in a topic, we are de facto unliking the topic
 		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
 			increaseTopicLikes($topic, $direction);
+
+		// And update the stats
+		updateMemberData($id_liker, array('likes_given' => '-'));
+		updateMemberData($liked_message['id_member'], array('likes_received' => '-'));
 	}
 
 	// Put it in the log so we can prevent flooding the system with likes

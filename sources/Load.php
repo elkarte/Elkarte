@@ -839,9 +839,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from,
 			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, COUNT(ml.id_member) AS likes_given, mem.likes_received';
-			$select_tables .= '
-				LEFT JOIN {db_prefix}message_likes AS ml ON (ml.id_member = mem.id_member)';
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.likes_given, mem.likes_received';
 			break;
 		case 'minimal':
 			$select_columns = '
