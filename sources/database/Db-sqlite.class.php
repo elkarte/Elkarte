@@ -979,7 +979,7 @@ class Database_SQLite implements Database
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+					$field_list[] = '\'' . $db->escape_string($item) . '\'';
 			}
 
 			// 'Insert' the data.

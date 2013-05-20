@@ -940,7 +940,7 @@ class Database_MySQL implements Database
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+					$field_list[] = '\'' . $db->escape_string($item) . '\'';
 			}
 
 			$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
@@ -1003,7 +1003,7 @@ class Database_MySQL implements Database
 					$type = strtolower($row['Type']);
 					$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
 
-					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $smcFunc['db_escape_string']($row['Default']) . '\'');
+					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $db->escape_string($row['Default']) . '\'');
 				}
 			}
 

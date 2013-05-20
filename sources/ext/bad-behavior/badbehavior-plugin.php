@@ -57,7 +57,7 @@ function bb2_db_escape($string)
 
 	$db = database();
 
-	return $smcFunc['db_escape_string']($string);
+	return $db->escape_string($string);
 }
 
 /**
