@@ -373,34 +373,6 @@ function expandIPv6($addr, $strict_check = true)
 		return false;
 }
 
-
-/**
- * Adds slashes to the array/variable.
- * What it does:
- * - returns the var, as an array or string, with escapes as required.
- * - importantly escapes all keys and values!
- * - calls itself recursively if necessary.
- *
- * @param array|string $var
- * @return array|string
- */
-function escapestring__recursive($var)
-{
-	$db = database();
-
-	if (!is_array($var))
-		return $db->escape_string($var);
-
-	// Reindex the array with slashes.
-	$new_var = array();
-
-	// Add slashes to every element, even the indexes!
-	foreach ($var as $k => $v)
-		$new_var[$db->escape_string($k)] = escapestring__recursive($v);
-
-	return $new_var;
-}
-
 /**
  * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
  * What it does:
@@ -422,58 +394,6 @@ function htmlspecialchars__recursive($var, $level = 0)
 		$var[$k] = $level > 25 ? null : htmlspecialchars__recursive($v, $level + 1);
 
 	return $var;
-}
-
-/**
- * Removes url stuff from the array/variable.  Uses two underscores to guard against overloading.
- * What it does:
- * - takes off url encoding (%20, etc.) from the array or string var.
- * - importantly, does it to keys too!
- * - calls itself recursively if there are any sub arrays.
- *
- * @param array|string $var
- * @param int $level = 0
- * @return array|string
- */
-function urldecode__recursive($var, $level = 0)
-{
-	if (!is_array($var))
-		return urldecode($var);
-
-	// Reindex the array...
-	$new_var = array();
-
-	// Add the htmlspecialchars to every element.
-	foreach ($var as $k => $v)
-		$new_var[urldecode($k)] = $level > 25 ? null : urldecode__recursive($v, $level + 1);
-
-	return $new_var;
-}
-
-/**
- * Remove slashes recursively.  Uses two underscores to guard against overloading.
- * What it does:
- * - removes slashes, recursively, from the array or string var.
- * - effects both keys and values of arrays.
- * - calls itself recursively to handle arrays of arrays.
- *
- * @param array|string $var
- * @param int $level = 0
- * @return array|string
- */
-function stripslashes__recursive($var, $level = 0)
-{
-	if (!is_array($var))
-		return stripslashes($var);
-
-	// Reindex the array without slashes, this time.
-	$new_var = array();
-
-	// Strip the slashes from every element.
-	foreach ($var as $k => $v)
-		$new_var[stripslashes($k)] = $level > 25 ? null : stripslashes__recursive($v, $level + 1);
-
-	return $new_var;
 }
 
 /**

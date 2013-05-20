@@ -186,4 +186,110 @@ class Util
 			return strlen(preg_replace('~' . $ent_list . '|.~u' . '', '_', $string));
 		}
 	}
+
+	/**
+	 * Adds slashes to the array/variable.
+	 * What it does:
+	 * - returns the var, as an array or string, with escapes as required.
+	 * - importantly escapes all keys and values!
+	 * - calls itself recursively if necessary.
+	 *
+	 * @param array|string $var
+	 * @return array|string
+	 */
+	static function escapestring_recursive($var)
+	{
+		global $smcFunc;
+
+		if (!is_array($var))
+			return $smcFunc['db_escape_string']($var);
+
+		// Reindex the array with slashes.
+		$new_var = array();
+
+		// Add slashes to every element, even the indexes!
+		foreach ($var as $k => $v)
+			$new_var[$smcFunc['db_escape_string']($k)] = escapestring_recursive($v);
+
+		return $new_var;
+	}
+
+	/**
+	 * Remove slashes recursively.
+	 * What it does:
+	 * - removes slashes, recursively, from the array or string var.
+	 * - effects both keys and values of arrays.
+	 * - calls itself recursively to handle arrays of arrays.
+	 *
+	 * @param array|string $var
+	 * @param int $level = 0
+	 * @return array|string
+	 */
+	static function stripslashes_recursive($var, $level = 0)
+	{
+		if (!is_array($var))
+			return stripslashes($var);
+
+		// Reindex the array without slashes, this time.
+		$new_var = array();
+
+		// Strip the slashes from every element.
+		foreach ($var as $k => $v)
+			$new_var[stripslashes($k)] = $level > 25 ? null : stripslashes_recursive($v, $level + 1);
+
+		return $new_var;
+	}
+
+	/**
+	 * Removes url stuff from the array/variable.
+	 * What it does:
+	 * - takes off url encoding (%20, etc.) from the array or string var.
+	 * - importantly, does it to keys too!
+	 * - calls itself recursively if there are any sub arrays.
+	 *
+	 * @param array|string $var
+	 * @param int $level = 0
+	 * @return array|string
+	 */
+	function urldecode_recursive($var, $level = 0)
+	{
+		if (!is_array($var))
+			return urldecode($var);
+
+		// Reindex the array...
+		$new_var = array();
+
+		// Add the htmlspecialchars to every element.
+		foreach ($var as $k => $v)
+			$new_var[urldecode($k)] = $level > 25 ? null : urldecode_recursive($v, $level + 1);
+
+		return $new_var;
+	}
+
+	/**
+	 * Unescapes any array or variable.
+	 * What it does:
+	 * - unescapes, recursively, from the array or string var.
+	 * - effects both keys and values of arrays.
+	 * - calls itself recursively to handle arrays of arrays.
+	 *
+	 * @param array|string $var
+	 * @return array|string
+	 */
+	function unescapestring_recursive($var)
+	{
+		global $smcFunc;
+
+		if (!is_array($var))
+		return $smcFunc['db_unescape_string']($var);
+
+		// Reindex the array without slashes, this time.
+		$new_var = array();
+
+		// Strip the slashes from every element.
+		foreach ($var as $k => $v)
+			$new_var[$smcFunc['db_unescape_string']($k)] = unescapestring_recursive($v);
+
+		return $new_var;
+	}
 }
