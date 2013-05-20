@@ -1429,6 +1429,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'spellcheck',
 	);
 
+	call_integration_hook('integrate_simple_actions', &$simpleActions);
+
 	// Output is fully XML, so no need for the index template.
 	if (isset($_REQUEST['xml']))
 	{

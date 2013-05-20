@@ -183,7 +183,7 @@ function deleteMembergroups($groups)
 		);
 
 	// Recalculate the post groups, as they likely changed.
-	updateStats('postgroups');
+	updatePostgroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
 	$settings_update = array('settings_updated' => time());
@@ -265,7 +265,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			)
 		);
 
-		updateStats('postgroups', $members);
+		updatePostgroupStats($members);
 
 		// Log what just happened.
 		foreach ($members as $member)
@@ -387,7 +387,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		);
 
 	// Their post groups may have changed now...
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
@@ -529,7 +529,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
@@ -1613,4 +1613,72 @@ function prepareMembergroupPermissions()
 	$smcFunc['db_free_result']($request);
 
 	return $profile_groups;
+}
+
+/**
+ * This function updates those members who match post-based
+ * membergroups in the database (restricted by parameter $members).
+ * Used by updateStats('postgroups').
+ *
+ * @param array $members = null The members to update, null if all
+ * @param array $parameter2 = null
+ */
+function updatePostgroupStats($members = null, $parameter2)
+{
+	global $smcFunc, $context;
+
+	// Parameter two is the updated columns: we should check to see if we base groups off any of these.
+	if ($parameter2 !== null && !in_array('posts', $parameter2))
+		return;
+
+	$postgroups = cache_get_data('updateStats:postgroups', 360);
+	if ($postgroups === null || $parameter1 === null)
+	{
+		// Fetch the postgroups!
+		$request = $smcFunc['db_query']('', '
+			SELECT id_group, min_posts
+			FROM {db_prefix}membergroups
+			WHERE min_posts != {int:min_posts}',
+			array(
+				'min_posts' => -1,
+			)
+		);
+		$postgroups = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$postgroups[$row['id_group']] = $row['min_posts'];
+		$smcFunc['db_free_result']($request);
+
+		// Sort them this way because if it's done with MySQL it causes a filesort :(.
+		arsort($postgroups);
+
+			cache_put_data('updateStats:postgroups', $postgroups, 360);
+	}
+
+	// Oh great, they've screwed their post groups.
+	if (empty($postgroups))
+		return;
+
+	// Set all membergroups from most posts to least posts.
+	$conditions = '';
+	$lastMin = 0;
+	foreach ($postgroups as $id => $min_posts)
+	{
+		$conditions .= '
+				WHEN posts >= ' . $min_posts . (!empty($lastMin) ? ' AND posts <= ' . $lastMin : '') . ' THEN ' . $id;
+		$lastMin = $min_posts;
+	}
+
+	$members = is_array($members) ? $members : array($members);
+
+	// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
+	$smcFunc['db_query']('', '
+		UPDATE {db_prefix}members
+		SET id_post_group = CASE ' . $conditions . '
+				ELSE 0
+			END' . ($members !== null ? '
+		WHERE id_member IN ({array_int:members})' : ''),
+		array(
+			'members' => $members,
+		)
+	);
 }

@@ -539,7 +539,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$recycle = true;
 
 			// Make sure we update the search subject index.
-			updateStats('subject', $topicID, $row['subject']);
+			updateSubjectStats($topicID, $row['subject']);
 		}
 
 		// If it wasn't approved don't keep it in the queue.
@@ -629,7 +629,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 
 	// Update the pesky statistics.
-	updateStats('message');
+	updateMessageStats();
 	updateStats('topic');
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -718,4 +718,84 @@ function canAccessMessage($id_msg, $check_approval = true)
 
 	// Otherwise, nope.
 	return false;
+}
+
+/**
+ * This function changes the total number of messages,
+ * and the highest message id by id_msg - which can be
+ * parameters 1 and 2, respectively.
+ * Used by updateStats('message').
+ *
+ * @param bool $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
+ * @param int $max_msg_id = null, Only used if $increment === true
+ */
+function updateMessageStats($increment = null, $max_msg_id = null)
+{
+	global $smcFunc, $modSettings;
+
+	if ($increment === true && $max_msg_id !== null)
+		updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
+	else
+	{
+		// SUM and MAX on a smaller table is better for InnoDB tables.
+		$result = $smcFunc['db_query']('', '
+			SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
+			FROM {db_prefix}boards
+			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+				AND id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => isset($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+				'blank_redirect' => '',
+			)
+		);
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
+
+		updateSettings(array(
+			'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
+			'maxMsgID' => $row['max_msg_id'] === null ? 0 : $row['max_msg_id']
+		));
+	}
+}
+
+/**
+ * This function updates the log_search_subjects in the event of a topic being
+ * moved, removed or split. It is being sent the topic id, and optionally
+ * the new subject.
+ * Used by updateStats('subject').
+ *
+ * @param int $id_topic
+ * @param string $subject
+ */
+function updateSubjectStats($id_topic, $subject = null)
+{
+	global $smcFunc;
+
+	// Remove the previous subject (if any).
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_search_subjects
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'id_topic' => (int) $id_topic,
+		)
+	);
+
+	// Insert the new subject.
+	if ($subject !== null)
+	{
+		$id_topic = (int) $id_topic;
+		$subject_words = text2words($subject);
+
+		$inserts = array();
+		foreach ($subject_words as $word)
+			$inserts[] = array($word, $id_topic);
+
+		if (!empty($inserts))
+			$smcFunc['db_insert']('ignore',
+				'{db_prefix}log_search_subjects',
+				array('word' => 'string', 'id_topic' => 'int'),
+				$inserts,
+				array('word', 'id_topic')
+			);
+	}
 }
