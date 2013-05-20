@@ -38,6 +38,9 @@ function cleanRequest()
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
 
+	// We'll need this fairly badly
+	require_once(SOURCEDIR . '/Request.php');
+
 	// Reject magic_quotes_sybase='on'.
 	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
 		die('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
@@ -198,67 +201,8 @@ function cleanRequest()
 	if (isset($_GET['action']))
 		$_GET['action'] = (string) $_GET['action'];
 
-	// Make sure we have a valid REMOTE_ADDR.
-	if (!isset($_SERVER['REMOTE_ADDR']))
-	{
-		// Command line, or else.
-		$_SERVER['REMOTE_ADDR'] = '';
-	}
-	// Perhaps we have a IPv6 address.
-	elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~::ffff:\d+\.\d+\.\d+\.\d+~', $_SERVER['REMOTE_ADDR']) !== 0)
-	{
-		$_SERVER['REMOTE_ADDR'] = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
-
-		// Just incase we have a legacy IPv4 address.
-		// @ TODO: Convert to IPv6.
-		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $_SERVER['REMOTE_ADDR']) === 0)
-			$_SERVER['REMOTE_ADDR'] = 'unknown';
-	}
-
-	// Try to calculate their most likely IP for those people behind proxies (And the like).
-	$_SERVER['BAN_CHECK_IP'] = $_SERVER['REMOTE_ADDR'];
-
-	// Find the user's IP address. (but don't let it give you 'unknown'!)
-	// @ TODO: IPv6 really doesn't need this.
-	if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['REMOTE_ADDR']) != 0))
-	{
-		// We have both forwarded for AND client IP... check the first forwarded for as the block - only switch if it's better that way.
-		if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.') && '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.') && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['REMOTE_ADDR']) != 0))
-			$_SERVER['BAN_CHECK_IP'] = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
-		else
-			$_SERVER['BAN_CHECK_IP'] = $_SERVER['HTTP_CLIENT_IP'];
-	}
-	if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['REMOTE_ADDR']) != 0))
-	{
-		// Since they are in different blocks, it's probably reversed.
-		if (strtok($_SERVER['REMOTE_ADDR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
-			$_SERVER['BAN_CHECK_IP'] = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
-		else
-			$_SERVER['BAN_CHECK_IP'] = $_SERVER['HTTP_CLIENT_IP'];
-	}
-	elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-	{
-		// If there are commas, get the last one.. probably.
-		if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',') !== false)
-		{
-			$ips = array_reverse(explode(', ', $_SERVER['HTTP_X_FORWARDED_FOR']));
-
-			// Go through each IP...
-			foreach ($ips as $i => $ip)
-			{
-				// Make sure it's in a valid range...
-				if (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $ip) != 0 && preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['REMOTE_ADDR']) == 0)
-					continue;
-
-				// Otherwise, we've got an IP!
-				$_SERVER['BAN_CHECK_IP'] = trim($ip);
-				break;
-			}
-		}
-		// Otherwise just use the only one.
-		elseif (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['REMOTE_ADDR']) != 0)
-			$_SERVER['BAN_CHECK_IP'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	}
+	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
+	$req = request();
 
 	// Make sure we know the URL of the current request.
 	if (empty($_SERVER['REQUEST_URI']))
@@ -268,14 +212,6 @@ function cleanRequest()
 	else
 		$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
 
-	// And make sure HTTP_USER_AGENT is set.
-	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES) : '';
-
-	// Some final checking.
-	if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $_SERVER['BAN_CHECK_IP']) === 0 || !isValidIPv6($_SERVER['BAN_CHECK_IP']))
-		$_SERVER['BAN_CHECK_IP'] = '';
-	if ($_SERVER['REMOTE_ADDR'] == 'unknown')
-		$_SERVER['REMOTE_ADDR'] = '';
 }
 
 /**
