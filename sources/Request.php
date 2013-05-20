@@ -145,9 +145,6 @@ class Request
 		// keep compatibility with the uses of $_SERVER['REMOTE_ADDR']...
 		$_SERVER['REMOTE_ADDR'] = $this->_client_ip;
 
-		// keep compatibility with the uses of $_SERVER['BAN_CHECK_IP']...
-		$_SERVER['BAN_CHECK_IP'] = $this->_client_ip;
-
 		// set the scheme, for later use
 		$this->_scheme = 'http';
 
