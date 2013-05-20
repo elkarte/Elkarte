@@ -600,7 +600,7 @@ function template_main()
 			}
 
 			echo '
-					<div class="list_posts smalltext" id="msg_', $post['id'], '_body">', $post['message'], '</div>
+					<div class="list_posts smalltext" id="msg_', $post['id'], '_body">', $post['body'], '</div>
 				</div>
 			</div>';
 		}

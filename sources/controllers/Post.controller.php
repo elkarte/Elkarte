@@ -771,7 +771,27 @@ class Post_Controller
 
 		// Update the topic summary, needed to show new posts in a preview
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
-			getTopic();
+		{
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
+			if (isset($_REQUEST['xml']))
+				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
+			else
+				$limit = empty($modSettings['topicSummaryPosts']) ? 0 : (int) $modSettings['topicSummaryPosts'];
+			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
+
+			$counter = 0;
+			$context['previous_posts'] = selectMessages($topic, 0, $limit, $before, $only_approved);
+			foreach ($context['previous_posts'] as &$post)
+			{
+				$post['is_new'] = !empty($context['new_replies']);
+				$post['counter'] = $counter++;
+				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($post['id_poster'], $user_info['ignoreusers']);
+
+				if (!empty($context['new_replies']))
+					$context['new_replies']--;
+			}
+		}
 
 		// Just ajax previewing then lets stop now
 		if (isset($_REQUEST['xml']))
@@ -910,7 +930,7 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context;
+		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $smcFunc, $scripturl, $settings;
 
 		// Sneaking off, are we?
@@ -1214,7 +1234,7 @@ class Post_Controller
 			}
 		}
 
-		// Incase we want to override
+		// In case we want to override
 		if (allowedTo('approve_posts'))
 		{
 			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
@@ -1410,7 +1430,23 @@ class Post_Controller
 			$_POST['question'] = $smcFunc['truncate']($_POST['question'], 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
+
+			// Finally, make the poll.
+			require_once(SUBSDIR . '/Poll.subs.php');
+			$id_poll = createPoll(
+				$_POST['question'],
+				$user_info['id'],
+				$_POST['guestname'],
+				$_POST['poll_max_votes'],
+				$_POST['poll_hide'],
+				$_POST['poll_expire'],
+				$_POST['poll_change_vote'],
+				$_POST['poll_guest_vote'],
+				$_POST['options']
+			);
 		}
+		else
+			$id_poll = 0;
 
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
@@ -1483,45 +1519,6 @@ class Post_Controller
 			}
 			unset($_SESSION['temp_attachments']);
 		}
-
-		// Make the poll...
-		if (isset($_REQUEST['poll']))
-		{
-			// Create the poll.
-			$smcFunc['db_insert']('',
-				'{db_prefix}polls',
-				array(
-					'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
-					'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
-				),
-				array(
-					$_POST['question'], $_POST['poll_hide'], $_POST['poll_max_votes'], (empty($_POST['poll_expire']) ? 0 : time() + $_POST['poll_expire'] * 3600 * 24), $user_info['id'],
-					$_POST['guestname'], $_POST['poll_change_vote'], $_POST['poll_guest_vote'],
-				),
-				array('id_poll')
-			);
-			$id_poll = $smcFunc['db_insert_id']('{db_prefix}polls', 'id_poll');
-
-			// Create each answer choice.
-			$i = 0;
-			$pollOptions = array();
-			foreach ($_POST['options'] as $option)
-			{
-				$pollOptions[] = array($id_poll, $i, $option);
-				$i++;
-			}
-
-			$smcFunc['db_insert']('insert',
-				'{db_prefix}poll_choices',
-				array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
-				$pollOptions,
-				array('id_poll', 'id_choice')
-			);
-
-			call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
-		}
-		else
-			$id_poll = 0;
 
 		// Creating a new topic?
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
@@ -1643,53 +1640,45 @@ class Post_Controller
 
 			// Delete it?
 			if (isset($_REQUEST['deleteevent']))
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}calendar
-					WHERE id_event = {int:id_event}',
-					array(
-						'id_event' => $_REQUEST['eventid'],
-					)
-				);
+				removeEvent($_REQUEST['eventid']);
 			// ... or just update it?
 			else
 			{
 				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
 				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
 
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}calendar
-					SET end_date = {date:end_date},
-						start_date = {date:start_date},
-						title = {string:title}
-					WHERE id_event = {int:id_event}',
-					array(
-						'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
-						'start_date' => strftime('%Y-%m-%d', $start_time),
-						'id_event' => $_REQUEST['eventid'],
-						'title' => $smcFunc['htmlspecialchars']($_REQUEST['evtitle'], ENT_QUOTES),
-					)
-				);
+				modifyEvent($_REQUEST['eventid'], array(
+					'start_date' => strftime('%Y-%m-%d', $start_time),
+					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
+					'title' => $_REQUEST['evtitle'],
+				));
 			}
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
 		}
 
 		// Marking read should be done even for editing messages....
 		// Mark all the parents read.  (since you just posted and they will be unread.)
-		if (!$user_info['is_guest'] && !empty($board_info['parent_boards']))
+		if (!$user_info['is_guest'])
 		{
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_boards
-				SET id_msg = {int:id_msg}
-				WHERE id_member = {int:current_member}
-					AND id_board IN ({array_int:board_list})',
-				array(
-					'current_member' => $user_info['id'],
-					'board_list' => array_keys($board_info['parent_boards']),
-					'id_msg' => $modSettings['maxMsgID'],
-				)
-			);
+			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
+
+			// Returning to the topic?
+			if (!empty($_REQUEST['goback']))
+				$board_list[] = $board;
+
+			if (!empty($board_list))
+			{
+				$smcFunc['db_query']('', '
+					UPDATE {db_prefix}log_boards
+					SET id_msg = {int:id_msg}
+					WHERE id_member = {int:current_member}
+						AND id_board IN ({array_int:board_list})',
+					array(
+						'current_member' => $user_info['id'],
+						'board_list' => $board_list,
+						'id_msg' => $modSettings['maxMsgID'],
+					)
+				);
+			}
 		}
 
 		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
@@ -1748,23 +1737,6 @@ class Post_Controller
 				else
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
-		}
-
-		// Returning to the topic?
-		if (!empty($_REQUEST['goback']))
-		{
-			// Mark the board as read.... because it might get confusing otherwise.
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}log_boards
-				SET id_msg = {int:maxMsgID}
-				WHERE id_member = {int:current_member}
-					AND id_board = {int:current_board}',
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-					'maxMsgID' => $modSettings['maxMsgID'],
-				)
-			);
 		}
 
 		if ($board_info['num_topics'] == 0)
@@ -1835,7 +1807,7 @@ class Post_Controller
 			loadJavascriptFile('post.js', array(), 'post_scripts');
 		}
 
-		include_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 
 		$moderate_boards = boardsAllowedTo('moderate_board');
 
@@ -2269,65 +2241,4 @@ class Post_Controller
 		$context['template_layers'] = array();
 		$context['sub_template'] = 'spellcheck';
 	}
-}
-
-/**
- * Get the topic for display purposes.
- *
- * gets a summary of the most recent posts in a topic.
- * depends on the topicSummaryPosts setting.
- * if you are editing a post, only shows posts previous to that post.
- */
-function getTopic()
-{
-	global $topic, $modSettings, $context, $smcFunc, $counter, $options;
-
-	if (isset($_REQUEST['xml']))
-		$limit = '
-		LIMIT ' . (empty($context['new_replies']) ? '0' : $context['new_replies']);
-	else
-		$limit = empty($modSettings['topicSummaryPosts']) ? '' : '
-		LIMIT ' . (int) $modSettings['topicSummaryPosts'];
-
-	// If you're modifying, get only those posts before the current one. (otherwise get all.)
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
-			m.body, m.smileys_enabled, m.id_msg, m.id_member
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE m.id_topic = {int:current_topic}' . (isset($_REQUEST['msg']) ? '
-			AND m.id_msg < {int:id_msg}' : '') .(!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND m.approved = {int:approved}') . '
-		ORDER BY m.id_msg DESC' . $limit,
-		array(
-			'current_topic' => $topic,
-			'id_msg' => isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0,
-			'approved' => 1,
-		)
-	);
-	$context['previous_posts'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		// Censor, BBC, ...
-		censorText($row['body']);
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
-		// ...and store.
-		$context['previous_posts'][] = array(
-			'counter' => $counter++,
-			'alternate' => $counter % 2,
-			'poster' => $row['poster_name'],
-			'message' => $row['body'],
-			'time' => standardTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'id' => $row['id_msg'],
-			'is_new' => !empty($context['new_replies']),
-			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($row['id_member'], $context['user']['ignoreusers']),
-		);
-
-		if (!empty($context['new_replies']))
-			$context['new_replies']--;
-	}
-	$smcFunc['db_free_result']($request);
 }

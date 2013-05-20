@@ -165,3 +165,68 @@ function getPollInfo($topicID)
 
 	return $pollinfo;
 }
+
+/**
+ * Create a poll
+ *
+ * @param string $question The title/question of the poll
+ * @param int $id_member = false The id of the creator
+ * @param string $poster_name The name of the poll creator
+ * @param int $max_votes = 1 The maximum number of votes you can do
+ * @param bool $hide_results = true If the results should be hidden
+ * @param int $expire = 0 The time in days that this poll will expire
+ * @param bool $can_change_vote = false If you can change your vote
+ * @param bool $can_guest_vote = false If guests can vote
+ * @param array $options = array() The poll options
+ * @return int the id of the created poll
+ */
+function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
+{
+	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
+
+	$db = database();
+	$db->insert('',
+		'{db_prefix}polls',
+		array(
+			'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
+			'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
+		),
+		array(
+			$question, $hide_results, $max_votes, $expire, $id_member,
+			$poster_name, $can_change_vote, $can_guest_vote,
+		),
+		array('id_poll')
+	);
+
+	$id_poll = $db->insert_id('{db_prefix}polls', 'id_poll');
+
+	if (!empty($options))
+		addPollOptions($id_poll, $options);
+
+	call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
+
+	return $id_poll;
+}
+
+/**
+ * Add options to an already created poll
+ *
+ * @param int $id_poll The id of the poll you're adding the options to
+ * @param array $options The options to choose from
+ */
+function addPollOptions($id_poll, array $options)
+{
+	$pollOptions = array();
+	foreach ($options as $i => $option)
+	{
+		$pollOptions[] = array($id_poll, $i, $option);
+	}
+
+	$db = database();
+	$db->insert('insert',
+		'{db_prefix}poll_choices',
+		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
+		$pollOptions,
+		array('id_poll', 'id_choice')
+	);
+}
