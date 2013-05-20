@@ -278,17 +278,17 @@ class Util
 	 */
 	function unescapestring_recursive($var)
 	{
-		global $smcFunc;
+		$db = database();
 
 		if (!is_array($var))
-		return $smcFunc['db_unescape_string']($var);
+		return $db->unescape_string($var);
 
 		// Reindex the array without slashes, this time.
 		$new_var = array();
 
 		// Strip the slashes from every element.
 		foreach ($var as $k => $v)
-			$new_var[$smcFunc['db_unescape_string']($k)] = unescapestring_recursive($v);
+			$new_var[$db->unescape_string($k)] = unescapestring_recursive($v);
 
 		return $new_var;
 	}
