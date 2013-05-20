@@ -663,3 +663,9 @@ CREATE TABLE {$db_prefix}message_likes (
 ALTER TABLE {$db_prefix}topics
 ADD COLUMN num_likes int NOT NULL default '0';
 ---#
+
+---# Adding new columns to members...
+ALTER TABLE {$db_prefix}members
+ADD COLUMN likes_given int NOT NULL default '0',
+ADD COLUMN likes_received int NOT NULL default '0',
+---#

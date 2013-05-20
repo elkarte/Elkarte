@@ -1288,6 +1288,8 @@ CREATE TABLE {$db_prefix}members (
   pm_email_notify tinyint(4) NOT NULL default '0',
   karma_bad smallint(5) unsigned NOT NULL default '0',
   karma_good smallint(5) unsigned NOT NULL default '0',
+  likes_given mediumint(5) unsigned NOT NULL default '0',
+  likes_received mediumint(5) unsigned NOT NULL default '0',
   usertitle varchar(255) NOT NULL default '',
   notify_announcements tinyint(4) NOT NULL default '1',
   notify_regularity tinyint(4) NOT NULL default '1',

@@ -1689,6 +1689,8 @@ CREATE TABLE {$db_prefix}members (
   pm_email_notify smallint NOT NULL default '0',
   karma_bad smallint NOT NULL default '0',
   karma_good smallint NOT NULL default '0',
+  likes_given int NOT NULL default '0',
+  likes_received int NOT NULL default '0',
   usertitle varchar(255) NOT NULL,
   notify_announcements smallint NOT NULL default '1',
   notify_regularity smallint NOT NULL default '1',
