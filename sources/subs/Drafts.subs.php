@@ -40,7 +40,7 @@ function create_pm_draft($draft, $recipientList)
 		serialize($recipientList),
 		$draft['outbox'],
 	);
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}user_drafts',
 		$draft_columns,
 		$draft_parameters,
@@ -128,7 +128,7 @@ function create_post_draft($draft)
 		$draft['locked'],
 		$draft['sticky']
 	);
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}user_drafts',
 		$draft_columns,
 		$draft_parameters,

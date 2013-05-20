@@ -880,7 +880,7 @@ function insertEvent(&$eventOptions)
 	call_integration_hook('integrate_create_event', array(&$eventOptions, &$event_columns, &$event_parameters));
 
 	// Insert the event!
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}calendar',
 		$event_columns,
 		$event_parameters,
@@ -1169,7 +1169,7 @@ function insert_holiday($date, $title)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}calendar_holidays',
 		array(
 			'event_date' => 'date', 'title' => 'string-60',

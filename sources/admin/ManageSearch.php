@@ -714,7 +714,7 @@ class ManageSearch_Controller
 					$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
 
 					if (!empty($inserts))
-						$smcFunc['db_insert']('ignore',
+						$db->insert('ignore',
 							'{db_prefix}log_search_words',
 							array('id_word' => 'int', 'id_msg' => 'int'),
 							$inserts,

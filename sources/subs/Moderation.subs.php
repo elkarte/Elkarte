@@ -250,7 +250,7 @@ function logWarningNotice($subject, $body)
 	$db = database();
 
 	// Log warning notice.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_member_notices',
 		array(
 			'subject' => 'string-255', 'body' => 'string-65534',
@@ -280,7 +280,7 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_comments',
 		array(
 			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int', 'recipient_name' => 'string-255',
@@ -556,7 +556,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 	// Or inserting a new row
 	else
 	{
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_comments',
 			array(
 				'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int',

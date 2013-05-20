@@ -1217,7 +1217,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		$db->free_result($request);
 
 		// Log the request.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_group_requests',
 			array(
 				'id_member' => 'int', 'id_group' => 'int', 'time_applied' => 'int', 'reason' => 'string-65534',

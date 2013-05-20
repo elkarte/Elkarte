@@ -105,7 +105,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	if (empty($last_error) || $last_error != $error_info)
 	{
 		// Insert the error into the database.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_errors',
 			array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 			$error_info,

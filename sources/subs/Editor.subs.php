@@ -1337,7 +1337,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 		$db = database();
 
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}antispam_questions',
 			array('question' => 'string-65535', 'answer' => 'string-65535', 'language' => 'string-50'),
 			$questions,

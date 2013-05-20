@@ -2083,7 +2083,7 @@ class PersonalMessage_Controller
 
 			// Create the rule?
 			if (empty($context['rid']))
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}pm_rules',
 					array(
 						'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',

@@ -425,7 +425,7 @@ class ManageSearchEngines_Controller
 					)
 				);
 			else
-				$smcFunc['db_insert']('insert',
+				$db->insert('insert',
 					'{db_prefix}spiders',
 					array(
 						'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string',

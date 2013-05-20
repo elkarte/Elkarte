@@ -255,7 +255,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		// Log each email that we sent so they can be replied to
 		if (!empty($sent))
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}postby_emails',
 				array(
 					'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
@@ -308,7 +308,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		$cur_insert_len = 0;
 
 		// Dump the data...
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}mail_queue',
 			array(
 				'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -354,7 +354,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		if ($this_insert_len + $cur_insert_len > 1000000)
 		{
 			// Flush out what we have so far.
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}mail_queue',
 				array(
 					'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -626,7 +626,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 	// Log each email
 	if (!empty($sent))
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}postby_emails',
 			array(
 				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'

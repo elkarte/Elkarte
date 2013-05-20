@@ -127,7 +127,7 @@ function writeLog($force = false)
 				)
 			);
 
-		$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
+		$db->insert($do_delete ? 'ignore' : 'replace',
 			'{db_prefix}log_online',
 			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
 			array($session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), 'IFNULL(INET_ATON(\'' . $user_info['ip'] . '\'), 0)', $serialized),
@@ -375,7 +375,7 @@ function trackStats($stats = array())
 	);
 	if ($smcFunc['db_affected_rows']() == 0)
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			array_merge($insert_keys, array('date' => 'date')),
 			array_merge($cache_stats, array($date)),
@@ -523,7 +523,7 @@ function logActions($logs)
 		);
 	}
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
@@ -550,7 +550,7 @@ function logLoginHistory($id_member, $ip, $ip2)
 
 	$db = database();
 
-	$smcFunc['db_insert']('insert',
+	$db->insert('insert',
 		'{db_prefix}member_logins',
 		array(
 			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',

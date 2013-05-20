@@ -1295,7 +1295,7 @@ function makeThemeChanges($memID, $id_theme)
 	{
 		if (!empty($themeSetArray))
 		{
-			$smcFunc['db_insert']('replace',
+			$db->insert('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$themeSetArray,
@@ -1382,7 +1382,7 @@ function makeNotificationChanges($memID)
 			$notification_inserts[] = array($memID, $id);
 
 		if (!empty($notification_inserts));
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_board' => 'int'),
 				$notification_inserts,
@@ -1509,7 +1509,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))
 	{
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
 			$changes,
@@ -2195,7 +2195,7 @@ function profileSaveAvatarData(&$value)
 				// Remove previous attachments this member might have had.
 				removeAttachments(array('id_member' => $memID));
 
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}attachments',
 					array(
 						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',

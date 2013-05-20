@@ -239,7 +239,7 @@ class Themes_Controller
 
 			if (!empty($setValues))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$setValues,
@@ -437,7 +437,7 @@ class Themes_Controller
 						)
 					);
 
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$setValues,
@@ -787,7 +787,7 @@ class Themes_Controller
 			// If we're actually inserting something..
 			if (!empty($inserts))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$inserts,
@@ -989,7 +989,7 @@ class Themes_Controller
 				// A variants to save for the user?
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_insert']('replace',
+					$db->insert('replace',
 						'{db_prefix}themes',
 						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 						array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
@@ -1006,7 +1006,7 @@ class Themes_Controller
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
@@ -1056,7 +1056,7 @@ class Themes_Controller
 
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_insert']('replace',
+					$db->insert('replace',
 						'{db_prefix}themes',
 						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 						array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
@@ -1568,7 +1568,7 @@ class Themes_Controller
 				$inserts[] = array($id_theme, $var, $val);
 
 			if (!empty($inserts))
-				$smcFunc['db_insert']('insert',
+				$db->insert('insert',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$inserts,
@@ -1667,7 +1667,7 @@ class Themes_Controller
 		}
 
 		// Update the option.
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 			array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']),

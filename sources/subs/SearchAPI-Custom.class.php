@@ -300,7 +300,7 @@ class Custom_Search
 			$inserts[] = array($word, $msgOptions['id']);
 
 		if (!empty($inserts))
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_search_words',
 				array('id_word' => 'int', 'id_msg' => 'int'),
 				$inserts,
@@ -356,7 +356,7 @@ class Custom_Search
 				$inserts = array();
 				foreach ($inserted_words as $word)
 					$inserts[] = array($word, $msgOptions['id']);
-				$smcFunc['db_insert']('insert',
+				$db->insert('insert',
 					'{db_prefix}log_search_words',
 					array('id_word' => 'string', 'id_msg' => 'int'),
 					$inserts,

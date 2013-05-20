@@ -101,7 +101,7 @@ class MaillistSettingsClass extends Settings_Form
 		}
 
 		// Do it !!
-		$smcFunc['db_insert']($update ? 'replace' : 'insert',
+		$db->insert($update ? 'replace' : 'insert',
 			'{db_prefix}' . $tablename,
 			$insert_type,
 			$insert_value,

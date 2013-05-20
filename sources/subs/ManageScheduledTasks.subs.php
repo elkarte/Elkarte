@@ -58,7 +58,7 @@ function logTask($task_id, $total_time)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_scheduled_tasks',
 		array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
 		array($task_id, time(), $total_time),

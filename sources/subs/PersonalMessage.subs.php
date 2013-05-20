@@ -690,7 +690,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		trackStats(array('pm' => '+'));
 
 	// Insert the message itself and then grab the last insert id.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}personal_messages',
 		array(
 			'id_pm_head' => 'int', 'id_member_from' => 'int', 'deleted_by_sender' => 'int',
@@ -736,7 +736,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 				$to_list[] = $to;
 		}
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}pm_recipients',
 			array(
 				'id_pm' => 'int', 'id_member' => 'int', 'bcc' => 'int', 'deleted' => 'int', 'is_new' => 'int'

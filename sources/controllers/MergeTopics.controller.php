@@ -683,7 +683,7 @@ class MergeTopics_Controller
 				while ($row = $db->fetch_assoc($request))
 					$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
 
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 						'{db_prefix}log_notify',
 						array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
 						$replaceEntries,

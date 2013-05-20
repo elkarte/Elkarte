@@ -367,7 +367,7 @@ function addProfileField($field)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}custom_fields',
 		array(
 			'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',

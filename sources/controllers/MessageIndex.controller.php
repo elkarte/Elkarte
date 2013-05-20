@@ -138,7 +138,7 @@ class MessageIndex_Controller
 				die;
 			}
 
-			$smcFunc['db_insert']('replace',
+			$db->insert('replace',
 				'{db_prefix}log_boards',
 				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 				array($modSettings['maxMsgID'], $user_info['id'], $board),

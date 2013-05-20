@@ -1688,7 +1688,7 @@ class Post_Controller
 		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
 				array($user_info['id'], $topic, 0),

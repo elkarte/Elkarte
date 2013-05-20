@@ -75,14 +75,14 @@ function markBoardsRead($boards, $unread = false)
 			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], $board);
 
 		// Update log_mark_read and log_boards.
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}log_mark_read',
 			array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 			$markRead,
 			array('id_board', 'id_member')
 		);
 
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}log_boards',
 			array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 			$markRead,
@@ -424,7 +424,7 @@ function modifyBoard($board_id, &$boardOptions)
 			foreach ($boardOptions['moderators'] as $moderator)
 				$inserts[] = array($board_id, $moderator);
 
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}moderators',
 				array('id_board' => 'int', 'id_member' => 'int'),
 				$inserts,
@@ -491,7 +491,7 @@ function createBoard($boardOptions)
 	call_integration_hook('integrate_create_board', array(&$boardOptions, &$board_columns, &$board_parameters));
 
 	// Insert a board, the settings are dealt with later.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}boards',
 		$board_columns,
 		$board_parameters,
@@ -973,7 +973,7 @@ function setBoardNotification($id_member, $id_board, $on = false)
 	if ($on)
 	{
 		// Turn notification on.  (note this just blows smoke if it's already on.)
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_notify',
 			array('id_member' => 'int', 'id_board' => 'int'),
 			array($id_member, $id_board),

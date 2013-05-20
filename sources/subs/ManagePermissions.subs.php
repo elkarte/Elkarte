@@ -233,7 +233,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		foreach ($groupLevels['global'][$level] as $permission)
 			$groupInserts[] = array($group, $permission);
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}permissions',
 			array('id_group' => 'int', 'permission' => 'string'),
 			$groupInserts,
@@ -244,7 +244,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		foreach ($groupLevels['board'][$level] as $permission)
 			$boardInserts[] = array(1, $group, $permission);
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string'),
 			$boardInserts,
@@ -276,7 +276,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 			foreach ($groupLevels['board'][$level] as $permission)
 				$boardInserts[] = array($profile, $group, $permission);
 
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}board_permissions',
 				array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string'),
 				$boardInserts,
@@ -319,7 +319,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 			foreach ($boardLevels[$level] as $permission)
 				$boardInserts[] = array($profile, $group, $permission);
 
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}board_permissions',
 				array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string'),
 				$boardInserts,
@@ -333,7 +333,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		foreach ($boardLevels[$level] as $permission)
 			$boardInserts[] = array($profile, 0, $permission);
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 				'{db_prefix}board_permissions',
 				array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string'),
 				$boardInserts,
@@ -858,7 +858,7 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
 	if (!empty($inserts))
 	{
 		// ..and insert the new ones.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}permissions',
 			array(
 				'permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int',
@@ -925,7 +925,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 	if (!empty($inserts))
 	{
 		// ..and insert the new ones.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}board_permissions',
 			array('permission' => 'string', 'id_group' => 'int', 'id_profile' => 'int', 'add_deny' => 'int'),
 			$inserts,
@@ -997,7 +997,7 @@ function replacePermission($permChange)
 
 	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}permissions',
 			array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int'),
 			$permChange,
@@ -1016,7 +1016,7 @@ function replaceBoardPermission($permChange)
 
 	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}board_permissions',
 		array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int', 'id_profile' => 'int'),
 		$permChange,
@@ -1243,7 +1243,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 
 	$profile_name = $smcFunc['htmlspecialchars']($profile_name);
 	// Insert the profile itself.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}permission_profiles',
 		array(
 			'profile_name' => 'string',
@@ -1270,7 +1270,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
@@ -1407,7 +1407,7 @@ function insertBoardPermission($new_permissions)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}board_permissions',
 		array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 		$new_permissions,

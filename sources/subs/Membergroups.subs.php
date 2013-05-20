@@ -1100,7 +1100,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}membergroups',
 		array(
 			'id_group' => 'int', 'description' => 'string', 'group_name' => 'string-80', 'min_posts' => 'int',
@@ -1146,7 +1146,7 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}permissions',
 			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
@@ -1183,7 +1183,7 @@ function copyBoardPermissions($id_group, $copy_from)
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
@@ -1510,7 +1510,7 @@ function assignGroupModerators($id_group, $group_moderators)
 		foreach ($group_moderators as $moderator)
 			$mod_insert[] = array($id_group, $moderator);
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}group_moderators',
 			array('id_group' => 'int', 'id_member' => 'int'),
 			$mod_insert,

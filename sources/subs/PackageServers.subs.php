@@ -81,7 +81,7 @@ function addPackageServer($name, $url)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}package_servers',
 		array(
 			'name' => 'string-255', 'url' => 'string-255',

@@ -707,7 +707,7 @@ class Display_Controller
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if (isset($_REQUEST['boardseen']))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}log_boards',
 					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 					array($modSettings['maxMsgID'], $user_info['id'], $board),
@@ -1252,7 +1252,7 @@ function loadAttachmentContext($id_msg)
 						$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
 
 						// Add this beauty to the database.
-						$smcFunc['db_insert']('',
+						$db->insert('',
 							'{db_prefix}attachments',
 							array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
 							array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),

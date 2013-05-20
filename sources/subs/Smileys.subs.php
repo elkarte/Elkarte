@@ -118,7 +118,7 @@ function addSmiley($param)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}smileys',
 		array(
 			'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80', 'hidden' => 'int', 'smiley_order' => 'int',
@@ -438,7 +438,7 @@ function logPackageInstall($param)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_packages',
 		array(
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',

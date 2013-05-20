@@ -746,7 +746,7 @@ function createAttachment(&$attachmentOptions)
 			$attachmentOptions['fileext'] = '';
 	}
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -772,7 +772,7 @@ function createAttachment(&$attachmentOptions)
 
 	// If it's not approved then add to the approval queue.
 	if (!$attachmentOptions['approved'])
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_attach' => 'int', 'id_msg' => 'int',
@@ -834,7 +834,7 @@ function createAttachment(&$attachmentOptions)
 			}
 
 			// To the database we go!
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}attachments',
 				array(
 					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -1251,7 +1251,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	$id_folder = getAttachmentPathID();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int',

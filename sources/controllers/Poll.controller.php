@@ -183,7 +183,7 @@ class Poll_Controller
 		}
 
 		// Add their vote to the tally.
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}log_polls',
 			array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
 			$inserts,
@@ -734,7 +734,7 @@ class Poll_Controller
 		else
 		{
 			// Create the poll.
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}polls',
 				array(
 					'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
@@ -810,7 +810,7 @@ class Poll_Controller
 					)
 				);
 			else
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}poll_choices',
 					array(
 						'id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255', 'votes' => 'int',

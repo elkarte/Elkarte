@@ -93,7 +93,7 @@ function updateMessageIcon($icon)
 
 	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}message_icons',
 		array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,
@@ -112,7 +112,7 @@ function addMessageIcon($icon)
 
 	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}message_icons',
 		array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,

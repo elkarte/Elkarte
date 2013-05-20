@@ -101,7 +101,7 @@ function AutoTask()
 				if ($completed)
 				{
 					$total_time = round(microtime(true) - $time_start, 3);
-					$smcFunc['db_insert']('',
+					$db->insert('',
 						'{db_prefix}log_scheduled_tasks',
 						array(
 							'id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float',
@@ -1153,7 +1153,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// Log each email.
 	if (!empty($sent))
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}postby_emails',
 			array(
 				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
@@ -1167,7 +1167,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (!empty($failed_emails))
 	{
 		// Update the failed attempts check.
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('mail_failed_attempts', empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts']),
@@ -1189,7 +1189,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 			);
 
 		// Add our email back to the queue, manually.
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}mail_queue',
 			array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
 			$failed_emails,

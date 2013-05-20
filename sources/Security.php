@@ -515,7 +515,7 @@ function log_ban($ban_ids = array(), $email = null)
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 		return;
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_banned',
 		array('id_member' => 'int', 'ip' => 'string-16', 'email' => 'string', 'log_time' => 'int'),
 		array($user_info['id'], $user_info['ip'], ($email === null ? ($user_info['is_guest'] ? '' : $user_info['email']) : $email), time()),
@@ -1221,7 +1221,7 @@ function spamProtection($error_type)
 	);
 
 	// Add a new entry, deleting the old if necessary.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array($user_info['ip'], time(), $error_type),

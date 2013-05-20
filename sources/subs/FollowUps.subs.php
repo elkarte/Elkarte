@@ -84,7 +84,7 @@ function linkMessages($msg, $topic)
 
 	$db = database();
 
-	$smcFunc['db_insert']('ignore',
+	$db->insert('ignore',
 		'{db_prefix}follow_ups',
 		array('follow_up' => 'int', 'derived_from' => 'int'),
 		array($topic, $msg),

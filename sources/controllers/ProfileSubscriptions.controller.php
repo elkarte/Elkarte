@@ -258,7 +258,7 @@ function action_subscriptions()
 		else
 		{
 			$pending_details = serialize(array($new_data));
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}log_subscribed',
 				array(
 					'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int', 'pending_details' => 'string-65534',

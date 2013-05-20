@@ -236,7 +236,7 @@ function trackStatsUsersOnline($total_users_online)
 		// The log_activity hasn't got an entry for today?
 		if ($db->num_rows($request) === 0)
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_activity',
 				array('date' => 'date', 'most_on' => 'int'),
 				array($date, $total_users_online),

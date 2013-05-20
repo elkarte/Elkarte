@@ -377,7 +377,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	else
 		$starttime = $forceStartTime;
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_subscribed',
 		array(
 			'id_subscribe' => 'int', 'id_member' => 'int', 'old_id_group' => 'int', 'start_time' => 'int',
@@ -575,7 +575,7 @@ function insertSubscription($insert)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 	'{db_prefix}subscriptions',
 		array(
 			'name' => 'string-60', 'description' => 'string-255', 'active' => 'int', 'length' => 'string-4', 'cost' => 'string',
@@ -941,7 +941,7 @@ function logSubscription($details)
 
 	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_subscribed',
 		array(
 			'id_subscribe' => 'int', 'id_member' => 'int', 'old_id_group' => 'int', 'start_time' => 'int',

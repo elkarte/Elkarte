@@ -218,7 +218,7 @@ function openID_makeAssociation($server)
 		$secret = $assoc_data['mac_key'];
 
 	// Store the data
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}openid_assoc',
 		array('server_url' => 'string', 'handle' => 'string', 'secret' => 'string', 'issued' => 'int', 'expires' => 'int', 'assoc_type' => 'string'),
 		array($server, $handle, $secret, $issued, $expires, $assoc_type),

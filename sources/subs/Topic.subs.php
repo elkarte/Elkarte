@@ -654,7 +654,7 @@ function moveTopics($topics, $toBoard)
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}log_boards',
 			array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
 			array($toBoard, $user_info['id'], $modSettings['maxMsgID']),
@@ -757,7 +757,7 @@ function markTopicsRead($mark_topics, $was_set = false)
 	if (!is_array($mark_topics))
 		return;
 
-	$smcFunc['db_insert']($was_set ? 'replace' : 'ignore',
+	$db->insert($was_set ? 'replace' : 'ignore',
 		'{db_prefix}log_topics',
 		array(
 			'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int',
@@ -902,7 +902,7 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 	if ($on)
 	{
 		// Attempt to turn notifications on.
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_notify',
 			array('id_member' => 'int', 'id_topic' => 'int'),
 			array($id_member, $id_topic),
@@ -1052,7 +1052,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	$was_set = getLoggedTopics($user_info['id'], array($topic));
 
 	// Set topic disregard on/off for this topic.
-	$smcFunc['db_insert'](empty($was_set) ? 'ignore' : 'replace',
+	$db->insert(empty($was_set) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
 		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int'),
 		array($id_member, $topic, $was_set ? $was_set : 0, $on ? 1 : 0),

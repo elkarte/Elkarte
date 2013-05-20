@@ -533,7 +533,7 @@ class ModerationCenter_Controller
 			// In it goes.
 			if (!empty($newComment))
 			{
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}log_comments',
 					array(
 						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
@@ -1293,7 +1293,7 @@ function ModBlockNotes()
 		if (!empty($_POST['new_note']) && $_POST['new_note'] !== $txt['mc_click_add_note'])
 		{
 			// Insert it into the database then!
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}log_comments',
 				array(
 					'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',

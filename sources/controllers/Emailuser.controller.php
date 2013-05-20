@@ -503,7 +503,7 @@ class Emailuser_Controller
 				if (empty($message['real_name']))
 					$message['real_name'] = $message['poster_name'];
 
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}log_reported',
 					array(
 						'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -522,7 +522,7 @@ class Emailuser_Controller
 			// Now just add our report...
 			if ($id_report)
 			{
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}log_reported_comments',
 					array(
 						'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string', 'email_address' => 'string',

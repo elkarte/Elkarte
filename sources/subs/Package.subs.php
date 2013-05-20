@@ -3344,7 +3344,7 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
 
 	$db = database();
 
-	$smcFunc['db_insert']('', '{db_prefix}log_packages',
+	$db->insert('', '{db_prefix}log_packages',
 		array(
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
 			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',

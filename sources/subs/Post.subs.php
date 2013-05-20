@@ -651,7 +651,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
 	
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -1079,7 +1079,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	call_integration_hook('integrate_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
 
 	// Insert the post.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}messages',
 		$message_columns,
 		$message_parameters,
@@ -1121,7 +1121,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
 
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}topics',
 			$topic_columns,
 			$topic_parameters,
@@ -1243,7 +1243,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 
 		// Add to the approval queue too.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_msg' => 'int',
@@ -1673,7 +1673,7 @@ function approvePosts($msgs, $approve = true)
 		foreach ($msgs as $msg)
 			$msgInserts[] = array($msg);
 
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}approval_queue',
 			array('id_msg' => 'int'),
 			$msgInserts,
@@ -1780,7 +1780,7 @@ function sendApprovalNotifications(&$topicData)
 	}
 
 	// These need to go into the digest too...
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -2198,7 +2198,7 @@ function notifyMembersBoard(&$topicData)
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',

@@ -149,7 +149,7 @@ function updateChildPermissions($parents, $profile = null)
 		// Finally insert.
 		if (!empty($permissions))
 		{
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}permissions',
 				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$permissions,
@@ -193,7 +193,7 @@ function updateChildPermissions($parents, $profile = null)
 		// Do the insert.
 		if (!empty($permissions))
 		{
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}board_permissions',
 				array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$permissions,
@@ -254,7 +254,7 @@ class InlinePermissions_Form
 
 		// ...and replace them with new ones.
 		if (!empty($insertRows))
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}permissions',
 				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$insertRows,

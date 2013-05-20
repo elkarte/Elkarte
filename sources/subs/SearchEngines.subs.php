@@ -131,7 +131,7 @@ function logSpider()
 		// Nothing updated?
 		if ($smcFunc['db_affected_rows']() == 0)
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
 				array(
 					'id_spider' => 'int', 'last_seen' => 'int', 'stat_date' => 'date', 'page_hits' => 'int',
@@ -155,7 +155,7 @@ function logSpider()
 		else
 			$url = '';
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}log_spider_hits',
 			array('id_spider' => 'int', 'log_time' => 'int', 'url' => 'string'),
 			array($_SESSION['id_robot'], time(), $url),
@@ -215,7 +215,7 @@ function consolidateSpiderStats()
 
 	// New stats?
 	if (!empty($stat_inserts))
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_spider_stats',
 			array('stat_date' => 'date', 'id_spider' => 'int', 'page_hits' => 'int', 'last_seen' => 'int'),
 			$stat_inserts,

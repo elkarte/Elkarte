@@ -158,7 +158,7 @@ function createCategory($catOptions)
 	call_integration_hook('integrate_create_category', array(&$catOptions, &$cat_columns, &$cat_parameters));
 
 	// Add the category to the database.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}categories',
 		$cat_columns,
 		$cat_parameters,
@@ -330,7 +330,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))
-			$smcFunc['db_insert']('replace',
+			$db->insert('replace',
 				'{db_prefix}collapsed_categories',
 				array(
 					'id_cat' => 'int', 'id_member' => 'int',

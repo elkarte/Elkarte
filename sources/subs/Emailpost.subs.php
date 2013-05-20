@@ -743,7 +743,7 @@ function pbe_emailError($error, $email_message)
 
 	// Log the error so the moderators can take a look, helps keep them sharp
 	$id = isset($_POST['item']) ? (int) $_POST['item'] : 0;
-	$smcFunc['db_insert'](isset($_POST['item']) ? 'replace' : 'ignore',
+	$db->insert(isset($_POST['item']) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
 		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
 		array($id, $error, $message_key, $email_message->subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
@@ -1536,7 +1536,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 	// add this post to the notification log
 	if (!empty($auto_notify) && (in_array('mark_any_notify', $pbe['user_info']['permissions'])) && !$board_notify)
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_notify',
 			array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
 			array($id_member, $id_topic, 0),
@@ -1726,7 +1726,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	// Place the entry in to the online log so the who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
-	$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
+	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
 		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
 		array($session_id, $pbe['profile']['id_member'], 0, $last_login, 'IFNULL(INET_ATON(\'' . $pbe['profile']['member_ip'] . '\'), 0)', $serialized),
