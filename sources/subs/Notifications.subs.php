@@ -188,6 +188,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			if ($type !== 'reply' && $row['notify_types'] == 2)
 				continue;
 
+			$email_perm = true;
+			if (validateAccess($row, $boards_index[$row['id_board']], $maillist, $email_perm) === false)
+				continue;
+
 			// for this member/board, loop through the topics and see if we should send it
 			foreach ($topicData as $id => &$data) 
 			{
@@ -197,10 +201,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 				// Don't do the excluded...
 				if ($data['exclude'] === $row['id_member'])
-					continue;
-
-				$email_perm = true;
-				if (validateAccess($row, $boards_index[$row['id_board']], $maillist, $email_perm) === false)
 					continue;
 
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
