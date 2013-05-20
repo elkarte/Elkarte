@@ -36,7 +36,7 @@ if (!defined('ELKARTE'))
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
 	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
 	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
@@ -60,8 +60,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if ($type !== 'reply' && !empty($maillist) && !empty($modSettings['pbe_no_mod_notices']))
 		return;
 
+	$db = database();
+
 	// Get the subject, body and basic poster details
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
 			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach, t.id_member_started,
 			b.member_groups as board_groups, b.name as board_name, b.id_profile
@@ -80,7 +82,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	);
 	$topicData = array();
 	$boards_index = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// Using the maillist function or the standard style
 		if ($maillist)
@@ -119,7 +121,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'started_by' => $row['id_member_started'],
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -141,7 +143,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
 	
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -154,7 +156,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if ($maillist)
 	{
 		// Find the members with *board* notifications on.
-		$members = $smcFunc['db_query']('', '
+		$members = $db->query('', '
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 				mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_board, ln.sent
@@ -178,7 +180,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		);
 		$boards = array();
 		$sent = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($members))
+		while ($row = $db->fetch_assoc($members))
 		{
 			// If they are not the poster do they want to know?
 			// @todo maybe if they posted via email?  
@@ -257,11 +259,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				}
 			}
 		}
-		$smcFunc['db_free_result']($members);
+		$db->free_result($members);
 	}
 
 	// Find the members with notification on for this topic.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			mem.id_group, mem.additional_groups, mem.id_post_group, ln.id_topic, ln.sent
@@ -284,7 +286,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		// Don't do the excluded...
 		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
@@ -351,14 +353,14 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			$sent++;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_language)
 		loadLanguage('Post');
 
 	// Sent!
 	if ($type == 'reply' && !empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
@@ -377,7 +379,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		{
 			if ($data['exclude'])
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_notify
 					SET sent = {int:not_sent}
 					WHERE id_topic = {int:id_topic}
@@ -404,7 +406,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function notifyMembersBoard(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc, $webmaster_email;
+	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -451,9 +453,11 @@ function notifyMembersBoard(&$topicData)
 	if (empty($board_index))
 		return;
 
+	$db = database();
+
 	// Load the actual board names
 	$board_names = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board IN ({array_int:board_list})',
@@ -461,15 +465,16 @@ function notifyMembersBoard(&$topicData)
 			'board_list' => $board_index,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$board_names[$row['id_board']] = $row['name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
-	foreach ($topicData as $id => $data)
+	foreach ($topicData as $data)
 		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
-	$smcFunc['db_insert']('',
+
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -479,7 +484,7 @@ function notifyMembersBoard(&$topicData)
 	);
 
 	// Find the members with notification on for these boards.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
 			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
@@ -502,7 +507,7 @@ function notifyMembersBoard(&$topicData)
 		)
 	);
 	// While we have members with board notifications 
-	while ($rowmember = $smcFunc['db_fetch_assoc']($members))
+	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
 		if (validateAccess($rowmember, $maillist, $email_perm) === false)
@@ -567,12 +572,12 @@ function notifyMembersBoard(&$topicData)
 			$sentOnceAlready = 1;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	loadLanguage('index', $user_info['language']);
 
 	// Sent!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_notify
 		SET sent = {int:is_sent}
 		WHERE id_board IN ({array_int:board_list})
@@ -593,7 +598,7 @@ function notifyMembersBoard(&$topicData)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $language, $user_info, $modSettings;
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -606,6 +611,8 @@ function sendApprovalNotifications(&$topicData)
 	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
 	if ($maillist)
 		require_once(SUBSDIR . '/Emailpost.subs.php');
+
+	$db = database();
 
 	$topics = array();
 	$digest_insert = array();
@@ -632,7 +639,7 @@ function sendApprovalNotifications(&$topicData)
 	}
 
 	// These need to go into the digest too...
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -642,7 +649,7 @@ function sendApprovalNotifications(&$topicData)
 	);
 
 	// Find everyone who needs to know about this.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
@@ -667,7 +674,7 @@ function sendApprovalNotifications(&$topicData)
 	$sent = 0;
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		if ($row['id_group'] != 1)
 		{
@@ -716,14 +723,14 @@ function sendApprovalNotifications(&$topicData)
 			$sent_this_time = true;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Post');
 
 	// Sent!
 	if (!empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
@@ -752,7 +759,7 @@ function sendApprovalNotifications(&$topicData)
  */
 function validateAccess($row, $maillist, &$email_perm = true)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 	static $board_profile = array();
 
 	// No need to check for you ;)
@@ -779,7 +786,8 @@ function validateAccess($row, $maillist, &$email_perm = true)
 			// In a group that has email posting permissions on this board
 			if (!isset($board_profile[$row['id_profile']]))
 			{
-				$request = $smcFunc['db_query']('', '
+				$db = database();
+				$request = $db->query('', '
 					SELECT permission, add_deny, id_group
 					FROM {db_prefix}board_permissions
 					WHERE id_profile = {int:id_profile}
@@ -789,9 +797,9 @@ function validateAccess($row, $maillist, &$email_perm = true)
 						'permission' => 'postby_email',
 					)
 				);
-				while ($row_perm = $smcFunc['db_fetch_assoc']($request))
+				while ($row_perm = $db->fetch_assoc($request))
 					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Get the email permission for this board / posting group
@@ -815,7 +823,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info, $smcFunc;
+	global $modSettings, $language, $scripturl, $user_info;
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -832,11 +840,11 @@ function adminNotify($type, $memberID, $member_name = null)
 		$member_name = $member_info['real_name'];
 	}
 
-	$toNotify = array();
 	$groups = array();
 
+	$db = database();
 	// All membergroups who can approve members.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:moderate_forum}
@@ -848,16 +856,16 @@ function adminNotify($type, $memberID, $member_name = null)
 			'moderate_forum' => 'moderate_forum',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add administrators too...
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
 	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -871,7 +879,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	);
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$replacements = array(
 			'USERNAME' => $member_name,
@@ -891,7 +899,7 @@ function adminNotify($type, $memberID, $member_name = null)
 		// And do the actual sending...
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
