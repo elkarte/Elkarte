@@ -1518,15 +1518,8 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 	else
 	{
 		// Make sure they don't get notified
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_topic = {int:current_topic}',
-			array(
-				'current_member' => $id_member,
-				'current_topic' => $id_topic,
-			)
-		);
+		require_once(SUBSDIR . '/Notifications.subs.php');
+		removeNotifications(array('topics' => $id_topic, 'members' => $id_member));
 	}
 }
 

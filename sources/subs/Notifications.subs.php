@@ -967,3 +967,64 @@ function getNotificationReplacementTokens(array $options)
 
 	return $replacements;
 }
+
+function getMemberNotifications(array $topics = array())
+{
+	
+}
+
+function getNotificationsByTopics(array $topics)
+{
+	$db = datatabse();
+	$request = $db->query('', '
+		SELECT id_member, MAX(sent) AS sent
+		FROM {db_prefix}log_notify
+		WHERE id_topic IN ({array_int:topics_list})
+		GROUP BY id_member',
+		array(
+			'topics_list' => $topics,
+		)
+	);
+}
+
+/**
+ * Remove notifications
+ * 
+ * @param array $options Containing 'members', 'boards', and/or 'topics'
+ */
+function removeNotifications(array $options)
+{
+	$db = datatabse();
+
+	$sql = '';
+	if (!empty($options['members']))
+	{
+		$sql .= 'id_member IN ({array_int:members})';
+		$members = is_array($options['members']) ? $options['members'] : array($options['members']);
+	}
+	if (!empty($options['boards']))
+	{
+		$sql .= (!empty($sql) ? '
+			AND ' : '') . 'id_board IN ({array_int:boards})';
+		$boards = is_array($options['boards']) ? $options['boards'] : array($options['boards']);
+	}
+	if (!empty($options['topics']))
+	{
+		$sql .= (!empty($sql) ? '
+			AND ' : '') . 'id_topic IN ({array_int:topics})';
+		$topics = is_array($options['topics']) ? $options['topics'] : array($options['topics']);
+	}
+
+	if (empty($sql))
+		return;
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_notify
+		WHERE ' . $sql,
+		array(
+			'members' => $members,
+			'boards' => $boards,
+			'topics' => $topics,
+		)
+	);
+}

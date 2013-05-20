@@ -1703,15 +1703,10 @@ class Post_Controller
 			);
 		}
 		elseif (!$newTopic)
-			$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}log_notify
-				WHERE id_member = {int:current_member}
-					AND id_topic = {int:current_topic}',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
+		{
+			require_once(SUBSDIR . '/Notifications.subs.php');
+			removeNotifications(array('members' => $user_info['id'], 'topics' => $topic));
+		}
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))

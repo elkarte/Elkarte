@@ -1099,14 +1099,8 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => create_function('$members', '
-					global $smcFunc;
-					$smcFunc[\'db_query\'](\'\', \'
-						DELETE FROM {db_prefix}log_notify
-						WHERE id_member IN ({array_int:members})\',
-						array(
-							\'members\' => $members,
-						)
-					);
+					require_once(SUBSDIR . \'/Notifications.subs.php\');
+					removeNotifications(array(\'members\' => $members));
 				'),
 			),
 			'messages' => array('repair_missing_notify_members', 'id_member'),

@@ -611,13 +611,9 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 			'boards_to_remove' => $boards_to_remove,
 		)
 	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
+
+	require_once(SUBSDIR . '/Notifications.subs.php');
+	removeNotifications(array('boards' => $boards_to_remove));
 
 	// Delete this board's moderators.
 	$smcFunc['db_query']('', '
@@ -965,15 +961,8 @@ function setBoardNotification($id_member, $id_board, $on = false)
 	else
 	{
 		// Turn notification off for this board.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_board = {int:current_board}',
-			array(
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-			)
-		);
+		require_once(SUBSDIR . '/Notifications.subs.php');
+		removeNotifications(array('boards' => $id_board, 'members' => $id_member));
 	}
 }
 

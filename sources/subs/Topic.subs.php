@@ -321,13 +321,10 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_topic IN ({array_int:topics})',
-		array(
-			'topics' => $topics,
-		)
-	);
+
+	require_once(SUBSDIR . '/Notifications.subs.php');
+	removeNotifications(array('topics' => $topics));
+
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})',
@@ -894,15 +891,8 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 	else
 	{
 		// Just turn notifications off.
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_topic = {int:current_topic}',
-			array(
-				'current_member' => $id_member,
-				'current_topic' => $id_topic,
-			)
-		);
+		require_once(SUBSDIR . '/Notifications.subs.php');
+		removeNotifications(array('topics' => $id_topic, 'members' => $id_member));
 	}
 }
 

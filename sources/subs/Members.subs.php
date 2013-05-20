@@ -270,13 +270,10 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_member IN ({array_int:users})',
-		array(
-			'users' => $users,
-		)
-	);
+
+	require_once(SUBSDIR . '/Notifications.subs.php');
+	removeNotifications(array('members' => $users));
+
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member IN ({array_int:users})',
