@@ -1223,7 +1223,7 @@ function loadAttachmentContext($id_msg)
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
 					require_once(SUBSDIR . '/Attachments.subs.php');
-					$attachment = $attachment + updateAttachmentThumbnail($filename, $attachment['id_thumb']);
+					$attachment = $attachment + updateAttachmentThumbnail($filename, $id_msg, $attachment['id_thumb']);
 				}
 
 				// Only adjust dimensions on successful thumbnail creation.
