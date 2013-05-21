@@ -133,7 +133,7 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 	padding: 2px 4px;
 	float: right;
 	cursor: pointer;
-	border: 1px solid #ccc; 
+	border: 1px solid #ccc;
 	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
 	border-radius: 2px;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
@@ -2667,7 +2667,7 @@ ul.follow_ups>li {
 /* Styles for edit post section
 ---------------------------------------------------- */
 
-#postmodify .roundframe {
+#postmodify div.roundframe {
 	padding: 12px 12%;
 }
 #postmodify {
@@ -4657,7 +4657,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	#top_section_notice, #logo, #topic_icons div p, .optional {
 		display: none;
 	}
-	
+
 	#guest_form input {
 		width: 50px;
 	}

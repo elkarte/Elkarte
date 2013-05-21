@@ -148,7 +148,7 @@ function template_main()
 
 	echo '
 							</select>
-							<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+							<img src="', $context['icon_url'], '" id="icons" style="margin:0 7px" alt="" /> 
 						</dd>';
 	if (!empty($context['show_boards_dropdown']))
 		echo '
