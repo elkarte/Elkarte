@@ -571,8 +571,6 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
  */
 function approveAllData()
 {
-
-
 	$db = database();
 
 	// Start with messages and topics.

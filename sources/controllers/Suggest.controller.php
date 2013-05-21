@@ -87,7 +87,6 @@ class Suggest_Controller
 	 */
 	function action_suggest_versions()
 	{
-
 		$xml_data = array(
 			'items' => array(
 				'identifier' => 'item',

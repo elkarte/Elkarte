@@ -24,7 +24,6 @@ if (!defined('ELKARTE'))
 
 class Poll_Controller
 {
-
 	/**
 	 * Allow the user to vote.
 	 * It is called to register a vote in a poll.
