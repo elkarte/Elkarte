@@ -29,8 +29,8 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 *  Maps the implementations in the legacy subs file (smf_db_function_name)
-	 *  to the $smcFunc['db_function_name'] variable.
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param string $db_server
 	 * @param string $db_name
@@ -38,33 +38,16 @@ class Database_MySQL implements Database
 	 * @param string $db_passwd
 	 * @param string $db_prefix
 	 * @param array $db_options
-	 * @return null
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $mysql_set_mode, $smcFunc;
 
-		// Map some database specific functions, only do this once.
-		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'mysql_fetch_assoc')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query', //
-				'db_quote' => 'elk_db_quote', //
-				'db_fetch_assoc' => 'mysql_fetch_assoc', //
-				'db_fetch_row' => 'mysql_fetch_row', //
-				'db_free_result' => 'mysql_free_result', //
-				'db_insert' => 'elk_db_insert', //
-				'db_insert_id' => 'elk_db_insert_id', //
-				'db_num_rows' => 'mysql_num_rows', //
-				'db_num_fields' => 'mysql_num_fields', //
-				'db_escape_string' => 'addslashes', //
-				'db_unescape_string' => 'stripslashes', //
-				'db_affected_rows' => 'elk_db_affected_rows', //
-				'last_error' => 'mysql_error', //
-				'db_case_sensitive' => false, //
-			);
-
-		// initialize the instance.
-		self::$_db = new self();
+		// initialize the instance... if not done already!
+		if (self::$_db === null)
+			self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @mysql_pconnect($db_server, $db_user, $db_passwd);
@@ -86,7 +69,7 @@ class Database_MySQL implements Database
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
-			$db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
+			$this->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
 			false
 		);
@@ -99,7 +82,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string &db_prefix
 	 * @param string $db_name
-	 * 
+	 *
 	 * @return string
 	 */
 	function fix_prefix($db_prefix, $db_name)
@@ -529,9 +512,6 @@ class Database_MySQL implements Database
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
-
-		$db = database();
-
 		// Get the file and line numbers.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
@@ -615,7 +595,7 @@ class Database_MySQL implements Database
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
-					$db->query('', "
+					$this->query('', "
 						REPAIR TABLE $table", false, false);
 
 				// And send off an email!
@@ -624,7 +604,7 @@ class Database_MySQL implements Database
 				$modSettings['cache_enable'] = $old_cache;
 
 				// Try the query again...?
-				$ret = $db->query('', $db_string, false, false);
+				$ret = $this->query('', $db_string, false, false);
 				if ($ret !== false)
 					return $ret;
 			}
@@ -662,7 +642,7 @@ class Database_MySQL implements Database
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
-						$ret = $db->query('', $db_string, false, false);
+						$ret = $this->query('', $db_string, false, false);
 
 						$new_errno = mysql_errno($db_connection);
 						if ($ret !== false || in_array($new_errno, array(1205, 1213)))
@@ -728,8 +708,6 @@ class Database_MySQL implements Database
 	{
 		global $db_connection, $db_prefix;
 
-		$db = database();
-
 		$connection = $connection === null ? $db_connection : $connection;
 
 		// With nothing to insert, simply return.
@@ -767,7 +745,7 @@ class Database_MySQL implements Database
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
 		// Do the insert.
-		$db->query('', '
+		$this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
 			VALUES
 				' . implode(',
@@ -885,7 +863,6 @@ class Database_MySQL implements Database
 	{
 		global $db_prefix;
 
-		$db = database();
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -900,7 +877,7 @@ class Database_MySQL implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $db->query('', '
+		$result = $this->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ *
 			FROM `' . $tableName . '`
 			LIMIT ' . $start . ', ' . $limit,
@@ -910,7 +887,7 @@ class Database_MySQL implements Database
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $db->num_rows($result);
+		$num_rows = $this->num_rows($result);
 
 		if ($num_rows == 0)
 			return '';
@@ -938,7 +915,7 @@ class Database_MySQL implements Database
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $db->escape_string($item) . '\'';
+					$field_list[] = '\'' . $this->escape_string($item) . '\'';
 			}
 
 			$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
@@ -962,8 +939,6 @@ class Database_MySQL implements Database
 	{
 		global $db_prefix;
 
-		$db = database();
-
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be needed...
@@ -976,7 +951,7 @@ class Database_MySQL implements Database
 		$schema_create .= 'CREATE TABLE `' . $tableName . '` (' . $crlf;
 
 		// Find all the fields.
-		$result = $db->query('', '
+		$result = $this->query('', '
 			SHOW FIELDS
 			FROM `{raw:table}`',
 			array(
@@ -1001,7 +976,7 @@ class Database_MySQL implements Database
 					$type = strtolower($row['Type']);
 					$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
 
-					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $db->escape_string($row['Default']) . '\'');
+					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $this->escape_string($row['Default']) . '\'');
 				}
 			}
 
@@ -1014,7 +989,7 @@ class Database_MySQL implements Database
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
 		// Find the keys.
-		$result = $db->query('', '
+		$result = $this->query('', '
 			SHOW KEYS
 			FROM `{raw:table}`',
 			array(
@@ -1049,7 +1024,7 @@ class Database_MySQL implements Database
 		}
 
 		// Now just get the comment and type... (MyISAM, etc.)
-		$result = $db->query('', '
+		$result = $this->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table}',
 			array(
@@ -1077,13 +1052,11 @@ class Database_MySQL implements Database
 	{
 		global $db_name;
 
-		$db = database();
-
 		$db_name_str = $db_name_str == false ? $db_name : $db_name_str;
 		$db_name_str = trim($db_name_str);
 		$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
 
-		$request = $db->query('', '
+		$request = $this->query('', '
 			SHOW TABLES
 			FROM `{raw:db_name_str}`
 			{raw:filter}',
@@ -1110,12 +1083,10 @@ class Database_MySQL implements Database
 	{
 		global $db_name, $db_prefix;
 
-		$db = database();
-
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Get how much overhead there is.
-		$request = $db->query('', '
+		$request = $this->query('', '
 				SHOW TABLE STATUS LIKE {string:table_name}',
 				array(
 					'table_name' => str_replace('_', '\_', $table),
@@ -1125,7 +1096,7 @@ class Database_MySQL implements Database
 		$this->free_result($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $db->query('', '
+		$request = $this->query('', '
 				OPTIMIZE TABLE `{raw:table}`',
 				array(
 					'table' => $table,
@@ -1135,7 +1106,7 @@ class Database_MySQL implements Database
 			return -1;
 
 		// How much left?
-		$request = $db->query('', '
+		$request = $this->query('', '
 				SHOW TABLE STATUS LIKE {string:table}',
 				array(
 					'table' => str_replace('_', '\_', $table),
@@ -1160,12 +1131,10 @@ class Database_MySQL implements Database
 	{
 		global $db_prefix;
 
-		$db = database();
-
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// First, get rid of the old table.
-		$db->query('', '
+		$this->query('', '
 			DROP TABLE IF EXISTS {raw:backup_table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1173,7 +1142,7 @@ class Database_MySQL implements Database
 		);
 
 		// Can we do this the quick way?
-		$result = $db->query('', '
+		$result = $this->query('', '
 			CREATE TABLE {raw:backup_table} LIKE {raw:table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1182,7 +1151,7 @@ class Database_MySQL implements Database
 		// If this failed, we go old school.
 		if ($result)
 		{
-			$request = $db->query('', '
+			$request = $this->query('', '
 				INSERT INTO {raw:backup_table}
 				SELECT *
 				FROM {raw:table}',
@@ -1197,7 +1166,7 @@ class Database_MySQL implements Database
 		}
 
 		// At this point, the quick method failed.
-		$result = $db->query('', '
+		$result = $this->query('', '
 			SHOW CREATE TABLE {raw:table}',
 			array(
 				'table' => $table,
@@ -1251,7 +1220,7 @@ class Database_MySQL implements Database
 		else
 			$create = '';
 
-		$request = $db->query('', '
+		$request = $this->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}
 			ENGINE={raw:engine}' . (empty($charset) ? '' : ' CHARACTER SET {raw:charset}' . (empty($collate) ? '' : ' COLLATE {raw:collate}')) . '
 			SELECT *
@@ -1271,7 +1240,7 @@ class Database_MySQL implements Database
 			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) == ',')
 				$auto_inc = substr($auto_inc, 0, -1);
 
-			$db->query('', '
+			$this->query('', '
 				ALTER TABLE {raw:backup_table}
 				CHANGE COLUMN {raw:column_detail} {raw:auto_inc}',
 				array(
@@ -1292,11 +1261,7 @@ class Database_MySQL implements Database
 	 */
 	function db_server_version()
 	{
-
-
-		$db = database();
-
-		$request = $db->query('', '
+		$request = $this->query('', '
 			SELECT VERSION()',
 			array(
 			)
@@ -1365,11 +1330,7 @@ class Database_MySQL implements Database
 	 */
 	function db_client_version()
 	{
-
-
-		$db = database();
-
-		$request = $db->query('', '
+		$request = $this->query('', '
 			SELECT VERSION()',
 			array(
 			)
