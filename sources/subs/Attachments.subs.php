@@ -2386,7 +2386,7 @@ function setRemovalNotice($messages, $notice)
  */
 function updateAttachmentThumbnail($filename, $id_msg, $old_id_thumb = 0)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$attachment = array();
 
@@ -2416,18 +2416,20 @@ function updateAttachmentThumbnail($filename, $id_msg, $old_id_thumb = 0)
 		$thumb_filename = $filename . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
 
+		$db = database();
+
 		// Add this beauty to the database.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}attachments',
 			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
 			array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
 			array('id_attach')
 		);
 
-		$attachment['id_thumb'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 		if (!empty($attachment['id_thumb']))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}attachments
 				SET id_thumb = {int:id_thumb}
 				WHERE id_attach = {int:id_attach}',
