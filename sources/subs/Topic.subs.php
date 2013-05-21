@@ -728,8 +728,6 @@ function moveTopicConcurrence()
  */
 function increaseViewCounter($id_topic)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -750,8 +748,6 @@ function increaseViewCounter($id_topic)
  */
 function markTopicsRead($mark_topics, $was_set = false)
 {
-
-
 	$db = database();
 
 	if (!is_array($mark_topics))
@@ -864,8 +860,6 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
  */
 function hasTopicNotification($id_member, $id_topic)
 {
-
-
 	$db = database();
 
 	// Find out if they have notification set for this topic already.
@@ -895,8 +889,6 @@ function hasTopicNotification($id_member, $id_topic)
  */
 function setTopicNotification($id_member, $id_topic, $on = false)
 {
-
-
 	$db = database();
 
 	if ($on)
@@ -967,8 +959,6 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1211,8 +1201,6 @@ function removeOldTopics()
  */
 function topicsStartedBy($memberID)
 {
-
-
 	$db = database();
 
 	// Fetch all topics started by this user.
@@ -1239,8 +1227,6 @@ function topicsStartedBy($memberID)
  */
 function messagesAfter($topic, $message)
 {
-
-
 	$db = database();
 
 	// Fetch the message IDs of the topic that are at or after the message.
@@ -1311,8 +1297,6 @@ function messageInfo($topic, $message, $topic_approved = false)
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
 {
-
-
 	$db = database();
 
 	// Get the messages and stick them into an array.
@@ -1372,8 +1356,6 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
  */
 function unapprovedPosts($id_topic, $id_member)
 {
-
-
 	$db = database();
 
 	// not all guests are the same!
@@ -1405,8 +1387,6 @@ function unapprovedPosts($id_topic, $id_member)
  */
 function updateSplitTopics($options, $id_board)
 {
-
-
 	$db = database();
 
 	// Any associated reported posts better follow...
@@ -1486,8 +1466,6 @@ function updateSplitTopics($options, $id_board)
 
 function topicStarter($topic)
 {
-
-
 	$db = database();
 
 	// Find out who started the topic - in case User Topic Locking is enabled.
@@ -1517,8 +1495,6 @@ function topicStarter($topic)
  */
 function setTopicAttribute($topic, $attributes)
 {
-
-
 	$db = database();
 
 	if (isset($attributes['locked']))
@@ -1552,8 +1528,6 @@ function setTopicAttribute($topic, $attributes)
  */
 function toggleTopicSticky($topics)
 {
-
-
 	$db = database();
 
 	$topics = is_array($topics) ? $topics : array($topics);
@@ -1581,8 +1555,6 @@ function toggleTopicSticky($topics)
  */
 function getLoggedTopics($member, $topics)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

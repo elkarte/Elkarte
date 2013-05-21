@@ -260,8 +260,6 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-
-
 	$db = database();
 
 	if (!is_array($v))
@@ -691,8 +689,6 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function logOnline($ids, $on = false)
 {
-
-
 	$db = database();
 
 	if (!is_array($ids))
@@ -718,8 +714,6 @@ function logOnline($ids, $on = false)
  */
 function deleteOnline($session)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -738,8 +732,6 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-
-
 	$db = database();
 
 	$isFirstLogin = false;
@@ -753,8 +745,6 @@ function isFirstLogin($id_member)
 
 function findUser($where, $whereparams)
 {
-
-
 	$db = database();
 
 	// Find the user!
@@ -823,8 +813,6 @@ function generateValidationCode()
  */
 function loadExistingMember($name)
 {
-
-
 	$db = database();
 
 	// Try to find the user, assuming a member_name was passed...

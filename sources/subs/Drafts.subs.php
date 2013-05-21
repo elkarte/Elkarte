@@ -16,8 +16,6 @@
  */
 function create_pm_draft($draft, $recipientList)
 {
-
-
 	$db = database();
 
 	$draft_columns = array(
@@ -63,8 +61,6 @@ function create_pm_draft($draft, $recipientList)
  */
 function modify_pm_draft($draft, $recipientList)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -150,8 +146,6 @@ function create_post_draft($draft)
  */
 function modify_post_draft($draft)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -195,8 +189,6 @@ function modify_post_draft($draft)
  */
 function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = true)
 {
-
-
 	$db = database();
 
 	// load in a draft from the DB
@@ -243,8 +235,6 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  */
 function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
 {
-
-
 	$db = database();
 
 	// load the drafts that the user has available for the given type & action
@@ -287,8 +277,6 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
  */
 function deleteDrafts($id_draft, $member_id = -1, $check = true)
 {
-
-
 	$db = database();
 
 	// Only a single draft.
@@ -352,8 +340,6 @@ function draftsCount($member_id, $draft_type)
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
-
-
 	$db = database();
 
 	// holds our results
@@ -382,8 +368,6 @@ function draftsRecipients($allRecipients, $recipient_ids)
  */
 function getOldDrafts($days)
 {
-
-
 	$db = database();
 
 	$drafts = array();

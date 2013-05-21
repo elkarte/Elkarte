@@ -559,8 +559,6 @@ function utf8_strtoupper($string)
  */
 function fix_serialized_columns()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

@@ -26,8 +26,6 @@ if (!defined('ELKARTE'))
  */
 function onlineCount()
 {
-
-
 	$db = database();
 
 	$result = $db->query('', '

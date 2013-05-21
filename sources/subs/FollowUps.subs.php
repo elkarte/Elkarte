@@ -20,8 +20,6 @@ if (!defined('ELKARTE'))
  */
 function followupTopics($messages, $include_approved = false)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -50,8 +48,6 @@ function followupTopics($messages, $include_approved = false)
  */
 function topicStartedHere($topic, $include_approved = false)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -80,8 +76,6 @@ function topicStartedHere($topic, $include_approved = false)
  */
 function linkMessages($msg, $topic)
 {
-
-
 	$db = database();
 
 	$db->insert('ignore',
@@ -99,8 +93,6 @@ function linkMessages($msg, $topic)
  */
 function unlinkMessages($msg, $topic)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -120,8 +112,6 @@ function unlinkMessages($msg, $topic)
  */
 function removeFollowUpsByTopic($topics)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -138,8 +128,6 @@ function removeFollowUpsByTopic($topics)
  */
 function removeFollowUpsByMessage($msgs)
 {
-
-
 	$db = database();
 
 	$db->query('', '

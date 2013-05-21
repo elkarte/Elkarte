@@ -914,8 +914,6 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-
-
 	$db = database();
 
 	// How many items do we have?
@@ -937,8 +935,6 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -956,8 +952,6 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-
-
 	$db = database();
 
 	$items = array();

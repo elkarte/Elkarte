@@ -55,8 +55,6 @@ function list_getNews()
  */
 function excludeBannedMembers()
 {
-
-
 	$db = database();
 
 	$excludes = array();
@@ -125,8 +123,6 @@ function excludeBannedMembers()
  */
 function getModerators()
 {
-
-
 	$db = database();
 
 	$mods = array();
@@ -159,8 +155,6 @@ function getModerators()
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
-
-
 	$db = database();
 
 	$recipients = array();

@@ -30,8 +30,6 @@ if (!defined('ELKARTE'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-
-
 	$db = database();
 
 	$catUpdates = array();
@@ -132,8 +130,6 @@ function modifyCategory($category_id, $catOptions)
  */
 function createCategory($catOptions)
 {
-
-
 	$db = database();
 
 	// Check required values.
@@ -264,8 +260,6 @@ function deleteCategories($categories, $moveBoardsTo = null)
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
 {
-
-
 	$db = database();
 
 	// Collapse or expand the categories.
@@ -357,8 +351,6 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  */
 function categoryName($id_cat)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

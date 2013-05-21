@@ -835,8 +835,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
  */
 function markPMsRead($memberID)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1022,8 +1020,6 @@ function loadPMs($pm_options, $id_member)
  */
 function pmCount($id_member, $time)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

@@ -31,8 +31,6 @@ if (!defined('ELKARTE'))
  */
 function getBirthdayRange($low_date, $high_date)
 {
-
-
 	$db = database();
 
 	// We need to search for any birthday in this range, and whatever year that birthday is on.
@@ -210,8 +208,6 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
  */
 function getHolidayRange($low_date, $high_date)
 {
-
-
 	$db = database();
 
 	// Get the lowest and highest dates for "all years".
@@ -809,8 +805,6 @@ function validateEventPost()
  */
 function getEventPoster($event_id)
 {
-
-
 	$db = database();
 
 	// A simple database query, how hard can that be?
@@ -968,8 +962,6 @@ function modifyEvent($event_id, &$eventOptions)
  */
 function removeEvent($event_id)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -995,8 +987,6 @@ function removeEvent($event_id)
  */
 function getEventProperties($event_id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1058,8 +1048,6 @@ function getEventProperties($event_id)
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1086,8 +1074,6 @@ function list_getHolidays($start, $items_per_page, $sort)
  */
 function list_getNumHolidays()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1109,8 +1095,6 @@ function list_getNumHolidays()
  */
 function removeHolidays($holiday_ids)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1135,8 +1119,6 @@ function removeHolidays($holiday_ids)
  */
 function editHoliday($holiday, $date, $title)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1163,8 +1145,6 @@ function editHoliday($holiday, $date, $title)
  */
 function insert_holiday($date, $title)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -1191,8 +1171,6 @@ function insert_holiday($date, $title)
  */
 function getHoliday($id_holiday)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

@@ -738,8 +738,6 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
-
-
 	$db = database();
 
 	$groups = array();
@@ -835,8 +833,6 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  */
 function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
-
-
 	$db = database();
 
 	if (!isset($group_id))
@@ -1025,8 +1021,6 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
-
-
 	$db = database();
 
 	$groups = array();
@@ -1071,8 +1065,6 @@ function getGroups($groupList)
  */
 function getMaxGroupID()
 {
-
-
 	$db = database();
 
     $request = $db->query('', '
@@ -1123,8 +1115,6 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
-
-
 	$db = database();
 
 	$inserts = array();
@@ -1163,8 +1153,6 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  */
 function copyBoardPermissions($id_group, $copy_from)
 {
-
-
 	$db = database();
 
 	$inserts = array();
@@ -1199,8 +1187,6 @@ function copyBoardPermissions($id_group, $copy_from)
  */
 function updateCopiedGroup($id_group, $copy_from)
 {
-
-
 	$db = database();
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -1231,8 +1217,6 @@ function updateCopiedGroup($id_group, $copy_from)
  */
 function updateInheritedGroup($id_group, $copy_id)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1286,8 +1270,6 @@ function updateMembergroupProperties($properties)
  */
 function detachGroupFromBoards($id_group, $boards, $access_list)
 {
-
-
 	$db = database();
 
 	// Find all board this group is in, but shouldn't be in.
@@ -1318,8 +1300,6 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1345,8 +1325,6 @@ function assignGroupToBoards($id_group, $boards, $access_list)
  */
 function detachDeletedGroupFromMembers($id_group)
 {
-
-
 	$db = database();
 
 	$updates = array();
@@ -1385,8 +1363,6 @@ function detachDeletedGroupFromMembers($id_group)
  */
 function setGroupToHidden($id_group)
 {
-
-
 	$db = database();
 
 	$updates = array();
@@ -1450,8 +1426,6 @@ function validateShowGroupMembership()
  */
 function detachGroupModerators($id_group)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1471,8 +1445,6 @@ function detachGroupModerators($id_group)
  */
 function getIDMemberFromGroupModerators($moderators)
 {
-
-
 	$db = database();
 
 	$group_moderators = array();
@@ -1502,8 +1474,6 @@ function getIDMemberFromGroupModerators($moderators)
  */
 function assignGroupModerators($id_group, $group_moderators)
 {
-
-
 	$db = database();
 
 	$mod_insert = array();
@@ -1526,8 +1496,6 @@ function assignGroupModerators($id_group, $group_moderators)
  */
 function getGroupModerators($id_group)
 {
-
-
 	$db = database();
 
 	$moderators = array();

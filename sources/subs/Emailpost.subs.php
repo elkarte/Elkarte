@@ -372,8 +372,6 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-
-
 	$db = database();
 
 	// Load up the parsers from the database
@@ -436,8 +434,6 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
-
-
 	$db = database();
 
 	// load up the text filters from the database, regex first and ordered by id number
@@ -1138,8 +1134,6 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  */
 function query_sender_wrapper($from)
 {
-
-
 	$db = database();
 
 	$result = array();
@@ -1175,8 +1169,6 @@ function query_sender_wrapper($from)
  */
 function query_user_keys($email)
 {
-
-
 	$db = database();
 
 	$keys = array();
@@ -1206,8 +1198,6 @@ function query_user_keys($email)
  */
 function query_key_owner($key)
 {
-
-
 	$db = database();
 
 	$email_to = false;
@@ -1238,8 +1228,6 @@ function query_key_owner($key)
  */
 function query_load_subject($message_id, $message_type, $email)
 {
-
-
 	$db = database();
 
 	$subject = '';
@@ -1328,8 +1316,6 @@ function query_load_subject($message_id, $message_type, $email)
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
-
-
 	$db = database();
 
 	// Load up the topic details
@@ -1402,8 +1388,6 @@ function query_load_message($message_type, $message_id, $pbe)
  */
 function query_load_board($message_id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1428,8 +1412,6 @@ function query_load_board($message_id)
  */
 function query_load_board_details($board_id, $pbe)
 {
-
-
 	$db = database();
 
 	$board_info = array();
@@ -1511,8 +1493,6 @@ function query_get_theme($id_member, $id_theme, $board_info)
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 {
-
-
 	$db = database();
 
 	// First see if they have a board notification on for this board
@@ -1568,8 +1548,6 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
  */
 function query_mark_pms($email_message, $pbe)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1673,8 +1651,6 @@ function query_key_maintenance($email_message)
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
-
-
 	$db = database();
 
 	$last_login = time();

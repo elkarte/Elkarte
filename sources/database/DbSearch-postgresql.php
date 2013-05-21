@@ -41,8 +41,6 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-
-
 		$db = database();
 
 		$replacements = array(
@@ -95,8 +93,6 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-
-
 		$db = database();
 
 		$size = 'int';

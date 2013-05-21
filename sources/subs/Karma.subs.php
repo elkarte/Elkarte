@@ -13,8 +13,6 @@
 
 function clearKarma($karmaWaitTime)
 {
-
-
 	$db = database();
 
 	// Delete any older items from the log. (karmaWaitTime is by hour.)
@@ -36,8 +34,6 @@ function clearKarma($karmaWaitTime)
  */
 function lastActionOn($id_executor, $id_target)
 {
-
-
 	$db = database();
 
 	// Find out if this user has done this recently...
@@ -68,8 +64,6 @@ function lastActionOn($id_executor, $id_target)
  */
 function addKarma($id_executor, $id_target, $direction)
 {
-
-
 	$db = database();
 
 	// Put it in the log.
@@ -93,8 +87,6 @@ function addKarma($id_executor, $id_target, $direction)
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
-
-
 	$db = database();
 
 	// You decided to go back on your previous choice?

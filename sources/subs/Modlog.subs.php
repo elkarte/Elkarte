@@ -343,8 +343,6 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {
-
-
 	$db = database();
 
 	$db->query('', '

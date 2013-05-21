@@ -732,8 +732,6 @@ function reorderBoards()
  */
 function fixChildren($parent, $newLevel, $newParent)
 {
-
-
 	$db = database();
 
 	// Grab all children of $parent...
@@ -935,8 +933,6 @@ function isChildOf($child, $parent)
  */
 function hasBoardNotification($id_member, $id_board)
 {
-
-
 	$db = database();
 
 	// Find out if they have notification set for this board already.
@@ -966,8 +962,6 @@ function hasBoardNotification($id_member, $id_board)
  */
 function setBoardNotification($id_member, $id_board, $on = false)
 {
-
-
 	$db = database();
 
 	if ($on)
@@ -1000,8 +994,6 @@ function setBoardNotification($id_member, $id_board, $on = false)
  */
 function accessibleBoards()
 {
-
-
 	$db = database();
 
 	// Find all the boards this user can see.
@@ -1030,8 +1022,6 @@ function accessibleBoards()
  */
 function boardInfo($board_id, $topic_id = null)
 {
-
-
 	$db = database();
 
 	if (!empty($topic_id))
@@ -1082,8 +1072,6 @@ function boardInfo($board_id, $topic_id = null)
  */
 function getOtherGroups($curBoard)
 {
-
-
 	$db = database();
 
 	$groups = array();
@@ -1124,8 +1112,6 @@ function getOtherGroups($curBoard)
  */
 function getBoardModerators($idboard)
 {
-
-
 	$db = database();
 
 	$moderators = array();
@@ -1153,8 +1139,6 @@ function getBoardModerators($idboard)
  */
 function getAllThemes()
 {
-
-
 	$db = database();
 
 	$themes = array();
@@ -1183,8 +1167,6 @@ function getAllThemes()
  */
 function getBoardProperties($idboard)
 {
-
-
 	$db = database();
 
 	$properties = array();
@@ -1211,8 +1193,6 @@ function getBoardProperties($idboard)
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
 {
-
-
 	$db = database();
 
 	$clauses = array();
@@ -1362,8 +1342,6 @@ function fetchBoardsInfo($conditions, $params = array())
  */
 function addChildBoards(&$boards)
 {
-
-
 	$db = database();
 
 	if (!is_array($boards))

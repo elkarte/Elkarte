@@ -877,8 +877,6 @@ function createAttachment(&$attachmentOptions)
 */
 function getAvatar($id_attach)
 {
-
-
 	$db = database();
 
 	// Use our cache when possible
@@ -919,8 +917,6 @@ function getAvatar($id_attach)
 */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
-
-
 	$db = database();
 
 	// Make sure this attachment is on this board.
@@ -954,8 +950,6 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 */
 function increaseDownloadCounter($id_attach)
 {
-
-
 	$db = database();
 
 	$db->query('attach_download_increase', '
@@ -1556,8 +1550,6 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
  */
 function getAttachmentCount()
 {
-
-
 	$db = database();
 
 	// Get the number of attachments....
@@ -1584,8 +1576,6 @@ function getAttachmentCount()
  */
 function getAvatarCount()
 {
-
-
 	$db = database();
 
 	// Get the avatar amount....
@@ -1629,8 +1619,6 @@ function getAttachmentDirs()
  */
 function getAvatarsDefault()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1745,8 +1733,6 @@ function getServerStoredAvatars($directory, $level)
  */
 function removeOrphanAttachments($attach_ids)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1775,8 +1761,6 @@ function removeOrphanAttachments($attach_ids)
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
-
-
 	$db = database();
 
 	if ($filesize === null)
@@ -1819,8 +1803,6 @@ function attachment_filesize($attach_id, $filesize = null)
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
-
-
 	$db = database();
 
 	if ($folder_id === null)
@@ -1860,8 +1842,6 @@ function attachment_folder($attach_id, $folder_id = null)
  */
 function maxThumbnails()
 {
-
-
 	$db = database();
 
 	$result = $db->query('', '
@@ -1886,8 +1866,6 @@ function maxThumbnails()
  */
 function validateAttachments($attachments, $approve_query)
 {
-
-
 	$db = database();
 
 	// double check the attachments array, pick only what is returned from the database
@@ -2006,8 +1984,6 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
-
-
 	$db = database();
 
 	// How many unapproved attachments in total?
@@ -2208,8 +2184,6 @@ function list_getBaseDirs()
  */
 function list_getNumFiles($browse_type)
 {
-
-
 	$db = database();
 
 	// Depending on the type of file, different queries are used.
@@ -2315,8 +2289,6 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
  */
 function overallAttachmentsSize()
 {
-
-
 	$db = database();
 
 	// Check the size of all the directories.
@@ -2415,8 +2387,6 @@ function moveAvatars()
  */
 function setRemovalNotice($messages, $notice)
 {
-
-
 	$db = database();
 
 	$db->query('', '
