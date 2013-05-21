@@ -29,8 +29,8 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Maps the implementations in the legacy subs file (smf_db_function_name)
-	 * to the $smcFunc['db_function_name'] variable.
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param string $db_server
 	 * @param string $db_name
@@ -38,17 +38,12 @@ class Database_SQLite implements Database
 	 * @param string $db_passwd
 	 * @param string $db_prefix
 	 * @param array $db_options
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $db_in_transact, $sqlite_error, $smcFunc;
-
-		// Map some database specific functions, only do this once.
-		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'sqlite_fetch_array')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query',
-				'db_case_sensitive' => true,
-			);
 
 		if (substr($db_name, -3) != '.db')
 			$db_name .= '.db';
@@ -217,8 +212,8 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Just like the db_query, escape and quote a string,
-	 * but not executing the query.
+	 * This function works like $db->query(), escapes and quotes a string,
+	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
 	 * @param string $db_values

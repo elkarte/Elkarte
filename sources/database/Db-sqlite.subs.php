@@ -30,21 +30,6 @@ function elk_db_replacement__callback($matches)
 }
 
 /**
- * Do a query.  Takes care of errors too.
- *
- * @param string $identifier
- * @param string $db_string
- * @param array $db_values = array()
- * @param resource $connection = null
- */
-function elk_db_query($identifier, $db_string, $db_values = array(), $connection = null)
-{
-	$db = database();
-
-	return $db->query($identifier, $db_string, $db_values, $connection);
-}
-
-/**
  * Database error!
  * Backtrace, log, try to fix.
  *

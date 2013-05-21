@@ -29,9 +29,8 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Maps the implementations in the legacy subs file (smf_db_function_name)
-	 * to the $smcFunc['db_function_name'] variable.
-	 * @see Db.class.php#initiate
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param type $db_server
 	 * @param type $db_name
@@ -39,19 +38,11 @@ class Database_PostgreSQL implements Database
 	 * @param type $db_passwd
 	 * @param type $db_prefix
 	 * @param type $db_options
-	 * @return null
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global $smcFunc;
-
-		// Map some database specific functions, only do this once.
-		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'postg_fetch_assoc')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query',
-				'db_case_sensitive' => true,
-			);
-
 		// initialize the instance.
 		self::$_db = new self();
 
@@ -204,8 +195,8 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Just like the db_query, escape and quote a string,
-	 * but not executing the query.
+	 * This function works like $db->query(), escapes and quotes a string,
+	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
 	 * @param string $db_values

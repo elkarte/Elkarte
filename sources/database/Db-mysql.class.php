@@ -29,8 +29,8 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 *  Maps the implementations in the legacy subs file (smf_db_function_name)
-	 *  to the $smcFunc['db_function_name'] variable.
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param string $db_server
 	 * @param string $db_name
@@ -38,18 +38,12 @@ class Database_MySQL implements Database
 	 * @param string $db_passwd
 	 * @param string $db_prefix
 	 * @param array $db_options
-	 * @return null
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $mysql_set_mode, $smcFunc;
-
-		// Map some database specific functions, only do this once.
-		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'mysql_fetch_assoc')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query', //
-				'db_case_sensitive' => false, //
-			);
 
 		// initialize the instance.
 		self::$_db = new self();
