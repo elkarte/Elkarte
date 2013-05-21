@@ -49,11 +49,6 @@ class Database_PostgreSQL implements Database
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'postg_fetch_assoc')
 			$smcFunc += array(
 				'db_query' => 'elk_db_query',
-				'db_quote' => 'elk_db_quote',
-				'db_insert' => 'elk_db_insert',
-				'db_insert_id' => 'elk_db_insert_id',
-				'db_fetch_assoc' => 'elk_db_fetch_assoc',
-				'last_error' => 'pg_last_error',
 				'db_case_sensitive' => true,
 			);
 

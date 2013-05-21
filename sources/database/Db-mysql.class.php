@@ -48,11 +48,6 @@ class Database_MySQL implements Database
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'mysql_fetch_assoc')
 			$smcFunc += array(
 				'db_query' => 'elk_db_query', //
-				'db_quote' => 'elk_db_quote', //
-				'db_fetch_assoc' => 'mysql_fetch_assoc', //
-				'db_insert' => 'elk_db_insert', //
-				'db_insert_id' => 'elk_db_insert_id', //
-				'last_error' => 'mysql_error', //
 				'db_case_sensitive' => false, //
 			);
 

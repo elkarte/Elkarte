@@ -47,11 +47,6 @@ class Database_SQLite implements Database
 		if (!isset($db->fetch_assoc) || $db->fetch_assoc != 'sqlite_fetch_array')
 			$smcFunc += array(
 				'db_query' => 'elk_db_query',
-				'db_quote' => 'elk_db_quote',
-				'db_fetch_assoc' => 'sqlite_fetch_array',
-				'db_insert' => 'elk_db_insert',
-				'db_insert_id' => 'elk_db_insert_id',
-				'last_error' => 'elk_db_last_error',
 				'db_case_sensitive' => true,
 			);
 
