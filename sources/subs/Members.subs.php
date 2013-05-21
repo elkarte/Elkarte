@@ -1049,8 +1049,6 @@ function groupsAllowedTo($permission, $board_id = null)
  */
 function membersAllowedTo($permission, $board_id = null)
 {
-
-
 	$db = database();
 
 	$member_groups = groupsAllowedTo($permission, $board_id);
@@ -1097,8 +1095,6 @@ function membersAllowedTo($permission, $board_id = null)
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
-
-
 	$db = database();
 
 	// Firstly, if email and username aren't passed find out the members email address and name.
@@ -1183,8 +1179,6 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1255,8 +1249,6 @@ function list_getNumMembers($where, $where_params = array())
  */
 function populateDuplicateMembers(&$members)
 {
-
-
 	$db = database();
 
 	// This will hold all the ip addresses.
@@ -1376,8 +1368,6 @@ function populateDuplicateMembers(&$members)
  */
 function isAnotherAdmin($memberID)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1406,8 +1396,6 @@ function isAnotherAdmin($memberID)
  */
 function admins($id_admin = 0)
 {
-
-
 	$db = database();
 
 	// Now let's get out and loop through the admins.
@@ -1437,8 +1425,6 @@ function admins($id_admin = 0)
  */
 function maxMemberID()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1532,8 +1518,6 @@ function getBasicMemberData($member_ids, $options = array())
  */
 function countInactiveMembers()
 {
-
-
 	$db = database();
 
 	$inactive_members = array();
@@ -1562,8 +1546,6 @@ function countInactiveMembers()
  */
 function getMemberByName($name)
 {
-
-
 	$db = database();
 
 	$member = array();
@@ -1719,8 +1701,6 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
  */
 function approveMembers($members, $condition, $timeBefore, $current_filter)
 {
-
-
 	$db = database();
 
 	// Approve/activate this member.
@@ -1750,8 +1730,6 @@ function approveMembers($members, $condition, $timeBefore, $current_filter)
  */
 function enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1778,8 +1756,6 @@ function enforceReactivation($member, $condition, $current_filter, $members, $ti
  */
 function countMembersInGroup($id_group = 0)
 {
-
-
 	$db = database();
 
 	// Determine the number of ungrouped members.

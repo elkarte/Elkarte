@@ -403,8 +403,6 @@ function expandIPv6($addr, $strict_check = true)
  */
 function escapestring__recursive($var)
 {
-
-
 	$db = database();
 
 	if (!is_array($var))
@@ -482,8 +480,6 @@ function urldecode__recursive($var, $level = 0)
  */
 function unescapestring__recursive($var)
 {
-
-
 	$db = database();
 
 	if (!is_array($var))

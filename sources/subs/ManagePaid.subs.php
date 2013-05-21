@@ -31,8 +31,6 @@ if (!defined('ELKARTE'))
  */
 function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = array())
 {
-
-
 	$db = database();
 
 	// Get the total amount of users.
@@ -112,8 +110,6 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
  */
 function reapplySubscriptions($users)
 {
-
-
 	$db = database();
 
 	// Make it an array.
@@ -551,8 +547,6 @@ function loadSubscriptions()
 
 function deleteSubscription($id)
 {
-
-
 	$db = database();
 
 	$db->query('delete_subscription', '
@@ -571,8 +565,6 @@ function deleteSubscription($id)
  */
 function insertSubscription($insert)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -599,8 +591,6 @@ function insertSubscription($insert)
  */
 function countActiveSubscriptions($sub_id)
 {
-
-
 	$db = database();
 
 	// Don't do groups if there are active members
@@ -628,8 +618,6 @@ function countActiveSubscriptions($sub_id)
  */
 function updateSubscription($update, $ignore_active)
 {
-
-
 	$db = database();
 
 	$db->query('substring', '
@@ -664,8 +652,6 @@ function updateSubscription($update, $ignore_active)
  */
 function getSubscriptionDetails($sub_id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -729,8 +715,6 @@ function getSubscriptionDetails($sub_id)
  */
 function getSubscription($id_sub)
 {
-
-
 	$db = database();
 
 	// Load the subscription information.
@@ -767,8 +751,6 @@ function getSubscription($id_sub)
  */
 function validateSubscriptionID($id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -796,8 +778,6 @@ function validateSubscriptionID($id)
  */
 function alreadySubscribed($id_sub, $id_member)
 {
-
-
 	$db = database();
 
 	// Ensure the member doesn't already have a subscription!
@@ -827,8 +807,6 @@ function alreadySubscribed($id_sub, $id_member)
  */
 function getSubscriptionStatus($log_id)
 {
-
-
 	$db = database();
 
 	$status = array();
@@ -857,8 +835,6 @@ function getSubscriptionStatus($log_id)
  */
 function updateSubscriptionItem($item)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -882,8 +858,6 @@ function updateSubscriptionItem($item)
  */
 function prepareDeleteSubscriptions($toDelete)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -909,8 +883,6 @@ function prepareDeleteSubscriptions($toDelete)
  */
 function getPendingSubscriptions($log_id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -937,8 +909,6 @@ function getPendingSubscriptions($log_id)
  */
 function logSubscription($details)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -963,8 +933,6 @@ function logSubscription($details)
  */
 function updatePendingSubscription($log_id, $details)
 {
-
-
 	$db = database();
 
 	// Update the entry.

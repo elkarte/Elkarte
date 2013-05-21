@@ -26,8 +26,6 @@ if (!defined('ELKARTE'))
  */
 function smileyExists($smileys)
 {
-
-
 	$db = database();
 
 	$found = array();
@@ -55,8 +53,6 @@ function smileyExists($smileys)
  */
 function validateDuplicateSmiley($code, $current = null)
 {
-
-
 	$db = database();
 
 	$db = database();
@@ -87,8 +83,6 @@ function validateDuplicateSmiley($code, $current = null)
  */
 function nextSmileyLocation($location)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -114,8 +108,6 @@ function nextSmileyLocation($location)
  */
 function addSmiley($param)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -135,8 +127,6 @@ function addSmiley($param)
  */
 function deleteSmileys($smileys)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -156,8 +146,6 @@ function deleteSmileys($smileys)
  */
 function updateSmileyDisplayType($smileys, $display_type)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -178,8 +166,6 @@ function updateSmileyDisplayType($smileys, $display_type)
  */
 function updateSmiley($param)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -208,8 +194,6 @@ function updateSmiley($param)
  */
 function getSmiley($id)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -237,8 +221,6 @@ function getSmiley($id)
  */
 function getSmileyPosition($location, $id)
 {
-
-
 	$db = database();
 
 	$smiley = array();
@@ -268,8 +250,6 @@ function getSmileyPosition($location, $id)
  */
 function moveSmileyPosition($smiley, $source)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -310,8 +290,6 @@ function moveSmileyPosition($smiley, $source)
  */
 function updateSmileyRow($id, $row, $location)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -335,8 +313,6 @@ function updateSmileyRow($id, $row, $location)
  */
 function updateSmileyOrder($id, $order)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -357,8 +333,6 @@ function updateSmileyOrder($id, $order)
  */
 function getSmileys()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -404,8 +378,6 @@ function getSmileys()
  */
 function isSmileySetInstalled($set)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -434,8 +406,6 @@ function isSmileySetInstalled($set)
  */
 function logPackageInstall($param)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -463,8 +433,6 @@ function logPackageInstall($param)
  */
 function getMaxSmileyOrder()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -490,8 +458,6 @@ function getMaxSmileyOrder()
  */
 function sortSmileyTable()
 {
-
-
 	$db = database();
 
 	$table = db_table();
@@ -586,8 +552,6 @@ function list_getNumSmileySets()
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -611,8 +575,6 @@ function list_getSmileys($start, $items_per_page, $sort)
  */
 function list_getNumSmileys()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

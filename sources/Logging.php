@@ -546,8 +546,6 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-
-
 	$db = database();
 
 	$db->insert('insert',

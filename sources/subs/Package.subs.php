@@ -386,8 +386,6 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-
-
 	$db = database();
 
 	// First, check that the database is valid, installed.list is still king.
@@ -2900,8 +2898,6 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-
-
 	$db = database();
 
 	$files = array();
@@ -3301,8 +3297,6 @@ function setPackageState($id)
  */
 function checkPackageDependency()
 {
-
-
 	$db = database();
 
 	$version = false;
@@ -3364,8 +3358,6 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
  */
 function setPackagesAsUninstalled()
 {
-
-
 	$db = database();
 
 	// Set everything as uninstalled, just like that

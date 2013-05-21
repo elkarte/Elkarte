@@ -84,8 +84,6 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-
-
 	$db = database();
 
 	// All the parent groups to sort out.

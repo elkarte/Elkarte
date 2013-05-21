@@ -16,8 +16,6 @@ if (!defined('ELKARTE'))
 
 function viewers($id, $session, $type = 'topic')
 {
-
-
 	$db = database();
 
 	if (!in_array($type, array('topic', 'board')))

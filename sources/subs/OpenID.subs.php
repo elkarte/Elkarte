@@ -116,8 +116,6 @@ function openID_revalidate()
  */
 function openID_getAssociation($server, $handle = null, $no_delete = false)
 {
-
-
 	$db = database();
 
 	if (!$no_delete)
@@ -242,8 +240,6 @@ function openID_makeAssociation($server)
  */
 function openID_removeAssociation($handle)
 {
-
-
 	$db = database();
 
 	$db->query('openid_remove_association', '
@@ -434,8 +430,6 @@ function openID_canonize($uri)
  */
 function openid_member_exists($url)
 {
-
-
 	$db = database();
 
 	$request = $db->query('openid_member_exists', '

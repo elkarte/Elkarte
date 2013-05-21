@@ -724,8 +724,6 @@ function loadAllPermissions($loadType = 'classic')
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -755,8 +753,6 @@ function countPermissions($groups, $hidden_permissions = null)
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -787,8 +783,6 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
  */
 function assignPermissionProfileToBoard($profile, $board)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -812,8 +806,6 @@ function assignPermissionProfileToBoard($profile, $board)
  */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
 {
-
-
 	$db = database();
 
 	// Retrieve current permissions of group.
@@ -879,8 +871,6 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
  */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
 {
-
-
 	$db = database();
 
 	// Now do the same for the board permissions.
@@ -943,8 +933,6 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
  */
 function deletePermission($groups, $permission, $illegal_permissions)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -969,8 +957,6 @@ function deletePermission($groups, $permission, $illegal_permissions)
  */
 function deleteBoardPermission($group, $profile_id, $permission)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -993,8 +979,6 @@ function deleteBoardPermission($group, $profile_id, $permission)
  */
 function replacePermission($permChange)
 {
-
-
 	$db = database();
 
 	$db->insert('replace',
@@ -1012,8 +996,6 @@ function replacePermission($permChange)
  */
 function replaceBoardPermission($permChange)
 {
-
-
 	$db = database();
 
 	$db->insert('replace',
@@ -1029,8 +1011,6 @@ function replaceBoardPermission($permChange)
  */
 function removeModeratorPermissions()
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1049,8 +1029,6 @@ function removeModeratorPermissions()
  */
 function fetchPermissions($id_group)
 {
-
-
 	$db = database();
 
 	$permissions = array(
@@ -1083,8 +1061,6 @@ function fetchPermissions($id_group)
  */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {
-
-
 	$db = database();
 
 	$permissions = array(
@@ -1117,8 +1093,6 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
  */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1140,8 +1114,6 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  */
 function deleteAllBoardPermissions($id_group, $id_profile)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1160,8 +1132,6 @@ function deleteAllBoardPermissions($id_group, $id_profile)
  */
 function clearDenyPermissions()
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -1186,8 +1156,6 @@ function clearDenyPermissions()
  */
 function clearPostgroupPermissions()
 {
-
-
 	$db = database();
 
 	$post_groups = array();
@@ -1310,8 +1278,6 @@ function renamePermissionProfile($id_profile, $name)
  */
 function deletePermissionProfiles($profiles)
 {
-
-
 	$db = database();
 
 	// Verify it's not in use...
@@ -1378,8 +1344,6 @@ function permProfilesInUse($profiles)
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {
-
-
 	$db = database();
 
 	// Start by deleting all the permissions relevant.
@@ -1403,8 +1367,6 @@ function deleteBoardPermissions($groups, $profile, $permissions)
  */
 function insertBoardPermission($new_permissions)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -1425,8 +1387,6 @@ function insertBoardPermission($new_permissions)
  */
 function getPermission($group, $profile, $permissions)
 {
-
-
 	$db = database();
 
 	$groups = array();

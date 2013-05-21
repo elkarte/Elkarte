@@ -114,8 +114,6 @@ class Fulltext_Search
 	 */
 	protected function _getMinWordLength()
 	{
-
-
 		$db = database();
 
 		// need some search specific database tricks

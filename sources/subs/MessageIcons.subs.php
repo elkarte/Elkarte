@@ -68,8 +68,6 @@ function getMessageIcons()
  */
 function deleteMessageIcon($icons)
 {
-
-
 	$db = database();
 
 	// Do the actual delete!
@@ -89,8 +87,6 @@ function deleteMessageIcon($icons)
  */
 function updateMessageIcon($icon)
 {
-
-
 	$db = database();
 
 	$db->insert('replace',
@@ -108,8 +104,6 @@ function updateMessageIcon($icon)
  */
 function addMessageIcon($icon)
 {
-
-
 	$db = database();
 
 	$db->insert('replace',
@@ -125,8 +119,6 @@ function addMessageIcon($icon)
  */
 function sortMessageIconTable()
 {
-
-
 	$db = database();
 
 	$db->query('alter_table_icons', '
@@ -147,8 +139,6 @@ function sortMessageIconTable()
  */
 function list_getMessageIcons($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

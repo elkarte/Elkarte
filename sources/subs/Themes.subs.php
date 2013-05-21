@@ -21,8 +21,6 @@ if (!defined('ELKARTE'))
  */
 function installedThemes()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -61,8 +59,6 @@ function installedThemes()
  */
 function themeDirectory($id_theme)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -89,8 +85,6 @@ function themeDirectory($id_theme)
  */
 function themeUrl($id_theme)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -120,8 +114,6 @@ function themeUrl($id_theme)
  */
 function validateThemeName($indexes, $value_data)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -157,8 +149,6 @@ function validateThemeName($indexes, $value_data)
  */
 function getBasicThemeInfos($themes)
 {
-
-
 	$db = database();
 
 	$themelist = array();
@@ -268,8 +258,6 @@ function getThemesPathbyID($theme_list = array())
  */
 function loadThemes($knownThemes)
 {
-
-
 	$db = database();
 
 	// Load up all the themes.

@@ -20,8 +20,6 @@ if (!defined('ELKARTE'))
  */
 function fetchPackageServers($server = null)
 {
-
-
 	$db = database();
 	
 	$servers = array();
@@ -56,8 +54,6 @@ function fetchPackageServers($server = null)
  */
 function deletePackageServer($id)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -77,8 +73,6 @@ function deletePackageServer($id)
  */
 function addPackageServer($name, $url)
 {
-
-
 	$db = database();
 
 	$db->insert('',

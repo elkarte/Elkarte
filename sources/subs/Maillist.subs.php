@@ -148,8 +148,6 @@ function list_maillist_count_unapproved()
  */
 function maillist_delete_entry($id)
 {
-
-
 	$db = database();
 
 	// bye bye error log entry
@@ -231,8 +229,6 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
  */
 function list_count_filter_parser($id, $style)
 {
-
-
 	$db = database();
 
 	$total = 0;
@@ -265,8 +261,6 @@ function list_count_filter_parser($id, $style)
  */
 function maillist_load_filter_parser($id, $style)
 {
-
-
 	$db = database();
 
 	$row = array();
@@ -300,8 +294,6 @@ function maillist_load_filter_parser($id, $style)
  */
 function maillist_delete_filter_parser($id)
 {
-
-
 	$db = database();
 
 	// Delete the rows from the database for the filter selected

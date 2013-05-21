@@ -1325,8 +1325,6 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-
-
 	$db = database();
 
 	// Update the boards they are being notified on.
@@ -2393,8 +2391,6 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  */
 function list_getUserWarningCount($memID)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

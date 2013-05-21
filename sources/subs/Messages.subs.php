@@ -91,8 +91,6 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function getMessageInfo($id_msg, $override_permissions = false)
 {
-
-
 	$db = database();
 
 	if (empty($id_msg))
@@ -664,8 +662,6 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function associatedTopic($msg_id, $topicID = null)
 {
-
-
 	$db = database();
 
 	if ($topicID === null)

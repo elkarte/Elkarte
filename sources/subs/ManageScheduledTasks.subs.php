@@ -26,8 +26,6 @@ if (!defined('ELKARTE'))
  */
 function loadTasks($tasks)
 {
-
-
 	$db = database();
 	
 	$request = $db->query('', '
@@ -54,8 +52,6 @@ function loadTasks($tasks)
  */
 function logTask($task_id, $total_time)
 {
-
-
 	$db = database();
 
 	$db->insert('',
@@ -73,8 +69,6 @@ function logTask($task_id, $total_time)
  */
 function updateTaskStatus($enablers)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -97,8 +91,6 @@ function updateTaskStatus($enablers)
  */
 function updateTask($id_task, $disabled, $offset, $interval, $unit)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -245,8 +237,6 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumaction_logEntries()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

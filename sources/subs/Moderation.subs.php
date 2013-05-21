@@ -463,8 +463,6 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function list_getWarningCount()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

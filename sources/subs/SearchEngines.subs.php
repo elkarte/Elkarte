@@ -170,8 +170,6 @@ function logSpider()
  */
 function consolidateSpiderStats()
 {
-
-
 	$db = database();
 
 	$request = $db->query('consolidate_spider_stats', '
@@ -239,8 +237,6 @@ function consolidateSpiderStats()
  */
 function recacheSpiderNames()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -262,8 +258,6 @@ function recacheSpiderNames()
  */
 function sortSpiderTable()
 {
-
-
 	$db = database();
 
 	$table = db_table();
