@@ -174,8 +174,8 @@ function template_action_summary()
 	// If likes enabled show the members karma.
 	if (!empty($modSettings['likes_enabled']))
 		echo '
-					<dt>', $modSettings['karmaLabel'], ' </dt>
-					<dd>', $context['member']['likes_received'], '/', $context['member']['likes_given'], '</dd>';
+					<dt>', $txt['likes'], ' </dt>
+					<dd>', $context['member']['likes']['received'], '/', $context['member']['likes']['given'], '</dd>';
 
 	if (!isset($context['disabled_fields']['gender']) && !empty($context['member']['gender']['name']))
 		echo '

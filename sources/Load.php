@@ -817,7 +817,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login,
+			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login, mem.likes_given, mem.likes_received,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
 			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
 			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
@@ -839,7 +839,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from,
 			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.likes_given, mem.likes_received';
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list';
 			break;
 		case 'minimal':
 			$select_columns = '
@@ -1031,10 +1031,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'allow' => !$user_info['is_guest'] && !empty($modSettings['karmaMode']) && $user_info['id'] != $user && allowedTo('karma_edit') &&
 				($user_info['posts'] >= $modSettings['karmaMinPosts'] || $user_info['is_admin']),
 			),
+			'likes' => array(
+				'given' => $profile['likes_given'],
+				'received' => $profile['likes_received']
+			),
 			'ip' => htmlspecialchars($profile['member_ip']),
 			'ip2' => htmlspecialchars($profile['member_ip2']),
-			'likes_given' => comma_format($profile['likes_given']),
-			'likes_received' => comma_format($profile['likes_received']),
 			'online' => array(
 				'is_online' => $profile['is_online'],
 				'text' => $smcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
