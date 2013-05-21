@@ -20,8 +20,6 @@ if (!defined('ELKARTE'))
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
-
-
 	$db = database();
 
 	// Delete all or just some?
@@ -58,8 +56,6 @@ function deleteErrors($type, $filter = null, $error_list = null)
  */
 function numErrors()
 {
-
-
 	$db = database();
 
 	// Just how many errors are there?

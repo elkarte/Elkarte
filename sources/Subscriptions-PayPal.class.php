@@ -363,8 +363,6 @@ class paypal_payment
 	 */
 	private function _findSubscription()
 	{
-
-
 		$db = database();
 
 		// Assume we have this?

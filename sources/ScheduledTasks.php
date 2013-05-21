@@ -1839,8 +1839,6 @@ function scheduled_remove_temp_attachments()
  */
 function scheduled_remove_topic_redirect()
 {
-
-
 	$db = database();
 
 	// init
@@ -1933,8 +1931,6 @@ function scheduled_maillist_fetch_IMAP()
  */
 function scheduled_remove_old_followups()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

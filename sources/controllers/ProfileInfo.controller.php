@@ -948,8 +948,6 @@ function action_showDisregarded()
  */
 function list_getDisregarded($start, $items_per_page, $sort, $memID)
 {
-
-
 	$db = database();
 
 	// Get the list of topics we can see

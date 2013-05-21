@@ -471,8 +471,6 @@ class Convert_Md
 	 */
 	private function _convert_header($level, $content)
 	{
-
-
 		$db = database();
 
 		$level = (int) ltrim($level, 'h');
@@ -549,8 +547,6 @@ class Convert_Md
 	 */
 	function _convert_table($node)
 	{
-
-
 		$db = database();
 
 		$table_heading = $node->getElementsByTagName('th');
@@ -827,8 +823,6 @@ class Convert_Md
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
-
-
 		$db = database();
 
 		$lines = array();

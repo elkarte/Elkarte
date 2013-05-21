@@ -38,8 +38,6 @@ function bb2_db_date()
  */
 function bb2_db_affected_rows()
 {
-
-
 	$db = database();
 
 	return $db->affected_rows();
@@ -53,8 +51,6 @@ function bb2_db_affected_rows()
  */
 function bb2_db_escape($string)
 {
-
-
 	$db = database();
 
 	return $db->escape_string($string);
@@ -68,8 +64,6 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-
-
 	$db = database();
 
 	return $db->num_rows($result);
@@ -85,8 +79,6 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
-
-
 	$db = database();
 
 	// First fix the horrors caused by bb's support of only mysql
@@ -119,8 +111,6 @@ function bb2_db_query($query)
  */
 function bb2_db_rows($result)
 {
-
-
 	$db = database();
 
 	$temp = array();

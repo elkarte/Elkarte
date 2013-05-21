@@ -78,8 +78,6 @@ function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id =
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
 {
-
-
 	$db = database();
 
 	if ($group_id !== false)
@@ -126,8 +124,6 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  */
 function removeBanGroups($group_ids)
 {
-
-
 	$db = database();
 
 	if (!is_array($group_ids))
@@ -158,8 +154,6 @@ function removeBanGroups($group_ids)
  */
 function removeBanLogs($ids = array())
 {
-
-
 	$db = database();
 
 	if (empty($ids))
@@ -373,8 +367,6 @@ function validateTriggers(&$triggers)
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
-
-
 	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
@@ -469,8 +461,6 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {
-
-
 	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
@@ -573,8 +563,6 @@ function logTriggersUpdates($logs, $new = true)
  */
 function updateBanGroup($ban_info = array())
 {
-
-
 	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
@@ -639,8 +627,6 @@ function updateBanGroup($ban_info = array())
  */
 function insertBanGroup($ban_info = array())
 {
-
-
 	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);
@@ -820,8 +806,6 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
  */
 function updateBanMembers()
 {
-
-
 	$db = database();
 
 	$updates = array();
@@ -948,8 +932,6 @@ function updateBanMembers()
 
 function getMemberData($id)
 {
-
-
 	$db = database();
 
 	$suggestions = array();
@@ -979,8 +961,6 @@ function getMemberData($id)
  */
 function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 {
-
-
 	$db = database();
 
 	$where = array(
@@ -1020,8 +1000,6 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  */
 function list_getNumBanTriggers($trigger_type)
 {
-
-
 	$db = database();
 
 	$where = array(
@@ -1055,8 +1033,6 @@ function list_getNumBanTriggers($trigger_type)
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1083,8 +1059,6 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumBanLogEntries()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1106,8 +1080,6 @@ function list_getNumBanLogEntries()
  */
 function list_getNumBans()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1238,8 +1210,6 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  */
 function list_getBans($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1300,8 +1270,6 @@ function list_getNumBanItems()
  */
 function banLoadAdditionalIPsMember($member_id)
 {
-
-
 	$db = database();
 
 	// Find some additional IP's used by this member.
@@ -1331,8 +1299,6 @@ function banLoadAdditionalIPsMember($member_id)
  */
 function banLoadAdditionalIPsError($member_id)
 {
-
-
 	$db = database();
 
 	$error_ips = array();
@@ -1386,8 +1352,6 @@ function banLoadAdditionalIPs($member_id)
  */
 function banDetails($ban_id, $ban_group)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

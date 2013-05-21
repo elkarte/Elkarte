@@ -794,8 +794,6 @@ class ManageSearchEngines_Controller
  */
 function list_getSpiders($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -820,8 +818,6 @@ function list_getSpiders($start, $items_per_page, $sort)
  */
 function list_getNumSpiders()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -846,8 +842,6 @@ function list_getNumSpiders()
  */
 function list_getSpiderLogs($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -873,8 +867,6 @@ function list_getSpiderLogs($start, $items_per_page, $sort)
  */
 function list_getNumSpiderLogs()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -900,8 +892,6 @@ function list_getNumSpiderLogs()
  */
 function list_getSpiderStats($start, $items_per_page, $sort)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -929,8 +919,6 @@ function list_getSpiderStats($start, $items_per_page, $sort)
  */
 function list_getNumSpiderStats()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '

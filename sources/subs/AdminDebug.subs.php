@@ -20,8 +20,6 @@ if (!defined('ELKARTE'))
  */
 function list_getAdminInfoFile($filename)
 {
-
-
 	$db = database();
 
 	$file = array();

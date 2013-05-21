@@ -22,8 +22,6 @@ if (!defined('ELKARTE'))
  */
 function deleteBadBehavior($type ,$filter)
 {
-
-
 	$db = database();
 
 	// Delete all or just some?
@@ -71,8 +69,6 @@ function deleteBadBehavior($type ,$filter)
  */
 function getBadBehaviorLogEntryCount($filter)
 {
-
-
 	$db = database();
 
 	$result = $db->query('', '

@@ -26,8 +26,6 @@ if (!defined('ELKARTE'))
  */
 function countMessages()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -47,8 +45,6 @@ function countMessages()
  */
 function flushLogTables()
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -88,8 +84,6 @@ function flushLogTables()
  */
 function getMessageTableColumns()
 {
-
-
 	$db = database();
 
 	$table = db_table();
@@ -105,8 +99,6 @@ function getMessageTableColumns()
  */
 function resizeMessageTableBody($type)
 {
-
-
 	$db = database();
 
 	$table = db_table();
@@ -122,8 +114,6 @@ function resizeMessageTableBody($type)
  */
 function detectExceedingMessages($start, $increment)
 {
-
-
 	$db = database();
 
 	$id_msg_exceeding = array();
@@ -208,8 +198,6 @@ function getElkTables()
  */
 function optimizeTable($tablename)
 {
-
-
 	$db = database();
 
 	$db = database();
@@ -223,8 +211,6 @@ function optimizeTable($tablename)
  */
 function getMaxTopicID()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -247,8 +233,6 @@ function getMaxTopicID()
  */
 function recountApprovedMessages($start, $increment)
 {
-
-
 	$db = database();
 
 	// Recount approved messages
@@ -288,8 +272,6 @@ function recountApprovedMessages($start, $increment)
  */
 function recountUnapprovedMessages($start, $increment)
 {
-
-
 	$db = database();
 
 	// Recount unapproved messages
@@ -330,8 +312,6 @@ function recountUnapprovedMessages($start, $increment)
  */
 function resetBoardsCounter($column)
 {
-
-
 	$db = database();
 
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
@@ -359,8 +339,6 @@ function resetBoardsCounter($column)
  */
 function updateBoardsCounter($type, $start, $increment)
 {
-
-
 	$db = database();
 
 	switch ($type)
@@ -483,8 +461,6 @@ function updateBoardsCounter($type, $start, $increment)
  */
 function updatePersonalMessagesCounter()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -528,8 +504,6 @@ function updatePersonalMessagesCounter()
  */
 function updateMessagesBoardID($start, $increment)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -565,8 +539,6 @@ function updateMessagesBoardID($start, $increment)
  */
 function updateBoardsLastMessage()
 {
-
-
 	$db = database();
 
 	// Update the latest message of each board.
@@ -638,8 +610,6 @@ function updateBoardsLastMessage()
  */
 function countTopicsFromBoard($id_board)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -664,8 +634,6 @@ function countTopicsFromBoard($id_board)
  */
 function getTopicsToMove($id_board)
 {
-
-
 	$db = database();
 
 	$topics = array();
@@ -696,8 +664,6 @@ function getTopicsToMove($id_board)
  */
 function countContributors()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -838,8 +804,6 @@ function updateZeroPostMembers()
  */
 function purgeMembers($type, $groups, $time_limit)
 {
-
-
 	$db = database();
 
 	$where_vars = array(

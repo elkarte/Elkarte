@@ -173,8 +173,6 @@ class Email_Parse
 	 */
 	private function _query_load_email($id)
 	{
-
-
 		$db = database();
 
 		// Nothing to load then

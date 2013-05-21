@@ -1476,8 +1476,6 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-
-
 	$db = database();
 
 	if (!is_array($msgs))
@@ -1701,8 +1699,6 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-
-
 	$db = database();
 
 	if (!is_array($topics))

@@ -24,8 +24,6 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-
-
 	$db = database();
 
 	if ($pollID === null)
@@ -66,8 +64,6 @@ function associatedPoll($topicID, $pollID = null)
  */
 function removePoll($pollID)
 {
-
-
 	$db = database();
 
 	// Remove votes.
@@ -105,8 +101,6 @@ function removePoll($pollID)
  */
 function resetVotes($pollID)
 {
-
-
 	$db = database();
 
 	$db->query('', '
@@ -144,8 +138,6 @@ function resetVotes($pollID)
  */
 function getPollInfo($topicID)
 {
-
-
 	$db = database();
 
 	// Check if a poll currently exists on this topic, and get the id, question and starter.

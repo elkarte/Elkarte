@@ -138,8 +138,6 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -163,8 +161,6 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-
-
 	$db = database();
 
 	$request = $db->query('substring', '
