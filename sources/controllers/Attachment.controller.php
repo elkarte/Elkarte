@@ -26,7 +26,7 @@ class Attachment_Controller
 	function action_attachment()
 	{
 		// default action to execute
-		action_dlattach();
+		$this->action_dlattach();
 	}
 
 	/**

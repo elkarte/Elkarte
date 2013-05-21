@@ -440,7 +440,7 @@ class ManageNews_Controller
 		}
 
 		// Clean the other vars.
-		action_mailingsend(true);
+		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');

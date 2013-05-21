@@ -28,7 +28,7 @@ class Announce_Controller
 	function action_index()
 	{
 		// default for action=announce: action_selectgroup() function.
-		action_selectgroup();
+		$this->action_selectgroup();
 	}
 
 	/**

@@ -601,12 +601,12 @@ class Admin_Controller
 	 * It prepares all the data necessary for the administration front page.
 	 * It uses the Admin template along with the admin sub template.
 	 * It requires the moderate_forum, manage_membergroups, manage_bans,
-	 *  admin_forum, manage_permissions, manage_attachments, manage_smileys,
-	 *  manage_boards, edit_news, or send_mail permission.
-	 *  It uses the index administrative area.
+	 * admin_forum, manage_permissions, manage_attachments, manage_smileys,
+	 * manage_boards, edit_news, or send_mail permission.
+	 * It uses the index administrative area.
 	 *
-	 *  It can be found by going to ?action=admin.
-	*/
+	 * It can be found by going to ?action=admin.
+	 */
 	public function action_home()
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;
@@ -723,7 +723,7 @@ class Admin_Controller
 	 * The credits section in admin panel.
 	 *
 	 *  Accessed by ?action=admin;area=credits
-	*/
+	 */
 	public function action_credits()
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;

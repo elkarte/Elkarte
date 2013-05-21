@@ -292,8 +292,6 @@ function action_trackactivity($memID)
  */
 function list_getUserErrorCount($where, $where_vars = array())
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -305,7 +303,6 @@ function list_getUserErrorCount($where, $where_vars = array())
 	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// @todo cast this to an integer
 	return $count;
 }
 
@@ -363,8 +360,6 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
  */
 function list_getIPMessageCount($where, $where_vars = array())
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -377,7 +372,6 @@ function list_getIPMessageCount($where, $where_vars = array())
 	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// @todo cast to integer
 	return $count;
 }
 
@@ -813,8 +807,6 @@ function action_tracklogin($memID = 0)
  */
 function list_getLoginCount($where, $where_vars = array())
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -828,7 +820,6 @@ function list_getLoginCount($where, $where_vars = array())
 	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// @todo cast to integer
 	return $count;
 }
 
@@ -980,8 +971,6 @@ function action_trackedits($memID)
  */
 function list_getProfileEditCount($memID)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -997,7 +986,6 @@ function list_getProfileEditCount($memID)
 	list ($edit_count) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// @todo cast to integer
 	return $edit_count;
 }
 

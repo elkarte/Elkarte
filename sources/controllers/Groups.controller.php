@@ -765,8 +765,6 @@ class Groups_Controller
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-
-
 	$db = database();
 
 	$request = $db->query('', '
