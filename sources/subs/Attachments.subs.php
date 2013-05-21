@@ -2404,15 +2404,17 @@ function setRemovalNotice($messages, $notice)
  * Update an attachment's thumbnail
  * 
  * @param string $filename
+ * @param int $id_attach
  * @param int $id_msg
  * @param int $old_id_thumb = 0
+ *
  * @return array The updated information
  */
-function updateAttachmentThumbnail($filename, $id_msg, $old_id_thumb = 0)
+function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0)
 {
 	global $modSettings;
 
-	$attachment = array();
+	$attachment = array('id_attach' => $id_attach);
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
 	if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))

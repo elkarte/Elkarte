@@ -1217,13 +1217,13 @@ function loadAttachmentContext($id_msg)
 			// Let's see, do we want thumbs?
 			if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 			{
-				// A proper thumb doesn't exist yet? Create one!
+				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
 					require_once(SUBSDIR . '/Attachments.subs.php');
-					$attachment = $attachment + updateAttachmentThumbnail($filename, $id_msg, $attachment['id_thumb']);
+					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
 				}
 
 				// Only adjust dimensions on successful thumbnail creation.
