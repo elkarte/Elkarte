@@ -59,16 +59,6 @@ function elk_db_query($identifier, $db_string, $db_values = array(), $connection
 }
 
 /**
- * affected_rows
- */
-function elk_db_affected_rows()
-{
-	$db = database();
-
-	return $db->affected_rows();
-}
-
-/**
  * insert_id
  *
  * @param string $table

@@ -59,17 +59,6 @@ function elk_db_query($identifier, $db_string, $db_values = array(), $connection
 }
 
 /**
- * affected_rows
- * @param resource $connection
- */
-function elk_db_affected_rows()
-{
-	$db = database();
-
-	return $db->affected_rows();
-}
-
-/**
  * Return last insert id
  *
  * @param string $table
@@ -249,11 +238,4 @@ function elk_udf_regexp($exp, $search)
 	$db = database();
 
 	return $db->udf_regexp($exp, $search);
-}
-
-function elk_db_unescape_string($string)
-{
-	$db = database();
-
-	return $db->unescape_string($string);
 }
