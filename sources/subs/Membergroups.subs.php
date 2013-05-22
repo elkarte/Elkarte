@@ -741,6 +741,8 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  * @param array $normalGroups = array() an array of normal groups id.
  * @param bool $include_hidden = false if true, it includes hidden groups in the count (default false).
  * @param bool $include_moderators = false if true, it includes board moderators too (default false).
+ *
+ * @return array
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
@@ -836,6 +838,8 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *  true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
  * @param bool $assignable = false determine if the group is assignable or not and return that information.
  * @param bool $protected = false if true, it includes protected groups in the result.
+ *
+ * @return array|false
  */
 function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
@@ -904,7 +908,8 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
  * @param array $excludes
  * @param string $sort_order
  * @param bool $split, splits postgroups and membergroups
- * @return type
+ *
+ * @return array
  */
 function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
 {
@@ -1024,6 +1029,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  * Retrieve groups and their number of members.
  *
  * @param array $groupList
+ *
  * @return array with ('id', 'name', 'member_count')
  */
 function getGroups($groupList)
@@ -1049,7 +1055,6 @@ function getGroups($groupList)
 		GROUP BY mg.id_group',
 		array(
 			'group_list' => $groups,
-			'newbie_id_group' => 4,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -1238,7 +1243,10 @@ function updateInheritedGroup($id_group, $copy_id)
 }
 
 /**
- * Updates the membergroup with the given information.
+ * This function updates the membergroup with the given information.
+ * It's passed an associative array $properties, with 'current_group' holding
+ * the group to update. The rest of the keys are details to update it with.
+ *
  * @param array $properties
  */
 function updateMembergroupProperties($properties)
@@ -1271,6 +1279,7 @@ function updateMembergroupProperties($properties)
 
 /**
  * Detaches a membergroup from the boards listed in $boards.
+ *
  * @param int $id_group
  * @param array $boards
  * @param array $access_list
@@ -1279,7 +1288,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 {
 	$db = database();
 
-	// Find all board this group is in, but shouldn't be in.
+	// Find all boards in whose access list this group is in, but shouldn't be.
 	$request = $db->query('', '
 		SELECT id_board, {raw:column}
 		FROM {db_prefix}boards
@@ -1305,6 +1314,14 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 	$db->free_result($request);
 }
 
+/**
+ * Assigns the given group $id_group to the boards specified, for
+ * the 'allow' or 'deny' list.
+ *
+ * @param int $id_group
+ * @param array $boards
+ * @param string $access_list ('allow', 'deny')
+ */
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
 	$db = database();
