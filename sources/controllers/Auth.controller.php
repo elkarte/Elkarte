@@ -32,7 +32,7 @@ class Auth_Controller
 	 *  @uses the protocol_login sub-template in the Wireless template,
 	 *   if you are using a wireless device
 	 */
-	function action_login()
+	public function action_login()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -78,7 +78,7 @@ class Auth_Controller
 	 * - accessed from ?action=login2, by forms.
 	 * On error, uses the same templates Login() uses.
 	 */
-	function action_login2()
+	public function action_login2()
 	{
 		global $txt, $scripturl, $user_info, $user_settings;
 
@@ -88,6 +88,7 @@ class Auth_Controller
 		// Load cookie authentication stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
 
+		// sa=salt
 		if (isset($_GET['sa']) && $_GET['sa'] == 'salt' && !$user_info['is_guest'])
 		{
 			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
@@ -95,7 +96,7 @@ class Auth_Controller
 			elseif (isset($_SESSION['login_' . $cookiename]))
 				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
 			else
-				trigger_error('Login2(): Cannot be logged in without a session or cookie', E_USER_ERROR);
+				trigger_error('action_login2(): Cannot be logged in without a session or cookie', E_USER_ERROR);
 
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
@@ -402,7 +403,7 @@ class Auth_Controller
  	* @param bool $internal if true, it doesn't check the session
  	* @param $redirect
  	*/
-	function action_logout($internal = false, $redirect = true)
+	public function action_logout($internal = false, $redirect = true)
 	{
 		global $user_info, $user_settings, $context, $modSettings;
 
@@ -464,7 +465,7 @@ class Auth_Controller
 	 * It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
 	 * It uses the 'kick_guest' sub template found in Login.template.php.
 	 */
-	function action_kickguest()
+	public function action_kickguest()
 	{
 		global $txt, $context;
 
@@ -484,7 +485,7 @@ class Auth_Controller
  	* Displays a login screen with sub template 'maintenance'.
  	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
  	*/
-	function action_maintenance_mode()
+	public function action_maintenance_mode()
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
