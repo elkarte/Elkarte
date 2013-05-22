@@ -148,48 +148,6 @@ function url_parts($local, $global)
 }
 
 /**
- * Throws guests out to the login screen when guest access is off.
- * - sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
- * - uses the 'kick_guest' sub template found in Login.template.php.
- */
-function KickGuest()
-{
-	global $txt, $context;
-
-	loadLanguage('Login');
-	loadTemplate('Login');
-
-	// Never redirect to an attachment
-	if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
-		$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
-
-	$context['sub_template'] = 'kick_guest';
-	$context['page_title'] = $txt['login'];
-}
-
-/**
- * Display a message about the forum being in maintenance mode.
- * - display a login screen with sub template 'maintenance'.
- * - sends a 503 header, so search engines don't bother indexing while we're in maintenance mode.
- */
-function InMaintenance()
-{
-	global $txt, $mtitle, $mmessage, $context;
-
-	loadLanguage('Login');
-	loadTemplate('Login');
-
-	// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-	header('HTTP/1.1 503 Service Temporarily Unavailable');
-
-	// Basic template stuff..
-	$context['sub_template'] = 'maintenance';
-	$context['title'] = &$mtitle;
-	$context['description'] = &$mmessage;
-	$context['page_title'] = $txt['maintain_mode'];
-}
-
-/**
  * Question the verity of the admin by asking for his or her password.
  * - loads Login.template.php and uses the admin_login sub template.
  * - sends data to template so the admin is sent on to the page they

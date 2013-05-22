@@ -458,6 +458,48 @@ class Auth_Controller
 			}
 		}
 	}
+
+	/**
+	 * Throws guests out to the login screen when guest access is off.
+	 * It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
+	 * It uses the 'kick_guest' sub template found in Login.template.php.
+	 */
+	function action_kickguest()
+	{
+		global $txt, $context;
+
+		loadLanguage('Login');
+		loadTemplate('Login');
+
+		// Never redirect to an attachment
+		if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+
+		$context['sub_template'] = 'kick_guest';
+		$context['page_title'] = $txt['login'];
+	}
+
+	/**
+ 	* Display a message about the forum being in maintenance mode.
+ 	* Displays a login screen with sub template 'maintenance'.
+ 	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
+ 	*/
+	function action_maintenance_mode()
+	{
+		global $txt, $mtitle, $mmessage, $context;
+
+		loadLanguage('Login');
+		loadTemplate('Login');
+
+		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+
+		// Basic template stuff..
+		$context['sub_template'] = 'maintenance';
+		$context['title'] = &$mtitle;
+		$context['description'] = &$mmessage;
+		$context['page_title'] = $txt['maintain_mode'];
+	}
 }
 
 /**
