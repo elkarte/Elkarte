@@ -242,41 +242,29 @@ class Post_Controller
 				// If the user doesn't have permission to edit the post in this topic, redirect them.
 				if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 				{
-					// @todo this shouldn't call directly CalendarPost()
 					require_once(CONTROLLERDIR . '/Calendar.controller.php');
 					$controller = new Calendar_Controller();
 					return $controller->action_event_post();
 				}
 
 				// Get the current event information.
-				$request = $db->query('', '
-					SELECT
-						id_member, title, MONTH(start_date) AS month, DAYOFMONTH(start_date) AS day,
-						YEAR(start_date) AS year, (TO_DAYS(end_date) - TO_DAYS(start_date)) AS span
-					FROM {db_prefix}calendar
-					WHERE id_event = {int:id_event}
-					LIMIT 1',
-					array(
-						'id_event' => $context['event']['id'],
-					)
-				);
-				$row = $db->fetch_assoc($request);
-				$db->free_result($request);
+				$event_info = getEventProperties($context['event']['id']);
 
 				// Make sure the user is allowed to edit this event.
-				if ($row['id_member'] != $user_info['id'])
+				if ($event_info['member'] != $user_info['id'])
 					isAllowedTo('calendar_edit_any');
 				elseif (!allowedTo('calendar_edit_any'))
 					isAllowedTo('calendar_edit_own');
 
-				$context['event']['month'] = $row['month'];
-				$context['event']['day'] = $row['day'];
-				$context['event']['year'] = $row['year'];
-				$context['event']['title'] = $row['title'];
-				$context['event']['span'] = $row['span'] + 1;
+				$context['event']['month'] = $event_info['month'];
+				$context['event']['day'] = $event_info['day'];
+				$context['event']['year'] = $event_info['year'];
+				$context['event']['title'] = $event_info['title'];
+				$context['event']['span'] = $event_info['span'];
 			}
 			else
 			{
+				// Posting a new event? (or preview...)
 				$today = getdate();
 
 				// You must have a month and year specified!

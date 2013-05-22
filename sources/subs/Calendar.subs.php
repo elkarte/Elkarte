@@ -1000,7 +1000,8 @@ function getEventProperties($event_id)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = c.id_topic)
 			LEFT JOIN {db_prefix}members AS mb ON (mb.id_member = t.id_member_started)
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg  = t.id_first_msg)
-		WHERE c.id_event = {int:id_event}',
+		WHERE c.id_event = {int:id_event}
+		LIMIT 1',
 		array(
 			'id_event' => $event_id,
 		)
@@ -1112,7 +1113,7 @@ function removeHolidays($holiday_ids)
 
 /**
  * Updates a calendar holiday
- * 
+ *
  * @param int $holiday
  * @param int $date
  * @param string $title
@@ -1139,7 +1140,7 @@ function editHoliday($holiday, $date, $title)
 
 /**
  * Insert a new holiday
- * 
+ *
  * @param int $date
  * @param type $title
  */
@@ -1165,9 +1166,9 @@ function insert_holiday($date, $title)
 
 /**
  * Get a specific holiday
- * 
+ *
  * @param int $id_holiday
- * @return array 
+ * @return array
  */
 function getHoliday($id_holiday)
 {
