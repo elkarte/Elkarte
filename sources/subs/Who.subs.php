@@ -110,3 +110,52 @@ function formatViewers($id, $type)
 	krsort($context['view_members_list']);
 	krsort($context['view_members']);
 }
+
+/**
+ * This function reads from the database the add-ons credits,
+ * and returns them in an array for display in credits section of the site.
+ * The add-ons copyright, license, title informations are those saved from <license>
+ * and <credits> tags in package.xml.
+ *
+ * @return array
+ */
+function addonsCredits()
+{
+	$db = database();
+
+	if (($mods = cache_get_data('mods_credits', 86400)) === null)
+	{
+		$credits = array();
+		$request = $db->query('substring', '
+			SELECT version, name, credits
+			FROM {db_prefix}log_packages
+			WHERE install_state = {int:installed_mods}
+				AND credits != {string:empty}
+				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
+				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
+			array(
+				'installed_mods' => 1,
+				'old_patch_name' => 'smf_patch',
+				'patch_name' => 'elk_patch',
+				'empty' => '',
+			)
+		);
+
+		while ($row = $db->fetch_assoc($request))
+		{
+			$credit_info = unserialize($row['credits']);
+
+			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
+			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
+			$version = $txt['credits_version'] . '' . $row['version'];
+			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
+
+			// build this one out and stash it away
+			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
+			$credits[] = $name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
+		}
+		cache_put_data('mods_credits', $credits, 86400);
+	}
+
+	return $credits;
+}

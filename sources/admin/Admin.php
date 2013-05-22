@@ -722,7 +722,7 @@ class Admin_Controller
 	/**
 	 * The credits section in admin panel.
 	 *
-	 *  Accessed by ?action=admin;area=credits
+	 * Accessed by ?action=admin;area=credits
 	 */
 	public function action_credits()
 	{

@@ -515,12 +515,11 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function action_credits($in_admin = false)
 {
-	global $context, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info, $smcFunc;
-
-	$db = database();
+	global $context, $txt;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	loadLanguage('Who');
+	require_once(SUBSDIR . '/Who.subs.php');
 
 	if ($in_admin)
 	{
@@ -530,6 +529,25 @@ function action_credits($in_admin = false)
 			'description' => '',
 		);
 	}
+
+	prepareCreditsData();
+
+	if (!$in_admin)
+	{
+		loadTemplate('Who');
+		$context['sub_template'] = 'credits';
+		$context['robot_no_index'] = true;
+		$context['page_title'] = $txt['credits'];
+	}
+}
+
+/**
+ * Prepare credits for display.
+ * This is a helper function, used by admin panel for credits and support page, and by the credits page.
+ */
+function prepareCreditsData()
+{
+	global $context, $modSettings, $forum_copyright, $forum_version, $txt;
 
 	$context['credits'] = array(
 		array(
@@ -570,63 +588,10 @@ function action_credits($in_admin = false)
 		),
 	);
 
-	// Support for mods that use the <credits> tag via the package manager
-	$context['credits_modifications'] = array();
-	if (($mods = cache_get_data('mods_credits', 86400)) === null)
-	{
-		$mods = array();
-		$request = $db->query('substring', '
-			SELECT version, name, credits
-			FROM {db_prefix}log_packages
-			WHERE install_state = {int:installed_mods}
-				AND credits != {string:empty}
-				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
-				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
-			array(
-				'installed_mods' => 1,
-				'old_patch_name' => 'smf_patch',
-				'patch_name' => 'elk_patch',
-				'empty' => '',
-			)
-		);
+	// Add-ons authors: to add credits, the simpler and better way is to add in your package.xml the <credits> <license> tags.
+	// Support for addons that use the <credits> tag via the package manager
+	$context['credits_modifications'] = addonsCredits();
 
-		while ($row = $db->fetch_assoc($request))
-		{
-			$credit_info = unserialize($row['credits']);
-
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . $smcFunc['htmlspecialchars']($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . $smcFunc['htmlspecialchars']($credit_info['license']);
-			$version = $txt['credits_version'] . ' ' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : $smcFunc['htmlspecialchars']($credit_info['title'])) . ': ' . $version;
-
-			// build this one out and stash it away
-			$mod_name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
-			$mods[] = $mod_name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
-		}
-		cache_put_data('mods_credits', $mods, 86400);
-	}
-	$context['credits_modifications'] = $mods;
-
-	$context['copyrights'] = array(
-		'elkarte' => sprintf($forum_copyright, ucfirst(strtolower($forum_version))),
-		/* Modification Authors:  You may add a copyright statement to this array for your mods.
-			Copyright statements should be in the form of a value only without a array key.  I.E.:
-				'Some Mod by Thantos &copy; 2010',
-				$txt['some_mod_copyright'],
-			But its better and simpler to just your package.xml and add in the <credits> <license> tags
-		*/
-		'mods' => array(
-		),
-	);
-
-	// Support for those that want to use a hook as well
+	// An alternative for add-ons credits is to use a hook.
 	call_integration_hook('integrate_credits');
-
-	if (!$in_admin)
-	{
-		loadTemplate('Who');
-		$context['sub_template'] = 'credits';
-		$context['robot_no_index'] = true;
-		$context['page_title'] = $txt['credits'];
-	}
 }
