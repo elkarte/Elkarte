@@ -491,7 +491,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load board names.
 	if (!empty($board_ids))
 	{
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('use_permissions' => true, 'included_boards' => array_keys($board_ids)), true);
 		foreach ($boards_list as $board)
 		{

@@ -116,7 +116,7 @@ class MergeTopics_Controller
 			fatal_lang_error('cannot_merge_any', 'user');
 
 		// Get a list of boards they can navigate to to merge.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = array(
 			'use_permissions' => true,
 			'not_redirection' => true

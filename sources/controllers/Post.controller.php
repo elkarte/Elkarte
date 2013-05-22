@@ -290,7 +290,7 @@ class Post_Controller
 					fatal_lang_error('cannot_post_new', 'user');
 
 				// Load a list of boards for this event in the context.
-				require_once(SUBSDIR . '/MessageIndex.subs.php');
+				require_once(SUBSDIR . '/Boards.subs.php');
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
@@ -552,7 +552,7 @@ class Post_Controller
 		{
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
 		}
