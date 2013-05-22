@@ -287,6 +287,8 @@ class Site_Dispatcher
 			{
 				// we still haven't found what we're looking for...
 				$this->_file_name = $default_action['file'];
+				if (isset($default_action['controller']))
+					$this->_controller_name = $default_action['controller'];
 				$this->_function_name = $default_action['function'];
 			}
 		}
@@ -325,7 +327,8 @@ class Site_Dispatcher
 				// things went pretty bad, huh?
 				// board index :P
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
-				return 'action_boardindex';
+				$controller = new BoardIndex_Controller();
+				return $this->action_boardindex();
 			}
 		}
 		else
