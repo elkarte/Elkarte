@@ -4650,7 +4650,11 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		width: 95%;
 	}
 	.pagelinks, .buttonlist {
-		width: 95%;
+		width: 80%;
+		float: none !important;
+	}
+	input {
+		max-width: 230px;
 	}
 }
 
@@ -4680,5 +4684,11 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 	#main_menu ul li {
 	margin-bottom: 5px;
+	}
+	#post_header dt {
+		width: 90%;
+	}
+	input {
+		max-width: 200px;
 	}
 }
