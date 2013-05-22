@@ -777,11 +777,18 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Handling function for the backup stuff.
+	 * It requires an administrator and the session hash by post.
 	 * This method simply forwards to DumpDatabase2().
 	 */
 	public function action_backup_display()
 	{
 		validateToken('admin-maint');
+
+		// Administrators only!
+		if (!allowedTo('admin_forum'))
+			fatal_lang_error('no_dump_database', 'critical');
+
+		checkSession('post');
 
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();
