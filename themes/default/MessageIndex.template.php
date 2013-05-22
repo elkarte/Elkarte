@@ -269,9 +269,9 @@ function template_main()
 
 		echo '
 	<div class="pagesection">
-		', template_button_strip($context['normal_buttons'], 'right'), '
 		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-		<div class="pagelinks">', $context['page_index'], '</div>
+			<div class="pagelinks floatleft">', $context['page_index'], '</div>
+		', template_button_strip($context['normal_buttons'], 'right'), '	
 	</div>';
 	}
 

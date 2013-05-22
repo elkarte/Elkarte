@@ -1334,10 +1334,6 @@ table.table_padding td {
 #main_content_section {
 	position: relative;
 }
-.pagesection .buttonlist  {
-	position: absolute;
-	right: 0;
-}
 .pagesection ul.buttonlist_c {
 	position: absolute;
 	right: 5px;
@@ -1346,6 +1342,9 @@ table.table_padding td {
 }
 .pagesection ul.buttonlist_c>li>ul, div.buttonlist ul>li>ul {
 	display: none;
+}
+#pagetop, #pagebot {
+	margin-top: 7px;
 }
 div.buttonlist ul>li>ul li {
 	float: none;
@@ -4650,6 +4649,13 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	.login {
 		width: 95%;
 	}
+	.pagelinks, .buttonlist {
+		width: 80%;
+		float: none !important;
+	}
+	input {
+		max-width: 230px;
+	}
 }
 
 /* mobile devices with low screen resolutions */
@@ -4678,4 +4684,11 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 	#main_menu ul li {
 	margin-bottom: 5px;
+	}
+	#post_header dt {
+		width: 90%;
+	}
+	input {
+		max-width: 200px;
+	}
 }
