@@ -416,7 +416,6 @@ function deleteMembers($users, $check_not_admin = false)
 
 	updateStats('member');
 
-	require_once(SOURCEDIR . '/Logging.php');
 	logActions($log_changes);
 }
 
@@ -1007,7 +1006,7 @@ function groupsAllowedTo($permission, $board_id = null)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
-			
+
 			if (empty($board_data))
 				fatal_lang_error('no_board');
 			$profile_id = $board_data['id_profile'];

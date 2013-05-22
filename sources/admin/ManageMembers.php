@@ -1141,7 +1141,6 @@ class ManageMembers_Controller
 		{
 			$log_action = $_POST['todo'] == 'remind' ? 'remind_member' : 'approve_member';
 
-			require_once(SOURCEDIR . '/Logging.php');
 			foreach ($member_info as $member)
 				logAction($log_action, array('member' => $member['id']), 'admin');
 		}

@@ -604,7 +604,6 @@ function action_modifyprofile()
 			if (!empty($context['log_changes']) && !empty($modSettings['modlog_enabled']))
 			{
 				$log_changes = array();
-				require_once(SOURCEDIR . '/Logging.php');
 				foreach ($context['log_changes'] as $k => $v)
 					$log_changes[] = array(
 						'action' => $k,
