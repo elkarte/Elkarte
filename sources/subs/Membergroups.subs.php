@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  * Has protection against deletion of protected membergroups.
  * Deletes the permissions linked to the membergroup.
  * Takes members out of the deleted membergroups.
+ *
  * @param array $groups
+ *
  * @return boolean
  */
 function deleteMembergroups($groups)
@@ -151,6 +153,8 @@ function deleteMembergroups($groups)
 			'additional_groups_explode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		)
 	);
+
+	// Update each member information.
 	$updates = array();
 	while ($row = $db->fetch_assoc($request))
 		$updates[$row['additional_groups']][] = $row['id_member'];
@@ -204,9 +208,11 @@ function deleteMembergroups($groups)
  * Requires the manage_membergroups permission.
  * Function includes a protection against removing from implicit groups.
  * Non-admins are not able to remove members from the admin group.
+ *
  * @param array $members
  * @param array $groups = null if groups is null, the specified members are stripped from all their membergroups.
  * @param bool $permissionCheckDone = false
+ *
  * @return boolean
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
@@ -250,9 +256,10 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Just in case.
 	if (empty($members))
 		return false;
-	elseif ($groups === null)
+
+	// Wanna remove all groups from these members? That's easy.
+	if ($groups === null)
 	{
-		// Wanna remove all groups from these members? That's easy.
 		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
@@ -395,22 +402,19 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
-	{
-		require_once(SOURCEDIR . '/Logging.php');
 		foreach ($log_inserts as $extra)
 			logAction('removed_from_group', $extra, 'admin');
-	}
 
 	// Mission successful.
 	return true;
 }
 
 /**
- * Add one or more members to a membergroup
+ * Add one or more members to a membergroup.
  *
  * Requires the manage_membergroups permission.
  * Function has protection against adding members to implicit groups.
- * Non-admins are not able to add members to the admin group.
+ * Non-admins cannot add members to the admin group, or protected groups.
  *
  * @param string|array $members
  * @param int $group
@@ -425,7 +429,8 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  * 						  what the previous primary membergroup was.
  * 	- auto              - Assigns a membergroup to the primary group if it's still
  * 						  available. If not, assign it to the additional group.
- * @param bool $permissionCheckDone
+ * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
+ *
  * @return boolean success or failure
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
@@ -472,7 +477,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	// ... and assign protected groups!
 	elseif (!allowedTo('admin_forum'))
 	{
-		$is_protected = membergroupsById($group);
+		$is_protected = membergroupsById($group, 1, false, false, true);
 
 		// Is it protected?
 		if ($is_protected['group_type'] == 1)
@@ -545,17 +550,18 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 }
 
 /**
- * Gets the members of a supplied membergroup
- * Returns them as a link for display
+ * Gets the members of a supplied membergroup.
+ * Returns them as a link for display.
  *
  * @param array &$members
  * @param int $membergroup
  * @param int $limit = null
+ *
  * @return boolean
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl, $txt;
+	global $scripturl;
 
 	$db = database();
 
@@ -588,6 +594,7 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
  *
  * @global type $scripturl
  * @global type $smcFunc
+ *
  * @return type
  */
 function cache_getMembergroupList()
@@ -731,10 +738,12 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 /**
  * Count the number of members in specific groups
  *
- * @param array $postGroups an array of post-based groups id
- * @param array $normalGroups an array of normal groups id
- * @param bool $include_hidden if include hidden groups in the count (default false)
- * @param bool $include_moderators if include board moderators too (default false)
+ * @param array $postGroups an array of post-based groups id.
+ * @param array $normalGroups = array() an array of normal groups id.
+ * @param bool $include_hidden = false if true, it includes hidden groups in the count (default false).
+ * @param bool $include_moderators = false if true, it includes board moderators too (default false).
+ *
+ * @return array
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
@@ -823,22 +832,25 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 /**
  * Returns details of membergroups based on the id
  *
- * @param array/int $group_id the ID of the groups
- * @param integer $limit the number of results returned (default 1, if null/false/0 returns all)
- * @param array/string $detailed returns more fields default false,
- *  - false returns: id_group, group_name, group_type,
- *  - true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent
- * @param bool $assignable determine if the group is assignable or not and return that information
- * @param bool $protected include protected groups
+ * @param array/int $group_ids the IDs of the groups.
+ * @param integer $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
+ * @param bool $detailed = false if true then it returns more fields (default false).
+ *  false returns: id_group, group_name, group_type.
+ *  true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
+ * @param bool $assignable = false determine if the group is assignable or not and return that information.
+ * @param bool $protected = false if true, it includes protected groups in the result.
+ *
+ * @return array|false
  */
-function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
 	$db = database();
 
-	if (!isset($group_id))
+	if (empty($group_ids))
 		return false;
 
-	$group_ids = is_array($group_id) ? $group_id : array($group_id);
+	if (!is_array($group_ids))
+		$group_ids = array($group_ids);
 
 	$groups = array();
 	$group_ids = array_map('intval', $group_ids);
@@ -897,7 +909,8 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
  * @param array $excludes
  * @param string $sort_order
  * @param bool $split, splits postgroups and membergroups
- * @return type
+ *
+ * @return array
  */
 function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
 {
@@ -1017,6 +1030,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  * Retrieve groups and their number of members.
  *
  * @param array $groupList
+ *
  * @return array with ('id', 'name', 'member_count')
  */
 function getGroups($groupList)
@@ -1042,7 +1056,6 @@ function getGroups($groupList)
 		GROUP BY mg.id_group',
 		array(
 			'group_list' => $groups,
-			'newbie_id_group' => 4,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -1231,7 +1244,10 @@ function updateInheritedGroup($id_group, $copy_id)
 }
 
 /**
- * Updates the membergroup with the given information.
+ * This function updates the membergroup with the given information.
+ * It's passed an associative array $properties, with 'current_group' holding
+ * the group to update. The rest of the keys are details to update it with.
+ *
  * @param array $properties
  */
 function updateMembergroupProperties($properties)
@@ -1264,6 +1280,7 @@ function updateMembergroupProperties($properties)
 
 /**
  * Detaches a membergroup from the boards listed in $boards.
+ *
  * @param int $id_group
  * @param array $boards
  * @param array $access_list
@@ -1272,7 +1289,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 {
 	$db = database();
 
-	// Find all board this group is in, but shouldn't be in.
+	// Find all boards in whose access list this group is in, but shouldn't be.
 	$request = $db->query('', '
 		SELECT id_board, {raw:column}
 		FROM {db_prefix}boards
@@ -1298,6 +1315,14 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 	$db->free_result($request);
 }
 
+/**
+ * Assigns the given group $id_group to the boards specified, for
+ * the 'allow' or 'deny' list.
+ *
+ * @param int $id_group
+ * @param array $boards
+ * @param string $access_list ('allow', 'deny')
+ */
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
 	$db = database();
@@ -1358,7 +1383,8 @@ function detachDeletedGroupFromMembers($id_group)
 }
 
 /**
- * Make the given group hidden. Hidden groups are stored in the additional_groups
+ * Make the given group hidden. Hidden groups are stored in the additional_groups.
+ *
  * @param int $id_group
  */
 function setGroupToHidden($id_group)
@@ -1396,7 +1422,8 @@ function setGroupToHidden($id_group)
 }
 
 /**
- * Make sure the membergroup key on the board index is valid
+ * Make sure the setting to display membergroup key on the board index is valid.
+ * It updates the setting if necessary.
  */
 function validateShowGroupMembership()
 {
@@ -1421,7 +1448,8 @@ function validateShowGroupMembership()
 }
 
 /**
- * Detaches group moderators from a deleted group
+ * Detaches group moderators from a deleted group.
+ *
  * @param int $id_group
  */
 function detachGroupModerators($id_group)
@@ -1489,10 +1517,11 @@ function assignGroupModerators($id_group, $group_moderators)
 }
 
 /**
- * List moderators from a given membergroup
+ * List moderators from a given membergroup.
  *
  * @param int $id_group
- * @return array
+ *
+ * @return array moderators as array (id => name)
  */
 function getGroupModerators($id_group)
 {
@@ -1518,7 +1547,9 @@ function getGroupModerators($id_group)
 
 /**
  * Lists all groups which inherit permission profiles from the given group.
+ *
  * @param int $id_group
+ *
  * @return array
  */
 function getInheritableGroups($id_group)
@@ -1552,6 +1583,7 @@ function getInheritableGroups($id_group)
 
 	return $inheritable_groups;
 }
+
 /**
  * Gets a list of membergroups, parent groups first.
  *

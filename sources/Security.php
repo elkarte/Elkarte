@@ -34,7 +34,7 @@ function validateSession($type = 'admin')
 {
 	global $modSettings, $user_info, $sc, $user_settings;
 
-	// We don't care if the option is off, because Guests should NEVER get past here.
+	// Guests are not welcome here.
 	is_not_guest();
 
 	// Validate what type of session check this is.
@@ -49,7 +49,7 @@ function validateSession($type = 'admin')
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
 		return;
 
-	// Or are they already logged in?, Moderator or admin sesssion is need for this area
+	// If their admin or moderator session hasn't expired yet, let it pass.
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 		return;
 
@@ -69,6 +69,7 @@ function validateSession($type = 'admin')
 			return;
 		}
 	}
+
 	// Posting the password... check it.
 	if (isset($_POST[$type. '_pass']))
 	{

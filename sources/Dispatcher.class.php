@@ -77,15 +77,17 @@ class Site_Dispatcher
 			// "maintenance mode" page
 			else
 			{
-				$this->_file_name = SUBSDIR . '/Auth.subs.php';
-				$this->_function_name = 'InMaintenance';
+				$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
+				$this->_controller_name = 'Auth_Controller';
+				$this->_function_name = 'action_maintenance_mode';
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
-			$this->_file_name = SUBSDIR . '/Auth.subs.php';
-			$this->_function_name = 'KickGuest';
+			$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
+			$this->_controller_name = 'Auth_Controller';
+			$this->_function_name = 'action_kickguest';
 		}
 		elseif (empty($_GET['action']))
 		{
