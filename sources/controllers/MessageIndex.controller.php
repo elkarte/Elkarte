@@ -157,37 +157,7 @@ class MessageIndex_Controller
 				unset($_SESSION['topicseen_cache'][$board]);
 
 			// From now on, they've seen it. So we reset notifications.
-			$request = $db->query('', '
-				SELECT sent
-				FROM {db_prefix}log_notify
-				WHERE id_board = {int:current_board}
-					AND id_member = {int:current_member}
-				LIMIT 1',
-				array(
-					'current_board' => $board,
-					'current_member' => $user_info['id'],
-				)
-			);
-			$context['is_marked_notify'] = $db->num_rows($request) != 0;
-			if ($context['is_marked_notify'])
-			{
-				list ($sent) = $db->fetch_row($request);
-				if (!empty($sent))
-				{
-					$db->query('', '
-						UPDATE {db_prefix}log_notify
-						SET sent = {int:is_sent}
-						WHERE id_board = {int:current_board}
-							AND id_member = {int:current_member}',
-						array(
-							'current_board' => $board,
-							'current_member' => $user_info['id'],
-							'is_sent' => 0,
-						)
-					);
-				}
-			}
-			$db->free_result($request);
+			$context['is_marked_notify'] = resetSentBoardNotification($user_info['id'], $board);
 		}
 		else
 			$context['is_marked_notify'] = false;
@@ -202,6 +172,7 @@ class MessageIndex_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
+		// Prepare child boards for display.
 		require_once(SUBSDIR . '/BoardIndex.subs.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,

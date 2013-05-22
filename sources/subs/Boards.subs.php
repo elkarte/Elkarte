@@ -1134,6 +1134,63 @@ function setBoardNotification($id_member, $id_board, $on = false)
 }
 
 /**
+ * Reset sent status for board notifications.
+ *
+ * @param int $id_member
+ * @param int $id_board
+ * @param bool $check = true check if the user has notifications enabled for the board
+ *
+ * @return bool if the board was marked for notifications
+ */
+function resetSentBoardNotification($id_member, $id_board, $check = true)
+{
+	// This function returns a boolean equivalent with hasBoardNotification().
+	// This is unexpected, but it's done this way to avoid any extra-query is executed on MessageIndex::action_messageindex().
+	// Just ignore the return value for normal use.
+
+	$db = database();
+
+	// Check if notifications are enabled for this user on the board?
+	if ($check)
+	{
+		// check if the member has notifications enabled for this board
+		$request = $db->query('', '
+			SELECT sent
+			FROM {db_prefix}log_notify
+			WHERE id_board = {int:current_board}
+				AND id_member = {int:current_member}
+			LIMIT 1',
+			array(
+				'current_board' => $id_board,
+				'current_member' => $id_member,
+			)
+		);
+		if ($db->num_rows($request) == 0)
+			// nothing to do
+			return false;
+		$sent = $db->fetch_row($request);
+		$db->free_result($request);
+		if (empty($sent))
+			// not sent already? No need to stay around then
+			return true;
+	}
+
+	// Reset 'sent' status.
+	$db->query('', '
+		UPDATE {db_prefix}log_notify
+		SET sent = {int:is_sent}
+		WHERE id_board = {int:current_board}
+			AND id_member = {int:current_member}',
+		array(
+			'current_board' => $idboard,
+			'current_member' => $id_member,
+			'is_sent' => 0,
+		)
+	);
+	return true;
+}
+
+/**
  * Returns all the boards accessible to the current user.
  */
 function accessibleBoards()
