@@ -1183,8 +1183,6 @@ function loadAttachmentContext($id_msg)
 {
 	global $attachments, $modSettings, $txt, $scripturl, $topic;
 
-	$db = database();
-
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
 	$have_unapproved = false;
@@ -1219,70 +1217,13 @@ function loadAttachmentContext($id_msg)
 			// Let's see, do we want thumbs?
 			if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 			{
-				// A proper thumb doesn't exist yet? Create one!
+				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
-					require_once(SUBSDIR . '/Graphics.subs.php');
-					if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
-					{
-						// So what folder are we putting this image in?
-						$path = getAttachmentPath();
-						$id_folder_thumb = getAttachmentPathID();
-
-						// Calculate the size of the created thumbnail.
-						$size = @getimagesize($filename . '_thumb');
-						list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
-						$thumb_size = filesize($filename . '_thumb');
-
-						// These are the only valid image types.
-						$validImageTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 5 => 'psd', 6 => 'bmp', 7 => 'tiff', 8 => 'tiff', 9 => 'jpeg', 14 => 'iff');
-
-						// What about the extension?
-						$thumb_ext = isset($validImageTypes[$size[2]]) ? $validImageTypes[$size[2]] : '';
-
-						// Figure out the mime type.
-						if (!empty($size['mime']))
-							$thumb_mime = $size['mime'];
-						else
-							$thumb_mime = 'image/' . $thumb_ext;
-
-						$thumb_filename = $attachment['filename'] . '_thumb';
-						$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
-
-						// Add this beauty to the database.
-						$db->insert('',
-							'{db_prefix}attachments',
-							array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
-							array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
-							array('id_attach')
-						);
-						$old_id_thumb = $attachment['id_thumb'];
-						$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
-						if (!empty($attachment['id_thumb']))
-						{
-							$db->query('', '
-								UPDATE {db_prefix}attachments
-								SET id_thumb = {int:id_thumb}
-								WHERE id_attach = {int:id_attach}',
-								array(
-									'id_thumb' => $attachment['id_thumb'],
-									'id_attach' => $attachment['id_attach'],
-								)
-							);
-
-							$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
-							rename($filename . '_thumb', $thumb_realname);
-
-							// Do we need to remove an old thumbnail?
-							if (!empty($old_id_thumb))
-							{
-								require_once(SUBSDIR . '/Attachments.subs.php');
-								removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
-							}
-						}
-					}
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
 				}
 
 				// Only adjust dimensions on successful thumbnail creation.
