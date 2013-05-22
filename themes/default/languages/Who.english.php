@@ -136,7 +136,7 @@ $txt['credits_team'] = 'The Team';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';
 $txt['credits_forum'] = 'Forum';
-$txt['credits_modifications'] = 'Modifications';
+$txt['credits_addons'] = 'Add-ons';
 $txt['credits_software_graphics'] = 'Software/Graphics';
 $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Graphics';
@@ -153,7 +153,6 @@ $txt['credits_groups_consultants'] = 'Consulting Developers';
 $txt['credits_groups_beta'] = 'Beta Testers';
 $txt['credits_beta_message'] = 'The invaluable few who tirelessly find bugs, provide feedback, and drive the developers crazier.';
 $txt['credits_groups_founder'] = 'Founding Father of SMF';
-$txt['credits_groups_orignal_pm'] = 'Original Project Managers';
 
 // List of people who have made more than a token contribution to this translation. (blank for English)
 $txt['translation_credits'] = array();

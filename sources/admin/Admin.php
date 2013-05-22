@@ -611,20 +611,18 @@ class Admin_Controller
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
+		// we need a little help
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 		// Find all of this forum's administrators...
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
 			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
 		}
-
-		// Load the credits stuff.
-		require_once(CONTROLLERDIR . '/Who.controller.php');
-		action_credits(true);
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
@@ -728,20 +726,28 @@ class Admin_Controller
 	{
 		global  $forum_version, $txt, $scripturl, $context, $user_info;
 
+		// we need a little help from our friends
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(CONTROLLERDIR . '/Who.controller.php');
+
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 		// Find all of this forum's administrators...
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
 			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
 		}
 
-		// Load the credits stuff.
-		require_once(CONTROLLERDIR . '/Who.controller.php');
-		action_credits(true);
+		// Load credits.
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['support_credits_title'],
+			'help' => '',
+			'description' => '',
+		);
+		loadLanguage('Who');
+		prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);

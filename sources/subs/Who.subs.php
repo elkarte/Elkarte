@@ -123,7 +123,7 @@ function addonsCredits()
 {
 	$db = database();
 
-	if (($mods = cache_get_data('mods_credits', 86400)) === null)
+	if (($credits = cache_get_data('addons_credits', 86400)) === null)
 	{
 		$credits = array();
 		$request = $db->query('substring', '
@@ -154,7 +154,7 @@ function addonsCredits()
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
 			$credits[] = $name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
 		}
-		cache_put_data('mods_credits', $credits, 86400);
+		cache_put_data('addons_credits', $credits, 86400);
 	}
 
 	return $credits;

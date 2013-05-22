@@ -1574,3 +1574,47 @@ function getLoggedTopics($member, $topics)
 
 	return $logged_topics;
 }
+
+/**
+ * Returns a list of topics ids and their subjects
+ *
+ * @param array $topic_ids
+ */
+function topicsList($topic_ids)
+{
+	global $modSettings;
+
+	// you have to want *something* from this function
+	if (empty($topic_ids))
+		return array();
+
+	$db = database();
+
+	$topics = array();
+
+	$result = $db->query('', '
+		SELECT t.id_topic, m.subject
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+		WHERE {query_see_board}
+			AND t.id_topic IN ({array_int:topic_list})' . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : '') . '
+		LIMIT {int:limit}',
+		array(
+			'topic_list' => $topic_ids,
+			'is_approved' => 1,
+			'limit' => count($topic_ids),
+		)
+	);
+	while ($row = $db->fetch_assoc($result))
+	{
+		$topics[$row['id_topic']] = array(
+			'id_topic' => $row['id_topic'],
+			'subject' => censorText($row['subject']),
+		);
+	}
+	$db->free_result($result);
+
+	return $topics;
+}
