@@ -359,7 +359,7 @@ class ManageMembers_Controller
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
 					$parameter = strtolower(strtr($smcFunc['htmlspecialchars']($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					if ($db->db_case_sensitive)
+					if ($db->db_case_sensitive())
 						$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 					else
 						$query_parts[] = '(' . implode( ' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
