@@ -313,21 +313,8 @@ class Post_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				$request = $db->query('', '
-					SELECT COUNT(*)
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg > {int:last_msg}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND approved = {int:approved}') . '
-					LIMIT 1',
-					array(
-						'current_topic' => $topic,
-						'last_msg' => (int) $_REQUEST['last_msg'],
-						'approved' => 1,
-					)
-				);
-				list ($context['new_replies']) = $db->fetch_row($request);
-				$db->free_result($request);
+				require_once(SUBSDIR . '/Topic.subs.php');
+				$context['new_replies'] = messagesSince($topic, (int) $_REQUEST['last_msg'], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
 				{
