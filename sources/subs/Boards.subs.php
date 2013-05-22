@@ -94,50 +94,53 @@ function markBoardsRead($boards, $unread = false)
 	// @todo look at this...
 	// The call to markBoardsRead() in Display() used to be simply
 	// marking log_boards (the previous query only)
-	$result = $db->query('', '
-		SELECT MIN(id_topic)
-		FROM {db_prefix}log_topics
-		WHERE id_member = {int:current_member}',
-		array(
-			'current_member' => $user_info['id'],
-		)
-	);
-	list ($lowest_topic) = $db->fetch_row($result);
-	$db->free_result($result);
+	// I'm setting this as 'disabled'... Remove the comments to get it executed again.
+	// MessageIndex::action_messageindex() does not update log_topics at all (only the above).
 
-	if (empty($lowest_topic))
-		return;
+	//$result = $db->query('', '
+	//	SELECT MIN(id_topic)
+	//	FROM {db_prefix}log_topics
+	//	WHERE id_member = {int:current_member}',
+	//	array(
+	//		'current_member' => $user_info['id'],
+	//	)
+	//);
+	//list ($lowest_topic) = $db->fetch_row($result);
+	//$db->free_result($result);
 
-	// @todo SLOW This query seems to eat it sometimes.
-	$result = $db->query('', '
-		SELECT lt.id_topic
-		FROM {db_prefix}log_topics AS lt
-			INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
-				AND t.id_board IN ({array_int:board_list}))
-		WHERE lt.id_member = {int:current_member}
-			AND lt.id_topic >= {int:lowest_topic}
-			AND lt.disregarded != 1',
-		array(
-			'current_member' => $user_info['id'],
-			'board_list' => $boards,
-			'lowest_topic' => $lowest_topic,
-		)
-	);
-	$topics = array();
-	while ($row = $db->fetch_assoc($result))
-		$topics[] = $row['id_topic'];
-	$db->free_result($result);
+	//if (empty($lowest_topic))
+	//	return;
 
-	if (!empty($topics))
-		$db->query('', '
-			DELETE FROM {db_prefix}log_topics
-			WHERE id_member = {int:current_member}
-				AND id_topic IN ({array_int:topic_list})',
-			array(
-				'current_member' => $user_info['id'],
-				'topic_list' => $topics,
-			)
-		);
+	//// @todo SLOW This query seems to eat it sometimes.
+	//$result = $db->query('', '
+	//	SELECT lt.id_topic
+	//	FROM {db_prefix}log_topics AS lt
+	//		INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
+	//			AND t.id_board IN ({array_int:board_list}))
+	//	WHERE lt.id_member = {int:current_member}
+	//		AND lt.id_topic >= {int:lowest_topic}
+	//		AND lt.disregarded != 1',
+	//	array(
+	//		'current_member' => $user_info['id'],
+	//		'board_list' => $boards,
+	//		'lowest_topic' => $lowest_topic,
+	//	)
+	//);
+	//$topics = array();
+	//while ($row = $db->fetch_assoc($result))
+	//	$topics[] = $row['id_topic'];
+	//$db->free_result($result);
+
+	//if (!empty($topics))
+	//	$db->query('', '
+	//		DELETE FROM {db_prefix}log_topics
+	//		WHERE id_member = {int:current_member}
+	//			AND id_topic IN ({array_int:topic_list})',
+	//		array(
+	//			'current_member' => $user_info['id'],
+	//			'topic_list' => $topics,
+	//		)
+	//	);
 }
 
 /**
@@ -1505,4 +1508,27 @@ function addChildBoards(&$boards)
 		if (in_array($row['id_parent'], $boards))
 			$boards[] = $row['id_board'];
 	$db->free_result($request);
+}
+
+/**
+ * Increment a board stat field, for example num_posts.
+ *
+ * @param int $board
+ * @param string $stat
+ */
+function incrementBoard($board, $stat)
+{
+	// @todo refactor it as increment any table perhaps
+	// or update any board fields
+
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}boards
+		SET ' . $stat . ' = ' . $stat . ' + 1
+		WHERE id_board = {int:board}',
+		array(
+			'board' => $board,
+		)
+	);
 }

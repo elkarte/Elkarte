@@ -33,18 +33,13 @@ class MessageIndex_Controller
 
 		$db = database();
 
+		// Fairly often, we'll work with boards. Current board, child boards.
+		require_once(SUBSDIR . '/Boards.subs.php');
+
 		// If this is a redirection board head off.
 		if ($board_info['redirect'])
 		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET num_posts = num_posts + 1
-				WHERE id_board = {int:current_board}',
-				array(
-					'current_board' => $board,
-				)
-			);
-
+			incrementBoard($board, 'num_posts');
 			redirectexit($board_info['redirect']);
 		}
 
@@ -138,27 +133,20 @@ class MessageIndex_Controller
 				die;
 			}
 
-			$db->insert('replace',
-				'{db_prefix}log_boards',
-				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-				array($modSettings['maxMsgID'], $user_info['id'], $board),
-				array('id_member', 'id_board')
-			);
-
+			// Mark the board as read, and its parents.
 			if (!empty($board_info['parent_boards']))
 			{
-				$db->query('', '
-					UPDATE {db_prefix}log_boards
-					SET id_msg = {int:id_msg}
-					WHERE id_member = {int:current_member}
-						AND id_board IN ({array_int:board_list})',
-					array(
-						'current_member' => $user_info['id'],
-						'board_list' => array_keys($board_info['parent_boards']),
-						'id_msg' => $modSettings['maxMsgID'],
-					)
-				);
+				$board_list = array_keys($board_info['parent_boards']);
+				$board_list[] = $board;
+			}
+			else
+				$board_list = array($board);
 
+			markBoardsRead($board_list);
+
+			// Clear topicseen cache
+			if (!empty($board_info['parent_boards']))
+			{
 				// We've seen all these boards now!
 				foreach ($board_info['parent_boards'] as $k => $dummy)
 					if (isset($_SESSION['topicseen_cache'][$k]))
@@ -168,6 +156,7 @@ class MessageIndex_Controller
 			if (isset($_SESSION['topicseen_cache'][$board]))
 				unset($_SESSION['topicseen_cache'][$board]);
 
+			// From now on, they've seen it. So we reset notifications.
 			$request = $db->query('', '
 				SELECT sent
 				FROM {db_prefix}log_notify
