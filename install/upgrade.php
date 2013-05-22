@@ -165,6 +165,7 @@ if (isset($_GET['ssi']))
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Package.subs.php');
+	require_once(SUBSDIR . '/Util.class.php');
 
 	loadUserSettings();
 	loadPermissions();

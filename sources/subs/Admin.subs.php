@@ -22,6 +22,7 @@ if (!defined('ELKARTE'))
 
 /**
  * Get a list of versions that are currently installed on the server.
+ *
  * @param array $checkFor
  */
 function getServerVersions($checkFor)
@@ -99,6 +100,8 @@ function getServerVersions($checkFor)
  *   language files found in the default theme directory (grouped by language).
  *
  * @param array &$versionOptions
+ *
+ * @return array
  */
 function getFileVersions(&$versionOptions)
 {
@@ -238,6 +241,7 @@ function getFileVersions(&$versionOptions)
 		foreach ($version_info['default_language_versions'] as $language => $dummy)
 			ksort($version_info['default_language_versions'][$language]);
 	}
+
 	return $version_info;
 }
 
@@ -297,9 +301,9 @@ function updateAdminPreferences()
 
 /**
  * Send all the administrators a lovely email.
- * - loads all users who are admins or have the admin forum permission.
- * - uses the email template and replacements passed in the parameters.
- * - sends them an email.
+ * It loads all users who are admins or have the admin forum permission.
+ * It uses the email template and replacements passed in the parameters.
+ * It sends them an email.
  *
  * @param string $template
  * @param array $replacements

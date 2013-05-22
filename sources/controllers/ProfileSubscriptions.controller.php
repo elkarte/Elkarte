@@ -312,7 +312,6 @@ function action_activateaccount()
 		updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
 
 		// Log what we did?
-		require_once(SOURCEDIR . '/Logging.php');
 		logAction('approve_member', array('member' => $memID), 'admin');
 
 		// If we are doing approval, update the stats for the member just in case.

@@ -32,7 +32,7 @@ class Auth_Controller
 	 *  @uses the protocol_login sub-template in the Wireless template,
 	 *   if you are using a wireless device
 	 */
-	function action_login()
+	public function action_login()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -76,65 +76,15 @@ class Auth_Controller
 	 * - upgrades password encryption on login, if necessary.
 	 * - after successful login, redirects you to $_SESSION['login_url'].
 	 * - accessed from ?action=login2, by forms.
-	 * On error, uses the same templates Login() uses.
+	 * On error, uses the same templates action_login() uses.
 	 */
-	function action_login2()
+	public function action_login2()
 	{
 		global $txt, $scripturl, $user_info, $user_settings;
-
-		$db = database();
 		global $cookiename, $maintenance, $modSettings, $context, $sc;
 
-		// Load cookie authentication stuff.
+		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
-
-		if (isset($_GET['sa']) && $_GET['sa'] == 'salt' && !$user_info['is_guest'])
-		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
-				list (, , $timeout) = @unserialize($_COOKIE[$cookiename]);
-			elseif (isset($_SESSION['login_' . $cookiename]))
-				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
-			else
-				trigger_error('Login2(): Cannot be logged in without a session or cookie', E_USER_ERROR);
-
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
-			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
-
-			setLoginCookie($timeout - time(), $user_info['id'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
-
-			redirectexit('action=login2;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
-		}
-		// Double check the cookie...
-		elseif (isset($_GET['sa']) && $_GET['sa'] == 'check')
-		{
-			// Strike!  You're outta there!
-			if ($_GET['member'] != $user_info['id'])
-				fatal_lang_error('login_cookie_error', false);
-
-			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
-			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
-			{
-				$_SESSION['moderate_time'] = time();
-				unset($_SESSION['just_registered']);
-			}
-
-			// Some whitelisting for login_url...
-			if (empty($_SESSION['login_url']))
-				redirectexit();
-			elseif (!empty($_SESSION['login_url']) && (strpos('http://', $_SESSION['login_url']) === false && strpos('https://', $_SESSION['login_url']) === false))
-			{
-				unset ($_SESSION['login_url']);
-				redirectexit();
-			}
-			else
-			{
-				// Best not to clutter the session data too much...
-				$temp = $_SESSION['login_url'];
-				unset($_SESSION['login_url']);
-
-				redirectexit($temp);
-			}
-		}
 
 		// Beyond this point you are assumed to be a guest trying to login.
 		if (!$user_info['is_guest'])
@@ -390,7 +340,7 @@ class Auth_Controller
 		if (!checkActivation())
 			return;
 
-		DoLogin();
+		doLogin();
 	}
 
 	/**
@@ -402,11 +352,9 @@ class Auth_Controller
  	* @param bool $internal if true, it doesn't check the session
  	* @param $redirect
  	*/
-	function action_logout($internal = false, $redirect = true)
+	public function action_logout($internal = false, $redirect = true)
 	{
 		global $user_info, $user_settings, $context, $modSettings;
-
-		$db = database();
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -457,6 +405,122 @@ class Auth_Controller
 				redirectexit($temp, $context['server']['needs_login_fix']);
 			}
 		}
+	}
+
+	/**
+	 * Throws guests out to the login screen when guest access is off.
+	 * It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
+	 * It uses the 'kick_guest' sub template found in Login.template.php.
+	 */
+	public function action_kickguest()
+	{
+		global $txt, $context;
+
+		loadLanguage('Login');
+		loadTemplate('Login');
+
+		// Never redirect to an attachment
+		if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+
+		$context['sub_template'] = 'kick_guest';
+		$context['page_title'] = $txt['login'];
+	}
+
+	/**
+ 	* Display a message about the forum being in maintenance mode.
+ 	* Displays a login screen with sub template 'maintenance'.
+ 	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
+ 	*/
+	public function action_maintenance_mode()
+	{
+		global $txt, $mtitle, $mmessage, $context;
+
+		loadLanguage('Login');
+		loadTemplate('Login');
+
+		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+
+		// Basic template stuff..
+		$context['sub_template'] = 'maintenance';
+		$context['title'] = &$mtitle;
+		$context['description'] = &$mmessage;
+		$context['page_title'] = $txt['maintain_mode'];
+	}
+
+	/**
+	 * Checks the cookie and update salt.
+	 * If successful, it redirects to action=auth;sa=check.
+	 * Accessed by ?action=auth;sa=salt.
+	 */
+	public function action_salt()
+	{
+		global $user_info, $user_settings, $context;
+
+		// we deal only with logged in folks in here!
+		if (!$user_info['is_guest'])
+		{
+			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
+				list (, , $timeout) = @unserialize($_COOKIE[$cookiename]);
+			elseif (isset($_SESSION['login_' . $cookiename]))
+				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
+			else
+				trigger_error('Auth: Cannot be logged in without a session or cookie', E_USER_ERROR);
+
+			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
+			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
+
+			setLoginCookie($timeout - time(), $user_info['id'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+
+			redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
+		}
+
+		// Lets be sure.
+		redirectexit();
+	}
+
+	/**
+	 * Double check the cookie.
+	 */
+	public function action_check()
+	{
+		global $user_info;
+
+		// Only our members, please.
+		if (!$user_info['is_guest'])
+		{
+			// Strike!  You're outta there!
+			if ($_GET['member'] != $user_info['id'])
+				fatal_lang_error('login_cookie_error', false);
+
+			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
+			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
+			{
+				$_SESSION['moderate_time'] = time();
+				unset($_SESSION['just_registered']);
+			}
+
+			// Some whitelisting for login_url...
+			if (empty($_SESSION['login_url']))
+				redirectexit();
+			elseif (!empty($_SESSION['login_url']) && (strpos('http://', $_SESSION['login_url']) === false && strpos('https://', $_SESSION['login_url']) === false))
+			{
+				unset ($_SESSION['login_url']);
+				redirectexit();
+			}
+			else
+			{
+				// Best not to clutter the session data too much...
+				$temp = $_SESSION['login_url'];
+				unset($_SESSION['login_url']);
+
+				redirectexit($temp);
+			}
+		}
+
+		// It'll never get here... until it does :P
+		redirectexit();
 	}
 }
 
@@ -510,16 +574,17 @@ function checkActivation()
 }
 
 /**
- * Perform the logging in. (set cookie, call hooks, etc)
+ * This function performs the logging in.
+ * It sets the cookie, it call hooks, updates runtime settings for the user.
  */
-function DoLogin()
+function doLogin()
 {
-	global $txt, $scripturl, $user_info, $user_settings;
-
-	$db = database();
+	global $user_info, $user_settings;
 	global $cookiename, $maintenance, $modSettings, $context;
 
-	// Load cookie authentication stuff.
+	$db = database();
+
+	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Call login integration functions.
@@ -572,7 +637,7 @@ function DoLogin()
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
-		redirectexit('action=login2;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
+		redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
 	else
 		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], $context['server']['needs_login_fix']);
 }

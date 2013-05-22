@@ -190,7 +190,7 @@ class Groups_Controller
 	}
 
 	/**
-	 * Display members of a group, and allow adding of members to a group. Silly function name though ;)
+	 * Display members of a group, and allow adding of members to a group.
 	 * It can be called from ManageMembergroups if it needs templating within the admin environment.
 	 * It shows a list of members that are part of a given membergroup.
 	 * It is called by ?action=moderate;area=viewgroups;sa=members;group=x
@@ -199,7 +199,6 @@ class Groups_Controller
 	 * It allows sorting on several columns.
 	 * It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
-	 * @todo: use createList
 	 */
 	function action_groupmembers()
 	{
@@ -236,6 +235,8 @@ class Groups_Controller
 			'name' => $context['group']['name'],
 		);
 		$context['can_send_email'] = allowedTo('send_email_to_members');
+
+		// @todo: use createList
 
 		// Load all the group moderators, for fun.
 		$request = $db->query('', '

@@ -400,7 +400,7 @@ function action_openidreturn()
 		if (!checkActivation())
 			return;
 
-		DoLogin();
+		doLogin();
 	}
 }
 

@@ -31,7 +31,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 	global $user_info;
 	static $memID;
 
-	// If we already 
+	// If we already
 	if (isset($memID) && !$reload_id)
 		return $memID;
 
@@ -1508,10 +1508,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			array('id_theme', 'variable', 'id_member')
 		);
 		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
-		{
-			require_once(SOURCEDIR . '/Logging.php');
 			logActions($log_changes);
-		}
 	}
 }
 

@@ -15,7 +15,8 @@ if (!defined('ELKARTE'))
 /**
  * Get the admin info file from the database
  *
- * @param type $filename
+ * @param string $filename
+ *
  * @return array
  */
 function list_getAdminInfoFile($filename)
