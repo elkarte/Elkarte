@@ -340,7 +340,7 @@ class Auth_Controller
 		if (!checkActivation())
 			return;
 
-		DoLogin();
+		doLogin();
 	}
 
 	/**
@@ -574,16 +574,17 @@ function checkActivation()
 }
 
 /**
- * Perform the logging in. (set cookie, call hooks, etc)
+ * This function performs the logging in.
+ * It sets the cookie, it call hooks, updates runtime settings for the user.
  */
-function DoLogin()
+function doLogin()
 {
-	global $txt, $scripturl, $user_info, $user_settings;
-
-	$db = database();
+	global $user_info, $user_settings;
 	global $cookiename, $maintenance, $modSettings, $context;
 
-	// Load cookie authentication stuff.
+	$db = database();
+
+	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Call login integration functions.
