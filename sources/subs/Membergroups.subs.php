@@ -480,7 +480,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	// ... and assign protected groups!
 	elseif (!allowedTo('admin_forum'))
 	{
-		$is_protected = membergroupsById($group);
+		$is_protected = membergroupsById($group, 1, false, false, true);
 
 		// Is it protected?
 		if ($is_protected['group_type'] == 1)
@@ -740,10 +740,10 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 /**
  * Count the number of members in specific groups
  *
- * @param array $postGroups an array of post-based groups id
- * @param array $normalGroups an array of normal groups id
- * @param bool $include_hidden if include hidden groups in the count (default false)
- * @param bool $include_moderators if include board moderators too (default false)
+ * @param array $postGroups an array of post-based groups id.
+ * @param array $normalGroups = array() an array of normal groups id.
+ * @param bool $include_hidden = false if true, it includes hidden groups in the count (default false).
+ * @param bool $include_moderators = false if true, it includes board moderators too (default false).
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
 {
@@ -832,22 +832,23 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 /**
  * Returns details of membergroups based on the id
  *
- * @param array/int $group_id the ID of the groups
- * @param integer $limit the number of results returned (default 1, if null/false/0 returns all)
- * @param array/string $detailed returns more fields default false,
- *  - false returns: id_group, group_name, group_type,
- *  - true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent
- * @param bool $assignable determine if the group is assignable or not and return that information
- * @param bool $protected include protected groups
+ * @param array/int $group_ids the IDs of the groups.
+ * @param integer $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
+ * @param bool $detailed = false if true then it returns more fields (default false).
+ *  false returns: id_group, group_name, group_type.
+ *  true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
+ * @param bool $assignable = false determine if the group is assignable or not and return that information.
+ * @param bool $protected = false if true, it includes protected groups in the result.
  */
-function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
 	$db = database();
 
-	if (!isset($group_id))
+	if (empty($group_ids))
 		return false;
 
-	$group_ids = is_array($group_id) ? $group_id : array($group_id);
+	if (!is_array($group_ids))
+		$group_ids = array($group_ids);
 
 	$groups = array();
 	$group_ids = array_map('intval', $group_ids);
