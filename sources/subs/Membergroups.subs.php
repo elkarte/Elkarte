@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  * Has protection against deletion of protected membergroups.
  * Deletes the permissions linked to the membergroup.
  * Takes members out of the deleted membergroups.
+ *
  * @param array $groups
+ *
  * @return boolean
  */
 function deleteMembergroups($groups)
@@ -151,6 +153,8 @@ function deleteMembergroups($groups)
 			'additional_groups_explode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		)
 	);
+
+	// Update each member information.
 	$updates = array();
 	while ($row = $db->fetch_assoc($request))
 		$updates[$row['additional_groups']][] = $row['id_member'];
@@ -204,9 +208,11 @@ function deleteMembergroups($groups)
  * Requires the manage_membergroups permission.
  * Function includes a protection against removing from implicit groups.
  * Non-admins are not able to remove members from the admin group.
+ *
  * @param array $members
  * @param array $groups = null if groups is null, the specified members are stripped from all their membergroups.
  * @param bool $permissionCheckDone = false
+ *
  * @return boolean
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
@@ -250,9 +256,10 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Just in case.
 	if (empty($members))
 		return false;
-	elseif ($groups === null)
+
+	// Wanna remove all groups from these members? That's easy.
+	if ($groups === null)
 	{
-		// Wanna remove all groups from these members? That's easy.
 		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
@@ -406,11 +413,11 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 }
 
 /**
- * Add one or more members to a membergroup
+ * Add one or more members to a membergroup.
  *
  * Requires the manage_membergroups permission.
  * Function has protection against adding members to implicit groups.
- * Non-admins are not able to add members to the admin group.
+ * Non-admins cannot add members to the admin group, or protected groups.
  *
  * @param string|array $members
  * @param int $group
@@ -425,7 +432,8 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  * 						  what the previous primary membergroup was.
  * 	- auto              - Assigns a membergroup to the primary group if it's still
  * 						  available. If not, assign it to the additional group.
- * @param bool $permissionCheckDone
+ * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
+ *
  * @return boolean success or failure
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
@@ -545,17 +553,18 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 }
 
 /**
- * Gets the members of a supplied membergroup
- * Returns them as a link for display
+ * Gets the members of a supplied membergroup.
+ * Returns them as a link for display.
  *
  * @param array &$members
  * @param int $membergroup
  * @param int $limit = null
+ *
  * @return boolean
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl, $txt;
+	global $scripturl;
 
 	$db = database();
 
