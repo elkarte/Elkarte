@@ -224,20 +224,20 @@ function template_credits()
 		</div>';
 	}
 
-	// How about Modifications, we all love em
-	if (!empty($context['credits_modifications']))
+	// Addons credits, copyright, license
+	if (!empty($context['credits_addons']))
 	{
 		echo '
 		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_modifications'], '</h3>
+			<h3 class="catbg">', $txt['credits_addons'], '</h3>
 		</div>
 		<div class="windowbg">
 			<div class="content">';
 
 		echo '
 				<dl>
-					<dt><strong>', $txt['credits_modifications'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_modifications']), '</dd>
+					<dt><strong>', $txt['credits_addons'], '</strong></dt>
+					<dd>', implode('</dd><dd>', $context['credits_addons']), '</dd>
 				</dl>';
 
 		echo '
@@ -245,7 +245,7 @@ function template_credits()
 		</div>';
 	}
 
-	// Elkarte !
+	// ElkArte !
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
@@ -260,12 +260,12 @@ function template_credits()
 					</dd>
 				</dl>';
 
-	if (!empty($context['copyrights']['mods']))
+	if (!empty($context['copyrights']['addons']))
 	{
 		echo '
 				<dl>
-					<dt><strong>', $txt['credits_modifications'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['copyrights']['mods']), '</dd>
+					<dt><strong>', $txt['credits_addons'], '</strong></dt>
+					<dd>', implode('</dd><dd>', $context['copyrights']['addons']), '</dd>
 				</dl>';
 	}
 

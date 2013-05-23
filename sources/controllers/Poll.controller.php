@@ -327,7 +327,7 @@ class Poll_Controller
 		$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
 		$poll_errors = error_context::context('poll');
 
-		$pollinfo = getPollInfo($topic);
+		$pollinfo = pollInfoForTopic($topic);
 
 		// Assume it all exists, right?
 		if (empty($pollinfo))

@@ -242,41 +242,29 @@ class Post_Controller
 				// If the user doesn't have permission to edit the post in this topic, redirect them.
 				if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 				{
-					// @todo this shouldn't call directly CalendarPost()
 					require_once(CONTROLLERDIR . '/Calendar.controller.php');
 					$controller = new Calendar_Controller();
 					return $controller->action_event_post();
 				}
 
 				// Get the current event information.
-				$request = $db->query('', '
-					SELECT
-						id_member, title, MONTH(start_date) AS month, DAYOFMONTH(start_date) AS day,
-						YEAR(start_date) AS year, (TO_DAYS(end_date) - TO_DAYS(start_date)) AS span
-					FROM {db_prefix}calendar
-					WHERE id_event = {int:id_event}
-					LIMIT 1',
-					array(
-						'id_event' => $context['event']['id'],
-					)
-				);
-				$row = $db->fetch_assoc($request);
-				$db->free_result($request);
+				$event_info = getEventProperties($context['event']['id']);
 
 				// Make sure the user is allowed to edit this event.
-				if ($row['id_member'] != $user_info['id'])
+				if ($event_info['member'] != $user_info['id'])
 					isAllowedTo('calendar_edit_any');
 				elseif (!allowedTo('calendar_edit_any'))
 					isAllowedTo('calendar_edit_own');
 
-				$context['event']['month'] = $row['month'];
-				$context['event']['day'] = $row['day'];
-				$context['event']['year'] = $row['year'];
-				$context['event']['title'] = $row['title'];
-				$context['event']['span'] = $row['span'] + 1;
+				$context['event']['month'] = $event_info['month'];
+				$context['event']['day'] = $event_info['day'];
+				$context['event']['year'] = $event_info['year'];
+				$context['event']['title'] = $event_info['title'];
+				$context['event']['span'] = $event_info['span'];
 			}
 			else
 			{
+				// Posting a new event? (or preview...)
 				$today = getdate();
 
 				// You must have a month and year specified!
@@ -302,7 +290,7 @@ class Post_Controller
 					fatal_lang_error('cannot_post_new', 'user');
 
 				// Load a list of boards for this event in the context.
-				require_once(SUBSDIR . '/MessageIndex.subs.php');
+				require_once(SUBSDIR . '/Boards.subs.php');
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
@@ -325,21 +313,8 @@ class Post_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				$request = $db->query('', '
-					SELECT COUNT(*)
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg > {int:last_msg}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND approved = {int:approved}') . '
-					LIMIT 1',
-					array(
-						'current_topic' => $topic,
-						'last_msg' => (int) $_REQUEST['last_msg'],
-						'approved' => 1,
-					)
-				);
-				list ($context['new_replies']) = $db->fetch_row($request);
-				$db->free_result($request);
+				require_once(SUBSDIR . '/Topic.subs.php');
+				$context['new_replies'] = messagesSince($topic, (int) $_REQUEST['last_msg'], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
 				{
@@ -577,7 +552,7 @@ class Post_Controller
 		{
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
 		}
@@ -1651,11 +1626,12 @@ class Post_Controller
 				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
 				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
 
-				modifyEvent($_REQUEST['eventid'], array(
+				$eventOptions = array(
 					'start_date' => strftime('%Y-%m-%d', $start_time),
 					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
 					'title' => $_REQUEST['evtitle'],
-				));
+				);
+				modifyEvent($_REQUEST['eventid'], $eventOptions);
 			}
 		}
 

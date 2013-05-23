@@ -387,39 +387,34 @@ class Display_Controller
 		// If we want to show event information in the topic, prepare the data.
 		if (allowedTo('calendar_view') && !empty($modSettings['cal_showInTopic']) && !empty($modSettings['cal_enabled']))
 		{
+			// We need events details and all that jazz
+			require_once(SUBSDIR . '/Calendar.subs.php');
+
 			// First, try create a better time format, ignoring the "time" elements.
 			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
 				$date_string = $user_info['time_format'];
 			else
 				$date_string = $matches[0];
 
-			// Any calendar information for this topic?
-			$request = $db->query('', '
-				SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
-				FROM {db_prefix}calendar AS cal
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
-				WHERE cal.id_topic = {int:current_topic}
-				ORDER BY start_date',
-				array(
-					'current_topic' => $topic,
-				)
-			);
+			// Get event information for this topic.
+			$events = eventInfoForTopic($topic);
+
 			$context['linked_calendar_events'] = array();
-			while ($row = $db->fetch_assoc($request))
+			foreach ($events as $event)
 			{
 				// Prepare the dates for being formatted.
-				$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
+				$start_date = sscanf($event['start_date'], '%04d-%02d-%02d');
 				$start_date = mktime(12, 0, 0, $start_date[1], $start_date[2], $start_date[0]);
-				$end_date = sscanf($row['end_date'], '%04d-%02d-%02d');
+				$end_date = sscanf($event['end_date'], '%04d-%02d-%02d');
 				$end_date = mktime(12, 0, 0, $end_date[1], $end_date[2], $end_date[0]);
 
 				$context['linked_calendar_events'][] = array(
-					'id' => $row['id_event'],
-					'title' => $row['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'can_export' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'id' => $event['id_event'],
+					'title' => $event['title'],
+					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
+					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
+					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'start_date' => standardTime($start_date, $date_string, 'none'),
 					'start_timestamp' => $start_date,
 				'end_date' => standardTime($end_date, $date_string, 'none'),
@@ -427,7 +422,6 @@ class Display_Controller
 					'is_last' => false
 				);
 			}
-			$db->free_result($request);
 
 			if (!empty($context['linked_calendar_events']))
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
@@ -436,61 +430,21 @@ class Display_Controller
 		// Create the poll info if it exists.
 		if ($context['is_poll'])
 		{
-			// Get the question and if it's locked.
-			$request = $db->query('', '
-				SELECT
-					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
-				FROM {db_prefix}polls AS p
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)
-				WHERE p.id_poll = {int:id_poll}
-				LIMIT 1',
-				array(
-					'id_poll' => $topicinfo['id_poll'],
-				)
-			);
-			$pollinfo = $db->fetch_assoc($request);
-			$db->free_result($request);
+			// Get information on the poll
+			require_once(SUBSDIR . '/Poll.subs.php');
+			$pollinfo = pollInfo($topicinfo['id_poll']);
 
-			$request = $db->query('', '
-				SELECT COUNT(DISTINCT id_member) AS total
-				FROM {db_prefix}log_polls
-				WHERE id_poll = {int:id_poll}
-					AND id_member != {int:not_guest}',
-				array(
-					'id_poll' => $topicinfo['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			list ($pollinfo['total']) = $db->fetch_row($request);
-			$db->free_result($request);
+			// Get the poll options
+			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
 
-			// Total voters needs to include guest voters
-			$pollinfo['total'] += $pollinfo['num_guest_voters'];
-
-			// Get all the options, and calculate the total votes.
-			$request = $db->query('', '
-				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
-				FROM {db_prefix}poll_choices AS pc
-					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-				WHERE pc.id_poll = {int:id_poll}',
-				array(
-					'current_member' => $user_info['id'],
-					'id_poll' => $topicinfo['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			$pollOptions = array();
+			// Compute total votes.
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $db->fetch_assoc($request))
+			foreach ($pollOptions as $choice)
 			{
-				censorText($row['label']);
-				$pollOptions[$row['id_choice']] = $row;
-				$realtotal += $row['votes'];
-				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
+				$realtotal += $choice['votes'];
+				$pollinfo['has_voted'] |= $choice['voted_this'] != -1;
 			}
-			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -548,9 +502,9 @@ class Display_Controller
 				'has_voted' => !empty($pollinfo['has_voted']),
 				'starter' => array(
 					'id' => $pollinfo['id_member'],
-					'name' => $row['poster_name'],
+					'name' => $pollinfo['poster_name'],
 					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $row['poster_name'] . '</a>'
+					'link' => $pollinfo['id_member'] == 0 ? $polinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
 				)
 			);
 
@@ -707,12 +661,8 @@ class Display_Controller
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if (isset($_REQUEST['boardseen']))
 			{
-				$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					array($modSettings['maxMsgID'], $user_info['id'], $board),
-					array('id_member', 'id_board')
-				);
+				require_once(SUBSDIR . '/Boards.subs.php');
+				markBoardsRead($board, false, false);
 			}
 		}
 

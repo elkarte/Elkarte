@@ -308,7 +308,7 @@ class ManageCalendar_Controller
 		$this->_calendarSettings = new Settings_Form();
 
 		// Load the boards list.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)
@@ -359,7 +359,7 @@ class ManageCalendar_Controller
 		global $txt;
 
 		// Load the boards list.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)

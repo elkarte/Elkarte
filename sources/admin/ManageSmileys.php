@@ -1347,7 +1347,7 @@ class ManageSmileys_Controller
 				'use_permissions' => true,
 				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 			);
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList($boardListOptions);
 		}
 	}

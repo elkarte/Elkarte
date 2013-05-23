@@ -26,17 +26,12 @@ if (!defined('ELKARTE'))
  * It uses gzip compression if compress is set in the URL/post data.
  * It may possibly time out, and mess up badly if you were relying on it. :P
  * The data dumped depends on whether "struct" and "data" are passed.
- * It requires an administrator and the session hash by post.
  * It is called from ManageMaintenance.php.
  */
 function DumpDatabase2()
 {
-	global $db_name, $scripturl, $context, $modSettings, $crlf;
-	global $db_prefix, $db_show_debug, $smcFunc;
-
-	// Administrators only!
-	if (!allowedTo('admin_forum'))
-		fatal_lang_error('no_dump_database', 'critical');
+	global $db_name, $scripturl, $modSettings;
+	global $db_prefix, $db_show_debug;
 
 	// We'll need a db to dump :P
 	$database = database();
@@ -48,8 +43,6 @@ function DumpDatabase2()
 	// You can't dump nothing!
 	if (!isset($_REQUEST['struct']) && !isset($_REQUEST['data']))
 		$_REQUEST['data'] = true;
-
-	checkSession('post');
 
 	// Attempt to stop from dying...
 	@set_time_limit(600);
@@ -187,7 +180,7 @@ function DumpDatabase2()
 			}
 			$db_chunks .=
 				$get_rows;
-			$current_used_memory += $smcFunc['strlen']($db_chunks);
+			$current_used_memory += Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
 			unset($db_chunks);

@@ -32,6 +32,7 @@ if (!defined('ELKARTE'))
  * @param string $error_type = 'general'
  * @param string $file = null
  * @param int $line = null
+ *
  * @return string, the error message
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
@@ -147,8 +148,8 @@ function fatal_error($error, $log = 'general')
  *  - the information is logged if log is specified.
  *
  * @param $error
- * @param $log
- * @param $sprintf
+ * @param $log = 'general'
+ * @param $sprintf = array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {

@@ -132,11 +132,62 @@ function resetVotes($pollID)
 }
 
 /**
- * Retrieve poll information.
+ * Get all poll information you wanted to know.
+ * Only returns info on the poll, not its options.
+ *
+ * @param int $id_poll
+ *
+ * @return array|false array of poll information, or false if no poll is found
+ */
+function pollInfo($id_poll)
+{
+	$db = database();
+
+	// Read info from the db
+	$request = $db->query('', '
+		SELECT
+			p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
+			p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
+		FROM {db_prefix}polls AS p
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)
+		WHERE p.id_poll = {int:id_poll}
+		LIMIT 1',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+	$poll_info = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	if (empty($poll_info))
+		return false;
+
+	$request = $db->query('', '
+		SELECT COUNT(DISTINCT id_member) AS total
+		FROM {db_prefix}log_polls
+		WHERE id_poll = {int:id_poll}
+			AND id_member != {int:not_guest}',
+		array(
+			'id_poll' => $id_poll,
+			'not_guest' => 0,
+		)
+	);
+	list ($poll_info['total']) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	// Total voters needs to include guest voters
+	$poll_info['total'] += $poll_info['num_guest_voters'];
+
+	return $poll_info;
+}
+
+/**
+ * Retrieve poll information, for the poll associated
+ * to topic $topicID.
  *
  * @param int $topicID the topic with an associated poll.
  */
-function getPollInfo($topicID)
+function pollInfoForTopic($topicID)
 {
 	$db = database();
 
@@ -164,6 +215,41 @@ function getPollInfo($topicID)
 	$db->free_result($request);
 
 	return $pollinfo;
+}
+
+/**
+ * Return poll options, customized for a given member.
+ * The function adds to poll options the information if the user
+ * has voted in this poll.
+ *
+ * @param int $id_poll
+ * @param int $id_member
+ */
+function pollOptionsForMember($id_poll, $id_member)
+{
+	$db = database();
+
+	// Get the choices
+	$request = $db->query('', '
+		SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
+		FROM {db_prefix}poll_choices AS pc
+			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
+		WHERE pc.id_poll = {int:id_poll}',
+		array(
+			'current_member' => $id_member,
+			'id_poll' => $id_poll,
+			'not_guest' => 0,
+		)
+	);
+	$pollOptions = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['label']);
+		$pollOptions[$row['id_choice']] = $row;
+	}
+	$db->free_result($request);
+
+	return $pollOptions;
 }
 
 /**

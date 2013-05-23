@@ -22,8 +22,8 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Check if the user is who he/she says he is
- * Makes sure the user is who they claim to be by requiring a password to be typed in every hour.
+ * Check if the user is who he/she says he is.
+ * This function makes sure the user is who they claim to be by requiring a password to be typed in every hour.
  * This check can be turned on and off by the securityDisable setting.
  * Uses the adminLogin() function of subs/Auth.subs.php if they need to login, which saves all request
  *  (POST and GET) data.
