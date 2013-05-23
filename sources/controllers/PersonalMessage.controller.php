@@ -752,7 +752,7 @@ class PersonalMessage_Controller
 				cache_put_data('response_prefix', $context['response_prefix'], 600);
 			}
 			$form_subject = $row_quoted['subject'];
-			if ($context['reply'] && trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if ($context['reply'] && trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			if (isset($_REQUEST['quote']))
@@ -1889,7 +1889,7 @@ class PersonalMessage_Controller
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => ($smcFunc['strpos']($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),

@@ -865,11 +865,11 @@ function cdata_parse($data, $ns = '')
 	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
-			$smcFunc['strpos']($data, '&', $pos),
-			$smcFunc['strpos']($data, ']', $pos),
+			Util::strpos($data, '&', $pos),
+			Util::strpos($data, ']', $pos),
 		);
 		if ($ns != '')
-			$positions[] = $smcFunc['strpos']($data, '<', $pos);
+			$positions[] = Util::strpos($data, '<', $pos);
 		foreach ($positions as $k => $dummy)
 		{
 			if ($dummy === false)
@@ -886,7 +886,7 @@ function cdata_parse($data, $ns = '')
 
 		if (Util::substr($data, $pos, 1) == '<')
 		{
-			$pos2 = $smcFunc['strpos']($data, '>', $pos);
+			$pos2 = Util::strpos($data, '>', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
 			if (Util::substr($data, $pos + 1, 1) == '/')
@@ -902,7 +902,7 @@ function cdata_parse($data, $ns = '')
 		}
 		elseif (Util::substr($data, $pos, 1) == '&')
 		{
-			$pos2 = $smcFunc['strpos']($data, ';', $pos);
+			$pos2 = Util::strpos($data, ';', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
 			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
