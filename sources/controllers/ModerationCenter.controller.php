@@ -401,7 +401,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modifyWarningTemplate()
 	{
-		global $context, $txt, $user_info, $smcFunc;
+		global $context, $txt, $user_info;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -442,7 +442,7 @@ class ModerationCenter_Controller
 			if (!empty($template_body) && !empty($template_title))
 			{
 				// Safety first.
-				$template_title = $smcFunc['htmlspecialchars']($template_title);
+				$template_title = Util::htmlspecialchars($template_title);
 
 				// Clean up BBC.
 				preparsecode($template_body);
@@ -502,7 +502,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modReport()
 	{
-		global $user_info, $context, $scripturl, $txt, $smcFunc;
+		global $user_info, $context, $scripturl, $txt;
 
 		$db = database();
 
@@ -526,7 +526,7 @@ class ModerationCenter_Controller
 		{
 			checkSession();
 
-			$newComment = trim($smcFunc['htmlspecialchars']($_POST['mod_comment']));
+			$newComment = trim(Util::htmlspecialchars($_POST['mod_comment']));
 
 			// In it goes.
 			if (!empty($newComment))
@@ -1276,7 +1276,7 @@ function ModBlockWatchedUsers()
  */
 function ModBlockNotes()
 {
-	global $context, $scripturl, $txt, $user_info, $smcFunc;
+	global $context, $scripturl, $txt, $user_info;
 
 	$db = database();
 
@@ -1285,7 +1285,7 @@ function ModBlockNotes()
 	{
 		checkSession();
 
-		$_POST['new_note'] = $smcFunc['htmlspecialchars'](trim($_POST['new_note']));
+		$_POST['new_note'] = Util::htmlspecialchars(trim($_POST['new_note']));
 
 		// Make sure they actually entered something.
 		if (!empty($_POST['new_note']) && $_POST['new_note'] !== $txt['mc_click_add_note'])

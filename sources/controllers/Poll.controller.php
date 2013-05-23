@@ -309,7 +309,7 @@ class Poll_Controller
 	 */
 	function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board, $scripturl, $smcFunc;
+		global $txt, $user_info, $context, $topic, $board, $scripturl;
 
 		$db = database();
 
@@ -354,7 +354,7 @@ class Poll_Controller
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
 		if (isset($_POST['preview']) || $poll_errors->hasErrors())
 		{
-			$question = $smcFunc['htmlspecialchars']($_POST['question']);
+			$question = Util::htmlspecialchars($_POST['question']);
 
 			// Basic theme info...
 			$context['poll'] = array(
@@ -417,7 +417,7 @@ class Poll_Controller
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
 			foreach ($_POST['options'] as $id => $label)
 			{
-				$label = $smcFunc['htmlspecialchars']($label);
+				$label = Util::htmlspecialchars($label);
 				censorText($label);
 
 				if (isset($context['choices'][$id]))
@@ -589,7 +589,7 @@ class Poll_Controller
 	function action_editpoll2()
 	{
 		global $txt, $topic, $board, $context;
-		global $modSettings, $user_info, $smcFunc;
+		global $modSettings, $user_info;
 
 		$db = database();
 
@@ -672,8 +672,8 @@ class Poll_Controller
 		checkSubmitOnce('check');
 
 		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
-		$_POST['question'] = $smcFunc['htmlspecialchars']($_POST['question']);
-		$_POST['question'] = $smcFunc['truncate']($_POST['question'], 255);
+		$_POST['question'] = Util::htmlspecialchars($_POST['question']);
+		$_POST['question'] = Util::truncate($_POST['question'], 255);
 
 		$_POST['poll_hide'] = (int) $_POST['poll_hide'];
 		$_POST['poll_expire'] = isset($_POST['poll_expire']) ? (int) $_POST['poll_expire'] : 0;
@@ -793,7 +793,7 @@ class Poll_Controller
 			}
 
 			// Dress the option up for its big date with the database.
-			$option = $smcFunc['htmlspecialchars']($option);
+			$option = Util::htmlspecialchars($option);
 
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))

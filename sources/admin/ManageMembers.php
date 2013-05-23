@@ -163,7 +163,7 @@ class ManageMembers_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings, $user_info;
 
 		$db = database();
 
@@ -357,7 +357,7 @@ class ManageMembers_Controller
 				else
 				{
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
-					$parameter = strtolower(strtr($smcFunc['htmlspecialchars']($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
 					if ($db->db_case_sensitive())
 						$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';

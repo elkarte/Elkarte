@@ -1437,7 +1437,7 @@ class ManageSmileys_Controller
 	 */
 	function action_install()
 	{
-		global $modSettings, $scripturl, $context, $txt, $user_info, $smcFunc;
+		global $modSettings, $scripturl, $context, $txt, $user_info;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
@@ -1454,7 +1454,7 @@ class ManageSmileys_Controller
 		if (isset($_REQUEST['set_gz']))
 		{
 			$base_name = strtr(basename($_REQUEST['set_gz']), ':/', '-_');
-			$name = $smcFunc['htmlspecialchars'](strtok(basename($_REQUEST['set_gz']), '.'));
+			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['set_gz']), '.'));
 			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
@@ -1474,7 +1474,7 @@ class ManageSmileys_Controller
 		elseif (isset($_REQUEST['package']))
 		{
 			$base_name = basename($_REQUEST['package']);
-			$name = $smcFunc['htmlspecialchars'](strtok(basename($_REQUEST['package']), '.'));
+			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['package']), '.'));
 			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
@@ -1564,7 +1564,7 @@ class ManageSmileys_Controller
 				// Do this one...
 				$thisAction = array(
 					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
 				$file =  BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
@@ -1611,7 +1611,7 @@ class ManageSmileys_Controller
 			{
 				updateSettings(array(
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
-					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' .  (!empty($action['description']) ? $smcFunc['htmlspecialchars']($action['description']) : basename($action['action'])) : ''),
+					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' .  (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
 				));
 			}
 
@@ -1632,7 +1632,7 @@ class ManageSmileys_Controller
 			);
 			logPackageInstall($installed);
 
-			logAction('install_package', array('package' => $smcFunc['htmlspecialchars']($smileyInfo['name']), 'version' => $smcFunc['htmlspecialchars']($smileyInfo['version'])), 'admin');
+			logAction('install_package', array('package' => Util::htmlspecialchars($smileyInfo['name']), 'version' => Util::htmlspecialchars($smileyInfo['version'])), 'admin');
 
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);

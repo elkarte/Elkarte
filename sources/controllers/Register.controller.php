@@ -33,7 +33,7 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $cur_profile, $smcFunc;
+		global $language, $scripturl, $cur_profile;
 
 		$db = database();
 
@@ -169,7 +169,7 @@ class Register_Controller
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields as $field)
 				if (isset($_POST[$field]))
-					$cur_profile[$field] = $smcFunc['htmlspecialchars']($_POST[$field]);
+					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
 
 			// Load all the fields in question.
 			setupProfileContext($reg_fields);
@@ -193,16 +193,16 @@ class Register_Controller
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = $smcFunc['htmlspecialchars'](!empty($_POST['user']) ? $_POST['user'] : $_SESSION['openid']['nickname']);
-			$context['email'] = $smcFunc['htmlspecialchars'](!empty($_POST['email']) ? $_POST['email'] : $_SESSION['openid']['email']);
+			$context['username'] = Util::htmlspecialchars(!empty($_POST['user']) ? $_POST['user'] : $_SESSION['openid']['nickname']);
+			$context['email'] = Util::htmlspecialchars(!empty($_POST['email']) ? $_POST['email'] : $_SESSION['openid']['email']);
 		}
 		// See whether we have some prefiled values.
 		else
 		{
 			$context += array(
 				'openid' => isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '',
-				'username' => isset($_POST['user']) ? $smcFunc['htmlspecialchars']($_POST['user']) : '',
-				'email' => isset($_POST['email']) ? $smcFunc['htmlspecialchars']($_POST['email']) : '',
+				'username' => isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '',
+				'email' => isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '',
 			);
 		}
 
@@ -227,7 +227,7 @@ class Register_Controller
 	function action_register2($verifiedOpenID = false)
 	{
 		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings, $smcFunc;
+		global $user_info, $options, $settings;
 
 		$db = database();
 
@@ -330,7 +330,7 @@ class Register_Controller
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
 			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && $smcFunc['strlen']($_POST['real_name']) < 60)
+			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
 				$possible_strings[] = 'real_name';
 		}
 
@@ -380,7 +380,7 @@ class Register_Controller
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
 			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = $smcFunc['htmlspecialchars']($_POST[$var], ENT_QUOTES);
+				$regOptions['extra_register_vars'][$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
 		foreach ($possible_ints as $var)
 			if (isset($_POST[$var]))
 				$regOptions['extra_register_vars'][$var] = (int) $_POST[$var];
@@ -426,7 +426,7 @@ class Register_Controller
 			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
 			{
 				// Is it too long?
-				if ($row['field_length'] && $row['field_length'] < $smcFunc['strlen']($value))
+				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
 					$custom_field_errors[] = array('custom_field_too_long', array($row['field_name'], $row['field_length']));
 
 				// Any masks to apply?
@@ -841,7 +841,7 @@ class Register_Controller
 	 */
 	function action_contact()
 	{
-		global $context, $txt, $user_info, $modSettings, $smcFunc;
+		global $context, $txt, $user_info, $modSettings;
 
 		// Already inside, no need to use this, just send a PM
 		// Disabled, you cannot enter.
@@ -882,7 +882,7 @@ class Register_Controller
 			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
 				$context['errors'][] = $txt['error_bad_email'];
 
-			$message = !empty($_POST['contactmessage']) ? trim($smcFunc['htmlspecialchars']($_POST['contactmessage'])) : '';
+			$message = !empty($_POST['contactmessage']) ? trim(Util::htmlspecialchars($_POST['contactmessage'])) : '';
 			if (empty($message))
 				$context['errors'][] = $txt['error_no_message'];
 			if (empty($context['errors']))

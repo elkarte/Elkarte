@@ -157,7 +157,7 @@ function setupProfileContext($fields)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $user_info, $settings, $scripturl, $smcFunc;
+	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
 
 	$db = database();
 
@@ -199,7 +199,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// If this was submitted already then make the value the posted version.
 		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
 		{
-			$value = $smcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
+			$value = Util::htmlspecialchars($_POST['customfield'][$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
@@ -661,9 +661,7 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\']($value) > 50)
+				if (Util::strlen($value) > 50)
 					return \'personal_text_too_long\';
 
 				return true;
@@ -718,13 +716,13 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $cur_profile, $smcFunc;
+				global $context, $cur_profile;
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
 				if (trim($value) == \'\')
 					return \'no_name\';
-				elseif ($smcFunc[\'strlen\']($value) > 60)
+				elseif (Util::strlen($value) > 60)
 					return \'name_too_long\';
 				elseif ($cur_profile[\'real_name\'] != $value)
 				{
@@ -871,9 +869,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\'] > 50)
+				if (Util::strlen($value) > 50)
 					return \'user_title_too_long\';
 
 				return true;
@@ -1412,7 +1408,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $user_profile, $user_info, $modSettings, $smcFunc;
+	global $context, $user_profile, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1460,7 +1456,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
 			if ($row['field_length'])
-				$value = $smcFunc['substr']($value, 0, $row['field_length']);
+				$value = Util::substr($value, 0, $row['field_length']);
 
 			// Any masks?
 			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
@@ -1809,7 +1805,7 @@ function profileReloadUser()
  */
 function profileValidateSignature(&$value)
 {
-	global $modSettings, $txt, $smcFunc;
+	global $modSettings, $txt;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
@@ -1974,7 +1970,7 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $smcFunc['strlen'](str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);

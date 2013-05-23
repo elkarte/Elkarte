@@ -1438,7 +1438,7 @@ class ManageMaillist_Controller
 	 */
 	public function action_modify_bounce_templates()
 	{
-		global $context, $txt, $user_info, $smcFunc;
+		global $context, $txt, $user_info;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -1480,7 +1480,7 @@ class ManageMaillist_Controller
 			if (!empty($template_body) && !empty($template_title))
 			{
 				// Safety first.
-				$template_title = $smcFunc['htmlspecialchars']($template_title);
+				$template_title = Util::htmlspecialchars($template_title);
 
 				// Clean up BBC.
 				preparsecode($template_body);

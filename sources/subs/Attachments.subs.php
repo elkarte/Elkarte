@@ -969,8 +969,6 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	if (empty($attachments))
@@ -1032,7 +1030,7 @@ function approveAttachments($attachments)
 			'approve_attach',
 			array(
 				'message' => $row['id_msg'],
-				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
+				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
 			)
 		);
 	$db->free_result($request);
@@ -1064,7 +1062,7 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$db = database();
 
@@ -1191,7 +1189,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 				'remove_attach',
 				array(
 					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
+					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
 				)
 			);
 		$db->free_result($request);

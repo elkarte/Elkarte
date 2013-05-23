@@ -43,7 +43,7 @@ class Database_MySQL implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global $mysql_set_mode, $smcFunc;
+		global $mysql_set_mode;
 
 		// initialize the instance... if not done already!
 		if (self::$_db === null)

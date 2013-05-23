@@ -245,8 +245,6 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Log warning notice.
@@ -256,7 +254,7 @@ function logWarningNotice($subject, $body)
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			$smcFunc['htmlspecialchars']($subject), $smcFunc['htmlspecialchars']($body),
+			Util::htmlspecialchars($subject), Util::htmlspecialchars($body),
 		),
 		array('id_notice')
 	);
@@ -348,7 +346,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global $scripturl, $user_info, $smcFunc;
+	global $scripturl, $user_info;
 
 	$db = database();
 
@@ -376,7 +374,7 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
 			'time' => standardTime($row['log_time']),
 			'title' => $row['template_title'],
-			'body' => $smcFunc['htmlspecialchars']($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 		);
 	}
 	$db->free_result($request);
@@ -486,7 +484,7 @@ function list_getWarningCount()
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context;
 
 	$db = database();
 
@@ -507,7 +505,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
-			'body' => $smcFunc['htmlspecialchars']($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);

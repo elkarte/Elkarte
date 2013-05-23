@@ -424,12 +424,10 @@ class Data_Validator
 	 */
 	protected function _validate_max_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
-
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) <= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) <= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -452,12 +450,10 @@ class Data_Validator
 	 */
 	protected function _validate_min_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
-
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) >= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) >= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -480,12 +476,10 @@ class Data_Validator
 	 */
 	protected function _validate_length($field, $input, $validation_parameters = null)
 	{
-		global $smcFunc;
-
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) == (int) $validation_parameters)
+		if (Util::strlen($input[$field]) == (int) $validation_parameters)
 			return;
 
 		return array(

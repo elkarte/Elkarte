@@ -174,8 +174,6 @@ function maillist_delete_entry($id)
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Init
@@ -207,9 +205,9 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		$email_filters[$i] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . $smcFunc['htmlspecialchars']($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . $smcFunc['htmlspecialchars']($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => $smcFunc['htmlspecialchars']($row['filter_name']),
+			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+			'filter_name' => Util::htmlspecialchars($row['filter_name']),
 		);
 		$i++;
 	};
@@ -312,7 +310,6 @@ function maillist_delete_filter_parser($id)
  * Creates a select list of boards for the admin
  *  - Sets the first one as a blank for use in a template select element
  *
- * @global type $smcFunc
  * @return type
  */
 function maillist_board_list()
@@ -340,7 +337,6 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @global type $smcFunc
  * @param type $switch
  */
 function enable_maillist_imap_cron($switch)

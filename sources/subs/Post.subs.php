@@ -2318,7 +2318,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, $smcFunc;
+	global $user_info, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -2348,8 +2348,8 @@ function lastPost()
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	if ($smcFunc['strlen']($row['body']) > 128)
-		$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+	if (Util::strlen($row['body']) > 128)
+		$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 	// Send the data.
 	return array(
@@ -2366,7 +2366,7 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -2413,7 +2413,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.
-			if (trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the message and subject.
@@ -2449,7 +2449,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$form_subject = $first_subject;
 
 			// Add 'Re: ' to the front of the subject.
-			if (trim($context['response_prefix']) != '' && $form_subject != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && $form_subject != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the subject.

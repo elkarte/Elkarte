@@ -150,10 +150,10 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords, $smcFunc;
+		global $excludedWords;
 
-		$x = $smcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = $smcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = Util::strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -171,7 +171,7 @@ class Fulltext_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		$subwords = text2words($word, null, false);
 
@@ -182,13 +182,13 @@ class Fulltext_Search
 			if (count($subwords) > 1 && preg_match('~[.:@$]~', $word))
 			{
 				// using special characters that a full index would ignore and the remaining words are short which would also be ignored
-				if (($smcFunc['strlen'](current($subwords)) < $this->min_word_length) && ($smcFunc['strlen'](next($subwords)) < $this->min_word_length))
+				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, "/*- ");
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif ($smcFunc['strlen'](trim($word, "/*- ")) < $this->min_word_length)
+			elseif (Util::strlen(trim($word, "/*- ")) < $this->min_word_length)
 			{
 				// short words have feelings too
 				$wordsSearch['words'][] = trim($word, "/*- ");

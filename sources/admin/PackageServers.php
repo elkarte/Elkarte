@@ -183,7 +183,7 @@ class PackageServers_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $forum_version, $context, $smcFunc;
+		global $txt, $context, $scripturl, $forum_version, $context;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
@@ -284,17 +284,17 @@ class PackageServers_Controller
 		// Get default author and email if they exist.
 		if ($listing->exists('default-author'))
 		{
-			$default_author = $smcFunc['htmlspecialchars']($listing->fetch('default-author'));
+			$default_author = Util::htmlspecialchars($listing->fetch('default-author'));
 			if ($listing->exists('default-author/@email'))
-				$default_email = $smcFunc['htmlspecialchars']($listing->fetch('default-author/@email'));
+				$default_email = Util::htmlspecialchars($listing->fetch('default-author/@email'));
 		}
 
 		// Get default web site if it exists.
 		if ($listing->exists('default-website'))
 		{
-			$default_website = $smcFunc['htmlspecialchars']($listing->fetch('default-website'));
+			$default_website = Util::htmlspecialchars($listing->fetch('default-website'));
 			if ($listing->exists('default-website/@title'))
-				$default_title = $smcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
+				$default_title = Util::htmlspecialchars($listing->fetch('default-website/@title'));
 		}
 
 		$the_version = strtr($forum_version, array('ELKARTE ' => ''));
@@ -321,10 +321,10 @@ class PackageServers_Controller
 				);
 
 				if (in_array($package['type'], array('title', 'text')))
-					$context['package_list'][$packageSection][$package['type']] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$context['package_list'][$packageSection][$package['type']] = Util::htmlspecialchars($thisPackage->fetch('.'));
 				// It's a Title, Heading, Rule or Text.
 				elseif (in_array($package['type'], array('heading', 'rule')))
-					$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
 				// It's a Remote link.
 				elseif ($package['type'] == 'remote')
 				{
@@ -351,7 +351,7 @@ class PackageServers_Controller
 						$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . $current_url;
 					}
 
-					$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
 					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
 				}
 				// It's a package...
@@ -375,7 +375,7 @@ class PackageServers_Controller
 					if ($package['description'] == '')
 						$package['description'] = $txt['package_no_description'];
 					else
-						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', $smcFunc['htmlspecialchars']($package['description'])));
+						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', Util::htmlspecialchars($package['description'])));
 
 					$package['is_installed'] = isset($installed_mods[$package['id']]);
 					$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
@@ -395,7 +395,7 @@ class PackageServers_Controller
 					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
 
 					$package['href'] = $url . '/' . $package['filename'];
-					$package['name'] = $smcFunc['htmlspecialchars']($package['name']);
+					$package['name'] = Util::htmlspecialchars($package['name']);
 					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
 					$package['download']['href'] = $scripturl . '?action=admin;area=packages;get;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
@@ -408,7 +408,7 @@ class PackageServers_Controller
 							$package['author']['email'] = $default_email;
 
 						if ($thisPackage->exists('author') && $thisPackage->fetch('author') != '')
-							$package['author']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('author'));
+							$package['author']['name'] = Util::htmlspecialchars($thisPackage->fetch('author'));
 						else
 							$package['author']['name'] = $default_author;
 
@@ -423,11 +423,11 @@ class PackageServers_Controller
 					if ($thisPackage->exists('website') || isset($default_website))
 					{
 						if ($thisPackage->exists('website') && $thisPackage->exists('website/@title'))
-							$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website/@title'));
+							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website/@title'));
 						elseif (isset($default_title))
 							$package['author']['website']['name'] = $default_title;
 						elseif ($thisPackage->exists('website'))
-							$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website'));
+							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website'));
 						else
 							$package['author']['website']['name'] = $default_website;
 
@@ -698,8 +698,6 @@ class PackageServers_Controller
 	 */
 	public function action_add()
 	{
-		global $smcFunc;
-
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 		// Validate the user.
 		checkSession();
@@ -709,8 +707,8 @@ class PackageServers_Controller
 			$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim($smcFunc['htmlspecialchars']($_POST['servername']));
-		$serverurl = trim($smcFunc['htmlspecialchars']($_POST['serverurl']));
+		$servername = trim(Util::htmlspecialchars($_POST['servername']));
+		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
 
 		// Make sure the URL has the correct prefix.
 		if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
