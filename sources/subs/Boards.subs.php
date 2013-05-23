@@ -1199,23 +1199,43 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 
 /**
  * Returns all the boards accessible to the current user.
+ * If $id_parents is given, return only the child boards of those boards.
+ *
+ * @param @id_parents
  */
-function accessibleBoards()
+function accessibleBoards($id_parents = null)
 {
 	$db = database();
 
-	// Find all the boards this user can see.
-	$result = $db->query('', '
-		SELECT b.id_board
-		FROM {db_prefix}boards AS b
-		WHERE {query_see_board}',
-		array(
-		)
-	);
 	$boards = array();
-	while ($row = $db->fetch_assoc($result))
+	if (empty($id_parents))
+	{
+		// Find all the boards this user can see.
+		$request = $db->query('', '
+			SELECT b.id_board
+			FROM {db_prefix}boards AS b
+			WHERE {query_see_board}',
+			array(
+			)
+		);
+	}
+	else
+	{
+		// Find all boards down from $id_parent
+		$request = $db->query('', '
+			SELECT b.id_board
+			FROM {db_prefix}boards AS b
+			WHERE b.id_parent IN ({array_int:parent_list})
+				AND {query_see_board}',
+			array(
+				'parent_list' => $id_parents,
+			)
+		);
+	}
+
+	while ($row = $db->fetch_assoc($request))
 		$boards[] = $row['id_board'];
-	$db->free_result($result);
+	$db->free_result($request);
 
 	return $boards;
 }

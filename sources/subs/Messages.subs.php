@@ -723,3 +723,78 @@ function canAccessMessage($id_msg, $check_approval = true)
 	// Otherwise, nope.
 	return false;
 }
+
+/**
+ * Advance message pointer in a topic.
+ * (in either direction)
+ * This function is used by previousMessage() and nextMessage().
+ * The boolean parameter $next determines the direction.
+ *
+ * @param int $id_msg origin message id
+ * @param int $id_topic topic
+ * @param bool $next = true if true, it increases the pointer, otherwise it decreases it
+ */
+function messagePointer($id_msg, $id_topic, $next = true)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT ' . ($next ? 'MIN(id_msg)' : 'MAX($id_msg)') . '
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg {raw:strictly} {int:topic_msg_id}',
+		array(
+			'current_topic' => $id_topic,
+			'topic_msg_id' => $id_msg,
+			'strictly' => $next ? '>' : '<'
+		)
+	);
+
+	list ($msg) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $msg;
+}
+
+/**
+ * Get previous message from where we were in the topic.
+ *
+ * @param int $id_msg
+ * @param int $id_topic
+ */
+function previousMessage($id_msg, $id_topic)
+{
+	return messagePointer($id_msg, $id_topic, false);
+}
+
+/**
+ * Get next message from where we were in the topic.
+ *
+ * @param int $id_msg
+ * @param int $id_topic
+ */
+function nextMessage($id_msg, $id_topic)
+{
+	return messagePointer($id_msg, $id_topic);
+}
+
+function messageAt($start, $id_topic)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+		ORDER BY id_msg
+		LIMIT {int:start}, 1',
+		array(
+			'current_topic' => $id_topic,
+			'start' => $start,
+		)
+	);
+	list ($msg) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $msg;
+}
