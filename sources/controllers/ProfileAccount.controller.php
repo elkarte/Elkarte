@@ -34,7 +34,11 @@ function action_issuewarning()
 	$memID = currentMemberID();
 
 	// make sure the sub-template is set...
+	loadTemplate('ProfileAccount');
 	$context['sub_template'] = 'issueWarning';
+
+	// We need this because of template_load_warning_variables
+	loadTemplate('Profile');
 
 	// Get all the actual settings.
 	list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -399,6 +403,7 @@ function action_deleteaccount()
 	$context['page_title'] = $txt['deleteAccount'] . ': ' . $cur_profile['real_name'];
 
 	// make sure the sub-template is set...
+	loadTemplate('ProfileAccount');
 	$context['sub_template'] = 'deleteAccount';
 }
 
