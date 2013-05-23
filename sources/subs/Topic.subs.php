@@ -44,7 +44,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	if (is_numeric($topics))
 		$topics = array($topics);
 
-	// Decrease the post counts.
+	// Decrease the post counts for members.
 	if ($decreasePostCount)
 	{
 		$requestMembers = $db->query('', '
@@ -189,7 +189,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 	$db->free_result($request);
 
-	// Decrease the posts/topics...
+	// Decrease number of posts and topics for each board.
 	foreach ($adjustBoards as $stats)
 	{
 		if (function_exists('apache_reset_timeout'))
@@ -213,7 +213,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 	}
 
-	// Remove Polls.
+	// Remove polls for these topics.
 	$request = $db->query('', '
 		SELECT id_poll
 		FROM {db_prefix}topics
@@ -255,7 +255,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 	}
 
-	// Get rid of the attachment(s), if they exist.
+	// Get rid of the attachment(s).
 	require_once(SUBSDIR . '/Attachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
@@ -263,7 +263,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	);
 	removeAttachments($attachmentQuery, 'messages');
 
-	// Delete possible search index entries.
+	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
 		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
@@ -301,7 +301,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 	}
 
-	// Delete anything related to the topic.
+	// Delete messages in each topic.
 	$db->query('', '
 		DELETE FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topics})',
@@ -309,6 +309,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+
+	// Remove linked calendar events.
+	// @todo if unlinked events are enabled, wouldn't this be expected to keep them?
 	$db->query('', '
 		DELETE FROM {db_prefix}calendar
 		WHERE id_topic IN ({array_int:topics})',
@@ -316,6 +319,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+
+	// Delete log_topics data
 	$db->query('', '
 		DELETE FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})',
@@ -323,6 +328,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+
+	// Delete notifications
 	$db->query('', '
 		DELETE FROM {db_prefix}log_notify
 		WHERE id_topic IN ({array_int:topics})',
@@ -330,6 +337,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+
+	// Delete the topics themselves
 	$db->query('', '
 		DELETE FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})',
@@ -337,6 +346,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
+
+	// Remove data from the subjects for search cache
 	$db->query('', '
 		DELETE FROM {db_prefix}log_search_subjects
 		WHERE id_topic IN ({array_int:topics})',
@@ -347,7 +358,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	require_once(SUBSDIR . '/FollowUps.subs.php');
 	removeFollowUpsByTopic($topics);
 
-	// Maybe there's a mod that wants to delete topic related data of its own
+	// Maybe there's an add-on that wants to delete topic related data of its own
  	call_integration_hook('integrate_remove_topics', array($topics));
 
 	// Update the totals...
@@ -365,14 +376,14 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 }
 
 /**
- * Moves one or more topics to a specific board. (doesn't check permissions.)
+ * Moves one or more topics to a specific board.
  * Determines the source boards for the supplied topics
  * Handles the moving of mark_read data
  * Updates the posts count of the affected boards
+ * This function doesn't check permissions.
  *
- * @param type $topics
- * @param type $toBoard
- * @return type
+ * @param array $topics
+ * @param int $toBoard
  */
 function moveTopics($topics, $toBoard)
 {

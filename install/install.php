@@ -636,7 +636,7 @@ function action_checkFilesWritable()
  */
 function action_databaseSettings()
 {
-	global $txt, $databases, $incontext;
+	global $txt, $databases, $incontext, $db_type;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
