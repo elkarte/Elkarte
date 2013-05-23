@@ -3166,7 +3166,7 @@ function template_footer()
 	}
 
 	foreach (Template_Layers::getInstance()->reverseLayers() as $layer)
-		loadSubTemplate($layer . '_below', true);
+		loadSubTemplate($layer . '_below', 'ignore');
 
 }
 
