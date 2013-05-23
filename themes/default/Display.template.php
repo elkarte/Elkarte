@@ -64,13 +64,10 @@ function template_main()
 
 	$ignoredMsgs = array();
 	$removableMessageIDs = array();
-	$alternate = false;
 
 	// Get all the messages...
 	while ($message = $context['get_message']())
 	{
-		$ignoring = false;
-		$alternate = !$alternate;
 		if ($message['can_remove'])
 			$removableMessageIDs[] = $message['id'];
 
@@ -80,6 +77,8 @@ function template_main()
 			$ignoring = true;
 			$ignoredMsgs[] = $message['id'];
 		}
+		else
+			$ignoring = false;
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '

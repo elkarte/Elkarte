@@ -354,7 +354,8 @@ class Topic_Controller
 
 		// Lets "output" all that info.
 		loadTemplate('Printpage');
-		$context['template_layers'] = array('print');
+		template_layers::getInstance()->removeAll();
+		template_layers::getInstance()->add('print');
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
 		$context['poster_name'] = $row['poster_name'];

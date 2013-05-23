@@ -2208,7 +2208,7 @@ class Post_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
-		$context['template_layers'] = array();
+		template_layers::getInstance()->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}
 }
