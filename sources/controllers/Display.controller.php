@@ -662,7 +662,7 @@ class Display_Controller
 			if (isset($_REQUEST['boardseen']))
 			{
 				require_once(SUBSDIR . '/Boards.subs.php');
-				markBoardsRead($board);
+				markBoardsRead($board, false, false);
 			}
 		}
 

@@ -142,7 +142,8 @@ class MessageIndex_Controller
 			else
 				$board_list = array($board);
 
-			markBoardsRead($board_list);
+			// Mark boards as read. Boards alone, no need for topics.
+			markBoardsRead($board_list, false, false);
 
 			// Clear topicseen cache
 			if (!empty($board_info['parent_boards']))

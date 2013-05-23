@@ -107,7 +107,8 @@ class MarkRead_Controller
 		$boards = accessibleBoards();
 
 		if (!empty($boards))
-			markBoardsRead($boards, isset($_REQUEST['unread']));
+			// Mark boards as read
+			markBoardsRead($boards, isset($_REQUEST['unread']), true);
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
@@ -264,7 +265,8 @@ class MarkRead_Controller
 		if (empty($boards))
 			return '';
 
-		markBoardsRead($boards, isset($_REQUEST['unread']));
+		// Mark boards as read.
+		markBoardsRead($boards, isset($_REQUEST['unread']), true);
 
 		foreach ($boards as $b)
 		{

@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  * @param array $boards
  * @param bool $unread = false
  */
-function markBoardsRead($boards, $unread = false)
+function markBoardsRead($boards, $unread = false, $resetTopics = false)
 {
 	global $user_info, $modSettings;
 
@@ -94,56 +94,60 @@ function markBoardsRead($boards, $unread = false)
 	// @todo look at this...
 	// The call to markBoardsRead() in Display() used to be simply
 	// marking log_boards (the previous query only)
-	// I'm setting this as 'disabled'... Remove the comments to get it executed again.
-	// MessageIndex::action_messageindex() does not update log_topics at all (only the above).
+	// I'm adding a bool to control the processing of log_topics. We might want to just disociate it from boards,
+	// and call the log_topics clear-up only from the controller that needs it..
 
-	// Note... (for read/unread rework)
+	// Notes (for read/unread rework)
+	// MessageIndex::action_messageindex() does not update log_topics at all (only the above).
 	// Display controller needed only to update log_boards.
 
-	//$result = $db->query('', '
-	//	SELECT MIN(id_topic)
-	//	FROM {db_prefix}log_topics
-	//	WHERE id_member = {int:current_member}',
-	//	array(
-	//		'current_member' => $user_info['id'],
-	//	)
-	//);
-	//list ($lowest_topic) = $db->fetch_row($result);
-	//$db->free_result($result);
+	if ($resetTopics)
+	{
+		$result = $db->query('', '
+			SELECT MIN(id_topic)
+			FROM {db_prefix}log_topics
+			WHERE id_member = {int:current_member}',
+			array(
+				'current_member' => $user_info['id'],
+			)
+		);
+		list ($lowest_topic) = $db->fetch_row($result);
+		$db->free_result($result);
 
-	//if (empty($lowest_topic))
-	//	return;
+		if (empty($lowest_topic))
+			return;
 
-	//// @todo SLOW This query seems to eat it sometimes.
-	//$result = $db->query('', '
-	//	SELECT lt.id_topic
-	//	FROM {db_prefix}log_topics AS lt
-	//		INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
-	//			AND t.id_board IN ({array_int:board_list}))
-	//	WHERE lt.id_member = {int:current_member}
-	//		AND lt.id_topic >= {int:lowest_topic}
-	//		AND lt.disregarded != 1',
-	//	array(
-	//		'current_member' => $user_info['id'],
-	//		'board_list' => $boards,
-	//		'lowest_topic' => $lowest_topic,
-	//	)
-	//);
-	//$topics = array();
-	//while ($row = $db->fetch_assoc($result))
-	//	$topics[] = $row['id_topic'];
-	//$db->free_result($result);
+		// @todo SLOW This query seems to eat it sometimes.
+		$result = $db->query('', '
+			SELECT lt.id_topic
+			FROM {db_prefix}log_topics AS lt
+				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
+					AND t.id_board IN ({array_int:board_list}))
+			WHERE lt.id_member = {int:current_member}
+				AND lt.id_topic >= {int:lowest_topic}
+				AND lt.disregarded != 1',
+			array(
+				'current_member' => $user_info['id'],
+				'board_list' => $boards,
+				'lowest_topic' => $lowest_topic,
+			)
+		);
+		$topics = array();
+		while ($row = $db->fetch_assoc($result))
+			$topics[] = $row['id_topic'];
+		$db->free_result($result);
 
-	//if (!empty($topics))
-	//	$db->query('', '
-	//		DELETE FROM {db_prefix}log_topics
-	//		WHERE id_member = {int:current_member}
-	//			AND id_topic IN ({array_int:topic_list})',
-	//		array(
-	//			'current_member' => $user_info['id'],
-	//			'topic_list' => $topics,
-	//		)
-	//	);
+		if (!empty($topics))
+			$db->query('', '
+				DELETE FROM {db_prefix}log_topics
+				WHERE id_member = {int:current_member}
+					AND id_topic IN ({array_int:topic_list})',
+				array(
+					'current_member' => $user_info['id'],
+					'topic_list' => $topics,
+				)
+			);
+	}
 }
 
 /**
