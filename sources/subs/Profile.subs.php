@@ -722,7 +722,7 @@ function loadProfileFields($force_reload = false)
 
 				if (trim($value) == \'\')
 					return \'no_name\';
-				elseif ($smcFunc[\'strlen\']($value) > 60)
+				elseif (Util::strlen($value) > 60)
 					return \'name_too_long\';
 				elseif ($cur_profile[\'real_name\'] != $value)
 				{

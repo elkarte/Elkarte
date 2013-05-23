@@ -593,7 +593,6 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
  * Retrieve a list of (visible) membergroups used by the cache.
  *
  * @global type $scripturl
- * @global type $smcFunc
  *
  * @return type
  */

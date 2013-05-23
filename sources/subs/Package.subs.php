@@ -3291,7 +3291,6 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
- * @global type $smcFunc
  */
 function checkPackageDependency()
 {

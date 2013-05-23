@@ -310,7 +310,6 @@ function maillist_delete_filter_parser($id)
  * Creates a select list of boards for the admin
  *  - Sets the first one as a blank for use in a template select element
  *
- * @global type $smcFunc
  * @return type
  */
 function maillist_board_list()
@@ -338,7 +337,6 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @global type $smcFunc
  * @param type $switch
  */
 function enable_maillist_imap_cron($switch)
