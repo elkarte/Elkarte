@@ -964,7 +964,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 	$request = $db->query('', '
 		SELECT t2.id_topic
 		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}topics AS t2 ON (' .
+		INNER JOIN {db_prefix}topics AS t2 ON (' .
 			(empty($includeStickies) ? '
 				t2.id_last_msg {raw:strictly} t.id_last_msg' : '
 				(t2.id_last_msg {raw:strictly} t.id_last_msg AND t2.is_sticky {raw:strictly_equal} t.is_sticky) OR t2.is_sticky {raw:strictly} t.is_sticky')
@@ -1348,6 +1348,43 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 }
 
 /**
+ * This function returns the number of messages in a topic,
+ * posted after $last_msg.
+ *
+ * @param int $id_topic
+ * @param int $last_msg
+ * @param bool $only_approved
+ *
+ * @return int
+ */
+function messagesSince($id_topic, $last_msg, $only_approved)
+{
+	$db = database();
+
+	// Give us something to work with
+	if (empty($id_topic) || empty($last_msg))
+		return false;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg > {int:last_msg}' . ($only_approved ? '
+			AND approved = {int:approved}' : '') . '
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+			'last_msg' => $last_msg,
+			'approved' => 1,
+		)
+	);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $count;
+}
+
+/**
  * Retrieve unapproved posts of the member
  * in a specific topic
  *
@@ -1573,4 +1610,48 @@ function getLoggedTopics($member, $topics)
 	$db->free_result($request);
 
 	return $logged_topics;
+}
+
+/**
+ * Returns a list of topics ids and their subjects
+ *
+ * @param array $topic_ids
+ */
+function topicsList($topic_ids)
+{
+	global $modSettings;
+
+	// you have to want *something* from this function
+	if (empty($topic_ids))
+		return array();
+
+	$db = database();
+
+	$topics = array();
+
+	$result = $db->query('', '
+		SELECT t.id_topic, m.subject
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+		WHERE {query_see_board}
+			AND t.id_topic IN ({array_int:topic_list})' . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : '') . '
+		LIMIT {int:limit}',
+		array(
+			'topic_list' => $topic_ids,
+			'is_approved' => 1,
+			'limit' => count($topic_ids),
+		)
+	);
+	while ($row = $db->fetch_assoc($result))
+	{
+		$topics[$row['id_topic']] = array(
+			'id_topic' => $row['id_topic'],
+			'subject' => censorText($row['subject']),
+		);
+	}
+	$db->free_result($result);
+
+	return $topics;
 }

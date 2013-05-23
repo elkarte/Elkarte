@@ -1000,7 +1000,8 @@ function getEventProperties($event_id)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = c.id_topic)
 			LEFT JOIN {db_prefix}members AS mb ON (mb.id_member = t.id_member_started)
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg  = t.id_first_msg)
-		WHERE c.id_event = {int:id_event}',
+		WHERE c.id_event = {int:id_event}
+		LIMIT 1',
 		array(
 			'id_event' => $event_id,
 		)
@@ -1036,6 +1037,33 @@ function getEventProperties($event_id)
 	$return_value['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
 
 	return $return_value;
+}
+
+function eventInfoForTopic($id_topic)
+{
+	$db = database();
+
+	$events = array();
+
+	// Get event for this topic. If we have one.
+	$request = $db->query('', '
+		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
+		FROM {db_prefix}calendar AS cal
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
+		WHERE cal.id_topic = {int:current_topic}
+		ORDER BY start_date',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		$events[] = $row;
+	}
+	$db->free_result($request);
+
+	return $events;
 }
 
 /**
@@ -1112,7 +1140,7 @@ function removeHolidays($holiday_ids)
 
 /**
  * Updates a calendar holiday
- * 
+ *
  * @param int $holiday
  * @param int $date
  * @param string $title
@@ -1139,7 +1167,7 @@ function editHoliday($holiday, $date, $title)
 
 /**
  * Insert a new holiday
- * 
+ *
  * @param int $date
  * @param type $title
  */
@@ -1165,9 +1193,9 @@ function insert_holiday($date, $title)
 
 /**
  * Get a specific holiday
- * 
+ *
  * @param int $id_holiday
- * @return array 
+ * @return array
  */
 function getHoliday($id_holiday)
 {

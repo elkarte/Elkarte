@@ -83,7 +83,7 @@ class SplitTopics_Controller
 
 		// We deal with topics here.
 		require_once(SUBSDIR . '/Topic.subs.php');
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 

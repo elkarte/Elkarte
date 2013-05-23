@@ -5,12 +5,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
  * @version 1.0 Alpha
  *
  * This file is mainly concerned with minor tasks relating to boards, such as
@@ -21,11 +15,14 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * This class handles a part of the actions to mak boards, topics, or replies, as read/unread.
+ */
 class MarkRead_Controller
 {
 	/**
-	* This is the main function for markasread file.
-	*/
+	 * This is the main function for markasread file.
+	 */
 	public function action_index()
 	{
 		// These checks have been moved here.
@@ -42,8 +39,8 @@ class MarkRead_Controller
 	}
 
 	/**
-	* This function forwards the request to the appropriate function.
-	*/
+	 * This function forwards the request to the appropriate function.
+	 */
 	private function _dispatch()
 	{
 		// sa=all action_markboards()
@@ -63,8 +60,8 @@ class MarkRead_Controller
 	}
 
 	/**
-	* This is the main function for markasread file when using APIs.
-	*/
+	 * This is the main method for markasread controller when using APIs.
+	 */
 	public function action_index_api()
 	{
 		global $context, $txt;
@@ -94,9 +91,9 @@ class MarkRead_Controller
 	}
 
 	/**
-	* action=markasread;sa=all
-	* Marks boards as read (or unread).
-	*/
+	 * Marks boards as read (or unread).
+	 * Accessed by action=markasread;sa=all
+	 */
 	public function action_markboards()
 	{
 		global $modSettings;
@@ -107,7 +104,8 @@ class MarkRead_Controller
 		$boards = accessibleBoards();
 
 		if (!empty($boards))
-			markBoardsRead($boards, isset($_REQUEST['unread']));
+			// Mark boards as read
+			markBoardsRead($boards, isset($_REQUEST['unread']), true);
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
@@ -120,9 +118,9 @@ class MarkRead_Controller
 	}
 
 	/**
-	* action=markasread;sa=unreadreplies
-	* Marks the selected topics as read.
-	*/
+	 * Marks the selected topics as read.
+	 * Accessed by action=markasread;sa=unreadreplies
+	 */
 	public function action_markreplies()
 	{
 		global $user_info, $modSettings;
@@ -148,9 +146,9 @@ class MarkRead_Controller
 	}
 
 	/**
-	* action=markasread;sa=topic
-	* Mark a single topic as unread.
-	*/
+	 * Mark a single topic as unread.
+	 * Accessed by action=markasread;sa=topic
+	 */
 	public function action_marktopic()
 	{
 		global $board, $topic, $user_info;
@@ -158,6 +156,7 @@ class MarkRead_Controller
 		$db = database();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
@@ -174,42 +173,14 @@ class MarkRead_Controller
 				$earlyMsg = 0;
 			// Otherwise, get the latest message before the named one.
 			else
-			{
-				$result = $db->query('', '
-					SELECT MAX(id_msg)
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg >= {int:id_first_msg}
-						AND id_msg < {int:topic_msg_id}',
-					array(
-						'current_topic' => $topic,
-						'topic_msg_id' => $topic_msg_id,
-						'id_first_msg' => $topicinfo['id_first_msg'],
-					)
-				);
-				list ($earlyMsg) = $db->fetch_row($result);
-				$db->free_result($result);
-			}
+				$earlyMsg = previousMessage($topic_msg_id, $topic);
 		}
 		// Marking read from first page?  That's the whole topic.
 		elseif ($_REQUEST['start'] == 0)
 			$earlyMsg = 0;
 		else
 		{
-			$result = $db->query('', '
-				SELECT id_msg
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-				ORDER BY id_msg
-				LIMIT {int:start}, 1',
-				array(
-					'current_topic' => $topic,
-					'start' => (int) $_REQUEST['start'],
-				)
-			);
-			list ($earlyMsg) = $db->fetch_row($result);
-			$db->free_result($result);
-
+			$earlyMsg = messageAt((int) $_REQUEST['start'], $topic);
 			$earlyMsg--;
 		}
 
@@ -220,10 +191,10 @@ class MarkRead_Controller
 	}
 
 	/**
-	* Mark as read: boards, topics, unread replies.
-	* Accessed by action=markasread
-	* Subactions: sa=topic, sa=all, sa=unreadreplies
-	*/
+	 * Mark as read: boards, topics, unread replies.
+	 * Accessed by action=markasread
+	 * Subactions: sa=topic, sa=all, sa=unreadreplies
+	 */
 	public function action_markasread()
 	{
 		global $board, $user_info, $board_info, $modSettings;
@@ -254,17 +225,17 @@ class MarkRead_Controller
 
 		if (isset($_REQUEST['children']) && !empty($boards))
 		{
-			// They want to mark the entire tree starting with the boards specified
-			// The easist thing is to just get all the boards they can see, but since we've specified the top of tree we ignore some of them
+			// Mark all children of the boards we got (selected by the user).
 			addChildBoards($boards);
 		}
 
-		$boards = boardsPosts($boards, $categories);
+		$boards = array_keys(boardsPosts($boards, $categories));
 
 		if (empty($boards))
 			return '';
 
-		markBoardsRead($boards, isset($_REQUEST['unread']));
+		// Mark boards as read.
+		markBoardsRead($boards, isset($_REQUEST['unread']), true);
 
 		foreach ($boards as $b)
 		{
@@ -274,21 +245,14 @@ class MarkRead_Controller
 
 		if (!isset($_REQUEST['unread']))
 		{
-			// Find all the boards this user can see.
-			$result = $db->query('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE b.id_parent IN ({array_int:parent_list})
-					AND {query_see_board}',
-				array(
-					'parent_list' => $boards,
-				)
-			);
-			if ($db->num_rows($result) > 0)
+			// Find all boards with the parents in the board list
+			$boards_to_add = accessibleBoards($boards);
+			if (!empty($boards_to_add))
 			{
+				// we've got some!
 				$logBoardInserts = '';
-				while ($row = $db->fetch_assoc($result))
-					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $row['id_board']);
+				foreach ($boards_to_add as $b)
+					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $b['id_board']);
 					$db->insert('replace',
 					'{db_prefix}log_boards',
 					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
@@ -296,7 +260,6 @@ class MarkRead_Controller
 					array('id_member', 'id_board')
 				);
 			}
-			$db->free_result($result);
 			if (empty($board))
 				return '';
 			else

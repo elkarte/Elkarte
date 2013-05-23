@@ -1796,13 +1796,13 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * Add a CSS file for output later
  *
  * @param string $filename
- * @param array $params
+ * @param array $params = array()
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
  * 	- ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
- * @param string $id
+ * @param string $id = ''
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
@@ -1877,7 +1877,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * need specific parameters on a per file basis, call it multiple times
  *
  * @param array $filenames
- * @param array $params
+ * @param array $params = array()
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
  * 	- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
@@ -1885,7 +1885,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
- * @param string $id
+ * @param string $id = ''
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
@@ -1990,7 +1990,7 @@ function addInlineJavascript($javascript, $defer = false)
  * Load a language file.  Tries the current and default themes as well as the user and global languages.
  *
  * @param string $template_name
- * @param string $lang
+ * @param string $lang = ''
  * @param bool $fatal = true
  * @param bool $force_reload = false
  * @return string The language actually loaded.
@@ -2179,7 +2179,6 @@ function getBoardParents($id_parent)
  * Attempt to reload our known languages.
  *
  * @param bool $use_cache = true
- * @param bool $favor_utf8 = true
  * @return array
  */
 function getLanguages($use_cache = true)

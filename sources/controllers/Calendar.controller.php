@@ -291,7 +291,7 @@ class Calendar_Controller
 				fatal_lang_error('cannot_post_new', 'permission');
 
 			// Load the list of boards and categories in the context.
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,

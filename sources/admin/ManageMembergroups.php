@@ -465,7 +465,7 @@ class ManageMembergroups_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('use_permissions' => true));
 
 		// Include a list of boards per category for easy toggling.
@@ -711,7 +711,7 @@ class ManageMembergroups_Controller
 		$context['boards'] = array();
 		if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('access' => $groups['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.

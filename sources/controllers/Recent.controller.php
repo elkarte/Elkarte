@@ -618,7 +618,9 @@ class Recent_Controller
 			{
 				// Mark the boards as read if there are no unread topics!
 				require_once(SUBSDIR . '/Boards.subs.php');
-				markBoardsRead(empty($boards) ? $board : $boards);
+				// @todo look at this... there are no more unread topics already.
+				// If clearing of log_topics is still needed, perhaps do it separately.
+				markBoardsRead(empty($boards) ? $board : $boards, false, true);
 
 				$context['topics'] = array();
 				if ($context['querystring_board_limits'] == ';start=%1$d')
@@ -704,7 +706,9 @@ class Recent_Controller
 				{
 					// Since there are no unread topics, mark the boards as read!
 					require_once(SUBSDIR . '/Boards.subs.php');
-					markBoardsRead(empty($boards) ? $board : $boards);
+					// @todo look at this... there are no more unread topics already.
+					// If clearing of log_topics is still needed, perhaps do it separately.
+					markBoardsRead(empty($boards) ? $board : $boards, false, true);
 				}
 
 				$context['topics'] = array();
