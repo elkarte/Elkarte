@@ -484,11 +484,11 @@ class MessageIndex_Controller
 		}
 
 		if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
-			$context['template_layers'][] = 'display_child_boards';
+			template_layers::getInstance()->add('display_child_boards');
 
 		// If there are children, but no topics and no ability to post topics...
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
-		$context['template_layers'][] = 'pages_and_buttons';
+		template_layers::getInstance()->add('pages_and_buttons');
 
 		addJavascriptVar('notification_board_notice', $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board'], true);
 
