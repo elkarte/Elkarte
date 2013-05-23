@@ -1626,11 +1626,12 @@ class Post_Controller
 				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
 				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
 
-				modifyEvent($_REQUEST['eventid'], array(
+				$eventOptions = array(
 					'start_date' => strftime('%Y-%m-%d', $start_time),
 					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
 					'title' => $_REQUEST['evtitle'],
-				));
+				);
+				modifyEvent($_REQUEST['eventid'], $eventOptions);
 			}
 		}
 
