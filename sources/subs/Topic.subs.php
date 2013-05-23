@@ -964,7 +964,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 	$request = $db->query('', '
 		SELECT t2.id_topic
 		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}topics AS t2 ON (' .
+		INNER JOIN {db_prefix}topics AS t2 ON (' .
 			(empty($includeStickies) ? '
 				t2.id_last_msg {raw:strictly} t.id_last_msg' : '
 				(t2.id_last_msg {raw:strictly} t.id_last_msg AND t2.is_sticky {raw:strictly_equal} t.is_sticky) OR t2.is_sticky {raw:strictly} t.is_sticky')
