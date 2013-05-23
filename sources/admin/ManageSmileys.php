@@ -1437,7 +1437,7 @@ class ManageSmileys_Controller
 	 */
 	function action_install()
 	{
-		global $modSettings, $scripturl, $context, $txt, $user_info, $smcFunc;
+		global $modSettings, $scripturl, $context, $txt, $user_info;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');

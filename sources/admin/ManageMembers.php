@@ -163,7 +163,7 @@ class ManageMembers_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings, $user_info;
 
 		$db = database();
 

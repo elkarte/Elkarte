@@ -39,7 +39,7 @@ class Post_Controller
 	function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $settings, $smcFunc;
+		global $user_info, $context, $settings;
 		global $options, $language;
 
 		$db = database();
@@ -908,7 +908,7 @@ class Post_Controller
 	function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context;
-		global $user_info, $board_info, $options, $scripturl, $settings, $smcFunc;
+		global $user_info, $board_info, $options, $scripturl, $settings;
 
 		$db = database();
 
@@ -1777,7 +1777,7 @@ class Post_Controller
 	 */
 	function action_quotefast()
 	{
-		global $modSettings, $user_info, $txt, $settings, $context, $smcFunc;
+		global $modSettings, $user_info, $txt, $settings, $context;
 
 		$db = database();
 
@@ -1884,7 +1884,7 @@ class Post_Controller
 	function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
-		global $user_info, $context, $language, $smcFunc;
+		global $user_info, $context, $language;
 
 		$db = database();
 
@@ -2143,7 +2143,7 @@ class Post_Controller
 	 */
 	function action_spellcheck()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		$db = database();
 

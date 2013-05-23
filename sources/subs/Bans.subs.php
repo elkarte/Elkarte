@@ -192,8 +192,6 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	$ban_errors = error_context::context('ban', 1);

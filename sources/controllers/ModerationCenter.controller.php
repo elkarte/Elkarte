@@ -401,7 +401,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modifyWarningTemplate()
 	{
-		global $context, $txt, $user_info, $smcFunc;
+		global $context, $txt, $user_info;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -502,7 +502,7 @@ class ModerationCenter_Controller
 	 */
 	function action_modReport()
 	{
-		global $user_info, $context, $scripturl, $txt, $smcFunc;
+		global $user_info, $context, $scripturl, $txt;
 
 		$db = database();
 
@@ -1276,7 +1276,7 @@ function ModBlockWatchedUsers()
  */
 function ModBlockNotes()
 {
-	global $context, $scripturl, $txt, $user_info, $smcFunc;
+	global $context, $scripturl, $txt, $user_info;
 
 	$db = database();
 

@@ -172,7 +172,7 @@ class Calendar_Controller
 	function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
-		global $modSettings, $topic, $smcFunc;
+		global $modSettings, $topic;
 
 		$db = database();
 
@@ -345,7 +345,7 @@ class Calendar_Controller
 	 */
 	function action_ical()
 	{
-		global $forum_version, $context, $modSettings, $webmaster_email, $mbname, $smcFunc;
+		global $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))

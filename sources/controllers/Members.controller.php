@@ -63,7 +63,7 @@ class Members_Controller
 	 */
 	function action_requestmembers()
 	{
-		global $user_info, $txt, $smcFunc;
+		global $user_info, $txt;
 
 		$db = database();
 
@@ -109,7 +109,7 @@ class Members_Controller
 	 */
 	function action_findmember()
 	{
-		global $context, $scripturl, $user_info, $smcFunc;
+		global $context, $scripturl, $user_info;
 
 		checkSession('get');
 

@@ -309,7 +309,7 @@ class Poll_Controller
 	 */
 	function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board, $scripturl, $smcFunc;
+		global $txt, $user_info, $context, $topic, $board, $scripturl;
 
 		$db = database();
 
@@ -589,7 +589,7 @@ class Poll_Controller
 	function action_editpoll2()
 	{
 		global $txt, $topic, $board, $context;
-		global $modSettings, $user_info, $smcFunc;
+		global $modSettings, $user_info;
 
 		$db = database();
 

@@ -350,8 +350,6 @@ class Sphinxql_Search
 	 */
 	private function _cleanString($string)
 	{
-		global $smcFunc;
-
 		// Decode the entities first
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 

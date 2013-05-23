@@ -174,8 +174,6 @@ function maillist_delete_entry($id)
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Init

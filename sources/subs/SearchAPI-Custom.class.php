@@ -157,7 +157,7 @@ class Custom_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		$subwords = text2words($word, $this->min_word_length, true);
 

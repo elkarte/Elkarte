@@ -609,7 +609,7 @@ class Admin_Controller
 	 */
 	public function action_home()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// we need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -724,7 +724,7 @@ class Admin_Controller
 	 */
 	public function action_credits()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// we need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -840,7 +840,7 @@ class Admin_Controller
 	 */
 	public function action_search()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 

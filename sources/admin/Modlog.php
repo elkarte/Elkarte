@@ -48,7 +48,7 @@ class Modlog_Controller
 	 */
 	public function action_modlog()
 	{
-		global $txt, $context, $scripturl, $smcFunc;
+		global $txt, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Modlog.subs.php');
 		// Are we looking at the moderation log or the administration log.

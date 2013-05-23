@@ -744,7 +744,7 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	if (!isset($_POST['deleteevent']))
 	{
@@ -838,8 +838,6 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Add special chars to the title.
@@ -898,8 +896,6 @@ function insertEvent(&$eventOptions)
  */
 function modifyEvent($event_id, &$eventOptions)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Properly sanitize the title.

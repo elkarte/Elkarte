@@ -431,8 +431,6 @@ function escapestring__recursive($var)
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
-	global $smcFunc;
-
 	if (!is_array($var))
 		return isset(Util::htmlspecialchars) ? Util::htmlspecialchars($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
 
@@ -534,8 +532,6 @@ function stripslashes__recursive($var, $level = 0)
  */
 function htmltrim__recursive($var, $level = 0)
 {
-	global $smcFunc;
-
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
 		return isset($smcFunc) ? Util::htmltrim($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");

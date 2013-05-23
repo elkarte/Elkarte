@@ -48,7 +48,7 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $language, $context, $txt, $smcFunc;
+	global $settings, $language, $context, $txt;
 
 	$db = database();
 
@@ -121,8 +121,6 @@ function list_getLanguages()
  */
 function cleanLangString($string, $to_display = true)
 {
-	global $smcFunc;
-
 	// If going to display we make sure it doesn't have any HTML in it - etc.
 	$new_string = '';
 	if ($to_display)
@@ -327,7 +325,7 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $txt, $scripturl, $smcFunc;
+	global $forum_version, $context, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again

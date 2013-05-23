@@ -1101,8 +1101,6 @@ function getMaxGroupID()
  */
 function addMembergroup($id_group, $groupname, $minposts, $type)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	$db->insert('',
@@ -1252,8 +1250,6 @@ function updateInheritedGroup($id_group, $copy_id)
  */
 function updateMembergroupProperties($properties)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	$db->query('', '

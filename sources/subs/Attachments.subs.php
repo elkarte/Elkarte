@@ -969,8 +969,6 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	if (empty($attachments))
@@ -1064,7 +1062,7 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$db = database();
 

@@ -103,7 +103,7 @@ class ManageSearch_Controller
 	 */
 	function action_searchSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// initialize the form
 		$this->_initSearchSettingsForm();

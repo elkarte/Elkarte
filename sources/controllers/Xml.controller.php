@@ -246,7 +246,7 @@ function action_previews()
  */
 function action_newspreview()
 {
-	global $context, $smcFunc;
+	global $context;
 
 	// Needed for parse bbc
 	require_once(SUBSDIR . '/Post.subs.php');
@@ -391,7 +391,7 @@ function action_sig_preview()
  */
 function action_warning_preview()
 {
-	global $context, $txt, $user_info, $scripturl, $mbname, $smcFunc;
+	global $context, $txt, $user_info, $scripturl, $mbname;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
@@ -458,7 +458,7 @@ function action_warning_preview()
  */
 function action_bounce_preview()
 {
-	global $context, $txt, $scripturl, $mbname, $modSettings, $smcFunc;
+	global $context, $txt, $scripturl, $mbname, $modSettings;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');

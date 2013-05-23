@@ -893,7 +893,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $modSettings, $smcFunc;
+		global $context, $modSettings;
 
 		if (!$this->_show_captcha)
 			return;
@@ -1067,8 +1067,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function prepareContext()
 	{
-		global $smcFunc;
-
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
@@ -1105,7 +1103,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $language, $smcFunc;
+		global $txt, $context, $language;
 
 		// Load any question and answers!
 		$filter = null;
@@ -1199,8 +1197,6 @@ class Control_Verification_Questions implements Control_Verifications
 	*/
 	private function _verifyAnswers()
 	{
-		global $smcFunc;
-
 		// Get the answers and see if they are all right!
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
 		$this->_incorrectQuestions = array();

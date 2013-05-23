@@ -150,7 +150,7 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords, $smcFunc;
+		global $excludedWords;
 
 		$x = Util::strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
 		$y = Util::strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
@@ -171,7 +171,7 @@ class Fulltext_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		$subwords = text2words($word, null, false);
 

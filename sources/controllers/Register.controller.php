@@ -33,7 +33,7 @@ class Register_Controller
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $settings, $modSettings, $user_info;
-		global $language, $scripturl, $cur_profile, $smcFunc;
+		global $language, $scripturl, $cur_profile;
 
 		$db = database();
 
@@ -227,7 +227,7 @@ class Register_Controller
 	function action_register2($verifiedOpenID = false)
 	{
 		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings, $smcFunc;
+		global $user_info, $options, $settings;
 
 		$db = database();
 
@@ -841,7 +841,7 @@ class Register_Controller
 	 */
 	function action_contact()
 	{
-		global $context, $txt, $user_info, $modSettings, $smcFunc;
+		global $context, $txt, $user_info, $modSettings;
 
 		// Already inside, no need to use this, just send a PM
 		// Disabled, you cannot enter.

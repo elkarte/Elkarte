@@ -112,7 +112,7 @@ class Packages_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $settings, $smcFunc;
+		global $txt, $context, $scripturl, $settings;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -939,7 +939,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'code' && !empty($action['filename']))
 				{
 					// This is just here as reference for what is available.
-					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					// Now include the file and be done with it ;).
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
@@ -966,7 +966,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
 				{
 					// These can also be there for database changes.
-					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					// Let the file work its magic ;)
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
@@ -1432,7 +1432,7 @@ class Packages_Controller
 	 */
 	public function action_options()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings;
 
 		if (isset($_POST['save']))
 		{

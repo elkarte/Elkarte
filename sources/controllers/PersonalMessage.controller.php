@@ -655,7 +655,7 @@ class PersonalMessage_Controller
 	function action_sendmessage()
 	{
 		global $txt, $scripturl, $modSettings;
-		global $context, $options, $language, $user_info, $smcFunc;
+		global $context, $options, $language, $user_info;
 
 		$db = database();
 
@@ -943,7 +943,7 @@ class PersonalMessage_Controller
 	function action_sendmessage2()
 	{
 		global $txt, $context;
-		global $user_info, $modSettings, $scripturl, $smcFunc;
+		global $user_info, $modSettings, $scripturl;
 
 		$db = database();
 
@@ -1493,7 +1493,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagelabels()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -1771,7 +1771,7 @@ class PersonalMessage_Controller
 	function action_reportmessage()
 	{
 		global $txt, $context, $scripturl;
-		global $user_info, $language, $modSettings, $smcFunc;
+		global $user_info, $language, $modSettings;
 
 		$db = database();
 
@@ -1920,7 +1920,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagerules()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -2592,7 +2592,7 @@ function preparePMContext($type = 'subject', $reset = false)
 function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global $user_info, $smcFunc;
+	global $user_info;
 
 	$db = database();
 

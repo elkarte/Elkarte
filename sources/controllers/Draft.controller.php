@@ -81,7 +81,7 @@ class Draft_Controller
 	 */
 	function action_showProfileDrafts($draft_type = 0)
 	{
-		global $txt, $scripturl, $modSettings, $context, $smcFunc;
+		global $txt, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID();
 
@@ -192,7 +192,7 @@ class Draft_Controller
 	 */
 	function action_showPMDrafts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
+		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID(false);
 		// @todo: is necessary? Added because the default was -1
@@ -324,7 +324,7 @@ class Draft_Controller
  */
 function saveDraft()
 {
-	global $context, $user_info, $modSettings, $board, $smcFunc;
+	global $context, $user_info, $modSettings, $board;
 
 	// ajax calling
 	if (!isset($context['drafts_save']))
@@ -424,7 +424,7 @@ function saveDraft()
  */
 function savePMDraft($recipientList)
 {
-	global $context, $user_info, $modSettings, $smcFunc;
+	global $context, $user_info, $modSettings;
 
 	// ajax calling
 	if (!isset($context['drafts_pm_save']))

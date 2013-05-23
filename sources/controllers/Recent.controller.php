@@ -266,7 +266,7 @@ class Recent_Controller
 	function action_unread()
 	{
 		global $board, $txt, $scripturl;
-		global $user_info, $context, $settings, $modSettings, $options, $smcFunc;
+		global $user_info, $context, $settings, $modSettings, $options;
 
 		$db = database();
 

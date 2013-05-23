@@ -2318,7 +2318,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, $smcFunc;
+	global $user_info, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -2366,7 +2366,7 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context;
 
 	$db = database();
 

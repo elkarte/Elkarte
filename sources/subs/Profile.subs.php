@@ -157,7 +157,7 @@ function setupProfileContext($fields)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $user_info, $settings, $scripturl, $smcFunc;
+	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
 
 	$db = database();
 
@@ -661,9 +661,7 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\']($value) > 50)
+				if (Util::strlen($value) > 50)
 					return \'personal_text_too_long\';
 
 				return true;
@@ -718,7 +716,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $cur_profile, $smcFunc;
+				global $context, $cur_profile;
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
@@ -871,9 +869,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\'] > 50)
+				if (Util::strlen($value) > 50)
 					return \'user_title_too_long\';
 
 				return true;
@@ -1412,7 +1408,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $user_profile, $user_info, $modSettings, $smcFunc;
+	global $context, $user_profile, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1809,7 +1805,7 @@ function profileReloadUser()
  */
 function profileValidateSignature(&$value)
 {
-	global $modSettings, $txt, $smcFunc;
+	global $modSettings, $txt;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 

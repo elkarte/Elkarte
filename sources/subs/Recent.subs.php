@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $context, $smcFunc;
+	global $scripturl, $txt, $user_info, $modSettings, $context;
 
 	$db = database();
 
