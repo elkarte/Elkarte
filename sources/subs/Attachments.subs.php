@@ -406,7 +406,7 @@ function processAttachments($id_msg = null)
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
 		$_SESSION['temp_attachments']['post'] = array(
-			'msg' => !empty($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+			'msg' => !empty($id_msg) ? $id_msg : 0,
 			'last_msg' => !empty($_REQUEST['last_msg']) ? $_REQUEST['last_msg'] : 0,
 			'topic' => !empty($topic) ? $topic : 0,
 			'board' => !empty($board) ? $board : 0,
