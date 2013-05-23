@@ -1051,7 +1051,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -2219,7 +2219,7 @@ function getLanguages($use_cache = true)
 					continue;
 
 				$languages[$matches[1]] = array(
-					'name' => $smcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
+					'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
 					'selected' => false,
 					'filename' => $matches[1],
 					'location' => $language_dir . '/index.' . $matches[1] . '.php',

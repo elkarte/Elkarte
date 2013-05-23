@@ -81,7 +81,7 @@ function list_getLanguages()
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => $smcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
@@ -355,7 +355,7 @@ function list_getLanguagesList()
 
 			$languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => $smcFunc['ucwords']($file->fetch('name')),
+				'name' => Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
