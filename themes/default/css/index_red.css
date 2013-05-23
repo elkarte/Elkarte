@@ -110,12 +110,12 @@ html, body {
 	border: none;
 	background: none;
 }
-.dropmenu li {
+#main_menu .dropmenu li {
 	border-right: 1px solid #343434;
 	padding-right: 10px;
 }
 
-.dropmenu li a {
+#main_menu .dropmenu li a {
 	background: none;
 	padding: 0 0.3em;
 	margin: 0;
@@ -124,7 +124,7 @@ html, body {
 	color: #fff;
 	border-radius: 2px;
 }
-.dropmenu li a:hover, .dropmenu li:hover a, .dropmenu li a:focus {
+#main_menu .dropmenu li a:hover, .dropmenu li:hover a, .dropmenu li a:focus {
 /* 	background: #597b9f; */
 	border: none;
 	color: #ccc;
@@ -133,7 +133,7 @@ html, body {
 	box-shadow: none;
 }
 /* Level 1 active button. */
-.dropmenu li a.active:hover, .dropmenu li:hover a.active {
+#main_menu .dropmenu li a.active:hover, .dropmenu li:hover a.active {
 /* 	background: orange; */
 	border: none;
 	color: #ccc;
@@ -141,7 +141,7 @@ html, body {
 	text-shadow: none;
 }
 
-.dropmenu li a.active {
+#main_menu .dropmenu li a.active {
 	border: none;
 	box-shadow: none;
 	color: #ccc;
@@ -168,7 +168,7 @@ li.greeting, .news p {
 	color: #efefef;
 }
 #logo {
-	display: none;
+	margin: 0;
 }
 
 .table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost, .table_list td.children {
