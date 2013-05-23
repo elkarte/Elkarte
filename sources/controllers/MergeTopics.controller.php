@@ -396,7 +396,7 @@ class MergeTopics_Controller
 		// Determine the subject of the newly merged topic - was a custom subject specified?
 		if (empty($_POST['subject']) && isset($_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$target_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$target_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 			// Keep checking the length.
 			if ($smcFunc['strlen']($target_subject) > 100)
 				$target_subject = $smcFunc['substr']($target_subject, 0, 100);

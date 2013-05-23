@@ -908,7 +908,7 @@ class Control_Verification_Captcha implements Control_Verifications
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
-			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? $smcFunc['htmlspecialchars']($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
 	}
 
 	public function prepareContext()
@@ -1081,7 +1081,7 @@ class Control_Verification_Questions implements Control_Verifications
 				'q' => parse_bbc($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? $smcFunc['htmlspecialchars']($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
+				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
 			$_SESSION[$this->_options['id'] . '_vv']['q'][] = $row['id_question'];
 		}
@@ -1137,13 +1137,13 @@ class Control_Verification_Questions implements Control_Verifications
 
 			foreach ($_POST['question'] as $id => $question)
 			{
-				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
+				$question = trim(Util::htmlspecialchars($question, ENT_COMPAT));
 				$answers = array();
 				$question_lang = isset($_POST['language'][$id]) && isset($languages[$_POST['language'][$id]]) ? $_POST['language'][$id] : $language;
 				if (!empty($_POST['answer'][$id]))
 					foreach ($_POST['answer'][$id] as $answer)
 					{
-						$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($answer, ENT_COMPAT)));
+						$answer = trim($smcFunc['strtolower'](Util::htmlspecialchars($answer, ENT_COMPAT)));
 						if ($answer != '')
 							$answers[] = $answer;
 					}
@@ -1211,7 +1211,7 @@ class Control_Verification_Questions implements Control_Verifications
 			foreach ($row['answer'] as $answer)
 				$answers[] = $smcFunc['strtolower']($answer);
 
-			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim($smcFunc['htmlspecialchars']($smcFunc['strtolower']($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(Util::htmlspecialchars($smcFunc['strtolower']($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
 				$this->_incorrectQuestions[] = $row['id_question'];
 		}
 

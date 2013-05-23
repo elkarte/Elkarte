@@ -1112,7 +1112,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
 		),
 		array(
-			$id_group, '', $smcFunc['htmlspecialchars']($groupname, ENT_QUOTES), $minposts,
+			$id_group, '', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
 		),
 		array('id_group')
@@ -1270,7 +1270,7 @@ function updateMembergroupProperties($properties)
 			'group_hidden' => $properties['group_hidden'],
 			'group_inherit' => $properties['group_inherit'],
 			'current_group' => $properties['current_group'],
-			'group_name' => $smcFunc['htmlspecialchars']($properties['group_name']),
+			'group_name' => Util::htmlspecialchars($properties['group_name']),
 			'online_color' => $properties['online_color'],
 			'icons' => $properties['icons'],
 			'group_desc' => $properties['group_desc'],

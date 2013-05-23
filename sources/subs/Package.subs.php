@@ -491,7 +491,7 @@ function getPackageInfo($gzfilename)
 	$package = $packageInfo->to_array();
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
-	$package['name'] = $smcFunc['htmlspecialchars']($package['name']);
+	$package['name'] = Util::htmlspecialchars($package['name']);
 
 	if (!isset($package['type']))
 		$package['type'] = 'modification';

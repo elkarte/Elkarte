@@ -1016,7 +1016,7 @@ class PersonalMessage_Controller
 				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
 				{
 					if (strlen(trim($recipient)) > 0)
-						$namedRecipientList[$recipientType][$index] = $smcFunc['htmlspecialchars']($smcFunc['strtolower'](trim($recipient)));
+						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars($smcFunc['strtolower'](trim($recipient)));
 					else
 						unset($namedRecipientList[$recipientType][$index]);
 				}
@@ -1094,7 +1094,7 @@ class PersonalMessage_Controller
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($smcFunc['htmlspecialchars']($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if ($smcFunc['htmltrim'](strip_tags(parse_bbc(Util::htmlspecialchars($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 				$post_errors->addError('no_message');
 		}
 
@@ -1120,8 +1120,8 @@ class PersonalMessage_Controller
 		if (isset($_REQUEST['preview']))
 		{
 			// Set everything up to be displayed.
-			$context['preview_subject'] = $smcFunc['htmlspecialchars']($_REQUEST['subject']);
-			$context['preview_message'] = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
+			$context['preview_subject'] = Util::htmlspecialchars($_REQUEST['subject']);
+			$context['preview_message'] = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.
@@ -1529,7 +1529,7 @@ class PersonalMessage_Controller
 			// Adding a new label?
 			if (isset($_POST['add']))
 			{
-				$_POST['label'] = strtr($smcFunc['htmlspecialchars'](trim($_POST['label'])), array(',' => '&#044;'));
+				$_POST['label'] = strtr(Util::htmlspecialchars(trim($_POST['label'])), array(',' => '&#044;'));
 
 				if ($smcFunc['strlen']($_POST['label']) > 30)
 					$_POST['label'] = $smcFunc['substr']($_POST['label'], 0, 30);
@@ -1561,7 +1561,7 @@ class PersonalMessage_Controller
 						continue;
 					elseif (isset($_POST['label_name'][$id]))
 					{
-						$_POST['label_name'][$id] = trim(strtr($smcFunc['htmlspecialchars']($_POST['label_name'][$id]), array(',' => '&#044;')));
+						$_POST['label_name'][$id] = trim(strtr(Util::htmlspecialchars($_POST['label_name'][$id]), array(',' => '&#044;')));
 
 						if ($smcFunc['strlen']($_POST['label_name'][$id]) > 30)
 							$_POST['label_name'][$id] = $smcFunc['substr']($_POST['label_name'][$id], 0, 30);
@@ -2011,7 +2011,7 @@ class PersonalMessage_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 
 			// Name is easy!
-			$ruleName = $smcFunc['htmlspecialchars'](trim($_POST['rule_name']));
+			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
 			if (empty($ruleName))
 				fatal_lang_error('pm_rule_no_name', false);
 
@@ -2054,7 +2054,7 @@ class PersonalMessage_Controller
 				elseif ($type == 'gid')
 					$criteria[] = array('t' => 'gid', 'v' => (int) $_POST['ruledefgroup'][$ind]);
 				elseif (in_array($type, array('sub', 'msg')) && trim($_POST['ruledef'][$ind]) != '')
-					$criteria[] = array('t' => $type, 'v' => $smcFunc['htmlspecialchars'](trim($_POST['ruledef'][$ind])));
+					$criteria[] = array('t' => $type, 'v' => Util::htmlspecialchars(trim($_POST['ruledef'][$ind])));
 			}
 
 			// Also do the actions!
@@ -2630,8 +2630,8 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	}
 
 	// Set everything up like before....
-	$context['subject'] = isset($_REQUEST['subject']) ? $smcFunc['htmlspecialchars']($_REQUEST['subject']) : '';
-	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), $smcFunc['htmlspecialchars']($_REQUEST['message'])) : '';
+	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
+	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'])) : '';
 	$context['copy_to_outbox'] = !empty($_REQUEST['outbox']);
 	$context['reply'] = !empty($_REQUEST['replied_to']);
 

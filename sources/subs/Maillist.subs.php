@@ -207,9 +207,9 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		$email_filters[$i] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . $smcFunc['htmlspecialchars']($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . $smcFunc['htmlspecialchars']($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => $smcFunc['htmlspecialchars']($row['filter_name']),
+			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+			'filter_name' => Util::htmlspecialchars($row['filter_name']),
 		);
 		$i++;
 	};

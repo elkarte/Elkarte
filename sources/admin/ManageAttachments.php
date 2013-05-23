@@ -1691,11 +1691,11 @@ class ManageAttachments_Controller
 				$errors = array();
 				if (!empty($_SESSION['errors']['dir']))
 					foreach ($_SESSION['errors']['dir'] as $error)
-						$errors['dir'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
+						$errors['dir'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 
 				if (!empty($_SESSION['errors']['base']))
 					foreach ($_SESSION['errors']['base'] as $error)
-						$errors['base'][] = $smcFunc['htmlspecialchars']($error, ENT_QUOTES);
+						$errors['base'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 			}
 			unset($_SESSION['errors']);
 		}

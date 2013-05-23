@@ -69,7 +69,7 @@ class Members_Controller
 
 		checkSession('get');
 
-		$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
+		$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search']) . '*';
 		$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search']));
 		$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
@@ -119,7 +119,7 @@ class Members_Controller
 		$context['sub_template'] = 'find_members';
 
 		if (isset($_REQUEST['search']))
-			$context['last_search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+			$context['last_search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
 		else
 			$_REQUEST['start'] = 0;
 
@@ -140,7 +140,7 @@ class Members_Controller
 		// If the user has done a search, well - search.
 		if (isset($_REQUEST['search']))
 		{
-			$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+			$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
 
 			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 			$total_results = count($context['results']);

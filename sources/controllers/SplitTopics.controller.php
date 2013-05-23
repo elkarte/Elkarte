@@ -145,12 +145,12 @@ class SplitTopics_Controller
 		if (empty($_SESSION['move_to_board']))
 		{
 			$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-			$context['reason'] = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+			$context['reason'] = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
 		}
 		else
 		{
 			$context['move_to_board'] = (int) $_SESSION['move_to_board'];
-			$context['reason'] = trim($smcFunc['htmlspecialchars']($_SESSION['reason']));
+			$context['reason'] = trim(Util::htmlspecialchars($_SESSION['reason']));
 		}
 		$_SESSION['move_to_board'] = $context['move_to_board'];
 		$_SESSION['reason'] = $context['reason'];
@@ -218,7 +218,7 @@ class SplitTopics_Controller
 			fatal_lang_error('splittopic_no_reason', false);
 
 		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-		$reason = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+		$reason = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
 
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		if (!empty($_POST['messageRedirect']) && empty($reason))
@@ -259,7 +259,7 @@ class SplitTopics_Controller
 			$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
 
 		$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
-		$context['reason'] = !empty($_SESSION['reason']) ? trim($smcFunc['htmlspecialchars']($_SESSION['reason'])) : '';
+		$context['reason'] = !empty($_SESSION['reason']) ? trim(Util::htmlspecialchars($_SESSION['reason'])) : '';
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -471,7 +471,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['moved'] . ': ' . strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['moved'] . ': ' . strtr($smcFunc['htmltrim'](Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -658,7 +658,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		fatal_lang_error('cant_insert_topic');
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 	// Check the subject length.
 	if ($smcFunc['strlen']($new_subject) > 100)
 		$new_subject = $smcFunc['substr']($new_subject, 0, 100);

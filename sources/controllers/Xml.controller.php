@@ -252,7 +252,7 @@ function action_newspreview()
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$errors = array();
-	$news = !isset($_POST['news']) ? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
+	$news = !isset($_POST['news']) ? '' : Util::htmlspecialchars($_POST['news'], ENT_QUOTES);
 	if (empty($news))
 		$errors[] = array('value' => 'no_news');
 	else
@@ -403,7 +403,7 @@ function action_warning_preview()
 	if (allowedTo('issue_warning'))
 	{
 		$warning_body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-		$context['preview_subject'] = !empty($_POST['title']) ? trim($smcFunc['htmlspecialchars']($_POST['title'])) : '';
+		$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
 		if (isset($_POST['issuing']))
 		{
 			if (empty($_POST['title']) || empty($_POST['body']))
@@ -470,7 +470,7 @@ function action_bounce_preview()
 	if (allowedTo('approve_emails'))
 	{
 		$body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-		$context['preview_subject'] = !empty($_POST['title']) ? trim($smcFunc['htmlspecialchars']($_POST['title'])) : '';
+		$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
 
 		if (isset($_POST['issuing']))
 		{

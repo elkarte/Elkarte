@@ -365,8 +365,8 @@ function saveDraft()
 	$draft['smileys_enabled'] = isset($_POST['ns']) ? (int) $_POST['ns'] : 0;
 	$draft['locked'] = isset($_POST['lock']) ? (int) $_POST['lock'] : 0;
 	$draft['sticky'] = isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0;
-	$draft['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-	$draft['body'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 	$draft['id_member'] = $user_info['id'];
 
 	// the message and subject still need a bit more work
@@ -468,8 +468,8 @@ function savePMDraft($recipientList)
 	$draft['id_pm_draft'] = $id_pm_draft;
 	$draft['reply_id'] = empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'];
 	$draft['outbox'] = empty($_POST['outbox']) ? 0 : 1;
-	$draft['body'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
-	$draft['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 	$draft['id_member'] = $user_info['id'];
 
 	// message and subject always need a bit more work

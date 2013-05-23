@@ -183,7 +183,7 @@ class MoveTopic_Controller
 		// Rename the topic...
 		if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$custom_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
 			if ($smcFunc['strlen']($custom_subject) > 100)
@@ -242,7 +242,7 @@ class MoveTopic_Controller
 			if ($user_info['language'] != $language)
 				loadLanguage('index', $language);
 
-			$reason = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
+			$reason = Util::htmlspecialchars($_POST['reason'], ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.

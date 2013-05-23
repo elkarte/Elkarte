@@ -100,7 +100,7 @@ function action_plushsearch1()
 	if (isset($_REQUEST['search']))
 		$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
 	if (isset($context['search_params']['search']))
-		$context['search_params']['search'] = $smcFunc['htmlspecialchars']($context['search_params']['search']);
+		$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 	if (isset($context['search_params']['userspec']))
 		$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec']);
 	if (!empty($context['search_params']['searchtype']))
@@ -382,7 +382,7 @@ function action_plushsearch2()
 		$userQuery = '';
 	else
 	{
-		$userString = strtr($smcFunc['htmlspecialchars']($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+		$userString = strtr(Util::htmlspecialchars($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 		$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 		preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -596,7 +596,7 @@ function action_plushsearch2()
 
 	// Remove the phrase parts and extract the words.
 	$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $search_params['search']);
-	$wordArray = explode(' ', $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
+	$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 	// A minus sign in front of a word excludes the word.... so...
 	$excludedWords = array();
@@ -762,20 +762,20 @@ function action_plushsearch2()
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
 				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . $smcFunc['htmlspecialchars']($word) . '&quot;';
+				$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
 				continue;
 			}
 			// For some strange reason spell check can crash PHP on decimals.
 			elseif (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $smcFunc['htmlspecialchars']($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 				continue;
 			}
 			elseif (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $smcFunc['htmlspecialchars']($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 				continue;
 			}
 
@@ -795,13 +795,13 @@ function action_plushsearch2()
 			{
 				$suggestions = array_values($suggestions);
 				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = '<em><strong>' . $smcFunc['htmlspecialchars']($suggestions[0]) . '</strong></em>';
+				$did_you_mean['display'][] = '<em><strong>' . Util::htmlspecialchars($suggestions[0]) . '</strong></em>';
 				$found_misspelling = true;
 			}
 			else
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $smcFunc['htmlspecialchars']($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 			}
 		}
 
@@ -814,12 +814,12 @@ function action_plushsearch2()
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
 					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . $smcFunc['htmlspecialchars']($word) . '&quot;';
+					$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
 				}
 				else
 				{
 					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . $smcFunc['htmlspecialchars']($word);
+					$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
 				}
 			}
 
@@ -842,9 +842,9 @@ function action_plushsearch2()
 	// Let the user adjust the search query, should they wish?
 	$context['search_params'] = $search_params;
 	if (isset($context['search_params']['search']))
-		$context['search_params']['search'] = $smcFunc['htmlspecialchars']($context['search_params']['search']);
+		$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 	if (isset($context['search_params']['userspec']))
-		$context['search_params']['userspec'] = $smcFunc['htmlspecialchars']($context['search_params']['userspec']);
+		$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
 
 	// Do we have captcha enabled?
 	if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $search_params['search']))
@@ -1942,7 +1942,7 @@ function MessageSearch2()
 		$userQuery = '';
 	else
 	{
-		$userString = strtr($smcFunc['htmlspecialchars']($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+		$userString = strtr(Util::htmlspecialchars($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 		$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 		preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -2065,7 +2065,7 @@ function MessageSearch2()
 
 	// Remove the phrase parts and extract the words.
 	$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $search_params['search']);
-	$wordArray = explode(' ', $smcFunc['htmlspecialchars'](un_htmlspecialchars($wordArray), ENT_QUOTES));
+	$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 	// A minus sign in front of a word excludes the word.... so...
 	$excludedWords = array();
@@ -2114,7 +2114,7 @@ function MessageSearch2()
 		else
 		{
 			// Sort out entities first.
-			$searchArray[$index] = $smcFunc['htmlspecialchars']($searchArray[$index]);
+			$searchArray[$index] = Util::htmlspecialchars($searchArray[$index]);
 		}
 	}
 	$searchArray = array_slice(array_unique($searchArray), 0, 10);
@@ -2134,9 +2134,9 @@ function MessageSearch2()
 	// Sort out the search query so the user can edit it - if they want.
 	$context['search_params'] = $search_params;
 	if (isset($context['search_params']['search']))
-		$context['search_params']['search'] = $smcFunc['htmlspecialchars']($context['search_params']['search']);
+		$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 	if (isset($context['search_params']['userspec']))
-		$context['search_params']['userspec'] = $smcFunc['htmlspecialchars']($context['search_params']['userspec']);
+		$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
 
 	// Now we have all the parameters, combine them together for pagination and the like...
 	$context['params'] = array();
@@ -2343,7 +2343,7 @@ function MessageSearch2()
 				// Fix the international characters in the keyword too.
 				$query = un_htmlspecialchars($query);
 				$query = trim($query, "\*+");
-				$query = strtr($smcFunc['htmlspecialchars']($query), array('\\\'' => '\''));
+				$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 				$body_highlighted = preg_replace('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/ieu', "'\$2' == '\$1' ? stripslashes('\$1') : '<strong class=\"highlight\">\$1</strong>'", $row['body']);
 				$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
@@ -2617,7 +2617,7 @@ function prepareSearchContext($reset = false)
 		// Fix the international characters in the keyword too.
 		$query = un_htmlspecialchars($query);
 		$query = trim($query, "\*+");
-		$query = strtr($smcFunc['htmlspecialchars']($query), array('\\\'' => '\''));
+		$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 		$body_highlighted = preg_replace('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/ieu', "'\$2' == '\$1' ? stripslashes('\$1') : '<strong class=\"highlight\">\$1</strong>'", $body_highlighted);
 		$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);

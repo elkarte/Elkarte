@@ -370,7 +370,7 @@ class Memberlist_Controller
 				'regular_id_group' => 0,
 				'is_activated' => 1,
 				'blank_string' => '',
-				'search' => '%' . strtr($smcFunc['htmlspecialchars']($_POST['search'], ENT_QUOTES), array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
+				'search' => '%' . strtr(Util::htmlspecialchars($_POST['search'], ENT_QUOTES), array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
 				'sort' => $context['columns'][$_REQUEST['sort']]['sort'][$context['sort_direction']],
 			);
 

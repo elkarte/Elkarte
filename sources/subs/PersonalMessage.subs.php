@@ -448,9 +448,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$user_info['name'] = $from['name'];
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = $smcFunc['htmlspecialchars']($message, ENT_QUOTES);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr($smcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 	if ($smcFunc['strlen']($htmlsubject) > 100)
 		$htmlsubject = $smcFunc['substr']($htmlsubject, 0, 100);
 

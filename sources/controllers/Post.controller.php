@@ -373,8 +373,8 @@ class Post_Controller
 			$context['can_announce'] &= $context['becomes_approved'];
 
 			// Set up the inputs for the form.
-			$form_subject = strtr($smcFunc['htmlspecialchars']($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
+			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
 
 			// Make sure the subject isn't too long - taking into account special characters.
 			if ($smcFunc['strlen']($form_subject) > 100)
@@ -382,7 +382,7 @@ class Post_Controller
 
 			if (isset($_REQUEST['poll']))
 			{
-				$context['poll']['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
+				$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
 				$context['choices'] = array();
 				$choice_id = 0;
@@ -1255,16 +1255,16 @@ class Post_Controller
 		}
 
 		// Check the subject and message.
-		if (!isset($_POST['subject']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) === '')
+		if (!isset($_POST['subject']) || $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['subject'])) === '')
 			$post_errors->addError('no_subject', 0);
-		if (!isset($_POST['message']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message']), ENT_QUOTES) === '')
+		if (!isset($_POST['message']) || $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
 			$post_errors->addError('no_message');
 		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -1358,7 +1358,7 @@ class Post_Controller
 		@set_time_limit(300);
 
 		// Add special html entities to the subject, name, and email.
-		$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 		$_POST['guestname'] = htmlspecialchars($_POST['guestname']);
 		$_POST['email'] = htmlspecialchars($_POST['email']);
 
@@ -1856,7 +1856,7 @@ class Post_Controller
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
-			$context['quote']['mozilla'] = strtr($smcFunc['htmlspecialchars']($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
@@ -1948,9 +1948,9 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 
-		if (isset($_POST['subject']) && $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) !== '')
+		if (isset($_POST['subject']) && $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
-			$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Maximum number of characters.
 			if ($smcFunc['strlen']($_POST['subject']) > 100)
@@ -1964,7 +1964,7 @@ class Post_Controller
 
 		if (isset($_POST['message']))
 		{
-			if ($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message'])) === '')
+			if ($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['message'])) === '')
 			{
 				$post_errors->addError('no_message');
 				unset($_POST['message']);
@@ -1976,7 +1976,7 @@ class Post_Controller
 			}
 			else
 			{
-				$_POST['message'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 
 				preparsecode($_POST['message']);
 

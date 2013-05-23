@@ -389,7 +389,7 @@ class Emailuser_Controller
 		// Make sure we have a comment and it's clean.
 		if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
 
 		if ($smcFunc['strlen']($poster_comment) > 254)
 			$report_errors->addError('post_too_long');

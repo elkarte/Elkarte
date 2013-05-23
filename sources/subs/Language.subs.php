@@ -216,7 +216,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Unhtml then rehtml the whole thing!
-		$new_string = $smcFunc['htmlspecialchars'](un_htmlspecialchars($new_string));
+		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{

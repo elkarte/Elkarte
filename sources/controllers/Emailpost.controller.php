@@ -432,7 +432,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// First on the agenda the subject
 	$subject = pbe_clean_email_subject($email_message->subject);
-	$subject = strtr($smcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	$subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Not to long not to short
 	if ($smcFunc['strlen']($subject) > 100)
@@ -598,7 +598,7 @@ function pbe_load_text($html, $email_message, $pbe)
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		$text = $smcFunc['htmlspecialchars']($text, ENT_QUOTES);
+		$text = Util::htmlspecialchars($text, ENT_QUOTES);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}

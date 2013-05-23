@@ -1021,8 +1021,8 @@ class ManageFeatures_Controller
 			if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
 				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
 
-			$_POST['field_name'] = $smcFunc['htmlspecialchars']($_POST['field_name']);
-			$_POST['field_desc'] = $smcFunc['htmlspecialchars']($_POST['field_desc']);
+			$_POST['field_name'] = Util::htmlspecialchars($_POST['field_name']);
+			$_POST['field_desc'] = Util::htmlspecialchars($_POST['field_desc']);
 
 			// Checkboxes...
 			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
@@ -1052,7 +1052,7 @@ class ManageFeatures_Controller
 				foreach ($_POST['select_option'] as $k => $v)
 				{
 					// Clean, clean, clean...
-					$v = $smcFunc['htmlspecialchars']($v);
+					$v = Util::htmlspecialchars($v);
 					$v = strtr($v, array(',' => ''));
 
 					// Nada, zip, etc...

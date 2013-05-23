@@ -434,7 +434,7 @@ function htmlspecialchars__recursive($var, $level = 0)
 	global $smcFunc;
 
 	if (!is_array($var))
-		return isset($smcFunc['htmlspecialchars']) ? $smcFunc['htmlspecialchars']($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
+		return isset(Util::htmlspecialchars) ? Util::htmlspecialchars($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)

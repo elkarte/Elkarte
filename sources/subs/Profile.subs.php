@@ -199,7 +199,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// If this was submitted already then make the value the posted version.
 		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
 		{
-			$value = $smcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
+			$value = Util::htmlspecialchars($_POST['customfield'][$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
