@@ -112,7 +112,7 @@ class Packages_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $settings, $smcFunc;
+		global $txt, $context, $scripturl, $settings;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
@@ -343,7 +343,7 @@ class Packages_Controller
 					$context['has_failure'] = true;
 					$context['actions'][] = array(
 						'type' => $txt['execute_modification'],
-						'action' => $smcFunc['htmlspecialchars'](strtr($action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.'))),
 						'description' => $txt['package_action_error'],
 						'failed' => true,
 					);
@@ -393,7 +393,7 @@ class Packages_Controller
 
 								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename] = array(
 									'type' => $txt['execute_modification'],
-									'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
 									'failed' => $failed,
 								);
@@ -402,7 +402,7 @@ class Packages_Controller
 							{
 								$context['actions'][$actual_filename] = array(
 									'type' => $txt['execute_modification'],
-									'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
 									'failed' => $failed,
 								);
@@ -417,7 +417,7 @@ class Packages_Controller
 						{
 							$context['actions'][$actual_filename] = array(
 								'type' => $txt['execute_modification'],
-								'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 								'description' => $txt['package_action_skipping']
 							);
 						}
@@ -426,7 +426,7 @@ class Packages_Controller
 							$context['has_failure'] = true;
 							$context['actions'][$actual_filename] = array(
 								'type' => $txt['execute_modification'],
-								'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 								'description' => $txt['package_action_missing'],
 								'failed' => true,
 							);
@@ -434,7 +434,7 @@ class Packages_Controller
 						elseif ($mod_action['type'] == 'error')
 							$context['actions'][$actual_filename] = array(
 								'type' => $txt['execute_modification'],
-								'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 								'description' => $txt['package_action_error'],
 								'failed' => true,
 							);
@@ -457,7 +457,7 @@ class Packages_Controller
 							if (empty($mod_action['is_custom']))
 								$context['actions'][$actual_filename]['operations'][] = array(
 									'type' => $txt['execute_modification'],
-									'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
 									'position' => $mod_action['position'],
 									'operation_key' => $operation_key,
@@ -471,7 +471,7 @@ class Packages_Controller
 							if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
 								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename]['operations'][] = array(
 									'type' => $txt['execute_modification'],
-									'action' => $smcFunc['htmlspecialchars'](strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
 									'position' => $mod_action['position'],
 									'operation_key' => $operation_key,
@@ -488,21 +488,21 @@ class Packages_Controller
 			{
 				$thisAction = array(
 					'type' => $txt['execute_code'],
-					'action' => $smcFunc['htmlspecialchars']($action['filename']),
+					'action' => Util::htmlspecialchars($action['filename']),
 				);
 			}
 			elseif ($action['type'] == 'database')
 			{
 				$thisAction = array(
 					'type' => $txt['execute_database_changes'],
-					'action' => $smcFunc['htmlspecialchars']($action['filename']),
+					'action' => Util::htmlspecialchars($action['filename']),
 				);
 			}
 			elseif (in_array($action['type'], array('create-dir', 'create-file')))
 			{
 				$thisAction = array(
 					'type' => $txt['package_create'] . ' ' . ($action['type'] == 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 			}
 			elseif ($action['type'] == 'hook')
@@ -514,14 +514,14 @@ class Packages_Controller
 
 				$thisAction = array(
 					'type' => $action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-					'action' => sprintf($txt['execute_hook_action'], $smcFunc['htmlspecialchars']($action['hook'])),
+					'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($action['hook'])),
 				);
 			}
 			elseif ($action['type'] == 'credits')
 			{
 				$thisAction = array(
 					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'], $smcFunc['htmlspecialchars']($action['title'])),
+					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
 				);
 			}
 			elseif ($action['type'] == 'requires')
@@ -554,7 +554,7 @@ class Packages_Controller
 				// Do this one...
 				$thisAction = array(
 					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
 				// Could this be theme related?
@@ -581,13 +581,13 @@ class Packages_Controller
 			elseif (in_array($action['type'], array('move-dir', 'move-file')))
 				$thisAction = array(
 					'type' => $txt['package_move'] . ' ' . ($action['type'] == 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['source'], array(BOARDDIR => '.'))) . ' => ' . $smcFunc['htmlspecialchars'](strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 			elseif (in_array($action['type'], array('remove-dir', 'remove-file')))
 			{
 				$thisAction = array(
 					'type' => $txt['package_delete'] . ' ' . ($action['type'] == 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['filename'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.')))
 				);
 
 				// Could this be theme related?
@@ -939,7 +939,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'code' && !empty($action['filename']))
 				{
 					// This is just here as reference for what is available.
-					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					// Now include the file and be done with it ;).
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
@@ -966,7 +966,7 @@ class Packages_Controller
 				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
 				{
 					// These can also be there for database changes.
-					global $txt, $modSettings, $context, $settings, $forum_version, $smcFunc;
+					global $txt, $modSettings, $context, $settings, $forum_version;
 
 					// Let the file work its magic ;)
 					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
@@ -1090,7 +1090,7 @@ class Packages_Controller
 			deltree(BOARDDIR . '/packages/temp');
 
 		// Log what we just did.
-		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
+		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		clean_cache();
@@ -1432,16 +1432,16 @@ class Packages_Controller
 	 */
 	public function action_options()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings;
 
 		if (isset($_POST['save']))
 		{
 			checkSession('post');
 
 			updateSettings(array(
-				'package_server' => trim($smcFunc['htmlspecialchars']($_POST['pack_server'])),
-				'package_port' => trim($smcFunc['htmlspecialchars']($_POST['pack_port'])),
-				'package_username' => trim($smcFunc['htmlspecialchars']($_POST['pack_user'])),
+				'package_server' => trim(Util::htmlspecialchars($_POST['pack_server'])),
+				'package_port' => trim(Util::htmlspecialchars($_POST['pack_port'])),
+				'package_username' => trim(Util::htmlspecialchars($_POST['pack_user'])),
 				'package_make_backups' => !empty($_POST['package_make_backups']),
 				'package_make_full_backups' => !empty($_POST['package_make_full_backups'])
 			));

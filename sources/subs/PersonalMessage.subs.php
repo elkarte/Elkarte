@@ -418,7 +418,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
-	global $modSettings, $webmaster_email, $smcFunc;
+	global $modSettings, $webmaster_email;
 
 	$db = database();
 
@@ -448,11 +448,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$user_info['name'] = $from['name'];
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = $smcFunc['htmlspecialchars']($message, ENT_QUOTES);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr($smcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if ($smcFunc['strlen']($htmlsubject) > 100)
-		$htmlsubject = $smcFunc['substr']($htmlsubject, 0, 100);
+	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if (Util::strlen($htmlsubject) > 100)
+		$htmlsubject = Util::substr($htmlsubject, 0, 100);
 
 	// Make sure is an array
 	if (!is_array($recipients))
@@ -469,7 +469,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = $smcFunc['strtolower'](trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -486,8 +486,8 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
-			if (isset($usernames[$smcFunc['strtolower']($row['member_name'])]))
-				$usernames[$smcFunc['strtolower']($row['member_name'])] = $row['id_member'];
+			if (isset($usernames[Util::strtolower($row['member_name'])]))
+				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
 		$db->free_result($request);
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.

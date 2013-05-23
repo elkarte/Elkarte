@@ -39,7 +39,7 @@ class Post_Controller
 	function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $settings, $smcFunc;
+		global $user_info, $context, $settings;
 		global $options, $language;
 
 		$db = database();
@@ -290,7 +290,6 @@ class Post_Controller
 					fatal_lang_error('cannot_post_new', 'user');
 
 				// Load a list of boards for this event in the context.
-				require_once(SUBSDIR . '/Boards.subs.php');
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
@@ -373,16 +372,16 @@ class Post_Controller
 			$context['can_announce'] &= $context['becomes_approved'];
 
 			// Set up the inputs for the form.
-			$form_subject = strtr($smcFunc['htmlspecialchars']($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
+			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
 
 			// Make sure the subject isn't too long - taking into account special characters.
-			if ($smcFunc['strlen']($form_subject) > 100)
-				$form_subject = $smcFunc['substr']($form_subject, 0, 100);
+			if (Util::strlen($form_subject) > 100)
+				$form_subject = Util::substr($form_subject, 0, 100);
 
 			if (isset($_REQUEST['poll']))
 			{
-				$context['poll']['question'] = isset($_REQUEST['question']) ? $smcFunc['htmlspecialchars'](trim($_REQUEST['question'])) : '';
+				$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
 				$context['choices'] = array();
 				$choice_id = 0;
@@ -461,7 +460,7 @@ class Post_Controller
 
 				if ($context['preview_message'] === '')
 					$post_errors->addError('no_message');
-				elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
+				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($form_message) > $modSettings['max_messageLength'])
 					$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 				// Protect any CDATA blocks.
@@ -908,7 +907,7 @@ class Post_Controller
 	function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context;
-		global $user_info, $board_info, $options, $scripturl, $settings, $smcFunc;
+		global $user_info, $board_info, $options, $scripturl, $settings;
 
 		$db = database();
 
@@ -955,6 +954,7 @@ class Post_Controller
 					$post_errors->addError($verification_error);
 		}
 
+		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
 
@@ -1000,7 +1000,10 @@ class Post_Controller
 		if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			processAttachments();
+			if (isset($_REQUEST['msg']))
+				processAttachments((int)$_REQUEST['msg']);
+			else
+				processAttachments();
 		}
 
 		// If this isn't a new topic load the topic info that we need.
@@ -1228,7 +1231,7 @@ class Post_Controller
 
 			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
 				$post_errors->addError('no_name');
-			if ($smcFunc['strlen']($_POST['guestname']) > 25)
+			if (Util::strlen($_POST['guestname']) > 25)
 				$post_errors->addError('long_name');
 
 			if (empty($modSettings['guest_post_no_email']))
@@ -1255,16 +1258,16 @@ class Post_Controller
 		}
 
 		// Check the subject and message.
-		if (!isset($_POST['subject']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) === '')
+		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
 			$post_errors->addError('no_subject', 0);
-		if (!isset($_POST['message']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message']), ENT_QUOTES) === '')
+		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
 			$post_errors->addError('no_message');
-		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -1272,11 +1275,11 @@ class Post_Controller
 			preparsecode($_POST['message']);
 
 			// Let's see if there's still some content left without the tags.
-			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 				$post_errors->addError('no_message');
 		}
 
-		if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
+		if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
 			$post_errors->addError('no_event');
 
 		// Validate the poll...
@@ -1358,13 +1361,13 @@ class Post_Controller
 		@set_time_limit(300);
 
 		// Add special html entities to the subject, name, and email.
-		$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 		$_POST['guestname'] = htmlspecialchars($_POST['guestname']);
 		$_POST['email'] = htmlspecialchars($_POST['email']);
 
 		// At this point, we want to make sure the subject isn't too long.
-		if ($smcFunc['strlen']($_POST['subject']) > 100)
-			$_POST['subject'] = $smcFunc['substr']($_POST['subject'], 0, 100);
+		if (Util::strlen($_POST['subject']) > 100)
+			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
@@ -1406,7 +1409,7 @@ class Post_Controller
 
 			// Clean up the question and answers.
 			$_POST['question'] = htmlspecialchars($_POST['question']);
-			$_POST['question'] = $smcFunc['truncate']($_POST['question'], 255);
+			$_POST['question'] = Util::truncate($_POST['question'], 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
 
@@ -1635,8 +1638,8 @@ class Post_Controller
 			}
 		}
 
-		// Marking read should be done even for editing messages....
-		// Mark all the parents read.  (since you just posted and they will be unread.)
+		// Marking boards as read.
+		// (You just posted and they will be unread.)
 		if (!$user_info['is_guest'])
 		{
 			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
@@ -1646,41 +1649,14 @@ class Post_Controller
 				$board_list[] = $board;
 
 			if (!empty($board_list))
-			{
-				$db->query('', '
-					UPDATE {db_prefix}log_boards
-					SET id_msg = {int:id_msg}
-					WHERE id_member = {int:current_member}
-						AND id_board IN ({array_int:board_list})',
-					array(
-						'current_member' => $user_info['id'],
-						'board_list' => $board_list,
-						'id_msg' => $modSettings['maxMsgID'],
-					)
-				);
-			}
+				markBoardsRead($board_list, false, false);
 		}
 
-		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
+		// Turn notification on or off.
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
-		{
-			$db->insert('ignore',
-				'{db_prefix}log_notify',
-				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
-				array($user_info['id'], $topic, 0),
-				array('id_member', 'id_topic', 'id_board')
-			);
-		}
+			setTopicNotification($user_info['id'], $topic, true);
 		elseif (!$newTopic)
-			$db->query('', '
-				DELETE FROM {db_prefix}log_notify
-				WHERE id_member = {int:current_member}
-					AND id_topic = {int:current_topic}',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
+			setTopicNotification($user_info, $topic, false);
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
@@ -1777,7 +1753,7 @@ class Post_Controller
 	 */
 	function action_quotefast()
 	{
-		global $modSettings, $user_info, $txt, $settings, $context, $smcFunc;
+		global $modSettings, $user_info, $txt, $settings, $context;
 
 		$db = database();
 
@@ -1856,7 +1832,7 @@ class Post_Controller
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
-			$context['quote']['mozilla'] = strtr($smcFunc['htmlspecialchars']($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
@@ -1884,7 +1860,7 @@ class Post_Controller
 	function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
-		global $user_info, $context, $language, $smcFunc;
+		global $user_info, $context, $language;
 
 		$db = database();
 
@@ -1948,13 +1924,13 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 
-		if (isset($_POST['subject']) && $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['subject'])) !== '')
+		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
-			$_POST['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Maximum number of characters.
-			if ($smcFunc['strlen']($_POST['subject']) > 100)
-				$_POST['subject'] = $smcFunc['substr']($_POST['subject'], 0, 100);
+			if (Util::strlen($_POST['subject']) > 100)
+				$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 		}
 		elseif (isset($_POST['subject']))
 		{
@@ -1964,23 +1940,23 @@ class Post_Controller
 
 		if (isset($_POST['message']))
 		{
-			if ($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['message'])) === '')
+			if (Util::htmltrim(Util::htmlspecialchars($_POST['message'])) === '')
 			{
 				$post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
-			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
+			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			{
 				$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 				unset($_POST['message']);
 			}
 			else
 			{
-				$_POST['message'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 
 				preparsecode($_POST['message']);
 
-				if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
+				if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
 				{
 					$post_errors->addError('no_message');
 					unset($_POST['message']);
@@ -2143,7 +2119,7 @@ class Post_Controller
 	 */
 	function action_spellcheck()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		$db = database();
 
@@ -2189,7 +2165,7 @@ class Post_Controller
 			$check_word = explode('|', $alphas[$i]);
 
 			// If the word is a known word, or spelled right...
-			if (in_array($smcFunc['strtolower']($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
+			if (in_array(Util::strtolower($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
 				continue;
 
 			// Find the word, and move up the "last occurance" to here.

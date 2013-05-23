@@ -623,7 +623,7 @@ class ManageLanguages_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language, $smcFunc;
+		global $settings, $context, $txt, $modSettings, $language;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
@@ -778,7 +778,7 @@ class ManageLanguages_Controller
 		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
-			'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 			'character_set' => 'UTF-8',
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],

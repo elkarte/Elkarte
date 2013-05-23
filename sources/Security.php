@@ -673,7 +673,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 
 		$parsed_url = parse_url($boardurl);
 
-		// Are global cookies on?  If so, let's check them ;).
+		// Are global cookies on? If so, let's check them ;).
 		if (!empty($modSettings['globalCookies']))
 		{
 			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $parsed_url['host'], $parts) == 1)

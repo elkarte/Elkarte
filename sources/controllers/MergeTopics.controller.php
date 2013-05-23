@@ -196,7 +196,7 @@ class MergeTopics_Controller
 	function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
-		global $language, $modSettings, $smcFunc;
+		global $language, $modSettings;
 
 		$db = database();
 
@@ -396,10 +396,10 @@ class MergeTopics_Controller
 		// Determine the subject of the newly merged topic - was a custom subject specified?
 		if (empty($_POST['subject']) && isset($_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$target_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 			// Keep checking the length.
-			if ($smcFunc['strlen']($target_subject) > 100)
-				$target_subject = $smcFunc['substr']($target_subject, 0, 100);
+			if (Util::strlen($target_subject) > 100)
+				$target_subject = Util::substr($target_subject, 0, 100);
 
 			// Nothing left - odd but pick the first topics subject.
 			if ($target_subject == '')

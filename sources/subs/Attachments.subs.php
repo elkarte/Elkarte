@@ -324,11 +324,14 @@ function attachments_init_dir (&$tree, &$count)
 }
 
 /**
- * Handles the actual saving of attachments to a directory
- * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder
- * Validates the save location actually exists
+ * Handles the actual saving of attachments to a directory.
+ * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
+ * Validates the save location actually exists.
+ *
+ * @param $id_msg = null id of the message with attachments, if any. If null, this is an upload in progress for a new post.
+ *
  */
-function processAttachments()
+function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info;
 
@@ -355,21 +358,8 @@ function processAttachments()
 	if (!isset($initial_error) && !isset($context['attachments']))
 	{
 		// If this isn't a new post, check the current attachments.
-		if (isset($_REQUEST['msg']))
-		{
-			$request = $db->query('', '
-				SELECT COUNT(*), SUM(size)
-				FROM {db_prefix}attachments
-				WHERE id_msg = {int:id_msg}
-					AND attachment_type = {int:attachment_type}',
-				array(
-					'id_msg' => (int) $_REQUEST['msg'],
-					'attachment_type' => 0,
-				)
-			);
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $db->fetch_row($request);
-			$db->free_result($request);
-		}
+		if (!empty($id_msg))
+			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
 		else
 			$context['attachments'] = array(
 				'quantity' => 0,
@@ -416,7 +406,7 @@ function processAttachments()
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
 		$_SESSION['temp_attachments']['post'] = array(
-			'msg' => !empty($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+			'msg' => !empty($id_msg) ? $id_msg : 0,
 			'last_msg' => !empty($_REQUEST['last_msg']) ? $_REQUEST['last_msg'] : 0,
 			'topic' => !empty($topic) ? $topic : 0,
 			'board' => !empty($board) ? $board : 0,
@@ -969,8 +959,6 @@ function increaseDownloadCounter($id_attach)
  */
 function approveAttachments($attachments)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	if (empty($attachments))
@@ -1032,7 +1020,7 @@ function approveAttachments($attachments)
 			'approve_attach',
 			array(
 				'message' => $row['id_msg'],
-				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
+				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
 			)
 		);
 	$db->free_result($request);
@@ -1064,7 +1052,7 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$db = database();
 
@@ -1191,7 +1179,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 				'remove_attach',
 				array(
 					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($row['filename'])),
+					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
 				)
 			);
 		$db->free_result($request);
@@ -2402,7 +2390,7 @@ function setRemovalNotice($messages, $notice)
 
 /**
  * Update an attachment's thumbnail
- * 
+ *
  * @param string $filename
  * @param int $id_attach
  * @param int $id_msg
@@ -2477,4 +2465,48 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	}
 
 	return $attachment;
+}
+
+/**
+ * Compute and return the total size of attachments to a single message.
+ *
+ * @param int $id_msg
+ * @param bool $include_count = true if true, it also returns the attachments count
+ *
+ * @return array
+ */
+function attachmentsSizeForMessage($id_msg, $include_count = true)
+{
+	$db = database();
+
+	if ($include_count)
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*), SUM(size)
+			FROM {db_prefix}attachments
+			WHERE id_msg = {int:id_msg}
+				AND attachment_type = {int:attachment_type}',
+			array(
+				'id_msg' => $id_msg,
+				'attachment_type' => 0,
+			)
+		);
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}attachments
+			WHERE id_msg = {int:id_msg}
+				AND attachment_type = {int:attachment_type}',
+			array(
+				'id_msg' => $id_msg,
+				'attachment_type' => 0,
+			)
+		);
+	}
+	$size = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $size;
 }

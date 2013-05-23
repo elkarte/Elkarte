@@ -103,7 +103,7 @@ class ManageSearch_Controller
 	 */
 	function action_searchSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings, $smcFunc;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// initialize the form
 		$this->_initSearchSettingsForm();
@@ -149,9 +149,9 @@ class ManageSearch_Controller
 				if (!empty($_POST['engine_url'][$id]))
 				{
 					$new_engines[] = array(
-						'name' => trim($smcFunc['htmlspecialchars']($searchengine, ENT_COMPAT)),
-						'url' => trim($smcFunc['htmlspecialchars']($_POST['engine_url'][$id], ENT_COMPAT)),
-						'separator' => trim($smcFunc['htmlspecialchars'](!empty($_POST['engine_separator'][$id]) ? $_POST['engine_separator'][$id] : '+', ENT_COMPAT)),
+						'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
+						'url' => trim(Util::htmlspecialchars($_POST['engine_url'][$id], ENT_COMPAT)),
+						'separator' => trim(Util::htmlspecialchars(!empty($_POST['engine_separator'][$id]) ? $_POST['engine_separator'][$id] : '+', ENT_COMPAT)),
 					);
 				}
 			}

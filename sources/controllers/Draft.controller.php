@@ -81,7 +81,7 @@ class Draft_Controller
 	 */
 	function action_showProfileDrafts($draft_type = 0)
 	{
-		global $txt, $scripturl, $modSettings, $context, $smcFunc;
+		global $txt, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID();
 
@@ -136,7 +136,7 @@ class Draft_Controller
 			if (empty($row['body']))
 				$row['body'] = '';
 
-			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			$row['subject'] = Util::htmltrim($row['subject']);
 			if (empty($row['subject']))
 				$row['subject'] = $txt['drafts_none'];
 
@@ -192,7 +192,7 @@ class Draft_Controller
 	 */
 	function action_showPMDrafts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context, $smcFunc;
+		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID(false);
 		// @todo: is necessary? Added because the default was -1
@@ -260,7 +260,7 @@ class Draft_Controller
 			if (empty($row['body']))
 				$row['body'] = '';
 
-			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			$row['subject'] = Util::htmltrim($row['subject']);
 			if (empty($row['subject']))
 				$row['subject'] = $txt['no_subject'];
 
@@ -324,7 +324,7 @@ class Draft_Controller
  */
 function saveDraft()
 {
-	global $context, $user_info, $modSettings, $board, $smcFunc;
+	global $context, $user_info, $modSettings, $board;
 
 	// ajax calling
 	if (!isset($context['drafts_save']))
@@ -365,14 +365,14 @@ function saveDraft()
 	$draft['smileys_enabled'] = isset($_POST['ns']) ? (int) $_POST['ns'] : 0;
 	$draft['locked'] = isset($_POST['lock']) ? (int) $_POST['lock'] : 0;
 	$draft['sticky'] = isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0;
-	$draft['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-	$draft['body'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
+	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 	$draft['id_member'] = $user_info['id'];
 
 	// the message and subject still need a bit more work
 	preparsecode($draft['body']);
-	if ($smcFunc['strlen']($draft['subject']) > 100)
-		$draft['subject'] = $smcFunc['substr']($draft['subject'], 0, 100);
+	if (Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
 	if (!empty($id_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])
@@ -424,7 +424,7 @@ function saveDraft()
  */
 function savePMDraft($recipientList)
 {
-	global $context, $user_info, $modSettings, $smcFunc;
+	global $context, $user_info, $modSettings;
 
 	// ajax calling
 	if (!isset($context['drafts_pm_save']))
@@ -468,14 +468,14 @@ function savePMDraft($recipientList)
 	$draft['id_pm_draft'] = $id_pm_draft;
 	$draft['reply_id'] = empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'];
 	$draft['outbox'] = empty($_POST['outbox']) ? 0 : 1;
-	$draft['body'] = $smcFunc['htmlspecialchars']($_POST['message'], ENT_QUOTES);
-	$draft['subject'] = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 	$draft['id_member'] = $user_info['id'];
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
-	if ($smcFunc['strlen']($draft['subject']) > 100)
-		$draft['subject'] = $smcFunc['substr']($draft['subject'], 0, 100);
+	if (Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing PM draft?
 	if (!empty($id_pm_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])

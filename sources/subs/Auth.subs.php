@@ -286,7 +286,7 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -298,7 +298,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	foreach ($names as $i => $name)
 	{
 		// Trim, and fix wildcards for each name.
-		$names[$i] = trim($smcFunc['strtolower']($name));
+		$names[$i] = trim(Util::strtolower($name));
 
 		$maybe_email |= strpos($name, '@') !== false;
 
@@ -433,12 +433,12 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $txt, $user_info, $smcFunc;
+	global $txt, $user_info;
 
 	$errors = array();
 
 	// Don't use too long a name.
-	if ($smcFunc['strlen']($username) > 25)
+	if (Util::strlen($username) > 25)
 		$errors[] = array('lang', 'error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -485,10 +485,10 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// Perform basic requirements first.
-	if ($smcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 		return 'short';
 
 	// Is this enough?
@@ -498,7 +498,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 		return 'restricted_words';
-	elseif ($smcFunc['strpos']($password, $username) !== false)
+	elseif (Util::strpos($password, $username) !== false)
 		return 'restricted_words';
 
 	// If just medium, we're done.
@@ -507,7 +507,7 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= $smcFunc['strtolower']($password) != $password;
+	$good &= Util::strtolower($password) != $password;
 
 	return $good ? null : 'chars';
 }

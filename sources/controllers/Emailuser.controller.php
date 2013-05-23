@@ -367,7 +367,7 @@ class Emailuser_Controller
 	 */
 	function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context, $smcFunc;
+		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
 
 		$db = database();
 
@@ -387,11 +387,11 @@ class Emailuser_Controller
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
+		if (!isset($_POST['comment']) || Util::htmltrim($_POST['comment']) === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
 
-		if ($smcFunc['strlen']($poster_comment) > 254)
+		if (Util::strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
 
 		// Guests need to provide their address!

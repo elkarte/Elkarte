@@ -744,7 +744,7 @@ function cache_getRecentEvents($eventOptions)
  */
 function validateEventPost()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	if (!isset($_POST['deleteevent']))
 	{
@@ -789,10 +789,10 @@ function validateEventPost()
 			fatal_lang_error('invalid_date', false);
 
 		// No title?
-		if ($smcFunc['htmltrim']($_POST['evtitle']) === '')
+		if (Util::htmltrim($_POST['evtitle']) === '')
 			fatal_lang_error('no_event_title', false);
-		if ($smcFunc['strlen']($_POST['evtitle']) > 100)
-			$_POST['evtitle'] = $smcFunc['substr']($_POST['evtitle'], 0, 100);
+		if (Util::strlen($_POST['evtitle']) > 100)
+			$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);
 		$_POST['evtitle'] = str_replace(';', '', $_POST['evtitle']);
 	}
 }
@@ -838,12 +838,10 @@ function getEventPoster($event_id)
  */
 function insertEvent(&$eventOptions)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Add special chars to the title.
-	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Add some sanity checking to the span.
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
@@ -898,12 +896,10 @@ function insertEvent(&$eventOptions)
  */
 function modifyEvent($event_id, &$eventOptions)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Properly sanitize the title.
-	$eventOptions['title'] = $smcFunc['htmlspecialchars']($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Scan the start date for validity and get its components.
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)

@@ -176,7 +176,7 @@ class Memberlist_Controller
 	 */
 	function action_mlall()
 	{
-		global $txt, $scripturl, $modSettings, $context, $smcFunc;
+		global $txt, $scripturl, $modSettings, $context;
 
 		// The chunk size for the cached index.
 		$cache_step_size = 500;
@@ -213,7 +213,7 @@ class Memberlist_Controller
 
 		if (!is_numeric($_REQUEST['start']))
 		{
-			if (preg_match('~^[^\'\\\\/]~u', $smcFunc['strtolower']($_REQUEST['start']), $match) === 0)
+			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($_REQUEST['start']), $match) === 0)
 				fatal_error('Hacker?', false);
 
 			$_REQUEST['start'] = ml_alphaStart($match[0]);
@@ -302,7 +302,7 @@ class Memberlist_Controller
 			$last_letter = '';
 			foreach ($context['members'] as $i => $dummy)
 			{
-				$this_letter = $smcFunc['strtolower']($smcFunc['substr']($context['members'][$i]['name'], 0, 1));
+				$this_letter = Util::strtolower(Util::substr($context['members'][$i]['name'], 0, 1));
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
@@ -320,7 +320,7 @@ class Memberlist_Controller
 	 */
 	function action_mlsearch()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings;
 
 		$db = database();
 
@@ -370,7 +370,7 @@ class Memberlist_Controller
 				'regular_id_group' => 0,
 				'is_activated' => 1,
 				'blank_string' => '',
-				'search' => '%' . strtr($smcFunc['htmlspecialchars']($_POST['search'], ENT_QUOTES), array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
+				'search' => '%' . strtr(Util::htmlspecialchars($_POST['search'], ENT_QUOTES), array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
 				'sort' => $context['columns'][$_REQUEST['sort']]['sort'][$context['sort_direction']],
 			);
 

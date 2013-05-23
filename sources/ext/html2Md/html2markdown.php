@@ -477,7 +477,7 @@ class Convert_Md
 
 		if ($level < 3)
 		{
-			$length = $smcFunc['strlen']($content);
+			$length = Util::strlen($content);
 			$underline = ($level === 1) ? '=' : '-';
 			$markdown = $content . $this->line_end . str_repeat($underline, $length) . $this->line_break;
 		}
@@ -567,7 +567,7 @@ class Convert_Md
 				$align_value = ($th !== null) ? strtolower($th->getAttribute('align')) : false;
 				$align[0][$col] = $align_value === false ? 'left' : $align_value;
 				$value[0][$col] = $this->_get_value($th);
-				$width[0][$col] = $smcFunc['strlen']($this->_get_value($th));
+				$width[0][$col] = Util::strlen($this->_get_value($th));
 
 				// Seed the max col width
 				$max[$col] = $width[0][$col];
@@ -589,7 +589,7 @@ class Convert_Md
 					$align_value = ($td !== null) ? strtolower($td->getAttribute('align')) : false;
 					$align[$row][$col] = $align_value === false ? 'left' : $align_value;
 					$value[$row][$col] = $this->_get_value($td);
-					$width[$row][$col] = $smcFunc['strlen']($this->_get_value($td));
+					$width[$row][$col] = Util::strlen($this->_get_value($td));
 
 					// Keep track of the longest col cell as we go
 					if ($width[$row][$col] > $max[$col])
@@ -833,13 +833,13 @@ class Convert_Md
 			{
 				// Add the #width to the output and set up for the next pass
 				$lines[] = $matches[1];
-				$string = $smcFunc['substr']($string, $smcFunc['strlen']($matches[0]));
+				$string = Util::substr($string, Util::strlen($matches[0]));
 			}
 			// Humm just a long word with no place to break, so we simply cut it after width characters
 			else
 			{
-				$lines[] = $smcFunc['substr']($string, 0, $width);
-				$string = $smcFunc['substr']($string, $width);
+				$lines[] = Util::substr($string, 0, $width);
+				$string = Util::substr($string, $width);
 			}
 		}
 
