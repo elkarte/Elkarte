@@ -1320,7 +1320,7 @@ class Database_MySQL implements Database
 	 */
 	function db_server_info()
 	{
-		return mysql_server_info();
+		return mysql_get_server_info();
 	}
 
 	/**
