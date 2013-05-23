@@ -391,7 +391,7 @@ class Emailuser_Controller
 			$report_errors->addError('no_comment');
 		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
 
-		if ($smcFunc['strlen']($poster_comment) > 254)
+		if (Util::strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
 
 		// Guests need to provide their address!

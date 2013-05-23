@@ -186,7 +186,7 @@ class MoveTopic_Controller
 			$custom_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if ($smcFunc['strlen']($custom_subject) > 100)
+			if (Util::strlen($custom_subject) > 100)
 				$custom_subject = Util::substr($custom_subject, 0, 100);
 
 			// If it's still valid move onwards and upwards.

@@ -2348,7 +2348,7 @@ function lastPost()
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	if ($smcFunc['strlen']($row['body']) > 128)
+	if (Util::strlen($row['body']) > 128)
 		$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 	// Send the data.

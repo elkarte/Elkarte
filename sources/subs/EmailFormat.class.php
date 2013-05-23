@@ -157,7 +157,7 @@ class Email_Format
 		for ($i = 0, $num = count($temp); $i < $num; $i++)
 		{
 			$this->_body_array[$i]['content'] = $temp[$i];
-			$this->_body_array[$i]['length'] = $smcFunc['strlen']($temp[$i]);
+			$this->_body_array[$i]['length'] = Util::strlen($temp[$i]);
 
 			// text lists a) 1. etc
 			$this->_body_array[$i]['list_item'] = $this->_in_plainlist($temp[$i]);

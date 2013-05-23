@@ -371,7 +371,7 @@ function saveDraft()
 
 	// the message and subject still need a bit more work
 	preparsecode($draft['body']);
-	if ($smcFunc['strlen']($draft['subject']) > 100)
+	if (Util::strlen($draft['subject']) > 100)
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
@@ -474,7 +474,7 @@ function savePMDraft($recipientList)
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
-	if ($smcFunc['strlen']($draft['subject']) > 100)
+	if (Util::strlen($draft['subject']) > 100)
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing PM draft?

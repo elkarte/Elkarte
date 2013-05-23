@@ -1085,7 +1085,7 @@ class PersonalMessage_Controller
 			$post_errors->addError('no_subject');
 		if (!isset($_REQUEST['message']) || $_REQUEST['message'] == '')
 			$post_errors->addError('no_message');
-		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_REQUEST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_REQUEST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError('long_message');
 		else
 		{
@@ -1531,7 +1531,7 @@ class PersonalMessage_Controller
 			{
 				$_POST['label'] = strtr(Util::htmlspecialchars(trim($_POST['label'])), array(',' => '&#044;'));
 
-				if ($smcFunc['strlen']($_POST['label']) > 30)
+				if (Util::strlen($_POST['label']) > 30)
 					$_POST['label'] = Util::substr($_POST['label'], 0, 30);
 				if ($_POST['label'] != '')
 					$the_labels[] = $_POST['label'];
@@ -1563,7 +1563,7 @@ class PersonalMessage_Controller
 					{
 						$_POST['label_name'][$id] = trim(strtr(Util::htmlspecialchars($_POST['label_name'][$id]), array(',' => '&#044;')));
 
-						if ($smcFunc['strlen']($_POST['label_name'][$id]) > 30)
+						if (Util::strlen($_POST['label_name'][$id]) > 30)
 							$_POST['label_name'][$id] = Util::substr($_POST['label_name'][$id], 0, 30);
 						if ($_POST['label_name'][$id] != '')
 						{

@@ -1974,7 +1974,7 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $smcFunc['strlen'](str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);

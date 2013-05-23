@@ -427,7 +427,7 @@ class Calendar_Controller
 		header('Connection: close');
 		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
-			header('Content-Length: ' . $smcFunc['strlen']($filecontents));
+			header('Content-Length: ' . Util::strlen($filecontents));
 
 		// This is a calendar item!
 		header('Content-Type: text/calendar');

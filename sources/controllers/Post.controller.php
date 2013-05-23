@@ -377,7 +377,7 @@ class Post_Controller
 			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
 
 			// Make sure the subject isn't too long - taking into account special characters.
-			if ($smcFunc['strlen']($form_subject) > 100)
+			if (Util::strlen($form_subject) > 100)
 				$form_subject = Util::substr($form_subject, 0, 100);
 
 			if (isset($_REQUEST['poll']))
@@ -461,7 +461,7 @@ class Post_Controller
 
 				if ($context['preview_message'] === '')
 					$post_errors->addError('no_message');
-				elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($form_message) > $modSettings['max_messageLength'])
+				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($form_message) > $modSettings['max_messageLength'])
 					$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 				// Protect any CDATA blocks.
@@ -1228,7 +1228,7 @@ class Post_Controller
 
 			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
 				$post_errors->addError('no_name');
-			if ($smcFunc['strlen']($_POST['guestname']) > 25)
+			if (Util::strlen($_POST['guestname']) > 25)
 				$post_errors->addError('long_name');
 
 			if (empty($modSettings['guest_post_no_email']))
@@ -1259,7 +1259,7 @@ class Post_Controller
 			$post_errors->addError('no_subject', 0);
 		if (!isset($_POST['message']) || $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
 			$post_errors->addError('no_message');
-		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 		else
 		{
@@ -1363,7 +1363,7 @@ class Post_Controller
 		$_POST['email'] = htmlspecialchars($_POST['email']);
 
 		// At this point, we want to make sure the subject isn't too long.
-		if ($smcFunc['strlen']($_POST['subject']) > 100)
+		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
 		// Make the poll...
@@ -1953,7 +1953,7 @@ class Post_Controller
 			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Maximum number of characters.
-			if ($smcFunc['strlen']($_POST['subject']) > 100)
+			if (Util::strlen($_POST['subject']) > 100)
 				$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 		}
 		elseif (isset($_POST['subject']))
@@ -1969,7 +1969,7 @@ class Post_Controller
 				$post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
-			elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_POST['message']) > $modSettings['max_messageLength'])
+			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			{
 				$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 				unset($_POST['message']);

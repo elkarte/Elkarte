@@ -429,7 +429,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) <= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) <= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -457,7 +457,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) >= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) >= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -485,7 +485,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if ($smcFunc['strlen']($input[$field]) == (int) $validation_parameters)
+		if (Util::strlen($input[$field]) == (int) $validation_parameters)
 			return;
 
 		return array(

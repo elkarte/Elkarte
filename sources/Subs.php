@@ -820,7 +820,7 @@ function shorten_subject($subject, $len)
 	global $smcFunc;
 
 	// It was already short enough!
-	if ($smcFunc['strlen']($subject) <= $len)
+	if (Util::strlen($subject) <= $len)
 		return $subject;
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
@@ -844,7 +844,7 @@ function shorten_text($text, $len = 384, $buffer = 12)
 {
 	global $smcFunc;
 
-	$current = $smcFunc['strlen']($text);
+	$current = Util::strlen($text);
 
 	// Its to long so lets cut it down to size
 	if ($current > $len)
@@ -853,7 +853,7 @@ function shorten_text($text, $len = 384, $buffer = 12)
 		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
 
 		// Always one clown in the audience who likes long words or not using the spacebar
-		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
+		if (Util::strlen($matches[1]) > $len + $buffer)
 			$matches[1] = substr($matches[1], 0, $len);
 
 		return rtrim($matches[1]) . '...';

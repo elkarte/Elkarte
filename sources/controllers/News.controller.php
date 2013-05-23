@@ -446,7 +446,7 @@ class News_Controller
 		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
@@ -612,7 +612,7 @@ class News_Controller
 		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
@@ -862,7 +862,7 @@ function cdata_parse($data, $ns = '')
 
 	$cdata = '<![CDATA[';
 
-	for ($pos = 0, $n = $smcFunc['strlen']($data); $pos < $n; null)
+	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
 			$smcFunc['strpos']($data, '&', $pos),

@@ -82,7 +82,7 @@ class Members_Controller
 			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
 				AND id_member IN ({array_int:buddy_list})' : '') . '
 				AND is_activated IN (1, 11)
-			LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
+			LIMIT ' . (Util::strlen($_REQUEST['search']) <= 2 ? '100' : '800'),
 			array(
 				'buddy_list' => $user_info['buddies'],
 				'search' => $_REQUEST['search'],

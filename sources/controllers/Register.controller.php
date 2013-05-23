@@ -330,7 +330,7 @@ class Register_Controller
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
 			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && $smcFunc['strlen']($_POST['real_name']) < 60)
+			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
 				$possible_strings[] = 'real_name';
 		}
 
@@ -426,7 +426,7 @@ class Register_Controller
 			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
 			{
 				// Is it too long?
-				if ($row['field_length'] && $row['field_length'] < $smcFunc['strlen']($value))
+				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
 					$custom_field_errors[] = array('custom_field_too_long', array($row['field_name'], $row['field_length']));
 
 				// Any masks to apply?

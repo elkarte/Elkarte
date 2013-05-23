@@ -438,7 +438,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
 	$errors = array();
 
 	// Don't use too long a name.
-	if ($smcFunc['strlen']($username) > 25)
+	if (Util::strlen($username) > 25)
 		$errors[] = array('lang', 'error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -488,7 +488,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	global $modSettings, $smcFunc;
 
 	// Perform basic requirements first.
-	if ($smcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 		return 'short';
 
 	// Is this enough?

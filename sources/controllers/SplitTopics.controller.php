@@ -660,7 +660,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	// Move the messages over to the other topic.
 	$new_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 	// Check the subject length.
-	if ($smcFunc['strlen']($new_subject) > 100)
+	if (Util::strlen($new_subject) > 100)
 		$new_subject = Util::substr($new_subject, 0, 100);
 	// Valid subject?
 	if ($new_subject != '')

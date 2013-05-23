@@ -1580,7 +1580,7 @@ function getMember($search, $buddies = array())
 		WHERE real_name LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($search) <= 2 ? '100' : '800'),
+		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
 		array(
 			'buddy_list' => $buddies,
 			'search' => $search,

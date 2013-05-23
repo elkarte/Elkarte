@@ -573,7 +573,7 @@ function action_plushsearch2()
 	if (!isset($search_params['search']) || $search_params['search'] == '')
 		$context['search_errors']['invalid_search_string'] = true;
 	// Too long?
-	elseif ($smcFunc['strlen']($search_params['search']) > $context['search_string_limit'])
+	elseif (Util::strlen($search_params['search']) > $context['search_string_limit'])
 	{
 		$context['search_errors']['string_too_long'] = true;
 	}
@@ -642,7 +642,7 @@ function action_plushsearch2()
 			unset($searchArray[$index]);
 		}
 		// Don't allow very, very short words.
-		elseif ($smcFunc['strlen']($value) < 2)
+		elseif (Util::strlen($value) < 2)
 		{
 			$context['search_errors']['search_string_small_words'] = true;
 			unset($searchArray[$index]);
@@ -2454,7 +2454,7 @@ function prepareSearchContext($reset = false)
 		$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
 		$message['body'] = strip_tags(strtr($message['body'], array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
 
-		if ($smcFunc['strlen']($message['body']) > $charLimit)
+		if (Util::strlen($message['body']) > $charLimit)
 		{
 			if (empty($context['key_words']))
 				$message['body'] = Util::substr($message['body'], 0, $charLimit) . '<strong>...</strong>';

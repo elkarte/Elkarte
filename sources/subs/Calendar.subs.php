@@ -791,7 +791,7 @@ function validateEventPost()
 		// No title?
 		if ($smcFunc['htmltrim']($_POST['evtitle']) === '')
 			fatal_lang_error('no_event_title', false);
-		if ($smcFunc['strlen']($_POST['evtitle']) > 100)
+		if (Util::strlen($_POST['evtitle']) > 100)
 			$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);
 		$_POST['evtitle'] = str_replace(';', '', $_POST['evtitle']);
 	}
