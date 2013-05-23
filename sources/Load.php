@@ -436,7 +436,7 @@ function loadBoard()
 			// So did it find anything?
 			if ($topic !== false)
 			{
-				$topic = $msgOptions['id_topic'];
+				$topic = $topic;
 
 				// Save save save.
 				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
