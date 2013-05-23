@@ -122,7 +122,7 @@ class Template_Layers
 		$this->_sorted_layers = array();
 
 		asort($this->_all_layers);
-		$this->_sorted_layers[] = array_keys($this->_all_layers);
+		$this->_sorted_layers = array_keys($this->_all_layers);
 
 		return $this->_sorted_layers;
 	}
@@ -159,7 +159,7 @@ class Template_Layers
 	public static function getInstance()
 	{
 		if (self::$_instance === null)
-			self::$_instance = new template_layers();
+			self::$_instance = new Template_Layers();
 
 		return self::$_instance;
 	}
