@@ -70,7 +70,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants
-	$settings['theme_variants'] = array('white', 'blue');
+	$settings['theme_variants'] = array('white', 'blue', 'red');
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
@@ -286,7 +286,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . '/logo_elk.png" alt="Elkarte Community" title="Elkarte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="Elkarte Community" title="Elkarte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
