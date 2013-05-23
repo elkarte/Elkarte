@@ -70,7 +70,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants
-	$settings['theme_variants'] = array('white', 'blue');
+	$settings['theme_variants'] = array('white', 'blue', 'red');
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
