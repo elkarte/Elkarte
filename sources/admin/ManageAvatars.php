@@ -82,7 +82,7 @@ class ManageAvatars_Controller
 		Settings_Form::prepare_db($config_vars);
 
 		// Add a layer for the javascript.
-		$context['template_layers'][] = 'avatar_settings';
+		template_layers::getInstance()->add('avatar_settings');
 		$context['sub_template'] = 'show_settings';
 	}
 

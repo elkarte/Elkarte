@@ -194,7 +194,8 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
-	$context['template_layers'] = $ssi_layers;
+	template_layers::getInstance()->removeAll();
+	template_layers::getInstance()->add($ssi_layers);
 	template_header();
 }
 else
