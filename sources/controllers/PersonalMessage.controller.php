@@ -1016,7 +1016,7 @@ class PersonalMessage_Controller
 				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
 				{
 					if (strlen(trim($recipient)) > 0)
-						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars($smcFunc['strtolower'](trim($recipient)));
+						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
 					else
 						unset($namedRecipientList[$recipientType][$index]);
 				}
@@ -1031,9 +1031,9 @@ class PersonalMessage_Controller
 					foreach ($foundMembers as $member)
 					{
 						$testNames = array(
-							$smcFunc['strtolower']($member['username']),
-							$smcFunc['strtolower']($member['name']),
-							$smcFunc['strtolower']($member['email']),
+							Util::strtolower($member['username']),
+							Util::strtolower($member['name']),
+							Util::strtolower($member['email']),
 						);
 
 						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)

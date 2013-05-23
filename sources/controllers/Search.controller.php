@@ -582,7 +582,7 @@ function action_plushsearch2()
 	$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $search_params['search']);
 
 	// Make the query lower case. It's gonna be case insensitive anyway.
-	$stripped_query = un_htmlspecialchars($smcFunc['strtolower']($stripped_query));
+	$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
 
 	// This (hidden) setting will do fulltext searching in the most basic way.
 	if (!empty($modSettings['search_simple_fulltext']))
@@ -783,7 +783,7 @@ function action_plushsearch2()
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if ($smcFunc['strtolower']($s) == $smcFunc['strtolower']($word))
+				if (Util::strtolower($s) == Util::strtolower($word))
 					unset($suggestions[$i]);
 				// Plus, don't suggest something the user thinks is rude!
 				elseif ($suggestions[$i] != censorText($s))
@@ -2057,7 +2057,7 @@ function MessageSearch2()
 	$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $search_params['search']);
 
 	// Make the query lower case since it will case insensitive anyway.
-	$stripped_query = un_htmlspecialchars($smcFunc['strtolower']($stripped_query));
+	$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
 
 	// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
 	preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
@@ -2108,7 +2108,7 @@ function MessageSearch2()
 			unset($searchArray[$index]);
 		}
 
-		$searchArray[$index] = $smcFunc['strtolower'](trim($value));
+		$searchArray[$index] = Util::strtolower(trim($value));
 		if ($searchArray[$index] == '')
 			unset($searchArray[$index]);
 		else

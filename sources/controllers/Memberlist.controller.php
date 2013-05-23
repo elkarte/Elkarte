@@ -213,7 +213,7 @@ class Memberlist_Controller
 
 		if (!is_numeric($_REQUEST['start']))
 		{
-			if (preg_match('~^[^\'\\\\/]~u', $smcFunc['strtolower']($_REQUEST['start']), $match) === 0)
+			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($_REQUEST['start']), $match) === 0)
 				fatal_error('Hacker?', false);
 
 			$_REQUEST['start'] = ml_alphaStart($match[0]);
@@ -302,7 +302,7 @@ class Memberlist_Controller
 			$last_letter = '';
 			foreach ($context['members'] as $i => $dummy)
 			{
-				$this_letter = $smcFunc['strtolower'](Util::substr($context['members'][$i]['name'], 0, 1));
+				$this_letter = Util::strtolower(Util::substr($context['members'][$i]['name'], 0, 1));
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{

@@ -300,7 +300,7 @@ class Groups_Controller
 
 			foreach ($member_names as $index => $member_name)
 			{
-				$member_names[$index] = trim($smcFunc['strtolower']($member_names[$index]));
+				$member_names[$index] = trim(Util::strtolower($member_names[$index]));
 
 				if (strlen($member_names[$index]) == 0)
 					unset($member_names[$index]);

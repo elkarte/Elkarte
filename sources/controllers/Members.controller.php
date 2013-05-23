@@ -70,7 +70,7 @@ class Members_Controller
 		checkSession('get');
 
 		$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search']) . '*';
-		$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search']));
+		$_REQUEST['search'] = trim(Util::strtolower($_REQUEST['search']));
 		$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		if (function_exists('iconv'))

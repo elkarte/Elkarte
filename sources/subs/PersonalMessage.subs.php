@@ -469,7 +469,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = $smcFunc['strtolower'](trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -486,8 +486,8 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
-			if (isset($usernames[$smcFunc['strtolower']($row['member_name'])]))
-				$usernames[$smcFunc['strtolower']($row['member_name'])] = $row['id_member'];
+			if (isset($usernames[Util::strtolower($row['member_name'])]))
+				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
 		$db->free_result($request);
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.

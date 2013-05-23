@@ -1143,7 +1143,7 @@ class Control_Verification_Questions implements Control_Verifications
 				if (!empty($_POST['answer'][$id]))
 					foreach ($_POST['answer'][$id] as $answer)
 					{
-						$answer = trim($smcFunc['strtolower'](Util::htmlspecialchars($answer, ENT_COMPAT)));
+						$answer = trim(Util::strtolower(Util::htmlspecialchars($answer, ENT_COMPAT)));
 						if ($answer != '')
 							$answers[] = $answer;
 					}
@@ -1209,9 +1209,9 @@ class Control_Verification_Questions implements Control_Verifications
 			// Everything lowercase
 			$answers = array();
 			foreach ($row['answer'] as $answer)
-				$answers[] = $smcFunc['strtolower']($answer);
+				$answers[] = Util::strtolower($answer);
 
-			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(Util::htmlspecialchars($smcFunc['strtolower']($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(Util::htmlspecialchars(Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
 				$this->_incorrectQuestions[] = $row['id_question'];
 		}
 

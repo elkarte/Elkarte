@@ -411,7 +411,7 @@ class ManageNews_Controller
 				foreach ($_POST[$type] as $index => $member)
 				{
 					if (strlen(trim($member)) > 0)
-						$_POST[$type][$index] = Util::htmlspecialchars($smcFunc['strtolower'](trim($member)));
+						$_POST[$type][$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
 					else
 						unset($_POST[$type][$index]);
 				}
