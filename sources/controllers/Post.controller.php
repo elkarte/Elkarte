@@ -1000,7 +1000,10 @@ class Post_Controller
 		if ($context['can_post_attachment'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			processAttachments();
+			if (isset($_REQUEST['msg']))
+				processAttachments((int)$_REQUEST['msg']);
+			else
+				processAttachments();
 		}
 
 		// If this isn't a new topic load the topic info that we need.

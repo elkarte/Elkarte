@@ -324,11 +324,14 @@ function attachments_init_dir (&$tree, &$count)
 }
 
 /**
- * Handles the actual saving of attachments to a directory
- * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder
- * Validates the save location actually exists
+ * Handles the actual saving of attachments to a directory.
+ * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
+ * Validates the save location actually exists.
+ *
+ * @param $id_msg = null id of the message with attachments, if any. If null, this is an upload in progress for a new post.
+ *
  */
-function processAttachments()
+function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info;
 
@@ -355,21 +358,8 @@ function processAttachments()
 	if (!isset($initial_error) && !isset($context['attachments']))
 	{
 		// If this isn't a new post, check the current attachments.
-		if (isset($_REQUEST['msg']))
-		{
-			$request = $db->query('', '
-				SELECT COUNT(*), SUM(size)
-				FROM {db_prefix}attachments
-				WHERE id_msg = {int:id_msg}
-					AND attachment_type = {int:attachment_type}',
-				array(
-					'id_msg' => (int) $_REQUEST['msg'],
-					'attachment_type' => 0,
-				)
-			);
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $db->fetch_row($request);
-			$db->free_result($request);
-		}
+		if (!empty($id_msg))
+			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
 		else
 			$context['attachments'] = array(
 				'quantity' => 0,
@@ -2400,7 +2390,7 @@ function setRemovalNotice($messages, $notice)
 
 /**
  * Update an attachment's thumbnail
- * 
+ *
  * @param string $filename
  * @param int $id_attach
  * @param int $id_msg
@@ -2475,4 +2465,48 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	}
 
 	return $attachment;
+}
+
+/**
+ * Compute and return the total size of attachments to a single message.
+ *
+ * @param int $id_msg
+ * @param bool $include_count = true if true, it also returns the attachments count
+ *
+ * @return array
+ */
+function attachmentsSizeForMessage($id_msg, $include_count = true)
+{
+	$db = database();
+
+	if ($include_count)
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*), SUM(size)
+			FROM {db_prefix}attachments
+			WHERE id_msg = {int:id_msg}
+				AND attachment_type = {int:attachment_type}',
+			array(
+				'id_msg' => $id_msg,
+				'attachment_type' => 0,
+			)
+		);
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}attachments
+			WHERE id_msg = {int:id_msg}
+				AND attachment_type = {int:attachment_type}',
+			array(
+				'id_msg' => $id_msg,
+				'attachment_type' => 0,
+			)
+		);
+	}
+	$size = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $size;
 }
