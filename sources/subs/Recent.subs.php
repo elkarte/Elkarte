@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $context, $smcFunc;
+	global $scripturl, $txt, $user_info, $modSettings, $context;
 
 	$db = database();
 
@@ -65,8 +65,8 @@ function getLastPosts($latestPostOptions)
 		censorText($row['body']);
 
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if (Util::strlen($row['body']) > 128)
+			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 		// Build the array.
 		$posts[] = array(

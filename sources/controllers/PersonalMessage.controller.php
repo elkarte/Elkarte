@@ -655,7 +655,7 @@ class PersonalMessage_Controller
 	function action_sendmessage()
 	{
 		global $txt, $scripturl, $modSettings;
-		global $context, $options, $language, $user_info, $smcFunc;
+		global $context, $options, $language, $user_info;
 
 		$db = database();
 
@@ -752,7 +752,7 @@ class PersonalMessage_Controller
 				cache_put_data('response_prefix', $context['response_prefix'], 600);
 			}
 			$form_subject = $row_quoted['subject'];
-			if ($context['reply'] && trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if ($context['reply'] && trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			if (isset($_REQUEST['quote']))
@@ -943,7 +943,7 @@ class PersonalMessage_Controller
 	function action_sendmessage2()
 	{
 		global $txt, $context;
-		global $user_info, $modSettings, $scripturl, $smcFunc;
+		global $user_info, $modSettings, $scripturl;
 
 		$db = database();
 
@@ -1016,7 +1016,7 @@ class PersonalMessage_Controller
 				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
 				{
 					if (strlen(trim($recipient)) > 0)
-						$namedRecipientList[$recipientType][$index] = $smcFunc['htmlspecialchars']($smcFunc['strtolower'](trim($recipient)));
+						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
 					else
 						unset($namedRecipientList[$recipientType][$index]);
 				}
@@ -1031,9 +1031,9 @@ class PersonalMessage_Controller
 					foreach ($foundMembers as $member)
 					{
 						$testNames = array(
-							$smcFunc['strtolower']($member['username']),
-							$smcFunc['strtolower']($member['name']),
-							$smcFunc['strtolower']($member['email']),
+							Util::strtolower($member['username']),
+							Util::strtolower($member['name']),
+							Util::strtolower($member['email']),
 						);
 
 						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)
@@ -1085,7 +1085,7 @@ class PersonalMessage_Controller
 			$post_errors->addError('no_subject');
 		if (!isset($_REQUEST['message']) || $_REQUEST['message'] == '')
 			$post_errors->addError('no_message');
-		elseif (!empty($modSettings['max_messageLength']) && $smcFunc['strlen']($_REQUEST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_REQUEST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError('long_message');
 		else
 		{
@@ -1094,7 +1094,7 @@ class PersonalMessage_Controller
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($smcFunc['htmlspecialchars']($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if (Util::htmltrim(strip_tags(parse_bbc(Util::htmlspecialchars($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 				$post_errors->addError('no_message');
 		}
 
@@ -1120,8 +1120,8 @@ class PersonalMessage_Controller
 		if (isset($_REQUEST['preview']))
 		{
 			// Set everything up to be displayed.
-			$context['preview_subject'] = $smcFunc['htmlspecialchars']($_REQUEST['subject']);
-			$context['preview_message'] = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
+			$context['preview_subject'] = Util::htmlspecialchars($_REQUEST['subject']);
+			$context['preview_message'] = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.
@@ -1493,7 +1493,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagelabels()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -1529,10 +1529,10 @@ class PersonalMessage_Controller
 			// Adding a new label?
 			if (isset($_POST['add']))
 			{
-				$_POST['label'] = strtr($smcFunc['htmlspecialchars'](trim($_POST['label'])), array(',' => '&#044;'));
+				$_POST['label'] = strtr(Util::htmlspecialchars(trim($_POST['label'])), array(',' => '&#044;'));
 
-				if ($smcFunc['strlen']($_POST['label']) > 30)
-					$_POST['label'] = $smcFunc['substr']($_POST['label'], 0, 30);
+				if (Util::strlen($_POST['label']) > 30)
+					$_POST['label'] = Util::substr($_POST['label'], 0, 30);
 				if ($_POST['label'] != '')
 					$the_labels[] = $_POST['label'];
 			}
@@ -1561,10 +1561,10 @@ class PersonalMessage_Controller
 						continue;
 					elseif (isset($_POST['label_name'][$id]))
 					{
-						$_POST['label_name'][$id] = trim(strtr($smcFunc['htmlspecialchars']($_POST['label_name'][$id]), array(',' => '&#044;')));
+						$_POST['label_name'][$id] = trim(strtr(Util::htmlspecialchars($_POST['label_name'][$id]), array(',' => '&#044;')));
 
-						if ($smcFunc['strlen']($_POST['label_name'][$id]) > 30)
-							$_POST['label_name'][$id] = $smcFunc['substr']($_POST['label_name'][$id], 0, 30);
+						if (Util::strlen($_POST['label_name'][$id]) > 30)
+							$_POST['label_name'][$id] = Util::substr($_POST['label_name'][$id], 0, 30);
 						if ($_POST['label_name'][$id] != '')
 						{
 							$the_labels[(int) $id] = $_POST['label_name'][$id];
@@ -1771,7 +1771,7 @@ class PersonalMessage_Controller
 	function action_reportmessage()
 	{
 		global $txt, $context, $scripturl;
-		global $user_info, $language, $modSettings, $smcFunc;
+		global $user_info, $language, $modSettings;
 
 		$db = database();
 
@@ -1889,7 +1889,7 @@ class PersonalMessage_Controller
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => ($smcFunc['strpos']($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),
@@ -1920,7 +1920,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagerules()
 	{
-		global $txt, $context, $user_info, $scripturl, $smcFunc;
+		global $txt, $context, $user_info, $scripturl;
 
 		$db = database();
 
@@ -2011,7 +2011,7 @@ class PersonalMessage_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 
 			// Name is easy!
-			$ruleName = $smcFunc['htmlspecialchars'](trim($_POST['rule_name']));
+			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
 			if (empty($ruleName))
 				fatal_lang_error('pm_rule_no_name', false);
 
@@ -2054,7 +2054,7 @@ class PersonalMessage_Controller
 				elseif ($type == 'gid')
 					$criteria[] = array('t' => 'gid', 'v' => (int) $_POST['ruledefgroup'][$ind]);
 				elseif (in_array($type, array('sub', 'msg')) && trim($_POST['ruledef'][$ind]) != '')
-					$criteria[] = array('t' => $type, 'v' => $smcFunc['htmlspecialchars'](trim($_POST['ruledef'][$ind])));
+					$criteria[] = array('t' => $type, 'v' => Util::htmlspecialchars(trim($_POST['ruledef'][$ind])));
 			}
 
 			// Also do the actions!
@@ -2592,7 +2592,7 @@ function preparePMContext($type = 'subject', $reset = false)
 function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings;
-	global $user_info, $smcFunc;
+	global $user_info;
 
 	$db = database();
 
@@ -2630,8 +2630,8 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	}
 
 	// Set everything up like before....
-	$context['subject'] = isset($_REQUEST['subject']) ? $smcFunc['htmlspecialchars']($_REQUEST['subject']) : '';
-	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), $smcFunc['htmlspecialchars']($_REQUEST['message'])) : '';
+	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
+	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'])) : '';
 	$context['copy_to_outbox'] = !empty($_REQUEST['outbox']);
 	$context['reply'] = !empty($_REQUEST['replied_to']);
 

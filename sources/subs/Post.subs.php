@@ -650,7 +650,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
-	
+
 	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
@@ -693,7 +693,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		while ($row = $db->fetch_assoc($members))
 		{
 			// for this member/board, loop through the topics and see if we should send it
-			foreach ($topicData as $id => $data) 
+			foreach ($topicData as $id => $data)
 			{
 				// Don't send it if its not from the right board
 				if ($data['board'] !== $row['id_board'])
@@ -706,7 +706,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				// If they are not the poster do they want to know?
-				// @todo maybe if they posted via email?  
+				// @todo maybe if they posted via email?
 				if ($type !== 'reply' && $row['notify_types'] == 2)
 					continue;
 
@@ -756,14 +756,14 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 						// In group mode like google group or yahoo group, the mail is from the poster
 						// Otherwise in maillist mode, it is from the site
 						$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($data['name']) : (!empty($modSettings['maillist_sitename']) ? un_htmlspecialchars($modSettings['maillist_sitename']) : $mbname);
-						
+
 						// The email address of the sender, irrespective of the envelope name above
 						$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
 						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $id);
 					}
 					else
 						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $data['last_id']);
-					
+
 					$sent++;
 
 					// make a note that this member was sent this topic
@@ -910,11 +910,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 /**
  * Checks if a user has the correct access to get notifications
- * - validates they have proper group access to a board 
+ * - validates they have proper group access to a board
  * - if using the maillist, checks if they should get a reply-able message
  * 		- not muted
  * 		- has postby_email permission on the board
- * 
+ *
  * Returns false if they do not have the proper group access to a board
  * Sets email_perm to false if they should not get a reply-able message
  *
@@ -2226,7 +2226,7 @@ function notifyMembersBoard(&$topicData)
 			'notify_regularity' => 2,
 		)
 	);
-	// While we have members with board notifications 
+	// While we have members with board notifications
 	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
@@ -2277,7 +2277,7 @@ function notifyMembersBoard(&$topicData)
 				$emailtype .= $send_body ? '_body' : '';
 				$emaildata = loadEmailTemplate((($maillist && $email_perm) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
 				$emailname = (!empty($topicData[$key]['name'])) ? un_htmlspecialchars($topicData[$key]['name']) : null;
-				
+
 				// Maillist style?
 				if ($maillist && $email_perm)
 				{
@@ -2318,7 +2318,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, $smcFunc;
+	global $user_info, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -2348,8 +2348,8 @@ function lastPost()
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	if ($smcFunc['strlen']($row['body']) > 128)
-		$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+	if (Util::strlen($row['body']) > 128)
+		$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 	// Send the data.
 	return array(
@@ -2366,7 +2366,7 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -2413,7 +2413,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.
-			if (trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the message and subject.
@@ -2449,7 +2449,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$form_subject = $first_subject;
 
 			// Add 'Re: ' to the front of the subject.
-			if (trim($context['response_prefix']) != '' && $form_subject != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && $form_subject != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the subject.

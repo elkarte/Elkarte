@@ -117,9 +117,7 @@ class ManageMail_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $smcFunc;
-
-							return $smcFunc[\'strlen\']($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars($smcFunc[\'substr\']($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
+							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
 						'),
 						'class' => 'smalltext',
 					),

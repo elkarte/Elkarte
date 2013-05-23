@@ -172,7 +172,7 @@ class Calendar_Controller
 	function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
-		global $modSettings, $topic, $smcFunc;
+		global $modSettings, $topic;
 
 		$db = database();
 
@@ -213,7 +213,7 @@ class Calendar_Controller
 				$eventOptions = array(
 					'board' => 0,
 					'topic' => 0,
-					'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'member' => $user_info['id'],
 					'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
 					'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
@@ -244,7 +244,7 @@ class Calendar_Controller
 				}
 
 				$eventOptions = array(
-					'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
 					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
 					'board' => isset($id_board) ? (int) $id_board : 0,
@@ -345,7 +345,7 @@ class Calendar_Controller
 	 */
 	function action_ical()
 	{
-		global $forum_version, $context, $modSettings, $webmaster_email, $mbname, $smcFunc;
+		global $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))
@@ -427,7 +427,7 @@ class Calendar_Controller
 		header('Connection: close');
 		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
-			header('Content-Length: ' . $smcFunc['strlen']($filecontents));
+			header('Content-Length: ' . Util::strlen($filecontents));
 
 		// This is a calendar item!
 		header('Content-Type: text/calendar');

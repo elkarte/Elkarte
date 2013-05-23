@@ -946,7 +946,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
-	global $context, $modSettings, $board_info, $settings, $smcFunc;
+	global $context, $modSettings, $board_info, $settings;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1044,14 +1044,14 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'ip2' => htmlspecialchars($profile['member_ip2']),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => $smcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $smcFunc['htmlspecialchars']($profile['real_name'])),
+				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1149,7 +1149,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $ssi_theme, $smcFunc;
+	global $context, $settings, $options, $ssi_theme;
 
 	$db = database();
 
@@ -1403,8 +1403,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['session_var'] = $_SESSION['session_var'];
 	$context['session_id'] = $_SESSION['session_value'];
 	$context['forum_name'] = $mbname;
-	$context['forum_name_html_safe'] = $smcFunc['htmlspecialchars']($context['forum_name']);
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : $smcFunc['htmlspecialchars']($settings['header_logo_url']);
+	$context['forum_name_html_safe'] = Util::htmlspecialchars($context['forum_name']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : Util::htmlspecialchars($settings['header_logo_url']);
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
@@ -2183,7 +2183,7 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $settings, $modSettings, $smcFunc;
+	global $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
 	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
@@ -2219,7 +2219,7 @@ function getLanguages($use_cache = true)
 					continue;
 
 				$languages[$matches[1]] = array(
-					'name' => $smcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
+					'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
 					'selected' => false,
 					'filename' => $matches[1],
 					'location' => $language_dir . '/index.' . $matches[1] . '.php',

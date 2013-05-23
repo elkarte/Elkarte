@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc;
+	global $context, $cur_profile, $memberContext;
 
 	$db = database();
 
@@ -104,7 +104,7 @@ function action_issuewarning()
 		$_POST['warn_reason'] = isset($_POST['warn_reason']) ? trim($_POST['warn_reason']) : '';
 		if ($_POST['warn_reason'] == '' && !$context['user']['is_owner'])
 			$issueErrors[] = 'warning_no_reason';
-		$_POST['warn_reason'] = $smcFunc['htmlspecialchars']($_POST['warn_reason']);
+		$_POST['warn_reason'] = Util::htmlspecialchars($_POST['warn_reason']);
 
 		// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
 		if ($_POST['warning_level'] == 'SAME')
@@ -180,7 +180,7 @@ function action_issuewarning()
 	if (isset($_POST['preview']))
 	{
 		$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
-		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim($smcFunc['htmlspecialchars']($_POST['warn_sub'])) : '';
+		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim(Util::htmlspecialchars($_POST['warn_sub'])) : '';
 		if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
 			$issueErrors[] = 'warning_notify_blank';
 

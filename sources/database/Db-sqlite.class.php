@@ -43,7 +43,7 @@ class Database_SQLite implements Database
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global $db_in_transact, $sqlite_error, $smcFunc;
+		global $db_in_transact, $sqlite_error;
 
 		if (substr($db_name, -3) != '.db')
 			$db_name .= '.db';

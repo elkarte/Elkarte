@@ -48,7 +48,7 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $language, $context, $txt, $smcFunc;
+	global $settings, $language, $context, $txt;
 
 	$db = database();
 
@@ -81,7 +81,7 @@ function list_getLanguages()
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => $smcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
@@ -121,8 +121,6 @@ function list_getLanguages()
  */
 function cleanLangString($string, $to_display = true)
 {
-	global $smcFunc;
-
 	// If going to display we make sure it doesn't have any HTML in it - etc.
 	$new_string = '';
 	if ($to_display)
@@ -216,7 +214,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Unhtml then rehtml the whole thing!
-		$new_string = $smcFunc['htmlspecialchars'](un_htmlspecialchars($new_string));
+		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{
@@ -327,7 +325,7 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $txt, $scripturl, $smcFunc;
+	global $forum_version, $context, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
@@ -350,12 +348,12 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), $smcFunc['strtolower']($context['elk_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), Util::strtolower($context['elk_search_term'])) === false)
 				continue;
 
 			$languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => $smcFunc['ucwords']($file->fetch('name')),
+				'name' => Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),

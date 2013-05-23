@@ -636,7 +636,7 @@ class ManageBans_Controller
 	 */
 	public function action_edit2()
 	{
-		global $context, $smcFunc;
+		global $context;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -658,9 +658,9 @@ class ManageBans_Controller
 			);
 			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($_POST['full_ban']) ? 0 : 1;
-			$ban_info['reason'] = !empty($_POST['reason']) ? $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES) : '';
-			$ban_info['name'] = !empty($_POST['ban_name']) ? $smcFunc['htmlspecialchars']($_POST['ban_name'], ENT_QUOTES) : '';
-			$ban_info['notes'] = isset($_POST['notes']) ? $smcFunc['htmlspecialchars']($_POST['notes'], ENT_QUOTES) : '';
+			$ban_info['reason'] = !empty($_POST['reason']) ? Util::htmlspecialchars($_POST['reason'], ENT_QUOTES) : '';
+			$ban_info['name'] = !empty($_POST['ban_name']) ? Util::htmlspecialchars($_POST['ban_name'], ENT_QUOTES) : '';
+			$ban_info['notes'] = isset($_POST['notes']) ? Util::htmlspecialchars($_POST['notes'], ENT_QUOTES) : '';
 			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
 			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
 			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_post']) ? 0 : 1;
@@ -996,9 +996,7 @@ class ManageBans_Controller
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => create_function('$rowData', '
-					global $smcFunc;
-
-					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'hostname\']), array(\'%\' => \'*\'));
+					return strtr(Util::htmlspecialchars($rowData[\'hostname\']), array(\'%\' => \'*\'));
 				'),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
@@ -1010,9 +1008,7 @@ class ManageBans_Controller
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => create_function('$rowData', '
-					global $smcFunc;
-
-					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'email_address\']), array(\'%\' => \'*\'));
+					return strtr(Util::htmlspecialchars($rowData[\'email_address\']), array(\'%\' => \'*\'));
 				'),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(

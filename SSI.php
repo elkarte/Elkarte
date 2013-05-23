@@ -401,7 +401,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 function ssi_queryPosts($query_where = '', $query_where_params = array(), $query_limit = 10, $query_order = 'm.id_msg DESC', $output_method = 'echo', $limit_body = false, $override_permissions = false)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$db = database();
 
@@ -457,7 +457,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			),
 			'subject' => $row['subject'],
 			'short_subject' => shorten_subject($row['subject'], 25),
-			'preview' => $smcFunc['strlen']($preview) > 128 ? $smcFunc['substr']($preview, 0, 128) . '...' : $preview,
+			'preview' => Util::strlen($preview) > 128 ? Util::substr($preview, 0, 128) . '...' : $preview,
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -507,7 +507,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	$db = database();
 
@@ -568,8 +568,8 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	while ($row = $db->fetch_assoc($request))
 	{
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if (Util::strlen($row['body']) > 128)
+			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 		// Censor the subject.
 		censorText($row['subject']);
@@ -1839,7 +1839,6 @@ function ssi_todaysCalendar($output_method = 'echo')
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
 {
 	global $scripturl, $db_prefix, $txt, $settings, $modSettings, $context;
-	global $smcFunc;
 
 	loadLanguage('Stats');
 
@@ -1938,9 +1937,9 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	while ($row = $db->fetch_assoc($request))
 	{
 		// If we want to limit the length of the post.
-		if (!empty($length) && $smcFunc['strlen']($row['body']) > $length)
+		if (!empty($length) && Util::strlen($row['body']) > $length)
 		{
-			$row['body'] = $smcFunc['substr']($row['body'], 0, $length);
+			$row['body'] = Util::substr($row['body'], 0, $length);
 			$cutoff = false;
 
 			$last_space = strrpos($row['body'], ' ');
@@ -1952,7 +1951,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 				$cutoff = $last_space;
 
 			if ($cutoff !== false)
-				$row['body'] = $smcFunc['substr']($row['body'], 0, $cutoff);
+				$row['body'] = Util::substr($row['body'], 0, $cutoff);
 			$row['body'] .= '...';
 		}
 

@@ -644,7 +644,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings, $smcFunc;
+	global $context, $user_info, $txt, $modSettings;
 	static $non_twelve_hour;
 
 	// Offset the time.
@@ -699,7 +699,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? $smcFunc['ucwords'](strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
 	}
 	else
 	{
@@ -817,14 +817,12 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global $smcFunc;
-
 	// It was already short enough!
-	if ($smcFunc['strlen']($subject) <= $len)
+	if (Util::strlen($subject) <= $len)
 		return $subject;
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
-	return $smcFunc['substr']($subject, 0, $len) . '...';
+	return Util::substr($subject, 0, $len) . '...';
 }
 
 /**
@@ -842,9 +840,7 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-	global $smcFunc;
-
-	$current = $smcFunc['strlen']($text);
+	$current = Util::strlen($text);
 
 	// Its to long so lets cut it down to size
 	if ($current > $len)
@@ -853,7 +849,7 @@ function shorten_text($text, $len = 384, $buffer = 12)
 		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
 
 		// Always one clown in the audience who likes long words or not using the spacebar
-		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
+		if (Util::strlen($matches[1]) > $len + $buffer)
 			$matches[1] = substr($matches[1], 0, $len);
 
 		return rtrim($matches[1]) . '...';
@@ -2636,7 +2632,7 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, $smcFunc;
+	global $context, $settings, $modSettings, $txt;
 
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
@@ -2664,7 +2660,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -2775,7 +2771,7 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings, $smcFunc;
+	global $user_settings;
 
 	static $loaded = false;
 
@@ -2934,8 +2930,8 @@ function setupThemeContext($forceload = false)
 		$context['page_title'] = '';
 
 	// Set some specific vars.
-	$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
-	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $smcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
+	$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? Util::htmlspecialchars($modSettings['meta_keywords']) : '';
 }
 
 /**

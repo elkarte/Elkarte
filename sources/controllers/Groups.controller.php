@@ -202,7 +202,7 @@ class Groups_Controller
 	 */
 	function action_groupmembers()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $settings, $smcFunc;
+		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
 		$db = database();
 
@@ -294,13 +294,13 @@ class Groups_Controller
 			$member_parameters = array();
 
 			// Get all the members to be added... taking into account names can be quoted ;)
-			$_REQUEST['toAdd'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
+			$_REQUEST['toAdd'] = strtr(Util::htmlspecialchars($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $_REQUEST['toAdd'], $matches);
 			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['toAdd']))));
 
 			foreach ($member_names as $index => $member_name)
 			{
-				$member_names[$index] = trim($smcFunc['strtolower']($member_names[$index]));
+				$member_names[$index] = trim(Util::strtolower($member_names[$index]));
 
 				if (strlen($member_names[$index]) == 0)
 					unset($member_names[$index]);

@@ -173,7 +173,7 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards, $smcFunc;
+	global $cat_tree, $boards;
 
 	$db = database();
 

@@ -609,7 +609,7 @@ class Admin_Controller
 	 */
 	public function action_home()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// we need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -724,7 +724,7 @@ class Admin_Controller
 	 */
 	public function action_credits()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// we need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -840,7 +840,7 @@ class Admin_Controller
 	 */
 	public function action_search()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -852,7 +852,7 @@ class Admin_Controller
 		);
 
 		$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subactions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
-		$context['search_term'] = isset($_REQUEST['search_term']) ? $smcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
 
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];

@@ -113,7 +113,7 @@ class MoveTopic_Controller
 	function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
-		global $board, $language, $user_info, $smcFunc;
+		global $board, $language, $user_info;
 
 		$db = database();
 
@@ -183,11 +183,11 @@ class MoveTopic_Controller
 		// Rename the topic...
 		if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$custom_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if ($smcFunc['strlen']($custom_subject) > 100)
-				$custom_subject = $smcFunc['substr']($custom_subject, 0, 100);
+			if (Util::strlen($custom_subject) > 100)
+				$custom_subject = Util::substr($custom_subject, 0, 100);
 
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
@@ -242,7 +242,7 @@ class MoveTopic_Controller
 			if ($user_info['language'] != $language)
 				loadLanguage('index', $language);
 
-			$reason = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
+			$reason = Util::htmlspecialchars($_POST['reason'], ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.

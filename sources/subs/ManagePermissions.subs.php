@@ -1205,11 +1205,9 @@ function clearPostgroupPermissions()
  */
 function copyPermissionProfile($profile_name, $copy_from)
 {
-	global $smcFunc;
-
 	$db = database();
 
-	$profile_name = $smcFunc['htmlspecialchars']($profile_name);
+	$profile_name = Util::htmlspecialchars($profile_name);
 	// Insert the profile itself.
 	$db->insert('',
 		'{db_prefix}permission_profiles',
@@ -1254,11 +1252,9 @@ function copyPermissionProfile($profile_name, $copy_from)
  */
 function renamePermissionProfile($id_profile, $name)
 {
-	global $smcFunc;
-
 	$db = database();
 
-	$name = $smcFunc['htmlspecialchars']($name);
+	$name = Util::htmlspecialchars($name);
 
 	$db->query('', '
 		UPDATE {db_prefix}permission_profiles

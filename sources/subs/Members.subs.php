@@ -436,7 +436,7 @@ function deleteMembers($users, $check_not_admin = false)
 function registerMember(&$regOptions, $return_errors = false)
 {
 	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings, $smcFunc;
+	global $user_info, $options, $settings;
 
 	$db = database();
 
@@ -481,7 +481,7 @@ function registerMember(&$regOptions, $return_errors = false)
 
 	// @todo Separate the sprintf?
 	if (empty($regOptions['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $regOptions['email']) === 0 || strlen($regOptions['email']) > 255)
-		$reg_errors[] = array('done', sprintf($txt['valid_email_needed'], $smcFunc['htmlspecialchars']($regOptions['username'])));
+		$reg_errors[] = array('done', sprintf($txt['valid_email_needed'], Util::htmlspecialchars($regOptions['username'])));
 
 	$username_validation_errors = validateUsername(0, $regOptions['username'], true, !empty($regOptions['check_reserved_name']));
 	if (!empty($username_validation_errors))
@@ -864,12 +864,12 @@ function registerMember(&$regOptions, $return_errors = false)
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
-	global $user_info, $modSettings, $context, $smcFunc;
+	global $user_info, $modSettings, $context;
 
 	$db = database();
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
-	$checkName = $smcFunc['strtolower']($name);
+	$checkName = Util::strtolower($name);
 
 	// Administrators are never restricted ;).
 	if (!allowedTo('moderate_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
@@ -889,10 +889,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 
 			// Case sensitive name?
 			if (empty($modSettings['reserveCase']))
-				$reservedCheck = $smcFunc['strtolower']($reservedCheck);
+				$reservedCheck = Util::strtolower($reservedCheck);
 
 			// If it's not just entire word, check for it in there somewhere...
-			if ($checkMe == $reservedCheck || ($smcFunc['strpos']($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
+			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
 					fatal_lang_error('username_reserved', 'password', array($reserved));
 				else
@@ -1569,8 +1569,6 @@ function getMemberByName($name)
 
 function getMember($search, $buddies = array())
 {
-	global $smcFunc;
-
 	$db = database();
 
 	// Find the member.
@@ -1580,7 +1578,7 @@ function getMember($search, $buddies = array())
 		WHERE real_name LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($search) <= 2 ? '100' : '800'),
+		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
 		array(
 			'buddy_list' => $buddies,
 			'search' => $search,

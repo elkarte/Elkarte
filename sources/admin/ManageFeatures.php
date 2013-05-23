@@ -385,7 +385,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $scripturl, $smcFunc;
+		global $context, $txt, $modSettings, $sig_start, $scripturl;
 
 		// initialize the form
 		$this->_initSignatureSettingsForm();
@@ -436,7 +436,7 @@ class ManageFeatures_Controller
 
 					// Max characters...
 					if (!empty($sig_limits[1]))
-						$sig = $smcFunc['substr']($sig, 0, $sig_limits[1]);
+						$sig = Util::substr($sig, 0, $sig_limits[1]);
 					// Max lines...
 					if (!empty($sig_limits[2]))
 					{
@@ -962,7 +962,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_profileedit()
 	{
-		global $txt, $scripturl, $context, $smcFunc;
+		global $txt, $scripturl, $context;
 
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');
@@ -1021,8 +1021,8 @@ class ManageFeatures_Controller
 			if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
 				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
 
-			$_POST['field_name'] = $smcFunc['htmlspecialchars']($_POST['field_name']);
-			$_POST['field_desc'] = $smcFunc['htmlspecialchars']($_POST['field_desc']);
+			$_POST['field_name'] = Util::htmlspecialchars($_POST['field_name']);
+			$_POST['field_desc'] = Util::htmlspecialchars($_POST['field_desc']);
 
 			// Checkboxes...
 			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
@@ -1052,7 +1052,7 @@ class ManageFeatures_Controller
 				foreach ($_POST['select_option'] as $k => $v)
 				{
 					// Clean, clean, clean...
-					$v = $smcFunc['htmlspecialchars']($v);
+					$v = Util::htmlspecialchars($v);
 					$v = strtr($v, array(',' => ''));
 
 					// Nada, zip, etc...
@@ -1079,7 +1079,7 @@ class ManageFeatures_Controller
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = $smcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($_POST['field_name'], array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.

@@ -1280,7 +1280,7 @@ class Themes_Controller
 	 */
 	function action_install()
 	{
-		global $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
+		global $boardurl, $txt, $context, $settings, $modSettings;
 
 		$db = database();
 
@@ -1392,7 +1392,7 @@ class Themes_Controller
 			$xml_info = '<' . '?xml version="1.0"?' . '>
 	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:smf="http://www.simplemachines.org/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>smf:' . $smcFunc['strtolower'](str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
+		<id>smf:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
 		<version>' . $modSettings['elkVersion'] . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $_REQUEST['copy'] . '</name>

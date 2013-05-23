@@ -449,8 +449,6 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global $smcFunc;
-
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
@@ -491,7 +489,7 @@ function getPackageInfo($gzfilename)
 	$package = $packageInfo->to_array();
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
-	$package['name'] = $smcFunc['htmlspecialchars']($package['name']);
+	$package['name'] = Util::htmlspecialchars($package['name']);
 
 	if (!isset($package['type']))
 		$package['type'] = 'modification';
@@ -3293,7 +3291,6 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
- * @global type $smcFunc
  */
 function checkPackageDependency()
 {

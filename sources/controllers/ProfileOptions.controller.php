@@ -70,7 +70,7 @@ function action_editBuddyIgnoreLists()
 function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext;
 
 	$db = database();
 
@@ -107,7 +107,7 @@ function action_editBuddies($memID)
 		checkSession();
 
 		// Prepare the string for extraction...
-		$_POST['new_buddy'] = strtr($smcFunc['htmlspecialchars']($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_buddy'] = strtr(Util::htmlspecialchars($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_buddy'], $matches);
 		$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_buddy']))));
 
@@ -185,7 +185,7 @@ function action_editBuddies($memID)
 function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext;
 
 	$db = database();
 
@@ -219,7 +219,7 @@ function action_editIgnoreList($memID)
 	{
 		checkSession();
 		// Prepare the string for extraction...
-		$_POST['new_ignore'] = strtr($smcFunc['htmlspecialchars']($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_ignore'] = strtr(Util::htmlspecialchars($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_ignore'], $matches);
 		$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_ignore']))));
 
